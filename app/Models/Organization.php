@@ -8,7 +8,7 @@ class Organization extends Model
 {
     //
 
-    protected $fillable = ['nama', 'code','email', 'telno', 'address', 'postcode', 'state'];
+    protected $fillable = ['nama','email', 'telno', 'address', 'postcode', 'state'];
 
     public $timestamps = false;
 }
