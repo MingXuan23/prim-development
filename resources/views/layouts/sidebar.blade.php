@@ -37,6 +37,13 @@
                 </li> -->
 
                 <li>
+                    <a href="{{ route('org.index') }}" class=" waves-effect">
+                        <i class="ti-clipboard"></i>
+                        <span>Organisasi</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('school.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Sekolah</span>
