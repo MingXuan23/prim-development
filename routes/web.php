@@ -36,7 +36,7 @@ Route::resources([
     'parent'    => 'ParentController',
     'pay'       => 'PayController',
     'org'       => 'OrganizationController',
-    'donate'    => 'DonationController',
+    'donate'    => 'DonationController'
 ]);
 
 Route::post('payment','PayController@paymentProcess')->name('payment');
