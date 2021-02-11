@@ -19,10 +19,7 @@ class CreateDonationsTable extends Migration
             $table->string('description')->nullable();
             $table->string('amount')->nullable();
             $table->date('date_created')->nullable();
-
-            // $table->integer('organ_id');
-            $table->unsignedBigInteger('organ_id');
-            $table->foreign('organ_id')->references('id')->on('organizations')->onDelete('cascade');
+            $table->string('status')->nullable();
         });
     }
 
@@ -33,9 +30,6 @@ class CreateDonationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('donations', function (Blueprint $table)
-        {
-            $table->drop('organ_id');
-        });
+        Schema::dropIfExists('donations');
     }
 }
