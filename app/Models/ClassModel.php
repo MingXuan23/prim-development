@@ -12,5 +12,4 @@ class ClassModel extends Model
     protected $fillable = ['nama', 'levelid'];
 
     public $timestamps = false;
-
 }
