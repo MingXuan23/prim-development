@@ -17,6 +17,13 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('donate.index') }}" class=" waves-effect">
+                        <i class="ti-clipboard"></i>
+                        <span>Derma</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('jaim.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>JAIM</span>
