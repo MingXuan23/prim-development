@@ -35,6 +35,7 @@ Route::resources([
     'jaim'      => 'UserJaimController',
     'parent'    => 'ParentController',
     'pay'       => 'PayController',
+    'org'       => 'OrganizationController',
 ]);
 
 Route::post('payment','PayController@paymentProcess')->name('payment');
