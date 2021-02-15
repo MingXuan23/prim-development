@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+@include('layouts.datatable');
 @endsection
 
 @section('content')
@@ -48,32 +49,36 @@
                 <br />
             </div> --}}
             <div class="table-responsive">
-                <table id="organzationTable" class="table table-bordered table-striped">
-                    <tr style="text-align:center">
-                        <th>Nama Organisasi</th>
-                        <th>No Telefon</th>
-                        <th>Email</th>
-                        <th>Alamat</th>
-                        <th>Action</th>
-                    </tr>
+                <table id="organizationTable" class="table table-bordered table-striped">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th>Nama Organisasi</th>
+                            <th>No Telefon</th>
+                            <th>Email</th>
+                            <th>Alamat</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
 
-                    @foreach($listorg as $row)
-                    <tr id="row{{$row->id}}">
-                        <td>{{ $row->nama }}</td>
-                        <td>{{ $row->telno }}</td>
-                        <td>{{ $row->email }}</td>
-                        <td>{{ $row->address }}</td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <a href="{{ route('organization.edit', $row->id ) }}"
-                                    class="btn btn-primary m-1">Edit</a>
-                                <button id="{{ $row->id }}" data-token="{{ csrf_token() }}"
-                                    class="btn btn-danger m-1">Delete</button>
-                            </div>
-                        </td>
+                    <tbody>
+                        @foreach($listorg as $row)
+                        <tr id="row{{$row->id}}">
+                            <td>{{ $row->nama }}</td>
+                            <td>{{ $row->telno }}</td>
+                            <td>{{ $row->email }}</td>
+                            <td>{{ $row->address }}</td>
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    <a href="{{ route('organization.edit', $row->id ) }}"
+                                        class="btn btn-primary m-1">Edit</a>
+                                    <button id="{{ $row->id }}" data-token="{{ csrf_token() }}"
+                                        class="btn btn-danger m-1">Padam</button>
+                                </div>
+                            </td>
 
-                    </tr>
-                    @endforeach
+                        </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -86,15 +91,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Delete Organization</h4>
+                <h4 class="modal-title">Padam Organisasi</h4>
             </div>
             <div class="modal-body">
-                Are you sure want to delete this organization?
+                Adakah anda pasti?
             </div>
             <div class="modal-footer">
                 <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
-                    name="delete">Delete</button>
-                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+                    name="delete">Padam</button>
+                <button type="button" data-dismiss="modal" class="btn">Batal</button>
             </div>
         </div>
     </div>
@@ -114,44 +119,53 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    // csrf token for ajax
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
+    $(document).ready( function () {
+        $('#organzationTable').DataTable({
+            ordering: true
+        });
 
-    var organization_id
-
-    $(document).on('click', '.btn-danger', function(){
-        organization_id = $(this).attr('id');
-        $('#deleteConfirmationModal').modal('show');
-        console.log(organization_id);
-    });
-
-    $('#delete').click(function() {
-        $.ajax({
-            type: "DELETE",
-            url: "/organization/" + organization_id,
-            beforeSend: function() {
-                $('#delete').text('Deleting...');
-            },
-            success: function(data) {
-                setTimeout(function() {
-                    $('#confirmModal').modal('hide');
-                }, 2000);
-                
-                console.log("success");
-                $("#row" + organization_id).remove();
-            },
-            error: function (data) {
-                console.log('Error:', data);
+        // csrf token for ajax
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
-        })
-    });
+        });
 
-    $('.alert').delay(3000).fadeOut();
+        var organization_id;
 
+        $(document).on('click', '.btn-danger', function(){
+            organization_id = $(this).attr('id');
+            $('#deleteConfirmationModal').modal('show');
+        });
+
+        $('#delete').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    _method: 'DELETE'
+                },
+                url: "/organization/" + organization_id,
+                beforeSend: function() {
+                    $('#delete').text('Padam...');
+                },
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+
+                    
+                    
+                    $('#organizationTable').DataTable().clear().draw();
+                },
+                error: function (data) {
+                    console.log('Error:', data);
+                }
+            })
+        });
+
+        $('.alert').delay(3000).fadeOut();
+    } );
 
 </script>
 @endsection
