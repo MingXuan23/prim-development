@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class OrganizationController extends Controller
 {
@@ -42,7 +43,6 @@ class OrganizationController extends Controller
      */
     public function store(Request $request)
     {
-        //
         $this->validate($request, [
             'name'         =>  'required',
             // 'code'         =>  'required',
@@ -53,7 +53,7 @@ class OrganizationController extends Controller
             'state'        =>  'required',
         ]);
 
-        $org = new Organization([
+        $organization = Organization::create([
             'nama'         =>  $request->get('name'),
             // 'code'         =>  '',
             'telno'        =>  $request->get('telno'),
@@ -63,8 +63,10 @@ class OrganizationController extends Controller
             'state'        =>  $request->get('state'),
         ]);
 
-        $org->save();
-        return redirect('/org')->with('success', 'New organization has been added successfully');
+        // $organization->organizationRole()->attach(4);
+        $organization->user()->attach(Auth::id());
+
+        return redirect('/organization')->with('success', 'New organization has been added successfully');
     }
 
     /**
@@ -128,7 +130,7 @@ class OrganizationController extends Controller
                 ]
             );
 
-        return redirect('/org')->with('success', 'The data has been updated!');
+        return redirect('/organization')->with('success', 'The data has been updated!');
     }
 
     /**
@@ -139,6 +141,12 @@ class OrganizationController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $result = Organization::destroy($id);
+
+        if ($result) {
+            return redirect('organization')->with('success', 'Organization Delete Successfully');
+        } else {
+            return redirect('organization')->with('failed', 'Organization Delete Failed');
+        }
     }
 }

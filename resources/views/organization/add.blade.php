@@ -29,7 +29,7 @@
             </div>
             @endif
             {{-- {{ route('sekolah.store') }} --}}
-            <form method="post" action="{{ route('org.store') }} " enctype="multipart/form-data">
+            <form method="post" action="{{ route('organization.store') }} " enctype="multipart/form-data">
                 {{csrf_field()}}
                 <div class="card-body">
                     <div class="form-group">

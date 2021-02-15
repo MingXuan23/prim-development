@@ -35,7 +35,7 @@ Route::resources([
     'jaim'      => 'UserJaimController',
     'parent'    => 'ParentController',
     'pay'       => 'PayController',
-    'org'       => 'OrganizationController',
+    'organization'       => 'OrganizationController',
     'donate'    => 'DonationController'
 ]);
 
