@@ -21,8 +21,8 @@
             {{-- <div class="card-header">List Of Applications</div> --}}
             <div>
                 {{-- route('sekolah.create')  --}}
-                <a style="margin: 19px; float: right;" href="{{ route('org.create') }}" class="btn btn-primary"> <i
-                        class="fas fa-plus"></i> Tambah Organisasi</a>
+                <a style="margin: 19px; float: right;" href="{{ route('organization.create') }}"
+                    class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Organisasi</a>
             </div>
 
             <div class="card-body">
@@ -48,7 +48,7 @@
                 <br />
             </div> --}}
             <div class="table-responsive">
-                <table class="table table-bordered table-striped">
+                <table id="organzationTable" class="table table-bordered table-striped">
                     <tr style="text-align:center">
                         <th>Nama Organisasi</th>
                         <th>No Telefon</th>
@@ -58,14 +58,17 @@
                     </tr>
 
                     @foreach($listorg as $row)
-                    <tr>
+                    <tr id="row{{$row->id}}">
                         <td>{{ $row->nama }}</td>
                         <td>{{ $row->telno }}</td>
                         <td>{{ $row->email }}</td>
                         <td>{{ $row->address }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
-                                <a href="{{ route('org.edit', $row->id ) }}" class="btn btn-primary m-1">Edit</a>
+                                <a href="{{ route('organization.edit', $row->id ) }}"
+                                    class="btn btn-primary m-1">Edit</a>
+                                <button id="{{ $row->id }}" data-token="{{ csrf_token() }}"
+                                    class="btn btn-danger m-1">Delete</button>
                             </div>
                         </td>
 
@@ -78,6 +81,25 @@
 
 </div>
 </div>
+{{-- confirmation delete modal --}}
+<div id="deleteConfirmationModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Organization</h4>
+            </div>
+            <div class="modal-body">
+                Are you sure want to delete this organization?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
+                    name="delete">Delete</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- end confirmation delete modal --}}
 
 @endsection
 
@@ -90,4 +112,46 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
+<script>
+    // csrf token for ajax
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    var organization_id
+
+    $(document).on('click', '.btn-danger', function(){
+        organization_id = $(this).attr('id');
+        $('#deleteConfirmationModal').modal('show');
+        console.log(organization_id);
+    });
+
+    $('#delete').click(function() {
+        $.ajax({
+            type: "DELETE",
+            url: "/organization/" + organization_id,
+            beforeSend: function() {
+                $('#delete').text('Deleting...');
+            },
+            success: function(data) {
+                setTimeout(function() {
+                    $('#confirmModal').modal('hide');
+                }, 2000);
+                
+                console.log("success");
+                $("#row" + organization_id).remove();
+            },
+            error: function (data) {
+                console.log('Error:', data);
+            }
+        })
+    });
+
+    $('.alert').delay(3000).fadeOut();
+
+
+</script>
 @endsection

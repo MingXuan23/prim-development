@@ -44,7 +44,7 @@
                 </li> -->
 
                 <li>
-                    <a href="{{ route('org.index') }}" class=" waves-effect">
+                    <a href="{{ route('organization.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Organisasi</span>
                     </a>

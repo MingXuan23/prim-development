@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta content="Parental Relationship Information Management" name="description" />
         <meta content="UTeM" name="author" />
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
         <!-- App favicon -->
         <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/favicon16x16-transparent.png')}}">
         @include('layouts.head')
