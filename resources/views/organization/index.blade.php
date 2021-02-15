@@ -154,8 +154,6 @@
                         $('#confirmModal').modal('hide');
                     }, 2000);
 
-                    
-                    
                     $('#organizationTable').DataTable().clear().draw();
                 },
                 error: function (data) {
