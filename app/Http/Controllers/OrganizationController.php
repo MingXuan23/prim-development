@@ -17,10 +17,12 @@ class OrganizationController extends Controller
      */
     public function index()
     {
-        //
-        $listorg = DB::table('organizations')
-            ->orderBy('nama')
-            ->get();
+
+        $userId = Auth::id();
+
+        $listorg = Organization::whereHas('user', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
 
         return view('organization.index', compact('listorg'));
     }
@@ -56,7 +58,6 @@ class OrganizationController extends Controller
 
         $organization = Organization::create([
             'nama'         =>  $request->get('name'),
-            // 'code'         =>  '',
             'telno'        =>  $request->get('telno'),
             'email'        =>  $request->get('email'),
             'address'      =>  $request->get('address'),
@@ -141,12 +142,18 @@ class OrganizationController extends Controller
      */
     public function destroy($id)
     {
-        $result = Organization::destroy($id);
+        $result = Organization::find($id)->delete();
 
         if ($result) {
-            return redirect('organization')->with('success', 'Organization Delete Successfully');
+            return response()->json([
+                'status' => 'success',
+                'msg' => 'Organization Delete Successfully'
+            ]);
         } else {
-            return redirect('organization')->with('failed', 'Organization Delete Failed');
+            return response()->json([
+                'status' => 'failed',
+                'msg' => 'Organization Delete Failed'
+            ]);
         }
     }
 }
