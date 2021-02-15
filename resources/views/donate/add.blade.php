@@ -38,7 +38,8 @@
 
                 <div class="form-group">
                     <label>Penerangan</label>
-                    <textarea name="description" class="form-control" placeholder="Penerangan" cols="30" rows="5"></textarea>
+                    <textarea name="description" class="form-control" placeholder="Penerangan" cols="30"
+                        rows="5"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -65,9 +66,7 @@
 @section('script')
 <!-- Peity chart-->
 <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
-
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 @endsection
