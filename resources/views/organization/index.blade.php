@@ -32,16 +32,18 @@
                 <div class="alert alert-danger">
                     <ul>
                         @foreach($errors->all() as $error)
-                        <li>{{$error}}</li>
+                        <li id="failed">{{$error}}</li>
                         @endforeach
                     </ul>
                 </div>
                 @endif
                 @if(\Session::has('success'))
                 <div class="alert alert-success">
-                    <p>{{ \Session::get('success') }}</p>
+                    <p id="success">{{ \Session::get('success') }}</p>
                 </div>
                 @endif
+
+                <div class="flash-message"></div>
 
                 {{-- <div align="right">
                             <a href="{{route('admin.create')}}" class="btn btn-primary">Add</a>
@@ -120,7 +122,7 @@
 
 <script>
     $(document).ready( function () {
-        $('#organzationTable').DataTable({
+        $('#organizationTable').DataTable({
             ordering: true
         });
 
@@ -141,7 +143,7 @@
         $('#delete').click(function() {
             $.ajax({
                 type: 'POST',
-                dataType: 'json',
+                dataType: 'html',
                 data: {
                     _method: 'DELETE'
                 },
@@ -154,15 +156,17 @@
                         $('#confirmModal').modal('hide');
                     }, 2000);
 
+                    $('div.flash-message').html(data);
+
                     $('#organizationTable').DataTable().clear().draw();
                 },
                 error: function (data) {
                     console.log('Error:', data);
+                    $('div.flash-message').html(data);
                 }
             })
         });
 
-        $('.alert').delay(3000).fadeOut();
     } );
 
 </script>
