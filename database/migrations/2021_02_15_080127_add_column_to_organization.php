@@ -15,6 +15,7 @@ class AddColumnToOrganization extends Migration
     {
         Schema::table('organizations', function (Blueprint $table) {
             $table->softDeletes();
+            
         });
     }
 
