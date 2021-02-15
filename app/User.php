@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Models\Organization;
+use App\Models\OrganizationRole;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -42,6 +43,10 @@ class User extends Authenticatable
     public function organization()
     {
         return $this->belongsToMany(Organization::class, 'organization_user');
+    }
+
+    public function organizationRole() {
+        return $this->belongsToMany(OrganizationRole::class, 'organization_user','', 'role_id');
     }
     
 }
