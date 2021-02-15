@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+@include('layouts.datatable')
 @endsection
 
 @section('content')
@@ -48,43 +49,49 @@
                 <br />
             </div> --}}
             <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <tr style="text-align:center">
-                        <th> No. </th>
-                        <th> Nama Derma </th>
-                        <th> Penerangan </th>
-                        <th> Harga (RM) </th>
-                        <th> Status </th>
-                        <th> Action </th>
-                    </tr>
+                <table id="donationTable" class="table table-bordered table-striped">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th> No. </th>
+                            <th> Nama Derma </th>
+                            <th> Penerangan </th>
+                            <th> Harga (RM) </th>
+                            <th> Status </th>
+                            <th> Action </th>
+                        </tr>
+                    </thead>
 
-                    @foreach($donate as $row)
-                    <tr>
-                        <td>{{ $loop->iteration }}.</td>
-                        <td>{{$row['nama']}}</td>
-                        <td>{{$row['description']}}</td>
-                        <td> {{ number_format($row['amount'], 2) ?? '0' }} </td>
-                        @if($row['status'] =='1')
-                        <td style="text-align: center">
-                            <p class="btn btn-success m-1"> Aktif </p>
-                        </td>
-                        @else
-                        <td style="text-align: center">
-                            <p class="btn btn-danger m-1"> Tidak Aktif </p>
-                        </td>
-                        @endif
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                {{-- <a href="{{ route('school.edit', $row['id']) }}" class="btn btn-primary
-                                m-1">Edit</a> --}}
-                                <a href="{{ route('donate.edit', $row['id']) }}" class="btn btn-primary m-1">Edit</a>
+                    <tbody>
+                        @foreach($donate as $row)
+                        <tr>
+                            <td>{{ $loop->iteration }}.</td>
+                            <td>{{$row['nama']}}</td>
+                            <td>{{$row['description']}}</td>
+                            <td> {{ number_format($row['amount'], 2) ?? '0' }} </td>
+                            @if($row['status'] =='1')
+                            <td style="text-align: center">
+                                <p class="btn btn-success m-1"> Aktif </p>
+                            </td>
+                            @else
+                            <td style="text-align: center">
+                                <p class="btn btn-danger m-1"> Tidak Aktif </p>
+                            </td>
+                            @endif
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    {{-- <a href="{{ route('school.edit', $row['id']) }}" class="btn btn-primary
+                                    m-1">Edit</a> --}}
+                                    <a href="{{ route('donate.edit', $row['id']) }}"
+                                        class="btn btn-primary m-1">Edit</a>
 
-                                <button class="btn btn-danger m-1" onclick="return confirm('Adakah anda pasti ?')">Buang</button>
-                            </div>
-                        </td>
+                                    <button class="btn btn-danger m-1"
+                                        onclick="return confirm('Adakah anda pasti ?')">Buang</button>
+                                </div>
+                            </td>
 
-                    </tr>
-                    @endforeach
+                        </tr>
+                        @endforeach
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -104,4 +111,12 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#donationTable').DataTable({
+            ordering: true
+        });
+    });
+</script>
 @endsection

@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
-use App\Models\OrganizationRole;
 
 class Organization extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state'];
 
     public $timestamps = false;
+
+    protected $dates = ['deleted_at'];
 
     public function user()
     {
