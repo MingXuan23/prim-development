@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organization;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -63,8 +64,7 @@ class OrganizationController extends Controller
             'state'        =>  $request->get('state'),
         ]);
 
-        // $organization->organizationRole()->attach(4);
-        $organization->user()->attach(Auth::id());
+        $organization->user()->attach(Auth::id(), ['role_id' => 2]);
 
         return redirect('/organization')->with('success', 'New organization has been added successfully');
     }
