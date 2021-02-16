@@ -25,7 +25,6 @@ Route::post('parent/fetchClass', 'ParentController@fetchClass')->name('parent.fe
 Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchStd');
 
 Route::get('donationlist', 'DonationController@indexDerma')->name('donate.donationlist');
-Route::post('donate/fetchDonation', 'DonationController@fetchDonation')->name('donate.fetchDonation');
 
 
 // Route::get('{id}',['uses'=>'FeesDetailsController@getFees']);
