@@ -52,6 +52,7 @@
                 <table id="donationTable" class="table table-bordered table-striped">
                     <thead>
                         <tr style="text-align:center">
+                            <th> No. </th>
                             <th> Nama Derma </th>
                             <th> Penerangan </th>
                             <th> Harga (RM) </th>
@@ -63,6 +64,7 @@
                     <tbody>
                         @foreach($donate as $row)
                         <tr>
+                            <td>{{ $loop->iteration }}.</td>
                             <td>{{$row['nama']}}</td>
                             <td>{{$row['description']}}</td>
                             <td> {{ number_format($row['amount'], 2) ?? '0' }} </td>

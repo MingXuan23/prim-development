@@ -20,23 +20,27 @@ Route::get('/form', 'HomeController@form');
 Route::resource('school','SchoolController');  
 
 Route::get('getdetails/{id}', 'DetailsController@getFees')->name('details.getfees');
+
 Route::post('parent/fetchClass', 'ParentController@fetchClass')->name('parent.fetchClass');
 Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchStd');
 
+Route::get('donationlist', 'DonationController@indexDerma')->name('donate.donationlist');
+
+
 // Route::get('{id}',['uses'=>'FeesDetailsController@getFees']);
 Route::resources([
-    'school'    => 'SchoolController',
-    'teacher'   => 'TeacherController',
-    'class'     => 'ClassController',
-    'student'   => 'StudentController',
-    'category'  => 'CategoryController',
-    'fees'      => 'FeesController',
-    'details'   => 'DetailsController',
-    'jaim'      => 'UserJaimController',
-    'parent'    => 'ParentController',
-    'pay'       => 'PayController',
+    'school'             => 'SchoolController',
+    'teacher'            => 'TeacherController',
+    'class'              => 'ClassController',
+    'student'            => 'StudentController',
+    'category'           => 'CategoryController',
+    'fees'               => 'FeesController',
+    'details'            => 'DetailsController',
+    'jaim'               => 'UserJaimController',
+    'parent'             => 'ParentController',
+    'pay'                => 'PayController',
     'organization'       => 'OrganizationController',
-    'donate'    => 'DonationController'
+    'donate'             => 'DonationController'
 ]);
 
 Route::post('payment','PayController@paymentProcess')->name('payment');
