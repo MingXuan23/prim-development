@@ -88,34 +88,6 @@
                                 <th> Action </th>
                             </tr>
                         </thead>
-                        {{-- <tbody>
-                            @foreach($donate as $row)
-                            <tr>
-                                <td>{{ $loop->iteration }}. </td>
-                        <td>{{ $row['nama'] }} </td>
-                        <td>{{ $row['description'] }}</td>
-                        <td> {{ number_format($row['amount'] , 2) ?? '0' }} </td>
-                        @if($row['status'] =='1')
-                        <td style="text-align: center">
-                            <p class="btn btn-success m-1"> Aktif </p>
-                        </td>
-                        @else
-                        <td style="text-align: center">
-                            <p class="btn btn-danger m-1"> Tidak Aktif </p>
-                        </td>
-                        @endif
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <a href="{{ route('donate.edit', $row['id']) }}" class="btn btn-primary m-1">Edit</a>
-
-                                <button class="btn btn-danger m-1"
-                                    onclick="return confirm('Adakah anda pasti ?')">Buang</button>
-                            </div>
-                        </td>
-
-                        </tr>
-                        @endforeach
-                        </tbody> --}}
 
                     </table>
                 </div>
@@ -138,7 +110,6 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    
     $(document).ready(function(){
 
         fetch_data();
