@@ -3,11 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Donation extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = ['nama', 'description', 'amount', 'date_created', 'status'];
     public $timestamps = false;
+
+    protected $dates = ['deleted_at'];
 
     public function organization()
     {

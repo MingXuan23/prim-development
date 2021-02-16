@@ -130,6 +130,14 @@ class DonationController extends Controller
 
     public function destroy($id)
     {
-        //
+        $result = Donation::find($id)->delete();
+
+        if ($result) {
+            Session::flash('success', 'Donation Delete Successfully');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Donation Delete Failed');
+            return View::make('layouts/flash-messages');
+        }
     }
 }
