@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Donation extends Model
 {
-    protected $fillable = ['nama', 'description', 'amount', 'date_created', 'status'];
+    protected $fillable = ['nama', 'description', 'date_created', 'date_started', 'date_end', 'status'];
     public $timestamps = false;
 
     public function organization()

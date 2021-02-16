@@ -55,7 +55,8 @@
                             <th> No. </th>
                             <th> Nama Derma </th>
                             <th> Penerangan </th>
-                            <th> Harga (RM) </th>
+                            <th> Tarikh Mula </th>
+                            <th> Tarikh Berakhir </th>
                             <th> Status </th>
                             <th> Action </th>
                         </tr>
@@ -67,7 +68,8 @@
                             <td>{{ $loop->iteration }}.</td>
                             <td>{{$row['nama']}}</td>
                             <td>{{$row['description']}}</td>
-                            <td> {{ number_format($row['amount'], 2) ?? '0' }} </td>
+                            <td>{{$row['date_started']}}</td>
+                            <td>{{$row['date_end']}}</td>
                             @if($row['status'] =='1')
                             <td style="text-align: center">
                                 <p class="btn btn-success m-1"> Aktif </p>
