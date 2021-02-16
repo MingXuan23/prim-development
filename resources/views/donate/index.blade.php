@@ -82,23 +82,58 @@
                 </div>
                 @endif
 
-                <div class="flash-message"></div>
+                {{-- <div align="right">
+                            <a href="{{route('admin.create')}}" class="btn btn-primary">Add</a>
+                <br />
+                <br />
+            </div> --}}
+            <div class="table-responsive">
+                <table id="donationTable" class="table table-bordered table-striped">
+                    <thead>
+                        <tr style="text-align:center">
+                            <th> No. </th>
+                            <th> Nama Derma </th>
+                            <th> Penerangan </th>
+                            <th> Tarikh Mula </th>
+                            <th> Tarikh Berakhir </th>
+                            <th> Status </th>
+                            <th> Action </th>
+                        </tr>
+                    </thead>
 
-                <div class="table-responsive">
-                    <table id="donationTable" class="table table-bordered table-striped">
-                        <thead>
-                            <tr style="text-align:center">
-                                <th> No. </th>
-                                <th> Nama Derma </th>
-                                <th> Penerangan </th>
-                                <th> Harga (RM) </th>
-                                <th> Status </th>
-                                <th> Action </th>
-                            </tr>
-                        </thead>
+                    <tbody>
+                        @foreach($donate as $row)
+                        <tr>
+                            <td>{{ $loop->iteration }}.</td>
+                            <td>{{$row['nama']}}</td>
+                            <td>{{$row['description']}}</td>
+                            <td>{{$row['date_started']}}</td>
+                            <td>{{$row['date_end']}}</td>
+                            @if($row['status'] =='1')
+                            <td style="text-align: center">
+                                <p class="btn btn-success m-1"> Aktif </p>
+                            </td>
+                            @else
+                            <td style="text-align: center">
+                                <p class="btn btn-danger m-1"> Tidak Aktif </p>
+                            </td>
+                            @endif
+                            <td>
+                                <div class="d-flex justify-content-center">
+                                    {{-- <a href="{{ route('school.edit', $row['id']) }}" class="btn btn-primary
+                                    m-1">Edit</a> --}}
+                                    <a href="{{ route('donate.edit', $row['id']) }}"
+                                        class="btn btn-primary m-1">Edit</a>
 
-                    </table>
-                </div>
+                                    <button class="btn btn-danger m-1"
+                                        onclick="return confirm('Adakah anda pasti ?')">Buang</button>
+                                </div>
+                            </td>
+
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
 

@@ -2,6 +2,8 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+@include('layouts.datepicker')
+
 @endsection
 
 @section('content')
@@ -32,6 +34,16 @@
             <div class="card-body">
 
                 <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" disabled selected>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label>Nama Derma</label>
                     <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
                 </div>
@@ -43,9 +55,31 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Harga</label>
-                    <input type="text" name="price" class="form-control" placeholder="Harga">
+                    <label>Tarikh Mula</label>
+
+                    <div id="datepicker-start_date" class="input-group date" data-date-format="mm-dd-yyyy"
+                        data-provide="datepicker">
+                        <input class="form-control" id="start_date" name="start_date" type="text"
+                            placeholder="Pilih Tarikh Mula" autocomplete="off">
+                        <div class="input-group-addon">
+                            <i class="mdi mdi-calendar-today"></i>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="form-group">
+                    <label>Tarikh Berakhir</label>
+
+                    <div id="datepicker-end_date" class="input-group date" data-date-format="mm-dd-yyyy"
+                        data-provide="datepicker">
+                        <input class="form-control" id="end_date" name="end_date" type="text"
+                            placeholder="Pilih Tarikh Berakhir" autocomplete="off">
+                        <div class="input-group-addon">
+                            <i class="mdi mdi-calendar-today"></i>
+                        </div>
+                    </div>
+                </div>
+
 
                 <div class="form-group mb-0">
                     <div>
@@ -69,4 +103,31 @@
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+
+<script>
+    $(document).ready(function(){
+
+        var today = new Date();
+
+        var start = $("#datepicker-start_date").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            startDate: today,
+            todayHighlight:true,
+            format: 'dd-mm-yyyy'
+        });
+
+        $("#datepicker-end_date").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            startDate: today,
+            todayHighlight:true,
+            format: 'dd-mm-yyyy'
+        });
+
+        // console.log($("#start_date").val());
+        
+    });
+</script>
 @endsection
