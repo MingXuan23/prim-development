@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Donation;
 use App\Models\Organization;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class DonationController extends Controller
@@ -70,27 +71,38 @@ class DonationController extends Controller
 
     public function create()
     {
-        return view('donate.add');
+        $organization = Organization::get();
+
+        return view('donate.add', compact('organization'));
     }
 
     public function store(Request $request)
     {
+        // dd($request->get('organization'));
+
         $this->validate($request, [
+            'organization'  =>  'required|not_in:0',
             'name'          =>  'required',
             'description'   =>  'required',
-            'price'         =>  'required|numeric'
+            'start_date'    =>  'required',
+            'end_date'      =>  'required'
         ]);
 
+        $dt = Carbon::now();
+        $startdate  = $dt->toDateString($request->get('start_date')); 
+        $enddate    = $dt->toDateString($request->get('end_date')); 
+        
         $newdonate = new Donation([
             'nama'           =>  $request->get('name'),
             'description'    =>  $request->get('description'),
-            'amount'         =>  $request->get('price'),
             'date_created'   =>  now(),
+            'date_started'   =>  $startdate,
+            'date_end'       =>  $enddate,
             'status'         =>  '1',
         ]);
         $newdonate->save();
 
-        $newdonate->organization()->attach(1);
+        $newdonate->organization()->attach($request->get('organization'));
 
         return redirect('/donate')->with('success', 'New donations has been added successfully');
     }

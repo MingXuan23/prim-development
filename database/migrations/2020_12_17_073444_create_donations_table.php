@@ -17,8 +17,9 @@ class CreateDonationsTable extends Migration
             $table->bigIncrements('id');
             $table->string('nama')->nullable();
             $table->string('description')->nullable();
-            $table->string('amount')->nullable();
             $table->date('date_created')->nullable();
+            $table->date('date_started')->nullable();
+            $table->date('date_end')->nullable();
             $table->string('status')->nullable();
         });
     }
