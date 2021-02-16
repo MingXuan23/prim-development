@@ -15,32 +15,92 @@ class DonationController extends Controller
         return view('donate.index', compact('donate'));
     }
 
-    public function indexDerma()
+    public function indexDerma(Request $request)
     {
+
+        if (request()->ajax()) {
+            $oid = $request->oid;
+
+            if ($oid) {
+                // $data = Donation::whereHas('organization', function ($query) use ($oid) {
+                //     $query->where('organization_id', $oid);
+                // })->get();
+                $data = DB::table('organizations')
+                    ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
+                    ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.amount', 'donations.status')
+                    ->where('organizations.id', $oid)
+                    ->orderBy('donations.nama');
+            } else {
+                $data = DB::table('donations')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.amount', 'donations.status')
+                    ->orderBy('donations.nama');;
+            }
+            // dd($data);
+
+            return datatables()->of($data)
+                ->addColumn('status', function ($row) {
+                    // dd($row);
+                    if ($row->status == '1') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<button class="btn btn-success m-1"> Aktif </button></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<button  class="btn btn-danger m-1"> Aktif </button></div>';
+
+                        return $btn;
+                    }
+                })
+                ->addColumn('action', function ($row) {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="'. route('donate.edit', $row->id). '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
+
         $organization = Organization::get();
-        $donate = Donation::all();
+        // $donate = Donation::all();
 
         // dd($organization);
-        return view('paydonate.index', compact('organization', 'donate'));
+
+        return view('paydonate.index', compact('organization'));
     }
 
-    public function fetchDonation(Request $request)
-    {
-        // dd($request->get('oid'));
+    // public function fetchDonation(Request $request)
+    // {
+    //     $oid = $request->get('oid');
+    //     if (request()->ajax()) {
+    //         if ($oid) {
+    //             $data = Donation::whereHas('organization', function ($query) use ($oid) {
+    //                 $query->where('organization_id', $oid);
+    //             })->get();
+    //         } else {
+    //         }
 
-        $organization = Organization::get();
-        $oid = $request->get('oid');
-        
-        $donate = Donation::whereHas('organization', function ($query) use ($oid) {
-            $query->where('organization_id', $oid);
-        })->get();
+    //         return datatables()->of($data)->make(true);
+    //     }
 
-        // dd($donate);
 
-        return response()->json(['success' => $donate]);
+    //     // dd($request->get('oid'));
 
-        // return view('paydonate.index', compact('organization', 'donate'));
-    }
+    //     $organization = Organization::get();
+    //     $oid = $request->get('oid');
+
+    //     $donate = Donation::whereHas('organization', function ($query) use ($oid) {
+    //         $query->where('organization_id', $oid);
+    //     })->get();
+
+    //     // dd($donate);
+
+    //     return response()->json(['success' => $donate]);
+
+    //     // return view('paydonate.index', compact('organization', 'donate'));
+    // }
 
     public function create()
     {

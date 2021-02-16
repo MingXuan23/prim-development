@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+@include('layouts.datatable')
 @endsection
 
 @section('content')
@@ -36,7 +37,7 @@
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" disabled selected>Pilih Organisasi</option>
+                        <option value="" selected>Semua Organisasi</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
@@ -76,43 +77,46 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <tr style="text-align:center">
-                            <th> No. </th>
-                            <th> Nama Derma </th>
-                            <th> Penerangan </th>
-                            <th> Harga (RM) </th>
-                            <th> Status </th>
-                            <th> Action </th>
-                        </tr>
+                    <table id="donationTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th> No. </th>
+                                <th> Nama Derma </th>
+                                <th> Penerangan </th>
+                                <th> Harga (RM) </th>
+                                <th> Status </th>
+                                <th> Action </th>
+                            </tr>
+                        </thead>
+                        {{-- <tbody>
+                            @foreach($donate as $row)
+                            <tr>
+                                <td>{{ $loop->iteration }}. </td>
+                        <td>{{ $row['nama'] }} </td>
+                        <td>{{ $row['description'] }}</td>
+                        <td> {{ number_format($row['amount'] , 2) ?? '0' }} </td>
+                        @if($row['status'] =='1')
+                        <td style="text-align: center">
+                            <p class="btn btn-success m-1"> Aktif </p>
+                        </td>
+                        @else
+                        <td style="text-align: center">
+                            <p class="btn btn-danger m-1"> Tidak Aktif </p>
+                        </td>
+                        @endif
+                        <td>
+                            <div class="d-flex justify-content-center">
+                                <a href="{{ route('donate.edit', $row['id']) }}" class="btn btn-primary m-1">Edit</a>
 
-                        @foreach($donate as $row)
-                        <tr>
-                            <td>{{ $loop->iteration }}. </td>
-                            <td>{{ $row['nama'] }} </td>
-                            <td>{{ $row['description'] }}</td>
-                            <td> {{ number_format($row['amount'] , 2) ?? '0' }} </td>
-                            @if($row['status'] =='1')
-                            <td style="text-align: center">
-                                <p class="btn btn-success m-1"> Aktif </p>
-                            </td>
-                            @else
-                            <td style="text-align: center">
-                                <p class="btn btn-danger m-1"> Tidak Aktif </p>
-                            </td>
-                            @endif
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <a href="{{ route('donate.edit', $row['id']) }}"
-                                        class="btn btn-primary m-1">Edit</a>
-
-                                    <button class="btn btn-danger m-1"
-                                        onclick="return confirm('Adakah anda pasti ?')">Buang</button>
-                                </div>
-                            </td>
+                                <button class="btn btn-danger m-1"
+                                    onclick="return confirm('Adakah anda pasti ?')">Buang</button>
+                            </div>
+                        </td>
 
                         </tr>
                         @endforeach
+                        </tbody> --}}
+
                     </table>
                 </div>
             </div>
@@ -134,60 +138,72 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    function filter() {  
-        // alert("Welcome to the javaTpoint.com");  
+    
+    $(document).ready(function(){
 
-            // alert($("#organization option:selected").val());
+        fetch_data();
+
+        function fetch_data(oid = '')
+        {
+            $('#donationTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url:"{{ route('donate.donationlist') }}",
+                    data:{ 
+                        oid:oid
+                    },
+                    type: 'GET',
+                   
+                },
+                order: [[ 1, 'asc' ]],
+                columns:[
+                        { 
+                            "data": null,
+                            searchable: false,
+                            "sortable": false, 
+                            render: function (data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            }  
+                        },
+                        { 
+                            data: "nama",
+                            name: 'nama'
+                        },
+                        { 
+                            data: "description",
+                            name: 'description'
+                        },
+                        { 
+                            data: "amount",
+                            name: 'amount' 
+                        },
+                        { 
+                            data: 'status', 
+                            name: 'status', 
+                            orderable: false, 
+                            searchable: false
+                        },
+                        {
+                            data: 'action', 
+                            name: 'action', 
+                            orderable: false, 
+                            searchable: false
+                        },
+                    ]
+            });
+        }
+
+        $('#organization').change(function(){
             var organizationid      = $("#organization option:selected").val();
-            var _token              = $('input[name="_token"]').val();
-            // console.log(schoolid);
-            $.ajax({
-                url:"{{ route('donate.fetchDonation') }}",
-                method: "POST",
-                data:{ oid:organizationid,
-                        _token:_token },
-                success:function(result)
-                {
-                   console.log(result);
-                }
-            })
-    } 
-    // $(document).ready(function(){
-        
+
+            $('#donationTable').DataTable().destroy();
+
+            fetch_data(organizationid);
+        });
         
 
-            //     $('#organisasi').change(function(){
-        
-            //         // $('#kelas').val('');
-            //         // $('#murid').val('');
-        
-            //         if($(this).val() != '')
-            //         {
-            //             // alert($(this).val();)
-            //             // alert($("#sekolah option:selected").val());
-            //             var organizationid      = $("#organisasi option:selected").val();
-            //             var _token              = $('input[name="_token"]').val();
-            //             // console.log(schoolid);
-        
-            //             $.ajax({
-            //                 url:"{{ route('donate.fetchDonation') }}",
-            //                 method:"POST",
-            //                 data:{ oid:organizationid,
-            //                         _token:_token },
-            //                 success:function(result)
-            //                 {
-                               
-            //                 }
-        
-            //             })
-        
-            //         }
-        
-        
-            //     });
+    });
 
-            // });
-        
-        
 </script>
 @endsection
