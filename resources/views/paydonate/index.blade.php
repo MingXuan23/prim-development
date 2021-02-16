@@ -83,7 +83,6 @@
                                 <th> No. </th>
                                 <th> Nama Derma </th>
                                 <th> Penerangan </th>
-                                <th> Harga (RM) </th>
                                 <th> Status </th>
                                 <th> Action </th>
                             </tr>
@@ -144,10 +143,6 @@
                         { 
                             data: "description",
                             name: 'description'
-                        },
-                        { 
-                            data: "amount",
-                            name: 'amount' 
                         },
                         { 
                             data: 'status', 
