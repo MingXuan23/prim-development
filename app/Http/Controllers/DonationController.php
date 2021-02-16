@@ -29,12 +29,12 @@ class DonationController extends Controller
                 $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
-                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.amount', 'donations.status')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
             } else {
                 $data = DB::table('donations')
-                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.amount', 'donations.status')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->orderBy('donations.nama');;
             }
             // dd($data);
@@ -89,9 +89,9 @@ class DonationController extends Controller
         ]);
 
         $dt = Carbon::now();
-        $startdate  = $dt->toDateString($request->get('start_date')); 
-        $enddate    = $dt->toDateString($request->get('end_date')); 
-        
+        $startdate  = $dt->toDateString($request->get('start_date'));
+        $enddate    = $dt->toDateString($request->get('end_date'));
+
         $newdonate = new Donation([
             'nama'           =>  $request->get('name'),
             'description'    =>  $request->get('description'),
