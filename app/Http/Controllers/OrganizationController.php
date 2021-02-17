@@ -7,8 +7,6 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\View;
 
 class OrganizationController extends Controller
 {
@@ -68,6 +66,12 @@ class OrganizationController extends Controller
         ]);
 
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
+
+        $user = Auth::user();
+        
+        // $role = Role::create(['name' => 'Admin']);
+
+        $user->assignRole('Admin');
 
         return redirect('/organization')->with('success', 'New organization has been added successfully');
     }
