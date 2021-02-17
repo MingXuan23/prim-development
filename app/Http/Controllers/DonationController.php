@@ -25,11 +25,13 @@ class DonationController extends Controller
 
     public function getDonationByOrganizationDatatable(Request $request)
     {
-        
+
 
         if (request()->ajax()) {
             $oid = $request->oid;
+
             $hasOrganizaton = $request->hasOrganization;
+            
             $userId = Auth::id();
 
             if (!empty($oid) && !empty($hasOrganizaton)) {
@@ -53,7 +55,7 @@ class DonationController extends Controller
                     ->where('users.id', $userId)
                     ->orderBy('donations.nama');
             }
-            
+
             return datatables()->of($data)
                 ->addColumn('status', function ($row) {
                     if ($row->status == '1') {
@@ -72,7 +74,7 @@ class DonationController extends Controller
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<a href="' . route('donate.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button id="'. $row->id .'" data-token="'. $token .'" class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
                 })
                 ->rawColumns(['status', 'action'])
@@ -85,7 +87,7 @@ class DonationController extends Controller
         $organization = Organization::get();
         return $organization;
     }
-    
+
     public function listOrganizationByUserId()
     {
         $userId = Auth::id();
