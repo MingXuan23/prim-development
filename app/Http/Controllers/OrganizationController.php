@@ -70,7 +70,7 @@ class OrganizationController extends Controller
 
         $user = Auth::user();
         
-        $role = Role::create(['name' => 'Admin']);
+        // $role = Role::create(['name' => 'Admin']);
 
         $user->assignRole('Admin');
 
