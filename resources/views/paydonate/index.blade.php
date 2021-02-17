@@ -121,7 +121,8 @@
                 ajax: {
                     url:"{{ route('donate.donationlist') }}",
                     data:{ 
-                        oid:oid
+                        oid:oid,
+                        hasOrganization: false
                     },
                     type: 'GET',
                    

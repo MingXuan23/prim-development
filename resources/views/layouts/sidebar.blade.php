@@ -24,7 +24,7 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('donate.donationlist') }}" class=" waves-effect">
+                    <a href="{{ route('donate.organizationlist') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Derma</span>
                     </a>
