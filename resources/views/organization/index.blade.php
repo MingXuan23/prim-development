@@ -10,18 +10,13 @@
     <div class="col-sm-6">
         <div class="page-title-box">
             <h4 class="font-size-18">Organisasi</h4>
-            <!-- <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-            </ol> -->
         </div>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            {{-- <div class="card-header">List Of Applications</div> --}}
             <div>
-                {{-- route('sekolah.create')  --}}
                 <a style="margin: 19px; float: right;" href="{{ route('organization.create') }}"
                     class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Organisasi</a>
             </div>
@@ -32,60 +27,58 @@
                 <div class="alert alert-danger">
                     <ul>
                         @foreach($errors->all() as $error)
-                        <li>{{$error}}</li>
+                        <li id="failed">{{$error}}</li>
                         @endforeach
                     </ul>
                 </div>
                 @endif
                 @if(\Session::has('success'))
                 <div class="alert alert-success">
-                    <p>{{ \Session::get('success') }}</p>
+                    <p id="success">{{ \Session::get('success') }}</p>
                 </div>
                 @endif
 
-                {{-- <div align="right">
-                            <a href="{{route('admin.create')}}" class="btn btn-primary">Add</a>
-                <br />
-                <br />
-            </div> --}}
-            <div class="table-responsive">
-                <table id="organizationTable" class="table table-bordered table-striped">
-                    <thead>
-                        <tr style="text-align:center">
-                            <th>Nama Organisasi</th>
-                            <th>No Telefon</th>
-                            <th>Email</th>
-                            <th>Alamat</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
+                <div class="flash-message"></div>
 
-                    <tbody>
-                        @foreach($listorg as $row)
-                        <tr id="row{{$row->id}}">
-                            <td>{{ $row->nama }}</td>
-                            <td>{{ $row->telno }}</td>
-                            <td>{{ $row->email }}</td>
-                            <td>{{ $row->address }}</td>
-                            <td>
-                                <div class="d-flex justify-content-center">
-                                    <a href="{{ route('organization.edit', $row->id ) }}"
-                                        class="btn btn-primary m-1">Edit</a>
-                                    <button id="{{ $row->id }}" data-token="{{ csrf_token() }}"
-                                        class="btn btn-danger m-1">Padam</button>
-                                </div>
-                            </td>
+                <div class="table-responsive">
+                    <table id="organizationTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th>Nama Organisasi</th>
+                                <th>No Telefon</th>
+                                <th>Email</th>
+                                <th>Alamat</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
 
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        <tbody>
+                            @foreach($listorg as $row)
+                            <tr id="row{{$row->id}}">
+                                <td>{{ $row->nama }}</td>
+                                <td>{{ $row->telno }}</td>
+                                <td>{{ $row->email }}</td>
+                                <td>{{ $row->address }}</td>
+                                <td>
+                                    <div class="d-flex justify-content-center">
+                                        <a href="{{ route('organization.edit', $row->id ) }}"
+                                            class="btn btn-primary m-1">Edit</a>
+                                        <button id="{{ $row->id }}" data-token="{{ csrf_token() }}"
+                                            class="btn btn-danger m-1">Padam</button>
+                                    </div>
+                                </td>
+
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
+    </div>
 </div>
-</div>
+
 {{-- confirmation delete modal --}}
 <div id="deleteConfirmationModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -120,8 +113,8 @@
 
 <script>
     $(document).ready( function () {
-        $('#organzationTable').DataTable({
-            ordering: true
+        var organizationTable = $('#organizationTable').DataTable({
+            ordering: true,
         });
 
         // csrf token for ajax
@@ -141,7 +134,7 @@
         $('#delete').click(function() {
             $.ajax({
                 type: 'POST',
-                dataType: 'json',
+                dataType: 'html',
                 data: {
                     _method: 'DELETE'
                 },
@@ -154,15 +147,18 @@
                         $('#confirmModal').modal('hide');
                     }, 2000);
 
-                    $('#organizationTable').DataTable().clear().draw();
+                    $('div.flash-message').html(data);
+
+                    window.location.reload();
                 },
                 error: function (data) {
-                    console.log('Error:', data);
+                    $('div.flash-message').html(data);
                 }
             })
         });
 
         $('.alert').delay(3000).fadeOut();
+
     } );
 
 </script>

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organization;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class OrganizationController extends Controller
 {
@@ -145,15 +146,11 @@ class OrganizationController extends Controller
         $result = Organization::find($id)->delete();
 
         if ($result) {
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Organization Delete Successfully'
-            ]);
+            Session::flash('success', 'Organization Delete Successfully');
+            return View::make('layouts/flash-messages');
         } else {
-            return response()->json([
-                'status' => 'failed',
-                'msg' => 'Organization Delete Failed'
-            ]);
+            Session::flash('error', 'Organization Delete Failed');
+            return View::make('layouts/flash-messages');
         }
     }
 }

@@ -20,4 +20,9 @@ class Organization extends Model
     {
         return $this->belongsToMany(User::class, 'organization_user');
     }
+
+    public function donation()
+    {
+        return $this->belongsToMany(Donation::class, 'donation_organization');
+    }
 }

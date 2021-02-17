@@ -4,73 +4,142 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Donation;
+use App\Models\Organization;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DonationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $donate = Donation::all();
-        return view('donate.index', compact('donate'));
+        $organization = $this->listOrganizationByUserId();
+        return view('donate.index', compact('organization'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function indexDerma()
+    {
+        $organization = $this->listAllOrganization();
+        return view('paydonate.index', compact('organization'));
+    }
+
+    public function getDonationByOrganizationDatatable(Request $request)
+    {
+        
+
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $hasOrganizaton = $request->hasOrganization;
+            $userId = Auth::id();
+
+            if (!empty($oid) && !empty($hasOrganizaton)) {
+                $data = DB::table('organizations')
+                    ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
+                    ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->where('organizations.id', $oid)
+                    ->orderBy('donations.nama');
+            } elseif (empty($oid) && ($hasOrganizaton == false)) {
+                $data = DB::table('donations')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->orderBy('donations.nama');
+            } elseif (empty($oid) && ($hasOrganizaton == true)) {
+                $data = DB::table('organizations')
+                    ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
+                    ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
+                    ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+                    ->join('users', 'users.id', '=', 'organization_user.user_id')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->where('users.id', $userId)
+                    ->orderBy('donations.nama');
+            }
+            
+            return datatables()->of($data)
+                ->addColumn('status', function ($row) {
+                    if ($row->status == '1') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<button class="btn btn-success m-1"> Aktif </button></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<button  class="btn btn-danger m-1"> Aktif </button></div>';
+
+                        return $btn;
+                    }
+                })
+                ->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('donate.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button id="'. $row->id .'" data-token="'. $token .'" class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
+    }
+
+    public function listAllOrganization()
+    {
+        $organization = Organization::get();
+        return $organization;
+    }
+    
+    public function listOrganizationByUserId()
+    {
+        $userId = Auth::id();
+
+        $listorg = Organization::whereHas('user', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
+
+        return $listorg;
+    }
+
     public function create()
     {
-        return view('donate.add');
+        $organization = $this->listOrganizationByUserId();
+
+        return view('donate.add', compact('organization'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
+        // dd($request->get('organization'));
+
         $this->validate($request, [
+            'organization'  =>  'required|not_in:0',
             'name'          =>  'required',
             'description'   =>  'required',
-            'price'         =>  'required|numeric'
+            'start_date'    =>  'required',
+            'end_date'      =>  'required'
         ]);
+
+        $dt = Carbon::now();
+        $startdate  = $dt->toDateString($request->get('start_date'));
+        $enddate    = $dt->toDateString($request->get('end_date'));
 
         $newdonate = new Donation([
             'nama'           =>  $request->get('name'),
             'description'    =>  $request->get('description'),
-            'amount'         =>  $request->get('price'),
             'date_created'   =>  now(),
+            'date_started'   =>  $startdate,
+            'date_end'       =>  $enddate,
             'status'         =>  '1',
         ]);
         $newdonate->save();
+
+        $newdonate->organization()->attach($request->get('organization'));
+
         return redirect('/donate')->with('success', 'New donations has been added successfully');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $donation = DB::table('donations')->where('id', $id)->first();
@@ -78,13 +147,6 @@ class DonationController extends Controller
         return view('donate.update', compact('donation'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         $this->validate($request, [
@@ -106,14 +168,16 @@ class DonationController extends Controller
         return redirect('/donate')->with('success', 'The data has been updated!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        $result = Donation::find($id)->delete();
+
+        if ($result) {
+            Session::flash('success', 'Donation Delete Successfully');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Donation Delete Failed');
+            return View::make('layouts/flash-messages');
+        }
     }
 }
