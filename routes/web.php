@@ -10,6 +10,9 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+use App\Http\Controllers\DonationController;
+
 Auth::routes();
 
 Route::get('/', 'HomeController@index');
@@ -17,15 +20,20 @@ Route::get('/form', 'HomeController@form');
 // Route::get('/school', 'FeeController@index');
 // Route::get('/school', 'SchoolController@index');
 
-Route::resource('school','SchoolController');  
+Route::resource('school', 'SchoolController');
 
 Route::get('getdetails/{id}', 'DetailsController@getFees')->name('details.getfees');
 
 Route::post('parent/fetchClass', 'ParentController@fetchClass')->name('parent.fetchClass');
 Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchStd');
 
-Route::get('donationlist', 'DonationController@indexDerma')->name('donate.donationlist');
+Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
+Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
+Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
 
+Route::group(['prefix' => 'donate'], function () {
+    
+});
 
 // Route::get('{id}',['uses'=>'FeesDetailsController@getFees']);
 Route::resources([
@@ -43,8 +51,8 @@ Route::resources([
     'donate'             => 'DonationController'
 ]);
 
-Route::post('payment','PayController@paymentProcess')->name('payment');
-Route::get('successpay','PayController@successPay')->name('successpay');
+Route::post('payment', 'PayController@paymentProcess')->name('payment');
+Route::get('successpay', 'PayController@successPay')->name('successpay');
 
 Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
@@ -59,4 +67,3 @@ Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
-

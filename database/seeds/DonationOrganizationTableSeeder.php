@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class OrganizationUserTableSeeder extends Seeder
+class DonationOrganizationTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,36 +11,32 @@ class OrganizationUserTableSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('organization_user')->delete();
+        \DB::table('donation_organization')->delete();
 
-        \DB::table('organization_user')->insert(array(
+        \DB::table('donation_organization')->insert(array(
             0 =>
             array(
                 "id" => 1,
-                "user_id" => 1,
-                "organization_id" => 1,
-                "role_id" => 2
+                "donation_id" => 1,
+                "organization_id" => 1
             ),
             1 =>
             array(
                 "id" => 2,
-                "user_id" => 2,
-                "organization_id" => 2,
-                "role_id" => 4
+                "donation_id" => 2,
+                "organization_id" => 1,
             ),
             2 =>
             array(
                 "id" => 3,
-                "user_id" => 3,
+                "donation_id" => 3,
                 "organization_id" => 2,
-                "role_id" => 2
             ),
-            2 =>
+            3 =>
             array(
                 "id" => 4,
-                "user_id" => 3,
+                "donation_id" => 4,
                 "organization_id" => 2,
-                "role_id" => 1
             ),
         ));
     }
