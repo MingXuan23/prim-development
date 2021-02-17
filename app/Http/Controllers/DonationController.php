@@ -7,41 +7,55 @@ use App\Models\Donation;
 use App\Models\Organization;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DonationController extends Controller
 {
     public function index()
     {
-        $donate = Donation::all();
-        return view('donate.index', compact('donate'));
+        $organization = $this->listOrganizationByUserId();
+        return view('donate.index', compact('organization'));
     }
 
-    public function indexDerma(Request $request)
+    public function indexDerma()
     {
+        $organization = $this->listAllOrganization();
+        return view('paydonate.index', compact('organization'));
+    }
+
+    public function getDonationByOrganizationDatatable(Request $request)
+    {
+        
 
         if (request()->ajax()) {
             $oid = $request->oid;
+            $hasOrganizaton = $request->hasOrganization;
+            $userId = Auth::id();
 
-            if ($oid) {
-                // $data = Donation::whereHas('organization', function ($query) use ($oid) {
-                //     $query->where('organization_id', $oid);
-                // })->get();
+            if (!empty($oid) && !empty($hasOrganizaton)) {
                 $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
                     ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
-            } else {
+            } elseif (empty($oid) && ($hasOrganizaton == false)) {
                 $data = DB::table('donations')
                     ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
-                    ->orderBy('donations.nama');;
+                    ->orderBy('donations.nama');
+            } elseif (empty($oid) && ($hasOrganizaton == true)) {
+                $data = DB::table('organizations')
+                    ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
+                    ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
+                    ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+                    ->join('users', 'users.id', '=', 'organization_user.user_id')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->where('users.id', $userId)
+                    ->orderBy('donations.nama');
             }
-            // dd($data);
-
+            
             return datatables()->of($data)
                 ->addColumn('status', function ($row) {
-                    // dd($row);
                     if ($row->status == '1') {
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button class="btn btn-success m-1"> Aktif </button></div>';
@@ -55,23 +69,37 @@ class DonationController extends Controller
                     }
                 })
                 ->addColumn('action', function ($row) {
+                    $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<a href="' . route('donate.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = $btn . '<button id="'. $row->id .'" data-token="'. $token .'" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
                 })
                 ->rawColumns(['status', 'action'])
                 ->make(true);
         }
+    }
 
+    public function listAllOrganization()
+    {
         $organization = Organization::get();
+        return $organization;
+    }
+    
+    public function listOrganizationByUserId()
+    {
+        $userId = Auth::id();
 
-        return view('paydonate.index', compact('organization'));
+        $listorg = Organization::whereHas('user', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
+
+        return $listorg;
     }
 
     public function create()
     {
-        $organization = Organization::get();
+        $organization = $this->listOrganizationByUserId();
 
         return view('donate.add', compact('organization'));
     }
