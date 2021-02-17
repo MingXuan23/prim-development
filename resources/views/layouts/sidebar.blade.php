@@ -17,6 +17,13 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('organization.index') }}" class=" waves-effect">
+                        <i class="ti-clipboard"></i>
+                        <span>Organisasi</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="{{ route('donate.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Urus Derma</span>
@@ -30,54 +37,55 @@
                     </a>
                 </li>
 
+                @role('jaim')
                 <li>
                     <a href="{{ route('jaim.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>JAIM</span>
                     </a>
                 </li>
+                @endrole
 
+                @role('ibu|bapa|penjaga')
                 <li>
                     <a href="{{ route('parent.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Carian Tanggungan</span>
                     </a>
                 </li>
-                <!-- <li>
-                    <a href="form" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
-                        <span>Form Example</span>
-                    </a>
-                </li> -->
+                @endrole
 
-                <li>
-                    <a href="{{ route('organization.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
-                        <span>Organisasi</span>
-                    </a>
-                </li>
-
+                @role('pentadbir|guru')
                 <li>
                     <a href="{{ route('school.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Sekolah</span>
                     </a>
                 </li>
+                @endrole
 
+
+                @role('pentadbir|guru')
                 <li>
                     <a href="{{ route('teacher.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Guru</span>
                     </a>
                 </li>
+                @endrole
 
+
+                @role('pentadbir|guru')
                 <li>
                     <a href="{{ route('class.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Kelas</span>
                     </a>
                 </li>
+                @endrole
+                
 
+                @role('pentadbir|guru')
                 <li>
                     <a href="{{ route('student.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -85,26 +93,37 @@
                     </a>
                 </li>
 
+                @endrole
+                
+                @role('pentadbir|guru')
                 <li>
                     <a href="{{ route('fees.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Yuran</span>
                     </a>
                 </li>
+                @endrole
 
+
+                @role('pentadbir|guru')
                 <li>
                     <a href="{{ route('fees.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Yuran - ibubapa (bayar)</span>
                     </a>
                 </li>
+                @endrole
 
+
+                @role('pentadbir|guru')
                 <li>
                     <a href="{{ route('chat-user') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Chat</span>
                     </a>
                 </li>
+                @endrole
+
 
                 <!-- <li>
                     <a href="" class=" waves-effect">
