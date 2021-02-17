@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Donation extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = ['nama', 'description', 'date_created', 'date_started', 'date_end', 'status'];
     
     public $timestamps = false;
