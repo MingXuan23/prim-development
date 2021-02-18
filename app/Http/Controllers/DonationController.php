@@ -32,18 +32,18 @@ class DonationController extends Controller
             $hasOrganizaton = $request->hasOrganization;
             $userId = Auth::id();
 
-            if (!empty($oid) && !empty($hasOrganizaton)) {
+            if ( $oid != '' && !is_null($hasOrganizaton)) {
                 $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
                     ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
-            } elseif (empty($oid) && ($hasOrganizaton == false)) {
+            } elseif ($hasOrganizaton == "false") {
                 $data = DB::table('donations')
                     ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->orderBy('donations.nama');
-            } elseif (empty($oid) && ($hasOrganizaton == true)) {
+            } elseif ($hasOrganizaton == "true") {
                 $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
