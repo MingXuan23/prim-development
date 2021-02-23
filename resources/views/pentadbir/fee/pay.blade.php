@@ -93,7 +93,14 @@
                        <h4>Jumlah : RM<span id="pay"></span> </h4>
                     </div>
                     <div class="col-md-4 p-2">
-                        <button class="btn btn-success float-right" type="submit" id="checkout-button">Bayar Sekarang</button>
+                        <form method="POST" action="{{ route('fpxIndex') }}"
+                        enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        <input type="hidden" name="amount" id="amount" value="0.00">
+                        <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
+                        <button class="btn btn-success float-right" type="submit" onclick="">Bayar
+                            Sekarang</button>
+                    </form>
                     </div>
                         <input type="hidden" name="bname" id="bname" value="{{ $getfees->nama  ?? '' }}">
                         <input type="hidden" name="ttlpay" id="ttlpay" value="0.00">
@@ -124,7 +131,7 @@
         }   
         var total = parseFloat(amt).toFixed(2);
         $("#pay").html(total);
-        $("input[name='ttlpay']").val(total);
+        $("input[name='amount']").val(total);
 
     }
 
