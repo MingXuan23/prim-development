@@ -12,6 +12,8 @@
 */
 
 use App\Http\Controllers\DonationController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
@@ -52,6 +54,7 @@ Route::resources([
 ]);
 
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
+Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
 Route::get('successpay', 'PayController@successPay')->name('successpay');
 
 Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');

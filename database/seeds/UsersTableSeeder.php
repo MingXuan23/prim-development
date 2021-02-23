@@ -65,6 +65,23 @@ class UsersTableSeeder extends Seeder
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01"
             ),
+            3 =>
+            array(
+                "id" => 4,
+                "email" => app()->environment('local') ? 'raziq@gmail.com' : 'raziq@gmail.com',
+                "password" => app()->environment('local') ? \Hash::make("test1234") : \Hash::make("test1234"),
+                "name" => "Ahmad Raziq Danish Bin Amirruddin",
+                "username" => "ajiq",
+                "icno" => "991011-14-6137",
+                "state" => "Selangor",
+                "postcode" => "45600",
+                "telno" => "0149547478",
+                "address" => "Batu 8, Kampung Ijok",
+                "email_verified_at" => "2020-06-07 18:52:01",
+                "remember_token" => "",
+                "created_at" => "2020-06-07 10:48:33",
+                "updated_at" => "2020-06-07 10:52:01"
+            ),
         ));
     }
 }

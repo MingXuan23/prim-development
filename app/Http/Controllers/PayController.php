@@ -65,7 +65,66 @@ class PayController extends Controller
         echo json_encode(['id' => $checkout_session->id]);
     }
 
-    public function successPay(){
+    public function successPay()
+    {
         return view('pentadbir.fee.successpay');
+    }
+
+    public function fpxIndex(Request $request)
+    {
+        $fpx_msgType = "AR";
+        $fpx_msgToken = "01";
+        $fpx_sellerExId = "EX00012323";
+        $fpx_sellerExOrderNo = 'T' . rand(1000000000, 9999999999);
+        $fpx_sellerTxnTime = date('YmdHis');
+        $fpx_sellerOrderNo = $request->o_id;
+        $fpx_sellerId = "SE00013841";
+        $fpx_sellerBankCode = "01";
+        $fpx_txnCurrency = "MYR";
+        $fpx_txnAmount = $request->amount;
+        $fpx_buyerEmail = "ahmadraziqdanish@gmail.com";
+        $fpx_checkSum = "";
+        $fpx_buyerName = "";
+        $fpx_buyerBankId = "TEST0021";
+        $fpx_buyerBankBranch = "";
+        $fpx_buyerAccNo = "";
+        $fpx_buyerId = "";
+        $fpx_makerName = "";
+        $fpx_buyerIban = "";
+        $fpx_productDesc = "SampleProduct";
+        $fpx_version = "6.0";
+
+        /* Generating signing String */
+        $data = $fpx_buyerAccNo . "|" . $fpx_buyerBankBranch . "|" . $fpx_buyerBankId . "|" . $fpx_buyerEmail . "|" . $fpx_buyerIban . "|" . $fpx_buyerId . "|" . $fpx_buyerName . "|" . $fpx_makerName . "|" . $fpx_msgToken . "|" . $fpx_msgType . "|" . $fpx_productDesc . "|" . $fpx_sellerBankCode . "|" . $fpx_sellerExId . "|" . $fpx_sellerExOrderNo . "|" . $fpx_sellerId . "|" . $fpx_sellerOrderNo . "|" . $fpx_sellerTxnTime . "|" . $fpx_txnAmount . "|" . $fpx_txnCurrency . "|" . $fpx_version;
+
+        /* Reading key */
+        $priv_key = file_get_contents('C:\\pki-keys\\DevExchange\\EX00012323.key');
+        $pkeyid = openssl_get_privatekey($priv_key, null);
+        openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
+        $fpx_checkSum = strtoupper(bin2hex($binary_signature));
+        return view('fpx.index', compact(
+            'fpx_msgType',
+            'fpx_msgToken',
+            'fpx_sellerExId',
+            'fpx_sellerExOrderNo',
+            'fpx_sellerTxnTime',
+            'fpx_sellerOrderNo',
+            'fpx_sellerId',
+            'fpx_sellerBankCode',
+            'fpx_txnCurrency',
+            'fpx_txnAmount',
+            'fpx_buyerEmail',
+            'fpx_checkSum',
+            'fpx_buyerName',
+            'fpx_buyerBankId',
+            'fpx_buyerBankBranch',
+            'fpx_buyerAccNo',
+            'fpx_buyerId',
+            'fpx_makerName',
+            'fpx_buyerIban',
+            'fpx_productDesc',
+            'fpx_version',
+            'data'
+        ));
     }
 }
