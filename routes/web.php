@@ -55,6 +55,8 @@ Route::resources([
 
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
+Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
+Route::post('transactionStatus', 'PayController@transactionStatus')->name('transactionStatus');
 Route::get('successpay', 'PayController@successPay')->name('successpay');
 
 Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');

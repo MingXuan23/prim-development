@@ -85,7 +85,7 @@ class PayController extends Controller
         $fpx_buyerEmail = "ahmadraziqdanish@gmail.com";
         $fpx_checkSum = "";
         $fpx_buyerName = "";
-        $fpx_buyerBankId = "TEST0021";
+        $fpx_buyerBankId = $request->bankid;
         $fpx_buyerBankBranch = "";
         $fpx_buyerAccNo = "";
         $fpx_buyerId = "";
@@ -126,5 +126,13 @@ class PayController extends Controller
             'fpx_version',
             'data'
         ));
+    }
+
+    public function paymentStatus () {
+        return view('fpx.pStatus');
+    }
+
+    public function transactionStatus() {
+        return view('fpx.tStatus');
     }
 }
