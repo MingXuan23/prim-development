@@ -8,6 +8,7 @@ use App\Models\Organization;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\DataTables;
 
 class DonationController extends Controller
 {
@@ -28,22 +29,25 @@ class DonationController extends Controller
 
 
         if (request()->ajax()) {
+
             $oid = $request->oid;
 
             $hasOrganizaton = $request->hasOrganization;
-            
+
             $userId = Auth::id();
 
-            if ( $oid != '' && !is_null($hasOrganizaton)) {
+            if ($oid != '' && !is_null($hasOrganizaton)) {
                 $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
-                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
             } elseif ($hasOrganizaton == "false") {
                 $data = DB::table('donations')
-                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
+                    ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
+                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->orderBy('donations.nama');
             } elseif ($hasOrganizaton == "true") {
                 $data = DB::table('organizations')
@@ -51,34 +55,55 @@ class DonationController extends Controller
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
                     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
                     ->join('users', 'users.id', '=', 'organization_user.user_id')
-                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->where('users.id', $userId)
                     ->orderBy('donations.nama');
             }
 
-            return datatables()->of($data)
-                ->addColumn('status', function ($row) {
-                    if ($row->status == '1') {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<button class="btn btn-success m-1"> Aktif </button></div>';
+            // dd($data->oid);
+            $table = Datatables::of($data);
 
-                        return $btn;
-                    } else {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<button  class="btn btn-danger m-1"> Aktif </button></div>';
+            $table->addColumn('status', function ($row) {
+                if ($row->status == '1') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<button class="btn btn-success m-1"> Aktif </button></div>';
 
-                        return $btn;
-                    }
-                })
-                ->addColumn('action', function ($row) {
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<button  class="btn btn-danger m-1"> Tidak Aktif </button></div>';
+
+                    return $btn;
+                }
+            });
+
+            if ($hasOrganizaton == "false") {
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_field();
+                    $oid = $row->oid;
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<form method="POST" action="' . route('fpxIndex') . '"
+                            enctype="multipart/form-data">
+                            ' . $token . '
+                            <input type="hidden" name="amount" id="amount" value="6">
+                            <input type="hidden" name="o_id" id="o_id" value=" ' . $row->oid . ' ">
+                            <input type="hidden" name="donate_id" id="donate_id" value=" ' . $row->id . ' ">
+                            <button class="btn btn-primary float-right" type="submit" onclick="">Bayar Sekarang</button>
+                            </form></div>';
+                    return $btn;
+                });
+            } else {
+                $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<a href="' . route('donate.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
-                })
-                ->rawColumns(['status', 'action'])
-                ->make(true);
+                });
+            }
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
         }
     }
 

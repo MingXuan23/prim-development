@@ -37,7 +37,7 @@
                     </a>
                 </li>
 
-                @role('Jaim')
+                @role('Superadmin|Jaim')
                 <li>
                     <a href="{{ route('jaim.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -46,7 +46,7 @@
                 </li>
                 @endrole
 
-                @role('Ibu|Bapa|Penjaga')
+                @role('Superadmin|Ibu|Bapa|Penjaga')
                 <li>
                     <a href="{{ route('parent.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -55,7 +55,7 @@
                 </li>
                 @endrole
 
-                @role('Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('school.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -65,7 +65,7 @@
                 @endrole
 
 
-                @role('Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('teacher.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -75,7 +75,7 @@
                 @endrole
 
 
-                @role('Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('class.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -85,7 +85,7 @@
                 @endrole
                 
 
-                @role('Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('student.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -95,7 +95,7 @@
 
                 @endrole
                 
-                @role('Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('fees.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -105,7 +105,7 @@
                 @endrole
 
 
-                @role('Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('fees.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -115,7 +115,7 @@
                 @endrole
 
 
-                @role('Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('chat-user') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
