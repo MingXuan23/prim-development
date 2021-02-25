@@ -48,7 +48,8 @@ Route::resources([
     'parent'             => 'ParentController',
     'pay'                => 'PayController',
     'organization'       => 'OrganizationController',
-    'donate'             => 'DonationController'
+    'donate'             => 'DonationController',
+    'reminder'           => 'ReminderController'
 ]);
 
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
@@ -67,3 +68,11 @@ Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
+
+Route::group(['prefix' => 'notification'], function () {
+    Route::get('/','HomeController@showNotification');
+    Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
+    Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
+});
+
+

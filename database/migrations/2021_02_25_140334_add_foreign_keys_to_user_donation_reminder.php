@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class AddForeignKeysToUserDonationReminder extends Migration
 {
-    /**s
+    /**
      * Run the migrations.
      *
      * @return void
