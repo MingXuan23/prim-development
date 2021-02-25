@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Process\Process;
 
 class PayController extends Controller
 {
@@ -98,7 +99,7 @@ class PayController extends Controller
         $data = $fpx_buyerAccNo . "|" . $fpx_buyerBankBranch . "|" . $fpx_buyerBankId . "|" . $fpx_buyerEmail . "|" . $fpx_buyerIban . "|" . $fpx_buyerId . "|" . $fpx_buyerName . "|" . $fpx_makerName . "|" . $fpx_msgToken . "|" . $fpx_msgType . "|" . $fpx_productDesc . "|" . $fpx_sellerBankCode . "|" . $fpx_sellerExId . "|" . $fpx_sellerExOrderNo . "|" . $fpx_sellerId . "|" . $fpx_sellerOrderNo . "|" . $fpx_sellerTxnTime . "|" . $fpx_txnAmount . "|" . $fpx_txnCurrency . "|" . $fpx_version;
 
         /* Reading key */
-        $priv_key = file_get_contents('C:\\pki-keys\\DevExchange\\EX00012323.key');
+        $priv_key = getenv('FPX_KEY');
         $pkeyid = openssl_get_privatekey($priv_key, null);
         openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
         $fpx_checkSum = strtoupper(bin2hex($binary_signature));

@@ -82,7 +82,7 @@ function verifySign_fpx($sign,$toSign)
 {
    error_reporting(0);
 
-return validateCertificate('C:\\pki-keys\\DevExchange\\',$sign, $toSign);
+return validateCertificate('https://prim.my/fpx/',$sign, $toSign);
 }
 
 function checkCertExpiry($path)
