@@ -38,7 +38,7 @@ function validateCertificate($path,$sign, $toSign)
 
 	$d_ate=date("Y");
 	//validating Last Three Certificates 
-	$fpxcert=array($path."fpxuat_current.cer",$path."fpxuat.cer");
+	$fpxcert=array($path."EX00012323.cer",$path."fpxuat.cer");
 	$certs=checkCertExpiry($fpxcert);
 	// echo count($certs) ;
 	    	$signdata = hextobin($sign);
