@@ -202,6 +202,12 @@ $val=verifySign_fpx($fpx_checkSum, $data);
 // if val is 00 sucess 
 ?>
 
+<script>
+	console.log('{{ $fpx_fpxTxnId }}');
+	console.log('{{ $val }}');
+	console.log('{{ $ErrorCode }}');
+</script>
+
   <table border="0" cellpadding="0" cellspacing="0" height="300" width="722">
     <tbody>
       <tr>
