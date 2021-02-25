@@ -173,28 +173,28 @@ function certRollOver($old_crt,$new_crt)
 		
 		return "true";
 }
-$fpx_buyerBankBranch=$_GET['fpx_buyerBankBranch'];
-$fpx_buyerBankId=$_POST['fpx_buyerBankId'];
-$fpx_buyerIban=$_POST['fpx_buyerIban'];
-$fpx_buyerId=$_POST['fpx_buyerId'];
-$fpx_buyerName=$_POST['fpx_buyerName'];
-$fpx_creditAuthCode=$_POST['fpx_creditAuthCode'];
-$fpx_creditAuthNo=$_POST['fpx_creditAuthNo'];
-$fpx_debitAuthCode=$_POST['fpx_debitAuthCode'];
-$fpx_debitAuthNo=$_POST['fpx_debitAuthNo'];
-$fpx_fpxTxnId=$_POST['fpx_fpxTxnId'];
-$fpx_fpxTxnTime=$_POST['fpx_fpxTxnTime'];
-$fpx_makerName=$_POST['fpx_makerName'];
-$fpx_msgToken=$_POST['fpx_msgToken'];
-$fpx_msgType=$_POST['fpx_msgType'];
-$fpx_sellerExId=$_POST['fpx_sellerExId'];
-$fpx_sellerExOrderNo=$_POST['fpx_sellerExOrderNo'];
-$fpx_sellerId=$_POST['fpx_sellerId'];
-$fpx_sellerOrderNo=$_POST['fpx_sellerOrderNo'];
-$fpx_sellerTxnTime=$_POST['fpx_sellerTxnTime'];
-$fpx_txnAmount=$_POST['fpx_txnAmount'];
-$fpx_txnCurrency=$_POST['fpx_txnCurrency'];
-$fpx_checkSum=$_POST['fpx_checkSum'];
+$fpx_buyerBankBranch=$request->fpx_buyerBankBranch;
+$fpx_buyerBankId=$request->fpx_buyerBankId;
+$fpx_buyerIban=$request->fpx_buyerIban;
+$fpx_buyerId=$request->fpx_buyerId;
+$fpx_buyerName=$request->fpx_buyerName;
+$fpx_creditAuthCode=$request->fpx_creditAuthCode;
+$fpx_creditAuthNo=$request->fpx_creditAuthNo;
+$fpx_debitAuthCode=$request->fpx_debitAuthCode;
+$fpx_debitAuthNo=$request->fpx_debitAuthNo;
+$fpx_fpxTxnId=$request->fpx_fpxTxnId;
+$fpx_fpxTxnTime=$request->fpx_fpxTxnTime;
+$fpx_makerName=$request->fpx_makerName;
+$fpx_msgToken=$request->fpx_msgToken;
+$fpx_msgType=$request->fpx_msgType;
+$fpx_sellerExId=$request->fpx_sellerExId;
+$fpx_sellerExOrderNo=$request->fpx_sellerExOrderNo;
+$fpx_sellerId=$request->fpx_sellerId;
+$fpx_sellerOrderNo=$request->fpx_sellerOrderNo;
+$fpx_sellerTxnTime=$request->fpx_sellerTxnTime;
+$fpx_txnAmount=$request->fpx_txnAmount;
+$fpx_txnCurrency=$request->fpx_txnCurrency;
+$fpx_checkSum=$request->fpx_checkSum;
 
 $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buyerId."|".$fpx_buyerName."|".$fpx_creditAuthCode."|".$fpx_creditAuthNo."|".$fpx_debitAuthCode."|".$fpx_debitAuthNo."|".$fpx_fpxTxnId."|".$fpx_fpxTxnTime."|".$fpx_makerName."|".$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_sellerExOrderNo."|".$fpx_sellerId."|".$fpx_sellerOrderNo."|".$fpx_sellerTxnTime."|".$fpx_txnAmount."|".$fpx_txnCurrency;
 
