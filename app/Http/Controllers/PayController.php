@@ -134,8 +134,9 @@ class PayController extends Controller
     }
 
     public function transactionReceipt(Request $request) {
-        $txnId = $request->fpx_fpxTxnId;
-        $txnAmount = $_POST['fpx_txnAmount'];
-        return view('fpx.tStatus', compact('request', 'txnId', 'txnAmount'));
+        $postdata = $_POST['fpx_txnAmount'];
+        $getdata = $_GET['fpx_txnAmount'];
+        $txnAmount = $request->fpx_txnAmount;
+        return view('fpx.tStatus', compact('request'));
     }
 }
