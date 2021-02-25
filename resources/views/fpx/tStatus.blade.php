@@ -173,28 +173,28 @@ function certRollOver($old_crt,$new_crt)
 		
 		return "true";
 }
-$fpx_buyerBankBranch=$_POST['fpx_buyerBankBranch'];
-$fpx_buyerBankId=$_POST['fpx_buyerBankId'];
-$fpx_buyerIban=$_POST['fpx_buyerIban'];
-$fpx_buyerId=$_POST['fpx_buyerId'];
-$fpx_buyerName=$_POST['fpx_buyerName'];
-$fpx_creditAuthCode=$_POST['fpx_creditAuthCode'];
-$fpx_creditAuthNo=$_POST['fpx_creditAuthNo'];
-$fpx_debitAuthCode=$_POST['fpx_debitAuthCode'];
-$fpx_debitAuthNo=$_POST['fpx_debitAuthNo'];
-$fpx_fpxTxnId=$_POST['fpx_fpxTxnId'];
-$fpx_fpxTxnTime=$_POST['fpx_fpxTxnTime'];
-$fpx_makerName=$_POST['fpx_makerName'];
-$fpx_msgToken=$_POST['fpx_msgToken'];
-$fpx_msgType=$_POST['fpx_msgType'];
-$fpx_sellerExId=$_POST['fpx_sellerExId'];
-$fpx_sellerExOrderNo=$_POST['fpx_sellerExOrderNo'];
-$fpx_sellerId=$_POST['fpx_sellerId'];
-$fpx_sellerOrderNo=$_POST['fpx_sellerOrderNo'];
-$fpx_sellerTxnTime=$_POST['fpx_sellerTxnTime'];
-$fpx_txnAmount=$_POST['fpx_txnAmount'];
-$fpx_txnCurrency=$_POST['fpx_txnCurrency'];
-$fpx_checkSum=$_POST['fpx_checkSum'];
+$fpx_buyerBankBranch=$_REQUEST['fpx_buyerBankBranch'];
+$fpx_buyerBankId=$_REQUEST['fpx_buyerBankId'];
+$fpx_buyerIban=$_REQUEST['fpx_buyerIban'];
+$fpx_buyerId=$_REQUEST['fpx_buyerId'];
+$fpx_buyerName=$_REQUEST['fpx_buyerName'];
+$fpx_creditAuthCode=$_REQUEST['fpx_creditAuthCode'];
+$fpx_creditAuthNo=$_REQUEST['fpx_creditAuthNo'];
+$fpx_debitAuthCode=$_REQUEST['fpx_debitAuthCode'];
+$fpx_debitAuthNo=$_REQUEST['fpx_debitAuthNo'];
+$fpx_fpxTxnId=$_REQUEST['fpx_fpxTxnId'];
+$fpx_fpxTxnTime=$_REQUEST['fpx_fpxTxnTime'];
+$fpx_makerName=$_REQUEST['fpx_makerName'];
+$fpx_msgToken=$_REQUEST['fpx_msgToken'];
+$fpx_msgType=$_REQUEST['fpx_msgType'];
+$fpx_sellerExId=$_REQUEST['fpx_sellerExId'];
+$fpx_sellerExOrderNo=$_REQUEST['fpx_sellerExOrderNo'];
+$fpx_sellerId=$_REQUEST['fpx_sellerId'];
+$fpx_sellerOrderNo=$_REQUEST['fpx_sellerOrderNo'];
+$fpx_sellerTxnTime=$_REQUEST['fpx_sellerTxnTime'];
+$fpx_txnAmount=$_REQUEST['fpx_txnAmount'];
+$fpx_txnCurrency=$_REQUEST['fpx_txnCurrency'];
+$fpx_checkSum=$_REQUEST['fpx_checkSum'];
 
 $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buyerId."|".$fpx_buyerName."|".$fpx_creditAuthCode."|".$fpx_creditAuthNo."|".$fpx_debitAuthCode."|".$fpx_debitAuthNo."|".$fpx_fpxTxnId."|".$fpx_fpxTxnTime."|".$fpx_makerName."|".$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_sellerExOrderNo."|".$fpx_sellerId."|".$fpx_sellerOrderNo."|".$fpx_sellerTxnTime."|".$fpx_txnAmount."|".$fpx_txnCurrency;
 
