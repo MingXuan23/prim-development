@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 <div class="container" style="margin-top: 5%;">
-
+    
     <form name="form1" method="post" action="https://uat.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp">
         <table border="0" cellpadding="2" cellspacing="1" width="100%">
             <tbody>
