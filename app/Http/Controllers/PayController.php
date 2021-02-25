@@ -130,10 +130,10 @@ class PayController extends Controller
     }
 
     public function paymentStatus (Request $request) {
-        return view('fpx.pStatus', compact($request));
+        return view('fpx.pStatus', compact('request'));
     }
 
     public function transactionReceipt(Request $request) {
-        return view('fpx.tStatus', compact($request));
+        return view('fpx.tStatus', compact('request'));
     }
 }
