@@ -200,7 +200,8 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
 
 $val=verifySign_fpx($fpx_checkSum, $data);
 
-echo $request;
+echo $txnId;
+echo $txnAmount;
 // if val is 00 sucess 
 ?>
 
@@ -208,7 +209,8 @@ echo $request;
 	console.log('{{ $fpx_fpxTxnId }}');
 	console.log('{{ $val }}');
 	console.log('{{ $ErrorCode }}');
-	console.log('{{ $request }}');
+	console.log('{{ $txnId }}');
+	console.log('{{ $txnAmount }}');
 </script>
 
   <table border="0" cellpadding="0" cellspacing="0" height="300" width="722">
