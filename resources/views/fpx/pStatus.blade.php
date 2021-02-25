@@ -82,7 +82,7 @@ function verifySign_fpx($sign,$toSign)
 {
    error_reporting(0);
 
-return validateCertificate('https://prim.my/fpx/',$sign, $toSign);
+return validateCertificate('fpx/',$sign, $toSign);
 }
 
 function checkCertExpiry($path)
@@ -191,9 +191,7 @@ $fpx_checkSum=$request->fpx_checkSum;
 
 $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buyerId."|".$fpx_buyerName."|".$fpx_creditAuthCode."|".$fpx_creditAuthNo."|".$fpx_debitAuthCode."|".$fpx_debitAuthNo."|".$fpx_fpxTxnId."|".$fpx_fpxTxnTime."|".$fpx_makerName."|".$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_sellerExOrderNo."|".$fpx_sellerId."|".$fpx_sellerOrderNo."|".$fpx_sellerTxnTime."|".$fpx_txnAmount."|".$fpx_txnCurrency;
 
-// $val=verifySign_fpx($fpx_checkSum, $data);
-$ErrorCode=" Your signature has been verified successfully. "." ErrorCode :[00]";
-$val="00";
+$val=verifySign_fpx($fpx_checkSum, $data);
 
 
 
