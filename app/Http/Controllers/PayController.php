@@ -132,7 +132,7 @@ class PayController extends Controller
         return view('fpx.pStatus');
     }
 
-    public function transactionStatus() {
+    public function transactionReceipt() {
         return view('fpx.tStatus');
     }
 }
