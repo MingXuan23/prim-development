@@ -166,7 +166,7 @@ function certRollOver($old_crt,$new_crt)
 		return "true";
 }
 
-$fpx_buyerBankBranch=$_POST['fpx_buyerBankBranch'];
+$fpx_buyerBankBranch=$_GET['fpx_buyerBankBranch'];
 $fpx_buyerBankId=$_POST['fpx_buyerBankId'];
 $fpx_buyerIban=$_POST['fpx_buyerIban'];
 $fpx_buyerId=$_POST['fpx_buyerId'];
