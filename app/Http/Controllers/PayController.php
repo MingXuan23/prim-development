@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\User;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Process\Process;
 
 class PayController extends Controller
@@ -83,16 +85,16 @@ class PayController extends Controller
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency = "MYR";
         $fpx_txnAmount = $request->amount;
-        $fpx_buyerEmail = "ahmadraziqdanish@gmail.com";
+        $fpx_buyerEmail = "prim.utem@gmail.com";
         $fpx_checkSum = "";
-        $fpx_buyerName = "";
+        $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
         $fpx_buyerBankId = $request->bankid;
         $fpx_buyerBankBranch = "";
         $fpx_buyerAccNo = "";
         $fpx_buyerId = "";
         $fpx_makerName = "";
         $fpx_buyerIban = "";
-        $fpx_productDesc = "SampleProduct";
+        $fpx_productDesc = $request->desc;
         $fpx_version = "6.0";
 
         /* Generating signing String */
@@ -134,6 +136,17 @@ class PayController extends Controller
     }
 
     public function transactionReceipt(Request $request) {
-        return view('fpx.tStatus', compact('request'));
+        $user = User::find(Auth::id());
+
+        // switch ($request->fpx_productDesc) {
+        //     case 'School Fees':
+                
+        //         break;
+        //     default:
+
+        //         break;
+        // } 
+
+        return view('fpx.tStatus', compact('request', 'user'));
     }
 }

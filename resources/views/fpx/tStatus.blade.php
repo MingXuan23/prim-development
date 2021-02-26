@@ -205,122 +205,93 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
 // if val is 00 sucess 
 ?>
 
-  <table border="0" cellpadding="0" cellspacing="0" height="300" width="722">
-    <tbody>
-      <tr>
-        <td colspan="3" align="left" height="111"><table style="background:#FDE6C4;border: 1px solid rgb(222, 217, 197);" cellpadding="0" cellspacing="0" height="111" width="722" >
-            <tbody>
-              <tr>
-                <td align="center"><strong>SAMPLE FPX MERCHANT PAGE</strong></td>
-              </tr>
-            </tbody>
-          </table>
-		  </td>
-      </tr>
-      <!-- header_eof //-->
-      <!-- body //-->
-      <tr>
-        <td style="padding-right: 1px;" align="right" valign="top" width="6"><br>
-        </td>
-        <td style="padding-left: 1px; padding-right: 1px;" align="left" valign="top" width="716" colspan=2>
-		<table bgcolor="#FFFFFF" border="0" cellpadding="0" cellspacing="5" class="infoBelow" width="100%" height="100%">
-		  <tbody>
-              <tr>
-                <td height="150" valign="top">				
-				<p class="normal">
-                    Thanks for shopping fdfonline! </p>
-                  <p>&nbsp;</p>				  
-				  
-				  <p class="normal"><b>TRANSACTION DETAILS Hasiiiii</b></p>
-				<!-- Display details for Receipt -->
-				  <table width="100%" align="center">
-				  <?php
-				  if($val=="00")
-				  {
-					?>
-					<tr>
-                      <td width="44%" align="left" class="main">Transaction Status</td>
-                      <td width="7%" align="center" class="main">:</td>
-                      <td width="49%" align="left" class="main"><strong>
-					  <!-- Comparing Debit Auth Code and Credit Auth Code to cater SUCCESSFUL and UNSUCCESSFUL result -->	
-						<?php
-						  if ($fpx_debitAuthCode == '00' && $fpx_debitAuthCode == '00')
-							{
-								echo "SUCCESSFUL";					
-							}
-							elseif ($fpx_debitAuthCode == '99')
-							{
-								echo "PENDING FOR AUTHORIZER TO APPROVE";
-							}
-							elseif ($fpx_debitAuthCode != '00' || $fpx_debitAuthCode != '' || $fpx_debitAuthCode != '99' )
-							{
-								echo "UNSUCCESSFUL.";
-							} 
-						?>
-						</strong></td>
+<html>
+<head>
+    <title>Thanks for your order!</title>
+    <style>
+        @@media print {
+            #printPageButton {
+                display: none;
+            }
+
+            #returnPageButton {
+                display: none;
+            }
+
+            #topnav {
+                display: none;
+            }
+
+            @@page {
+                margin: 0;
+            }
+
+            body {
+                margin: 0.5cm;
+            }
+        }
+    </style>
+</head>
+<body style="font-size:16px">
+    <div class="container" style="padding:50px">
+        <div class="row">
+            <div class="col-md-6">
+                <address>
+                    <strong>{{ $user->name }}</strong>
+                    <br>
+                    <abbr title="Email">E:</abbr> {{ $user->email }}
+                    <br>
+                    <abbr title="Phone">P:</abbr> {{ $user->telno }}
+					<br>
+                    <abbr title="Bank">B:</abbr> {{ $fpx_buyerBankId }}
+                </address>
+            </div>
+            <div class="col-md-6 text-right">
+                <p>
+                    <em>Date: {{ $request->fpx_fpxTxnTime }}</em>
+                </p>
+                <p>
+                    <em>Receipt #: {{ $request->fpx_fpxTxnId }}</em>
+                </p>
+				<p>
+                    <em>Order #: {{ $request->fpx_sellerOrderNo }}</em>
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="text-center">
+                <h1>Receipt : <span style="color: green">Successful</span></h1>
+            </div>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Transaction</th>
+                        <th class="text-center">Price</th>
+                        <th class="text-center">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="col-md-9"><em>{{ $request->fpx_productDesc }}</em></td>
+                        <td class="col-md-1" style="text-align: center"> RM {{ $fpx_txnAmount }} </td>
+                        <td class="col-md-1 text-center">RM {{ $fpx_txnAmount }}</td>
                     </tr>
                     <tr>
-                      <td width="44%" align="left" class="main">FPX Txn ID</td>
-                      <td width="7%" align="center" class="main">:</td>
-                      <td width="49%" align="left" class="main"><?php print $fpx_fpxTxnId; ?></td>
+                        <td>   </td>
+                        <td>   </td>
+                        <td class="text-right"><h4><strong>Total: </strong></h4></td>
+                        <td class="text-center text-danger"><h4><strong>RM {{ ($fpx_txnAmount + 1) }}</strong></h4></td>
                     </tr>
-                    <tr>
-                      <td width="44%" align="left" class="main">Seller Order Number</td>
-                      <td width="7%" align="center" class="main">:</td>
-                      <td width="49%" align="left" class="main"><?php print $fpx_sellerOrderNo; ?></td>
-                    </tr>
-					<tr>
-                      <td width="44%" align="left" class="main">Buyer Bank</td>
-                      <td width="7%" align="center" class="main">:</td>
-                      <td width="49%" align="left" class="main"><?php print $fpx_buyerBankId; ?></td>
-                    </tr>					
-					<tr>
-                      <td width="44%" align="left" class="main">Transaction Amount</td>
-                      <td width="7%" align="center" class="main">:</td>
-                      <td width="49%" align="left" class="main">&nbsp;RM<?php print $fpx_txnAmount; ?></td>
-                    </tr>
-					<tr>
-					 <td width="44%" align="left" class="main"></td>
-                      <td width="7%" align="center" class="main"></td>
-                      <td width="49%" align="left" class="main">&nbsp <?php print $ErrorCode; ?> </td>
-                    </tr>
-					
-					<?php
-					}
-					else
-					{
-					?>
-					<tr>
-                      <td width="44%" align="left" class="main">  </td>
-                      <td width="7%" align="center" class="main"></td>
-                      <td width="49%" align="left" class="main"><?php print $ErrorCode; ?></td>
-                    </tr>
-					<?php
-					}
-					
-					?>
-					
-                  </table>
-			    </td>
-              </tr>
-		  </tbody>
-          </table></td>
-      </tr>
-      <!-- footer //-->  
-    </tbody>
-  </table>
-  <p>&nbsp;</p>
-  <hr>
-  <center>
-  <p class="infoBelow">&nbsp;</p>
-	<p>&nbsp;</p>
-	<tr>
-        <td style="padding-left: 1px; padding-right: 1px;" align="left" valign="top" width="716" colspan=2>
-			
-		</td>
-	</tr>
-  <p>&nbsp;</p>
-</center>   
-<!-- footer_eof //-->
-<br>
-</body></html>
+                </tbody>
+            </table>
+
+            <a href="https://prim.my/fees" id="returnPageButton" class="btn btn-primary">
+                <span class="mdi mdi-chevron-left-circle"> Return</span>
+            </a>
+            <button type="button" onclick="window.print();" id="printPageButton" class="btn btn-success ml-2">
+                <span class="mdi mdi-file-pdf"> Print</span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>
