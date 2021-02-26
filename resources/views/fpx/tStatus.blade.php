@@ -237,7 +237,7 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
                     <br>
                     <abbr title="Phone">P:</abbr> {{ $user->telno }}
 					<br>
-                    <abbr title="Bank">B:</abbr> {{ $fpx_buyerBankId }}
+                    <abbr title="Bank">B:</abbr> {{ $fpx_buyerBankBranch }}
                 </address>
             </div>
             <div class="col-md-6 text-right">
@@ -266,7 +266,7 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="col-md-9"><em>{{ $request->fpx_productDesc }}</em></td>
+                        <td class="col-md-9"><em>{{ $request->fpx_sellerExOrderNo }}</em></td>
                         <td class="col-md-1" style="text-align: center"> RM {{ $fpx_txnAmount }} </td>
                         <td class="col-md-1 text-center">RM {{ $fpx_txnAmount }}</td>
                     </tr>

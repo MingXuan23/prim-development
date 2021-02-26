@@ -78,7 +78,7 @@ class PayController extends Controller
         $fpx_msgType = "AR";
         $fpx_msgToken = "01";
         $fpx_sellerExId = "EX00012323";
-        $fpx_sellerExOrderNo = 'T' . rand(1000000000, 9999999999);
+        $fpx_sellerExOrderNo = $request->desc;
         $fpx_sellerTxnTime = date('YmdHis');
         $fpx_sellerOrderNo = $request->o_id;
         $fpx_sellerId = "SE00013841";
