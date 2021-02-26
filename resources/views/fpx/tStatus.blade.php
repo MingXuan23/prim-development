@@ -90,7 +90,7 @@ function verifySign_fpx($sign,$toSign)
 {
    error_reporting(0);
 
-return validateCertificate('fpx/',$sign, $toSign);
+return validateCertificate('https://prim.my/fpx/',$sign, $toSign);
 }
 
 function checkCertExpiry($path)
@@ -200,8 +200,6 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
 
 $val=verifySign_fpx($fpx_checkSum, $data);
 
-echo $txnId;
-echo $txnAmount;
 // if val is 00 sucess 
 ?>
 
