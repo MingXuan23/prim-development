@@ -1,10 +1,5 @@
-<html>
-<head>
-<title>SAMPLE FPX MERCHANT PAGE - Your One Stop Online Computer Shopping</title>
-<link rel="stylesheet" type="text/css" href="files/style.css">
-</head>
+@extends('layouts.master')
 
-<center>
 <?php
 /// Summary description for Controller
 ///  ErrorCode  : Description
@@ -205,9 +200,7 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
 // if val is 00 sucess 
 ?>
 
-<html>
-<head>
-    <title>Thanks for your order!</title>
+@section ('css')
     <style>
         @@media print {
             #printPageButton {
@@ -231,8 +224,9 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
             }
         }
     </style>
-</head>
-<body style="font-size:16px">
+@endsection
+
+@section('content')
     <div class="container" style="padding:50px">
         <div class="row">
             <div class="col-md-6">
@@ -293,5 +287,4 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
             </button>
         </div>
     </div>
-</body>
-</html>
+@endsection
