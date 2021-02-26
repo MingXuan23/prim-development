@@ -20,6 +20,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         //
-        'uatdemofpx.paynet.com.my/'
+        'https://uatdemofpx.paynet.com.my/UatBuyerBankSim1.7/CazhInter.jsp',
+        'https://uat.mepsfpx.com.my/FPXMain/processMesgFromSBIBanks.jsp'
     ];
 }
