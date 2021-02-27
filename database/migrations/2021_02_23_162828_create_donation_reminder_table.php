@@ -15,9 +15,11 @@ class CreateDonationReminderTable extends Migration
     {
         Schema::create('donation_reminder', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('timezoneoffset');
+            $table->string('date');
+            $table->string('time');
+            $table->string('day');
+            $table->string('recurrence');
             $table->timestamps();
-            $table->bigInteger('user_id')->unsigned()->index('donation_reminder_ibfk_1');
         });
     }
 
