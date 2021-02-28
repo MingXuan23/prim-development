@@ -11,7 +11,6 @@
 |
 */
 
-use App\Http\Controllers\DonationController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -29,30 +28,33 @@ Route::get('getdetails/{id}', 'DetailsController@getFees')->name('details.getfee
 Route::post('parent/fetchClass', 'ParentController@fetchClass')->name('parent.fetchClass');
 Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchStd');
 
-Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
-Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
-Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
-
 Route::group(['prefix' => 'donate'], function () {
-    
+    Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
+    Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
+    Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
 });
 
-// Route::get('{id}',['uses'=>'FeesDetailsController@getFees']);
-Route::resources([
-    'school'             => 'SchoolController',
-    'teacher'            => 'TeacherController',
-    'class'              => 'ClassController',
-    'student'            => 'StudentController',
-    'category'           => 'CategoryController',
-    'fees'               => 'FeesController',
-    'details'            => 'DetailsController',
-    'jaim'               => 'UserJaimController',
-    'parent'             => 'ParentController',
-    'pay'                => 'PayController',
-    'organization'       => 'OrganizationController',
-    'donate'             => 'DonationController',
-    'reminder'           => 'ReminderController'
-]);
+Route::group(['prefix' => 'organization'], function () {
+    Route::get('list','OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
+});
+
+Route::group(['middleware' => ['auth']], function() {
+    Route::resources([
+        'school'             => 'SchoolController',
+        'teacher'            => 'TeacherController',
+        'class'              => 'ClassController',
+        'student'            => 'StudentController',
+        'category'           => 'CategoryController',
+        'fees'               => 'FeesController',
+        'details'            => 'DetailsController',
+        'jaim'               => 'UserJaimController',
+        'parent'             => 'ParentController',
+        'pay'                => 'PayController',
+        'organization'       => 'OrganizationController',
+        'donate'             => 'DonationController',
+        'reminder'           => 'ReminderController'
+    ]);
+});
 
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');

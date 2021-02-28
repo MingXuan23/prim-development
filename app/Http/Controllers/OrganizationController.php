@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OrganizationRequest;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use View;
 
 class OrganizationController extends Controller
 {
@@ -16,14 +19,7 @@ class OrganizationController extends Controller
      */
     public function index()
     {
-
-        $userId = Auth::id();
-
-        $listorg = Organization::whereHas('user', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })->get();
-
-        return view('organization.index', compact('listorg'));
+        return view('organization.index');
     }
 
     /**
@@ -33,7 +29,6 @@ class OrganizationController extends Controller
      */
     public function create()
     {
-        //
         return view('organization.add');
     }
 
@@ -43,33 +38,17 @@ class OrganizationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(OrganizationRequest $request)
     {
-        $this->validate($request, [
-            'name'         =>  'required',
-            // 'code'         =>  'required',
-            'telno'        =>  'required|numeric',
-            'email'        =>  'required',
-            'address'      =>  'required',
-            'postcode'     =>  'required',
-            'state'        =>  'required',
-        ]);
 
-        $organization = Organization::create([
-            'nama'         =>  $request->get('name'),
-            'telno'        =>  $request->get('telno'),
-            'email'        =>  $request->get('email'),
-            'address'      =>  $request->get('address'),
-            'postcode'     =>  $request->get('postcode'),
-            'state'        =>  $request->get('state'),
-        ]);
-
+        //create organization
+        $organization = Organization::create($request->validated());
+        
+        //attach foreign key to pivot table 
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
 
         $user = Auth::user();
         
-        // $role = Role::create(['name' => 'Admin']);
-
         $user->assignRole('Admin');
 
         return redirect('/organization')->with('success', 'New organization has been added successfully');
@@ -155,6 +134,34 @@ class OrganizationController extends Controller
         } else {
             Session::flash('error', 'Organization Delete Failed');
             return View::make('layouts/flash-messages');
+        }
+    }
+
+    public function getOrganizationDatatable()
+    {
+        $userId = Auth::id();
+
+        // $organizationList = Organization::whereHas('user', function ($query) use ($userId) {
+        //     $query->where('user_id', $userId);
+        // })->get();
+
+        $data = DB::table('organizations')
+                ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+                ->join('users', 'users.id', '=', 'organization_user.user_id')
+                ->select('organizations.id','organizations.nama', 'organizations.telno', 'organizations.email', 'organizations.address')
+                ->where('users.id', $userId)
+                ->orderBy('organizations.nama');
+
+        if (request()->ajax()) {
+            return datatables()->of($data)
+                ->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('organization.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                })
+                ->make(true);
         }
     }
 }
