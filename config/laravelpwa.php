@@ -29,21 +29,21 @@ return [
                 'purpose' => 'any'
             ],
             '152x152' => [
-                'path' => '/images/icons/icon-152x152.png',
+                'path' => '/images/icons/icon-152x152.ico',
                 'purpose' => 'any'
             ],
             '192x192' => [
-                'path' => '/images/icons/icon-192x192.png',
+                'path' => '/images/icons/icon-192x192.ico',
                 'purpose' => 'any'
             ],
-            '384x384' => [
-                'path' => '/images/icons/icon-384x384.png',
-                'purpose' => 'any'
-            ],
-            '512x512' => [
-                'path' => '/images/icons/icon-512x512.png',
-                'purpose' => 'any'
-            ],
+            // '384x384' => [
+            //     'path' => '/images/icons/icon-384x384.png',
+            //     'purpose' => 'any'
+            // ],
+            // '512x512' => [
+            //     'path' => '/images/icons/icon-512x512.png',
+            //     'purpose' => 'any'
+            // ],
         ],
         'splash' => [
             '640x1136' => '/images/icons/splash-640x1136.png',
