@@ -60,12 +60,13 @@ class DonationController extends Controller
                 ->addColumn('status', function ($row) {
                     if ($row->status == '1') {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<button class="btn btn-success m-1"> Aktif </button></div>';
+                        $btn = $btn . '<h5><span class="badge badge-success">Aktif</span></h5>
+                        </div>';
 
                         return $btn;
                     } else {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<button  class="btn btn-danger m-1"> Aktif </button></div>';
+                        $btn = $btn . '<span class="badge badge-danger">Tidak Aktif</span></div>';
 
                         return $btn;
                     }
