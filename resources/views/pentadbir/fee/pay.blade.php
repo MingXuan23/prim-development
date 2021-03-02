@@ -91,30 +91,65 @@
                     </div>
                     <div class="col-md-8 p-3">
                        <h4>Jumlah : RM<span id="pay"></span> </h4>
+                        <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
+                       <select name="bankid" id="bankid" class="form-control">
+                           <option value="">Select bank</option>
+                           <option value="ABB0234">Affin B2C - Test ID</option>
+                           <option value="ABB0233">Affin Bank</option>
+                           <option value="ABMB0212">Alliance Bank (Personal)</option>
+                           <option value="AGRO01">AGRONet</option>
+                           <option value="AMBB0209">AmBank</option>
+                           <option value="BIMB0340">Bank Islam</option>
+                           <option value="BMMB0341">Bank Muamalat</option>
+                           <option value="BKRM0602">Bank Rakyat</option>
+                           <option value="BSN0601">BSN</option>
+                           <option value="BCBB0235">CIMB Clicks</option>
+                           <option value="CIT0219">Citibank</option>
+                           <option value="HLB0224">Hong Leong Bank</option>
+                           <option value="HSBC0223">HSBC Bank</option>
+                           <option value="KFH0346">KFH</option>
+                           <option value="MBB0228">Maybank2E</option>
+                           <option value="MB2U0227">Maybank2U</option>
+                           <option value="OCBC0229">OCBC Bank</option>
+                           <option value="PBB0233">Public Bank</option>
+                           <option value="RHB0218">RHB Bank</option>
+                           <option value="TEST0021">SBI Bank A</option>
+                           <option value="TEST0022">SBI Bank B</option>
+                           <option value="TEST0023">SBI Bank C</option>
+                           <option value="SCB0216">Standard Chartered</option>
+                           <option value="UOB0226">UOB Bank</option>
+                           <option value="UOB0229">UOB Bank - Test ID</option>
+                       </select>
                     </div>
                     <div class="col-md-4 p-2">
-                        <form method="POST" action="{{ route('fpxIndex') }}"
-                        enctype="multipart/form-data">
-                        {{ csrf_field() }}
-                        <input type="hidden" name="amount" id="amount" value="0.00">
-                        <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
-                        <button class="btn btn-success float-right" type="submit" onclick="">Bayar
-                            Sekarang</button>
-                    </form>
+                            {{ csrf_field() }}
+                            <input type="hidden" name="amount" id="amount" value="0.00">
+                            <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
+                            <input type="hidden" name="desc" id="desc" value="School Fees">
+                            <button class="btn btn-success float-right" type="submit" onclick="return checkBank();">Bayar Sekarang</button>
+                            <img src="assets/images/FPX_ParticipatingBanks.PNG" class="float-right" alt="FPXBanks" style="margin-top:20px">
+                        </form>
                     </div>
-                        <input type="hidden" name="bname" id="bname" value="{{ $getfees->nama  ?? '' }}">
-                        <input type="hidden" name="ttlpay" id="ttlpay" value="0.00">
-                        <input type="hidden" value="{{ route('payment') }}" id="routepay">
-                </div>
+                    <input type="hidden" name="bname" id="bname" value="{{ $getfees->nama  ?? '' }}">
+                    <input type="hidden" name="ttlpay" id="ttlpay" value="0.00">
+                    <input type="hidden" value="{{ route('payment') }}" id="routepay">
+            </div>
         </div>
     </div>
 </div>
-
-
 @endsection
 
 @section('script')
 <script>
+
+    function checkBank() {
+        var t = jQuery('#bankid').val();
+        if (t === '' || t === null) {
+            alert('Please select a bank');
+            return false;
+        }
+    }
+
     var amt = 0;
 
     $("#pay").html("0.00");

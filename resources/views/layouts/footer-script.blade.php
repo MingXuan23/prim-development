@@ -1,10 +1,24 @@
         <!-- JAVASCRIPT -->
         <script src="{{ URL::asset('assets/libs/jquery/jquery.min.js')}}"></script>
+        <script src="{{ URL::asset('assets/libs/jquery-ui/jquery-ui.min.js')}}"></script>
         <script src="{{ URL::asset('assets/libs/bootstrap/bootstrap.min.js')}}"></script>
         <script src="{{ URL::asset('assets/libs/metismenu/metismenu.min.js')}}"></script>
         <script src="{{ URL::asset('assets/libs/simplebar/simplebar.min.js')}}"></script>
         <script src="{{ URL::asset('assets/libs/node-waves/node-waves.min.js')}}"></script>
-
+        <script type="text/javascript">
+                // Initialize the service worker
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/serviceworker.js', {
+                        scope: '.'
+                    }).then(function (registration) {
+                        // Registration was successful
+                        console.log('Laravel PWA: ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function (err) {
+                        // registration failed :(
+                        console.log('Laravel PWA: ServiceWorker registration failed: ', err);
+                    });
+                }
+            </script>
         @yield('script')
 
         <!-- App js -->

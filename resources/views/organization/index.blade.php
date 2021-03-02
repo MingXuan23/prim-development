@@ -41,9 +41,11 @@
                 <div class="flash-message"></div>
 
                 <div class="table-responsive">
-                    <table id="organizationTable" class="table table-bordered table-striped">
+                    <table id="organizationTable" class="table table-bordered table-striped dt-responsive nowrap" 
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
+                                <th>No</th>
                                 <th>Nama Organisasi</th>
                                 <th>No Telefon</th>
                                 <th>Email</th>
@@ -51,26 +53,6 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-
-                        <tbody>
-                            @foreach($listorg as $row)
-                            <tr id="row{{$row->id}}">
-                                <td>{{ $row->nama }}</td>
-                                <td>{{ $row->telno }}</td>
-                                <td>{{ $row->email }}</td>
-                                <td>{{ $row->address }}</td>
-                                <td>
-                                    <div class="d-flex justify-content-center">
-                                        <a href="{{ route('organization.edit', $row->id ) }}"
-                                            class="btn btn-primary m-1">Edit</a>
-                                        <button id="{{ $row->id }}" data-token="{{ csrf_token() }}"
-                                            class="btn btn-danger m-1">Padam</button>
-                                    </div>
-                                </td>
-
-                            </tr>
-                            @endforeach
-                        </tbody>
                     </table>
                 </div>
             </div>
@@ -113,9 +95,44 @@
 
 <script>
     $(document).ready( function () {
+        
         var organizationTable = $('#organizationTable').DataTable({
             ordering: true,
-        });
+            processing: true,
+            serverSide: true,
+                ajax: {
+                    url: "{{ route('organization.getOrganizationDatatable') }}",
+                    type: 'GET',
+                },
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "nama",
+                    name: "nama"
+                }, {
+                    data: "telno",
+                    name: "telno"
+                }, {
+                    data: "email",
+                    name: "email"
+                }, {
+                    data: "address",
+                    name: "address"
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                },]
+          });
 
         // csrf token for ajax
         $.ajaxSetup({
@@ -136,6 +153,7 @@
                 type: 'POST',
                 dataType: 'html',
                 data: {
+                    "_token": "{{ csrf_token() }}",
                     _method: 'DELETE'
                 },
                 url: "/organization/" + organization_id,
@@ -149,7 +167,7 @@
 
                     $('div.flash-message').html(data);
 
-                    window.location.reload();
+                    organizationTable.ajax.reload();
                 },
                 error: function (data) {
                     $('div.flash-message').html(data);
@@ -159,7 +177,7 @@
 
         $('.alert').delay(3000).fadeOut();
 
-    } );
+    });
 
 </script>
 @endsection

@@ -19,7 +19,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'device_token'
+
     ];
 
     /**
@@ -42,7 +43,7 @@ class User extends Authenticatable
 
     public function organization()
     {
-        return $this->belongsToMany(Organization::class, 'organization_user');
+        return $this->belongsToMany(Organization::class, 'organization_user', 'user_id', 'organization_id');
     }
 
     public function organizationRole() {
