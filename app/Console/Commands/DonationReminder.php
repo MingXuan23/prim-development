@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Notifications\DonationReminderNotification;
+use DB;
 
 class DonationReminder extends Command
 {
@@ -37,42 +39,46 @@ class DonationReminder extends Command
      */
     public function handle()
     {
-        $data = DB::table('users')
-                ->join('user_donation_reminder','users.id','=','user_donation_reminder.user_id')
-                ->join('donations','user_donation_reminder.donation_id','=','donations.id')
-                ->join('donation_reminder','user_donation_reminder.reminder_id','=','donation_reminder.id')
-                ->select('users.email','users.name','users.device_token','donations.nama','donation_reminder.date','donation_reminder.day','donation_reminder.time')
-                ->get();
+            $data = DB::table('users')
+                    ->join('user_donation_reminder','users.id','=','user_donation_reminder.user_id')
+                    ->join('donations','user_donation_reminder.donation_id','=','donations.id')
+                    ->join('donation_reminder','user_donation_reminder.reminder_id','=','donation_reminder.id')
+                    ->select('users.email','users.name','users.device_token','donations.nama','donation_reminder.date','donation_reminder.day', 'donation_reminder.recurrence','donation_reminder.time')
+                    ->get();
 
-            $firebaseToken = User::whereNotNull('device_token')->pluck('device_token')->all();
-          
-            $SERVER_API_KEY = 'AAAAZ2cxdAY:APA91bG1viidrnyfHhJR_cvcmDBhyTubyqXLvu-g_gN6_cq5pBj1DiFW6CriQZr7zQ2Bz-bX4UZNWFSS7HX4bbpiniZpupvmwlZ_4hCySVwPVIqhNKB6Ejh5O7npWkTHtIM6MSMt9qqO';
-      
-            $data = [
-                "registration_ids" => $firebaseToken,
-                "notification" => [
-                    "title" => $data->name,
-                    "body" => $data->nama,  
-                ]
-            ];
-            $dataString = json_encode($data);
-        
-            $headers = [
-                'Authorization: key=' . $SERVER_API_KEY,
-                'Content-Type: application/json',
-            ];
-        
-            $ch = curl_init();
-          
-            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
-                   
-            $response = curl_exec($ch);
-      
-            dd($response);
+            // dd($data);
+            
+            foreach ($data as $reminder) {
+                $recurrence = $reminder->recurrence;
+                $time = $reminder->time;
+                $day = $reminder->day;
+                $date = $reminder->date;
+
+                //get current time
+                $timeNow = now()->format('H:i');
+                
+                //get current day
+                $dayNow = now()->dayOfWeekIso;
+
+                //get current date
+                $dateNow = now()->format('d');
+
+                if ($recurrence == "daily") {
+                    if($timeNow == $time)
+                        new DonationReminderNotification($reminder);
+                    else
+                        print_r("Not time: daily \n");
+                } else if ($recurrence == "weekly") {
+                    if(($timeNow == $time) && ($dayNow == $day))
+                        new DonationReminderNotification($reminder);
+                    else
+                        print_r("Not time: weekly \n");
+                } else if ($recurrence == "monthly") {
+                    if(($timeNow == $time) && ($dateNow == $date))
+                        new DonationReminderNotification($reminder);
+                    else
+                        print_r("NNot time: monthly\n");
+                }
+            }
     }
 }

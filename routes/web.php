@@ -77,9 +77,9 @@ Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file')
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
 
 Route::group(['prefix' => 'notification'], function () {
-    Route::get('/','HomeController@showNotification');
+    Route::get('/','HomeController@showNotification')->name('index.notification');
     Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
     Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
 });
 
-
+Route::get('/offline', 'HomeController@pwaOffline');

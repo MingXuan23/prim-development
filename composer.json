@@ -22,6 +22,7 @@
         "yajra/laravel-datatables-oracle": "^9.15"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.5",
         "facade/ignition": "^2.0",
         "fakerphp/faker": "^1.9.1",
         "laracasts/generators": "^2.0",
