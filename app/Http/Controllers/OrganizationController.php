@@ -73,11 +73,9 @@ class OrganizationController extends Controller
      */
     public function edit($id)
     {
-        //
+        
         $org = DB::table('organizations')->where('id', $id)->first();
 
-        //$userinfo = User_info::find($id);
-        //dd($userinfo);
         return view('organization.update', compact('org'));
     }
 
@@ -88,34 +86,11 @@ class OrganizationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(OrganizationRequest $request, $id)
     {
-        //
-        $this->validate($request, [
-            'name'         =>  'required',
-            // 'code'         =>  'required',
-            'telno'        =>  'required|numeric',
-            'email'        =>  'required',
-            'address'      =>  'required',
-            'postcode'     =>  'required',
-            'state'        =>  'required',
-        ]);
+        Organization::where('id', $id)->update($request->validated());
 
-        $orgupdate    = DB::table('organizations')
-            ->where('id', $id)
-            ->update(
-                [
-                    'nama'      => $request->get('name'),
-                    // 'code'      => $request->get('code'),
-                    'email'     => $request->get('email'),
-                    'telno'     => $request->get('telno'),
-                    'address'   => $request->get('address'),
-                    'state'     => $request->get('state'),
-                    'postcode'  => $request->get('postcode')
-                ]
-            );
-
-        return redirect('/organization')->with('success', 'The data has been updated!');
+        return redirect('/organization')->with('success', 'Maklumat berjaya dikemaskini');
     }
 
     /**
@@ -139,21 +114,10 @@ class OrganizationController extends Controller
 
     public function getOrganizationDatatable()
     {
-        $userId = Auth::id();
-
-        // $organizationList = Organization::whereHas('user', function ($query) use ($userId) {
-        //     $query->where('user_id', $userId);
-        // })->get();
-
-        $data = DB::table('organizations')
-                ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-                ->join('users', 'users.id', '=', 'organization_user.user_id')
-                ->select('organizations.id','organizations.nama', 'organizations.telno', 'organizations.email', 'organizations.address')
-                ->where('users.id', $userId)
-                ->orderBy('organizations.nama');
+        $organizationList = $this->getOrganizationByUserId();
 
         if (request()->ajax()) {
-            return datatables()->of($data)
+            return datatables()->of($organizationList)
                 ->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
@@ -163,5 +127,13 @@ class OrganizationController extends Controller
                 })
                 ->make(true);
         }
+    }
+
+    public function getOrganizationByUserId() {
+        $userId = Auth::id();
+
+        return Organization::whereHas('user', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })->get();
     }
 }
