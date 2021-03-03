@@ -18,8 +18,8 @@ class CreateTransactionsTable extends Migration
             $table->string('nama')->nullable();
             $table->string('description')->nullable();
             $table->string('transac_no')->nullable();
-            $table->dateTime('datetime_created')->nullable();    
-            $table->string('amount')->nullable();
+            $table->dateTime('datetime_created')->nullable();   
+            $table->double('amount', 8, 2)->nullable();
             $table->string('status')->nullable();
             $table->integer('user_id')->nullable();
         });

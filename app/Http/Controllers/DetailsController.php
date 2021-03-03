@@ -76,6 +76,8 @@ class DetailsController extends Controller
             'cat'          =>  'required',
         ]);
 
+        // price must in decimal
+        
         $no = (doubleval($request->get('price')));
         $total = $no * $request->get('quantity');
         // dd($total);

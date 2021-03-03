@@ -83,14 +83,7 @@ class DonationController extends Controller
                     $token = csrf_field();
                     $oid = $row->oid;
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<form method="POST" action="' . route('fpxIndex') . '"
-                            enctype="multipart/form-data">
-                            ' . $token . '
-                            <input type="hidden" name="amount" id="amount" value="6">
-                            <input type="hidden" name="o_id" id="o_id" value=" ' . $row->oid . ' ">
-                            <input type="hidden" name="donate_id" id="donate_id" value=" ' . $row->id . ' ">
-                            <button class="btn btn-primary float-right" type="submit" onclick="">Bayar Sekarang</button>
-                            </form></div>';
+                    $btn = $btn . '<a href="' .route('paydonate', ['id' => $row->id] ).' " class="btn btn-success m-1">Bayar</a></div>';
                     return $btn;
                 });
             } else {
