@@ -40,6 +40,15 @@ class PayController extends Controller
         return view('pentadbir.fee.pay', compact('getfees', 'getcat', 'getdetail'));
     }
 
+    public function donateindex(Request $request)
+    {
+        $donateid   = $request->id;
+        $getdonate  = DB::table('donations')->where('id', $donateid)->first();
+
+        // dd($getdonate);
+        return view('paydonate.pay', compact('getdonate'));
+    }
+
     public function paymentProcess(Request $request)
     {
         \Stripe\Stripe::setApiKey('sk_test_51I6AHSI3fJ2mpqjYO5tSNuiCIdR1dw7Bh2Lqgh0u8xPkVyCnyOEELQjMBPUTroSEH7DWCo6WYLTvMO2Vd58hu5gO00DQ1uX9Fj');
@@ -77,6 +86,19 @@ class PayController extends Controller
 
     public function fpxIndex(Request $request)
     {
+        // dd($request);
+        // $user = Auth::id();
+        if ($request->desc == 'Donation') {
+
+            $fpx_buyerEmail = $request->email;
+            $telno = $request->telno;
+            $fpx_buyerName = $request->name;
+        } else {
+            $fpx_buyerEmail = "prim.utem@gmail.com";
+            $telno = "";
+            $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
+        }
+
         $fpx_msgType = "AR";
         $fpx_msgToken = "01";
         $fpx_sellerExId = "EX00012323";
@@ -87,9 +109,7 @@ class PayController extends Controller
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency = "MYR";
         $fpx_txnAmount = $request->amount;
-        $fpx_buyerEmail = "prim.utem@gmail.com";
         $fpx_checkSum = "";
-        $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
         $fpx_buyerBankId = $request->bankid;
         $fpx_buyerBankBranch = "";
         $fpx_buyerAccNo = "";
@@ -103,6 +123,7 @@ class PayController extends Controller
         $data = $fpx_buyerAccNo . "|" . $fpx_buyerBankBranch . "|" . $fpx_buyerBankId . "|" . $fpx_buyerEmail . "|" . $fpx_buyerIban . "|" . $fpx_buyerId . "|" . $fpx_buyerName . "|" . $fpx_makerName . "|" . $fpx_msgToken . "|" . $fpx_msgType . "|" . $fpx_productDesc . "|" . $fpx_sellerBankCode . "|" . $fpx_sellerExId . "|" . $fpx_sellerExOrderNo . "|" . $fpx_sellerId . "|" . $fpx_sellerOrderNo . "|" . $fpx_sellerTxnTime . "|" . $fpx_txnAmount . "|" . $fpx_txnCurrency . "|" . $fpx_version;
 
         /* Reading key */
+        // dd(getenv('FPX_KEY'));
         $priv_key = getenv('FPX_KEY');
         $pkeyid = openssl_get_privatekey($priv_key, null);
         openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
@@ -129,15 +150,18 @@ class PayController extends Controller
             'fpx_buyerIban',
             'fpx_productDesc',
             'fpx_version',
+            'telno',
             'data'
         ));
     }
 
-    public function paymentStatus (Request $request) {
+    public function paymentStatus(Request $request)
+    {
         return view('fpx.pStatus', compact('request'));
     }
 
-    public function transactionReceipt(Request $request) {
+    public function transactionReceipt(Request $request)
+    {
         $user = User::find(Auth::id());
         $case = explode("_", $request->fpx_sellerExOrderNo);
 
@@ -159,6 +183,9 @@ class PayController extends Controller
                     if ($feetrans->save())
                         return view('fpx.tStatus', compact('request', 'user'));
                 }
+                break;
+
+            case 'Donation':
                 break;
             default:
                 return 'Failed';

@@ -12,16 +12,21 @@
                                 <tr>
                                     <td height="164" align="center" class="main"><b>Payment Method via FPX</b>
                                         <p>&nbsp;</p>
-                                        <input type="submit" style="cursor:hand" class="btn btn-primary" value="Click to Pay" />
+                                        <input type="submit" style="cursor:hand" class="btn btn-primary"
+                                            value="Click to Pay" />
                                         <p>&nbsp;</p>
                                         <p> <img src="assets/images/FPXButton.PNG" border="2" /></p>
                                         <p>&nbsp;</p>
                                         <p class="main">&nbsp;</p>
-                                        <p class="main"><strong>* You must have Internet Banking Account in order to make transaction using FPX.</strong></p>
+                                        <p class="main"><strong>* You must have Internet Banking Account in order to
+                                                make transaction using FPX.</strong></p>
                                         <p>&nbsp;</p>
-                                        <p class="main"><strong>* Please ensure that your browser's pop up blocker has been disabled to avoid any interruption during making transaction.</strong></p>
+                                        <p class="main"><strong>* Please ensure that your browser's pop up blocker has
+                                                been disabled to avoid any interruption during making
+                                                transaction.</strong></p>
                                         <p>&nbsp;</p>
-                                        <p class="main"><strong>* Do not close browser / refresh page until you receive response.</strong></p>
+                                        <p class="main"><strong>* Do not close browser / refresh page until you receive
+                                                response.</strong></p>
                                         <p>&nbsp;</p>
                                     </td>
                                 </tr>
@@ -31,7 +36,7 @@
                 </tr>
             </tbody>
         </table>
-    
+
         <input type=hidden value="{{ $fpx_msgType }}" name="fpx_msgType">
         <input type=hidden value="{{ $fpx_msgToken }}" name="fpx_msgToken">
         <input type=hidden value="{{ $fpx_sellerExId }}" name="fpx_sellerExId">
@@ -53,6 +58,7 @@
         <input type=hidden value="{{ $fpx_buyerIban }}" name="fpx_buyerIban">
         <input type=hidden value="{{ $fpx_version }}" name="fpx_version">
         <input type=hidden value="{{ $fpx_productDesc }}" name="fpx_productDesc">
+        <input type=hidden value="{{ $telno }}" name="telno">
     </form>
 
 </div>

@@ -54,7 +54,7 @@ class FeesController extends Controller
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('class_organization.id as id')
             ->orderBy('nama')
-            ->where('classes.nama', 'LIKE', $yearstd . '%')
+            ->where('classes.nama', 'LIKE',  '%' .$yearstd . '%')
             ->get();
 
         // dd($listclass[0]->id);
