@@ -126,7 +126,6 @@
                             <input type="hidden" name="amount" id="amount" value="0.00">
                             <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
                             <input type="hidden" name="desc" id="desc" value="School Fees">
-                            <input type="hidden" name="exno" id="exno" value="1">
                             <button class="btn btn-success float-right" type="submit" onclick="return checkBank();">Bayar Sekarang</button>
                             <img src="assets/images/FPX_ParticipatingBanks.PNG" class="float-right" alt="FPXBanks" style="margin-top:20px">
                         </form>

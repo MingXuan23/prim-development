@@ -80,7 +80,7 @@ class PayController extends Controller
         $fpx_msgType = "AR";
         $fpx_msgToken = "01";
         $fpx_sellerExId = "EX00012323";
-        $fpx_sellerExOrderNo = $request->exno;
+        $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
         $fpx_sellerTxnTime = date('YmdHis');
         $fpx_sellerOrderNo = $request->o_id;
         $fpx_sellerId = "SE00013841";
@@ -139,9 +139,10 @@ class PayController extends Controller
 
     public function transactionReceipt(Request $request) {
         $user = User::find(Auth::id());
+        $case = explode("_", $request->fpx_sellerExOrderNo);
 
-        switch ($request->fpx_sellerExOrderNo) {
-            case '1':
+        switch ($case[0]) {
+            case 'School Fees':
                 $transaction = new Transaction();
                 $transaction->nama = $request->fpx_sellerExOrderNo;
                 $transaction->description = $request->fpx_sellerOrderNo;
