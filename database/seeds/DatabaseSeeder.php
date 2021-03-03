@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleTableSeeder::class);
         $this->call(RemindersTableSeeder::class);
         $this->call(UserReminderDonationTableSeeder::class);
-        
+        $this->call(ModelHasRolesTableSeeder::class);
+        $this->call(PaymentTypeTableSeeder::class);
     }
 }
