@@ -37,7 +37,14 @@
                     </a>
                 </li>
 
-                @role('Superadmin|Jaim')
+                <li>
+                    <a href="{{ route('index.notification') }}" class=" waves-effect">
+                        <i class="ti-clipboard"></i>
+                        <span>Peringatan Derma</span>
+                    </a>
+                </li>
+
+                @role('Jaim')
                 <li>
                     <a href="{{ route('jaim.index') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>

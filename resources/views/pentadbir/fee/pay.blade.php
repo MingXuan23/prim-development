@@ -124,7 +124,6 @@
                     <div class="col-md-4 p-2">
                             {{ csrf_field() }}
                             <input type="hidden" name="amount" id="amount" value="0.00">
-                            <input type="hidden" name="exno" id="exno" value="1">
                             <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
                             <input type="hidden" name="desc" id="desc" value="School Fees">
                             <button class="btn btn-success float-right" type="submit" onclick="return checkBank();">Bayar Sekarang</button>

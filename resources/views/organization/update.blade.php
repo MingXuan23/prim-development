@@ -35,7 +35,7 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label>Nama Organisasi</label>
-                        <input type="text" name="name" class="form-control" placeholder="Nama Organisasi" value="{{ $org->nama }}">
+                        <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi" value="{{ $org->nama }}">
                     </div>
                     <div class="form-group">
                         <label>No Telefon</label>

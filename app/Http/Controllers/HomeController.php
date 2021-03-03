@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -43,7 +44,9 @@ class HomeController extends Controller
 
     public function saveToken(Request $request)
     {
-        auth()->user()->update(['device_token'=>$request->token]);
+        $userId = Auth::id();
+
+        auth()->user()->where('id', $userId)->update(['device_token'=>$request->token]);
         return response()->json(['token saved successfully.']);
     }
   
@@ -84,5 +87,9 @@ class HomeController extends Controller
         $response = curl_exec($ch);
   
         dd($response);
+    }
+
+    public function pwaOffline () {
+        return view('vendor.laravelpwa.offline');
     }
 }
