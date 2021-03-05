@@ -86,7 +86,7 @@ class PayController extends Controller
 
     public function fpxIndex(Request $request)
     {
-        // dd($request);
+            // dd($request);
         // $user = Auth::id();
         if ($request->desc == 'Donation') {
 
@@ -217,13 +217,13 @@ class PayController extends Controller
 
                     break;
                 default:
-                    return 'Failed';
+                    return view('errors.500');
                     break;
             }
-
-            return 'Failed';
-        } else {
-            return 'Failed';
+            return view('errors.500');
+        }
+        else {
+            return view('fpx.transactionFailed');
         }
     }
 }
