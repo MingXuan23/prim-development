@@ -167,6 +167,7 @@ class PayController extends Controller
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
                 case 'School Fees':
+                    $user = User::find(Auth::id());
                     $transaction = new Transaction();
                     $transaction->nama = $request->fpx_sellerExOrderNo;
                     $transaction->description = $request->fpx_sellerOrderNo;
@@ -188,6 +189,7 @@ class PayController extends Controller
                             return view('fpx.tStatus', compact('request', 'user'));
                     }
                     break;
+                    
                 case 'Donation':
 
                     $transaction = new Transaction();
