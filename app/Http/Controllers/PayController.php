@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Fees_Transaction;
+use App\Models\Fees_Transaction;
 use App\Http\Controllers\Controller;
 use App\Models\Detail;
-use App\Transaction;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\User;
@@ -165,33 +165,36 @@ class PayController extends Controller
         $user = User::find(Auth::id());
         $case = explode("_", $request->fpx_sellerExOrderNo);
 
-        switch ($case[0]) {
-            case 'School Fees':
-                $transaction = new Transaction();
-                $transaction->nama = $request->fpx_sellerExOrderNo;
-                $transaction->description = $request->fpx_sellerOrderNo;
-                $transaction->transac_no = $request->fpx_fpxTxnId;
-                $transaction->datetime_created = now();
-                $transaction->amount = $request->fpx_txnAmount;
-                $transaction->status = 'Success';
-                $transaction->user_id = Auth::id();
-
-                if ($transaction->save()) {
-                    $feetrans = new Fees_Transaction();
-                    $feetrans->student_fees_id = 1;
-                    $feetrans->payment_type_id = 1;
-                    $feetrans->transactions_id = $transaction->id;
-                    if ($feetrans->save())
-                        return view('fpx.tStatus', compact('request', 'user'));
-                }
-                break;
-            case 'Donation':
-                break;
-            default:
-                return 'Failed';
-                break;
+        if ($request->fpx_debitAuthCode == '00') {
+            switch ($case[0]) {
+                case 'School Fees':
+                    $transaction = new Transaction();
+                    $transaction->nama = $request->fpx_sellerExOrderNo;
+                    $transaction->description = $request->fpx_sellerOrderNo;
+                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction->datetime_created = now();
+                    $transaction->amount = $request->fpx_txnAmount;
+                    $transaction->status = 'Success';
+                    $transaction->user_id = Auth::id();
+    
+                    if ($transaction->save()) {
+                        $feetrans = new Fees_Transaction();
+                        $feetrans->student_fees_id = 1;
+                        $feetrans->payment_type_id = 1;
+                        $feetrans->transactions_id = $transaction->id;
+                        if ($feetrans->save())
+                            return view('fpx.tStatus', compact('request', 'user'));
+                    }
+                    break;
+                default:
+                    return 'Failed';
+                    break;
+            }
+    
+            return 'Failed';
         }
-
-        return 'Failed';
+        else {
+            return 'Failed';
+        }
     }
 }
