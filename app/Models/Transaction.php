@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Models\Donation;
 use Illuminate\Database\Eloquent\Model;
@@ -12,5 +12,5 @@ class Transaction extends Model
     {
         return $this->belongsToMany(Donation::class, 'donation_transaction');
     }
-
+    public $timestamps = false;
 }
