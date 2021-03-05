@@ -22,6 +22,7 @@ class CreateTransactionsTable extends Migration
             $table->double('amount', 8, 2)->nullable();
             $table->string('status')->nullable();
             $table->integer('user_id')->nullable();
+            $table->string('email')->nullable();
         });
     }
 

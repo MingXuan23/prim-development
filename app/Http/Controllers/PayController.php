@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Fees_Transaction;
 use App\Http\Controllers\Controller;
 use App\Models\Detail;
-use App\Transaction;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\User;
@@ -99,9 +99,9 @@ class PayController extends Controller
             $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
         }
 
-        $fpx_msgType = "AR";
-        $fpx_msgToken = "01";
-        $fpx_sellerExId = "EX00012323";
+        $fpx_msgType        = "AR";
+        $fpx_msgToken       = "01";
+        $fpx_sellerExId     = "EX00012323";
         $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
         $fpx_sellerTxnTime = date('YmdHis');
         $fpx_sellerOrderNo = $request->o_id;
@@ -162,11 +162,12 @@ class PayController extends Controller
 
     public function transactionReceipt(Request $request)
     {
-        $user = User::find(Auth::id());
         $case = explode("_", $request->fpx_sellerExOrderNo);
-
+        $user   = '';
+        $telno  = '';
         switch ($case[0]) {
             case 'School Fees':
+
                 $transaction = new Transaction();
                 $transaction->nama = $request->fpx_sellerExOrderNo;
                 $transaction->description = $request->fpx_sellerOrderNo;
@@ -186,6 +187,30 @@ class PayController extends Controller
                 break;
 
             case 'Donation':
+
+                $transaction = new Transaction();
+                $transaction->nama          = $request->fpx_sellerExOrderNo;
+                $transaction->description   = $request->fpx_sellerOrderNo;
+                $transaction->transac_no    = $request->fpx_fpxTxnId;
+                $transaction->datetime_created = now();
+                $transaction->amount        = $request->fpx_txnAmount;
+                $transaction->status        = 'Success';
+
+                $user = User::find(Auth::id());
+
+                if ($user) {
+                    $transaction->user_id   = Auth::id();
+                    $transaction->email     = $user->email;
+                } else {
+                    $transaction->email     = 'hisham@gmail.com';
+                }
+
+                if ($transaction->save()) {
+
+                    $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
+                    // return view('fpx.tStatus', compact('request', 'user'));
+                }
+
                 break;
             default:
                 return 'Failed';
