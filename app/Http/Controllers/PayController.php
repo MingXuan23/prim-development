@@ -178,7 +178,7 @@ class PayController extends Controller
                     $transaction->user_id = Auth::id();
     
                     if ($transaction->save()) {
-                        $res = DB::table('fees_transaction')->insert(array(
+                        $res = DB::table('fees_transactions')->insert(array(
                             0 => array(
                                 'student_fees_id' => 1,
                                 'payment_type_id' => 1,
