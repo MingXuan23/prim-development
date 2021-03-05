@@ -178,11 +178,14 @@ class PayController extends Controller
                     $transaction->user_id = Auth::id();
     
                     if ($transaction->save()) {
-                        $feetrans = new Fees_Transaction();
-                        $feetrans->student_fees_id = 1;
-                        $feetrans->payment_type_id = 1;
-                        $feetrans->transactions_id = $transaction->id;
-                        if ($feetrans->save())
+                        $res = DB::table('fees_transaction')->insert(array(
+                            0 => array(
+                                'student_fees_id' => 1,
+                                'payment_type_id' => 1,
+                                'transactions_id' => $transaction->id,
+                            ),
+                        ));
+                        if ($res)
                             return view('fpx.tStatus', compact('request', 'user'));
                     }
                     break;
