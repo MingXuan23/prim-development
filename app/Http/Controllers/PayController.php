@@ -175,16 +175,16 @@ class PayController extends Controller
                 $transaction->amount = $request->fpx_txnAmount;
                 $transaction->status = 'Success';
                 $transaction->user_id = Auth::id();
+
                 if ($transaction->save()) {
                     $feetrans = new Fees_Transaction();
-                    $feetrans->student_fees_id = '';
+                    $feetrans->student_fees_id = 1;
                     $feetrans->payment_type_id = 1;
                     $feetrans->transactions_id = $transaction->id;
                     if ($feetrans->save())
                         return view('fpx.tStatus', compact('request', 'user'));
                 }
                 break;
-
             case 'Donation':
                 break;
             default:
