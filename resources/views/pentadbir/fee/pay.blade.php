@@ -109,7 +109,7 @@
                            <option value="HSBC0223">HSBC Bank</option>
                            <option value="KFH0346">KFH</option>
                            <option value="MBB0228">Maybank2E</option>
-                           <option value="MB2U0227">Maybank2U</option>
+                           <option value="MB2U0227"> Maybank2U</option>
                            <option value="OCBC0229">OCBC Bank</option>
                            <option value="PBB0233">Public Bank</option>
                            <option value="RHB0218">RHB Bank</option>
@@ -126,8 +126,9 @@
                             <input type="hidden" name="amount" id="amount" value="0.00">
                             <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
                             <input type="hidden" name="desc" id="desc" value="School Fees">
+                            <br>
+                            <br>
                             <button class="btn btn-success float-right" type="submit" onclick="return checkBank();">Bayar Sekarang</button>
-                            <img src="assets/images/FPX_ParticipatingBanks.PNG" class="float-right" alt="FPXBanks" style="margin-top:20px">
                         </form>
                     </div>
                     <input type="hidden" name="bname" id="bname" value="{{ $getfees->nama  ?? '' }}">
@@ -135,6 +136,13 @@
                     <input type="hidden" value="{{ route('payment') }}" id="routepay">
             </div>
         </div>
+    </div>
+    <hr>
+    <h4>Powered by:</h4>
+    <div class="row" style="align-self: center">
+            <a href="https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp">
+                <img src="assets/images/FPX_ParticipatingBanks.PNG" alt="FPXBanks">
+            </a>
     </div>
 </div>
 @endsection
