@@ -189,6 +189,7 @@ class PayController extends Controller
                             return view('fpx.tStatus', compact('request', 'user'));
                     }
                     break;
+                    
                 case 'Donation':
 
                     $transaction = new Transaction();
