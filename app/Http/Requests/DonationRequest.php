@@ -25,10 +25,10 @@ class DonationRequest extends FormRequest
     {
         return [
             'organization'  =>  'required|not_in:0',
-            'nama'          =>  'required',
+            'name'          =>  'required',
             'description'   =>  'required',
-            'date_started'  =>  'required',
-            'date_end'      =>  'required'
+            'start_date'    =>  'required',
+            'end_date'      =>  'required'
         ];
     }
 }

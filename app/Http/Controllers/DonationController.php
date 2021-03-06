@@ -128,6 +128,7 @@ class DonationController extends Controller
     public function store(DonationRequest $request)
     {
 
+        // dd($request);
         $dt = Carbon::now();
         $startdate  = $dt->toDateString($request->get('start_date'));
         $enddate    = $dt->toDateString($request->get('end_date'));
