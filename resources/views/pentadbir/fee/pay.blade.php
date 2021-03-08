@@ -152,8 +152,13 @@
 
     function checkBank() {
         var t = jQuery('#bankid').val();
+        var a = parseFloat(jQuery('#amount').val());
         if (t === '' || t === null) {
             alert('Please select a bank');
+            return false;
+        }
+        else if (a < 1.00 || a > 30000.00) {
+            alert('Total amount of transaction should be between RM2.00 and RM30,000.00');
             return false;
         }
     }
