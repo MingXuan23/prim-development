@@ -268,7 +268,7 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
                     <tr>
                         <td class="col-md-9"><em>{{ $request->fpx_sellerExOrderNo }}</em></td>
                         <td class="col-md-1" style="text-align: center"> RM {{ $fpx_txnAmount }} </td>
-                        @if ($case[0] == "School Fees")
+                        @if ($desc == "School Fees")
                             <td class="col-md-1 text-center text-danger">RM 1.50</td>
                         @else
                             <td class="col-md-1 text-center text-danger">RM 1.00</td>
