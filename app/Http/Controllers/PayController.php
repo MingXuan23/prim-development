@@ -163,7 +163,6 @@ class PayController extends Controller
     public function transactionReceipt(Request $request)
     {
         $case = explode("_", $request->fpx_sellerExOrderNo);
-        $desc = $case[0];
 
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
@@ -216,7 +215,7 @@ class PayController extends Controller
                     if ($transaction->save()) {
 
                         $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
-                        return view('fpx.tStatus', compact('request', 'user', 'desc'));
+                        return view('fpx.tStatus', compact('request', 'user'));
                     }
 
                     break;
