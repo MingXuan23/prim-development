@@ -187,6 +187,9 @@ class PayController extends Controller
                         ));
                         if ($res)
                             return view('fpx.tStatus', compact('request', 'user'));
+                        else {
+                            return view('errors.500');
+                        }
                     }
                     break;
                     
@@ -212,7 +215,7 @@ class PayController extends Controller
                     if ($transaction->save()) {
 
                         $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
-                        return view('fpx.tStatus', compact('request', 'user'));
+                        return view('fpx.tStatus', compact('request', 'user', 'case'));
                     }
 
                     break;
