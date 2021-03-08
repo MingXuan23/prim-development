@@ -82,15 +82,15 @@ class DonationController extends Controller
 
                 $table->addColumn('action', function ($row) {
                     $token = csrf_field();
-                    $oid = $row->oid;
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' .route('paydonate', ['id' => $row->id] ).' " class="btn btn-success m-1">Bayar</a></div>';
+                    $btn = $btn . '<a href="' . route('paydonate', ['id' => $row->id]) . ' " class="btn btn-success m-1">Bayar</a></div>';
                     return $btn;
                 });
             } else {
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('donate.details', $row->id) . '" class="btn btn-primary m-1">Details</a>';
                     $btn = $btn . '<a href="' . route('donate.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
@@ -99,6 +99,24 @@ class DonationController extends Controller
             $table->rawColumns(['status', 'action']);
             return $table->make(true);
         }
+    }
+
+
+    public function listAllDonor($id)
+    {
+        // dd($id);
+        $listdonor = DB::table('users')
+            ->join('donation_user', 'donation_user.user_id', '=', 'users.id')
+            ->join('donations', 'donations.id', '=', 'donation_user.donation_id')
+            ->join('donation_transaction', 'donation_transaction.donation_user_id', '=', 'donation_user.id')
+            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
+            ->select('users.name as uname', 'users.email', 'donations.nama as dname', 'transactions.amount', 'transactions.status')
+            ->where('donations.id', $id)
+            ->orderBy('donations.nama');
+
+        dd($listdonor->get());
+        // $organization = Organization::get();
+        // return $organization;
     }
 
     public function listAllOrganization()
@@ -141,7 +159,7 @@ class DonationController extends Controller
             'date_end'       =>  $enddate,
             'status'         =>  '1',
         ]);
-        
+
         $newdonate->organization()->attach($request->get('organization'));
 
         return redirect('/donate')->with('success', 'New donations has been added successfully');
