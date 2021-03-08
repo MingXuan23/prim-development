@@ -192,7 +192,7 @@
                         <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
                        <select name="bankid" id="bankid" class="form-control">
                            <option value="">Select bank</option>
-                           @foreach ($collection as $key=>$value)
+                           @foreach ($bank_list as $key=>$value)
                                 @if ($value == "A")
                                     <option value="{{ $key }}">{{ $key }}</option>
                                 @else
