@@ -157,8 +157,12 @@
             alert('Please select a bank');
             return false;
         }
-        else if (a < 1.00 || a > 30000.00) {
-            alert('Total amount of transaction should be between RM2.00 and RM30,000.00');
+        if (a < 1.00) {
+            alert('Transaction Amount is Lower than the Minimum Limit RM1.00 for B2C');
+            return false;
+        }
+        else if (a > 30000.00) {
+            alert('Transaction Amount Limit Exceeded RM30,000.00 for B2C');
             return false;
         }
     }

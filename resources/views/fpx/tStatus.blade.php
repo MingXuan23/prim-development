@@ -278,7 +278,11 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
                         <td>   </td>
                         <td>   </td>
                         <td class="text-right"><h4><strong>Total: </strong></h4></td>
-                        <td class="text-center text-danger"><h4><strong>RM {{ ($fpx_txnAmount + 1.00) }}</strong></h4></td>
+                        @if (explode("_", $fpx_sellerExOrderNo)[0] == "School Fees")
+                            <td class="text-center text-danger"><h4><strong>RM {{ $fpx_txnAmount }}</strong></h4></td>
+                        @else
+                            <td class="text-center text-danger"><h4><strong>RM {{ ($fpx_txnAmount + 1.00) }}</strong></h4></td>
+                        @endif
                     </tr>
                 </tbody>
             </table>
