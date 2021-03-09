@@ -92,8 +92,8 @@ class PayController extends Controller
 
             $fpx_buyerEmail = $request->email;
             $telno = $request->telno;
-            $fpx_buyerName = $request->name ;
-            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis'). "_" . $request->name . "_" . $telno . "_" . $request->email;
+            $fpx_buyerName = $request->name;
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis') . "_" . $request->name . "_" . $telno . "_" . $request->email;
         } else {
             $fpx_buyerEmail = "prim.utem@gmail.com";
             $telno = "";
@@ -197,13 +197,12 @@ class PayController extends Controller
                 case 'Donation':
 
                     $user       = User::find(Auth::id());
-                    $text       = explode("_", $request->fpx_buyerName);
                     $username   = $case[2];
-                    $telno      = $text[3];
-                    $email      = $text[4];
+                    $telno      = $case[3];
+                    $email      = $case[4];
 
                     $transaction = new Transaction();
-                    $transaction->nama          = $request->fpx_sellerExOrderNo;
+                    $transaction->nama          = $case[0] . '_' . $case[1];
                     $transaction->description   = $request->fpx_sellerOrderNo;
                     $transaction->transac_no    = $request->fpx_fpxTxnId;
                     $transaction->datetime_created = now();
