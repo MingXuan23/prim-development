@@ -92,17 +92,18 @@ class PayController extends Controller
 
             $fpx_buyerEmail = $request->email;
             $telno = $request->telno;
-            $fpx_buyerName = $request->name . "_" . $telno;
+            $fpx_buyerName = $request->name ;
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis'). "_" . $request->name . "_" . $telno . "_" . $request->email;
         } else {
             $fpx_buyerEmail = "prim.utem@gmail.com";
             $telno = "";
             $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
         }
 
         $fpx_msgType        = "AR";
         $fpx_msgToken       = "01";
         $fpx_sellerExId     = "EX00012323";
-        $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
         $fpx_sellerTxnTime  = date('YmdHis');
         $fpx_sellerOrderNo  = $request->o_id;
         $fpx_sellerId       = "SE00013841";
@@ -197,8 +198,9 @@ class PayController extends Controller
 
                     $user       = User::find(Auth::id());
                     $text       = explode("_", $request->fpx_buyerName);
-                    $username   = $text[0];
-                    $telno      = $text[1];
+                    $username   = $case[2];
+                    $telno      = $text[3];
+                    $email      = $text[4];
 
                     $transaction = new Transaction();
                     $transaction->nama          = $request->fpx_sellerExOrderNo;
@@ -207,9 +209,11 @@ class PayController extends Controller
                     $transaction->datetime_created = now();
                     $transaction->amount        = $request->fpx_txnAmount;
                     $transaction->status        = 'Success';
-                    $transaction->email         = $request->fpx_buyerEmail;
+                    $transaction->email         = $email;
                     $transaction->telno         = $telno;
                     $transaction->username      = $username;
+
+                    $request->buyerName = $username;
 
                     if ($user) {
                         $transaction->user_id   = Auth::id();
