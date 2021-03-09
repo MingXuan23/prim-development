@@ -30,6 +30,7 @@ Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchS
 
 Route::group(['prefix' => 'donate'], function () {
     Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
+    Route::get('donationdetails/{id}', 'DonationController@listAllDonor')->name('donate.details');
     Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
     Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
 });

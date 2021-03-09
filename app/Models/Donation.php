@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Transaction;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -21,9 +22,9 @@ class Donation extends Model
         return $this->belongsToMany(Organization::class, 'donation_organization');
     }
 
-    public function transaction()
+    public function user()
     {
-        return $this->belongsToMany(Transaction::class, 'donation_transaction');
+        return $this->belongsToMany(User::class, 'donation_user');
     }
 
 }
