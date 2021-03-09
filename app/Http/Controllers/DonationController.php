@@ -78,7 +78,6 @@ class DonationController extends Controller
             if ($hasOrganizaton == "false") {
                 $table->addColumn('action', function ($row) {
                     $token = csrf_field();
-                    $oid = $row->oid;
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<a href="' . route('paydonate', ['id' => $row->id]) . ' " class="btn btn-success m-1">Bayar</a></div>';
                     return $btn;
@@ -87,6 +86,7 @@ class DonationController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('donate.details', $row->id) . '" class="btn btn-primary m-1">Details</a>';
                     $btn = $btn . '<a href="' . route('donate.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
@@ -97,7 +97,40 @@ class DonationController extends Controller
         }
     }
 
-    public static function listAllOrganization()
+
+    public function listAllDonor($id)
+    {
+        // dd($id);
+        $listdonor = DB::table('donations')
+            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
+            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
+            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email')
+            ->where('donations.id', $id)
+            ->orderBy('donations.nama')
+            ->get();
+
+        dd($listdonor);
+        // $case = explode("_", 'hisham_hishamudin@gmail.com_0124025232');
+        // dd($case[2]);
+
+        // $emailuser[] = '';
+        // for ($i = 0; $i < count($listdonor); $i++) {
+        //     $emailuser[] = $listdonor[$i]->email;
+
+        //     $listdonor2 = DB::table('users')->where('email', $emailuser[$i])->get();
+        // }
+
+        // dd($listdonor2->toArray());
+
+        // $organization = Organization::get();
+        // return $organization;
+    }
+
+    public function historyDonor()
+    {
+    }
+
+    public function listAllOrganization()
     {
         $organization = Organization::get();
         return $organization;

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Donation;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -50,4 +51,9 @@ class User extends Authenticatable
         return $this->belongsToMany(OrganizationRole::class, 'organization_user','', 'role_id');
     }
     
+    public function donation()
+    {
+        return $this->belongsToMany(Donation::class, 'donation_user');
+    }
+
 }
