@@ -187,6 +187,9 @@ class PayController extends Controller
                         ));
                         if ($res)
                             return view('fpx.tStatus', compact('request', 'user'));
+                        else {
+                            return view('errors.500');
+                        }
                     }
                     break;
                     
