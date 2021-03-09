@@ -201,98 +201,104 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
 ?>
 
 @section ('css')
-    <style>
-        @@media print {
-            #printPageButton {
-                display: none;
-            }
-
-            #returnPageButton {
-                display: none;
-            }
-
-            #topnav {
-                display: none;
-            }
-
-            @@page {
-                margin: 0;
-            }
-
-            body {
-                margin: 0.5cm;
-            }
+<style>
+    @@media print {
+        #printPageButton {
+            display: none;
         }
-    </style>
+
+        #returnPageButton {
+            display: none;
+        }
+
+        #topnav {
+            display: none;
+        }
+
+        @@page {
+            margin: 0;
+        }
+
+        body {
+            margin: 0.5cm;
+        }
+    }
+</style>
 @endsection
 
 @section('content')
-    <div class="container" style="padding:50px">
-        <div class="row">
-            <div class="col-md-6">
-                <address>
-                    <strong>{{ $fpx_buyerName }}</strong>
-                    <br>
-                    <abbr title="Email">E:</abbr> {{ $user->email }}
-                    <br>
-                    <abbr title="Phone">P:</abbr> {{ $user->telno }}
-					<br>
-                    <abbr title="Bank">B:</abbr> {{ $fpx_buyerBankBranch }}
-                </address>
-            </div>
-            <div class="col-md-6 text-right">
-                <p>
-                    <em>Date: {{ $request->fpx_fpxTxnTime }}</em>
-                </p>
-                <p>
-                    <em>Receipt #: {{ $request->fpx_fpxTxnId }}</em>
-                </p>
-				<p>
-                    <em>Order #: {{ $request->fpx_sellerOrderNo }}</em>
-                </p>
-            </div>
+<div class="container" style="padding:50px">
+    <div class="row">
+        <div class="col-md-6">
+            <address>
+                <strong>{{ $fpx_buyerName }}</strong>
+                <br>
+                <abbr title="Email">E:</abbr> {{ $user->email }}
+                <br>
+                <abbr title="Phone">P:</abbr> {{ $user->telno }}
+                <br>
+                <abbr title="Bank">B:</abbr> {{ $fpx_buyerBankBranch }}
+            </address>
         </div>
-        <div class="row">
-            <div class="text-center">
-                <h1>Receipt : <span style="color: green">Successful</span></h1>
-            </div>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Transaction</th>
-                        <th class="text-center">Price</th>
-                        <th class="text-center">Tax (Paid By JAIM)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="col-md-9"><em>{{ $request->fpx_sellerExOrderNo }}</em></td>
-                        <td class="col-md-1" style="text-align: center"> RM {{ $fpx_txnAmount }} </td>
-                        @if (explode("_", $fpx_sellerExOrderNo)[0] == "School Fees")
-                            <td class="col-md-1 text-center text-danger">RM 1.50</td>
-                        @else
-                            <td class="col-md-1 text-center text-danger">RM 1.00</td>
-                        @endif
-                    </tr>
-                    <tr>
-                        <td>   </td>
-                        <td>   </td>
-                        <td class="text-right"><h4><strong>Total: </strong></h4></td>
-                        @if (explode("_", $fpx_sellerExOrderNo)[0] == "School Fees")
-                            <td class="text-center text-danger"><h4><strong>RM {{ $fpx_txnAmount }}</strong></h4></td>
-                        @else
-                            <td class="text-center text-danger"><h4><strong>RM {{ ($fpx_txnAmount + 1.00) }}</strong></h4></td>
-                        @endif
-                    </tr>
-                </tbody>
-            </table>
-
-            <a href="https://prim.my/fees" id="returnPageButton" class="btn btn-primary">
-                <span class="mdi mdi-chevron-left-circle"> Return</span>
-            </a>
-            <button type="button" onclick="window.print();" id="printPageButton" class="btn btn-success ml-2">
-                <span class="mdi mdi-file-pdf"> Print</span>
-            </button>
+        <div class="col-md-6 text-right">
+            <p>
+                <em>Date: {{ $request->fpx_fpxTxnTime }}</em>
+            </p>
+            <p>
+                <em>Receipt #: {{ $request->fpx_fpxTxnId }}</em>
+            </p>
+            <p>
+                <em>Order #: {{ $request->fpx_sellerOrderNo }}</em>
+            </p>
         </div>
     </div>
+    <div class="row">
+        <div class="text-center">
+            <h1>Receipt : <span style="color: green">Successful</span></h1>
+        </div>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Transaction</th>
+                    <th class="text-center">Price</th>
+                    <th class="text-center">Tax (Paid By JAIM)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-md-9"><em>{{ $request->fpx_sellerExOrderNo }}</em></td>
+                    <td class="col-md-1" style="text-align: center"> RM {{ $fpx_txnAmount }} </td>
+                    @if (explode("_", $fpx_sellerExOrderNo)[0] == "School Fees")
+                    <td class="col-md-1 text-center text-danger">RM 1.50</td>
+                    @else
+                    <td class="col-md-1 text-center text-danger">RM 1.00</td>
+                    @endif
+                </tr>
+                <tr>
+                    <td>   </td>
+                    <td>   </td>
+                    <td class="text-right">
+                        <h4><strong>Total: </strong></h4>
+                    </td>
+                    @if (explode("_", $fpx_sellerExOrderNo)[0] == "School Fees")
+                    <td class="text-center text-danger">
+                        <h4><strong>RM {{ $fpx_txnAmount }}</strong></h4>
+                    </td>
+                    @else
+                    <td class="text-center text-danger">
+                        <h4><strong>RM {{ $fpx_txnAmount }}</strong></h4>
+                    </td>
+                    @endif
+                </tr>
+            </tbody>
+        </table>
+
+        <a href="https://prim.my/fees" id="returnPageButton" class="btn btn-primary">
+            <span class="mdi mdi-chevron-left-circle"> Return</span>
+        </a>
+        <button type="button" onclick="window.print();" id="printPageButton" class="btn btn-success ml-2">
+            <span class="mdi mdi-file-pdf"> Print</span>
+        </button>
+    </div>
+</div>
 @endsection

@@ -217,7 +217,8 @@ class PayController extends Controller
                     if ($transaction->save()) {
 
                         $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
-                        return view('fpx.tStatus', compact('request', 'user'));
+                        dd($request);
+                        // return view('fpx.tStatus', compact('request', 'user'));
                     }
 
                     break;
