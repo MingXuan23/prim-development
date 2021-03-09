@@ -15,7 +15,7 @@ class DonationController extends Controller
 {
     public function index()
     {
-        $organization = $this->listOrganizationByUserId();
+        $organization = $this->getOrganizationByUserId();
         return view('donate.index', compact('organization'));
     }
 
@@ -27,10 +27,7 @@ class DonationController extends Controller
 
     public function getDonationByOrganizationDatatable(Request $request)
     {
-
-
         if (request()->ajax()) {
-
             $oid = $request->oid;
 
             $hasOrganizaton = $request->hasOrganization;
@@ -79,12 +76,11 @@ class DonationController extends Controller
             });
 
             if ($hasOrganizaton == "false") {
-
                 $table->addColumn('action', function ($row) {
                     $token = csrf_field();
                     $oid = $row->oid;
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' .route('paydonate', ['id' => $row->id] ).' " class="btn btn-success m-1">Bayar</a></div>';
+                    $btn = $btn . '<a href="' . route('paydonate', ['id' => $row->id]) . ' " class="btn btn-success m-1">Bayar</a></div>';
                     return $btn;
                 });
             } else {
@@ -101,13 +97,13 @@ class DonationController extends Controller
         }
     }
 
-    public function listAllOrganization()
+    public static function listAllOrganization()
     {
         $organization = Organization::get();
         return $organization;
     }
 
-    public function listOrganizationByUserId()
+    public function getOrganizationByUserId()
     {
         $userId = Auth::id();
 
@@ -120,7 +116,7 @@ class DonationController extends Controller
 
     public function create()
     {
-        $organization = $this->listOrganizationByUserId();
+        $organization = $this->getOrganizationByUserId();
 
         return view('donate.add', compact('organization'));
     }
@@ -141,7 +137,7 @@ class DonationController extends Controller
             'date_end'       =>  $enddate,
             'status'         =>  '1',
         ]);
-        
+
         $newdonate->organization()->attach($request->get('organization'));
 
         return redirect('/donate')->with('success', 'New donations has been added successfully');
@@ -191,5 +187,11 @@ class DonationController extends Controller
             Session::flash('error', 'Donation Delete Failed');
             return View::make('layouts/flash-messages');
         }
+    }
+
+    public static function getAllDonation()
+    {
+        $donations = Donation::get();
+        return $donations;
     }
 }

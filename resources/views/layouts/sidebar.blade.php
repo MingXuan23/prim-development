@@ -38,10 +38,13 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('index.notification') }}" class=" waves-effect">
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Peringatan Derma</span>
                     </a>
+                    <ul class="sub-menu" aria-expanded="true">
+                        <li><a href="{{ route('reminder.index') }}">Pengurusan Peringatan</a></li>
+                    </ul>
                 </li>
 
                 @role('Jaim')
