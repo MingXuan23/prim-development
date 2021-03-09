@@ -86,13 +86,13 @@ class PayController extends Controller
 
     public function fpxIndex(Request $request)
     {
-            // dd($request);
+        // dd($request);
         // $user = Auth::id();
         if ($request->desc == 'Donation') {
 
             $fpx_buyerEmail = $request->email;
             $telno = $request->telno;
-            $fpx_buyerName = $request->name;
+            $fpx_buyerName = $request->name . "_" . $telno;
         } else {
             $fpx_buyerEmail = "prim.utem@gmail.com";
             $telno = "";
@@ -103,21 +103,21 @@ class PayController extends Controller
         $fpx_msgToken       = "01";
         $fpx_sellerExId     = "EX00012323";
         $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-        $fpx_sellerTxnTime = date('YmdHis');
-        $fpx_sellerOrderNo = $request->o_id;
-        $fpx_sellerId = "SE00013841";
+        $fpx_sellerTxnTime  = date('YmdHis');
+        $fpx_sellerOrderNo  = $request->o_id;
+        $fpx_sellerId       = "SE00013841";
         $fpx_sellerBankCode = "01";
-        $fpx_txnCurrency = "MYR";
-        $fpx_txnAmount = $request->amount;
-        $fpx_checkSum = "";
-        $fpx_buyerBankId = $request->bankid;
+        $fpx_txnCurrency    = "MYR";
+        $fpx_txnAmount      = $request->amount;
+        $fpx_checkSum       = "";
+        $fpx_buyerBankId    = $request->bankid;
         $fpx_buyerBankBranch = "";
-        $fpx_buyerAccNo = "";
-        $fpx_buyerId = "";
-        $fpx_makerName = "";
-        $fpx_buyerIban = "";
-        $fpx_productDesc = $request->desc;
-        $fpx_version = "6.0";
+        $fpx_buyerAccNo     = "";
+        $fpx_buyerId        = "";
+        $fpx_makerName      = "";
+        $fpx_buyerIban      = "";
+        $fpx_productDesc    = $request->desc;
+        $fpx_version        = "6.0";
 
         /* Generating signing String */
         $data = $fpx_buyerAccNo . "|" . $fpx_buyerBankBranch . "|" . $fpx_buyerBankId . "|" . $fpx_buyerEmail . "|" . $fpx_buyerIban . "|" . $fpx_buyerId . "|" . $fpx_buyerName . "|" . $fpx_makerName . "|" . $fpx_msgToken . "|" . $fpx_msgType . "|" . $fpx_productDesc . "|" . $fpx_sellerBankCode . "|" . $fpx_sellerExId . "|" . $fpx_sellerExOrderNo . "|" . $fpx_sellerId . "|" . $fpx_sellerOrderNo . "|" . $fpx_sellerTxnTime . "|" . $fpx_txnAmount . "|" . $fpx_txnCurrency . "|" . $fpx_version;
@@ -192,8 +192,13 @@ class PayController extends Controller
                         }
                     }
                     break;
-                    
+
                 case 'Donation':
+
+                    $user       = User::find(Auth::id());
+                    $text       = explode("_", $request->fpx_buyerName);
+                    $username   = $text[0];
+                    $telno      = $text[1];
 
                     $transaction = new Transaction();
                     $transaction->nama          = $request->fpx_sellerExOrderNo;
@@ -202,16 +207,13 @@ class PayController extends Controller
                     $transaction->datetime_created = now();
                     $transaction->amount        = $request->fpx_txnAmount;
                     $transaction->status        = 'Success';
-
-                    $user = User::find(Auth::id());
+                    $transaction->email         = $request->fpx_buyerEmail;
+                    $transaction->telno         = $telno;
+                    $transaction->username      = $username;
 
                     if ($user) {
                         $transaction->user_id   = Auth::id();
-                        $transaction->email     = $user->email;
-                    } else {
-                        $transaction->email     = 'hisham@gmail.com';
                     }
-
                     if ($transaction->save()) {
 
                         $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
@@ -224,8 +226,7 @@ class PayController extends Controller
                     break;
             }
             return view('errors.500');
-        }
-        else {
+        } else {
             return view('fpx.transactionFailed');
         }
     }

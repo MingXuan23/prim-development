@@ -105,18 +105,34 @@ class DonationController extends Controller
     public function listAllDonor($id)
     {
         // dd($id);
-        $listdonor = DB::table('users')
-            ->join('donation_user', 'donation_user.user_id', '=', 'users.id')
-            ->join('donations', 'donations.id', '=', 'donation_user.donation_id')
-            ->join('donation_transaction', 'donation_transaction.donation_user_id', '=', 'donation_user.id')
+        $listdonor = DB::table('donations')
+            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
             ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
-            ->select('users.name as uname', 'users.email', 'donations.nama as dname', 'transactions.amount', 'transactions.status')
+            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email')
             ->where('donations.id', $id)
-            ->orderBy('donations.nama');
+            ->orderBy('donations.nama')
+            ->get();
 
-        dd($listdonor->get());
+        dd($listdonor);
+        // $case = explode("_", 'hisham_hishamudin@gmail.com_0124025232');
+        // dd($case[2]);
+
+        // $emailuser[] = '';
+        // for ($i = 0; $i < count($listdonor); $i++) {
+        //     $emailuser[] = $listdonor[$i]->email;
+
+        //     $listdonor2 = DB::table('users')->where('email', $emailuser[$i])->get();
+        // }
+
+        // dd($listdonor2->toArray());
+
         // $organization = Organization::get();
         // return $organization;
+    }
+
+    public function historyDonor()
+    {
+        
     }
 
     public function listAllOrganization()
