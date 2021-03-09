@@ -10,7 +10,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Derma</h4>
+            <h4 class="font-size-18">Peringatan Derma</h4>
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Derma >> Peringatan Derma</li>
             </ol>
@@ -36,7 +36,8 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label>Peringatan</label>
-                            <select type="text" name="recurrence" id="recurrence" class="form-control" placeholder="Peringatan">
+                        <select type="text" name="recurrence" id="recurrence" class="form-control"
+                            placeholder="Peringatan">
                             <option value="" disabled selected>Pilih Peringatan</option>
                             <option value="daily">Harian</option>
                             <option value="weekly">Mingguan</option>
@@ -47,44 +48,44 @@
                         <label class="control-label">Tarikh</label>
                         <div id="datepicker-date" class="input-group date" data-date-format="mm-dd-yyyy"
                             data-provide="datepicker">
-                            <input class="form-control" id="date" name="date" type="date"
-                                placeholder="Pilih Tarikh" autocomplete="off">
+                            <input class="form-control" id="date" name="date" type="date" placeholder="Pilih Tarikh"
+                                autocomplete="off">
                         </div>
                     </div>
                     <div class="form-group" id="time-form" style="display: none">
                         <label>Masa</label>
                         <div id="datepicker-time" class="input-group date">
-                            <input class="form-control" id="time" name="time" type="time"
-                                placeholder="Pilih Masa" autocomplete="off">
+                            <input class="form-control" id="time" name="time" type="time" placeholder="Pilih Masa"
+                                autocomplete="off">
                         </div>
                     </div>
                     <div class="form-group" id="day-form" style="display: none">
                         <label>Hari</label>
-                            <select type="text" name="" class="form-control" placeholder="Peringatan">
+                        <select type="text" name="" class="form-control" placeholder="Peringatan">
                             <option value="" disabled selected>Pilih Hari</option>
-                            <option value="Isnin">Isnin</option>
-                            <option value="Selesa">Selesa</option>
-                            <option value="Rabu">Rabu</option>
-                            <option value="Khamis">Khamis</option>
-                            <option value="Jumaat">Jumaat</option>
-                            <option value="Sabtu">Sabtu</option>
-                            <option value="Ahad">Ahad</option>
+                            <option value="1">Isnin</option>
+                            <option value="2">Selesa</option>
+                            <option value="3">Rabu</option>
+                            <option value="4">Khamis</option>
+                            <option value="5">Jumaat</option>
+                            <option value="6">Sabtu</option>
+                            <option value="7">Ahad</option>
 
                         </select>
                     </div>
-                    </div>
-                    <div class="form-group mb-0">
-                        <div>
-                            <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
-                                Simpan
-                            </button>
-                        </div>
+                </div>
+                <div class="form-group mb-0">
+                    <div>
+                        <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
+                            Simpan
+                        </button>
                     </div>
                 </div>
-
-            </form>
         </div>
+
+        </form>
     </div>
+</div>
 </div>
 @endsection
 
@@ -105,6 +106,8 @@
 
 <script>
     $(document).ready(function(){
+
+        //reminder form
         $("#recurrence").change(function() {
             if ($(this).val() == "daily") {
                 $('#time-form').show();
@@ -120,28 +123,24 @@
                 $('#day-form').hide();
             }
         });
-    });
-</script>
-<<<<<<< HEAD
-=======
 
-<script>
-  
-    var firebaseConfig = {
-        apiKey: "AIzaSyDNqEXol-c8yRpS7Vrsha5H1WGLBaqfWbI",
-        authDomain: "primmy.firebaseapp.com",
-        projectId: "primmy",
-        storageBucket: "primmy.appspot.com",
-        messagingSenderId: "444112925702",
-        appId: "1:444112925702:web:b18cfccc89f9835db27f87",
-        measurementId: "G-DFHDL94FKJ"
-    };
-      
-    firebase.initializeApp(firebaseConfig);
-    const messaging = firebase.messaging();
-  
-    function initFirebaseMessagingRegistration() {
-            messaging
+        //init notification and token for firebase services
+
+        //firebase config
+        var firebaseConfig = {
+            apiKey: "AIzaSyDNqEXol-c8yRpS7Vrsha5H1WGLBaqfWbI",
+            authDomain: "primmy.firebaseapp.com",
+            projectId: "primmy",
+            storageBucket: "primmy.appspot.com",
+            messagingSenderId: "444112925702",
+            appId: "1:444112925702:web:b18cfccc89f9835db27f87",
+            measurementId: "G-DFHDL94FKJ"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        messaging
             .requestPermission()
             .then(function () {
                 return messaging.getToken()
@@ -163,27 +162,26 @@
                     },
                     dataType: 'JSON',
                     success: function (response) {
-                        alert('Token saved successfully.');
+                        // alert('Token saved successfully.');
                     },
                     error: function (err) {
-                        console.log('User Chat Token Error'+ err);
+                        // console.log('User Chat Token Error'+ err);
                     },
                 });
   
             }).catch(function (err) {
                 console.log('User Chat Token Error'+ err);
             });
-     }  
-      
-    messaging.onMessage(function(payload) {
-        const noteTitle = payload.notification.title;
-        const noteOptions = {
-            body: payload.notification.body,
-            icon: payload.notification.icon,
-        };
-        new Notification(noteTitle, noteOptions);
+
+            messaging.onMessage(function(payload) {
+                const noteTitle = payload.notification.title;
+                const noteOptions = {
+                    body: payload.notification.body,
+                    icon: payload.notification.icon,
+                };
+                new Notification(noteTitle, noteOptions);
+            });
+        
     });
-   
 </script>
->>>>>>> 8a0c01c383195204058187527b6342c0b57b1961
 @endsection

@@ -39,46 +39,49 @@ class DonationReminder extends Command
      */
     public function handle()
     {
-            $data = DB::table('users')
-                    ->join('user_donation_reminder','users.id','=','user_donation_reminder.user_id')
-                    ->join('donations','user_donation_reminder.donation_id','=','donations.id')
-                    ->join('donation_reminder','user_donation_reminder.reminder_id','=','donation_reminder.id')
-                    ->select('users.email','users.name','users.device_token','donations.nama','donation_reminder.date','donation_reminder.day', 'donation_reminder.recurrence','donation_reminder.time')
+        $data = DB::table('users')
+                    ->join('user_donation_reminder', 'users.id', '=', 'user_donation_reminder.user_id')
+                    ->join('donations', 'user_donation_reminder.donation_id', '=', 'donations.id')
+                    ->join('donation_reminder', 'user_donation_reminder.reminder_id', '=', 'donation_reminder.id')
+                    ->select('users.email', 'users.name', 'users.device_token', 'donations.nama', 'donation_reminder.date', 'donation_reminder.day', 'donation_reminder.recurrence', 'donation_reminder.time')
                     ->get();
 
-            // dd($data);
+        // dd($data);
             
-            foreach ($data as $reminder) {
-                $recurrence = $reminder->recurrence;
-                $time = $reminder->time;
-                $day = $reminder->day;
-                $date = $reminder->date;
+        foreach ($data as $reminder) {
+            $recurrence = $reminder->recurrence;
+            $time = $reminder->time;
+            $day = $reminder->day;
+            $date = $reminder->date;
 
-                //get current time
-                $timeNow = now()->format('H:i');
+            //get current time
+            $timeNow = now()->format('H:i');
                 
-                //get current day
-                $dayNow = now()->dayOfWeekIso;
+            //get current day
+            $dayNow = now()->dayOfWeekIso;
 
-                //get current date
-                $dateNow = now()->format('d');
+            //get current date
+            $dateNow = now()->format('d');
 
-                if ($recurrence == "daily") {
-                    if($timeNow == $time)
-                        new DonationReminderNotification($reminder);
-                    else
-                        print_r("Not time: daily \n");
-                } else if ($recurrence == "weekly") {
-                    if(($timeNow == $time) && ($dayNow == $day))
-                        new DonationReminderNotification($reminder);
-                    else
-                        print_r("Not time: weekly \n");
-                } else if ($recurrence == "monthly") {
-                    if(($timeNow == $time) && ($dateNow == $date))
-                        new DonationReminderNotification($reminder);
-                    else
-                        print_r("NNot time: monthly\n");
+            if ($recurrence == "daily") {
+                if ($timeNow == $time) {
+                    new DonationReminderNotification($reminder);
+                } else {
+                    print_r("Not time: daily \n");
+                }
+            } elseif ($recurrence == "weekly") {
+                if (($timeNow == $time) && ($dayNow == $day)) {
+                    new DonationReminderNotification($reminder);
+                } else {
+                    print_r("Not time: weekly \n");
+                }
+            } elseif ($recurrence == "monthly") {
+                if (($timeNow == $time) && ($dateNow == $date)) {
+                    new DonationReminderNotification($reminder);
+                } else {
+                    print_r("NNot time: monthly\n");
                 }
             }
+        }
     }
 }
