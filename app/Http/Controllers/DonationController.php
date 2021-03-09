@@ -132,7 +132,17 @@ class DonationController extends Controller
 
     public function historyDonor()
     {
-        
+        $userId = Auth::id();
+
+        $listhistory = DB::table('donations')
+            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
+            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
+            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email')
+            ->where('transactions.user_id', $userId)
+            ->orderBy('donations.nama')
+            ->get();
+
+        dd($listhistory);
     }
 
     public function listAllOrganization()

@@ -33,13 +33,14 @@ Route::group(['prefix' => 'donate'], function () {
     Route::get('donationdetails/{id}', 'DonationController@listAllDonor')->name('donate.details');
     Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
     Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
+    Route::get('history', 'DonationController@historyDonor')->name('historypayment');
 });
 
 Route::group(['prefix' => 'organization'], function () {
-    Route::get('list','OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
+    Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
 });
 
-Route::group(['middleware' => ['auth']], function() {
+Route::group(['middleware' => ['auth']], function () {
     Route::resources([
         'school'             => 'SchoolController',
         'teacher'            => 'TeacherController',
@@ -79,7 +80,7 @@ Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file')
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
 
 Route::group(['prefix' => 'notification'], function () {
-    Route::get('/','HomeController@showNotification')->name('index.notification');
+    Route::get('/', 'HomeController@showNotification')->name('index.notification');
     Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
     Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
 });
