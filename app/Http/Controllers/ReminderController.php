@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Reminder;
 use Illuminate\Http\Request;
+use App\Http\Controllers\DonationController;
+use App\Http\Requests\ReminderRequest;
+use App\Models\Donation;
+use DB;
+use Illuminate\Support\Carbon;
 
 class ReminderController extends Controller
 {
@@ -14,7 +19,8 @@ class ReminderController extends Controller
      */
     public function index()
     {
-        return view("reminder.index");
+        $donations = DonationController::getAllDonation();
+        return view("reminder.index", compact('donations'));
     }
 
     /**
@@ -33,17 +39,16 @@ class ReminderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ReminderRequest $request)
     {
-        $this->validate($request, [
-            'date'          =>  'required',
-            'time'          =>  'required',
-        ]);
+        $dateRequest = new Carbon($request->date);
 
-        $date = Carbon::parse("{$request->date} {$request->time}");
+        $date = $dateRequest->format('d');
+        
 
+        dd($date);
         // $reminder = Reminder::create([
-        //     'timezoneoffset'       s    =>  
+        //     'timezoneoffset'       s    =>
         // ]);
     }
 
@@ -90,5 +95,53 @@ class ReminderController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public static function getReminderByDonationId($donationId)
+    {
+        $reminders = DB::table('donation_reminder')
+                        ->join('user_donation_reminder', 'donation_reminder.id', '=', 'user_donation_reminder.reminder_id')
+                        ->join('donations', 'user_donation_reminder.donation_id', '=', 'donations.id')
+                        ->select('donations.id', 'donations.nama', 'donation_reminder.date', 'donation_reminder.day', 'donation_reminder.time', 'donation_reminder.recurrence')
+                        ->where('donations.id', $donationId)
+                        ->orderBy('donations.nama')
+                        ->get();
+
+        return $reminders;
+    }
+
+    public static function getAllReminder()
+    {
+        $reminders = DB::table('donation_reminder')
+                        ->join('user_donation_reminder', 'donation_reminder.id', '=', 'user_donation_reminder.reminder_id')
+                        ->join('donations', 'user_donation_reminder.donation_id', '=', 'donations.id')
+                        ->select('donations.id', 'donations.nama', 'donation_reminder.date', 'donation_reminder.day', 'donation_reminder.time', 'donation_reminder.recurrence')
+                        ->orderBy('donations.nama')
+                        ->get();
+        
+        return $reminders;
+    }
+
+    public function getReminderDatatable(Request $request)
+    {
+        $donationId = $request->donationId;
+
+        if (request()->ajax()) {
+            if (is_null($donationId)) {
+                $data = $this->getAllReminder();
+            } else {
+                $data = $this->getReminderByDonationId($donationId);
+            }
+
+            return datatables()->of($data)
+                ->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('reminder.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                })
+                ->make(true);
+        }
     }
 }

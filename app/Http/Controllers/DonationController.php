@@ -15,7 +15,7 @@ class DonationController extends Controller
 {
     public function index()
     {
-        $organization = $this->listOrganizationByUserId();
+        $organization = $this->getOrganizationByUserId();
         return view('donate.index', compact('organization'));
     }
 
@@ -27,10 +27,7 @@ class DonationController extends Controller
 
     public function getDonationByOrganizationDatatable(Request $request)
     {
-
-
         if (request()->ajax()) {
-
             $oid = $request->oid;
 
             $hasOrganizaton = $request->hasOrganization;
@@ -79,7 +76,6 @@ class DonationController extends Controller
             });
 
             if ($hasOrganizaton == "false") {
-
                 $table->addColumn('action', function ($row) {
                     $token = csrf_field();
                     $btn = '<div class="d-flex justify-content-center">';
@@ -151,7 +147,7 @@ class DonationController extends Controller
         return $organization;
     }
 
-    public function listOrganizationByUserId()
+    public function getOrganizationByUserId()
     {
         $userId = Auth::id();
 
@@ -164,7 +160,7 @@ class DonationController extends Controller
 
     public function create()
     {
-        $organization = $this->listOrganizationByUserId();
+        $organization = $this->getOrganizationByUserId();
 
         return view('donate.add', compact('organization'));
     }
@@ -235,5 +231,11 @@ class DonationController extends Controller
             Session::flash('error', 'Donation Delete Failed');
             return View::make('layouts/flash-messages');
         }
+    }
+
+    public static function getAllDonation()
+    {
+        $donations = Donation::get();
+        return $donations;
     }
 }
