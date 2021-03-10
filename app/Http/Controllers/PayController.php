@@ -93,12 +93,14 @@ class PayController extends Controller
             $fpx_buyerEmail = $request->email;
             $telno = $request->telno;
             $fpx_buyerName = $request->name;
-            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis') . "_" . $request->name . "_" . $telno . "_" . $request->email;
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail = "prim.utem@gmail.com";
             $telno = "";
             $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_buyerIban      = "";
         }
 
         $fpx_msgType        = "AR";
@@ -116,7 +118,6 @@ class PayController extends Controller
         $fpx_buyerAccNo     = "";
         $fpx_buyerId        = "";
         $fpx_makerName      = "";
-        $fpx_buyerIban      = "";
         $fpx_productDesc    = $request->desc;
         $fpx_version        = "6.0";
 
@@ -164,6 +165,7 @@ class PayController extends Controller
     public function transactionReceipt(Request $request)
     {
         $case = explode("_", $request->fpx_sellerExOrderNo);
+        $text = explode("/", $request->fpx_buyerIban);
 
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
@@ -197,12 +199,12 @@ class PayController extends Controller
                 case 'Donation':
 
                     $user       = User::find(Auth::id());
-                    $username   = $case[2];
-                    $telno      = $case[3];
-                    $email      = $case[4];
+                    $username   = $text[0];
+                    $telno      = $text[1];
+                    $email      = $text[2];
 
                     $transaction = new Transaction();
-                    $transaction->nama          = $case[0] . '_' . $case[1];
+                    $transaction->nama          = $request->fpx_sellerExOrderNo;
                     $transaction->description   = $request->fpx_sellerOrderNo;
                     $transaction->transac_no    = $request->fpx_fpxTxnId;
                     $transaction->datetime_created = now();
@@ -220,7 +222,7 @@ class PayController extends Controller
                     if ($transaction->save()) {
 
                         $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
-                        // dd($request);
+                        dd($request);
                         return view('fpx.tStatus', compact('request', 'user'));
                     }
 
