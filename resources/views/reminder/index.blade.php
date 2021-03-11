@@ -128,8 +128,10 @@
 
       fetch_data();
 
+      var reminderTable;
+
       function fetch_data(donationId = '') {
-          $('#reminderTable').DataTable({
+          reminderTable = $('#reminderTable').DataTable({
                   processing: true,
                   serverSide: true,
                   ajax: {
@@ -196,10 +198,10 @@
           }
       });
 
-      var donation_id;
+      var reminder_id;
 
       $(document).on('click', '.btn-danger', function(){
-          donation_id = $(this).attr('id');
+        reminder_id = $(this).attr('id');
           $('#deleteConfirmationModal').modal('show');
       });
 
@@ -210,7 +212,7 @@
                 data: {
                     _method: 'DELETE'
                 },
-                url: "/donate/" + donation_id,
+                url: "/reminder/" + reminder_id,
                 beforeSend: function() {
                     $('#delete').text('Padam...');
                 },
@@ -219,7 +221,11 @@
                         $('#confirmModal').modal('hide');
                     }, 2000);
 
-                    window.location.reload();
+                    $('div.flash-message').html(data);
+                    
+                    // window.location.reload();
+                    reminderTable.ajax.reload();
+
                 },
                 error: function (data) {
                     $('div.flash-message').html(data);

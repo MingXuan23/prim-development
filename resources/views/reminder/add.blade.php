@@ -39,9 +39,10 @@
                 <div class="form-group">
                     <label>Derma</label>
                     <select name="donation" id="donation" class="form-control">
-                        <option value="" selected>Semua Derma</option>
+                        <option value="" >Semua Derma</option>
                         @foreach($donations as $donation)
-                        <option value="{{ $donation->id }}">{{ $donation->nama }}</option>
+                        <option value="{{ $donation->id ? $donation->id : old($donation->id)}}
+                            " {{ old($donation->id) ? 'selected' : 'selected' }}>{{ $donation->nama }}</option>
                         @endforeach
                     </select>
                 </div>
