@@ -383,7 +383,7 @@ new Chartist.Pie('#simple-pie', data, {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\prim\resources\js\pages\chartist.init */"./resources/js/pages/chartist.init.js");
+module.exports = __webpack_require__(/*! D:\laragon\www\prim-development\resources\js\pages\chartist.init */"./resources/js/pages/chartist.init.js");
 
 
 /***/ })

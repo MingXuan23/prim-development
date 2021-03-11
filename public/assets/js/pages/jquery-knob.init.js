@@ -113,7 +113,7 @@ $(function () {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\prim\resources\js\pages\jquery-knob.init.js */"./resources/js/pages/jquery-knob.init.js");
+module.exports = __webpack_require__(/*! D:\laragon\www\prim-development\resources\js\pages\jquery-knob.init.js */"./resources/js/pages/jquery-knob.init.js");
 
 
 /***/ })
