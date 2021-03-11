@@ -24,8 +24,8 @@ class ReminderRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'recurrence'    => 'required',
-            'donation'      => '',
+            'recurrence'    => 'required',
+            'donation'      => 'required',
             'date'          => '',
             'time'          => '',
             'day'           => ''

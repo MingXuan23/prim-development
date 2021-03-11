@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reminder;
-use Illuminate\Http\Request;
 use App\Http\Controllers\DonationController;
 use App\Http\Requests\ReminderRequest;
-use App\Models\Donation;
+use Illuminate\Http\Request;
+use Session;
+use View;
 use Auth;
 use DB;
-use Illuminate\Support\Carbon;
 
 class ReminderController extends Controller
 {
@@ -47,7 +47,6 @@ class ReminderController extends Controller
         $reminder = Reminder::create($request->validated());
         
         $reminder->donation()->attach($request->donation, ['user_id' => $userId]);
-        
 
         return redirect('/reminder')->with('success', 'Peringatan derma telah berjaya ditambah');
     }
@@ -71,7 +70,7 @@ class ReminderController extends Controller
      */
     public function edit($id)
     {
-        $donations = DonationController::getAllDonation();
+        $donations = DonationController::getDonationByReminderId($id);
         $reminder = Reminder::find($id);
 
         return view('reminder.add', compact('donations'))->with('reminder', $reminder);
@@ -87,7 +86,6 @@ class ReminderController extends Controller
     public function update(ReminderRequest $request, $id)
     {
         Reminder::where('id', $id)->update($request->validated());
-        Reminder::find($id)->donation()->updateExistingPivot($request->donation, $request->donation);
 
         return redirect('/reminder')->with('success', 'Peringatan derma berjaya dikemaskini');
     }
@@ -100,7 +98,15 @@ class ReminderController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $result = Reminder::find($id)->delete();
+
+        if ($result) {
+            Session::flash('success', 'Peringatan derma telah berjaya dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Peringatan derma gagal untuk dipadam');
+            return View::make('layouts/flash-messages');
+        }
     }
 
     public static function getReminderByDonationId($donationId)

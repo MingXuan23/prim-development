@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DonationRequest;
-use Illuminate\Http\Request;
-use App\Models\Donation;
 use App\Models\Organization;
-use Carbon\Carbon;
+use App\Models\Reminder;
+use App\Models\Donation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
+use Carbon\Carbon;
 
 class DonationController extends Controller
 {
@@ -236,6 +237,15 @@ class DonationController extends Controller
     public static function getAllDonation()
     {
         $donations = Donation::get();
+        return $donations;
+    }
+
+    public static function getDonationByReminderId($id)
+    {
+        $donations = Donation::whereHas('reminder', function ($query) use ($id) {
+            $query->where('reminder_id', $id);
+        })->get();
+
         return $donations;
     }
 }
