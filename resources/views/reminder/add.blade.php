@@ -20,7 +20,6 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card card-primary">
-
             @if(count($errors) > 0)
             <div class="alert alert-danger">
                 <ul>
@@ -30,59 +29,70 @@
                 </ul>
             </div>
             @endif
-            {{-- {{ route('sekolah.store') }} --}}
-            <form method="post" action="{{ route('reminder.store') }} " enctype="multipart/form-data">
-                {{csrf_field()}}
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>Peringatan</label>
-                        <select type="text" name="recurrence" id="recurrence" class="form-control"
-                            placeholder="Peringatan">
-                            <option value="" disabled selected>Pilih Peringatan</option>
-                            <option value="daily">Harian</option>
-                            <option value="weekly">Mingguan</option>
-                            <option value="monthly">Bulanan</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="date-form" style="display: none">
-                        <label class="control-label">Tarikh</label>
-                        <div id="datepicker-date" class="input-group date" data-date-format="mm-dd-yyyy"
-                            data-provide="datepicker">
-                            <input class="form-control" id="date" name="date" type="date" placeholder="Pilih Tarikh"
-                                autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-group" id="time-form" style="display: none">
-                        <label>Masa</label>
-                        <div id="datepicker-time" class="input-group date">
-                            <input class="form-control" id="time" name="time" type="time" placeholder="Pilih Masa"
-                                autocomplete="off">
-                        </div>
-                    </div>
-                    <div class="form-group" id="day-form" style="display: none">
-                        <label>Hari</label>
-                        <select type="text" name="" class="form-control" placeholder="Peringatan">
-                            <option value="" disabled selected>Pilih Hari</option>
-                            <option value="1">Isnin</option>
-                            <option value="2">Selesa</option>
-                            <option value="3">Rabu</option>
-                            <option value="4">Khamis</option>
-                            <option value="5">Jumaat</option>
-                            <option value="6">Sabtu</option>
-                            <option value="7">Ahad</option>
 
-                        </select>
+            <form action="{{ $reminder->id == null ? route('reminder.store') :  action('ReminderController@update', $reminder->id) }}" method="POST">
+            {{csrf_field()}}
+            @isset($reminder->id)
+            {{ method_field('PATCH')}}
+            @endisset
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Derma</label>
+                    <select name="donation" id="donation" class="form-control">
+                        <option value="" selected>Semua Derma</option>
+                        @foreach($donations as $donation)
+                        <option value="{{ $donation->id }}">{{ $donation->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Peringatan</label>
+                    <select type="text" name="recurrence" id="recurrence" class="form-control"
+                        placeholder="Peringatan">
+                        <option value="">Pilih Peringatan</option>
+                        <option value="daily" {{ old('recurrence', $reminder->recurrence) == 'daily' ? 'selected' : '' }}>Harian</option>
+                        <option value="weekly" {{ old('recurrence', $reminder->recurrence) == 'weekly' ? 'selected' : '' }}>Mingguan</option>
+                        <option value="monthly" {{ old('recurrence', $reminder->recurrence) == 'monthly' ? 'selected' : '' }}>Bulanan</option>
+                    </select>
+                </div>
+                <div class="form-group" id="date-form" style="{{ old('id', $reminder->id) ? '' : 'display: none'  }}">
+                    <label class="control-label">Tarikh</label>
+                    <select type="text" name="date" class="form-control" placeholder="Tarikh">
+                        <option value="" disabled {{ old('id', $reminder->id) ? '' : 'selected'  }}>Pilih Tarikh</option>
+                        @for ($i=1; $i <= 31;$i++)
+                            <option value="{{ $i }}">{{ $i }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div class="form-group" id="time-form" style="{{ old('id', $reminder->id) ? '' : 'display: none'  }}">
+                    <label>Masa</label>
+                    <div id="datepicker-time" class="input-group date">
+                        <input class="form-control" id="time" name="time" type="time" placeholder="Pilih Masa"
+                            autocomplete="off" value="{{ old('time', \Carbon\Carbon::parse($reminder->time)->format('H:i A')) }}">
                     </div>
+                </div>
+                <div class="form-group" id="day-form" style="{{ old('id', $reminder->id) ? '' : 'display: none'  }}">
+                    <label>Hari</label>
+                    <select type="text" name="day" class="form-control" placeholder="Peringatan">
+                        <option value="" disabled {{ old('id', $reminder->id) ? '' : 'selected'  }}>Pilih Hari</option>
+                        <option value="1" {{ old('time', $reminder->day) == '1' ? 'selected' : '' }}>Isnin</option>
+                        <option value="2" {{ old('time', $reminder->day) == '2' ? 'selected' : '' }}>Selesa </option>
+                        <option value="3" {{ old('time', $reminder->day) == '3' ? 'selected' : '' }}>Rabu </option>
+                        <option value="4" {{ old('time', $reminder->day) == '4' ? 'selected' : '' }}>Khamis </option>
+                        <option value="5" {{ old('time', $reminder->day) == '5' ? 'selected' : '' }}>Jumaat </option>
+                        <option value="6" {{ old('time', $reminder->day) == '6' ? 'selected' : '' }}>Sabtu </option>
+                        <option value="7" {{ old('time', $reminder->day) == '7' ? 'selected' : '' }}>Ahad </option>
+                    </select>
                 </div>
                 <div class="form-group mb-0">
                     <div>
-                        <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
+                        <button type="submit" class="btn btn-primary waves-effect waves-light mr-1" style="margin: 19px; float: right;">
                             Simpan
                         </button>
                     </div>
                 </div>
+            </div>
         </div>
-
         </form>
     </div>
 </div>

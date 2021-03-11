@@ -119,7 +119,7 @@
 <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
 
 <!-- Plugin Js-->
-<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/moment/moment.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
@@ -149,7 +149,7 @@
                       "sortable": false,
                       render: function (data, type, row, meta) {
                           return meta.row + meta.settings._iDisplayStart + 1;
-                      }
+                      },
                   }, {
                       data: "nama",
                       name: 'nama'
@@ -161,7 +161,15 @@
                       name: 'day'
                   }, {
                       data: "time",
-                      name: 'time'
+                      name: 'time',
+                      // render: function(data, type, row){
+                      //     if(type === "sort" || type === "type"){
+                      //         return data;
+                      //     }
+                      //     console.log(row.time);
+                      //     return moment.utc(row.time).format("HH:mm");
+                      // }
+
                   }, {
                       data: 'date',
                       name: 'date',

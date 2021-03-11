@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Reminder extends Model
 {
     protected $table = "donation_reminder";
+
+    protected $fillable = ['date','time','day','recurrence'];
     
     public function donation()
     {
