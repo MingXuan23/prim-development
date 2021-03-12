@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Reminder;
 use App\Http\Controllers\DonationController;
 use App\Http\Requests\ReminderRequest;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 use Illuminate\Http\Request;
-use Session;
-use View;
 use Auth;
 use DB;
 

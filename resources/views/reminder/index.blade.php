@@ -129,6 +129,7 @@
       fetch_data();
 
       var reminderTable;
+      console.log(reminderTable);
 
       function fetch_data(donationId = '') {
           reminderTable = $('#reminderTable').DataTable({
