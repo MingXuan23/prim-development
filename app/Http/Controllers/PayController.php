@@ -94,13 +94,13 @@ class PayController extends Controller
             $telno = $request->telno;
             $fpx_buyerName = $request->name;
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail = "prim.utem@gmail.com";
             $telno = "";
             $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            $fpx_buyerIban      = "";
+            // $fpx_buyerIban      = "";
         }
 
         $fpx_msgType        = "AR";
