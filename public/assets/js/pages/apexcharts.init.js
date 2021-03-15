@@ -730,13 +730,13 @@ chart.render();
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! C:\laragon\www\prim\resources\js\pages\apexcharts.init.js */"./resources/js/pages/apexcharts.init.js");
-__webpack_require__(/*! C:\laragon\www\prim\resources\scss\bootstrap.scss */"./resources/scss/bootstrap.scss");
-__webpack_require__(/*! C:\laragon\www\prim\resources\scss\bootstrap-dark.scss */"./resources/scss/bootstrap-dark.scss");
-__webpack_require__(/*! C:\laragon\www\prim\resources\scss\icons.scss */"./resources/scss/icons.scss");
-__webpack_require__(/*! C:\laragon\www\prim\resources\scss\app-rtl.scss */"./resources/scss/app-rtl.scss");
-__webpack_require__(/*! C:\laragon\www\prim\resources\scss\app.scss */"./resources/scss/app.scss");
-module.exports = __webpack_require__(/*! C:\laragon\www\prim\resources\scss\app-dark.scss */"./resources/scss/app-dark.scss");
+__webpack_require__(/*! D:\laragon\www\prim-development\resources\js\pages\apexcharts.init.js */"./resources/js/pages/apexcharts.init.js");
+__webpack_require__(/*! D:\laragon\www\prim-development\resources\scss\bootstrap.scss */"./resources/scss/bootstrap.scss");
+__webpack_require__(/*! D:\laragon\www\prim-development\resources\scss\bootstrap-dark.scss */"./resources/scss/bootstrap-dark.scss");
+__webpack_require__(/*! D:\laragon\www\prim-development\resources\scss\icons.scss */"./resources/scss/icons.scss");
+__webpack_require__(/*! D:\laragon\www\prim-development\resources\scss\app-rtl.scss */"./resources/scss/app-rtl.scss");
+__webpack_require__(/*! D:\laragon\www\prim-development\resources\scss\app.scss */"./resources/scss/app.scss");
+module.exports = __webpack_require__(/*! D:\laragon\www\prim-development\resources\scss\app-dark.scss */"./resources/scss/app-dark.scss");
 
 
 /***/ })
