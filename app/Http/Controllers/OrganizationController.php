@@ -128,7 +128,7 @@ class OrganizationController extends Controller
         }
     }
 
-    public function getOrganizationByUserId()
+    public static function getOrganizationByUserId()
     {
         $userId = Auth::id();
 

@@ -22,5 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UserReminderDonationTableSeeder::class);
         $this->call(ModelHasRolesTableSeeder::class);
         $this->call(PaymentTypeTableSeeder::class);
+        $this->call(TransactionsTableSeeder::class);
+        $this->call(DonationTransactionTableSeeder::class);
     }
 }
