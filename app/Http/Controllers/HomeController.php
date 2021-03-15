@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\OrganizationController;
+use DB;
 
 class HomeController extends Controller
 {
@@ -25,7 +27,11 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view("index");
+        $donorsDays = $this->getTotalDonorByDay();
+        // $donorsWeeks = $this->getTotalDonorByWeek();
+        $organizations = OrganizationController::getOrganizationByUserId();
+        
+        return view("index", compact('organizations', 'donorsDays', 'donorsWeeks'));
     }
 
     /**
@@ -38,9 +44,10 @@ class HomeController extends Controller
         return view("form");
     }
 
-    public function showNotification () {
-       return view('notification.push-notification'); 
-    }   
+    public function showNotification()
+    {
+        return view('notification.push-notification');
+    }
 
     public function saveToken(Request $request)
     {
@@ -65,7 +72,7 @@ class HomeController extends Controller
             "registration_ids" => $firebaseToken,
             "notification" => [
                 "title" => $request->title,
-                "body" => $request->body,  
+                "body" => $request->body,
             ]
         ];
         $dataString = json_encode($data);
@@ -89,7 +96,38 @@ class HomeController extends Controller
         dd($response);
     }
 
-    public function pwaOffline () {
+    public function pwaOffline()
+    {
         return view('vendor.laravelpwa.offline');
+    }
+
+    public function getTotalDonorByDay()
+    {
+        $donors = DB::table('transactions')
+                    ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
+                    ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
+                    ->where('donations.id', 1)
+                    ->where('transactions.status', 'Success')
+                    // ->where(DB::raw('date(transactions.datetime_created) = curdate()'))
+                    ->select(DB::raw('count(transactions.id) as donor'))
+                    ->get();
+
+        return $donors;
+    }
+
+    public function getTotalDonorByWeek()
+    {
+        $donors = DB::table('transactions')
+                    ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
+                    ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
+                    ->where([
+                        ['donations.id', '=' ,1],
+                        [DB::raw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')],
+                        ['donations.status', '=', 'Success']
+                    ])
+                    ->select(DB::raw('count(transactions.id) as donor'))
+                    ->get();
+                    
+        return $donors;
     }
 }
