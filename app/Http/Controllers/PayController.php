@@ -166,7 +166,7 @@ class PayController extends Controller
     public function transactionReceipt(Request $request)
     {
         $case = explode("_", $request->fpx_sellerExOrderNo);
-        $text = explode("/", $request->fpx_buyerIban);
+        // $text = explode("/", $request->fpx_buyerIban);
 
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
@@ -199,10 +199,11 @@ class PayController extends Controller
 
                 case 'Donation':
 
+                    dd($request);
                     $user       = User::find(Auth::id());
-                    $username   = $text[0];
-                    $telno      = $text[1];
-                    $email      = $text[2];
+                    // $username   = $text[0];
+                    // $telno      = $text[1];
+                    // $email      = $text[2];
 
                     $transaction = new Transaction();
                     $transaction->nama          = $request->fpx_sellerExOrderNo;
@@ -210,12 +211,12 @@ class PayController extends Controller
                     $transaction->transac_no    = $request->fpx_fpxTxnId;
                     $transaction->datetime_created = now();
                     $transaction->amount        = $request->fpx_txnAmount;
-                    $transaction->status        = 'Success';
-                    $transaction->email         = $email;
-                    $transaction->telno         = $telno;
-                    $transaction->username      = $username;
+                    // $transaction->status        = 'Success';
+                    // $transaction->email         = $email;
+                    // $transaction->telno         = $telno;
+                    // $transaction->username      = $username;
 
-                    $request->buyerName = $username;
+                    // $request->buyerName = $username;
 
                     if ($user) {
                         $transaction->user_id   = Auth::id();
