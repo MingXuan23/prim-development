@@ -125,7 +125,8 @@ class PayController extends Controller
 
         /* Reading key */
         // dd(getenv('FPX_KEY'));
-        $priv_key = getenv('FPX_KEY');
+        // $priv_key = getenv('FPX_KEY');
+        $priv_key = file_get_contents('C:\\pki-keys\\DevExchange\\EX00012323.key');
         $pkeyid = openssl_get_privatekey($priv_key, null);
         openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
         $fpx_checkSum = strtoupper(bin2hex($binary_signature));

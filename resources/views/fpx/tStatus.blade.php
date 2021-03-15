@@ -231,7 +231,7 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
     <div class="row">
         <div class="col-md-6">
             <address>
-                <strong>{{ $fpx_buyerName }}</strong>
+                <strong>{{ $user->name }}</strong>
                 <br>
                 <abbr title="Email">E:</abbr> {{ $user->email }}
                 <br>

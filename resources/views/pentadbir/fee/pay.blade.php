@@ -49,7 +49,8 @@
     /* Generating signing String */
     $data=$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_version;
     /* Reading key */
-    $priv_key = getenv('FPX_KEY');
+    // $priv_key = getenv('FPX_KEY');
+    $priv_key = file_get_contents('C:\\pki-keys\\DevExchange\\EX00012323.key');
     $pkeyid = openssl_get_privatekey($priv_key);
     openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
     $fpx_checkSum = strtoupper(bin2hex( $binary_signature ) );
@@ -245,10 +246,10 @@
     <hr>
     <h4>Powered by:</h4>
     <div class="row" style="align-self: center">
-            <a href="https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp">
-                <img src="assets/images/FPX_ParticipatingBanks.PNG" alt="FPXBanks">
-            </a>
+        <img src="assets/images/fpx/FPX.png" alt="FPXBanks" style="width: 50%">
     </div>
+    <hr>
+    <h4>FPX Terms & Conditions: <a href="https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp" target="_blank">Click Here</a></h4>
 </div>
 @endsection
 
