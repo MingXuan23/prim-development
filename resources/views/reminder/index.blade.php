@@ -119,7 +119,7 @@
 <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
 
 <!-- Plugin Js-->
-<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/moment/moment.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
@@ -128,8 +128,11 @@
 
       fetch_data();
 
+      var reminderTable;
+      console.log(reminderTable);
+
       function fetch_data(donationId = '') {
-          $('#reminderTable').DataTable({
+          reminderTable = $('#reminderTable').DataTable({
                   processing: true,
                   serverSide: true,
                   ajax: {
@@ -149,7 +152,7 @@
                       "sortable": false,
                       render: function (data, type, row, meta) {
                           return meta.row + meta.settings._iDisplayStart + 1;
-                      }
+                      },
                   }, {
                       data: "nama",
                       name: 'nama'
@@ -161,7 +164,15 @@
                       name: 'day'
                   }, {
                       data: "time",
-                      name: 'time'
+                      name: 'time',
+                      // render: function(data, type, row){
+                      //     if(type === "sort" || type === "type"){
+                      //         return data;
+                      //     }
+                      //     console.log(row.time);
+                      //     return moment.utc(row.time).format("HH:mm");
+                      // }
+
                   }, {
                       data: 'date',
                       name: 'date',
@@ -188,10 +199,10 @@
           }
       });
 
-      var donation_id;
+      var reminder_id;
 
       $(document).on('click', '.btn-danger', function(){
-          donation_id = $(this).attr('id');
+        reminder_id = $(this).attr('id');
           $('#deleteConfirmationModal').modal('show');
       });
 
@@ -202,7 +213,7 @@
                 data: {
                     _method: 'DELETE'
                 },
-                url: "/donate/" + donation_id,
+                url: "/reminder/" + reminder_id,
                 beforeSend: function() {
                     $('#delete').text('Padam...');
                 },
@@ -211,7 +222,11 @@
                         $('#confirmModal').modal('hide');
                     }, 2000);
 
-                    window.location.reload();
+                    $('div.flash-message').html(data);
+                    
+                    // window.location.reload();
+                    reminderTable.ajax.reload();
+
                 },
                 error: function (data) {
                     $('div.flash-message').html(data);

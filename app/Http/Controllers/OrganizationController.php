@@ -44,7 +44,7 @@ class OrganizationController extends Controller
         //create organization
         $organization = Organization::create($request->validated());
         
-        //attach foreign key to pivot table 
+        //attach foreign key to pivot table
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
 
         $user = Auth::user();
@@ -73,7 +73,6 @@ class OrganizationController extends Controller
      */
     public function edit($id)
     {
-        
         $org = DB::table('organizations')->where('id', $id)->first();
 
         return view('organization.update', compact('org'));
@@ -129,7 +128,8 @@ class OrganizationController extends Controller
         }
     }
 
-    public function getOrganizationByUserId() {
+    public static function getOrganizationByUserId()
+    {
         $userId = Auth::id();
 
         return Organization::whereHas('user', function ($query) use ($userId) {

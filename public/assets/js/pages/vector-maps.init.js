@@ -243,7 +243,7 @@ function ($) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\prim\resources\js\pages\vector-maps.init.js */"./resources/js/pages/vector-maps.init.js");
+module.exports = __webpack_require__(/*! D:\laragon\www\prim-development\resources\js\pages\vector-maps.init.js */"./resources/js/pages/vector-maps.init.js");
 
 
 /***/ })

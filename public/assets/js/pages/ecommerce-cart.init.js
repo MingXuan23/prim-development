@@ -114,7 +114,7 @@ $("input[name='demo_vertical']").TouchSpin({
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\prim\resources\js\pages\ecommerce-cart.init.js */"./resources/js/pages/ecommerce-cart.init.js");
+module.exports = __webpack_require__(/*! D:\laragon\www\prim-development\resources\js\pages\ecommerce-cart.init.js */"./resources/js/pages/ecommerce-cart.init.js");
 
 
 /***/ })

@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DonationRequest;
-use Illuminate\Http\Request;
-use App\Models\Donation;
 use App\Models\Organization;
-use Carbon\Carbon;
+use App\Models\Reminder;
+use App\Models\Donation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
+use Carbon\Carbon;
 
 class DonationController extends Controller
 {
@@ -104,30 +105,47 @@ class DonationController extends Controller
         $listdonor = DB::table('donations')
             ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
             ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
-            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email')
+            ->select('donations.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
             ->where('donations.id', $id)
             ->orderBy('donations.nama')
             ->get();
 
-        dd($listdonor);
-        // $case = explode("_", 'hisham_hishamudin@gmail.com_0124025232');
-        // dd($case[2]);
 
-        // $emailuser[] = '';
-        // for ($i = 0; $i < count($listdonor); $i++) {
-        //     $emailuser[] = $listdonor[$i]->email;
+        return view('donate.donor', compact('listdonor'));
 
-        //     $listdonor2 = DB::table('users')->where('email', $emailuser[$i])->get();
-        // }
 
-        // dd($listdonor2->toArray());
+        // dd($listdonor);
+    }
 
-        // $organization = Organization::get();
-        // return $organization;
+    public function getDonorDatatable(Request $request)
+    {
+        // $listdonor2 = $this->listAllDonor($request->did);
+        $listdonor = DB::table('donations')
+        ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
+        ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
+        ->select('donations.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
+        ->where('donations.id', $request->did)
+        ->orderBy('donations.nama')
+        ->get();
+        if (request()->ajax()) {
+            return datatables()->of($listdonor)
+                ->make(true);
+        }
     }
 
     public function historyDonor()
     {
+        $userId = Auth::id();
+
+        $listhistory = DB::table('donations')
+            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
+            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
+            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email')
+            ->where('transactions.user_id', $userId)
+            ->orderBy('donations.nama')
+            ->get();
+
+        dd($listhistory);
     }
 
     public function listAllOrganization()
@@ -225,6 +243,15 @@ class DonationController extends Controller
     public static function getAllDonation()
     {
         $donations = Donation::get();
+        return $donations;
+    }
+
+    public static function getDonationByReminderId($id)
+    {
+        $donations = Donation::whereHas('reminder', function ($query) use ($id) {
+            $query->where('reminder_id', $id);
+        })->get();
+
         return $donations;
     }
 }

@@ -5,36 +5,59 @@
 @endsection
 
 @section('content')
-                        <!-- start page title -->
-                        <div class="row align-items-center">
-                            <div class="col-sm-6">
-                                <div class="page-title-box">
-                                    <h4 class="font-size-18">Dashboard</h4>
-                                    <ol class="breadcrumb mb-0">
-                                        <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                                    </ol>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6">
-                                <div class="float-right d-none d-md-block">
-                                    <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle waves-effect waves-light"
-                                            type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="mdi mdi-settings mr-2"></i> Settings
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Separated link</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+<!-- start page title -->
+<div class="row align-items-center">
+    <div class="card-body">
+        <div class="form-group">
+          <select name="organization" id="organization" class="form-control">
+            <option value="" selected>Pilih Organisasi</option>
+            @foreach($organizations as $organization)
+                <option value="{{ $organization->id }}">{{ $organization->nama }}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="row">
+            <div class="col-xl-4 col-md-4">
+                <div class="card bg-primary">
+                    <div class="card-body">
+                        <div class="text-center text-white py-4">
+                            <h5 class="mt-0 mb-4 text-white-50 font-size-16">Jumlah Penderma Hari Ini</h5>
+                            @foreach($donorsDays as $donor)
+                            <h1>{{ $donor->donor }}</h1>
+                            @endforeach
+                            <p class="font-size-14 pt-1">Orang</p>
                         </div>
-                        <!-- end page title -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-primary">
+                    <div class="card-body">
+                        <div class="text-center text-white py-4">
+                            <h5 class="mt-0 mb-4 text-white-50 font-size-16">Jumlah Penderma Minggu Ini</h5>
+                            {{-- @foreach($donorsWeeks as $donor) --}}
+                            <h1>1435</h1>
+                            {{-- @endforeach --}}
+                            <p class="font-size-14 pt-1">Orang</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-primary">
+                    <div class="card-body">
+                        <div class="text-center text-white py-4">
+                            <h5 class="mt-0 mb-4 text-white-50 font-size-16">Jumlah Penderma Bulan Ini</h5>
+                            <h1>1452</h1>
+                            <p class="font-size-14 pt-1">Orang</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+</div>
+<!-- end page title -->
 
                        
 @endsection

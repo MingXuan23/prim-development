@@ -30,9 +30,11 @@ Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchS
 
 Route::group(['prefix' => 'donate'], function () {
     Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
-    Route::get('donationdetails/{id}', 'DonationController@listAllDonor')->name('donate.details');
+    Route::get('donor/{id}', 'DonationController@listAllDonor')->name('donate.details');
+    Route::get('donorList', 'DonationController@getDonorDatatable')->name('donate.donorlist');
     Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
     Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
+    Route::get('history', 'DonationController@historyDonor')->name('historypayment');
 });
 
 Route::group(['prefix' => 'organization'], function () {
@@ -89,3 +91,8 @@ Route::group(['prefix' => 'notification'], function () {
 });
 
 Route::get('/offline', 'HomeController@pwaOffline');
+
+Route::group(['prefix' => 'dashboard'], function () {
+    Route::get('/donorDays', 'HomeController@getTotalDonorByDay')->name('donor.day');
+    Route::get('/donorWeeks', 'HomeController@getTotalDonorByWeek')->name('donor.week');
+});

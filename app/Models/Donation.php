@@ -27,7 +27,7 @@ class Donation extends Model
         return $this->belongsToMany(User::class, 'donation_user');
     }
 
-    public function donation()
+    public function reminder()
     {
         return $this->belongsToMany(Reminder::class, 'user_donation_reminder', 'donation_id', 'reminder_id');
     }
