@@ -226,7 +226,7 @@ class PayController extends Controller
 
                 case 'Donation':
 
-                    $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId]);
+                    $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success'])->first();
                     $user2      = User::find(Auth::id());
 
                     // dd($user);
