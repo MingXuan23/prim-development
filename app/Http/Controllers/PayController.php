@@ -69,7 +69,7 @@ class PayController extends Controller
         if ($transaction->save()) {
 
             $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
-            dd('done');
+            // dd('done');
             // return view('fpx.tStatus', compact('request', 'user'));
         }
     }
@@ -226,7 +226,8 @@ class PayController extends Controller
 
                 case 'Donation':
 
-                    $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success'])->first();
+                    Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+                    $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
                     $user2      = User::find(Auth::id());
 
                     // dd($user);
