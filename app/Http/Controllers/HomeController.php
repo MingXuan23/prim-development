@@ -27,12 +27,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $donorsDays = $this->getTotalDonorByDay();
-        $donorsWeeks = $this->getTotalDonorByWeek();
-        $donorsMonths = $this->getTotalDonorByMonth();
+        // $donorsDays = $this->getTotalDonorByDay();
+        // $donorsWeeks = $this->getTotalDonorByWeek();
+        // $donorsMonths = $this->getTotalDonorByMonth();
         $organizations = OrganizationController::getOrganizationByUserId();
-        
-        return view("index", compact('organizations', 'donorsDays', 'donorsWeeks', 'donorsMonths'));
+        return view("index", compact('organizations'));
+
+        // return view("index", compact('organizations', 'donorsDays', 'donorsWeeks', 'donorsMonths'));
     }
 
     public function getTotalDonorDashboard(Request $requests)
@@ -49,6 +50,8 @@ class HomeController extends Controller
         ];
 
         $donor = json_encode($donor);
+
+        // dd($donor);
 
         return $donor;
     }
@@ -120,12 +123,14 @@ class HomeController extends Controller
         return view('vendor.laravelpwa.offline');
     }
 
-    public function getTotalDonorByDay()
+    public function getTotalDonorByDay($id)
     {
         $donors = DB::table('transactions')
                     ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
                     ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-                    ->where('donations.id', 1)
+                    ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
+                    ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
+                    ->where('organizations.id', $id)
                     ->where('transactions.status', 'Success')
                     ->whereRaw('date(transactions.datetime_created) = curdate()')
                     ->select(DB::raw('count(transactions.id) as donor'))
@@ -134,12 +139,14 @@ class HomeController extends Controller
         return $donors;
     }
 
-    public function getTotalDonorByWeek()
+    public function getTotalDonorByWeek($id)
     {
         $donors = DB::table('transactions')
                     ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
                     ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-                    ->where('donations.id', 1)
+                    ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
+                    ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
+                    ->where('organizations.id', $id)
                     ->where('transactions.status', 'Success')
                     ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
                     ->select(DB::raw('count(transactions.id) as donor'))
@@ -148,12 +155,14 @@ class HomeController extends Controller
         return $donors;
     }
 
-    public function getTotalDonorByMonth()
+    public function getTotalDonorByMonth($id)
     {
         $donors = DB::table('transactions')
                     ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
                     ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-                    ->where('donations.id', 1)
+                    ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
+                    ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
+                    ->where('organizations.id', $id)
                     ->where('transactions.status', 'Success')
                     ->whereRaw('year(transactions.datetime_created) = year(curdate())')
                     ->whereRaw('month(transactions.datetime_created) = month(curdate())')
