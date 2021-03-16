@@ -42,6 +42,13 @@ class DonationTransactionTableSeeder extends Seeder
                 "transaction_id" => 4,
                 "payment_type_id" => 1
             ),
+            4 =>
+            array(
+                "id" => 5,
+                "donation_id" => 1,
+                "transaction_id" => 5,
+                "payment_type_id" => 1
+            ),
         ));
     }
 }
