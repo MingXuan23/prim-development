@@ -49,6 +49,32 @@ class PayController extends Controller
         return view('paydonate.pay', compact('getdonate'));
     }
 
+    public function transaction(Request $request)
+    {
+        $user       = User::find(Auth::id());
+        $transaction = new Transaction();
+        $transaction->nama          = $request->fpx_sellerExOrderNo;
+        $transaction->description   = $request->fpx_sellerOrderNo;
+        $transaction->transac_no    = $request->fpx_fpxTxnId;
+        $transaction->datetime_created = now();
+        $transaction->amount        = $request->fpx_txnAmount;
+        $transaction->status        = 'Pending';
+        $transaction->email         = $request->fpx_buyerEmail;
+        $transaction->telno         = $request->telno;
+        $transaction->username      = $request->fpx_buyerName;
+
+        if ($user) {
+            $transaction->user_id   = Auth::id();
+        }
+        if ($transaction->save()) {
+
+            $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
+            // dd('done');
+            // return view('fpx.tStatus', compact('request', 'user'));
+        }
+    }
+
+
     public function paymentProcess(Request $request)
     {
         \Stripe\Stripe::setApiKey('sk_test_51I6AHSI3fJ2mpqjYO5tSNuiCIdR1dw7Bh2Lqgh0u8xPkVyCnyOEELQjMBPUTroSEH7DWCo6WYLTvMO2Vd58hu5gO00DQ1uX9Fj');
@@ -200,34 +226,13 @@ class PayController extends Controller
 
                 case 'Donation':
 
-                    dd($request);
-                    $user       = User::find(Auth::id());
-                    // $username   = $text[0];
-                    // $telno      = $text[1];
-                    // $email      = $text[2];
+                    Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+                    $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    $user2      = User::find(Auth::id());
 
-                    $transaction = new Transaction();
-                    $transaction->nama          = $request->fpx_sellerExOrderNo;
-                    $transaction->description   = $request->fpx_sellerOrderNo;
-                    $transaction->transac_no    = $request->fpx_fpxTxnId;
-                    $transaction->datetime_created = now();
-                    $transaction->amount        = $request->fpx_txnAmount;
-                    // $transaction->status        = 'Success';
-                    // $transaction->email         = $email;
-                    // $transaction->telno         = $telno;
-                    // $transaction->username      = $username;
+                    // dd($user);
+                    return view('fpx.tStatus', compact('request', 'user'));
 
-                    // $request->buyerName = $username;
-
-                    if ($user) {
-                        $transaction->user_id   = Auth::id();
-                    }
-                    if ($transaction->save()) {
-
-                        $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
-                        dd($request);
-                        return view('fpx.tStatus', compact('request', 'user'));
-                    }
 
                     break;
                 default:

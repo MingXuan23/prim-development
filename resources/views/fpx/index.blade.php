@@ -1,8 +1,8 @@
 @extends('layouts.master')
 
 <div class="container" style="margin-top: 5%;">
-    
-    <form name="form1" method="post" action="https://uat.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp">
+    <form name="form1" id="form1" method="post" action="https://uat.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp">
+        @csrf
         <table border="0" cellpadding="2" cellspacing="1" width="100%">
             <tbody>
                 <tr class="infoBoxContents">
@@ -12,7 +12,7 @@
                                 <tr>
                                     <td height="164" align="center" class="main"><b>Payment Method via FPX</b>
                                         <p>&nbsp;</p>
-                                        <input type="submit" style="cursor:hand" class="btn btn-primary"
+                                        <input type="submit" style="cursor:hand" class="btn btn-primary" onclick="pay()"
                                             value="Click to Pay" />
                                         <p>&nbsp;</p>
                                         <p> <img src="assets/images/FPXButton.PNG" border="2" /></p>
@@ -62,3 +62,30 @@
     </form>
 
 </div>
+
+@section('script')
+<script>
+    // console.log('hihi');
+    var values = $("#form1").serialize();
+
+    function pay(){
+        // alert(values);
+        // console.log(values);
+
+        $.ajax({
+                    url: "{{ route('trn') }}",
+                    type: "post",
+                    data: values ,
+                    success: function (response) {
+
+                    // You will get response from your PHP page (what you echo or print)
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.log(textStatus, errorThrown);
+                    }
+                });
+
+    }
+    
+</script>
+@endsection

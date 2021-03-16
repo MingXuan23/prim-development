@@ -64,6 +64,7 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
+Route::post('trn', 'PayController@transaction')->name('trn');
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
@@ -93,6 +94,5 @@ Route::group(['prefix' => 'notification'], function () {
 Route::get('/offline', 'HomeController@pwaOffline');
 
 Route::group(['prefix' => 'dashboard'], function () {
-    Route::get('/donorDays', 'HomeController@getTotalDonorByDay')->name('donor.day');
-    Route::get('/donorWeeks', 'HomeController@getTotalDonorByWeek')->name('donor.week');
+    Route::get('/donor', 'HomeController@getTotalDonorDashboard')->name('donor');
 });
