@@ -293,7 +293,7 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
             </tbody>
         </table>
 
-        <a href="https://prim.my/fees" id="returnPageButton" class="btn btn-primary">
+        <a href="https://prim.my" id="returnPageButton" class="btn btn-primary">
             <span class="mdi mdi-chevron-left-circle"> Return</span>
         </a>
         <button type="button" onclick="window.print();" id="printPageButton" class="btn btn-success ml-2">
