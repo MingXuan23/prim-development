@@ -121,12 +121,12 @@ class DonationController extends Controller
     {
         // $listdonor2 = $this->listAllDonor($request->did);
         $listdonor = DB::table('donations')
-        ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
-        ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
-        ->select('donations.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
-        ->where('donations.id', $request->did)
-        ->orderBy('donations.nama')
-        ->get();
+            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
+            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
+            ->select('donations.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
+            ->where('donations.id', $request->did)
+            ->orderBy('donations.nama')
+            ->get();
         if (request()->ajax()) {
             return datatables()->of($listdonor)
                 ->make(true);
