@@ -242,13 +242,13 @@ $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buye
         </div>
         <div class="col-md-6 text-right">
             <p>
-                <em>Date: {{ $request->fpx_fpxTxnTime }}</em>
+                <em>Transaction Date: {{ $request->fpx_fpxTxnTime }}</em>
             </p>
             <p>
-                <em>Receipt #: {{ $request->fpx_fpxTxnId }}</em>
+                <em>Transaction #: {{ $request->fpx_fpxTxnId }}</em>
             </p>
             <p>
-                <em>Order #: {{ $request->fpx_sellerOrderNo }}</em>
+                <em>Seller Order #: {{ $request->fpx_sellerOrderNo }}</em>
             </p>
         </div>
     </div>

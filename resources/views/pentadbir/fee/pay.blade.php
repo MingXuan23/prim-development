@@ -49,8 +49,8 @@
     /* Generating signing String */
     $data=$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_version;
     /* Reading key */
-    $priv_key = getenv('FPX_KEY');
-    // $priv_key = file_get_contents('C:\\pki-keys\\DevExchange\\EX00012323.key');
+    // $priv_key = getenv('FPX_KEY');
+    $priv_key = file_get_contents('C:\\pki-keys\\DevExchange\\EX00012323.key');
     $pkeyid = openssl_get_privatekey($priv_key);
     openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
     $fpx_checkSum = strtoupper(bin2hex( $binary_signature ) );
