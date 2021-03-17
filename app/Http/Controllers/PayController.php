@@ -199,14 +199,9 @@ class PayController extends Controller
             switch ($case[0]) {
                 case 'School Fees':
                     $user = User::find(Auth::id());
-                    $transaction = new Transaction();
-                    $transaction->nama = $request->fpx_sellerExOrderNo;
-                    $transaction->description = $request->fpx_sellerOrderNo;
+                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
                     $transaction->transac_no = $request->fpx_fpxTxnId;
-                    $transaction->datetime_created = now();
-                    $transaction->amount = $request->fpx_txnAmount;
-                    $transaction->status = 'Success';
-                    $transaction->user_id = Auth::id();
+                    $transaction->status = "Success";
 
                     if ($transaction->save()) {
                         $res = DB::table('fees_transactions')->insert(array(
