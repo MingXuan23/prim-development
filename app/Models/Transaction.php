@@ -10,7 +10,7 @@ class Transaction extends Model
     //
     public function donation()
     {
-        return $this->belongsToMany(Donation::class, 'donation_transaction');
+        return $this->belongsToMany(Donation::class, 'donation_transaction', 'transaction_id', 'donation_id');
     }
     public $timestamps = false;
 }

@@ -91,8 +91,9 @@ Route::group(['prefix' => 'notification'], function () {
     Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
 });
 
-Route::get('/offline', 'HomeController@pwaOffline');
+// Route::get('/offline', 'HomeController@pwaOffline');
 
 Route::group(['prefix' => 'dashboard'], function () {
     Route::get('/donor', 'HomeController@getTotalDonorDashboard')->name('donor');
+    Route::get('/donation', 'HomeController@getTotalDonation')->name('donation');
 });
