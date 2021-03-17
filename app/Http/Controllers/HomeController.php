@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\OrganizationController;
 use DB;
@@ -170,5 +171,19 @@ class HomeController extends Controller
                     ->get();
 
         return $donors;
+    }
+
+    public function getTotalDonation()
+    {
+        $organizationId = 1;
+
+        $totalDonation = Transaction::whereHas('donation', function ($q) use ($organizationId) {
+            $q->whereHas('organization', function ($q) use ($organizationId) {
+                $q->where('organization_id', $organizationId);
+                $q->whereRaw('date(transactions.datetime_created) = curdate()');
+            });
+        })->get();
+
+        dd(json_encode($totalDonation->amount));
     }
 }
