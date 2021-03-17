@@ -31,4 +31,9 @@ class Donation extends Model
     {
         return $this->belongsToMany(Reminder::class, 'user_donation_reminder', 'donation_id', 'reminder_id');
     }
+
+    public function transaction()
+    {
+        return $this->belongsToMany(Transaction::class, 'donation_transaction', 'donation_id', 'transaction_id');
+    }
 }

@@ -22,9 +22,6 @@
                     <div class="card-body">
                         <div class="text-center text-white py-4">
                             <h5 class="mt-0 mb-4 text-white-50 font-size-16">Jumlah Penderma Hari Ini</h5>
-                            {{-- @foreach($donorsDays as $donor)
-                            <h1>{{ $donor->donor }}</h1>
-                            @endforeach --}}
                             <h1 id="day"></h1>
                             <p class="font-size-14 pt-1">Orang</p>
                         </div>
@@ -36,9 +33,6 @@
                     <div class="card-body">
                         <div class="text-center text-white py-4">
                             <h5 class="mt-0 mb-4 text-white-50 font-size-16">Jumlah Penderma Minggu Ini</h5>
-                            {{-- @foreach($donorsWeeks as $donor)
-                            <h1>{{ $donor->donor }}</h1>
-                            @endforeach --}}
                             <h1 id="week"></h1>
                             <p class="font-size-14 pt-1">Orang</p>
                         </div>
@@ -50,11 +44,20 @@
                     <div class="card-body">
                         <div class="text-center text-white py-4">
                             <h5 class="mt-0 mb-4 text-white-50 font-size-16">Jumlah Penderma Bulan Ini</h5>
-                            {{-- @foreach($donorsMonths as $donor)
-                            <h1>{{ $donor->donor }}</h1>
-                            @endforeach --}}
                             <h1 id="month"></h1>
                             <p class="font-size-14 pt-1">Orang</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card bg-success">
+                    <div class="card-body">
+                        <div class="text-center text-white py-4">
+                            <h5 class="mt-0 mb-4 text-white-50 font-size-16">Derma Terkumpul Hari Ini</h5>
+                            <h1 id="donation_day"></h1>
                         </div>
                     </div>
                 </div>

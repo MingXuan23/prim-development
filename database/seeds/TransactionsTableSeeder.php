@@ -84,6 +84,20 @@ class TransactionsTableSeeder extends Seeder
                 "telno" => "01242384753",
                 "username" => "ajiq.damian"
             ),
+            5 =>
+            array(
+                "id" => 6,
+                "nama" => "Donation_23210315210448",
+                "description" => "3",
+                "transac_no" => "2103092104320408",
+                "datetime_created" => "2021-03-16 21:23:25",
+                "amount" => 123,
+                "status" => "Success",
+                "user_id" => null,
+                "email" => null,
+                "telno" => "01242384753",
+                "username" => "zaki.salleh"
+            ),
         ));
     }
 }
