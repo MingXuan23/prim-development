@@ -11,35 +11,36 @@
 
                 <li>
                     <a href="/" class="waves-effect">
-                        <i class="ti-home"></i><span class="badge badge-pill badge-primary float-right">2</span>
+                        <i class="ti-home"></i>
+                        {{-- <span class="badge badge-pill badge-primary float-right">2</span> --}}
                         <span>Dashboard</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="{{ route('organization.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="mdi mdi-account-group"></i>
                         <span>Organisasi</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="{{ route('donate.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-money-bill-alt"></i>
                         <span>Urus Derma</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="{{ route('donate.organizationlist') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-hand-holding-heart"></i>
                         <span>Derma</span>
                     </a>
                 </li>
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-check"></i>
                         <span>Peringatan Derma</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="true">
@@ -59,7 +60,7 @@
                 @role('Superadmin|Ibu|Bapa|Penjaga')
                 <li>
                     <a href="{{ route('parent.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-child"></i>
                         <span>Carian Tanggungan</span>
                     </a>
                 </li>
@@ -68,7 +69,7 @@
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('school.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-school"></i>
                         <span>Sekolah</span>
                     </a>
                 </li>
@@ -78,7 +79,7 @@
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('teacher.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-chalkboard-teacher"></i>
                         <span>Guru</span>
                     </a>
                 </li>
@@ -88,7 +89,7 @@
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('class.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="mdi mdi-google-classroom"></i>
                         <span>Kelas</span>
                     </a>
                 </li>
@@ -98,7 +99,7 @@
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('student.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-user-graduate"></i>
                         <span>Pelajar</span>
                     </a>
                 </li>
@@ -108,7 +109,7 @@
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('fees.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-file-invoice-dollar"></i>
                         <span>Yuran</span>
                     </a>
                 </li>
@@ -118,7 +119,7 @@
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('fees.index') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="fas fa-file-invoice-dollar"></i>
                         <span>Yuran - ibubapa (bayar)</span>
                     </a>
                 </li>
@@ -128,7 +129,7 @@
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('chat-user') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
+                        <i class="mdi mdi-chat-outline"></i>
                         <span>Chat</span>
                     </a>
                 </li>

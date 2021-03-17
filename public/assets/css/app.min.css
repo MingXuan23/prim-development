@@ -457,7 +457,7 @@ body[data-layout=horizontal] .footer {
 #sidebar-menu ul li a i {
   display: inline-block;
   min-width: 1.75rem;
-  padding-bottom: 0.125em;
+  padding-bottom: 0.2em;
   line-height: 1.40625rem;
   vertical-align: middle;
   color: #464b50;
