@@ -16,11 +16,13 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "2.4",
         "maatwebsite/excel": "^3.1",
+        "silviolleite/laravelpwa": "^2.0",
         "spatie/laravel-permission": "^3.18",
         "stripe/stripe-php": "^7.67",
         "yajra/laravel-datatables-oracle": "^9.15"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.5",
         "facade/ignition": "^2.0",
         "fakerphp/faker": "^1.9.1",
         "laracasts/generators": "^2.0",

@@ -337,7 +337,7 @@ function ($) {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! C:\laragon\www\prim\resources\js\pages\sweet-alerts.init.js */"./resources/js/pages/sweet-alerts.init.js");
+module.exports = __webpack_require__(/*! D:\laragon\www\prim-development\resources\js\pages\sweet-alerts.init.js */"./resources/js/pages/sweet-alerts.init.js");
 
 
 /***/ })

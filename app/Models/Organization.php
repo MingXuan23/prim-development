@@ -18,7 +18,7 @@ class Organization extends Model
 
     public function user()
     {
-        return $this->belongsToMany(User::class, 'organization_user');
+        return $this->belongsToMany(User::class, 'organization_user','organization_id','user_id');
     }
 
     public function donation()

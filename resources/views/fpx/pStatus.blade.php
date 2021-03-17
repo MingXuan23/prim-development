@@ -30,7 +30,7 @@ function validateCertificate($path,$sign, $toSign)
 
 	$d_ate=date("Y");
 	//validating Last Three Certificates 
-	$fpxcert=array($path."fpxuat_current.cer",$path."fpxuat.cer");
+	$fpxcert=array($path."EX00012323.cer",$path."fpxuat.cer");
 	$certs=checkCertExpiry($fpxcert);
 	// echo count($certs) ;
 	    	$signdata = hextobin($sign);
@@ -191,7 +191,7 @@ $fpx_checkSum=$request->fpx_checkSum;
 
 $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buyerId."|".$fpx_buyerName."|".$fpx_creditAuthCode."|".$fpx_creditAuthNo."|".$fpx_debitAuthCode."|".$fpx_debitAuthNo."|".$fpx_fpxTxnId."|".$fpx_fpxTxnTime."|".$fpx_makerName."|".$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_sellerExOrderNo."|".$fpx_sellerId."|".$fpx_sellerOrderNo."|".$fpx_sellerTxnTime."|".$fpx_txnAmount."|".$fpx_txnCurrency;
 
-$val=verifySign_fpx($fpx_checkSum, $data);
+// $val=verifySign_fpx($fpx_checkSum, $data);
 
 
 

@@ -11,7 +11,6 @@
 |
 */
 
-use App\Http\Controllers\DonationController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -29,34 +28,47 @@ Route::get('getdetails/{id}', 'DetailsController@getFees')->name('details.getfee
 Route::post('parent/fetchClass', 'ParentController@fetchClass')->name('parent.fetchClass');
 Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchStd');
 
-Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
-Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
-Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
-
 Route::group(['prefix' => 'donate'], function () {
-    
+    Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
+    Route::get('donor/{id}', 'DonationController@listAllDonor')->name('donate.details');
+    Route::get('donorList', 'DonationController@getDonorDatatable')->name('donate.donorlist');
+    Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
+    Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
+    Route::get('history', 'DonationController@historyDonor')->name('historypayment');
 });
 
-// Route::get('{id}',['uses'=>'FeesDetailsController@getFees']);
-Route::resources([
-    'school'             => 'SchoolController',
-    'teacher'            => 'TeacherController',
-    'class'              => 'ClassController',
-    'student'            => 'StudentController',
-    'category'           => 'CategoryController',
-    'fees'               => 'FeesController',
-    'details'            => 'DetailsController',
-    'jaim'               => 'UserJaimController',
-    'parent'             => 'ParentController',
-    'pay'                => 'PayController',
-    'organization'       => 'OrganizationController',
-    'donate'             => 'DonationController'
-]);
+Route::group(['prefix' => 'organization'], function () {
+    Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
+});
 
+Route::group(['prefix' => 'reminder'], function () {
+    Route::get('list', 'ReminderController@getReminderDatatable')->name('reminder.getReminder');
+});
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::resources([
+        'school'             => 'SchoolController',
+        'teacher'            => 'TeacherController',
+        'class'              => 'ClassController',
+        'student'            => 'StudentController',
+        'category'           => 'CategoryController',
+        'fees'               => 'FeesController',
+        'details'            => 'DetailsController',
+        'jaim'               => 'UserJaimController',
+        'parent'             => 'ParentController',
+        'pay'                => 'PayController',
+        'organization'       => 'OrganizationController',
+        'donate'             => 'DonationController',
+        'reminder'           => 'ReminderController'
+    ]);
+});
+
+Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
+Route::post('trn', 'PayController@transaction')->name('trn');
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
-Route::get('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
-Route::get('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
+Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
+Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
 Route::get('successpay', 'PayController@successPay')->name('successpay');
 
 Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
@@ -72,3 +84,16 @@ Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
+
+Route::group(['prefix' => 'notification'], function () {
+    Route::get('/', 'HomeController@showNotification')->name('index.notification');
+    Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
+    Route::post('/send-notification', [App\Http\Controllers\HomeController::class, 'sendNotification'])->name('send.notification');
+});
+
+// Route::get('/offline', 'HomeController@pwaOffline');
+
+Route::group(['prefix' => 'dashboard'], function () {
+    Route::get('/donor', 'HomeController@getTotalDonorDashboard')->name('donor');
+    Route::get('/donation', 'HomeController@getTotalDonation')->name('donation');
+});

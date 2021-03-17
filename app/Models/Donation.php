@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Transaction;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -18,5 +20,20 @@ class Donation extends Model
     public function organization()
     {
         return $this->belongsToMany(Organization::class, 'donation_organization');
+    }
+
+    public function user()
+    {
+        return $this->belongsToMany(User::class, 'donation_user');
+    }
+
+    public function reminder()
+    {
+        return $this->belongsToMany(Reminder::class, 'user_donation_reminder', 'donation_id', 'reminder_id');
+    }
+
+    public function transaction()
+    {
+        return $this->belongsToMany(Transaction::class, 'donation_transaction', 'donation_id', 'transaction_id');
     }
 }

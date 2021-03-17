@@ -32,8 +32,107 @@
     }
 
 </style>
-
 @endsection
+
+<?php
+    //Merchant will need to edit the below parameter to match their environment.
+    error_reporting(E_ALL);
+
+    /* Generating String to send to fpx */
+    /*For B2C, message.token = 01
+    For B2B1, message.token = 02 */
+
+    $fpx_msgToken="01";
+    $fpx_msgType="BE";
+    $fpx_sellerExId="EX00012323";
+    $fpx_version="6.0";
+    /* Generating signing String */
+    $data=$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_version;
+    /* Reading key */
+    $priv_key = getenv('FPX_KEY');
+    // $priv_key = file_get_contents('C:\\pki-keys\\DevExchange\\EX00012323.key');
+    $pkeyid = openssl_get_privatekey($priv_key);
+    openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
+    $fpx_checkSum = strtoupper(bin2hex( $binary_signature ) );
+
+
+    //extract data from the post
+
+    extract($_POST);
+    $fields_string="";
+
+    //set POST variables
+    $url ='https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList';
+
+    $fields = array(
+                            'fpx_msgToken' => urlencode($fpx_msgToken),
+                            'fpx_msgType' => urlencode($fpx_msgType),
+                            'fpx_sellerExId' => urlencode($fpx_sellerExId),
+                            'fpx_checkSum' => urlencode($fpx_checkSum),
+                            'fpx_version' => urlencode($fpx_version)
+                            
+                    );
+    $response_value=array();
+    $bank_list=array();
+
+    try{
+    //url-ify the data for the POST
+    foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+    rtrim($fields_string, '&');
+
+    //open connection
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
+    //set the url, number of POST vars, POST data
+    curl_setopt($ch,CURLOPT_URL, $url);
+
+    curl_setopt($ch,CURLOPT_POST, count($fields));
+    curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+
+    // receive server response ...
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    //execute post
+    $result = curl_exec($ch);
+
+
+
+    //close connection
+    curl_close($ch);
+
+    $token = strtok($result, "&");
+    while ($token !== false)
+    {
+        list($key1,$value1)=explode("=", $token);
+        $value1=urldecode($value1);
+        $response_value[$key1]=$value1;
+        $token = strtok("&");
+    }
+
+    $fpx_msgToken=reset($response_value);
+
+    //Response Checksum Calculation String
+    $data=$response_value['fpx_bankList']."|".$response_value['fpx_msgToken']."|".$response_value['fpx_msgType']."|".$response_value['fpx_sellerExId'];
+
+    // val == 00 verification success
+
+    $token = strtok($response_value['fpx_bankList'], ",");
+    while ($token !== false)
+    {
+        list($key1,$value1)=explode("~", $token);
+        $value1=urldecode($value1);
+        $bank_list[$key1]=$value1;
+        $token = strtok(",");
+    }
+
+
+    }
+    catch(Exception $e){
+        echo 'Error :', ($e->getMessage());
+    }
+
+?>
 
 @section('content')
 <div class="row align-items-center">
@@ -94,6 +193,13 @@
                         <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
                        <select name="bankid" id="bankid" class="form-control">
                            <option value="">Select bank</option>
+                           @foreach ($bank_list as $key=>$value)
+                                @if ($value == "A")
+                                    <option value="{{ $key }}">{{ $key }}</option>
+                                @else
+                                    <option value="{{ $key }}">{{ $key }} (Offline)</option>
+                                @endif
+                           @endforeach
                            <option value="ABB0234">Affin B2C - Test ID</option>
                            <option value="ABB0233">Affin Bank</option>
                            <option value="ABMB0212">Alliance Bank (Personal)</option>
@@ -109,7 +215,7 @@
                            <option value="HSBC0223">HSBC Bank</option>
                            <option value="KFH0346">KFH</option>
                            <option value="MBB0228">Maybank2E</option>
-                           <option value="MB2U0227">Maybank2U</option>
+                           <option value="MB2U0227"> Maybank2U</option>
                            <option value="OCBC0229">OCBC Bank</option>
                            <option value="PBB0233">Public Bank</option>
                            <option value="RHB0218">RHB Bank</option>
@@ -125,8 +231,10 @@
                             {{ csrf_field() }}
                             <input type="hidden" name="amount" id="amount" value="0.00">
                             <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
+                            <input type="hidden" name="desc" id="desc" value="School Fees">
+                            <br>
+                            <br>
                             <button class="btn btn-success float-right" type="submit" onclick="return checkBank();">Bayar Sekarang</button>
-                            <img src="assets/images/FPX_ParticipatingBanks.PNG" class="float-right" alt="FPXBanks" style="margin-top:20px">
                         </form>
                     </div>
                     <input type="hidden" name="bname" id="bname" value="{{ $getfees->nama  ?? '' }}">
@@ -135,6 +243,13 @@
             </div>
         </div>
     </div>
+    <hr>
+    <h4>Powered by:</h4>
+    <div class="row" style="align-self: center">
+        <img src="assets/images/fpx/FPX.png" alt="FPXBanks" style="width: 50%">
+    </div>
+    <hr>
+    <h4>FPX Terms & Conditions: <a href="https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp" target="_blank">Click Here</a></h4>
 </div>
 @endsection
 
@@ -143,8 +258,17 @@
 
     function checkBank() {
         var t = jQuery('#bankid').val();
+        var a = parseFloat(jQuery('#amount').val());
         if (t === '' || t === null) {
             alert('Please select a bank');
+            return false;
+        }
+        if (a < 1.00) {
+            alert('Transaction Amount is Lower than the Minimum Limit RM1.00 for B2C');
+            return false;
+        }
+        else if (a > 30000.00) {
+            alert('Transaction Amount Limit Exceeded RM30,000.00 for B2C');
             return false;
         }
     }

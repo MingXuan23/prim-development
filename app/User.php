@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\Donation;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -19,7 +20,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'device_token'
+
     ];
 
     /**
@@ -42,11 +44,16 @@ class User extends Authenticatable
 
     public function organization()
     {
-        return $this->belongsToMany(Organization::class, 'organization_user');
+        return $this->belongsToMany(Organization::class, 'organization_user', 'user_id', 'organization_id');
     }
 
     public function organizationRole() {
         return $this->belongsToMany(OrganizationRole::class, 'organization_user','', 'role_id');
     }
     
+    public function donation()
+    {
+        return $this->belongsToMany(Donation::class, 'donation_user');
+    }
+
 }

@@ -231,7 +231,6 @@ class PayController extends Controller
                     $user2      = User::find(Auth::id());
 
                     // dd($user);
-                    
                     return view('fpx.tStatus', compact('request', 'user'));
 
 

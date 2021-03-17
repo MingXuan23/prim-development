@@ -66,6 +66,7 @@ class DetailsController extends Controller
         //     ->get();
         // dd($liststd);
 
+        // dd($request->id);
 
 
         $this->validate($request, [
@@ -75,6 +76,8 @@ class DetailsController extends Controller
             'cat'          =>  'required',
         ]);
 
+        // price must in decimal
+        
         $no = (doubleval($request->get('price')));
         $total = $no * $request->get('quantity');
         // dd($total);
@@ -94,7 +97,7 @@ class DetailsController extends Controller
             'fees_id'    => $request->id
         ]);
 
-
+        // insert student first
         $liststd =  DB::table('class_student')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
@@ -102,6 +105,8 @@ class DetailsController extends Controller
             ->select('class_student.id as cid')
             ->where('class_fees.fees_id', $request->id)
             ->get();
+
+        // dd($liststd);
 
         for ($i = 0; $i < count($liststd); $i++) {
             $array[] = array(
