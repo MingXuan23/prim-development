@@ -95,5 +95,5 @@ Route::group(['prefix' => 'notification'], function () {
 
 Route::group(['prefix' => 'dashboard'], function () {
     Route::get('/donor', 'HomeController@getTotalDonorDashboard')->name('donor');
-    Route::get('/donation', 'HomeController@getTotalDonation')->name('donation');
+    Route::get('/donation', 'HomeController@getTotalDonationDashboard')->name('donation');
 });

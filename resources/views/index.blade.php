@@ -57,7 +57,9 @@
                     <div class="card-body">
                         <div class="text-center text-white py-4">
                             <h5 class="mt-0 mb-4 text-white-50 font-size-16">Derma Terkumpul Hari Ini</h5>
-                            <h1 id="donation_day"></h1>
+                            @foreach($donations as $donation)
+                            <h1 id="donation_day">RM {{ $donation->donation_amount }}</h1>
+                            @endforeach
                         </div>
                     </div>
                 </div>
