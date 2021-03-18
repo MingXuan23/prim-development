@@ -122,10 +122,36 @@
     {
         list($key1,$value1)=explode("~", $token);
         $value1=urldecode($value1);
-        $bank_list[$key1]=$value1;
+        $bank_list[$key1]=[ 'value' => $value1, 'nama' => '' ];
         $token = strtok(",");
     }
 
+    $bank_list['ABB0234']['nama']   = $bank_list['ABB0234']['value'] == "A" ? "Affin B2C - Test ID" : "Affin B2C - Test ID (OFFLINE)";
+    $bank_list['ABB0233']['nama']   = $bank_list['ABB0233']['value'] == "A" ? "Affin Bank" : "Affin Bank (OFFLINE)";
+    $bank_list['ABMB0212']['nama']  = $bank_list['ABMB0212']['value'] == "A" ? "Alliance Bank (Personal)" : "Alliance Bank (OFFLINE)";
+    $bank_list['AGRO01']['nama']    = $bank_list['AGRO01']['value']  == "A" ? "AGRONet" : "AGRONet (OFFLINE)";
+    $bank_list['AMBB0209']['nama']  = $bank_list['AMBB0209']['value'] == "A" ? "AmBank" : "AmBank (OFFLINE)";
+    $bank_list['BIMB0340']['nama']  = $bank_list['BIMB0340']['value'] == "A" ? "Bank Islam Sdn Bhd" : "Bank Islam Sdn Bhd (OFFLINE)";
+    $bank_list['BMMB0341']['nama']  = $bank_list['BMMB0341']['value'] == "A" ? "Bank Muamalat" : "Bank Muamalat (OFFLINE)";
+    $bank_list['BKRM0602']['nama']  = $bank_list['BKRM0602']['value'] == "A" ? "Bank Rakyat" : "Bank Rakyat (OFFLINE)";
+    $bank_list['BSN0601']['nama']   = $bank_list['BSN0601']['value']  == "A" ? "BSN" : "BSN (OFFLINE)";
+    $bank_list['BCBB0235']['nama']  = $bank_list['BCBB0235']['value'] == "A" ? "CIMB Clicks" : "CIMB Clicks (OFFLINE)";
+    $bank_list['CIT0219']['nama']   = $bank_list['CIT0219']['value']  == "A" ? "Citibank" : "Citibank (OFFLINE)";
+    $bank_list['HLB0224']['nama']   = $bank_list['HLB0224']['value']  == "A" ? "Hong Leong Bank" : "Hong Leong Bank (OFFLINE)";
+    $bank_list['HSBC0223']['nama']  = $bank_list['HSBC0223']['value'] == "A" ? "HSBC Bank" : "HSBC Bank (OFFLINE)";
+    $bank_list['KFH0346']['nama']   = $bank_list['KFH0346']['value']  == "A" ? "KFH" : "KFH (OFFLINE)";
+    $bank_list['MBB0228']['nama']   = $bank_list['MBB0228']['value']  == "A" ? "Maybank2E" : "Maybank2E (OFFLINE)";
+    $bank_list['MB2U0227']['nama']  = $bank_list['MB2U0227']['value'] == "A" ? "Maybank2U" : "Maybank2U (OFFLINE)";
+    $bank_list['OCBC0229']['nama']  = $bank_list['OCBC0229']['value'] == "A" ? "OCBC Bank" : "OCBC Bank (OFFLINE)";
+    $bank_list['PBB0233']['nama']   = $bank_list['PBB0233']['value']  == "A" ? "Public Bank" : "Public Bank (OFFLINE)";
+    $bank_list['RHB0218']['nama']   = $bank_list['RHB0218']['value']  == "A" ? "RHB Bank" : "RHB Bank (OFFLINE)";
+    $bank_list['TEST0021']['nama']  = $bank_list['TEST0021']['value'] == "A" ? "SBI Bank A" : "SBI Bank A (OFFLINE)";
+    $bank_list['TEST0022']['nama']  = $bank_list['TEST0022']['value'] == "A" ? "SBI Bank B" : "SBI Bank B (OFFLINE)";
+    $bank_list['TEST0023']['nama']  = $bank_list['TEST0023']['value'] == "A" ? "SBI Bank C" : "SBI Bank C (OFFLINE)";
+    $bank_list['SCB0216']['nama']   = $bank_list['SCB0216']['value']  == "A" ? "Standard Chartered" : "Standard Chartered (OFFLINE)";
+    $bank_list['UOB0226']['nama']   = $bank_list['UOB0226']['value']  == "A" ? "UOB Bank" : "UOB Bank (OFFLINE)";
+    $bank_list['UOB0229']['nama']   = $bank_list['UOB0229']['value']  == "A" ? "UOB Bank - Test ID" : "UOB Bank - Test ID (OFFLINE)";
+    sort($bank_list);
 
     }
     catch(Exception $e){
@@ -194,37 +220,8 @@
                        <select name="bankid" id="bankid" class="form-control">
                            <option value="">Select bank</option>
                            @foreach ($bank_list as $key=>$value)
-                                @if ($value == "A")
-                                    <option value="{{ $key }}">{{ $key }}</option>
-                                @else
-                                    <option value="{{ $key }}">{{ $key }} (Offline)</option>
-                                @endif
+                                <option value="{{ $key }}">{{ $value['nama'] }}</option>
                            @endforeach
-                           <option value="ABB0234">Affin B2C - Test ID</option>
-                           <option value="ABB0233">Affin Bank</option>
-                           <option value="ABMB0212">Alliance Bank (Personal)</option>
-                           <option value="AGRO01">AGRONet</option>
-                           <option value="AMBB0209">AmBank</option>
-                           <option value="BIMB0340">Bank Islam</option>
-                           <option value="BMMB0341">Bank Muamalat</option>
-                           <option value="BKRM0602">Bank Rakyat</option>
-                           <option value="BSN0601">BSN</option>
-                           <option value="BCBB0235">CIMB Clicks</option>
-                           <option value="CIT0219">Citibank</option>
-                           <option value="HLB0224">Hong Leong Bank</option>
-                           <option value="HSBC0223">HSBC Bank</option>
-                           <option value="KFH0346">KFH</option>
-                           <option value="MBB0228">Maybank2E</option>
-                           <option value="MB2U0227"> Maybank2U</option>
-                           <option value="OCBC0229">OCBC Bank</option>
-                           <option value="PBB0233">Public Bank</option>
-                           <option value="RHB0218">RHB Bank</option>
-                           <option value="TEST0021">SBI Bank A</option>
-                           <option value="TEST0022">SBI Bank B</option>
-                           <option value="TEST0023">SBI Bank C</option>
-                           <option value="SCB0216">Standard Chartered</option>
-                           <option value="UOB0226">UOB Bank</option>
-                           <option value="UOB0229">UOB Bank - Test ID</option>
                        </select>
                     </div>
                     <div class="col-md-4 p-2">

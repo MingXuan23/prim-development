@@ -2,7 +2,22 @@
 
 @section('content')
 <div class="container">
-    <h2>Failed</h2>
+    <h2>Transaction Status: <span class="text-danger">Failed</span></h2>
+    
+    <div class="row" style="margin-top: 20px">
+        <div class="col-6">
+            <p>Name: {{ $user->username }}</p>
+            <p>Email: {{ $user->email }}</p>
+            <p>Phone No: {{ $user->telno }}</p>
+            <p>Bank: {{ $request->fpx_buyerBankBranch }}</p>
+        </div>
+        <div class="col-6">
+            <p>Transaction Date: {{ $request->fpx_fpxTxnTime }}</p>
+            <p>Transaction #: {{ $request->fpx_fpxTxnId }}</p>
+            <p>Seller Order #: {{ $request->fpx_sellerOrderNo }}</p>
+            <p>Transaction Amount: <span class="text-danger">RM0.00</span></p>
+        </div>
+    </div>
 
     <br>
     <strong><p>The transaction has been cancelled by your own/rejected by your banking service. Please try again later.</p></strong>
