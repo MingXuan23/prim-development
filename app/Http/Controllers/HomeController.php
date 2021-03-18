@@ -128,55 +128,6 @@ class HomeController extends Controller
         return view('vendor.laravelpwa.offline');
     }
 
-    public function getTotalDonorByDay($organizationId)
-    {
-        $donors = DB::table('transactions')
-                    ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
-                    ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-                    ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
-                    ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
-                    ->where('organizations.id', $organizationId)
-                    ->where('transactions.status', 'Success')
-                    ->whereRaw('date(transactions.datetime_created) = curdate()')
-                    ->select(DB::raw('count(transactions.id) as donor'))
-                    ->get();
-
-        return $donors;
-    }
-
-    public function getTotalDonorByWeek($organizationId)
-    {
-        $donors = DB::table('transactions')
-                    ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
-                    ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-                    ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
-                    ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
-                    ->where('organizations.id', $organizationId)
-                    ->where('transactions.status', 'Success')
-                    ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
-                    ->select(DB::raw('count(transactions.id) as donor'))
-                    ->get();
-
-        return $donors;
-    }
-
-    public function getTotalDonorByMonth($organizationId)
-    {
-        $donors = DB::table('transactions')
-                    ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
-                    ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-                    ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
-                    ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
-                    ->where('organizations.id', $organizationId)
-                    ->where('transactions.status', 'Success')
-                    ->whereRaw('year(transactions.datetime_created) = year(curdate())')
-                    ->whereRaw('month(transactions.datetime_created) = month(curdate())')
-                    ->select(DB::raw('count(transactions.id) as donor'))
-                    ->get();
-
-        return $donors;
-    }
-
     public function getTransactionByOrganizationIdAndStatus($organizationId)
     {
         $transaction = Transaction::select(DB::raw('sum(transactions.amount) as donation_amount'))
@@ -190,6 +141,37 @@ class HomeController extends Controller
                         ]));
 
         return $transaction;
+    }
+
+    public function getTotalDonorByDay($organizationId)
+    {
+        $donors = $this->getTransactionByOrganizationIdAndStatus($organizationId)
+                    ->whereRaw('date(transactions.datetime_created) = curdate()')
+                    ->select(DB::raw('count(transactions.id) as donor'))
+                    ->get();
+
+        return $donors;
+    }
+
+    public function getTotalDonorByWeek($organizationId)
+    {
+        $donors = $this->getTransactionByOrganizationIdAndStatus($organizationId)
+                    ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
+                    ->select(DB::raw('count(transactions.id) as donor'))
+                    ->get();
+
+        return $donors;
+    }
+
+    public function getTotalDonorByMonth($organizationId)
+    {
+        $donors = $this->getTransactionByOrganizationIdAndStatus($organizationId)
+                    ->whereRaw('year(transactions.datetime_created) = year(curdate())')
+                    ->whereRaw('month(transactions.datetime_created) = month(curdate())')
+                    ->select(DB::raw('count(transactions.id) as donor'))
+                    ->get();
+
+        return $donors;
     }
 
     public function getTotalDonationByDay($organizationId)
