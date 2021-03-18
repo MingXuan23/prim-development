@@ -33,40 +33,32 @@ class HomeController extends Controller
         return view("index", compact('organizations'));
     }
 
-    public function getTotalDonorDashboard(Request $requests)
+    public function getDashboardItem(Request $requests)
     {
         $organizationId = $requests->id;
+
+        // get total donors by day,week,month
         $donorsDays = $this->getTotalDonorByDay($organizationId);
         $donorsWeeks = $this->getTotalDonorByWeek($organizationId);
         $donorsMonths = $this->getTotalDonorByMonth($organizationId);
-
-        $donor = [
-            "day" => $donorsDays,
-            "week" => $donorsWeeks,
-            "month" => $donorsMonths
-        ];
-
-        $donor = json_encode($donor);
-
-        return $donor;
-    }
-
-    public function getTotalDonationDashboard(Request $requests)
-    {
-        $organizationId = $requests->id;
+        
+        // get total donation by day,week,month
         $donationDays = $this->getTotalDonationByDay($organizationId);
         $donationWeeks = $this->getTotalDonationByWeek($organizationId);
         $donationMonths = $this->getTotalDonationByMonth($organizationId);
 
-        $donation = [
-            "day" => $donationDays,
-            "week" => $donationWeeks,
-            "month" => $donationMonths
+        $dashboard = [
+            "donor_day" => $donorsDays,
+            "donor_week" => $donorsWeeks,
+            "donor_month" => $donorsMonths,
+            "donation_day" => $donationDays,
+            "donation_week" => $donationWeeks,
+            "donation_month" => $donationMonths
         ];
 
-        $donation = json_encode($donation);
+        $dashboard = json_encode($dashboard);
 
-        return $donation;
+        return $dashboard;
     }
 
     /**
