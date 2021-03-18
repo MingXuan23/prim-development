@@ -93,6 +93,5 @@ Route::group(['prefix' => 'notification'], function () {
 // Route::get('/offline', 'HomeController@pwaOffline');
 
 Route::group(['prefix' => 'dashboard'], function () {
-    Route::get('/donor', 'HomeController@getTotalDonorDashboard')->name('donor');
-    Route::get('/donation', 'HomeController@getTotalDonationDashboard')->name('donation');
+    Route::get('/item', 'HomeController@getDashboardItem')->name('dashboard.item');
 });
