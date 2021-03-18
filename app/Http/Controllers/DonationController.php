@@ -54,7 +54,7 @@ class DonationController extends Controller
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
                     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
                     ->join('users', 'users.id', '=', 'organization_user.user_id')
-                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->where('users.id', $userId)
                     ->orderBy('donations.nama');
             }
@@ -108,8 +108,9 @@ class DonationController extends Controller
             ->select('donations.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
             ->where('donations.id', $id)
             ->orderBy('donations.nama')
-            ->get();
+            ->first();
 
+            dd($listdonor);
 
         return view('donate.donor', compact('listdonor'));
 
