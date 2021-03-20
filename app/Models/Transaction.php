@@ -13,4 +13,7 @@ class Transaction extends Model
         return $this->belongsToMany(Donation::class, 'donation_transaction', 'transaction_id', 'donation_id');
     }
     public $timestamps = false;
+
+    protected $dates = ['datetime_created'];
+
 }
