@@ -54,7 +54,7 @@ class DonationController extends Controller
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
                     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
                     ->join('users', 'users.id', '=', 'organization_user.user_id')
-                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
                     ->where('users.id', $userId)
                     ->orderBy('donations.nama');
             }
@@ -102,14 +102,21 @@ class DonationController extends Controller
     public function listAllDonor($id)
     {
         // dd($id);
-        $listdonor = DB::table('donations')
+        $aa = DB::table('donations')
             ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
             ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
             ->select('donations.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
             ->where('donations.id', $id)
             ->orderBy('donations.nama')
-            ->get();
+            ->first();
 
+        if ($aa) {
+            $listdonor = $aa;
+            // dd($listdonor);
+        } else {
+            $listdonor = "";
+            // dd($listdonor);
+        }
 
         return view('donate.donor', compact('listdonor'));
 
@@ -127,6 +134,9 @@ class DonationController extends Controller
             ->where('donations.id', $request->did)
             ->orderBy('donations.nama')
             ->get();
+
+        dd($listdonor);
+
         if (request()->ajax()) {
             return datatables()->of($listdonor)
                 ->make(true);
@@ -135,17 +145,66 @@ class DonationController extends Controller
 
     public function historyDonor()
     {
+
+        return view('donate.history');
+
         $userId = Auth::id();
 
         $listhistory = DB::table('donations')
             ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
             ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
-            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email')
+            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
             ->where('transactions.user_id', $userId)
             ->orderBy('donations.nama')
             ->get();
 
-        dd($listhistory);
+        // dd($listhistory);
+        // if (request()->ajax()) {
+        //     return datatables()->of($listhistory)
+        //         ->make(true);
+        // }
+    }
+
+    public function getHistoryDonorDT()
+    {
+
+        $userId = Auth::id();
+
+        $listhistory = DB::table('donations')
+            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
+            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
+            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
+            ->where('transactions.user_id', $userId)
+            ->orderBy('donations.nama')
+            ->get();
+
+        // dd($listhistory);
+        if (request()->ajax()) {
+            return datatables()->of($listhistory)
+                ->editColumn('datetime_created', function ($data) {
+                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created)->format('H:i:s d-m-Y');
+                    return $formatedDate;
+                })
+                ->addColumn('status', function ($data) {
+                    if ($data->status == 'Success') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<button class="btn btn-success m-1"> Success </button></div>';
+                        return $btn;
+
+                    } else if ($data->status == 'Pending'){
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<button  class="btn btn-warning m-1"> Pending </button></div>';
+                        return $btn;
+                    }
+                    else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<button  class="btn btn-danger m-1"> Failed </button></div>';
+                        return $btn;
+                    }
+                })
+                ->rawColumns(['status'])
+                ->make(true);
+        }
     }
 
     public function listAllOrganization()

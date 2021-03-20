@@ -34,7 +34,8 @@ Route::group(['prefix' => 'donate'], function () {
     Route::get('donorList', 'DonationController@getDonorDatatable')->name('donate.donorlist');
     Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
     Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
-    Route::get('history', 'DonationController@historyDonor')->name('historypayment');
+    Route::get('history', 'DonationController@historyDonor')->name('historydonor');
+    Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('historydonorDT');
 });
 
 Route::group(['prefix' => 'organization'], function () {

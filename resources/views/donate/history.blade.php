@@ -11,7 +11,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Senarai Penderma </h4>
+            <h4 class="font-size-18">Sejarah Derma </h4>
             <!-- <ol class="breadcrumb mb-0">
                   <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
               </ol> -->
@@ -57,21 +57,17 @@
                 </div>
                 @endif
 
-                <input type="text" id="don" name="don" class="form-control"
-                    value="{{ empty($listdonor) ? '' : $listdonor->id }}">
-
-
                 <div class="table-responsive">
                     <table id="donorTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
+                                <th> Nama Derma </th>
                                 <th> Nama Penderma </th>
-                                <th> Email </th>
-                                <th> No Telefon </th>
                                 <th> Tarikh Derma </th>
                                 <th> Amaun (RM) </th>
+                                <th> Status </th>
                             </tr>
                         </thead>
                     </table>
@@ -95,24 +91,12 @@
 <script>
     $(document).ready(function() {
 
-        var donateid = $('#don').val();
-        // var donateid = "{{ $listdonor->id }}";
-        if(donateid == ""){
-            console.log("ss");
-        }
-        else{
-            console.log(donateid)
-        
-
-        
-            $('#donorTable').DataTable({
+       
+        $('#donorTable').DataTable({
                   processing: true,
                   serverSide: true,
                   ajax: {
-                      url: "{{ route('donate.donorlist') }}",
-                      data: {
-                          did: donateid,
-                      },
+                      url: "{{ route('historydonorDT') }}",
                       type: 'GET',
 
                   },
@@ -127,17 +111,12 @@
                           return meta.row + meta.settings._iDisplayStart + 1;
                       }
                   }, {
+                      data: "dname",
+                      name: 'dname'
+                  }, {
                       data: "username",
                       name: 'username'
-                  }, {
-                      data: "email",
-                      name: 'email',
-                      orderable: false
-                  }, {
-                      data: "telno",
-                      name: 'telno',
-                      orderable: false
-                  }, {
+                  },{
                       data: "datetime_created",
                       name: 'datetime_created',
                       orderable: false,
@@ -147,10 +126,13 @@
                       name: 'amount',
                       orderable: false,
                       searchable: false
-                  }, ]
+                  }, {
+                      data: 'status',
+                      name: 'status',
+                      orderable: false,
+                      searchable: false
+                  },]
           });
-        
-        }
         
 
 });
