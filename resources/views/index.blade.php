@@ -110,20 +110,24 @@
                         },
 						success: function(data){
 
-                            var donation = JSON.parse(data);
-							var donor_day      = donation.donor_day[0].donor;
-							var donor_week     = donation.donor_week[0].donor;
-							var donor_month    = donation.donor_month[0].donor;
-                            var donation_day   = donation.donation_day[0].donation_amount;
-							var donation_week  = donation.donation_week[0].donation_amount;
-							var donation_month = donation.donation_month[0].donation_amount;
+                            var a = ["day", "week", "month"];
 
-                            document.getElementById("donor_day").innerHTML = donor_day;
-                            document.getElementById("donor_week").innerHTML = donor_week;
-                            document.getElementById("donor_month").innerHTML = donor_month;
-                            document.getElementById("donation_day").innerHTML = donation_day;
-                            document.getElementById("donation_week").innerHTML = donation_week;
-                            document.getElementById("donation_month").innerHTML = donation_month;
+                            console.log(donation);
+                            for(var i=0; i<a.length;i++){
+                                console.log("donor_" + a[i]);
+                                console.log("donation_" + a[i]);
+                                try {
+                                    var donor = data.data["donor_" + a[i]].donor;
+                                    var donation = data.data["donation_" + a[i]].donation_amount;
+                                    
+                                    console.log(donor);
+                                    
+                                    document.getElementById("donor_" + a[i]).innerHTML =  donor ?? 0;
+                                    document.getElementById("donation_"  + a[i]).innerHTML =  donation ?? 0;
+                                } catch(e){
+                                    console.log(e);
+                                }
+                            }
 						}
 					});
             });

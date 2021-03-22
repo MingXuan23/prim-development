@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Transaction;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,16 +10,12 @@ class Donation extends Model
 {
     use SoftDeletes;
 
+    public $table = "donations";
     protected $fillable = ['nama', 'description', 'date_created', 'date_started', 'date_end', 'status'];
     
     public $timestamps = false;
 
     protected $dates = ['deleted_at'];
-
-    public function organization()
-    {
-        return $this->belongsToMany(Organization::class, 'donation_organization');
-    }
 
     public function user()
     {
@@ -35,5 +30,15 @@ class Donation extends Model
     public function transaction()
     {
         return $this->belongsToMany(Transaction::class, 'donation_transaction', 'donation_id', 'transaction_id');
+    }
+
+    public function transactions()
+    {
+        return $this->hasManyThrough(Transaction::class, DonationTransaction::class, 'donation_id', 'id', 'id', 'transaction_id');
+    }
+
+    public function organization()
+    {
+        return $this->hasOneThrough(Organization::class, DonationOrganization::class, 'donation_id', 'id', 'id', 'organization_id');
     }
 }
