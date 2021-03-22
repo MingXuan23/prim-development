@@ -101,32 +101,19 @@ class DonationController extends Controller
 
     public function listAllDonor($id)
     {
-        // dd($id);
-        $aa = DB::table('donations')
-            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
-            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
-            ->select('donations.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
+        $listdonor = DB::table('donations')
+            ->select('donations.id as id', 'donations.nama as dname')
             ->where('donations.id', $id)
-            ->orderBy('donations.nama')
             ->first();
 
-        if ($aa) {
-            $listdonor = $aa;
-            // dd($listdonor);
-        } else {
-            $listdonor = "";
-            // dd($listdonor);
-        }
-
         return view('donate.donor', compact('listdonor'));
-
-
-        // dd($listdonor);
     }
 
     public function getDonorDatatable(Request $request)
     {
         // $listdonor2 = $this->listAllDonor($request->did);
+        // dd($request->did);
+
         $listdonor = DB::table('donations')
             ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
             ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
@@ -135,34 +122,20 @@ class DonationController extends Controller
             ->orderBy('donations.nama')
             ->get();
 
-        dd($listdonor);
+        // dd($listdonor);
 
         if (request()->ajax()) {
             return datatables()->of($listdonor)
+                ->editColumn('amount', function ($data) {
+                    return number_format($data->amount, 2);
+                })
                 ->make(true);
         }
     }
 
     public function historyDonor()
     {
-
         return view('donate.history');
-
-        $userId = Auth::id();
-
-        $listhistory = DB::table('donations')
-            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
-            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
-            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
-            ->where('transactions.user_id', $userId)
-            ->orderBy('donations.nama')
-            ->get();
-
-        // dd($listhistory);
-        // if (request()->ajax()) {
-        //     return datatables()->of($listhistory)
-        //         ->make(true);
-        // }
     }
 
     public function getHistoryDonorDT()
@@ -190,13 +163,11 @@ class DonationController extends Controller
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button class="btn btn-success m-1"> Success </button></div>';
                         return $btn;
-
-                    } else if ($data->status == 'Pending'){
+                    } else if ($data->status == 'Pending') {
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button  class="btn btn-warning m-1"> Pending </button></div>';
                         return $btn;
-                    }
-                    else {
+                    } else {
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button  class="btn btn-danger m-1"> Failed </button></div>';
                         return $btn;
