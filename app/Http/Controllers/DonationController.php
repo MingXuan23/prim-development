@@ -158,6 +158,9 @@ class DonationController extends Controller
                     $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created)->format('H:i:s d-m-Y');
                     return $formatedDate;
                 })
+                ->editColumn('amount', function ($data) {
+                    return number_format($data->amount, 2);
+                })
                 ->addColumn('status', function ($data) {
                     if ($data->status == 'Success') {
                         $btn = '<div class="d-flex justify-content-center">';
