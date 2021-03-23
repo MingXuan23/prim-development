@@ -117,14 +117,6 @@ class DonationController extends Controller
             ->where('donations.id', $id)
             ->first();
 
-        if ($aa) {
-            $listdonor = $aa;
-        // dd($listdonor);
-        } else {
-            $listdonor = "";
-            // dd($listdonor);
-        }
-
         return view('donate.donor', compact('listdonor'));
     }
 
@@ -184,11 +176,7 @@ class DonationController extends Controller
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button class="btn btn-success m-1"> Success </button></div>';
                         return $btn;
-<<<<<<< HEAD
                     } else if ($data->status == 'Pending') {
-=======
-                    } elseif ($data->status == 'Pending') {
->>>>>>> 803d3992c0916126aa37cbfce28bd6965c90e121
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button  class="btn btn-warning m-1"> Pending </button></div>';
                         return $btn;
