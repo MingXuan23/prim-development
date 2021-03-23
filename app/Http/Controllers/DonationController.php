@@ -112,7 +112,7 @@ class DonationController extends Controller
 
         if ($aa) {
             $listdonor = $aa;
-            // dd($listdonor);
+        // dd($listdonor);
         } else {
             $listdonor = "";
             // dd($listdonor);
@@ -145,7 +145,6 @@ class DonationController extends Controller
 
     public function historyDonor()
     {
-
         return view('donate.history');
 
         $userId = Auth::id();
@@ -167,7 +166,6 @@ class DonationController extends Controller
 
     public function getHistoryDonorDT()
     {
-
         $userId = Auth::id();
 
         $listhistory = DB::table('donations')
@@ -190,13 +188,11 @@ class DonationController extends Controller
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button class="btn btn-success m-1"> Success </button></div>';
                         return $btn;
-
-                    } else if ($data->status == 'Pending'){
+                    } elseif ($data->status == 'Pending') {
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button  class="btn btn-warning m-1"> Pending </button></div>';
                         return $btn;
-                    }
-                    else {
+                    } else {
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button  class="btn btn-danger m-1"> Failed </button></div>';
                         return $btn;
