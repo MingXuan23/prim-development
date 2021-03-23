@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Donation;
 use Illuminate\Database\Eloquent\Model;
 use DB;
+use DonationTransaction;
 
 class Transaction extends Model
 {
@@ -20,15 +21,77 @@ class Transaction extends Model
     public static function getTransactionByOrganizationIdAndStatus($organizationId)
     {
         $transaction = Transaction::select(DB::raw('sum(transactions.amount) as donation_amount'))
-                        ->join('donation_transaction', 'donation_transaction.transaction_id', '=', 'transactions.id')
+                        ->join('donation_transaction', 'transactions.id', '=', 'donation_transaction.transaction_id')
                         ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-                        ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
-                        ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
+                        ->join('donation_organization', 'donations.id', '=', 'donation_organization.donation_id')
+                        ->join('organizations', 'donation_organization.organization_id', '=', 'organizations.id')
                         ->where(([
                             ['organizations.id','=' ,$organizationId],
                             ['transactions.status', '=', 'Success']
                         ]));
 
         return $transaction;
+    }
+
+    public static function getTotalDonorByDay($organizationId)
+    {
+        $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
+                    ->whereRaw('date(transactions.datetime_created) = curdate()')
+                    ->select(DB::raw('count(transactions.id) as donor'))
+                    ->first();
+
+        return $donors;
+    }
+
+    public static function getTotalDonorByWeek($organizationId)
+    {
+        $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
+                    ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
+                    ->select(DB::raw('count(transactions.id) as donor'))
+                    ->first();
+
+        return $donors;
+    }
+
+    public static function getTotalDonorByMonth($organizationId)
+    {
+        $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
+                    ->whereRaw('year(transactions.datetime_created) = year(curdate())')
+                    ->whereRaw('month(transactions.datetime_created) = month(curdate())')
+                    ->select(DB::raw('count(transactions.id) as donor'))
+                    ->first();
+
+        return $donors;
+    }
+
+    public static function getTotalDonationByDay($organizationId)
+    {
+        $totalDonation = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
+                        ->whereRaw('date(transactions.datetime_created) = curdate()')
+                        ->select(DB::raw('sum(transactions.amount) as donation_amount'))
+                        ->first();
+
+        return $totalDonation;
+    }
+
+    public static function getTotalDonationByWeek($organizationId)
+    {
+        $totalDonation = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
+                        ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
+                        ->select(DB::raw('sum(transactions.amount) as donation_amount'))
+                        ->first();
+
+        return $totalDonation;
+    }
+
+    public static function getTotalDonationByMonth($organizationId)
+    {
+        $totalDonation = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
+                        ->whereRaw('year(transactions.datetime_created) = year(curdate())')
+                        ->whereRaw('month(transactions.datetime_created) = month(curdate())')
+                        ->select(DB::raw('sum(transactions.amount) as donation_amount'))
+                        ->first();
+
+        return $totalDonation;
     }
 }
