@@ -26,15 +26,17 @@
                                     <img src="assets/images/services-icon/donation.png" alt="">
                                 </div>
                                 <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Jumlah Penderma</h5>
-                                <h4 class="font-weight-medium font-size-24" id="donor_day">0</h4>
+                                <h4 class="font-weight-medium font-size-24" id="total_donor">0</h4>
                                 <div class="mini-stat-label bg-success">
-                                    <p class="mb-0">Hari Ini</p>
+                                    <p id="p_day" class="mb-0">Hari Ini</p>
                                 </div>
                             </div>
                             <div class="pt-2 float-right">
-                                <p class="text-white-50 mb-0 mt-1"><button class="btn btn-secondary mx-2">Hari
-                                        ini</button><button class="btn btn-secondary mx-2">Minggu
-                                        ini</button><button class="btn btn-secondary mx-2">Bulan ini</button></p>
+                                <p class="text-white-50 mb-0 mt-1">
+                                    <button onclick="" class="btn btn-secondary mx-2">Hari ini</button>
+                                    <button onclick="" class="btn btn-secondary mx-2">Minggu ini</button>
+                                    <button onclick="" class="btn btn-secondary mx-2">Bulan ini</button>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -47,15 +49,16 @@
                                     <img src="assets/images/services-icon/donate.png" style="max-width: 40px" alt="">
                                 </div>
                                 <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Derma Terkumpul</h5>
-                                <h4 class="font-weight-medium font-size-24" id="donor_week">RM 0.00</h4>
+                                <h4 class="font-weight-medium font-size-24" id="total_donation">RM 0.00</h4>
                                 <div class="mini-stat-label bg-success">
-                                    <p class="mb-0">Minggu Ini</p>
+                                    <p id="p_donor_day" class="mb-0">Minggu Ini</p>
                                 </div>
                             </div>
                             <div class="pt-2 float-right">
-                                <p class="text-white-50 mb-0 mt-1"><button class="btn btn-secondary mx-2">Hari
-                                        ini</button><button class="btn btn-secondary mx-2">Minggu
-                                        ini</button><button class="btn btn-secondary mx-2">Bulan ini</button></p>
+                                <p class="text-white-50 mb-0 mt-1">
+                                    <button id="btn_day" class="btn btn-secondary mx-2" onclick="getTotalDonation(this.id)" >Hari ini</button>
+                                    <button id="btn_week" class="btn btn-secondary mx-2" onclick="getTotalDonation(this.id)" >Minggu ini</button>
+                                    <button id="btn_month" class="btn btn-secondary mx-2" onclick="getTotalDonation(this.id)" >Bulan ini</button></p>
                             </div>
                         </div>
                     </div>
@@ -207,73 +210,5 @@
 
     {{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
 
-    <script>
-        // on change event for organization_dropdown
-        $('#organization_dropdown').change(function() {
-            var organizationid = $("#organization_dropdown option:selected").val();
-
-            $.ajax({
-                type: 'GET',
-                url: '{{ route('dashboard.item') }}',
-                data: {
-                    id: organizationid
-                },
-                success: function(data) {
-
-                    var a = ["day", "week", "month"];
-
-                    console.log(donation);
-                    for (var i = 0; i < a.length; i++) {
-                        console.log("donor_" + a[i]);
-                        console.log("donation_" + a[i]);
-                        try {
-                            var donor = data.data["donor_" + a[i]].donor;
-                            var donation = data.data["donation_" + a[i]].donation_amount;
-
-                            console.log(donor);
-
-                            document.getElementById("donor_" + a[i]).innerHTML = donor ?? 0;
-                            document.getElementById("donation_" + a[i]).innerHTML = donation ?? 0;
-                        } catch (e) {
-                            console.log(e);
-                        }
-                    }
-                }
-            });
-        });
-
-        var chart = new Chartist.Line('.ct-chart', {
-            labels: ['01/02 10.00 pm', '06/03 3.00 pm', '09/04 11.00 am', '10/04 6.00 am', ''],
-            series: [
-                [{
-                    meta: 'Robert Sitton',
-                    value: 15
-                }, {
-                    meta: 'Brent Shipley',
-                    value: 4
-                }, {
-                    meta: 'Philip Smead',
-                    value: 90
-                }, {
-                    meta: 'Adi Iman',
-                    value: 40
-                }, 0]
-            ]
-        }, {
-            // Remove this configuration to see that chart rendered with cardinal spline interpolation
-            // Sometimes, on large jumps in data values, it's better to use simple smoothing.
-            lineSmooth: Chartist.Interpolation.simple({
-                divisor: 2
-            }),
-            fullWidth: true,
-            chartPadding: {
-                right: 20
-            },
-            low: 0,
-            plugins: [
-                Chartist.plugins.tooltip()
-            ]
-        });
-
-    </script>
+@include('dashboard.index')
 @endsection
