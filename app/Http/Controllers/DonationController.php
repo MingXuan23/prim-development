@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\URL;
 
 class DonationController extends Controller
 {
@@ -28,6 +29,7 @@ class DonationController extends Controller
 
     public function getDonationByOrganizationDatatable(Request $request)
     {
+        
         if (request()->ajax()) {
             $oid = $request->oid;
 
@@ -46,7 +48,7 @@ class DonationController extends Controller
                 $data = DB::table('donations')
                     ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
                     ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
-                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status','donations.url')
                     ->orderBy('donations.nama');
             } elseif ($hasOrganizaton == "true") {
                 $data = DB::table('organizations')
@@ -77,6 +79,15 @@ class DonationController extends Controller
             });
 
             if ($hasOrganizaton == "false") {
+                $table->addColumn('URL', function ($row) {
+                    $token = csrf_field();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<input type="text" id="geturl" name="geturl" class="form-control" value="'. URL::action('DonationController@urlDonation', array('link' => $row->url)) .'">
+                    <div class="input-group-append">
+                    <button class="btn btn-primary" onclick="myFunction()">Copy</button>
+                    </div></div>';
+                    return $btn;
+                });
                 $table->addColumn('action', function ($row) {
                     $token = csrf_field();
                     $btn = '<div class="d-flex justify-content-center">';
@@ -93,11 +104,11 @@ class DonationController extends Controller
                     return $btn;
                 });
             }
-            $table->rawColumns(['status', 'action']);
+            $table->rawColumns(['status', 'URL', 'action']);
             return $table->make(true);
         }
+        // return Donation::geturl();
     }
-
 
     public function listAllDonor($id)
     {
@@ -198,6 +209,14 @@ class DonationController extends Controller
         return $listorg;
     }
 
+    public function urlDonation($link)
+    {
+        $getdonate = Donation::where('url',$link)->first();
+
+        return view('paydonate.pay', compact('getdonate'));
+
+    }
+
     public function create()
     {
         $organization = $this->getOrganizationByUserId();
@@ -209,6 +228,11 @@ class DonationController extends Controller
     {
 
         // dd($request);
+
+        $link = explode(" ", $request->get('name'));
+        $str = implode("-", $link);
+        // dd($str);
+
         $dt = Carbon::now();
         $startdate  = $dt->toDateString($request->get('start_date'));
         $enddate    = $dt->toDateString($request->get('end_date'));
@@ -220,6 +244,7 @@ class DonationController extends Controller
             'date_started'   =>  $startdate,
             'date_end'       =>  $enddate,
             'status'         =>  '1',
+            'url'            =>  $str,
         ]);
 
         $newdonate->organization()->attach($request->get('organization'));

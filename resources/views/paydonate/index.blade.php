@@ -85,6 +85,7 @@
                                 <th> Nama Derma </th>
                                 <th> Penerangan </th>
                                 <th> Status </th>
+                                <th> URL </th>
                                 <th> Action </th>
                             </tr>
                         </thead>
@@ -153,6 +154,11 @@
                             searchable: false
                         },
                         {
+                            data: 'URL', 
+                            name: 'URL', 
+                            orderable: false, 
+                            searchable: false
+                        },{
                             data: 'action', 
                             name: 'action', 
                             orderable: false, 
@@ -171,7 +177,17 @@
         });
         
 
+        
+
     });
+
+    function myFunction() {
+        var copyText = document.getElementById("geturl");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999)
+        document.execCommand("copy");
+        alert("Copied the text: " + copyText.value);
+    }
 
 </script>
 @endsection

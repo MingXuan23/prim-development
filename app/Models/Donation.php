@@ -5,13 +5,14 @@ namespace App\Models;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\URL;
 
 class Donation extends Model
 {
     use SoftDeletes;
 
     public $table = "donations";
-    protected $fillable = ['nama', 'description', 'date_created', 'date_started', 'date_end', 'status'];
+    protected $fillable = ['nama', 'description', 'date_created', 'date_started', 'date_end', 'status', 'url'];
     
     public $timestamps = false;
 
@@ -39,6 +40,13 @@ class Donation extends Model
 
     public function organization()
     {
-        return $this->hasOneThrough(Organization::class, DonationOrganization::class, 'donation_id', 'id', 'id', 'organization_id');
+        return $this->belongsToMany(Organization::class, 'donation_organization');
     }
+
+    public function getUrl(){
+        $cat = 'ss';
+        $id = 'kayu';
+        return URL::action('DonationController@urlDonation', array('id' => $cat));
+    }
+
 }
