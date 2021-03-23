@@ -11,7 +11,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Senarai Penderma </h4>
+            <h4 class="font-size-18">Senarai Penderma untuk {{ $listdonor->dname }}</h4>
             <!-- <ol class="breadcrumb mb-0">
                   <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
               </ol> -->
@@ -57,9 +57,7 @@
                 </div>
                 @endif
 
-                <input type="text" id="don" name="don" class="form-control"
-                    value="{{ empty($listdonor) ? '' : $listdonor->id }}">
-
+                <input hidden type="text" id="don" name="don" class="form-control" value="{{ $listdonor->id }}">
 
                 <div class="table-responsive">
                     <table id="donorTable" class="table table-bordered table-striped dt-responsive nowrap"
@@ -96,16 +94,8 @@
     $(document).ready(function() {
 
         var donateid = $('#don').val();
-        // var donateid = "{{ $listdonor->id }}";
-        if(donateid == ""){
-            console.log("ss");
-        }
-        else{
-            console.log(donateid)
-        
 
-        
-            $('#donorTable').DataTable({
+        $('#donorTable').DataTable({
                   processing: true,
                   serverSide: true,
                   ajax: {
@@ -149,8 +139,6 @@
                       searchable: false
                   }, ]
           });
-        
-        }
         
 
 });

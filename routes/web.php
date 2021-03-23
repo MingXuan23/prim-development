@@ -38,6 +38,8 @@ Route::group(['prefix' => 'donate'], function () {
     Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('historydonorDT');
 });
 
+Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
+
 Route::group(['prefix' => 'organization'], function () {
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
 });
