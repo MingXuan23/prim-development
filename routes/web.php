@@ -34,7 +34,8 @@ Route::group(['prefix' => 'donate'], function () {
     Route::get('donorList', 'DonationController@getDonorDatatable')->name('donate.donorlist');
     Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
     Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
-    Route::get('history', 'DonationController@historyDonor')->name('historypayment');
+    Route::get('history', 'DonationController@historyDonor')->name('historydonor');
+    Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('historydonorDT');
 });
 
 Route::group(['prefix' => 'organization'], function () {
@@ -94,6 +95,5 @@ Route::group(['prefix' => 'notification'], function () {
 // Route::get('/offline', 'HomeController@pwaOffline');
 
 Route::group(['prefix' => 'dashboard'], function () {
-    Route::get('/donor', 'HomeController@getTotalDonorDashboard')->name('donor');
-    Route::get('/donation', 'HomeController@getTotalDonation')->name('donation');
+    Route::get('/item', 'HomeController@getDashboardItem')->name('dashboard.item');
 });

@@ -39,6 +39,13 @@
                 </li>
 
                 <li>
+                    <a href="{{ route('historydonor') }}" class=" waves-effect">
+                        <i class="mdi mdi-history"></i>
+                        <span>Sejarah Derma</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fas fa-check"></i>
                         <span>Peringatan Derma</span>
