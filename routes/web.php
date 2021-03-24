@@ -98,4 +98,5 @@ Route::group(['prefix' => 'notification'], function () {
 
 Route::group(['prefix' => 'dashboard'], function () {
     Route::get('/totalDonation', 'DashboardController@getTotalDonation')->name('dashboard.totalDonation');
+    Route::get('/totalDonor', 'DashboardController@getTotalDonor')->name('dashboard.totalDonor');
 });

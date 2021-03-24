@@ -28,14 +28,14 @@
                                 <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Jumlah Penderma</h5>
                                 <h4 class="font-weight-medium font-size-24" id="total_donor">0</h4>
                                 <div class="mini-stat-label bg-success">
-                                    <p id="p_day" class="mb-0">Hari Ini</p>
+                                    <p id="p_donor_day" class="mb-0">Hari Ini</p>
                                 </div>
                             </div>
                             <div class="pt-2 float-right">
                                 <p class="text-white-50 mb-0 mt-1">
-                                    <button onclick="" class="btn btn-secondary mx-2">Hari ini</button>
-                                    <button onclick="" class="btn btn-secondary mx-2">Minggu ini</button>
-                                    <button onclick="" class="btn btn-secondary mx-2">Bulan ini</button>
+                                    <button id="btn_donor_day" onclick="getTotalDonor(this.id)"  class="btn btn-secondary mx-2">Hari ini</button>
+                                    <button id="btn_donor_week" onclick="getTotalDonor(this.id)"  class="btn btn-secondary mx-2">Minggu ini</button>
+                                    <button id="btn_donor_month" onclick="getTotalDonor(this.id)"  class="btn btn-secondary mx-2">Bulan ini</button>
                                 </p>
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                                 <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Derma Terkumpul</h5>
                                 <h4 class="font-weight-medium font-size-24" id="total_donation">RM 0.00</h4>
                                 <div class="mini-stat-label bg-success">
-                                    <p id="p_donor_day" class="mb-0">Minggu Ini</p>
+                                    <p id="p_donation_day" class="mb-0">Minggu Ini</p>
                                 </div>
                             </div>
                             <div class="pt-2 float-right">

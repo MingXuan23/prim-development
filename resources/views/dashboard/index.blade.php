@@ -12,13 +12,13 @@
 
             if (id == "btn_day") {
                 duration = "day";
-                document.getElementById("p_donor_day").innerHTML = "Hari Ini"
+                document.getElementById("p_donation_day").innerHTML = "Hari Ini"
             } else if (id == "btn_week") {
                 duration = "week";
-                document.getElementById("p_donor_day").innerHTML = "Minggu Ini"
+                document.getElementById("p_donation_day").innerHTML = "Minggu Ini"
             } else if (id == "btn_month") {
                 duration = "month";
-                document.getElementById("p_donor_day").innerHTML = "Bulan Ini"
+                document.getElementById("p_donation_day").innerHTML = "Bulan Ini"
             }
             
             $.ajax({
@@ -30,7 +30,6 @@
                 },
                 success: function(data) {
                     duration = data.data.duration;
-                    console.log(duration);
                     if (duration == "day") {
                         document.getElementById("total_donation").innerHTML = (data.data.donation_amount === null) ? "RM 0.00" : "RM " + data.data.donation_amount;
                     } else if (duration == "week") {
@@ -41,6 +40,41 @@
                 }
             });
         }
+
+    function getTotalDonor(id){
+        var duration;
+        var totalDonationDay; 
+        
+        if (id == "btn_donor_day") {
+            duration = "day";
+            document.getElementById("p_donor_day").innerHTML = "Hari Ini"
+        } else if (id == "btn_donor_week") {
+            duration = "week";
+            document.getElementById("p_donor_day").innerHTML = "Minggu Ini"
+        } else if (id == "btn_donor_month") {
+            duration = "month";
+            document.getElementById("p_donor_day").innerHTML = "Bulan Ini"
+        }
+        
+        $.ajax({
+            type: 'GET',
+            url: '{{ route('dashboard.totalDonor') }}',
+            data: {
+                id: organizationid,
+                duration: duration
+            },
+            success: function(data) {
+                duration = data.data.duration;
+                if (duration == "day") {
+                    document.getElementById("total_donor").innerHTML = (data.data.donor === null) ? 0 : data.data.donor;
+                } else if (duration == "week") {
+                    document.getElementById("total_donor").innerHTML = (data.data.donor === null) ? 0 : data.data.donor;
+                } else if (duration == "month") {
+                    document.getElementById("total_donor").innerHTML = (data.data.donor === null) ? 0 : data.data.donor;
+                }
+            }
+        });
+    }
 
     var chart = new Chartist.Line('.ct-chart', {
         labels: ['01/02 10.00 pm', '06/03 3.00 pm', '09/04 11.00 am', '10/04 6.00 am', ''],
