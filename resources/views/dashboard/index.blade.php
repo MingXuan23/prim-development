@@ -4,6 +4,33 @@
     $('#organization_dropdown').change(function() {
         organizationid = $("#organization_dropdown option:selected").val();
         
+        $.ajax({
+            type: 'GET',
+            url: '{{ route('dashboard.latest_transaction') }}',
+            data: {
+                id: organizationid,
+            },
+            success: function(data) {
+            var res='';
+                $.each(data, function(key, value) {
+                    console.log(data);
+                    
+                    res +=
+                        '<tr>' +
+                            '<td>' +
+                                '<div>' +
+                                    '<img src="assets/images/users/user-2.jpg" alt="" class="avatar-xs rounded-circle mr-2">' +  data.data[0].username +
+                                '</div>' +
+                            '</td>' +
+                            '<td>' + data.data[0].latest + '</td>' +
+                            '<td>' + data.data[0].amount + '</td>' +
+                        '</tr>';
+                });
+
+                $('tbody').html(res);
+            }
+        });
+
     });
 
     function getTotalDonation(id){
@@ -75,6 +102,8 @@
             }
         });
     }
+
+   
 
     var chart = new Chartist.Line('.ct-chart', {
         labels: ['01/02 10.00 pm', '06/03 3.00 pm', '09/04 11.00 am', '10/04 6.00 am', ''],

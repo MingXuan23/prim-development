@@ -83,4 +83,17 @@ class DashboardController extends AppBaseController
             }
         }
     }
+
+    public function getLatestTransaction(Request $request)
+    {
+        $organizationID = $request->id;
+
+        try {
+            $response = Transaction::getLastestTransaction($organizationID);
+            
+            return $this->sendResponse($response, "Success");
+        } catch (\Throwable $th) {
+            return $this->sendError($th->getMessage(), 500);
+        }
+    }
 }
