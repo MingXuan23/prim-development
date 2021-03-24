@@ -43,7 +43,44 @@ class DashboardController extends AppBaseController
             } catch (\Throwable $th) {
                 return $this->sendError($th->getMessage(), 500);
             }
-        } else {
+        }
+    }
+
+    public function getTotalDonor(Request $request)
+    {
+        $organizationID = $request->id;
+        $duration = $request->duration;
+
+        if ($duration == "day") {
+            try {
+                $response = Transaction::getTotalDonorByDay($organizationID);
+                $response = json_decode($response, true);
+                $response['duration'] = 'day';
+
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
+        } elseif ($duration == "week") {
+            try {
+                $response = Transaction::getTotalDonorByWeek($organizationID);
+                $response = json_decode($response, true);
+                $response['duration'] = 'week';
+
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
+        } elseif ($duration == "month") {
+            try {
+                $response = Transaction::getTotalDonorByMonth($organizationID);
+                $response = json_decode($response, true);
+                $response['duration'] = 'month';
+                
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
         }
     }
 }
