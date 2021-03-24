@@ -84,11 +84,10 @@
                                             <th scope="col">Name</th>
                                             <th scope="col">Date</th>
                                             <th scope="col">Amount</th>
-                                            <th scope="col" colspan="2">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        {{-- <tr>
                                             <td>
                                                 <div>
                                                     <img src="assets/images/users/user-2.jpg" alt=""
@@ -97,7 +96,6 @@
                                             </td>
                                             <td>01/02/2021</td>
                                             <td>RM 90.00</td>
-                                            <td><span class="badge badge-success">Paid</span></td>
                                         </tr>
                                         <tr>
                                             <td>
@@ -108,7 +106,6 @@
                                             </td>
                                             <td>06/03/2021</td>
                                             <td>RM 4.00</td>
-                                            <td><span class="badge badge-warning">Pending</span></td>
                                         </tr>
                                         <tr>
                                             <td>
@@ -119,8 +116,7 @@
                                             </td>
                                             <td>09/04/2021</td>
                                             <td>RM 15.00</td>
-                                            <td><span class="badge badge-warning">Pending</span></td>
-                                        </tr>
+                                        </tr> --}}
                                     </tbody>
                                 </table>
                             </div>

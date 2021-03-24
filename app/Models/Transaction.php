@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Models\Donation;
 use Illuminate\Database\Eloquent\Model;
 use DB;
-use DonationTransaction;
+use App\Models\DonationTransaction;
 
 class Transaction extends Model
 {
@@ -93,5 +93,17 @@ class Transaction extends Model
                         ->first();
 
         return $totalDonation;
+    }
+
+    public static function getLastestTransaction($organizationId)
+    {
+        $result = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
+                ->select(['*',DB::raw('max(datetime_created) as latest')])
+                ->groupBy('transactions.id')
+                ->orderBy('latest', 'desc')
+                ->take(3)
+                ->get();
+
+        return $result;
     }
 }
