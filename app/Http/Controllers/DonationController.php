@@ -41,7 +41,7 @@ class DonationController extends Controller
                 $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
-                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url')
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
             } elseif ($hasOrganizaton == "false") {
@@ -82,9 +82,9 @@ class DonationController extends Controller
                 $table->addColumn('URL', function ($row) {
                     $token = csrf_field();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<input type="text" id="geturl" name="geturl" class="form-control" value="'. URL::action('DonationController@urlDonation', array('link' => $row->url)) .'">
+                    $btn = $btn . '<input type="text" readonly id="'. $row->id .'" class="form-control" value="'. URL::action('DonationController@urlDonation', array('link' => $row->url)) .'">
                     <div class="input-group-append">
-                    <button class="btn btn-primary" onclick="myFunction()">Copy</button>
+                    <button id="btncopy"  onclick="copyToClipboard('. $row->id .')" class="btn btn-primary">Copy</button>
                     </div></div>';
                     return $btn;
                 });

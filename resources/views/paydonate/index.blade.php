@@ -77,7 +77,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="donationTable" class="table table-bordered table-striped dt-responsive nowrap" 
+                    <table id="donationTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
@@ -176,18 +176,16 @@
             fetch_data(organizationid);
         });
         
-
-        
-
     });
 
-    function myFunction() {
-        var copyText = document.getElementById("geturl");
+    function copyToClipboard(target) {
+        var copyText = document.getElementById(target);
         copyText.select();
         copyText.setSelectionRange(0, 99999)
         document.execCommand("copy");
-        alert("Copied the text: " + copyText.value);
+        alert("Link Derma telah disalin");
     }
+
 
 </script>
 @endsection
