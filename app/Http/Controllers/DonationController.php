@@ -38,17 +38,29 @@ class DonationController extends Controller
             $userId = Auth::id();
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
-                $data = DB::table('organizations')
+                if($hasOrganizaton == "false"){
+                    $data = DB::table('organizations')
+                    ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
+                    ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
+                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url')
+                    ->where('organizations.id', $oid)
+                    ->where('donations.status', 1)
+                    ->orderBy('donations.nama');
+                }else{
+                    $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
                     ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url')
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
+                }
+                
             } elseif ($hasOrganizaton == "false") {
                 $data = DB::table('donations')
                     ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
                     ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
                     ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status','donations.url')
+                    ->where('donations.status', 1)
                     ->orderBy('donations.nama');
             } elseif ($hasOrganizaton == "true") {
                 $data = DB::table('organizations')
@@ -67,12 +79,12 @@ class DonationController extends Controller
             $table->addColumn('status', function ($row) {
                 if ($row->status == '1') {
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<button class="btn btn-success m-1"> Aktif </button></div>';
+                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
 
                     return $btn;
                 } else {
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<button  class="btn btn-danger m-1"> Tidak Aktif </button></div>';
+                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
 
                     return $btn;
                 }
@@ -98,7 +110,7 @@ class DonationController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('donate.details', $row->id) . '" class="btn btn-primary m-1">Details</a>';
+                    $btn = '<a href="' . route('donate.details', $row->id) . '" class="btn btn-primary m-1">Details</a>';
                     $btn = $btn . '<a href="' . route('donate.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
@@ -174,7 +186,7 @@ class DonationController extends Controller
                 ->addColumn('status', function ($data) {
                     if ($data->status == 'Success') {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<button class="btn btn-success m-1"> Success </button></div>';
+                        $btn = $btn . '<span class="badge badge-success">Success</span></div>';
                         return $btn;
                     } else if ($data->status == 'Pending') {
                         $btn = '<div class="d-flex justify-content-center">';
