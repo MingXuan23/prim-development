@@ -99,7 +99,14 @@
                       url: "{{ route('historydonorDT') }}",
                       type: 'GET',
 
-                  },
+                  },'columnDefs': [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%"
+                  },{
+                      "targets": [3], // your case first column
+                      "className": "text-center",
+                  },],
                   order: [
                       [1, 'asc']
                   ],

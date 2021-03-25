@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
 @endsection
 
@@ -84,8 +85,7 @@
                                 <th> No. </th>
                                 <th> Nama Derma </th>
                                 <th> Penerangan </th>
-                                <th> Status </th>
-                                <th> URL </th>
+                                <th> Link Derma </th>
                                 <th> Action </th>
                             </tr>
                         </thead>
@@ -110,6 +110,8 @@
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
+<script src="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.js')}}"></script>
+
 <script>
     $(document).ready(function(){
 
@@ -129,6 +131,11 @@
                     type: 'GET',
                    
                 },
+                'columnDefs': [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%"
+                  },],
                 order: [[ 1, 'asc' ]],
                 columns:[
                         { 
@@ -146,12 +153,6 @@
                         { 
                             data: "description",
                             name: 'description'
-                        },
-                        { 
-                            data: 'status', 
-                            name: 'status', 
-                            orderable: false, 
-                            searchable: false
                         },
                         {
                             data: 'URL', 
@@ -183,7 +184,14 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999)
         document.execCommand("copy");
-        alert("Link Derma telah disalin");
+        Swal.fire({
+            title: 'Berjaya disalin',
+            text: 'Anda telah menyalin link!',
+            type: 'success',
+            confirmButtonColor: '#556ee6',
+            cancelButtonColor: "#f46a6a"
+        });
+        // alert("Link Derma telah disalin");
     }
 
 
