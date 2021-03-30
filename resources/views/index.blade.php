@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-xl-4">
+                <div class="col-xl-6">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-4">Carta Transaksi Derma</h4>
@@ -73,12 +73,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-8">
+                <div class="col-xl-6">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-4">Derma Terbaru</h4>
                             <div class="table-responsive">
-                                <table class="table table-hover table-centered table-nowrap mb-0">
+                                <table class="table table-hover table-centered table-nowrap mb-0" style="text-align: justify;">
                                     <thead>
                                         <tr>
                                             <th scope="col">Name</th>
@@ -87,36 +87,36 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {{-- <tr>
+                                        <tr>
                                             <td>
                                                 <div>
                                                     <img src="assets/images/users/user-2.jpg" alt=""
-                                                        class="avatar-xs rounded-circle mr-2"> Philip Smead
+                                                        class="avatar-xs rounded-circle mr-2">  
                                                 </div>
                                             </td>
-                                            <td>01/02/2021</td>
-                                            <td>RM 90.00</td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <div>
                                                     <img src="assets/images/users/user-3.jpg" alt=""
-                                                        class="avatar-xs rounded-circle mr-2"> Brent Shipley
+                                                        class="avatar-xs rounded-circle mr-2"> 
                                                 </div>
                                             </td>
-                                            <td>06/03/2021</td>
-                                            <td>RM 4.00</td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <div>
                                                     <img src="assets/images/users/user-4.jpg" alt=""
-                                                        class="avatar-xs rounded-circle mr-2"> Robert Sitton
+                                                        class="avatar-xs rounded-circle mr-2"> 
                                                 </div>
                                             </td>
-                                            <td>09/04/2021</td>
-                                            <td>RM 15.00</td>
-                                        </tr> --}}
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -204,6 +204,7 @@
     <script src="{{ URL::asset('assets/libs/peity/peity.min.js') }}"></script>
     <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js') }}"></script>
 
+    <script src="{{ URL::asset('assets/libs/moment/moment.min.js') }}"></script>
     {{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
 
 @include('dashboard.index')

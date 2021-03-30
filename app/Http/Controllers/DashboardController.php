@@ -96,4 +96,16 @@ class DashboardController extends AppBaseController
             return $this->sendError($th->getMessage(), 500);
         }
     }
+
+    public function getTransactionByOrganizationIdAndStatus(Request $request)
+    {
+        $organizationID = $request->id;
+        try {
+            $response = Transaction::getTransaction($organizationID);
+
+            return $this->sendResponse($response, "Success");
+        } catch (\Throwable $th) {
+            return $this->sendError($th->getMessage(), 500);
+        }
+    }
 }
