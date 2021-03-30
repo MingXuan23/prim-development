@@ -100,4 +100,5 @@ Route::group(['prefix' => 'dashboard'], function () {
     Route::get('/totalDonation', 'DashboardController@getTotalDonation')->name('dashboard.totalDonation');
     Route::get('/totalDonor', 'DashboardController@getTotalDonor')->name('dashboard.totalDonor');
     Route::get('/latestTransaction', 'DashboardController@getLatestTransaction')->name('dashboard.latest_transaction');
+    Route::get('/getTransaction', 'DashboardController@getTransactionByOrganizationIdAndStatus')->name('dashboard.get_transaction');
 });

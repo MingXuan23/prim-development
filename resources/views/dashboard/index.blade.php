@@ -11,23 +11,71 @@
                 id: organizationid,
             },
             success: function(data) {
+                
             var res='';
-                $.each(data, function(key, value) {
-                    console.log(data);
-                    
+                for (var i=0; i < data.data.length; i++) {
+                    var date = new Array();
+                    date = moment(data.data[i].latest); 
+                    date[i] = date.format('D-M-Y');
+
                     res +=
                         '<tr>' +
                             '<td>' +
                                 '<div>' +
-                                    '<img src="assets/images/users/user-2.jpg" alt="" class="avatar-xs rounded-circle mr-2">' +  data.data[0].username +
+                                    '<img src="assets/images/users/user-2.jpg" alt="" class="avatar-xs rounded-circle mr-2">' +  data.data[i].username +
                                 '</div>' +
                             '</td>' +
-                            '<td>' + data.data[0].latest + '</td>' +
-                            '<td>' + data.data[0].amount + '</td>' +
+                            '<td>' + date[i] + '</td>' +
+                            '<td> RM ' + data.data[i].amount + '</td>' +
                         '</tr>';
-                });
+                }
 
                 $('tbody').html(res);
+            }
+        });
+
+        $.ajax({
+            type: 'GET',
+            url: '{{ route('dashboard.get_transaction') }}',
+            data: {
+                id: organizationid,
+            },
+            success: function(data) {
+                var date = new Array();
+                var username = new Array();
+                var amount = new Array();
+                var series = new Array();
+
+                for (var i=0; i < data.data.length; i++) {
+                    var NowMoment = moment(data.data[i].datetime_created); 
+                    date[i] = NowMoment.format('D-M hh:mm A');
+                    username[i] = data.data[i].username;
+                    amount[i] = data.data[i].amount;  
+                    series = [username,amount];                  
+                }
+
+                console.log(series);
+
+                var chart = new Chartist.Line('.ct-chart', {
+                    labels: date,
+                    series: series
+                }, {
+                    // Remove this configuration to see that chart rendered with cardinal spline interpolation
+                    // Sometimes, on large jumps in data values, it's better to use simple smoothing.
+                    // lineSmooth: Chartist.Interpolation.simple({
+                    //     divisor: 2
+                    // }),
+                    // fullWidth: true,
+                    // chartPadding: {
+                    //     right: 20
+                    // },
+                    low: 0,
+                    plugins: [
+                        Chartist.plugins.tooltip()
+                    ]
+                });
+
+                
             }
         });
 
@@ -105,38 +153,7 @@
 
    
 
-    var chart = new Chartist.Line('.ct-chart', {
-        labels: ['01/02 10.00 pm', '06/03 3.00 pm', '09/04 11.00 am', '10/04 6.00 am', ''],
-        series: [
-            [{
-                meta: 'Robert Sitton',
-                value: 15
-            }, {
-                meta: 'Brent Shipley',
-                value: 4
-            }, {
-                meta: 'Philip Smead',
-                value: 90
-            }, {
-                meta: 'Adi Iman',
-                value: 40
-            }, 0]
-        ]
-    }, {
-        // Remove this configuration to see that chart rendered with cardinal spline interpolation
-        // Sometimes, on large jumps in data values, it's better to use simple smoothing.
-        lineSmooth: Chartist.Interpolation.simple({
-            divisor: 2
-        }),
-        fullWidth: true,
-        chartPadding: {
-            right: 20
-        },
-        low: 0,
-        plugins: [
-            Chartist.plugins.tooltip()
-        ]
-    });
+    
 
    
 

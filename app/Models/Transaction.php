@@ -20,7 +20,7 @@ class Transaction extends Model
 
     public static function getTransactionByOrganizationIdAndStatus($organizationId)
     {
-        $transaction = Transaction::select(DB::raw('sum(transactions.amount) as donation_amount'))
+        $transaction = Transaction::select('*')
                         ->join('donation_transaction', 'transactions.id', '=', 'donation_transaction.transaction_id')
                         ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
                         ->join('donation_organization', 'donations.id', '=', 'donation_organization.donation_id')
@@ -103,6 +103,14 @@ class Transaction extends Model
                 ->orderBy('latest', 'desc')
                 ->take(3)
                 ->get();
+
+        return $result;
+    }
+
+    public static function getTransaction($organizationId)
+    {
+        $result = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
+                    ->get();
 
         return $result;
     }
