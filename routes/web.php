@@ -62,7 +62,8 @@ Route::group(['middleware' => ['auth']], function () {
         'pay'                => 'PayController',
         'organization'       => 'OrganizationController',
         'donate'             => 'DonationController',
-        'reminder'           => 'ReminderController'
+        'reminder'           => 'ReminderController',
+        'activity'           => 'ActivityController'
     ]);
 });
 

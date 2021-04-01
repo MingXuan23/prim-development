@@ -55,6 +55,13 @@
                     </ul>
                 </li>
 
+                <li>
+                    <a href="{{ route('activity.index') }}" class="waves-effect">
+                        <i class="mdi mdi-format-list-checks"></i>
+                        <span>Aktiviti</span>
+                    </a>
+                </li>
+
                 @role('Jaim')
                 <li>
                     <a href="{{ route('jaim.index') }}" class=" waves-effect">
