@@ -90,6 +90,8 @@ Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-pag
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
 
+Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
+
 Route::group(['prefix' => 'notification'], function () {
     Route::get('/', 'HomeController@showNotification')->name('index.notification');
     Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');

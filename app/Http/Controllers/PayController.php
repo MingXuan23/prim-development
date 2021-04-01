@@ -49,6 +49,13 @@ class PayController extends Controller
         return view('paydonate.pay', compact('getdonate'));
     }
 
+    public function billIndex(){
+        $data['users'] = User::where('id', '!=', Auth::id())->get();
+        $data['authInfo'] = User::find(Auth::id());
+
+        return view('layouts.bill', $data);
+    }
+
     public function transaction(Request $request)
     {
         $user       = User::find(Auth::id());
