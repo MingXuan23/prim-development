@@ -34,7 +34,7 @@ class CreateFeesDetailsTable extends Migration
     {
         Schema::dropIfExists('fees_details', function (Blueprint $table)
         {
-            $table->drop('category_id');
+            $table->drop('details_id');
 
             $table->drop('fees_id');
         });

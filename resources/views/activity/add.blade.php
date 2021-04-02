@@ -29,7 +29,7 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="" enctype="multipart/form-data">
+        <form method="post" action="{{ route('activity.store') }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
 
@@ -45,7 +45,7 @@
 
                 <div class="form-group">
                     <label>Nama Derma</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
+                    <input type="text" name="name" class="form-control" placeholder="Nama Aktiviti">
                 </div>
 
                 <div class="form-group">
