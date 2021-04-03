@@ -12,4 +12,6 @@ class FeeController extends Controller
         return view('pentadbir.fee.index');
     }
 
+
+
 }

@@ -132,7 +132,7 @@
 
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
-                    <a href="{{ route('fees.index') }}" class=" waves-effect">
+                    <a href="{{ route('parentpay') }}" class=" waves-effect">
                         <i class="fas fa-file-invoice-dollar"></i>
                         <span>Yuran - ibubapa (bayar)</span>
                     </a>

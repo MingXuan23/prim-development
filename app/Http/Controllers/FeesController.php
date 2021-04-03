@@ -22,6 +22,12 @@ class FeesController extends Controller
         return view('pentadbir.fee.index', compact('fees'));
     }
 
+    public function parentpay()
+    {
+        $fees = DB::table('fees')->orderBy('nama')->get();
+        return view('parent.fee.index', compact('fees'));
+    }
+
     /**
      * Show the form for creating a new resource.
      *
