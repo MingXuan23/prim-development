@@ -1,7 +1,7 @@
 <script>
     // on change event for organization_dropdown
     var organizationid
-    $('#organization_dropdown').change(function() {
+    $('#organization_dropdown').change( () =>  {
         organizationid = $("#organization_dropdown option:selected").val();
         
         $.ajax({
@@ -40,7 +40,8 @@
             data: {
                 id: organizationid,
             },
-            success: function(data) {
+            success: (data) => {
+                console.log(data);
                 var date = new Array();
                 var username = new Array();
                 var amount = new Array();
@@ -53,8 +54,6 @@
                     amount[i] = data.data[i].amount;  
                     series = [username,amount];                  
                 }
-
-                console.log(series);
 
                 var chart = new Chartist.Line('.ct-chart', {
                     labels: date,
@@ -74,14 +73,12 @@
                         Chartist.plugins.tooltip()
                     ]
                 });
-
-                
             }
         });
 
     });
 
-    function getTotalDonation(id){
+    let getTotalDonation = (id) => {
             var duration;
             var totalDonationDay; 
 
@@ -116,7 +113,7 @@
             });
         }
 
-    function getTotalDonor(id){
+    let getTotalDonor = (id) => {
         var duration;
         var totalDonationDay; 
         
@@ -150,11 +147,4 @@
             }
         });
     }
-
-   
-
-    
-
-   
-
 </script>

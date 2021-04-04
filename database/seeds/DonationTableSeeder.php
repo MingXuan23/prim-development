@@ -14,6 +14,16 @@ class DonationTableSeeder extends Seeder
         $current_date = Carbon\Carbon::now();
         $end_date = $current_date->addDays(30);
 
+        $url = array();
+
+        $nama = array("Derma Kilat Pembinaan Tandas", "Derma Kilat Pemasangan Kipas", "Derma Kilat Pemasangan Aircond", "Derma Kilat Pemasangan Paip");
+        
+        for ($i = 0; $i < count($nama); $i++) {
+            $link = explode(" ", $nama[$i]);
+            $url[] = implode("-", $link);
+        }
+
+
         \DB::table('donations')->delete();
 
         \DB::table('donations')->insert(array(
@@ -26,6 +36,7 @@ class DonationTableSeeder extends Seeder
                 "date_end"      => $end_date,
                 "date_created"  => $current_date,
                 "status"        => 1,
+                "url"           => $url[0]
             ),
             1 =>
             array(
@@ -36,6 +47,7 @@ class DonationTableSeeder extends Seeder
                 "date_end"      => $end_date,
                 "date_created"  => $current_date,
                 "status"        => 1,
+                "url"           => $url[1]
             ),
             2 =>
             array(
@@ -46,6 +58,7 @@ class DonationTableSeeder extends Seeder
                 "date_end"      => $end_date,
                 "date_created"  => $current_date,
                 "status"        => 1,
+                "url"           => $url[2]
             ),
             3 =>
             array(
@@ -56,6 +69,7 @@ class DonationTableSeeder extends Seeder
                 "date_end"      => $end_date,
                 "date_created"  => $current_date,
                 "status"        => 1,
+                "url"           => $url[3]
             ),
         ));
     }
