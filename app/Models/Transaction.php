@@ -101,7 +101,7 @@ class Transaction extends Model
                 ->select(['*',DB::raw('max(datetime_created) as latest')])
                 ->groupBy('transactions.id')
                 ->orderBy('latest', 'desc')
-                ->take(3)
+                ->take(4)
                 ->get();
 
         return $result;

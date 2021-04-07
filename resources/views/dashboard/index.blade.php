@@ -1,38 +1,55 @@
 <script>
     // on change event for organization_dropdown
     var organizationid
+
     $('#organization_dropdown').change( () =>  {
         organizationid = $("#organization_dropdown option:selected").val();
         
-        $.ajax({
-            type: 'GET',
-            url: '{{ route('dashboard.latest_transaction') }}',
-            data: {
-                id: organizationid,
-            },
-            success: function(data) {
-                
-            var res='';
-                for (var i=0; i < data.data.length; i++) {
-                    var date = new Array();
-                    date = moment(data.data[i].latest); 
-                    date[i] = date.format('D-M-Y');
+        $('#donorTable').DataTable({
+                  processing:   true,
+                  serverSide:   true,
+                  destroy:      true,
+                  paging:       false,
+                  ordering:     false,
+                  info:         false,
+                  searching:    false,
+                  ajax: {
+                      url: "{{ route('dashboard.latest_transaction') }}",
+                      data: {
+                        id: organizationid,
+                      },
+                      type: 'GET',
 
-                    res +=
-                        '<tr>' +
-                            '<td>' +
-                                '<div>' +
-                                    '<img src="assets/images/users/user-2.jpg" alt="" class="avatar-xs rounded-circle mr-2">' +  data.data[i].username +
-                                '</div>' +
-                            '</td>' +
-                            '<td>' + date[i] + '</td>' +
-                            '<td> RM ' + data.data[i].amount + '</td>' +
-                        '</tr>';
-                }
-
-                $('tbody').html(res);
-            }
-        });
+                  },
+                  columnDefs: [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%",
+                  },{
+                      "targets": [1,2,3], // your case first column
+                      "className": "text-center",
+                  },],
+                  order: [
+                      [1, 'asc']
+                  ],
+                  columns: [{
+                      "data": null,
+                      searchable: false,
+                      "sortable": false,
+                      render: function (data, type, row, meta) {
+                          return meta.row + meta.settings._iDisplayStart + 1;
+                      }
+                  }, {
+                      data: "username",
+                      name: "username"
+                  }, {
+                      data: "latest",
+                      name: "latest",
+                  }, {
+                      data: "amount",
+                      name: 'amount'
+                  },]
+          });
 
         $.ajax({
             type: 'GET',
@@ -41,7 +58,6 @@
                 id: organizationid,
             },
             success: (data) => {
-                console.log(data);
                 var date = new Array();
                 var username = new Array();
                 var amount = new Array();

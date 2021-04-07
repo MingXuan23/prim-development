@@ -2,6 +2,9 @@
 
 @section('css')
     <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ URL::asset('assets/libs/datatables/datatables.min.css') }}" rel="stylesheet">
+
+    {{-- @include('layouts.datatable') --}}
 @endsection
 
 @section('content')
@@ -73,11 +76,26 @@
                         </div>
                     </div>
                 </div>
+
+                
                 <div class="col-xl-6">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-4">Derma Terbaru</h4>
                             <div class="table-responsive">
+                                <table id="donorTable" class="table table-bordered table-striped dt-responsive nowrap"
+                                  style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                  <thead>
+                                    <tr style="text-align:center">
+                                        <th> No. </th>
+                                        <th> Nama Penderma </th>
+                                        <th> Tarikh </th>
+                                        <th> Jumlah (RM) </th>
+                                    </tr>
+                                  </thead>
+                                </table>
+                              </div>
+                            {{-- <div class="table-responsive">
                                 <table class="table table-hover table-centered table-nowrap mb-0" style="text-align: justify;">
                                     <thead>
                                         <tr>
@@ -119,12 +137,12 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- <div class="row">
+          {{-- <div class="row">
             <div class="col-xl-4 col-md-4">
                 <div class="card bg-primary">
                     <div class="card-body">
@@ -160,7 +178,7 @@
             </div>
         </div> --}}
 
-            {{-- <div class="row">
+        {{-- <div class="row">
             <div class="col-md-4">
                 <div class="card bg-success">
                     <div class="card-body">
@@ -205,6 +223,10 @@
     <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js') }}"></script>
 
     <script src="{{ URL::asset('assets/libs/moment/moment.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/libs/datatables/datatables.min.js') }}" defer></script>
+    {{-- <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script> --}}
+
+    
     {{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
 
 @include('dashboard.index')
