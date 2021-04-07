@@ -29,7 +29,6 @@ class DonationController extends Controller
 
     public function getDonationByOrganizationDatatable(Request $request)
     {
-        
         if (request()->ajax()) {
             $oid = $request->oid;
 
@@ -38,7 +37,7 @@ class DonationController extends Controller
             $userId = Auth::id();
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
-                if($hasOrganizaton == "false"){
+                if ($hasOrganizaton == "false") {
                     $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
@@ -46,7 +45,7 @@ class DonationController extends Controller
                     ->where('organizations.id', $oid)
                     ->where('donations.status', 1)
                     ->orderBy('donations.nama');
-                }else{
+                } else {
                     $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
@@ -54,12 +53,11 @@ class DonationController extends Controller
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
                 }
-                
             } elseif ($hasOrganizaton == "false") {
                 $data = DB::table('donations')
                     ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
                     ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
-                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status','donations.url')
+                    ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url')
                     ->where('donations.status', 1)
                     ->orderBy('donations.nama');
             } elseif ($hasOrganizaton == "true") {
@@ -188,7 +186,7 @@ class DonationController extends Controller
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<span class="badge badge-success">Success</span></div>';
                         return $btn;
-                    } else if ($data->status == 'Pending') {
+                    } elseif ($data->status == 'Pending') {
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<button  class="btn btn-warning m-1"> Pending </button></div>';
                         return $btn;
@@ -222,10 +220,9 @@ class DonationController extends Controller
 
     public function urlDonation($link)
     {
-        $getdonate = Donation::where('url',$link)->first();
+        $getdonate = Donation::where('url', $link)->first();
 
         return view('paydonate.pay', compact('getdonate'));
-
     }
 
     public function create()

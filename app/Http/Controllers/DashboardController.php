@@ -91,7 +91,14 @@ class DashboardController extends AppBaseController
         try {
             $response = Transaction::getLastestTransaction($organizationID);
             
-            return $this->sendResponse($response, "Success");
+            if (request()->ajax()) {
+                return datatables()->of($response)
+                    ->editColumn('latest', function ($response) {
+                        //change over here
+                        return date('d/m/Y', strtotime($response->latest));
+                    })
+                    ->make(true);
+            }
         } catch (\Throwable $th) {
             return $this->sendError($th->getMessage(), 500);
         }
