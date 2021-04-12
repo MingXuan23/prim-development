@@ -6,12 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reminder extends Model
 {
-    protected $table = "donation_reminder";
-
     protected $fillable = ['date','time','day','recurrence'];
-    
+
     public function donation()
     {
-        return $this->belongsToMany(Organization::class, 'user_donation_reminder', 'reminder_id', 'donation_id');
+        return $this->belongsTo(Donation::class);
     }
+
+    public static function getReminderByDonationId($donationId)
+    {
+        $reminders = Reminder::with(["donation"])->whereHas('donation', function ($query) use ($donationId) {
+            $query->where("id", $donationId);
+        })->get();
+
+        return $reminders;
+    }
+
+    public static function getAllReminder()
+    {
+        $reminders = Reminder::with('donation')->get();
+
+        return $reminders;
+    }
+
 }
