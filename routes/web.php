@@ -47,6 +47,7 @@ Route::group(['prefix' => 'organization'], function () {
 
 Route::group(['prefix' => 'reminder'], function () {
     Route::get('list', 'ReminderController@getReminderDatatable')->name('reminder.getReminder');
+    Route::get('testing', 'ReminderController@testingEloquent');
 });
 
 Route::group(['middleware' => ['auth']], function () {

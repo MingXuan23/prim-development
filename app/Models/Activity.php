@@ -17,5 +17,4 @@ class Activity extends Model
     {
         return $this->hasMany(Organization::class);
     }
-
 }

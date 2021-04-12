@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Http\Request;
 use Auth;
-use DB;
 
 class ReminderController extends Controller
 {
@@ -73,7 +72,7 @@ class ReminderController extends Controller
         $donations = DonationController::getDonationByReminderId($id);
         $reminder = Reminder::find($id);
 
-        return view('reminder.add', compact('donations'))->with('reminder', $reminder);
+        return view('reminder.add')->with('reminder', $reminder)->with('donations', $donations);
     }
 
     /**
@@ -109,50 +108,70 @@ class ReminderController extends Controller
         }
     }
 
-    public static function getReminderByDonationId($donationId)
-    {
-        $reminders = DB::table('donation_reminder')
-                        ->join('user_donation_reminder', 'donation_reminder.id', '=', 'user_donation_reminder.reminder_id')
-                        ->join('donations', 'user_donation_reminder.donation_id', '=', 'donations.id')
-                        ->select('donations.id', 'donation_reminder.id as reminder_id', 'donations.nama', 'donation_reminder.date', 'donation_reminder.day', 'donation_reminder.time', 'donation_reminder.recurrence')
-                        ->where('donations.id', $donationId)
-                        ->orderBy('donations.nama')
-                        ->get();
-
-        return $reminders;
-    }
-
-    public static function getAllReminder()
-    {
-        $reminders = DB::table('donation_reminder')
-                        ->join('user_donation_reminder', 'donation_reminder.id', '=', 'user_donation_reminder.reminder_id')
-                        ->join('donations', 'user_donation_reminder.donation_id', '=', 'donations.id')
-                        ->select('donations.id', 'donation_reminder.id as reminder_id', 'donations.nama', 'donation_reminder.date', 'donation_reminder.day', 'donation_reminder.time', 'donation_reminder.recurrence')
-                        ->orderBy('donations.nama')
-                        ->get();
-        
-        return $reminders;
-    }
-
     public function getReminderDatatable(Request $request)
     {
         $donationId = $request->donationId;
 
         if (request()->ajax()) {
             if (is_null($donationId)) {
-                $data = $this->getAllReminder();
+                $data = Reminder::getAllReminder();
             } else {
-                $data = $this->getReminderByDonationId($donationId);
+                $data = Reminder::getReminderByDonationId($donationId);
             }
 
-            // dd($data);
             return datatables()->of($data)
                 ->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('reminder.edit', $row->reminder_id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button id="' . $row->reminder_id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = $btn . '<a href="' . route('reminder.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
+                })
+                ->editColumn('time', function ($response) {
+                    //convert to 12 hour format
+                    return date('h:i A', strtotime($response->time));
+                })
+                ->editColumn('recurrence', function ($response) {
+                    switch ($response->recurrence) {
+                        case "daily":
+                            return "Harian";
+                            break;
+                        case "weekly":
+                            return "Mingguan";
+                            break;
+                        case "monthly":
+                            return "Bulanan";
+                            break;
+                        default:
+                            break;
+                    }
+                })
+                ->editColumn('day', function ($response) {
+                    switch ($response->day) {
+                        case 1:
+                            return "Isnin";
+                            break;
+                        case 2:
+                            return "Selesa";
+                            break;
+                        case 3:
+                            return "Rabu";
+                            break;
+                        case 4:
+                            return "Khamis";
+                            break;
+                        case 5:
+                            return "Jummat";
+                            break;
+                        case 6:
+                            return "Sabtu";
+                            break;
+                        case 7:
+                            return "Ahad";
+                            break;
+                        default:
+                            break;
+                    }
                 })
                 ->make(true);
         }

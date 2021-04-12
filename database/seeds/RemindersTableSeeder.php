@@ -11,9 +11,9 @@ class RemindersTableSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('donation_reminder')->delete();
+        \DB::table('reminders')->delete();
 
-        \DB::table('donation_reminder')->insert(array(
+        \DB::table('reminders')->insert(array(
             0 =>
             array(
                 'id' => 1,
@@ -21,6 +21,8 @@ class RemindersTableSeeder extends Seeder
                 'time' => '8:00',
                 'day' => '',
                 'recurrence' => 'monthly',
+                'donation_id' => 1,
+                'user_id' => 1
             ),
             1 =>
             array(
@@ -29,6 +31,8 @@ class RemindersTableSeeder extends Seeder
                 'time' => '8:00',
                 'day' => '',
                 'recurrence' => 'daily',
+                'donation_id' => 2,
+                'user_id' => 1
             ),
             2 =>
             array(
@@ -37,6 +41,8 @@ class RemindersTableSeeder extends Seeder
                 'time' => '8:00',
                 'day' => 1,
                 'recurrence' => 'weekly',
+                'donation_id' => 3,
+                'user_id' => 1
             ),
         ));
     }
