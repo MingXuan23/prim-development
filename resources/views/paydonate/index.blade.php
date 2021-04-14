@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
 @endsection
 
@@ -77,14 +78,14 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="donationTable" class="table table-bordered table-striped dt-responsive nowrap" 
+                    <table id="donationTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th> Nama Derma </th>
                                 <th> Penerangan </th>
-                                <th> Status </th>
+                                <th> Link Derma </th>
                                 <th> Action </th>
                             </tr>
                         </thead>
@@ -109,6 +110,8 @@
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
+<script src="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.js')}}"></script>
+
 <script>
     $(document).ready(function(){
 
@@ -128,6 +131,11 @@
                     type: 'GET',
                    
                 },
+                'columnDefs': [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%"
+                  },],
                 order: [[ 1, 'asc' ]],
                 columns:[
                         { 
@@ -146,13 +154,12 @@
                             data: "description",
                             name: 'description'
                         },
-                        { 
-                            data: 'status', 
-                            name: 'status', 
+                        {
+                            data: 'URL', 
+                            name: 'URL', 
                             orderable: false, 
                             searchable: false
-                        },
-                        {
+                        },{
                             data: 'action', 
                             name: 'action', 
                             orderable: false, 
@@ -170,8 +177,23 @@
             fetch_data(organizationid);
         });
         
-
     });
+
+    function copyToClipboard(target) {
+        var copyText = document.getElementById(target);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999)
+        document.execCommand("copy");
+        Swal.fire({
+            title: 'Berjaya disalin',
+            text: 'Anda telah menyalin link!',
+            type: 'success',
+            confirmButtonColor: '#556ee6',
+            cancelButtonColor: "#f46a6a"
+        });
+        // alert("Link Derma telah disalin");
+    }
+
 
 </script>
 @endsection

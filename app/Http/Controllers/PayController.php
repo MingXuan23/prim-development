@@ -49,6 +49,40 @@ class PayController extends Controller
         return view('paydonate.pay', compact('getdonate'));
     }
 
+    // public function parentpay(Request $request)
+    // {
+    //     $feesid     = $request->id;
+    //     $getfees    = DB::table('fees')->where('id', $feesid)->first();
+
+    //     $getcat = DB::table('fees')
+    //         ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+    //         ->join('details', 'details.id', '=', 'fees_details.details_id')
+    //         ->join('categories', 'categories.id', '=', 'details.category_id')
+    //         ->distinct('categories.nama')
+    //         ->select('categories.id as cid', 'categories.nama as cnama')
+    //         ->where('fees.id', $feesid)
+    //         ->orderBy('categories.id')
+    //         ->get();
+
+    //     $getdetail  = DB::table('fees')
+    //         ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+    //         ->join('details', 'details.id', '=', 'fees_details.details_id')
+    //         ->join('categories', 'categories.id', '=', 'details.category_id')
+    //         ->select('categories.id as cid', 'categories.nama as cnama', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'details.totalamount as totalamount', 'details.id as did')
+    //         ->where('fees.id', $feesid)
+    //         ->orderBy('details.nama')
+    //         ->get();
+    //     return view('parent.fee.index', compact('getfees', 'getcat', 'getdetail'));
+    // }
+
+    public function billIndex()
+    {
+        $data['users'] = User::where('id', '!=', Auth::id())->get();
+        $data['authInfo'] = User::find(Auth::id());
+
+        return view('layouts.bill', $data);
+    }
+
     public function transaction(Request $request)
     {
         $user       = User::find(Auth::id());
@@ -228,7 +262,7 @@ class PayController extends Controller
                     $user2      = User::find(Auth::id());
 
                     // dd($user);
-                    
+
                     return view('fpx.tStatus', compact('request', 'user'));
 
 

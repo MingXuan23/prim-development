@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/', 'HomeController@index');
+// Route::get('/', 'LandingPageController@index');
 Route::get('/form', 'HomeController@form');
 // Route::get('/school', 'FeeController@index');
 // Route::get('/school', 'SchoolController@index');
@@ -38,12 +39,15 @@ Route::group(['prefix' => 'donate'], function () {
     Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('historydonorDT');
 });
 
+Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
+
 Route::group(['prefix' => 'organization'], function () {
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
 });
 
 Route::group(['prefix' => 'reminder'], function () {
     Route::get('list', 'ReminderController@getReminderDatatable')->name('reminder.getReminder');
+    Route::get('testing', 'ReminderController@testingEloquent');
 });
 
 Route::group(['middleware' => ['auth']], function () {
@@ -60,7 +64,8 @@ Route::group(['middleware' => ['auth']], function () {
         'pay'                => 'PayController',
         'organization'       => 'OrganizationController',
         'donate'             => 'DonationController',
-        'reminder'           => 'ReminderController'
+        'reminder'           => 'ReminderController',
+        'activity'           => 'ActivityController'
     ]);
 });
 
@@ -71,6 +76,7 @@ Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
 Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
 Route::get('successpay', 'PayController@successPay')->name('successpay');
+Route::get('feesparent', 'FeesController@parentpay')->name('parentpay');
 
 Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
@@ -86,6 +92,8 @@ Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-pag
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
 
+Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
+
 Route::group(['prefix' => 'notification'], function () {
     Route::get('/', 'HomeController@showNotification')->name('index.notification');
     Route::post('/save-token', [App\Http\Controllers\HomeController::class, 'saveToken'])->name('save-token');
@@ -95,5 +103,8 @@ Route::group(['prefix' => 'notification'], function () {
 // Route::get('/offline', 'HomeController@pwaOffline');
 
 Route::group(['prefix' => 'dashboard'], function () {
-    Route::get('/item', 'HomeController@getDashboardItem')->name('dashboard.item');
+    Route::get('/totalDonation', 'DashboardController@getTotalDonation')->name('dashboard.totalDonation');
+    Route::get('/totalDonor', 'DashboardController@getTotalDonor')->name('dashboard.totalDonor');
+    Route::get('/latestTransaction', 'DashboardController@getLatestTransaction')->name('dashboard.latest_transaction');
+    Route::get('/getTransaction', 'DashboardController@getTransactionByOrganizationIdAndStatus')->name('dashboard.get_transaction');
 });

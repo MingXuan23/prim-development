@@ -2,6 +2,9 @@
 
 @section('css')
     <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ URL::asset('assets/libs/datatables/datatables.min.css') }}" rel="stylesheet">
+
+    {{-- @include('layouts.datatable') --}}
 @endsection
 
 @section('content')
@@ -26,15 +29,17 @@
                                     <img src="assets/images/services-icon/donation.png" alt="">
                                 </div>
                                 <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Jumlah Penderma</h5>
-                                <h4 class="font-weight-medium font-size-24" id="donor_day">0</h4>
+                                <h4 class="font-weight-medium font-size-24" id="total_donor">0</h4>
                                 <div class="mini-stat-label bg-success">
-                                    <p class="mb-0">Hari Ini</p>
+                                    <p id="p_donor_day" class="mb-0">Hari Ini</p>
                                 </div>
                             </div>
                             <div class="pt-2 float-right">
-                                <p class="text-white-50 mb-0 mt-1"><button class="btn btn-secondary mx-2">Hari
-                                        ini</button><button class="btn btn-secondary mx-2">Minggu
-                                        ini</button><button class="btn btn-secondary mx-2">Bulan ini</button></p>
+                                <p class="text-white-50 mb-0 mt-1">
+                                    <button id="btn_donor_day" onclick="getTotalDonor(this.id)"  class="btn btn-secondary mx-2">Hari ini</button>
+                                    <button id="btn_donor_week" onclick="getTotalDonor(this.id)"  class="btn btn-secondary mx-2">Minggu ini</button>
+                                    <button id="btn_donor_month" onclick="getTotalDonor(this.id)"  class="btn btn-secondary mx-2">Bulan ini</button>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -47,22 +52,23 @@
                                     <img src="assets/images/services-icon/donate.png" style="max-width: 40px" alt="">
                                 </div>
                                 <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Derma Terkumpul</h5>
-                                <h4 class="font-weight-medium font-size-24" id="donor_week">RM 0.00</h4>
+                                <h4 class="font-weight-medium font-size-24" id="total_donation">RM 0.00</h4>
                                 <div class="mini-stat-label bg-success">
-                                    <p class="mb-0">Minggu Ini</p>
+                                    <p id="p_donation_day" class="mb-0">Minggu Ini</p>
                                 </div>
                             </div>
                             <div class="pt-2 float-right">
-                                <p class="text-white-50 mb-0 mt-1"><button class="btn btn-secondary mx-2">Hari
-                                        ini</button><button class="btn btn-secondary mx-2">Minggu
-                                        ini</button><button class="btn btn-secondary mx-2">Bulan ini</button></p>
+                                <p class="text-white-50 mb-0 mt-1">
+                                    <button id="btn_day" class="btn btn-secondary mx-2" onclick="getTotalDonation(this.id)" >Hari ini</button>
+                                    <button id="btn_week" class="btn btn-secondary mx-2" onclick="getTotalDonation(this.id)" >Minggu ini</button>
+                                    <button id="btn_month" class="btn btn-secondary mx-2" onclick="getTotalDonation(this.id)" >Bulan ini</button></p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-xl-4">
+                <div class="col-xl-6">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-4">Carta Transaksi Derma</h4>
@@ -70,18 +76,32 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-8">
+
+                
+                <div class="col-xl-6">
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title mb-4">Derma Terbaru</h4>
                             <div class="table-responsive">
-                                <table class="table table-hover table-centered table-nowrap mb-0">
+                                <table id="donorTable" class="table table-bordered table-striped dt-responsive nowrap"
+                                  style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                  <thead>
+                                    <tr style="text-align:center">
+                                        <th> No. </th>
+                                        <th> Nama Penderma </th>
+                                        <th> Tarikh </th>
+                                        <th> Jumlah (RM) </th>
+                                    </tr>
+                                  </thead>
+                                </table>
+                              </div>
+                            {{-- <div class="table-responsive">
+                                <table class="table table-hover table-centered table-nowrap mb-0" style="text-align: justify;">
                                     <thead>
                                         <tr>
                                             <th scope="col">Name</th>
                                             <th scope="col">Date</th>
                                             <th scope="col">Amount</th>
-                                            <th scope="col" colspan="2">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -89,43 +109,40 @@
                                             <td>
                                                 <div>
                                                     <img src="assets/images/users/user-2.jpg" alt=""
-                                                        class="avatar-xs rounded-circle mr-2"> Philip Smead
+                                                        class="avatar-xs rounded-circle mr-2">  
                                                 </div>
                                             </td>
-                                            <td>01/02/2021</td>
-                                            <td>RM 90.00</td>
-                                            <td><span class="badge badge-success">Paid</span></td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <div>
                                                     <img src="assets/images/users/user-3.jpg" alt=""
-                                                        class="avatar-xs rounded-circle mr-2"> Brent Shipley
+                                                        class="avatar-xs rounded-circle mr-2"> 
                                                 </div>
                                             </td>
-                                            <td>06/03/2021</td>
-                                            <td>RM 4.00</td>
-                                            <td><span class="badge badge-warning">Pending</span></td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <div>
                                                     <img src="assets/images/users/user-4.jpg" alt=""
-                                                        class="avatar-xs rounded-circle mr-2"> Robert Sitton
+                                                        class="avatar-xs rounded-circle mr-2"> 
                                                 </div>
                                             </td>
-                                            <td>09/04/2021</td>
-                                            <td>RM 15.00</td>
-                                            <td><span class="badge badge-warning">Pending</span></td>
+                                            <td></td>
+                                            <td></td>
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
             </div>
-            {{-- <div class="row">
+          {{-- <div class="row">
             <div class="col-xl-4 col-md-4">
                 <div class="card bg-primary">
                     <div class="card-body">
@@ -161,7 +178,7 @@
             </div>
         </div> --}}
 
-            {{-- <div class="row">
+        {{-- <div class="row">
             <div class="col-md-4">
                 <div class="card bg-success">
                     <div class="card-body">
@@ -205,75 +222,12 @@
     <script src="{{ URL::asset('assets/libs/peity/peity.min.js') }}"></script>
     <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js') }}"></script>
 
+    <script src="{{ URL::asset('assets/libs/moment/moment.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/libs/datatables/datatables.min.js') }}" defer></script>
+    {{-- <script src="//cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script> --}}
+
+    
     {{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
 
-    <script>
-        // on change event for organization_dropdown
-        $('#organization_dropdown').change(function() {
-            var organizationid = $("#organization_dropdown option:selected").val();
-
-            $.ajax({
-                type: 'GET',
-                url: '{{ route('dashboard.item') }}',
-                data: {
-                    id: organizationid
-                },
-                success: function(data) {
-
-                    var a = ["day", "week", "month"];
-
-                    console.log(donation);
-                    for (var i = 0; i < a.length; i++) {
-                        console.log("donor_" + a[i]);
-                        console.log("donation_" + a[i]);
-                        try {
-                            var donor = data.data["donor_" + a[i]].donor;
-                            var donation = data.data["donation_" + a[i]].donation_amount;
-
-                            console.log(donor);
-
-                            document.getElementById("donor_" + a[i]).innerHTML = donor ?? 0;
-                            document.getElementById("donation_" + a[i]).innerHTML = donation ?? 0;
-                        } catch (e) {
-                            console.log(e);
-                        }
-                    }
-                }
-            });
-        });
-
-        var chart = new Chartist.Line('.ct-chart', {
-            labels: ['01/02 10.00 pm', '06/03 3.00 pm', '09/04 11.00 am', '10/04 6.00 am', ''],
-            series: [
-                [{
-                    meta: 'Robert Sitton',
-                    value: 15
-                }, {
-                    meta: 'Brent Shipley',
-                    value: 4
-                }, {
-                    meta: 'Philip Smead',
-                    value: 90
-                }, {
-                    meta: 'Adi Iman',
-                    value: 40
-                }, 0]
-            ]
-        }, {
-            // Remove this configuration to see that chart rendered with cardinal spline interpolation
-            // Sometimes, on large jumps in data values, it's better to use simple smoothing.
-            lineSmooth: Chartist.Interpolation.simple({
-                divisor: 2
-            }),
-            fullWidth: true,
-            chartPadding: {
-                right: 20
-            },
-            low: 0,
-            plugins: [
-                Chartist.plugins.tooltip()
-            ]
-        });
-
-    </script>
+@include('dashboard.index')
 @endsection

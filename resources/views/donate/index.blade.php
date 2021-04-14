@@ -79,21 +79,22 @@
         </div>
         @endif
 
-      <div class="table-responsive">
-        <table id="donationTable" class="table table-bordered table-striped dt-responsive nowrap" 
-          style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-          <thead>
-            <tr style="text-align:center">
-              <th> No. </th>
-              <th> Nama Derma </th>
-              <th> Penerangan </th>
-              <th> Tarikh Mula </th>
-              <th> Tarikh Berakhir </th>
-              <th> Status </th>
-              <th> Action </th>
-            </tr>
-          </thead>
-        </table>
+        <div class="table-responsive">
+          <table id="donationTable" class="table table-bordered table-striped dt-responsive nowrap"
+            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+            <thead>
+              <tr style="text-align:center">
+                <th> No. </th>
+                <th> Nama Derma </th>
+                <th> Penerangan </th>
+                <th> Tarikh Mula </th>
+                <th> Tarikh Berakhir </th>
+                <th> Status </th>
+                <th> Action </th>
+              </tr>
+            </thead>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -148,6 +149,14 @@
                       type: 'GET',
 
                   },
+                  'columnDefs': [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%"
+                  },{
+                      "targets": [3,4,5,6], // your case first column
+                      "className": "text-center",
+                  },],
                   order: [
                       [1, 'asc']
                   ],

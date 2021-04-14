@@ -55,6 +55,13 @@
                     </ul>
                 </li>
 
+                <li>
+                    <a href="{{ route('activity.index') }}" class="waves-effect">
+                        <i class="mdi mdi-format-list-checks"></i>
+                        <span>Aktiviti</span>
+                    </a>
+                </li>
+
                 @role('Jaim')
                 <li>
                     <a href="{{ route('jaim.index') }}" class=" waves-effect">
@@ -125,7 +132,7 @@
 
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
-                    <a href="{{ route('fees.index') }}" class=" waves-effect">
+                    <a href="{{ route('parentpay') }}" class=" waves-effect">
                         <i class="fas fa-file-invoice-dollar"></i>
                         <span>Yuran - ibubapa (bayar)</span>
                     </a>
@@ -138,6 +145,15 @@
                     <a href="{{ route('chat-user') }}" class=" waves-effect">
                         <i class="mdi mdi-chat-outline"></i>
                         <span>Chat</span>
+                    </a>
+                </li>
+                @endrole
+
+                @role('Superadmin|Ibu|Bapa|Penjaga')
+                <li>
+                    <a href="{{ route('billIndex') }}" class=" waves-effect">
+                        <i class="mdi"></i>
+                        <span>Bill Design</span>
                     </a>
                 </li>
                 @endrole
