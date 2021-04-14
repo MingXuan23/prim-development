@@ -13,9 +13,5 @@ class Activity extends Model
 
     protected $dates = ['deleted_at'];
 
-    public function organization()
-    {
-        return $this->hasMany(Organization::class);
-    }
 
 }
