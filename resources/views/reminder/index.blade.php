@@ -143,6 +143,14 @@
                       type: 'GET',
 
                   },
+                  columnDefs: [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%",
+                  },{
+                      "targets": [1,2,3,4,5], // your case first column
+                      "className": "text-center",
+                  },],
                   order: [
                       [1, 'asc']
                   ],
@@ -154,28 +162,25 @@
                           return meta.row + meta.settings._iDisplayStart + 1;
                       },
                   }, {
-                      data: "nama",
-                      name: 'nama'
+                      data: "donation.nama",
+                      name: 'nama',
+                      "bSortable": false
                   }, {
                       data: "recurrence",
-                      name: 'description'
+                      name: 'description',
+                      "bSortable": false
                   }, {
                       data: "day",
-                      name: 'day'
+                      name: 'day',
+                      "bSortable": false
                   }, {
                       data: "time",
                       name: 'time',
-                      // render: function(data, type, row){
-                      //     if(type === "sort" || type === "type"){
-                      //         return data;
-                      //     }
-                      //     console.log(row.time);
-                      //     return moment.utc(row.time).format("HH:mm");
-                      // }
-
+                      "bSortable": false
                   }, {
                       data: 'date',
                       name: 'date',
+                      "bSortable": false
                   }, {
                       data: 'action',
                       name: 'action',
@@ -188,7 +193,6 @@
       $('#donation').change(function() {
           var donationId = $("#donation option:selected").val();
           $('#reminderTable').DataTable().destroy();
-          console.log(donationId);
           fetch_data(donationId);
       });
 

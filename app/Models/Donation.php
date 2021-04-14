@@ -26,7 +26,7 @@ class Donation extends Model
 
     public function reminder()
     {
-        return $this->belongsToMany(Reminder::class, 'user_donation_reminder', 'donation_id', 'reminder_id');
+        return $this->hasMany(Reminder::class);
     }
 
     public function transaction()
@@ -44,10 +44,10 @@ class Donation extends Model
         return $this->belongsToMany(Organization::class, 'donation_organization');
     }
 
-    public function getUrl(){
+    public function getUrl()
+    {
         $cat = 'ss';
         $id = 'kayu';
         return URL::action('DonationController@urlDonation', array('id' => $cat));
     }
-
 }

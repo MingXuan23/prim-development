@@ -308,14 +308,14 @@ class DonationController extends Controller
 
     public static function getAllDonation()
     {
-        $donations = Donation::get();
+        $donations = Donation::all();
         return $donations;
     }
 
     public static function getDonationByReminderId($id)
     {
-        $donations = Donation::whereHas('reminder', function ($query) use ($id) {
-            $query->where('reminder_id', $id);
+        $donations = Donation::with(["reminder"])->whereHas('reminder', function ($query) use ($id) {
+            $query->where("id", $id);
         })->get();
 
         return $donations;

@@ -25,7 +25,6 @@ class ReminderRequest extends FormRequest
     {
         return [
             'recurrence'    => 'required',
-            'donation'      => 'required',
             'date'          => '',
             'time'          => '',
             'day'           => ''
