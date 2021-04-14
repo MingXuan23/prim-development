@@ -151,7 +151,11 @@
     $bank_list['SCB0216']['nama']   = $bank_list['SCB0216']['value']  == "A" ? "Standard Chartered" : "Standard Chartered (OFFLINE)";
     $bank_list['UOB0226']['nama']   = $bank_list['UOB0226']['value']  == "A" ? "UOB Bank" : "UOB Bank (OFFLINE)";
     $bank_list['UOB0229']['nama']   = $bank_list['UOB0229']['value']  == "A" ? "UOB Bank - Test ID" : "UOB Bank - Test ID (OFFLINE)";
-    asort($bank_list);
+    // asort($bank_list);
+    function compareByName($a, $b) {
+        return strcasecmp($a["nama"], $b["nama"]);
+    }
+    usort($bank_list, 'compareByName');
 
     }
     catch(Exception $e){
@@ -229,9 +233,17 @@
                             <input type="hidden" name="amount" id="amount" value="0.00">
                             <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
                             <input type="hidden" name="desc" id="desc" value="School Fees">
+                            <div class="float-right">
+                                <input type="checkbox" id="TC" name="TC" onchange="
+                                    if (this.checked)
+                                        document.getElementById('bayarBtn').disabled = false;
+                                    else
+                                        document.getElementById('bayarBtn').disabled = true;
+                                    "><label style="margin-left: 5px" for="TC"><a href="https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp" target="_blank">I Agree to the FPX Terms And Condition.</a></label>
+                            </div>
                             <br>
                             <br>
-                            <button class="btn btn-success float-right" type="submit" onclick="return checkBank();">Bayar Sekarang</button>
+                            <button id="bayarBtn" class="btn btn-success float-right" type="submit" onclick="return checkBank();" disabled>Bayar Sekarang</button>
                         </form>
                     </div>
                     <input type="hidden" name="bname" id="bname" value="{{ $getfees->nama  ?? '' }}">
@@ -245,8 +257,8 @@
     <div class="row" style="align-self: center">
         <img src="assets/images/fpx/FPX.png" alt="FPXBanks" style="width: 50%">
     </div>
-    <hr>
-    <h4>FPX Terms & Conditions: <a href="https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp" target="_blank">Click Here</a></h4>
+    {{-- <hr>
+    <h4>FPX Terms & Conditions: <a href="https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp" target="_blank">https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp</a></h4> --}}
 </div>
 @endsection
 
