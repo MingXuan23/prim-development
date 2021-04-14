@@ -122,7 +122,7 @@
     {
         list($key1,$value1)=explode("~", $token);
         $value1=urldecode($value1);
-        $bank_list[$key1]=[ 'value' => $value1, 'nama' => '' ];
+        $bank_list[$key1]=[ 'value' => $value1, 'nama' => '', 'key' => $key1 ];
         $token = strtok(",");
     }
 
@@ -224,7 +224,7 @@
                        <select name="bankid" id="bankid" class="form-control">
                            <option value="">Select bank</option>
                            @foreach ($bank_list as $key=>$value)
-                                <option value="{{ $key }}">{{ $value['nama'] }}</option>
+                                <option value="{{ $value['key'] }}">{{ $value['nama'] }}</option>
                            @endforeach
                        </select>
                     </div>
