@@ -34,7 +34,7 @@
 
                 <div class="form-group">
                     <label>Nama Derma</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Derma" value="{{ $donation->nama }}">
+                    <input type="text" name="nama" class="form-control" placeholder="Nama Derma" value="{{ $donation->nama }}">
                 </div>
 
                 <div class="form-group">
@@ -47,12 +47,9 @@
                     <label>Tarikh Mula</label>
 
                     <div id="datepicker-start_date" class="input-group date" data-date-format="mm-dd-yyyy"
-                        data-provide="datepicker">
-                        <input class="form-control" id="start_date" name="start_date" type="text"
-                            placeholder="Pilih Tarikh Mula" autocomplete="off"  value="{{ $donation->date_started }}" >
-                        <div class="input-group-addon">
-                            <i class="mdi mdi-calendar-today"></i>
-                        </div>
+                    data-provide="datepicker">
+                        <input class="form-control" id="start_date" name="start_date" type="date"
+                        placeholder="Pilih Tarikh Mula" autocomplete="off"  value="{{ $donation->date_started }}">
                     </div>
                 </div>
 
@@ -60,16 +57,11 @@
                     <label>Tarikh Berakhir</label>
 
                     <div id="datepicker-end_date" class="input-group date" data-date-format="mm-dd-yyyy"
-                        data-provide="datepicker">
-                        <input class="form-control" id="end_date" name="end_date" type="text"
-                            placeholder="Pilih Tarikh Berakhir" autocomplete="off" value="{{ $donation->date_end }}">
-                        <div class="input-group-addon">
-                            <i class="mdi mdi-calendar-today"></i>
-                        </div>
+                    data-provide="datepicker">
+                        <input class="form-control" id="end_date" name="end_date" type="date"
+                        placeholder="Pilih Tarikh Berakhir" autocomplete="off"  value="{{ $donation->date_end }}">
                     </div>
                 </div>
-
-
 
                 <div class="form-group mb-0">
                     <div>
