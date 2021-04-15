@@ -114,6 +114,14 @@ class DonationController extends Controller
                     return $btn;
                 });
             }
+            $table->editColumn('date_started', function ($row) {
+                //convert to 12 hour format
+                return date('d/m/Y', strtotime($row->date_started));
+            });
+            $table->editColumn('date_end', function ($row) {
+                //convert to 12 hour format
+                return date('d/m/Y', strtotime($row->date_end));
+            });
             $table->rawColumns(['status', 'URL', 'action']);
             return $table->make(true);
         }
@@ -275,22 +283,24 @@ class DonationController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name'          =>  'required',
+            'nama'          =>  'required',
             'description'   =>  'required',
-            'price'         =>  'required|numeric'
+            'start_date'    =>  'required',
+            'end_date'      =>  'required',
         ]);
 
         DB::table('donations')
             ->where('id', $id)
             ->update(
                 [
-                    'nama'           =>  $request->get('name'),
-                    'description'    =>  $request->get('description'),
-                    'amount'         =>  $request->get('price'),
+                    'nama'          => $request->nama,
+                    'description'   => $request->description,
+                    'date_started'  => $request->start_date,
+                    'date_end'      => $request->end_date
                 ]
             );
 
-        return redirect('/donate')->with('success', 'The data has been updated!');
+        return redirect('/donate')->with('success', 'Derma Telah Berjaya Dikemaskini');
     }
 
     public function destroy($id)
