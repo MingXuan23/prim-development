@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reminder;
+use App\Models\Donation;
 use App\Http\Controllers\DonationController;
 use App\Http\Requests\ReminderRequest;
 use Illuminate\Support\Facades\Session;
@@ -12,6 +13,15 @@ use Auth;
 
 class ReminderController extends Controller
 {
+    private $reminder;
+    private $donation;
+
+    public function __construct(Reminder $reminder, Donation $donation)
+    {
+        $this->reminder = $reminder;
+        $this->donation = $donation;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -19,7 +29,7 @@ class ReminderController extends Controller
      */
     public function index()
     {
-        $donations = DonationController::getAllDonation();
+        $donations = $this->donation->getAllDonation();
         return view("reminder.index", compact('donations'));
     }
 
@@ -30,7 +40,7 @@ class ReminderController extends Controller
      */
     public function create()
     {
-        $donations = DonationController::getAllDonation();
+        $donations = $this->donation->getAllDonation();
         return view("reminder.add", compact('donations'), ['reminder' => new Reminder()]);
     }
 
@@ -69,7 +79,7 @@ class ReminderController extends Controller
      */
     public function edit($id)
     {
-        $donations = DonationController::getDonationByReminderId($id);
+        $donations = $this->donation->getDonationByReminderId($id);
         $reminder = Reminder::find($id);
 
         return view('reminder.add')->with('reminder', $reminder)->with('donations', $donations);
@@ -114,9 +124,9 @@ class ReminderController extends Controller
 
         if (request()->ajax()) {
             if (is_null($donationId)) {
-                $data = Reminder::getAllReminder();
+                $data = $this->reminder->getAllReminder();
             } else {
-                $data = Reminder::getReminderByDonationId($donationId);
+                $data = $this->reminder->getReminderByDonationId($donationId);
             }
 
             return datatables()->of($data)

@@ -13,7 +13,7 @@ class Reminder extends Model
         return $this->belongsTo(Donation::class);
     }
 
-    public static function getReminderByDonationId($donationId)
+    public function getReminderByDonationId($donationId)
     {
         $reminders = Reminder::with(["donation"])->whereHas('donation', function ($query) use ($donationId) {
             $query->where("id", $donationId);
@@ -22,11 +22,10 @@ class Reminder extends Model
         return $reminders;
     }
 
-    public static function getAllReminder()
+    public function getAllReminder()
     {
         $reminders = Reminder::with('donation')->get();
 
         return $reminders;
     }
-
 }
