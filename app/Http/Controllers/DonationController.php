@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DonationRequest;
 use App\Models\Organization;
 use App\Models\Reminder;
 use App\Models\Donation;
 use Illuminate\Http\Request;
+use App\Http\Requests\DonationRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\DataTables;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
+use Yajra\DataTables\DataTables;
+use Carbon\Carbons;
 
 class DonationController extends Controller
 {
@@ -314,20 +314,5 @@ class DonationController extends Controller
             Session::flash('error', 'Donation Delete Failed');
             return View::make('layouts/flash-messages');
         }
-    }
-
-    public static function getAllDonation()
-    {
-        $donations = Donation::all();
-        return $donations;
-    }
-
-    public static function getDonationByReminderId($id)
-    {
-        $donations = Donation::with(["reminder"])->whereHas('reminder', function ($query) use ($id) {
-            $query->where("id", $id);
-        })->get();
-
-        return $donations;
     }
 }
