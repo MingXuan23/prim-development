@@ -32,7 +32,7 @@ class OrganizationsTableSeeder extends Seeder
             array(
                 "id" => 2,
                 "code" => "MS002",
-                "email" => "admin_masjid@gmail.com",
+                "email" => "admin_najihah@gmail.com",
                 "nama" => "Masjid An-Najihah",
                 "telno" => "0194959837",
                 "address" => "Sungai Gedong, Bagan Serai",
