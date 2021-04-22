@@ -45,6 +45,14 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
 });
 
+Route::group(['prefix' => 'organization'], function () {
+    Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
+});
+
+Route::group(['prefix' => 'activity'], function () {
+    Route::get('list', 'ActivityController@getActivityDatatable')->name('ActivityDT');
+});
+
 Route::group(['prefix' => 'reminder'], function () {
     Route::get('list', 'ReminderController@getReminderDatatable')->name('reminder.getReminder');
     Route::get('testing', 'ReminderController@testingEloquent');

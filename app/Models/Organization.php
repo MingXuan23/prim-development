@@ -30,4 +30,10 @@ class Organization extends Model
     {
         return $this->hasManyThrough(Donation::class, DonationOrganization::class, 'organization_id', 'id', 'id', 'donation_id');
     }
+
+    public function activity()
+    {
+        return $this->hasMany(Activity::class);
+    }
+
 }
