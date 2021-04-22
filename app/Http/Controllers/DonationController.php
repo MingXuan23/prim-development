@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DonationRequest;
 use App\Models\Organization;
 use App\Models\Reminder;
 use App\Models\Donation;
 use Illuminate\Http\Request;
+use App\Http\Requests\DonationRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\DataTables;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
+use Yajra\DataTables\DataTables;
+use Carbon\Carbons;
 
 class DonationController extends Controller
 {
@@ -114,6 +114,14 @@ class DonationController extends Controller
                     return $btn;
                 });
             }
+            $table->editColumn('date_started', function ($row) {
+                //convert to 12 hour format
+                return date('d/m/Y', strtotime($row->date_started));
+            });
+            $table->editColumn('date_end', function ($row) {
+                //convert to 12 hour format
+                return date('d/m/Y', strtotime($row->date_end));
+            });
             $table->rawColumns(['status', 'URL', 'action']);
             return $table->make(true);
         }
@@ -275,22 +283,24 @@ class DonationController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name'          =>  'required',
+            'nama'          =>  'required',
             'description'   =>  'required',
-            'price'         =>  'required|numeric'
+            'start_date'    =>  'required',
+            'end_date'      =>  'required',
         ]);
 
         DB::table('donations')
             ->where('id', $id)
             ->update(
                 [
-                    'nama'           =>  $request->get('name'),
-                    'description'    =>  $request->get('description'),
-                    'amount'         =>  $request->get('price'),
+                    'nama'          => $request->nama,
+                    'description'   => $request->description,
+                    'date_started'  => $request->start_date,
+                    'date_end'      => $request->end_date
                 ]
             );
 
-        return redirect('/donate')->with('success', 'The data has been updated!');
+        return redirect('/donate')->with('success', 'Derma Telah Berjaya Dikemaskini');
     }
 
     public function destroy($id)
@@ -304,20 +314,5 @@ class DonationController extends Controller
             Session::flash('error', 'Donation Delete Failed');
             return View::make('layouts/flash-messages');
         }
-    }
-
-    public static function getAllDonation()
-    {
-        $donations = Donation::all();
-        return $donations;
-    }
-
-    public static function getDonationByReminderId($id)
-    {
-        $donations = Donation::with(["reminder"])->whereHas('reminder', function ($query) use ($id) {
-            $query->where("id", $id);
-        })->get();
-
-        return $donations;
     }
 }

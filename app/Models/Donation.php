@@ -50,4 +50,20 @@ class Donation extends Model
         $id = 'kayu';
         return URL::action('DonationController@urlDonation', array('id' => $cat));
     }
+
+    public function getAllDonation()
+    {
+        $donations = Donation::all();
+
+        return $donations;
+    }
+
+    public function getDonationByReminderId($id)
+    {
+        $donations = Donation::with(["reminder"])->whereHas('reminder', function ($query) use ($id) {
+            $query->where("id", $id);
+        })->get();
+
+        return $donations;
+    }
 }
