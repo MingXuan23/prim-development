@@ -102,7 +102,11 @@ class PayController extends Controller
         }
         if ($transaction->save()) {
 
-            $transaction->donation()->attach($request->fpx_sellerOrderNo, ['payment_type_id' => 1]);
+            $id = substr($request->fpx_sellerOrderNo, -1); 
+            $transaction->donation()->attach($id, ['payment_type_id' => 1]);
+
+            /// ******************* utk bridge yuran ****************************
+            
             // dd('done');
             // return view('fpx.tStatus', compact('request', 'user'));
         }
@@ -168,7 +172,7 @@ class PayController extends Controller
         $fpx_msgToken       = "01";
         $fpx_sellerExId     = "EX00012323";
         $fpx_sellerTxnTime  = date('YmdHis');
-        $fpx_sellerOrderNo  = $request->o_id;
+        $fpx_sellerOrderNo  = date('YmdHis') . rand(10000,99999)  . $request->o_id;
         $fpx_sellerId       = "SE00013841";
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
