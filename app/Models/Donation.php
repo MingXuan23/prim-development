@@ -34,10 +34,10 @@ class Donation extends Model
         return $this->belongsToMany(Transaction::class, 'donation_transaction', 'donation_id', 'transaction_id');
     }
 
-    public function transactions()
-    {
-        return $this->hasManyThrough(Transaction::class, DonationTransaction::class, 'donation_id', 'id', 'id', 'transaction_id');
-    }
+    // public function transactions()
+    // {
+    //     return $this->hasManyThrough(Transaction::class, DonationTransaction::class, 'donation_id', 'id', 'id', 'transaction_id');
+    // }
 
     public function organization()
     {

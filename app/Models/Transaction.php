@@ -13,10 +13,21 @@ class Transaction extends Model
 
     protected $dates = ['datetime_created'];
 
+    // public function donation()
+    // {
+    //     return $this->hasOneThrough(Donation::class, DonationTransaction::class, 'transaction_id', 'id', 'id', 'donation_id');
+    // }
+
     public function donation()
     {
-        return $this->hasOneThrough(Donation::class, DonationTransaction::class, 'transaction_id', 'id', 'id', 'donation_id');
+        return $this->belongsToMany(Donation::class, 'donation_transaction', 'transaction_id', 'donation_id');
     }
+
+    // public function fee()
+    // {
+    //     return $this->belongsToMany(Fee::class, 'fees_transactions', 'transactions_id', 'donation_id');
+    // }
+
 
     public static function getTransactionByOrganizationIdAndStatus($organizationId)
     {
