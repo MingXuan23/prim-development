@@ -1,5 +1,82 @@
 @extends('layouts.master-without-nav')
 
+<?php
+
+error_reporting(E_ALL);
+
+extract($_POST);
+$fields_string="";
+
+//set POST variables
+$url ='https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp';
+
+$fields = array(
+						'fpx_msgType' => urlencode($fpx_msgType),
+						'fpx_msgToken' => urlencode($fpx_msgToken),
+						'fpx_sellerExId' => urlencode($fpx_sellerExId),
+						'fpx_sellerExOrderNo' => urlencode($fpx_sellerExOrderNo),
+						'fpx_sellerTxnTime' => urlencode($fpx_sellerTxnTime),
+						'fpx_sellerOrderNo' => urlencode($fpx_sellerOrderNo),
+						'fpx_sellerId' => urlencode($fpx_sellerId),
+						'fpx_sellerBankCode' => urlencode($fpx_sellerBankCode),
+						'fpx_txnCurrency' => urlencode($fpx_txnCurrency),
+						'fpx_txnAmount' => urlencode($fpx_txnAmount),
+						'fpx_buyerEmail' => urlencode($fpx_buyerEmail),
+						'fpx_checkSum' => urlencode($fpx_checkSum),
+						'fpx_buyerName' => urlencode($fpx_buyerName),
+						'fpx_buyerBankId' => urlencode($fpx_buyerBankId),
+						'fpx_buyerBankBranch' => urlencode($fpx_buyerBankBranch),
+						'fpx_buyerAccNo' => urlencode($fpx_buyerAccNo),
+						'fpx_buyerId' => urlencode($fpx_buyerId),
+						'fpx_makerName' => urlencode($fpx_makerName),
+						'fpx_buyerIban' => urlencode($fpx_buyerIban),
+						'fpx_productDesc' => urlencode($fpx_productDesc),
+						'fpx_version' => urlencode($fpx_version)
+				);
+$response_value=array();
+
+try{
+//url-ify the data for the POST
+foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+rtrim($fields_string, '&');
+
+//open connection
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+
+//set the url, number of POST vars, POST data
+curl_setopt($ch,CURLOPT_URL, $url);
+
+curl_setopt($ch,CURLOPT_POST, count($fields));
+curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+
+// receive server response ...
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//execute post
+$result = curl_exec($ch);
+//echo "RESULT";
+//echo $result;
+
+
+//close connection
+curl_close($ch);
+
+$token = strtok($result, "&");
+while ($token !== false)
+{
+	list($key1,$value1)=explode("=", $token);
+	$value1=urldecode($value1);
+	$response_value[$key1]=$value1;
+	$token = strtok("&");
+}
+
+$fpx_debitAuthCode=reset($response_value);
+//Response Checksum Calculation String
+$data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankId']."|".$response_value['fpx_buyerIban']."|".$response_value['fpx_buyerId']."|".$response_value['fpx_buyerName']."|".$response_value['fpx_creditAuthCode']."|".$response_value['fpx_creditAuthNo']."|".$fpx_debitAuthCode."|".$response_value['fpx_debitAuthNo']."|".$response_value['fpx_fpxTxnId']."|".$response_value['fpx_fpxTxnTime']."|".$response_value['fpx_makerName']."|".$response_value['fpx_msgToken']."|".$response_value['fpx_msgType']."|".$response_value['fpx_sellerExId']."|".$response_value['fpx_sellerExOrderNo']."|".$response_value['fpx_sellerId']."|".$response_value['fpx_sellerOrderNo']."|".$response_value['fpx_sellerTxnTime']."|".$response_value['fpx_txnAmount']."|".$response_value['fpx_txnCurrency'];
+
+?>
+
 @section('content')
 <div class="container">
     <h2>Transaction Status: <span class="text-danger">Failed</span></h2>
