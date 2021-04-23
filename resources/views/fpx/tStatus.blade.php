@@ -14,7 +14,7 @@ $fpx_msgType="AE";
 $fpx_msgToken="01";
 $fpx_sellerExId="EX00012323";
 $fpx_sellerExOrderNo=$request->fpx_sellerExOrderNo;
-$fpx_sellerTxnTime=$request->fpx_sellerTxnTime;
+$fpx_sellerTxnTime=$request->fpx_fpxTxnTime;
 $fpx_sellerOrderNo=$request->fpx_sellerOrderNo;
 $fpx_sellerId="SE00013841";
 $fpx_sellerBankCode="01";
@@ -23,18 +23,18 @@ $fpx_txnAmount=$request->fpx_txnAmount;
 $fpx_buyerEmail="";
 $fpx_checkSum="";
 $fpx_buyerName="";
-$fpx_buyerBankId="";
-$fpx_buyerBankBranch="";
+$fpx_buyerBankId=$request->fpx_buyerBankId;
+$fpx_buyerBankBranch=$request->fpx_buyerBankBranch;
 $fpx_buyerAccNo="";
 $fpx_buyerId="";
-$fpx_makerName="";
+$fpx_makerName=$request->fpx_makerName;
 $fpx_buyerIban="";
 $fpx_productDesc="SampleProduct";
 $fpx_version="6.0";
 
 // $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buyerId."|".$fpx_buyerName."|".$fpx_creditAuthCode."|".$fpx_creditAuthNo."|".$fpx_debitAuthCode."|".$fpx_debitAuthNo."|".$fpx_fpxTxnId."|".$fpx_fpxTxnTime."|".$fpx_makerName."|".$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_sellerExOrderNo."|".$fpx_sellerId."|".$fpx_sellerOrderNo."|".$fpx_sellerTxnTime."|".$fpx_txnAmount."|".$fpx_txnCurrency;
 
-extract($_POST);
+// extract($_POST);
 $fields_string="";
 
 //set POST variables
