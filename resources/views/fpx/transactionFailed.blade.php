@@ -26,7 +26,7 @@ $fpx_buyerIban="";
 $fpx_productDesc="SampleProduct";
 $fpx_version="6.0";
 
-extract($_POST);
+// extract($_POST);
 $fields_string="";
 
 //set POST variables
