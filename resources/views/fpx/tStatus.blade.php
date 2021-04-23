@@ -10,28 +10,27 @@
 ///  09         : Your Data cannot be verified against the Signature.
 error_reporting(E_ALL);
 
-$fpx_buyerBankBranch=$request->fpx_buyerBankBranch;
-$fpx_buyerBankId=$request->fpx_buyerBankId;
-$fpx_buyerIban=$request->fpx_buyerIban;
-$fpx_buyerId=$request->fpx_buyerId;
-$fpx_buyerName=$request->fpx_buyerName;
-$fpx_creditAuthCode=$request->fpx_creditAuthCode;
-$fpx_creditAuthNo=$request->fpx_creditAuthNo;
-$fpx_debitAuthCode=$request->fpx_debitAuthCode;
-$fpx_debitAuthNo=$request->fpx_debitAuthNo;
-$fpx_fpxTxnId=$request->fpx_fpxTxnId;
-$fpx_fpxTxnTime=$request->fpx_fpxTxnTime;
-$fpx_makerName=$request->fpx_makerName;
-$fpx_msgToken=$request->fpx_msgToken;
-$fpx_msgType=$request->fpx_msgType;
-$fpx_sellerExId=$request->fpx_sellerExId;
+$fpx_msgType="AE";
+$fpx_msgToken="01";
+$fpx_sellerExId="EX00012323";
 $fpx_sellerExOrderNo=$request->fpx_sellerExOrderNo;
-$fpx_sellerId=$request->fpx_sellerId;
-$fpx_sellerOrderNo=$request->fpx_sellerOrderNo;
 $fpx_sellerTxnTime=$request->fpx_sellerTxnTime;
+$fpx_sellerOrderNo=$request->fpx_sellerOrderNo;
+$fpx_sellerId="SE00013841";
+$fpx_sellerBankCode="01";
+$fpx_txnCurrency="MYR";
 $fpx_txnAmount=$request->fpx_txnAmount;
-$fpx_txnCurrency=$request->fpx_txnCurrency;
-$fpx_checkSum=$request->fpx_checkSum;
+$fpx_buyerEmail="";
+$fpx_checkSum="";
+$fpx_buyerName="";
+$fpx_buyerBankId="";
+$fpx_buyerBankBranch="";
+$fpx_buyerAccNo="";
+$fpx_buyerId="";
+$fpx_makerName="";
+$fpx_buyerIban="";
+$fpx_productDesc="SampleProduct";
+$fpx_version="6.0";
 
 // $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buyerId."|".$fpx_buyerName."|".$fpx_creditAuthCode."|".$fpx_creditAuthNo."|".$fpx_debitAuthCode."|".$fpx_debitAuthNo."|".$fpx_fpxTxnId."|".$fpx_fpxTxnTime."|".$fpx_makerName."|".$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_sellerExOrderNo."|".$fpx_sellerId."|".$fpx_sellerOrderNo."|".$fpx_sellerTxnTime."|".$fpx_txnAmount."|".$fpx_txnCurrency;
 
@@ -107,6 +106,30 @@ $fpx_debitAuthCode=reset($response_value);
 $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankId']."|".$response_value['fpx_buyerIban']."|".$response_value['fpx_buyerId']."|".$response_value['fpx_buyerName']."|".$response_value['fpx_creditAuthCode']."|".$response_value['fpx_creditAuthNo']."|".$fpx_debitAuthCode."|".$response_value['fpx_debitAuthNo']."|".$response_value['fpx_fpxTxnId']."|".$response_value['fpx_fpxTxnTime']."|".$response_value['fpx_makerName']."|".$response_value['fpx_msgToken']."|".$response_value['fpx_msgType']."|".$response_value['fpx_sellerExId']."|".$response_value['fpx_sellerExOrderNo']."|".$response_value['fpx_sellerId']."|".$response_value['fpx_sellerOrderNo']."|".$response_value['fpx_sellerTxnTime']."|".$response_value['fpx_txnAmount']."|".$response_value['fpx_txnCurrency'];
 
 // $val=verifySign_fpx($fpx_checkSum, $data);
+
+$fpx_buyerBankBranch=$request->fpx_buyerBankBranch;
+$fpx_buyerBankId=$request->fpx_buyerBankId;
+$fpx_buyerIban=$request->fpx_buyerIban;
+$fpx_buyerId=$request->fpx_buyerId;
+$fpx_buyerName=$request->fpx_buyerName;
+$fpx_creditAuthCode=$request->fpx_creditAuthCode;
+$fpx_creditAuthNo=$request->fpx_creditAuthNo;
+$fpx_debitAuthCode=$request->fpx_debitAuthCode;
+$fpx_debitAuthNo=$request->fpx_debitAuthNo;
+$fpx_fpxTxnId=$request->fpx_fpxTxnId;
+$fpx_fpxTxnTime=$request->fpx_fpxTxnTime;
+$fpx_makerName=$request->fpx_makerName;
+$fpx_msgToken=$request->fpx_msgToken;
+$fpx_msgType=$request->fpx_msgType;
+$fpx_sellerExId=$request->fpx_sellerExId;
+$fpx_sellerExOrderNo=$request->fpx_sellerExOrderNo;
+$fpx_sellerId=$request->fpx_sellerId;
+$fpx_sellerOrderNo=$request->fpx_sellerOrderNo;
+$fpx_sellerTxnTime=$request->fpx_sellerTxnTime;
+$fpx_txnAmount=$request->fpx_txnAmount;
+$fpx_txnCurrency=$request->fpx_txnCurrency;
+$fpx_checkSum=$request->fpx_checkSum;
+
  $val="00";
  $ErrorCode=" Your signature has been verified successfully. "." ErrorCode :[00]";
 

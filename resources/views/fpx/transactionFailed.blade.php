@@ -4,6 +4,28 @@
 
 error_reporting(E_ALL);
 
+$fpx_msgType="AE";
+$fpx_msgToken="01";
+$fpx_sellerExId="EX00012323";
+$fpx_sellerExOrderNo=$request->fpx_sellerExOrderNo;
+$fpx_sellerTxnTime=$request->fpx_sellerTxnTime;
+$fpx_sellerOrderNo=$request->fpx_sellerOrderNo;
+$fpx_sellerId="SE00013841";
+$fpx_sellerBankCode="01";
+$fpx_txnCurrency="MYR";
+$fpx_txnAmount=$request->fpx_txnAmount;
+$fpx_buyerEmail="";
+$fpx_checkSum="";
+$fpx_buyerName="";
+$fpx_buyerBankId="";
+$fpx_buyerBankBranch="";
+$fpx_buyerAccNo="";
+$fpx_buyerId="";
+$fpx_makerName="";
+$fpx_buyerIban="";
+$fpx_productDesc="SampleProduct";
+$fpx_version="6.0";
+
 extract($_POST);
 $fields_string="";
 
