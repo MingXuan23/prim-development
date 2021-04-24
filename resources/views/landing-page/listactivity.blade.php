@@ -96,7 +96,8 @@
                             <div class="single-blog-grid-item">
                                 <!-- single blog grid item -->
                                 <div class="thumb">
-                                    <img src="assets/img/5.jpg" alt="blog images" width="360" height="251">
+                                    <img src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="blog image"
+                                        width="360" height="251">
                                 </div>
                                 <div class="content">
                                     <ul class="post-meta">
