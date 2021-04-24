@@ -15,4 +15,14 @@ class LandingPageController extends Controller
     {
         return view('landing-page.organization_list');
     }
+
+    public function activitylist()
+    {
+        return view('landing-page.listactivity');
+    }
+
+    public function activitydetails()
+    {
+        return view('landing-page.activitydetails');
+    }
 }
