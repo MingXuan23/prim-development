@@ -980,13 +980,13 @@
 ** Normalize
 ====================*/
 html {
-  font-family: "Poppins", sans-serif;
+  font-family: "Poppins", sans-serif !important;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   overflow-x: hidden; }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Poppins", sans-serif !important;
   font-size: 16px;
   margin: 0;
   color: #666666;
@@ -4403,3 +4403,189 @@ ul {
     border-radius: 5px;
     font-weight: 500;
     line-height: 50px; }
+
+    /*===========================
+      18.PORTFOLIO css 
+===========================*/
+.portfolio-area {
+  padding-top: 120px;
+  padding-bottom: 130px; }
+
+.portfolio-menu ul li {
+  font-size: 16px;
+  font-weight: 700;
+  color: #6c6c6c;
+  line-height: 48px;
+  padding: 0 30px;
+  position: relative;
+  z-index: 5;
+  -webkit-transition: all 0.3s ease-out 0s;
+  -moz-transition: all 0.3s ease-out 0s;
+  -ms-transition: all 0.3s ease-out 0s;
+  -o-transition: all 0.3s ease-out 0s;
+  transition: all 0.3s ease-out 0s;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 50px;
+  overflow: hidden;
+  margin-top: 4px;
+  text-transform: uppercase; }
+  .portfolio-menu ul li:last-child {
+    margin-right: 0; }
+  @media only screen and (min-width: 768px) and (max-width: 991px) {
+    .portfolio-menu ul li {
+      font-size: 14px;
+      padding: 0 26px; } }
+  @media (max-width: 767px) {
+    .portfolio-menu ul li {
+      font-size: 14px;
+      padding: 0 22px;
+      line-height: 42px; } }
+  .portfolio-menu ul li::before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: -webkit-linear-gradient(left, #0067f4 0%, #2bdbdc 100%);
+    background: -o-linear-gradient(left, #0067f4 0%, #2bdbdc 100%);
+    background: linear-gradient(to right, #0067f4 0%, #2bdbdc 100%);
+    z-index: -1;
+    opacity: 0;
+    -webkit-transition: all 0.3s ease-out 0s;
+    -moz-transition: all 0.3s ease-out 0s;
+    -ms-transition: all 0.3s ease-out 0s;
+    -o-transition: all 0.3s ease-out 0s;
+    transition: all 0.3s ease-out 0s; }
+  .portfolio-menu ul li:hover, .portfolio-menu ul li.active {
+    color: #fff; }
+    .portfolio-menu ul li:hover::before, .portfolio-menu ul li.active::before {
+      opacity: 1; }
+
+.single-portfolio .portfolio-image {
+  position: relative;
+  overflow: hidden; }
+  .single-portfolio .portfolio-image img {
+    width: 100%;
+    -webkit-transition: all 0.3s ease-out 0s;
+    -moz-transition: all 0.3s ease-out 0s;
+    -ms-transition: all 0.3s ease-out 0s;
+    -o-transition: all 0.3s ease-out 0s;
+    transition: all 0.3s ease-out 0s; }
+  .single-portfolio .portfolio-image .portfolio-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: all 0.5s ease-out 0s;
+    -moz-transition: all 0.5s ease-out 0s;
+    -ms-transition: all 0.5s ease-out 0s;
+    -o-transition: all 0.5s ease-out 0s;
+    transition: all 0.5s ease-out 0s;
+    background-color: rgba(255, 255, 255, 0.8);
+    -webkit-transform: scale(0.9);
+    -moz-transform: scale(0.9);
+    -ms-transform: scale(0.9);
+    -o-transform: scale(0.9);
+    transform: scale(0.9);
+    border-radius: 8px; }
+    .single-portfolio .portfolio-image .portfolio-overlay .portfolio-content {
+      padding: 16px; }
+      .single-portfolio .portfolio-image .portfolio-overlay .portfolio-content .portfolio-icon {
+        position: relative;
+        display: inline-block;
+        margin: 0 20px; }
+        .single-portfolio .portfolio-image .portfolio-overlay .portfolio-content .portfolio-icon a {
+          font-size: 48px;
+          color: #0067f4;
+          position: relative;
+          z-index: 5;
+          line-height: 50px; }
+        .single-portfolio .portfolio-image .portfolio-overlay .portfolio-content .portfolio-icon .shape {
+          position: absolute;
+          top: 7px;
+          left: 0; }
+.single-portfolio:hover .portfolio-overlay {
+  opacity: 1;
+  visibility: visible; }
+
+
+
+/*===========================
+      26.TESTIMONIAL css 
+===========================*/
+/*===== TESTIMONIAL STYLE THREE =====*/
+.single-testimonial {
+  background-color: #fff;
+  padding: 40px 30px 50px;
+  border-radius: 50px; }
+  .single-testimonial .testimonial-text .text {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 36px;
+    color: #121212;
+    padding-bottom: 25px; }
+    @media (max-width: 767px) {
+      .single-testimonial .testimonial-text .text {
+        font-size: 18px;
+        line-height: 32px; } }
+  .single-testimonial .testimonial-author {
+    border-top: 1px solid #e9ecef;
+    padding-top: 50px; }
+    .single-testimonial .testimonial-author .author-info .author-image img {
+      border-radius: 50%;
+      width: 70px; }
+    .single-testimonial .testimonial-author .author-info .author-name {
+      padding-left: 30px; }
+      .single-testimonial .testimonial-author .author-info .author-name .name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #121212; }
+      .single-testimonial .testimonial-author .author-info .author-name .sub-title {
+        font-size: 14px;
+        color: #a4a4a4;
+        margin-top: 5px; }
+    @media (max-width: 767px) {
+      .single-testimonial .testimonial-author .author-review {
+        padding-left: 100px;
+        padding-top: 15px; } }
+    @media only screen and (min-width: 576px) and (max-width: 767px) {
+      .single-testimonial .testimonial-author .author-review {
+        padding-left: 0;
+        padding-top: 15px; } }
+    .single-testimonial .testimonial-author .author-review .star li {
+      display: inline-block;
+      font-size: 14px;
+      color: #ffb400; }
+    .single-testimonial .testimonial-author .author-review .review {
+      font-size: 14px;
+      color: #000;
+      margin-top: 5px; }
+
+.testimonial-active .slick-arrow {
+  position: absolute;
+  bottom: 0;
+  left: -635px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #a4a4a4;
+  -webkit-transition: all 0.3s ease-out 0s;
+  -moz-transition: all 0.3s ease-out 0s;
+  -ms-transition: all 0.3s ease-out 0s;
+  -o-transition: all 0.3s ease-out 0s;
+  transition: all 0.3s ease-out 0s; }
+  @media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .testimonial-active .slick-arrow {
+      left: -480px; } }
+  .testimonial-active .slick-arrow:hover {
+    color: #000; }
+  .testimonial-active .slick-arrow.next {
+    left: -600px; }
+    @media only screen and (min-width: 992px) and (max-width: 1199px) {
+      .testimonial-active .slick-arrow.next {
+        left: -445px; } }
+
