@@ -24,6 +24,8 @@ Route::get('/form', 'HomeController@form');
 //landing page route
 Route::get('/', 'LandingPageController@index');
 Route::get('/organization-list', 'LandingPageController@organizationList');
+Route::get('/activity-list', 'LandingPageController@activitylist');
+Route::get('/activity-details', 'LandingPageController@activitydetails');
 
 
 Route::resource('school', 'SchoolController');
