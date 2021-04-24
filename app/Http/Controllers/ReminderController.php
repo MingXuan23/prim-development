@@ -20,6 +20,9 @@ class ReminderController extends Controller
     {
         $this->reminder = $reminder;
         $this->donation = $donation;
+        
+        $this->middleware('ReminderResource');
+
     }
 
     /**
