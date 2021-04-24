@@ -737,10 +737,10 @@
 .breadcrumb-area {
   position: relative;
   z-index: 0;
-  padding: 229px 0 140px 0;
+  padding: 214px 0 35px 0;
   background-color: #1f2732; }
   .breadcrumb-area.extra {
-    padding-top: 232px; }
+    padding-top: 190px; }
   .breadcrumb-area .page-title {
     color: #fff;
     font-size: 50px;

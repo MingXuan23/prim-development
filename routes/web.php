@@ -17,10 +17,14 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/', 'HomeController@index');
-Route::get('/', 'LandingPageController@index');
 Route::get('/form', 'HomeController@form');
 // Route::get('/school', 'FeeController@index');
 // Route::get('/school', 'SchoolController@index');
+
+//landing page route
+Route::get('/', 'LandingPageController@index');
+Route::get('/organization-list', 'LandingPageController@organizationList');
+
 
 Route::resource('school', 'SchoolController');
 

@@ -10,4 +10,9 @@ class LandingPageController extends Controller
     {
         return view('landing-page.index');
     }
+
+    public function organizationList()
+    {
+        return view('landing-page.organization_list');
+    }
 }

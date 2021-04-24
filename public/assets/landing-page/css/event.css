@@ -1,0 +1,122 @@
+    .event {
+        display: inline-block;
+        width: 100%;
+        height: 150px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        border: 1px solid #607D8D;
+        vertical-align: middle;
+    }
+
+        .event .date {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            text-align: center;
+            background-color: #607D8D;
+            vertical-align: middle;
+            overflow: hidden;
+        }
+
+            .event .date .day {
+                font-size: 70px;
+                color: #fff;
+            }
+
+            .event .date .month {
+                font-size: 30px;
+                color: #fff;
+            }
+
+        .event .img {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            vertical-align: top;
+            overflow: hidden;
+        }
+
+            .event .img img {
+                width: 100%;
+                height: auto;
+                vertical-align: middle;
+            }
+
+        .event .desc {
+            display: inline-block;
+            padding-left: 20px;
+            font-size: 15px;
+            overflow: hidden;
+            vertical-align: middle;
+        }
+
+        .event .social {
+            font-size: 25px;
+            overflow: hidden;
+        }
+
+            .event .social .si {
+                display: inline-block;
+                width: 100%;
+                clear: both;
+                vertical-align: middle;
+                overflow: hidden;
+            }
+
+            .event .social .facebook {
+                color: rgb(48, 88, 145) !important;
+            }
+
+            .event .social .twitter {
+                color: rgb(79, 213, 248) !important;
+            }
+
+            .event .social .google-plus {
+                color: rgb(221, 75, 57) !important;
+            }
+
+            .event .social .facebook:hover {
+                color: #607D8D !important;
+            }
+
+            .event .social .twitter:hover {
+                color: #607D8D !important;
+            }
+
+            .event .social .google-plus:hover {
+                color: #607D8D !important;
+            }
+
+    @media screen and (max-width:640px) {
+        .event .desc h3 {
+            font-size: 15px;
+        }
+
+        .event {
+            height: 100px;
+        }
+
+            .event .date {
+                width: 100px;
+                height: 100px;
+            }
+
+                .event .date .day {
+                    font-size: 20px;
+                }
+
+            .event .img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .event .social {
+                font-size: 16px;
+            }
+    }
+
+    @media screen and (max-width:480px) {
+        .event .img {
+            display: none;
+        }
+    }
