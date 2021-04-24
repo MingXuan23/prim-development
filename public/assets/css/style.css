@@ -2161,7 +2161,7 @@ p {
 /*===========================
         09.NAVBAR css 
 ===========================*/
-.navbar-area {
+/* .navbar-area {
   position: absolute;
   top: 0;
   left: 0;
@@ -2354,7 +2354,7 @@ p {
     .navbar-area.sticky .navbar .navbar-btn li a.solid {
       border-color: #0067f4;
       background-color: #0067f4;
-      color: #fff; }
+      color: #fff; } */
 
 /*===========================
        10.SLIDER css 
