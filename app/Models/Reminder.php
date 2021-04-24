@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\User;
+use Illuminate\Support\Facades\Auth;
 
 class Reminder extends Model
 {
@@ -11,6 +13,11 @@ class Reminder extends Model
     public function donation()
     {
         return $this->belongsTo(Donation::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function getReminderByDonationId($donationId)
@@ -24,7 +31,8 @@ class Reminder extends Model
 
     public function getAllReminder()
     {
-        $reminders = Reminder::with('donation')->get();
+        $userId = Auth::id();
+        $reminders = Reminder::with('donation')->where('user_id', $userId)->get();
 
         return $reminders;
     }

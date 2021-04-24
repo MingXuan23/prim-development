@@ -144,5 +144,19 @@
             return false;
         }
     }
+
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: "/fpx/getBankList",
+        success: function(data) {
+            for(var i = 0; i < data.data.length; i++){
+                console.log(data.data[i].code);
+            }
+        },
+        error: function (data) {
+            console.log(data);
+        }
+    });
 </script>
 @endsection

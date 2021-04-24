@@ -8,6 +8,6 @@ class LandingPageController extends Controller
 {
     public function index()
     {
-        return view('layouts.master-landing');
+        return view('landing-page.index');
     }
 }

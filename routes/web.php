@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('/', 'HomeController@index');
-// Route::get('/', 'LandingPageController@index');
+Route::get('/', 'LandingPageController@index');
 Route::get('/form', 'HomeController@form');
 // Route::get('/school', 'FeeController@index');
 // Route::get('/school', 'SchoolController@index');
@@ -115,4 +115,8 @@ Route::group(['prefix' => 'dashboard'], function () {
     Route::get('/totalDonor', 'DashboardController@getTotalDonor')->name('dashboard.totalDonor');
     Route::get('/latestTransaction', 'DashboardController@getLatestTransaction')->name('dashboard.latest_transaction');
     Route::get('/getTransaction', 'DashboardController@getTransactionByOrganizationIdAndStatus')->name('dashboard.get_transaction');
+});
+
+Route::group(['prefix' => 'fpx'], function () {
+    Route::get('/getBankList', 'FPXController@getBankList')->name('fpx.bank_list');
 });
