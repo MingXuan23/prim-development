@@ -4448,9 +4448,9 @@ ul {
     left: 0;
     width: 100%;
     height: 100%;
-    background: -webkit-linear-gradient(left, #0067f4 0%, #2bdbdc 100%);
-    background: -o-linear-gradient(left, #0067f4 0%, #2bdbdc 100%);
-    background: linear-gradient(to right, #0067f4 0%, #2bdbdc 100%);
+    background: -webkit-linear-gradient(left, #6e35ea 0%, #b562db 100%);
+    background: -o-linear-gradient(left, #6e35ea 0%, #b562db 100%);
+    background: linear-gradient(to right, #6e35ea 0%, #b562db 100%);
     z-index: -1;
     opacity: 0;
     -webkit-transition: all 0.3s ease-out 0s;
