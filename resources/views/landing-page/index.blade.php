@@ -142,15 +142,16 @@
         </div>
     </section>
 
-<!-- about us area end -->
-<!-- portfolio area start -->
-<section class="portfolio" class="portfolio-area portfolio-four pb-100">
+    <!-- about us area end -->
+    <!-- portfolio area start -->
+    <section class="portfolio" class="portfolio-area portfolio-four pb-100">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-6 col-md-10">
                     <div class="section-title text-center pb-10">
-                        <h3 class="title">Featured Works</h3>
-                        <p class="text">Stop wasting time and money designing and managing a website that doesn’t get results. Happiness guaranteed!</p>
+                        <h3 class="title">Organisasi</h3>
+                        <p class="text">Stop wasting time and money designing and managing a website that doesn’t get
+                            results. Happiness guaranteed!</p>
                     </div> <!-- section title -->
                 </div>
             </div> <!-- row -->
@@ -158,11 +159,12 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="portfolio-menu text-center mt-50">
                         <ul>
-                            <li data-filter="*" class="active">ALL WORK</li>
-                            <li data-filter=".branding-4">BRANDING</li>
-                            <li data-filter=".marketing-4">MARKETING</li>
-                            <li data-filter=".planning-4">PLANNING</li>
-                            <li data-filter=".research-4">RESEARCH</li>
+                            <li> Semua Organisasi </li>
+                            <li data-filter=".branding-4" class="active">Masjid An-Najihah </li>
+                            <li data-filter=".marketing-4">Masjid Al-Alami</li>
+                            <li data-filter=".planning-4">Tahfiz Iman</li>
+                            <li data-filter=".research-4">Pusat Islam UTeM</li>
+                            {{-- <li >Semua Organisasi</li> --}}
                         </ul>
                     </div> <!-- portfolio menu -->
                 </div>
@@ -171,11 +173,13 @@
                         <div class="col-lg-4 col-sm-6 branding-4 planning-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/1.png') }}" alt="">
+                                    <img src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="blog image"
+                                        width="277" height="277">
                                     <div class="portfolio-overlay d-flex align-items-center justify-content-center">
                                         <div class="portfolio-content">
                                             <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/1.png"><i class="lni lni-zoom-in"></i></a>
+                                                <a class="image-popup" href="assets/images/portfolio/1.png"><i
+                                                        class="lni lni-zoom-in"></i></a>
                                                 <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                             </div>
                                             <div class="portfolio-icon">
@@ -190,11 +194,13 @@
                         <div class="col-lg-4 col-sm-6 marketing-4 research-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/2.png') }}" alt="">
+                                    <img src="{{ URL::asset('assets/landing-page/img/blog/2.jpg') }}" alt="blog image"
+                                        width="277" height="277">
                                     <div class="portfolio-overlay d-flex align-items-center justify-content-center">
                                         <div class="portfolio-content">
                                             <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/2.png"><i class="lni lni-zoom-in"></i></a>
+                                                <a class="image-popup" href="assets/images/portfolio/2.png"><i
+                                                        class="lni lni-zoom-in"></i></a>
                                                 <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                             </div>
                                             <div class="portfolio-icon">
@@ -209,11 +215,13 @@
                         <div class="col-lg-4 col-sm-6 branding-4 marketing-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/3.png') }}" alt="">
+                                    <img src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="blog image"
+                                        width="277" height="277">
                                     <div class="portfolio-overlay d-flex align-items-center justify-content-center">
                                         <div class="portfolio-content">
                                             <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/3.png"><i class="lni lni-zoom-in"></i></a>
+                                                <a class="image-popup" href="assets/images/portfolio/3.png"><i
+                                                        class="lni lni-zoom-in"></i></a>
                                                 <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                             </div>
                                             <div class="portfolio-icon">
@@ -228,11 +236,13 @@
                         <div class="col-lg-4 col-sm-6 planning-4 research-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/4.png') }}" alt="">
+                                    <img src="{{ URL::asset('assets/landing-page/img/blog/4.jpg') }}" alt="blog image"
+                                        width="277" height="277">
                                     <div class="portfolio-overlay d-flex align-items-center justify-content-center">
                                         <div class="portfolio-content">
                                             <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/4.png"><i class="lni lni-zoom-in"></i></a>
+                                                <a class="image-popup" href="assets/images/portfolio/4.png"><i
+                                                        class="lni lni-zoom-in"></i></a>
                                                 <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                             </div>
                                             <div class="portfolio-icon">
@@ -247,11 +257,13 @@
                         <div class="col-lg-4 col-sm-6 marketing-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/5.png') }}" alt="">
+                                    <img src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="blog image"
+                                        width="277" height="277">
                                     <div class="portfolio-overlay d-flex align-items-center justify-content-center">
                                         <div class="portfolio-content">
                                             <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/5.png"><i class="lni lni-zoom-in"></i></a>
+                                                <a class="image-popup" href="assets/images/portfolio/5.png"><i
+                                                        class="lni lni-zoom-in"></i></a>
                                                 <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                             </div>
                                             <div class="portfolio-icon">
@@ -266,11 +278,13 @@
                         <div class="col-lg-4 col-sm-6 planning-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/6.png') }}" alt="">
+                                    <img src="{{ URL::asset('assets/landing-page/img/blog/2.jpg') }}" alt="blog image"
+                                        width="277" height="277">
                                     <div class="portfolio-overlay d-flex align-items-center justify-content-center">
                                         <div class="portfolio-content">
                                             <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/6.png"><i class="lni lni-zoom-in"></i></a>
+                                                <a class="image-popup" href="assets/images/portfolio/6.png"><i
+                                                        class="lni lni-zoom-in"></i></a>
                                                 <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                             </div>
                                             <div class="portfolio-icon">
@@ -282,66 +296,72 @@
                                 </div>
                             </div> <!-- single portfolio -->
                         </div>
+
+
+                        <!-- portfolio menu -->
                         {{-- <div class="col-lg-4 col-sm-6 research-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
                                     <img src="{{ URL::asset('assets/images/portfolio/7.png') }}" alt="">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/7.png"><i class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
+                            <div class="portfolio-content">
+                                <div class="portfolio-icon">
+                                    <a class="image-popup" href="assets/images/portfolio/7.png"><i
+                                            class="lni lni-zoom-in"></i></a>
+                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                 </div>
-                            </div> <!-- single portfolio -->
+                                <div class="portfolio-icon">
+                                    <a href="#"><i class="lni lni-link"></i></a>
+                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-lg-4 col-sm-6 branding-4 planning-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/8.png') }}" alt="">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/8.png"><i class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                        </div>
-                                    </div>
+                    </div>
+                </div> <!-- single portfolio -->
+            </div>
+            <div class="col-lg-4 col-sm-6 branding-4 planning-4">
+                <div class="single-portfolio">
+                    <div class="portfolio-image">
+                        <img src="{{ URL::asset('assets/images/portfolio/8.png') }}" alt="">
+                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
+                            <div class="portfolio-content">
+                                <div class="portfolio-icon">
+                                    <a class="image-popup" href="assets/images/portfolio/8.png"><i
+                                            class="lni lni-zoom-in"></i></a>
+                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                 </div>
-                            </div> <!-- single portfolio -->
+                                <div class="portfolio-icon">
+                                    <a href="#"><i class="lni lni-link"></i></a>
+                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-lg-4 col-sm-6 marketing-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/9.png') }}" alt="">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/9.png"><i class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                        </div>
-                                    </div>
+                    </div>
+                </div> <!-- single portfolio -->
+            </div>
+            <div class="col-lg-4 col-sm-6 marketing-4">
+                <div class="single-portfolio">
+                    <div class="portfolio-image">
+                        <img src="{{ URL::asset('assets/images/portfolio/9.png') }}" alt="">
+                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
+                            <div class="portfolio-content">
+                                <div class="portfolio-icon">
+                                    <a class="image-popup" href="assets/images/portfolio/9.png"><i
+                                            class="lni lni-zoom-in"></i></a>
+                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
                                 </div>
-                            </div> <!-- single portfolio -->
-                        </div> --}}
-                    </div> <!-- row -->
-                </div>
-            </div> <!-- row -->
+                                <div class="portfolio-icon">
+                                    <a href="#"><i class="lni lni-link"></i></a>
+                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- single portfolio -->
+            </div> --}}
+        </div> <!-- row -->
+        </div>
+        </div> <!-- row -->
         </div>
     </section>
     <!-- video area end -->
@@ -657,183 +677,172 @@
     <!-- testimonial area start -->
     {{-- <section class="testimonial-area">
             <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-            <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title ">
-                        <!-- section title -->
-                        {{-- <span class="subtitle">Testimonial</span> --}}
-                        <h3 class="title extra">Testimonial</h3>
-                        <p>Apa kata pengguna-pengguna kami</p>
-                    </div><!-- //. section title -->
-                </div>
+    <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="section-title ">
+                    <!-- section title -->
+                    <span class="subtitle">Testimonial</span>
+                    <h3 class="title extra">Testimonial</h3>
+                    <p>Apa kata pengguna-pengguna kami</p>
+                </div><!-- //. section title -->
             </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="testimonial-carousel">
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="testimonial-carousel">
 
-                        <div class="single-testimonial-item">
-                            <!-- single testimonial item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/testimonial/01.jpg') }}" alt="">
-                            <div class="hover">
-                                <!-- hover -->
-                                <div class="hover-inner">
-                                    <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                    <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                        dolor tempor incididunt .</p>
-                                    <div class="author-meta">
-                                        <h4 class="name">Riley Cassidy</h4>
-                                        <span class="post">Chief executive</span>
-                                    </div>
+                    <div class="single-testimonial-item">
+                        <!-- single testimonial item -->
+                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/01.jpg') }}" alt="">
+                        <div class="hover">
+                            <!-- hover -->
+                            <div class="hover-inner">
+                                <div class="icon"><i class="fas fa-quote-left"></i></div>
+                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
+                                    dolor tempor incididunt .</p>
+                                <div class="author-meta">
+                                    <h4 class="name">Riley Cassidy</h4>
+                                    <span class="post">Chief executive</span>
                                 </div>
-                            </div><!-- //. hover -->
-                        </div><!-- //. single testimonial item -->
-                        <div class="single-testimonial-item">
-                            <!-- single testimonial item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/testimonial/02.jpg') }}" alt="">
-                            <div class="hover">
-                                <!-- hover -->
-                                <div class="hover-inner">
-                                    <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                    <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                        dolor tempor incididunt .</p>
-                                    <div class="author-meta">
-                                        <h4 class="name">Archie Tracey</h4>
-                                        <span class="post">Technician</span>
-                                    </div>
+                            </div>
+                        </div><!-- //. hover -->
+                    </div><!-- //. single testimonial item -->
+                    <div class="single-testimonial-item">
+                        <!-- single testimonial item -->
+                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/02.jpg') }}" alt="">
+                        <div class="hover">
+                            <!-- hover -->
+                            <div class="hover-inner">
+                                <div class="icon"><i class="fas fa-quote-left"></i></div>
+                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
+                                    dolor tempor incididunt .</p>
+                                <div class="author-meta">
+                                    <h4 class="name">Archie Tracey</h4>
+                                    <span class="post">Technician</span>
                                 </div>
-                            </div><!-- //. hover -->
-                        </div><!-- //. single testimonial item -->
-                        <div class="single-testimonial-item">
-                            <!-- single testimonial item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/testimonial/03.jpg') }}" alt="">
-                            <div class="hover">
-                                <!-- hover -->
-                                <div class="hover-inner">
-                                    <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                    <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                        dolor tempor incididunt .</p>
-                                    <div class="author-meta">
-                                        <h4 class="name">Brodie Hopley</h4>
-                                        <span class="post">Chief Elevator</span>
-                                    </div>
+                            </div>
+                        </div><!-- //. hover -->
+                    </div><!-- //. single testimonial item -->
+                    <div class="single-testimonial-item">
+                        <!-- single testimonial item -->
+                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/03.jpg') }}" alt="">
+                        <div class="hover">
+                            <!-- hover -->
+                            <div class="hover-inner">
+                                <div class="icon"><i class="fas fa-quote-left"></i></div>
+                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
+                                    dolor tempor incididunt .</p>
+                                <div class="author-meta">
+                                    <h4 class="name">Brodie Hopley</h4>
+                                    <span class="post">Chief Elevator</span>
                                 </div>
-                            </div><!-- //. hover -->
-                        </div><!-- //. single testimonial item -->
+                            </div>
+                        </div><!-- //. hover -->
+                    </div><!-- //. single testimonial item -->
 
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </section> --}}
     <!-- testimonial area end -->
 
     <!-- price plan area start -->
-    {{-- <section class="pricing-plan-area pricing-plan-bg" id="pricing">
+    <section class="pricing-plan-area pricing-plan-bg" id="pricing">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <div class="section-title white">
                         <!-- section title -->
-                        <span class="subtitle">Pricing plans</span>
-                        <h3 class="title extra">Choose your pricing</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
+                        {{-- <span class="subtitle">Pricing plans</span> --}}
+                        <h3 class="title extra">Testimonial</h3>
+                        <p>Apa kata pengguna-pengguna kami....</p>
                     </div><!-- //. section title -->
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-4 col-md-6">
-                    <div class="single-price-plan-01 wow zoomIn">
-                        <!-- single price plan one -->
-                        <div class="price-header">
-                            <h4 class="name">Primary Plan</h4>
-                            <div class="price-wrap">
-                                <span class="price">$250</span>
-                                <span class="month">/Mo</span>
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="single-testimonial">
+                        <div class="testimonial-text">
+                            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
+                                volutpat nisl, sit amet convallis nunc turp.”</p>
+                        </div>
+                        <div class="testimonial-author d-sm-flex justify-content-between">
+                            <div class="author-info d-flex align-items-center">
+                                <div class="author-image">
+                                    <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}"
+                                        alt="author">
+                                </div>
+                                <div class="author-name media-body">
+                                    <h5 class="name">Mr. Jems Bond</h5>
+                                    <span class="sub-title">CEO Mbuild Firm</span>
+                                </div>
+                            </div>
+                            <div class="author-review">
+                                <ul class="star">
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                </ul>
+                                <span class="review">( 7 Reviews )</span>
                             </div>
                         </div>
-                        <div class="price-body">
-                            <ul>
-                                <li>5 Analyzer</li>
-                                <li>3 Month Support</li>
-                                <li>10 Sessions</li>
-                                <li>No Risk Garrunty</li>
-                            </ul>
-                        </div>
-                        <div class="price-footer">
-                            <a href="#" class="boxed-btn btn-rounded gd-bg-2">Get Started</a>
-                        </div>
-                    </div><!-- //. single price plan one -->
+                    </div> <!-- single testimonial -->
                 </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="single-price-plan-01 wow zoomIn">
-                        <!-- single price plan one -->
-                        <div class="price-header">
-                            <h4 class="name">Basic Plan</h4>
-                            <div class="price-wrap">
-                                <span class="price">$350</span>
-                                <span class="month">/Mo</span>
+                <div class="col-lg-6">
+                
+                    <div class="single-testimonial">
+                        <div class="testimonial-text">
+                            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
+                                volutpat nisl, sit amet convallis nunc turp.”</p>
+                        </div>
+                        <div class="testimonial-author d-sm-flex justify-content-between">
+                            <div class="author-info d-flex align-items-center">
+                                <div class="author-image">
+                                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}"
+                                        alt="author">
+                                </div>
+                                <div class="author-name media-body">
+                                    <h5 class="name">Mr. Jems Bond</h5>
+                                    <span class="sub-title">CEO Mbuild Firm</span>
+                                </div>
+                            </div>
+                            <div class="author-review">
+                                <ul class="star">
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                    <li><i class="lni lni-star-filled"></i></li>
+                                </ul>
+                                <span class="review">( 7 Reviews )</span>
                             </div>
                         </div>
-                        <div class="price-body">
-                            <ul>
-                                <li>5 Analyzer</li>
-                                <li>3 Month Support</li>
-                                <li>10 Sessions</li>
-                                <li>No Risk Garrunty</li>
-                            </ul>
-                        </div>
-                        <div class="price-footer">
-                            <a href="#" class="boxed-btn btn-rounded gd-bg-2">Get Started</a>
-                        </div>
-                    </div><!-- //. single price plan one -->
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="single-price-plan-01 wow zoomIn">
-                        <!-- single price plan one -->
-                        <div class="price-header">
-                            <h4 class="name">Advance Plan</h4>
-                            <div class="price-wrap">
-                                <span class="price">$150</span>
-                                <span class="month">/Mo</span>
-                            </div>
-                        </div>
-                        <div class="price-body">
-                            <ul>
-                                <li>5 Analyzer</li>
-                                <li>3 Month Support</li>
-                                <li>10 Sessions</li>
-                                <li>No Risk Garrunty</li>
-                            </ul>
-                        </div>
-                        <div class="price-footer">
-                            <a href="#" class="boxed-btn btn-rounded gd-bg-2">Get Started</a>
-                        </div>
-                    </div><!-- //. single price plan one -->
+                    </div> <!-- single testimonial -->
                 </div>
             </div>
         </div>
-    </section> --}}
+    </section>
     <!-- price plan area end -->
-       <!--====== TESTIMONIAL PART START ======-->
+    <!--====== TESTIMONIAL PART START ======-->
+    
 
-       <section id="testimonial" class="testimonial-area">
+    {{-- <section id="testimonial" class="testimonial-area">
         <div class="container">
-            <div class="row justify-content-between">
-                <div class="col-xl-5 col-lg-6">
-                    <div class="testimonial-left-content mt-45">
-                        <h6 class="sub-title">Testimonials</h6>
-                        <h4 class="title">What Clients Says <br> About Us</h4>
-                        <ul class="testimonial-line">
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                            <li></li>
-                        </ul>
-                        <p class="text">Duis et metus et massa tempus lacinia. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Maecenas ultricies, orci molestie blandit interdum. <br> <br> ipsum ante pellentesque nisl, eget mollis turpis quam nec eros. ultricies, orci molestie blandit interdum.</p>
-                    </div> <!-- testimonial left content -->
+            
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="contact-area-wrapper" id="contact">
+                        <!-- contact area wrapper -->
+                        <span class="subtitle">Contact us</span>
+                        <h3 class="title">Testimonial</h3>
+                        <p>Apa kata pelanggan kami...</p>
+                       
+                    </div><!-- //. contact area wrapper -->
                 </div>
                 <div class="col-lg-6">
                     <div class="testimonial-right-content mt-50">
@@ -843,12 +852,14 @@
                         <div class="testimonial-content-wrapper testimonial-active">
                             <div class="single-testimonial">
                                 <div class="testimonial-text">
-                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu volutpat nisl, sit amet convallis nunc turp.”</p>
+                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
+                                        volutpat nisl, sit amet convallis nunc turp.”</p>
                                 </div>
                                 <div class="testimonial-author d-sm-flex justify-content-between">
                                     <div class="author-info d-flex align-items-center">
                                         <div class="author-image">
-                                            <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}" alt="author">
+                                            <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}"
+                                                alt="author">
                                         </div>
                                         <div class="author-name media-body">
                                             <h5 class="name">Mr. Jems Bond</h5>
@@ -869,12 +880,14 @@
                             </div> <!-- single testimonial -->
                             <div class="single-testimonial">
                                 <div class="testimonial-text">
-                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu volutpat nisl, sit amet convallis nunc turp.”</p>
+                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
+                                        volutpat nisl, sit amet convallis nunc turp.”</p>
                                 </div>
                                 <div class="testimonial-author d-sm-flex justify-content-between">
                                     <div class="author-info d-flex align-items-center">
                                         <div class="author-image">
-                                                <img src="{{ URL::asset('assets/images/testimonial/author-2.jpg') }}" alt="author">
+                                            <img src="{{ URL::asset('assets/images/testimonial/author-2.jpg') }}"
+                                                alt="author">
                                         </div>
                                         <div class="author-name media-body">
                                             <h5 class="name">Mr. Jems Bond</h5>
@@ -895,12 +908,14 @@
                             </div> <!-- single testimonial -->
                             <div class="single-testimonial">
                                 <div class="testimonial-text">
-                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu volutpat nisl, sit amet convallis nunc turp.”</p>
+                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
+                                        volutpat nisl, sit amet convallis nunc turp.”</p>
                                 </div>
                                 <div class="testimonial-author d-sm-flex justify-content-between">
                                     <div class="author-info d-flex align-items-center">
                                         <div class="author-image">
-                                                <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}" alt="author">
+                                            <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}"
+                                                alt="author">
                                         </div>
                                         <div class="author-name media-body">
                                             <h5 class="name">Mr. Jems Bond</h5>
@@ -924,10 +939,10 @@
                 </div>
             </div> <!-- row -->
         </div> <!-- container -->
-    </section>
+    </section> --}}
 
     <!--====== TESTIMONIAL PART ENDS ======-->
-    
+
     <!-- team member area start -->
     <section class="team-member-area" id="team">
         <div class="bg-shape-1">

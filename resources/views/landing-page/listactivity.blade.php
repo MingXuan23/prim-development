@@ -84,10 +84,10 @@
                                 </div>
                                 <div class="content">
                                     <ul class="post-meta">
-                                        <li><a href="#">21 Aug, 2018 </a></li>
+                                        <li>21 Aug, 2018 </li>
                                     </ul>
-                                    <h4 class="title"><a href="#">Gotong Royong Belia Masjid</a></h4>
-                                    <a href="#" class="readmore">Baca Selanjutnya <i
+                                    <h4 class="title">Gotong Royong Belia Masjid</h4>
+                                    <a href="/activity-details" class="readmore">Baca Selanjutnya <i
                                             class="fas fa-long-arrow-alt-right"></i></a>
                                 </div>
                             </div><!-- //. single blog grid item -->
@@ -101,9 +101,9 @@
                                 </div>
                                 <div class="content">
                                     <ul class="post-meta">
-                                        <li><a href="#">21 Aug, 2018 </a></li>
+                                        <li>21 Aug, 2018 </li>
                                     </ul>
-                                    <h4 class="title"><a href="#">Tadarus Al Quran</a></h4>
+                                    <h4 class="title">Tadarus Al Quran</h4>
                                     <a href="#" class="readmore">Baca Selanjutnya <i
                                             class="fas fa-long-arrow-alt-right"></i></a>
                                 </div>
@@ -118,10 +118,10 @@
                                 </div>
                                 <div class="content">
                                     <ul class="post-meta">
-                                        <li><a href="#">21 Aug, 2018 </a></li>
+                                        <li>21 Aug, 2018 </li>
                                     </ul>
-                                    <h4 class="title"><a href="#">Gotong Royong Muslimat</a></h4>
-                                    <a href="#" class="readmore">Baca Selanjutnya <i
+                                    <h4 class="title">Gotong Royong Muslimat</h4>
+                                    <a href="/activity-details" class="readmore">Baca Selanjutnya <i
                                             class="fas fa-long-arrow-alt-right"></i></a>
                                 </div>
                             </div><!-- //. single blog grid item -->
@@ -135,10 +135,10 @@
                                 </div>
                                 <div class="content">
                                     <ul class="post-meta">
-                                        <li><a href="#">21 Aug, 2018 </a></li>
+                                        <li>21 Aug, 2018 </li>
                                     </ul>
-                                    <h4 class="title"><a href="#">Gotong Royong Sambutan Ramadhan</a></h4>
-                                    <a href="#" class="readmore">Baca Selanjutnya <i
+                                    <h4 class="title">Gotong Royong Sambutan Ramadhan</h4>
+                                    <a href="/activity-details" class="readmore">Baca Selanjutnya <i
                                             class="fas fa-long-arrow-alt-right"></i></a>
                                 </div>
                             </div><!-- //. single blog grid item -->
@@ -152,10 +152,10 @@
                                 </div>
                                 <div class="content">
                                     <ul class="post-meta">
-                                        <li><a href="#">21 Aug, 2018 </a></li>
+                                        <li>21 Aug, 2018 </li>
                                     </ul>
-                                    <h4 class="title"><a href="#">Gotong Royong Belia Masjid</a></h4>
-                                    <a href="#" class="readmore">Baca Selanjutnya <i
+                                    <h4 class="title">Gotong Royong Belia Masjid</h4>
+                                    <a href="/activity-details" class="readmore">Baca Selanjutnya <i
                                             class="fas fa-long-arrow-alt-right"></i></a>
                                 </div>
                             </div><!-- //. single blog grid item -->
@@ -169,10 +169,10 @@
                                 </div>
                                 <div class="content">
                                     <ul class="post-meta">
-                                        <li><a href="#">21 Aug, 2018 </a></li>
+                                        <li>21 Aug, 2018 </li>
                                     </ul>
-                                    <h4 class="title"><a href="#">Gotong Royong Belia Masjid</a></h4>
-                                    <a href="#" class="readmore">Baca Selanjutnya <i
+                                    <h4 class="title">Gotong Royong Belia Masjid</h4>
+                                    <a href="/activity-details" class="readmore">Baca Selanjutnya <i
                                             class="fas fa-long-arrow-alt-right"></i></a>
                                 </div>
                             </div><!-- //. single blog grid item -->

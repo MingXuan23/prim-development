@@ -92,7 +92,7 @@
                                         <td>
                                             <img src="{{ URL::asset('assets/landing-page/img/building-solid.svg') }}"
                                                 alt="">
-                                            <a href="#" class="user-link">Masjid An-Najihah</a>
+                                            <a href="/activity-list" class="user-link">Masjid An-Najihah <i class="fas fa-chevron-right"></i></a>
                                             <span class="user-subhead">Ayer Keroh</span>
                                         </td>
                                         <td>
@@ -109,7 +109,7 @@
                                             <img src="{{ URL::asset('assets/landing-page/img/building-solid.svg') }}"
                                                 alt="">
 
-                                            <a href="#" class="user-link">Masjid Al-Alami</a>
+                                            <a href="#" class="user-link">Masjid Al-Alami <i class="fas fa-chevron-right"></i></a>
                                             <span class="user-subhead">Ayer Keroh</span>
                                         </td>
                                         <td>
@@ -118,6 +118,7 @@
 
                                         <td>
                                             <a href="#">marlon@brando.com</a>
+                                           
                                         </td>
 
                                     </tr>
@@ -126,7 +127,7 @@
                                             <img src="{{ URL::asset('assets/landing-page/img/building-solid.svg') }}"
                                                 alt="">
 
-                                            <a href="#" class="user-link">Tahfiz Iman</a>
+                                            <a href="#" class="user-link">Tahfiz Iman <i class="fas fa-chevron-right"></i></a>
                                             <span class="user-subhead">Bagan Serai</span>
                                         </td>
                                         <td>
@@ -143,7 +144,7 @@
                                             <img src="{{ URL::asset('assets/landing-page/img/building-solid.svg') }}"
                                                 alt="">
 
-                                            <a href="#" class="user-link">Pusat Islam UTeM</a>
+                                            <a href="#" class="user-link">Pusat Islam UTeM <i class="fas fa-chevron-right"></i></a>
                                             <span class="user-subhead">Ayer Keroh</span>
                                         </td>
                                         <td>
@@ -160,7 +161,7 @@
                                             <img src="{{ URL::asset('assets/landing-page/img/building-solid.svg') }}"
                                                 alt="">
 
-                                            <a href="#" class="user-link">Surau Telok Mas</a>
+                                            <a href="#" class="user-link">Surau Telok Mas <i class="fas fa-chevron-right"></i></a>
                                             <span class="user-subhead">Telok Mas</span>
                                         </td>
                                         <td>

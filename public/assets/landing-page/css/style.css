@@ -4404,9 +4404,7 @@ ul {
     font-weight: 500;
     line-height: 50px; }
 
-
-    
-/*===========================
+    /*===========================
       18.PORTFOLIO css 
 ===========================*/
 .portfolio-area {
@@ -4515,11 +4513,12 @@ ul {
   opacity: 1;
   visibility: visible; }
 
+
+
 /*===========================
       26.TESTIMONIAL css 
 ===========================*/
 /*===== TESTIMONIAL STYLE THREE =====*/
-
 .single-testimonial {
   background-color: #fff;
   padding: 40px 30px 50px;
@@ -4566,4 +4565,27 @@ ul {
       font-size: 14px;
       color: #000;
       margin-top: 5px; }
+
+.testimonial-active .slick-arrow {
+  position: absolute;
+  bottom: 0;
+  left: -635px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #a4a4a4;
+  -webkit-transition: all 0.3s ease-out 0s;
+  -moz-transition: all 0.3s ease-out 0s;
+  -ms-transition: all 0.3s ease-out 0s;
+  -o-transition: all 0.3s ease-out 0s;
+  transition: all 0.3s ease-out 0s; }
+  @media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .testimonial-active .slick-arrow {
+      left: -480px; } }
+  .testimonial-active .slick-arrow:hover {
+    color: #000; }
+  .testimonial-active .slick-arrow.next {
+    left: -600px; }
+    @media only screen and (min-width: 992px) and (max-width: 1199px) {
+      .testimonial-active .slick-arrow.next {
+        left: -445px; } }
 
