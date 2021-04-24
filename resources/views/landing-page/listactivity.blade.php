@@ -19,7 +19,7 @@
             <div class="responsive-mobile-menu">
                 <div class="logo-wrapper">
                     <a href="index.html" class="logo">
-                        <img src="{{ URL::asset('assets/landing-page/logo-header.png') }}" alt="logo">
+                        <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
                     </a>
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
