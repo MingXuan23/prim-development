@@ -3221,7 +3221,7 @@ p.form-message.success, p.form-message.error {
       color: #fff; }
 
 /*===== BACK TO TOP =====*/
-.back-to-top {
+/* .back-to-top {
   font-size: 20px;
   color: #fff;
   position: fixed;
@@ -3242,6 +3242,6 @@ p.form-message.success, p.form-message.error {
   display: none; }
   .back-to-top:hover {
     color: #fff;
-    background-color: #0067f4; }
+    background-color: #0067f4; } */
 
 /*# sourceMappingURL=style.css.map */
