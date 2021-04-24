@@ -30,25 +30,25 @@
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
                     <li class="current-menu-item">
-                        <a href="#">Home</a>
+                        <a href="#">Utama</a>
                     </li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="#team">Team</a></li>
+                    <li><a href="#about">Perkhidmatan</a></li>
+                    {{-- <li><a href="#pricing">Pricing</a></li> --}}
+                    <li><a href="#team">Modul</a></li>
                     <li class="menu-item-has-children">
-                        <a href="#">Blog</a>
+                        <a href="#">Organisasi</a>
                         <ul class="sub-menu">
-                            <li><a href="blog.html">Blog 01</a></li>
-                            <li><a href="blog-details.html">Blog Details</a></li>
+                            <li><a href="/organization-list">Masjid</a></li>
+                            <li><a href="blog-details.html">Sekolah JAIM</a></li>
                         </ul>
                     </li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#contact">Hubungi Kami</a></li>
                 </ul>
             </div>
             <div class="nav-right-content">
                 <ul>
                     <li class="button-wrapper">
-                        <a href="#" class="boxed-btn btn-rounded">Download</a>
+                        <a href="/login" class="boxed-btn btn-rounded">Log Masuk</a>
                     </li>
                 </ul>
             </div>

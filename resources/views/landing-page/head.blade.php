@@ -19,3 +19,21 @@
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/responsive.css') }}">
     <!-- box-list -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/box-list.css') }}">
+
+     <!--====== Magnific Popup CSS ======-->
+     {{-- <link rel="stylesheet" href="{{ URL::asset('assets/css/magnific-popup.css') }}"> --}}
+        
+     <!--====== Slick CSS ======-->
+     <link rel="stylesheet" href="{{ URL::asset('assets/libs/slick/slick.css') }}">
+         
+     <!--====== Line Icons CSS ======-->
+     {{-- <link rel="stylesheet" href="{{ URL::asset('assets/css/LineIcons.css') }}"> --}}
+         
+     <!--====== Bootstrap CSS ======-->
+     <link rel="stylesheet" href="{{ URL::asset('assets/css/bootstrap.min.css') }}">
+     
+     <!--====== Default CSS ======-->
+     <link rel="stylesheet" href="{{ URL::asset('assets/css/default.css') }}">
+     
+     <!--====== Style CSS ======-->
+     <link rel="stylesheet" href="{{ URL::asset('assets/css/style.css') }}">
