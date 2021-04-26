@@ -3,39 +3,42 @@
 <div class="container" style="margin-top: 5%;">
     <form name="form1" id="form1" method="post" action="https://uat.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp">
         @csrf
-        <table border="0" cellpadding="2" cellspacing="1" width="100%">
-            <tbody>
-                <tr class="infoBoxContents">
-                    <td valign="top" width="30%">
-                        <table border="0" cellpadding="2" cellspacing="0" width="100%">
-                            <tbody>
-                                <tr>
-                                    <td height="164" align="center" class="main"><b>Payment Method via FPX</b>
-                                        <p>&nbsp;</p>
-                                        <input type="submit" style="cursor:hand" class="btn btn-primary" onclick="pay()"
-                                            value="Click to Pay" />
-                                        <p>&nbsp;</p>
-                                        {{-- <p> <img src="assets/images/FPXButton.PNG" border="2" /></p> --}}
-                                        <p>&nbsp;</p>
-                                        <p class="main">&nbsp;</p>
-                                        <p class="main"><strong>* You must have Internet Banking Account in order to
-                                                make transaction using FPX.</strong></p>
-                                        <p>&nbsp;</p>
-                                        <p class="main"><strong>* Please ensure that your browser's pop up blocker has
-                                                been disabled to avoid any interruption during making
-                                                transaction.</strong></p>
-                                        <p>&nbsp;</p>
-                                        <p class="main"><strong>* Do not close browser / refresh page until you receive
-                                                response.</strong></p>
-                                        <p>&nbsp;</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="card">
+                <div class="card-body"> 
+                    <table border="0" cellpadding="2" cellspacing="1" width="100%">
+                    <tbody>
+                        <tr class="infoBoxContents">
+                            <td valign="top" width="30%">
+                                <table border="0" cellpadding="2" cellspacing="0" width="100%">
+                                    <tbody>
+                                        <tr>
+                                            <td height="164" align="center" class="main"><b>Payment Method via FPX</b>
+                                                <p>&nbsp;</p>
+                                                {{-- <input type="submit" style="cursor:hand" class="btn btn-primary" onclick="pay()"
+                                                    value="Click to Pay" /> --}}
+                                                <p> <img src="assets/images/FPXButton.PNG" border="2" /></p>
+                                                <p class="main">&nbsp;</p>
+                                                <p class="main"><strong>* You must have Internet Banking Account in order to
+                                                        make transaction using FPX.</strong></p>
+                                                <p>&nbsp;</p>
+                                                <p class="main"><strong>* Please ensure that your browser's pop up blocker has
+                                                        been disabled to avoid any interruption during making
+                                                        transaction.</strong></p>
+                                                <p>&nbsp;</p>
+                                                <p class="main"><strong>* You will be redirected to secure payment site. Do not close browser / refresh page until you receive
+                                                        response.</strong></p>
+                                                <p>&nbsp;</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+       
 
         <input type=hidden value="{{ $fpx_msgType }}" name="fpx_msgType">
         <input type=hidden value="{{ $fpx_msgToken }}" name="fpx_msgToken">
@@ -67,23 +70,30 @@
 <script>
     // console.log('hihi');
     var values = $("#form1").serialize();
+    
+    function redirectFPX() {
+        $('#form1').submit();
+    }
+    // $('#form1').submit();
+    setTimeout("redirectFPX();",3000);
+
+   
 
     function pay(){
         // alert(values);
         // console.log(values);
 
         $.ajax({
-                    url: "{{ route('trn') }}",
-                    type: "post",
-                    data: values ,
-                    success: function (response) {
-
-                    // You will get response from your PHP page (what you echo or print)
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.log(textStatus, errorThrown);
-                    }
-                });
+                url: "{{ route('trn') }}",
+                type: "post",
+                data: values ,
+                success: function (response) {
+                // You will get response from your PHP page (what you echo or print)
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(textStatus, errorThrown);
+                }
+            });
 
     }
     

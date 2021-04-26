@@ -56,11 +56,6 @@ class PayController extends Controller
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
-    public function test()
-    {
-        dd("test");
-    }
-
     // public function parentpay(Request $request)
     // {
     //     $feesid     = $request->id;
