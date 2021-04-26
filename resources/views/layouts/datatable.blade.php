@@ -1,2 +1,2 @@
-        <link href="{{ URL::asset('assets/DataTables/datatables.min.css') }}" rel="stylesheet">
-        <script src="{{ URL::asset('assets/DataTables/datatables.min.js') }}" defer></script>
+        <link href="{{ URL::asset('assets/libs/datatables/datatables.min.css') }}" rel="stylesheet">
+        <script src="{{ URL::asset('assets/libs/datatables/datatables.min.js') }}" defer></script>

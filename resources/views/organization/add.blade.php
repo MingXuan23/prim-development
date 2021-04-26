@@ -34,7 +34,7 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label>Nama Organisasi</label>
-                        <input type="text" name="name" class="form-control" placeholder="Nama Organisasi">
+                        <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi">
                     </div>
                     <div class="form-group">
                         <label>No Telefon</label>

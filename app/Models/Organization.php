@@ -18,6 +18,22 @@ class Organization extends Model
 
     public function user()
     {
-        return $this->belongsToMany(User::class, 'organization_user');
+        return $this->belongsToMany(User::class, 'organization_user', 'organization_id', 'user_id');
     }
+
+    public function donation()
+    {
+        return $this->belongsToMany(Donation::class, 'donation_organization');
+    }
+
+    public function donations()
+    {
+        return $this->hasManyThrough(Donation::class, DonationOrganization::class, 'organization_id', 'id', 'id', 'donation_id');
+    }
+
+    public function activity()
+    {
+        return $this->hasMany(Activity::class);
+    }
+
 }

@@ -20,5 +20,9 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         //
+        'https://uat.mepsfpx.com.my/*',
+        'https://uat.mepsfpx.com.my',
+        'https://prim.my/transactionReceipt',
+        'https://prim.my/paymentStatus',
     ];
 }

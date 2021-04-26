@@ -22,6 +22,12 @@ class FeesController extends Controller
         return view('pentadbir.fee.index', compact('fees'));
     }
 
+    public function parentpay()
+    {
+        $fees = DB::table('fees')->orderBy('nama')->get();
+        return view('parent.fee.index', compact('fees'));
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -54,7 +60,7 @@ class FeesController extends Controller
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('class_organization.id as id')
             ->orderBy('nama')
-            ->where('classes.nama', 'LIKE', $yearstd . '%')
+            ->where('classes.nama', 'LIKE',  '%' .$yearstd . '%')
             ->get();
 
         // dd($listclass[0]->id);
