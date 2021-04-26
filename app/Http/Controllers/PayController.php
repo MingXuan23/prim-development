@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Fees_Transaction;
 use App\Http\Controllers\Controller;
-use App\Models\Detail;
 use App\Models\Transaction;
+use App\User;
+use App\Models\Donation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\User;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\Process\Process;
 
 class PayController extends Controller
 {
+    private $donation;
+
+    public function __construct(Donation $donation, User $user)
+    {
+        $this->donation = $donation;
+        $this->user = $user;
+    }
+
     public function index(Request $request)
     {
         $feesid     = $request->id;
@@ -42,11 +48,17 @@ class PayController extends Controller
 
     public function donateindex(Request $request)
     {
-        $donateid   = $request->id;
-        $getdonate  = DB::table('donations')->where('id', $donateid)->first();
+        $donationId   = $request->id;
+        $donation  = $this->donation->getDonationById($donationId);
 
-        // dd($getdonate);
-        return view('paydonate.pay', compact('getdonate'));
+        $user = $this->user->getUserById();
+        
+        return view('paydonate.pay', compact('donation', 'user'));
+    }
+
+    public function test()
+    {
+        dd("test");
     }
 
     // public function parentpay(Request $request)
@@ -101,8 +113,7 @@ class PayController extends Controller
             $transaction->user_id   = Auth::id();
         }
         if ($transaction->save()) {
-
-            $id = substr($request->fpx_sellerOrderNo, -1); 
+            $id = substr($request->fpx_sellerOrderNo, -1);
             $transaction->donation()->attach($id, ['payment_type_id' => 1]);
 
             /// ******************* utk bridge yuran ****************************
@@ -154,12 +165,11 @@ class PayController extends Controller
         // dd($request);
         // $user = Auth::id();
         if ($request->desc == 'Donation') {
-
             $fpx_buyerEmail = $request->email;
             $telno = $request->telno;
             $fpx_buyerName = $request->name;
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail = "prim.utem@gmail.com";
             $telno = "";
@@ -172,7 +182,7 @@ class PayController extends Controller
         $fpx_msgToken       = "01";
         $fpx_sellerExId     = "EX00012323";
         $fpx_sellerTxnTime  = date('YmdHis');
-        $fpx_sellerOrderNo  = date('YmdHis') . rand(10000,99999)  . $request->o_id;
+        $fpx_sellerOrderNo  = date('YmdHis') . rand(10000, 99999)  . $request->o_id;
         $fpx_sellerId       = "SE00013841";
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
@@ -251,9 +261,9 @@ class PayController extends Controller
                                 'transactions_id' => $transaction->id,
                             ),
                         ));
-                        if ($res)
+                        if ($res) {
                             return view('fpx.tStatus', compact('request', 'user'));
-                        else {
+                        } else {
                             return view('errors.500');
                         }
                     }

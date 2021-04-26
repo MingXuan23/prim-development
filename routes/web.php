@@ -126,3 +126,5 @@ Route::group(['prefix' => 'dashboard'], function () {
 Route::group(['prefix' => 'fpx'], function () {
     Route::get('/getBankList', 'FPXController@getBankList')->name('fpx.bank_list');
 });
+
+Route::get('/test', 'PayController@test');

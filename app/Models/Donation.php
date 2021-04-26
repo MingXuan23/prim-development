@@ -66,4 +66,11 @@ class Donation extends Model
 
         return $donations;
     }
+
+    public function getDonationById($id)
+    {
+        $donation = Donation::find($id);
+        
+        return $donation;
+    }
 }

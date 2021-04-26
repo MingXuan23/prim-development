@@ -20,7 +20,8 @@
         </div>
         <div class="col-md-12 pb-3">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Sila penuhkan ruangan untuk derma</li>
+                
+                <li class="breadcrumb-item active">Sila penuhkan ruangan untuk derma s</li>
             </ol>
         </div>
         <div class="col-md-12">
@@ -29,13 +30,13 @@
 
                 </div>
                 <div class="col-md-8 p-3">
-                    <h4>{{ $getdonate->nama }} </h4>
+                    <h4>{{ $donation->nama }} </h4>
                     <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
                         {{csrf_field()}}
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Nama</label>
-                                <input type="text" name="name" class="form-control" placeholder="Nama">
+                                <input type="text" name="name" class="form-control" placeholder="Nama" value="">
                             </div>
                             <div class="form-group">
                                 <label>Email</label>

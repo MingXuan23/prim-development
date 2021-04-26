@@ -47,8 +47,9 @@ class User extends Authenticatable
         return $this->belongsToMany(Organization::class, 'organization_user', 'user_id', 'organization_id');
     }
 
-    public function organizationRole() {
-        return $this->belongsToMany(OrganizationRole::class, 'organization_user','', 'role_id');
+    public function organizationRole()
+    {
+        return $this->belongsToMany(OrganizationRole::class, 'organization_user', '', 'role_id');
     }
     
     public function donation()
@@ -56,4 +57,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Donation::class, 'donation_user');
     }
 
+    public function getUserById()
+    {
+        $id = Auth::id();
+        $user = User::find($id)->first();
+
+        return $user;
+    }
 }
