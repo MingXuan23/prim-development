@@ -5,6 +5,7 @@ namespace App;
 use App\Models\Donation;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;

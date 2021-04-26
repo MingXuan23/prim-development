@@ -21,7 +21,7 @@
         <div class="col-md-12 pb-3">
             <ol class="breadcrumb mb-0">
                 
-                <li class="breadcrumb-item active">Sila penuhkan ruangan untuk derma s</li>
+                <li class="breadcrumb-item active">Sila penuhkan ruangan untuk derma</li>
             </ol>
         </div>
         <div class="col-md-12">
@@ -36,15 +36,15 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Nama</label>
-                                <input type="text" name="name" class="form-control" placeholder="Nama" value="">
+                                <input type="text" name="name" class="form-control" placeholder="Nama" value="{{ $user->name }}">
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="text" name="email" class="form-control" placeholder="Email">
+                                <input type="text" name="email" class="form-control" placeholder="Email" value="{{ $user->email }}">
                             </div>
                             <div class="form-group">
                                 <label>No Telefon</label>
-                                <input type="text" name="telno" class="form-control" placeholder="No Telefon">
+                                <input type="text" name="telno" class="form-control" placeholder="No Telefon" value="{{ $user->telno }}">
                             </div>
                             <div class="form-group">
                                 <label>Amaun</label>
@@ -88,7 +88,7 @@
                         </div>
 
                         <input type="hidden" name="desc" id="desc" value="Donation">
-                        <input type="hidden" name="o_id" id="o_id" value="{{ $getdonate->id }} ">
+                        <input type="hidden" name="o_id" id="o_id" value="{{ $donation->id }} ">
 
                         <br>
 
