@@ -8,5 +8,6 @@
         <link href="{{ URL::asset('assets/css/app-rtl.min.css')}}" id="app-rtl" rel="stylesheet" type="text/css" />
         <link href="{{ URL::asset('assets/css/app-dark.min.css')}}" id="app-dark" rel="stylesheet" type="text/css" />
         <link href="{{ URL::asset('assets/css/app.min.css')}}" id="app-light" rel="stylesheet" type="text/css" />
+        <link href="{{ URL::asset('assets/css/style.css')}}" id="app-light" rel="stylesheet" type="text/css" />
         {{-- <script src="https://js.stripe.com/v3/"></script> --}}
         @laravelPWA

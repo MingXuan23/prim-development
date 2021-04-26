@@ -86,7 +86,7 @@ Route::group(['middleware' => ['auth']], function () {
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
 Route::post('trn', 'PayController@transaction')->name('trn');
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
-Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
+Route::get('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
 Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
 Route::get('successpay', 'PayController@successPay')->name('successpay');
@@ -126,5 +126,3 @@ Route::group(['prefix' => 'dashboard'], function () {
 Route::group(['prefix' => 'fpx'], function () {
     Route::get('/getBankList', 'FPXController@getBankList')->name('fpx.bank_list');
 });
-
-Route::get('/test', 'PayController@test');

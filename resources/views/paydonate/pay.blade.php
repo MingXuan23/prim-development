@@ -13,24 +13,19 @@
     </div>
 </div>
 
-<div class="card p-4">
-    <div class="row">
-        <div class="col-md-12 pb-3">
-            {{-- <h3>{{ $getfees->nama  ?? '' }}</h3> --}}
-        </div>
-        <div class="col-md-12 pb-3">
-            <ol class="breadcrumb mb-0">
-                
-                <li class="breadcrumb-item active">Sila penuhkan ruangan untuk derma</li>
-            </ol>
-        </div>
-        <div class="col-md-12">
-            <div class="row">
-                <div class="container-wrapper-scroll p-2 mb-3">
-
-                </div>
-                <div class="col-md-8 p-3">
-                    <h4>{{ $donation->nama }} </h4>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <img class="card-img-top img-fluid card-img" src="{{ URL::asset('images/derma/derma-1.jpg') }}"
+                                    alt="Image Not Available">
+            </div>
+        </div>    
+    </div>
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body">
+                <h4>{{ $donation->nama }} </h4>
                     <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
                         {{csrf_field()}}
                         <div class="card-body">
@@ -84,38 +79,28 @@
                                     <option value="UOB0229">UOB Bank - Test ID</option>
                                 </select>
                             </div>
-
                         </div>
 
                         <input type="hidden" name="desc" id="desc" value="Donation">
                         <input type="hidden" name="o_id" id="o_id" value="{{ $donation->id }} ">
 
-                        <br>
-
-                        <button class="btn btn-success float-right" type="submit" onclick="return checkBank();">
+                        <button class="btn btn-success float-right submit" type="submit" onclick="return checkBank();">
                             Bayar Sekarang
                         </button>
                     </form>
-
-                </div>
-                {{-- <div class="col-md-4 p-2">
-                    {{ csrf_field() }}
-                <input type="hidden" name="amount" id="amount" value="0.00">
-                <input type="hidden" name="o_id" id="o_id" value="{{ $getfees->id }}">
-                <input type="hidden" name="desc" id="desc" value="School Fees">
-                <button class="btn btn-success float-right" type="submit" onclick="return checkBank();">Bayar
-                    Sekarang</button>
-                <img src="assets/images/FPX_ParticipatingBanks.PNG" class="float-right" alt="FPXBanks"
-                    style="margin-top:20px">
-
-            </div> --}}
-            {{-- <input type="hidden" name="bname" id="bname" value="{{ $getfees->nama  ?? '' }}">
-            <input type="hidden" name="ttlpay" id="ttlpay" value="0.00">
-            <input type="hidden" value="{{ route('payment') }}" id="routepay"> --}}
-        </div>
+            </div>
+        </div>    
     </div>
 </div>
-</div>
+{{-- <div id="redirectModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h4>You will be redirected to secure payment site. Do not close the window until the transaction complete.</h4>
+            </div>
+        </div>
+    </div>
+</div> --}}
 
 @endsection
 
@@ -145,6 +130,11 @@
             return false;
         }
     }
+
+    // $(document).on('click', '.submit', function() {
+    //     $('#redirectModal').modal('show');
+    //     setTimeout("$('#redirectModal').modal('hide');", 3000);
+    // });
 
     $.ajax({
         type: 'GET',
