@@ -33,7 +33,7 @@ $fields_string="";
 $url ='https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp';
 
 $fields = array(
-						'fpx_msgType' => urlencode($fpx_msgType),
+						'fpx_msgType' => urlencode("AE"),
 						'fpx_msgToken' => urlencode($fpx_msgToken),
 						'fpx_sellerExId' => urlencode($fpx_sellerExId),
 						'fpx_sellerExOrderNo' => urlencode($fpx_sellerExOrderNo),
