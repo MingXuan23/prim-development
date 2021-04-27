@@ -70,6 +70,8 @@ try{
 foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
 rtrim($fields_string, '&');
 
+echo $fields_string;
+
 //open connection
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
