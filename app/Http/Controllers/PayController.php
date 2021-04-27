@@ -270,10 +270,7 @@ class PayController extends Controller
                     $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
                     $user2      = User::find(Auth::id());
 
-                    // dd($user);
-
                     return view('fpx.tStatus', compact('request', 'user'));
-
 
                     break;
                 default:
