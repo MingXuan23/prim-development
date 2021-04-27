@@ -70,8 +70,6 @@ try{
 foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
 rtrim($fields_string, '&');
 
-echo $fields_string;
-
 //open connection
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -170,6 +168,7 @@ $fpx_checkSum=$request->fpx_checkSum;
 
 @section('content')
 <div class="container" style="padding:50px">
+    <span>{{ $fields_string }}</span>
     <div class="row">
         <div class="col-md-6">
             <address>
