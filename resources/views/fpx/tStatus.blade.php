@@ -170,7 +170,7 @@ $fpx_checkSum=$request->fpx_checkSum;
 <div class="container" style="padding:50px">
     <span>{{ $fields_string }}</span>
     <span>{{ $fpx_msgType }}</span>
-    <span>{{ $response_value['fpx_msgType'] }}</span>
+    <span>{{ $data }}</span>
     <div class="row">
         <div class="col-md-6">
             <address>
