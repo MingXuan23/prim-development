@@ -41,7 +41,7 @@ $fields_string="";
 $url ='https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp';
 
 $fields = array(
-						'fpx_msgType' => urlencode($fpx_msgType),
+						'fpx_msgType' => urlencode("AE"),
 						'fpx_msgToken' => urlencode($fpx_msgToken),
 						'fpx_sellerExId' => urlencode($fpx_sellerExId),
 						'fpx_sellerExOrderNo' => urlencode($fpx_sellerExOrderNo),
@@ -170,6 +170,7 @@ $fpx_checkSum=$request->fpx_checkSum;
 <div class="container" style="padding:50px">
     <span>{{ $fields_string }}</span>
     <span>{{ $fpx_msgType }}</span>
+    <span>{{ $response_value['fpx_msgType'] }}</span>
     <div class="row">
         <div class="col-md-6">
             <address>
