@@ -124,7 +124,7 @@ $fpx_fpxTxnId=$request->fpx_fpxTxnId;
 $fpx_fpxTxnTime=$request->fpx_fpxTxnTime;
 $fpx_makerName=$request->fpx_makerName;
 $fpx_msgToken=$request->fpx_msgToken;
-$fpx_msgType=$request->fpx_msgType;
+// $fpx_msgType=$request->fpx_msgType;
 $fpx_sellerExId=$request->fpx_sellerExId;
 $fpx_sellerExOrderNo=$request->fpx_sellerExOrderNo;
 $fpx_sellerId=$request->fpx_sellerId;
@@ -169,6 +169,7 @@ $fpx_checkSum=$request->fpx_checkSum;
 @section('content')
 <div class="container" style="padding:50px">
     <span>{{ $fields_string }}</span>
+    <span>{{ $fpx_msgType }}</span>
     <div class="row">
         <div class="col-md-6">
             <address>
