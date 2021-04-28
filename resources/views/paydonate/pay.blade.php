@@ -13,6 +13,7 @@
     </div>
 </div>
 
+<div class="container">
 <div class="row">
     <div class="col-lg-6">
         <div class="card">
@@ -31,26 +32,26 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Nama</label>
-                                <input type="text" name="name" class="form-control" placeholder="Nama" value="{{ $user->name }}">
+                                <input type="text" name="name" class="form-control" placeholder="Nama" value="{{ $user->name }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="text" name="email" class="form-control" placeholder="Email" value="{{ $user->email }}">
+                                <input type="email" parsley-type="email" name="email" class="form-control" placeholder="Email" value="{{ $user->email }}" required>
                             </div>
                             <div class="form-group">
                                 <label>No Telefon</label>
-                                <input type="text" name="telno" class="form-control" placeholder="No Telefon" value="{{ $user->telno }}">
+                                <input type="text" name="telno" class="form-control" data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$" placeholder="No Telefon" value="{{ $user->telno }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Amaun</label>
                                 <input id="input-currency" class="form-control input-mask text-left"
                                     data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                                    im-insert="true" style="text-align: right;" name="amount">
+                                    im-insert="true" style="text-align: right;" name="amount" required>
                             </div>
 
                             <div class="form-group">
                                 <label>Pilih Bank</label>
-                                <select name="bankid" id="bankid" class="form-control">
+                                <select name="bankid" id="bankid" class="form-control" required>
                                     <option value="">Select bank</option>
                                     <option value="ABB0234">Affin B2C - Test ID</option>
                                     <option value="ABB0233">Affin Bank</option>
@@ -92,6 +93,7 @@
         </div>    
     </div>
 </div>
+</div>
 {{-- <div id="redirectModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -116,7 +118,7 @@
 
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
 
-
+<script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 
 <script>
     $(document).ready(function () {
