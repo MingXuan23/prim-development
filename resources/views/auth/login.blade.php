@@ -20,7 +20,7 @@ Login
                         <div class="bg-primary">
                             <div class="text-primary text-center p-4">
                                 <h5 class="text-white font-size-20">Welcome Back!</h5>
-                                <p class="text-white-50">Sign in to continue to PRIM Test.</p>
+                                <p class="text-white-50">Sign in to continue to PRIM</p>
                                 <a href="index" class="logo logo-admin">
                                     <img src="assets/images/logo/prim-logo.svg" height="45" alt="logo">
                                 </a>
