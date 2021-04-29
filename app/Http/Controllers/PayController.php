@@ -51,7 +51,9 @@ class PayController extends Controller
         $donationId   = $request->id;
         $donation  = $this->donation->getDonationById($donationId);
 
-        $user = $this->user->getUserById();
+        if (Auth::id()) {
+            $user = $this->user->getUserById();
+        }
         
         return view('paydonate.pay', compact('donation', 'user'));
     }
@@ -116,37 +118,6 @@ class PayController extends Controller
             // dd('done');
             // return view('fpx.tStatus', compact('request', 'user'));
         }
-    }
-
-
-    public function paymentProcess(Request $request)
-    {
-        \Stripe\Stripe::setApiKey('sk_test_51I6AHSI3fJ2mpqjYO5tSNuiCIdR1dw7Bh2Lqgh0u8xPkVyCnyOEELQjMBPUTroSEH7DWCo6WYLTvMO2Vd58hu5gO00DQ1uX9Fj');
-
-        $bname      = $request->bname;
-        $ttlpay      = $request->ttlpay;
-
-        $amount = $ttlpay * 100;
-
-        $YOUR_DOMAIN = url('/');
-        $checkout_session = \Stripe\Checkout\Session::create([
-            'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'myr',
-                    'unit_amount' => $amount,
-                    'product_data' => [
-                        'name' => $bname,
-                        'images' => [$YOUR_DOMAIN . "/assets/images/logo/prim.svg"],
-                    ],
-                ],
-                'quantity' => 1,
-            ]],
-            'mode' => 'payment',
-            'success_url' => $YOUR_DOMAIN . '/successpay',
-            'cancel_url' => url()->previous(),
-        ]);
-        echo json_encode(['id' => $checkout_session->id]);
     }
 
     public function successPay()
@@ -283,5 +254,10 @@ class PayController extends Controller
             $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
             return view('fpx.transactionFailed', compact('request', 'user'));
         }
+    }
+
+    public function showReceipt()
+    {
+        return view('receipt.index');
     }
 }
