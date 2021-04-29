@@ -22,7 +22,7 @@ Login
                                 <h5 class="text-white font-size-20">Welcome Back!</h5>
                                 <p class="text-white-50">Sign in to continue to PRIM</p>
                                 <a href="index" class="logo logo-admin">
-                                    <img src="assets/images/logo/prim-logo.svg" height="45" alt="logo">
+                                    <img src="assets/images/logo/prim-logo2.svg" height="60" alt="logo">
                                 </a>
                             </div>
                         </div>
