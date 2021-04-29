@@ -1,6 +1,6 @@
     @yield('css')
     
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
     <!-- bootstrap -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/bootstrap.min.css') }}">
     <!-- icofont -->

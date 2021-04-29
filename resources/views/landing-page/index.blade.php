@@ -32,9 +32,10 @@
                     <li class="current-menu-item">
                         <a href="#">Utama</a>
                     </li>
-                    <li><a href="#about">Perkhidmatan</a></li>
+                    <li><a href="#about">Derma</a></li>
                     {{-- <li><a href="#pricing">Pricing</a></li> --}}
-                    <li><a href="#team">Modul</a></li>
+                    <li><a href="#team">Sekolah</a></li>
+                    {{-- <li><a href="#team">Modul</a></li> --}}
                     <li class="menu-item-has-children">
                         <a href="#">Organisasi</a>
                         <ul class="sub-menu">

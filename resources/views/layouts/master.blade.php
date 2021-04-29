@@ -8,7 +8,7 @@
         <meta content="UTeM" name="author" />
         <meta name="csrf-token" content="{{ csrf_token() }}" />
         <!-- App favicon -->
-        <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/favicon16x16-transparent.png')}}">
+        <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
         <!-- Web Application Manifest -->
         <link rel="manifest" href="/manifest.json">
         @include('layouts.head')
