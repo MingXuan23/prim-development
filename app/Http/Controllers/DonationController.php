@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Organization;
 use App\Models\Reminder;
 use App\Models\Donation;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\DonationRequest;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,13 @@ use Carbon\Carbons;
 
 class DonationController extends Controller
 {
+    private $user;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
     public function index()
     {
         $organization = $this->getOrganizationByUserId();
@@ -228,9 +236,13 @@ class DonationController extends Controller
 
     public function urlDonation($link)
     {
-        $getdonate = Donation::where('url', $link)->first();
+        $donation = Donation::where('url', $link)->first();
 
-        return view('paydonate.pay', compact('getdonate'));
+        if (Auth::id()) {
+            $user = $this->user->getUserById();
+        }
+
+        return view('paydonate.pay', compact('donation', 'user'));
     }
 
     public function create()

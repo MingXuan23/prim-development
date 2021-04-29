@@ -32,12 +32,16 @@
     </div>
           <!-- Begin page -->
           <div id="layout-wrapper">
-            @include('layouts.topbar')
-            @include('layouts.sidebar')
+            @auth
+                @include('layouts.topbar')
+                @include('layouts.sidebar')
+            @endauth
             <!-- ============================================================== -->
             <!-- Start right Content here -->
             <!-- ============================================================== -->
-            <div class="main-content">
+            @auth
+                <div class="main-content">
+            @endauth
             <div class="page-content">
                 <div class="container-fluid">
                     @yield('content')
@@ -53,6 +57,7 @@
 
     <!-- Right Sidebar -->
     @include('layouts.right-sidebar')
+
     <!-- /Right-bar -->
 
     <!-- Right bar overlay-->

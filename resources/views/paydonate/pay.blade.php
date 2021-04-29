@@ -8,13 +8,17 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Invois</h4>
+            <h4 class="font-size-18">
+                @auth
+                    
+                @endauth
+            </h4>
         </div>
     </div>
 </div>
 
 <div class="container">
-<div class="row">
+<div class="row ">
     <div class="col-lg-6">
         <div class="card">
             <div class="card-body">
@@ -32,15 +36,30 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Nama</label>
-                                <input type="text" name="name" class="form-control" placeholder="Nama" value="{{ $user->name }}" required>
+                                @auth
+                                    <input type="text" name="name" class="form-control" placeholder="Nama" value="{{ $user->name }}" required>
+                                @endauth
+                                @guest
+                                    <input type="text" name="name" class="form-control" placeholder="Nama" value="" required>
+                                @endguest
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="email" parsley-type="email" name="email" class="form-control" placeholder="Email" value="{{ $user->email }}" required>
+                                @auth
+                                    <input type="email" parsley-type="email" name="email" class="form-control" placeholder="Email" value="{{ $user->email }}" required>
+                                @endauth
+                                @guest
+                                    <input type="email" parsley-type="email" name="email" class="form-control" placeholder="Email" value="" required>
+                                @endguest
                             </div>
                             <div class="form-group">
                                 <label>No Telefon</label>
-                                <input type="text" name="telno" class="form-control" data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$" placeholder="No Telefon" value="{{ $user->telno }}" required>
+                                @auth
+                                    <input type="text" name="telno" class="form-control" data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$" placeholder="No Telefon" value="{{ $user->telno }}" required>
+                                @endauth
+                                @guest
+                                    <input type="text" name="telno" class="form-control" data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$" placeholder="No Telefon" value="" required>
+                                @endguest
                             </div>
                             <div class="form-group">
                                 <label>Amaun</label>

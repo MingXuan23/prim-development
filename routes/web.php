@@ -35,7 +35,7 @@ Route::get('getdetails/{id}', 'DetailsController@getFees')->name('details.getfee
 Route::post('parent/fetchClass', 'ParentController@fetchClass')->name('parent.fetchClass');
 Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchStd');
 
-Route::group(['prefix' => 'donate'], function () {
+Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
     Route::get('donor/{id}', 'DonationController@listAllDonor')->name('donate.details');
     Route::get('donorList', 'DonationController@getDonorDatatable')->name('donate.donorlist');
@@ -126,3 +126,5 @@ Route::group(['prefix' => 'dashboard'], function () {
 Route::group(['prefix' => 'fpx'], function () {
     Route::get('/getBankList', 'FPXController@getBankList')->name('fpx.bank_list');
 });
+
+Route::get('/receipt', 'PayController@showReceipt');
