@@ -30,11 +30,11 @@
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
                     <li class="current-menu-item">
-                        <a href="#">Utama</a>
+                        <a href="/">Utama</a>
                     </li>
                     <li><a href="/organization-list">Derma</a></li>
                     {{-- <li><a href="#pricing">Pricing</a></li> --}}
-                    <li><a href="#team">Sekolah</a></li>
+                    <li><a href="#sekolah">Sekolah</a></li>
                     {{-- <li><a href="#team">Modul</a></li> --}}
                     <li class="menu-item-has-children">
                         <a href="#">Organisasi</a>
@@ -70,8 +70,8 @@
                         <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
                             berdaftar.</p>
                         <div class="btn-wrapper wow fadeInUp">
-                            <a href="#" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                            <a href="#" class="boxed-btn btn-rounded blank">Log Masuk</a>
+                            <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
+                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
                         </div>
                     </div>
                 </div>
