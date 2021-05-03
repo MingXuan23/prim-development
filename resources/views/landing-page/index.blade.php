@@ -32,7 +32,7 @@
                     <li class="current-menu-item">
                         <a href="#">Utama</a>
                     </li>
-                    <li><a href="#about">Derma</a></li>
+                    <li><a href="/organization-list">Derma</a></li>
                     {{-- <li><a href="#pricing">Pricing</a></li> --}}
                     <li><a href="#team">Sekolah</a></li>
                     {{-- <li><a href="#team">Modul</a></li> --}}
@@ -1128,7 +1128,7 @@
                         <div class="footer-widget about_widget">
                             <a href="index.html" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-white.png') }}" alt=""></a>
-                            <p>Within coming figure sex things are. Pretended concluded did repulsive education
+                            <p>Within coming figure things are. Pretended concluded did repulsive education
                                 smallness yet yet described. Had country man his pressed shewing. </p>
                             <ul class="social-icon">
                                 <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
