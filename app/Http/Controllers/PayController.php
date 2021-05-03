@@ -48,6 +48,8 @@ class PayController extends Controller
 
     public function donateindex(Request $request)
     {
+        $user = "";
+        
         $donationId   = $request->id;
         $donation  = $this->donation->getDonationById($donationId);
 
