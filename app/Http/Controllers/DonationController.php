@@ -236,6 +236,8 @@ class DonationController extends Controller
 
     public function urlDonation($link)
     {
+        $user = "";
+
         $donation = Donation::where('url', $link)->first();
 
         if (Auth::id()) {
