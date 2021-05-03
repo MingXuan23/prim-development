@@ -419,7 +419,7 @@
     .navbar-area .navbar-collapse {
         position: absolute;
         top: 105px;
-        background: #fff;
+        background: #500ade;
         z-index: 9;
         right: 0;
         width: 250px;

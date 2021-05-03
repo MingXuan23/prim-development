@@ -12,7 +12,7 @@
     <!-- Owl Carousel -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/owl.carousel.min.css') }}">
     <!-- magnific popup -->
-    <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/magnific-popup.min.css') }}">
+    <link rel="stylesheet" href="{{ URL::asset('assets/libs/magnific-popup/magnific-popup.min.css') }}">
     <!-- stylesheet -->
     <link rel="old stylesheet" href="{{ URL::asset('assets/landing-page/css/style.css') }}">
     <!-- responsive -->

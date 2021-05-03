@@ -7,9 +7,12 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noarchive">
-    <title> PRIM | Senarai Organisasi</title>
+    <title> PRIM | Senarai Derma</title>
 
     @include('landing-page.head')
+    @include('layouts.datatable')
+    @include('layouts.datatable-responsive')
+
 </head>
 
 <body>
@@ -79,15 +82,18 @@
                 <div class="col-lg-12">
                     <div class="main-box clearfix">
                         <div class="table-responsive">
-                            <table class="table user-list">
+                            <table class="table user-list display nowrap " width="100%" id="tableDerma">
                                 <thead>
                                     <tr>
-                                        <th><span>Nama Organisasi</span></th>
-                                        <th><span>Alamat</span></th>
-                                        <th><span>Email</span></th>
+                                        <th class="all"><span>Nama Organisasi</span></th>
+                                        <th class="all"><span>Alamat</span></th>
+                                        <th class="all"><span>Email</span></th>
+                                        <th class="none"><span>Nama Derma</span></th>
+                                        <th class="none"><span>Penerangan</span></th>
+                                        <th class="none"><span>Action</span></th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                {{-- <tbody>
                                     <tr>
                                         <td>
                                             <img src="{{ URL::asset('assets/landing-page/img/building-solid.svg') }}"
@@ -173,7 +179,7 @@
                                         </td>
 
                                     </tr>
-                                </tbody>
+                                </tbody> --}}
                             </table>
                         </div>
                         {{-- <ul class="pagination pull-right">
@@ -201,7 +207,7 @@
                         <div class="footer-widget about_widget">
                             <a href="index.html" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-white.png') }}" alt=""></a>
-                            <p>Within coming figure sex things are. Pretended concluded did repulsive education
+                            <p>Within coming figure things are. Pretended concluded did repulsive education
                                 smallness yet yet described. Had country man his pressed shewing. </p>
                             <ul class="social-icon">
                                 <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
@@ -303,6 +309,74 @@
 
     <!-- jquery -->
     @include('landing-page.footer-script')
+
+
 </body>
 
 </html>
+
+<script>
+    $(document).ready( function () {
+        
+        var tableDerma = $('#tableDerma').DataTable({
+            ordering: true,
+            processing: true,
+            serverSide: true,
+                ajax: {
+                    url: "{{ route('landing-page.getOrganizationDatatable') }}",
+                    type: 'GET',
+                },
+                order: [
+                    [1, 'asc']
+                ],
+                responsive: {
+                    details: {
+                    type: 'column'
+                    }
+                },
+                columnDefs: [{
+                    className: 'control',
+                    orderable: false,
+                    targets: 0  
+                }],
+                columns: [{
+                    data: "nama_organisasi",
+                    name: "nama"
+                }, {
+                    data: "address",
+                    name: "address"
+                }, {
+                    data: "email",
+                    name: "email"
+                },{
+                    data: "nama_derma",
+                    name: "nama_derma"
+                },{
+                    data: "description",
+                    name: "description"
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                    
+                },]
+          });
+
+          $('#btn-show-all-doc').on('click', expandCollapseAll);
+
+            function expandCollapseAll() {
+                tableDerma.rows('.parent').nodes().to$().find('td:first-child').trigger('click').length || 
+                tableDerma.rows(':not(.parent)').nodes().to$().find('td:first-child').trigger('click')
+            }
+
+        // csrf token for ajax
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+    });
+
+</script>
