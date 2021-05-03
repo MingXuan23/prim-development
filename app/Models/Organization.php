@@ -36,4 +36,12 @@ class Organization extends Model
         return $this->hasMany(Activity::class);
     }
 
+    public function getOrganizationByDonationId($donationId)
+    {
+        $organization = Organization::with(["donation"])->whereHas('donation', function ($query) use ($donationId) {
+            $query->where("donations.id", $donationId);
+        })->get();
+
+        return $organization;
+    }
 }

@@ -73,4 +73,13 @@ class Donation extends Model
         
         return $donation;
     }
+
+    public function getDonationByTransactionName($transaction_name)
+    {
+        $donation = Donation::with(["transaction"])->whereHas('transaction', function ($query) use ($transaction_name) {
+            $query->where("nama", $transaction_name);
+        })->get();
+
+        return $donation;
+    }
 }

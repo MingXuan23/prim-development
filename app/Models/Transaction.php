@@ -125,4 +125,10 @@ class Transaction extends Model
 
         return $result;
     }
+
+    public function getTransactionByName($name)
+    {
+        $transaction = Transaction::where("nama", $name);
+        return $transaction;
+    }
 }

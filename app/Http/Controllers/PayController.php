@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\User;
 use App\Models\Donation;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -13,11 +14,16 @@ use Illuminate\Support\Facades\Auth;
 class PayController extends Controller
 {
     private $donation;
+    private $user;
+    private $organization;
+    private $transaction;
 
-    public function __construct(Donation $donation, User $user)
+    public function __construct(Donation $donation, User $user, Organization $organization, Transaction $transaction)
     {
         $this->donation = $donation;
         $this->user = $user;
+        $this->organization = $organization;
+        $this->transaction = $transaction;
     }
 
     public function index(Request $request)
@@ -240,10 +246,13 @@ class PayController extends Controller
                 case 'Donation':
 
                     Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
-                    $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $user2      = User::find(Auth::id());
-
-                    return view('fpx.tStatus', compact('request', 'user'));
+                    // $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    // $user2      = User::find(Auth::id());
+                    $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
+                    $organization = $this->organization->getOrganizationByDonationId($donation->id);
+                    $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
+                    
+                    return view('receipt.index', compact('request', 'user', 'donation', 'organization', 'transaction'));
 
                     break;
                 default:
@@ -260,6 +269,9 @@ class PayController extends Controller
 
     public function showReceipt()
     {
+        // $donation = $this->donation->getDonationByTransactionName("Donation_23210315210448");
+        // $organization = $this->organization->getOrganizationByDonationId(3);
+        // dd($organization);
         return view('receipt.index');
     }
 }
