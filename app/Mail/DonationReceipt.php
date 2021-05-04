@@ -36,6 +36,17 @@ class DonationReceipt extends Mailable
      */
     public function build()
     {
-        return $this->view('mail.receipt');
+        return $this->view('mail.receipt')
+                    ->with([
+                        'organizationName'  => $this->organization->nama,
+                        'organizationTelNo'   => $this->organization->telno,
+                        'organizationEmail'   => $this->organization->email,
+                        'transactionUsername' => $this->transaction->username,
+                        'transactionEmail'  => $this->transaction->emai,
+                        'transactionName'   => $this->transaction->nama,
+                        'transactionDate'   => $this->transaction->datetime_created,
+                        'transactionAmount' => $this->transaction->amount,
+                        'donationName'      => $this->donation->nama
+                    ]);
     }
 }
