@@ -155,7 +155,7 @@ $fpx_checkSum=$request->fpx_checkSum;
                                 <tbody><tr>
                                     <td class="content-block">
                                         <h2>{{ $organization->nama }}</h2>
-                                        <h3 style="font-size: 14px !important">{{ $organization->telno }} | {{ $organization->email }}}</h3>
+                                        <h3 style="font-size: 14px !important">{{ $organization->telno }} | {{ $organization->email }}</h3>
                                     </td>
                                 </tr>
                                 <tr>
@@ -165,8 +165,8 @@ $fpx_checkSum=$request->fpx_checkSum;
                                                 <tr>
                                                 <td>
                                                     Nama: {{ $transaction->username }}<br>
-                                                    Email: {{ $transaction->name }}<br>
-                                                    Donation ID: {{ $request->fpx_sellerOrderNo }}<br>
+                                                    Email: {{ $transaction->email }}<br>
+                                                    Donation ID: {{ $transaction->nama }}<br>
                                                     Tarikh Derma: {{ date('d-m-Y', strtotime($transaction->datetime_created)) }}
                                                 </td>
                                             </tr>
@@ -175,7 +175,7 @@ $fpx_checkSum=$request->fpx_checkSum;
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0">
                                                         <tbody><tr>
                                                             <td>{{ $donation->nama }}</td>
-                                                            <td class="alignright">RM {{ $fpx_txnAmount }}</td>
+                                                            <td class="alignright">RM {{ $transaction->amount }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td>Tax (Paid By JAIM)</td>
@@ -183,7 +183,7 @@ $fpx_checkSum=$request->fpx_checkSum;
                                                         </tr>
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ $fpx_txnAmount }}</td>
+                                                            <td class="alignright">RM  {{ $transaction->amount }}</td>
                                                         </tr>
                                                     </tbody></table>
                                                 </td>
