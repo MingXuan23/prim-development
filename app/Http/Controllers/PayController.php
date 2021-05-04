@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\DonationReceipt;
 use App\Models\Transaction;
 use App\User;
 use App\Models\Donation;
@@ -252,6 +253,8 @@ class PayController extends Controller
                     $organization = $this->organization->getOrganizationByDonationId($donation->id);
                     $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
                     
+                    Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
+
                     return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
 
                     break;

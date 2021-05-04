@@ -298,7 +298,7 @@
                                                 <td>
                                                     Nama: {{ $transaction->username }}<br>
                                                     Email: {{ $transaction->email }}<br>
-                                                    Donation ID: {{ $request->fpx_sellerOrderNo }}<br>
+                                                    Donation ID: {{ $transaction->nama }}<br>
                                                     Tarikh Derma: {{ date('d-m-Y', strtotime($transaction->datetime_created)) }}
                                                 </td>
                                             </tr>
@@ -307,7 +307,7 @@
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0">
                                                         <tbody><tr>
                                                             <td>{{ $donation->nama }}</td>
-                                                            <td class="alignright">RM {{ $fpx_txnAmount }}</td>
+                                                            <td class="alignright">RM {{ $transaction->amount }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td>Tax (Paid By JAIM)</td>

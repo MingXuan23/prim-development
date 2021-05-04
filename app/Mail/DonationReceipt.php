@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Donation;
+use App\Models\Organization;
 use App\Models\Transaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -15,15 +16,17 @@ class DonationReceipt extends Mailable
 
     private $donation;
     private $transaction;
+    private $organization;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Donation $donation, Transaction $transaction)
+    public function __construct(Donation $donation, Transaction $transaction, Organization $organization)
     {
         $this->donation = $donation;
         $this->transaction = $transaction;
+        $this->organization = $organization;
     }
 
     /**
