@@ -246,5 +246,9 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
             <span class="mdi mdi-file-pdf"> Print</span>
         </button>
     </div>
+
+    <div class="row">
+        <span>AC Response : {{ $data }}</span>
+    </div>
 </div>
 @endsection
