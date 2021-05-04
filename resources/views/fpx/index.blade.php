@@ -14,8 +14,8 @@
                                         <tr>
                                             <td height="164" align="center" class="main"><b>Payment Method via FPX</b>
                                                 <p>&nbsp;</p>
-                                                {{-- <input type="submit" style="cursor:hand" class="btn btn-primary" onclick="pay()"
-                                                    value="Click to Pay" /> --}}
+                                                <input type="submit" style="cursor:hand" class="btn btn-primary" onclick="pay()"
+                                                    value="Click to Pay" />
                                                 <p> <img src="assets/images/FPXButton.PNG" border="2" /></p>
                                                 <p class="main">&nbsp;</p>
                                                 <p class="main"><strong>* You must have Internet Banking Account in order to
@@ -71,12 +71,12 @@
     // console.log('hihi');
     var values = $("#form1").serialize();
     
-    function redirectFPX() {
-        $('#form1').submit();
-        pay();
-    }
+    // function redirectFPX() {
+    //     $('#form1').submit();
+    //     pay();
+    // }
     
-    setTimeout("redirectFPX();",3000);
+    // setTimeout("redirectFPX();",3000);
 
     function pay(){
         $.ajax({
