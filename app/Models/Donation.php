@@ -78,7 +78,7 @@ class Donation extends Model
     {
         $donation = Donation::with(["transaction"])->whereHas('transaction', function ($query) use ($transaction_name) {
             $query->where("nama", $transaction_name);
-        })->get();
+        })->first();
 
         return $donation;
     }
