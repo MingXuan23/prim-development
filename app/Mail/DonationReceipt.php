@@ -42,7 +42,7 @@ class DonationReceipt extends Mailable
                         'organizationTelNo'   => $this->organization->telno,
                         'organizationEmail'   => $this->organization->email,
                         'transactionUsername' => $this->transaction->username,
-                        'transactionEmail'  => $this->transaction->emai,
+                        'transactionEmail'  => $this->transaction->email,
                         'transactionName'   => $this->transaction->nama,
                         'transactionDate'   => $this->transaction->datetime_created,
                         'transactionAmount' => $this->transaction->amount,
