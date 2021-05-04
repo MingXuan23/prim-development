@@ -164,8 +164,8 @@ $fpx_checkSum=$request->fpx_checkSum;
                                             <tbody>
                                                 <tr>
                                                 <td>
-                                                    Nama: {{ $request->fpx_buyerName }}<br>
-                                                    Email: {{ $request->fpx_fpx_buyerEmail }}<br>
+                                                    Nama: {{ $transaction->username }}<br>
+                                                    Email: {{ $transaction->name }}<br>
                                                     Donation ID: {{ $request->fpx_sellerOrderNo }}<br>
                                                     Tarikh Derma: {{ date('d-m-Y', strtotime($transaction->datetime_created)) }}
                                                 </td>

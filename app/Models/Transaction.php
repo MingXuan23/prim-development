@@ -128,7 +128,7 @@ class Transaction extends Model
 
     public function getTransactionByName($name)
     {
-        $transaction = Transaction::where("nama", $name);
+        $transaction = Transaction::where("nama", $name)->first();
         return $transaction;
     }
 }

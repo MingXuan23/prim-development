@@ -40,7 +40,7 @@ class Organization extends Model
     {
         $organization = Organization::with(["donation"])->whereHas('donation', function ($query) use ($donationId) {
             $query->where("donations.id", $donationId);
-        })->get();
+        })->first();
 
         return $organization;
     }
