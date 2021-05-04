@@ -115,6 +115,7 @@ class PayController extends Controller
         $transaction->email         = $request->fpx_buyerEmail;
         $transaction->telno         = $request->telno;
         $transaction->username      = $request->fpx_buyerName;
+        $transaction->fpx_checksum  = $request->fpx_checkSum;
 
         if ($user) {
             $transaction->user_id   = Auth::id();
