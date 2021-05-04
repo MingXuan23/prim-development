@@ -4,6 +4,8 @@
 
 error_reporting(E_ALL);
 
+// extract($_POST);
+
 $fpx_msgType="AE";
 $fpx_msgToken="01";
 $fpx_sellerExId="EX00012323";
@@ -14,19 +16,25 @@ $fpx_sellerId="SE00013841";
 $fpx_sellerBankCode="01";
 $fpx_txnCurrency="MYR";
 $fpx_txnAmount=$request->fpx_txnAmount;
-$fpx_buyerEmail="";
+$fpx_buyerEmail=$request->fpx_buyerEmail;
 $fpx_checkSum="";
-$fpx_buyerName="";
+$fpx_buyerName=$request->fpx_buyerName;
 $fpx_buyerBankId=$request->fpx_buyerBankId;
 $fpx_buyerBankBranch=$request->fpx_buyerBankBranch;
 $fpx_buyerAccNo="";
 $fpx_buyerId="";
 $fpx_makerName=$request->fpx_makerName;
 $fpx_buyerIban="";
-$fpx_productDesc="SampleProduct";
+$fpx_productDesc=explode("_", $request->fpx_sellerExOrderNo)[0];
 $fpx_version="6.0";
 
-extract($_POST);
+$data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buyerId."|".$fpx_buyerName."|".$fpx_creditAuthCode."|".$fpx_creditAuthNo."|".$fpx_debitAuthCode."|".$fpx_debitAuthNo."|".$fpx_fpxTxnId."|".$fpx_fpxTxnTime."|".$fpx_makerName."|".$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_sellerExOrderNo."|".$fpx_sellerId."|".$fpx_sellerOrderNo."|".$fpx_sellerTxnTime."|".$fpx_txnAmount."|".$fpx_txnCurrency;
+
+$priv_key = getenv('FPX_KEY');
+$pkeyid = openssl_get_privatekey($priv_key, null);
+openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
+$fpx_checkSum = strtoupper(bin2hex($binary_signature));
+
 $fields_string="";
 
 //set POST variables
