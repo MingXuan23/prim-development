@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Yajra\DataTables\DataTables;
-use Carbon\Carbons;
+use Illuminate\Support\Carbon;
 
 class DonationController extends Controller
 {
@@ -187,11 +187,10 @@ class DonationController extends Controller
             ->orderBy('donations.nama')
             ->get();
 
-        // dd($listhistory);
         if (request()->ajax()) {
             return datatables()->of($listhistory)
                 ->editColumn('datetime_created', function ($data) {
-                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created)->format('H:i:s d-m-Y');
+                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created)->format('d/m/Y');
                     return $formatedDate;
                 })
                 ->editColumn('amount', function ($data) {
