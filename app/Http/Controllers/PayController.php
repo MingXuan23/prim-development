@@ -252,7 +252,7 @@ class PayController extends Controller
                     $organization = $this->organization->getOrganizationByDonationId($donation->id);
                     $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
                     
-                    return view('receipt.index', compact('request', 'user', 'donation', 'organization', 'transaction'));
+                    return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
 
                     break;
                 default:
