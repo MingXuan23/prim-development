@@ -286,8 +286,8 @@
                             <table width="100%" cellpadding="0" cellspacing="0">
                                 <tbody><tr>
                                     <td class="content-block">
-                                        <h2>{{ $organization->nama }}</h2>
-                                        <h3 style="font-size: 14px !important">{{ $organization->telno }} | {{ $organization->email }}</h3>
+                                        <h2>{{ $organizationName }}</h2>
+                                        <h3 style="font-size: 14px !important">{{ $organizationTelNo }} | {{ $organizationEmail }}</h3>
                                     </td>
                                 </tr>
                                 <tr>
@@ -296,18 +296,18 @@
                                             <tbody>
                                                 <tr>
                                                 <td>
-                                                    Nama: {{ $transaction->username }}<br>
-                                                    Email: {{ $transaction->email }}<br>
-                                                    Donation ID: {{ $transaction->nama }}<br>
-                                                    Tarikh Derma: {{ date('d-m-Y', strtotime($transaction->datetime_created)) }}
+                                                    Nama: {{ $transactionUsername }}<br>
+                                                    Email: {{ $transactionEmail }}<br>
+                                                    Donation ID: {{ $transactionName }}<br>
+                                                    Tarikh Derma: {{ date('d-m-Y', strtotime($transactionDate)) }}
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0">
                                                         <tbody><tr>
-                                                            <td>{{ $donation->nama }}</td>
-                                                            <td class="alignright">RM {{ $transaction->amount }}</td>
+                                                            <td>{{ $donationName }}</td>
+                                                            <td class="alignright">RM {{ $transactionAmount }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td>Tax (Paid By JAIM)</td>
@@ -315,7 +315,7 @@
                                                         </tr>
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ $transaction->amount }}</td>
+                                                            <td class="alignright">RM  {{ $transactionAmount }}</td>
                                                         </tr>
                                                     </tbody></table>
                                                 </td>
