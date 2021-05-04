@@ -238,11 +238,14 @@ class PayController extends Controller
                                 'transactions_id' => $transaction->id,
                             ),
                         ));
+
                         if ($res) {
                             return view('fpx.tStatus', compact('request', 'user'));
                         } else {
                             return view('errors.500');
                         }
+
+                        
                     }
                     break;
 
