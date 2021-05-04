@@ -239,8 +239,6 @@ class PayController extends Controller
                             ),
                         ));
 
-                        dd($request);
-                        
                         if ($res) {
                             return view('fpx.tStatus', compact('request', 'user'));
                         } else {
