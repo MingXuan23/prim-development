@@ -337,5 +337,3 @@
 </table>
 </body>
 </html>
-
-@endsection
