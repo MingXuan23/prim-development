@@ -10,7 +10,10 @@
 ///  09         : Your Data cannot be verified against the Signature.
 error_reporting(E_ALL);
 
-// extract($_POST);
+$fpx_buyerAccNo="";
+$fpx_buyerId="";
+$fpx_buyerIban="";
+extract($_POST);
 
 $fpx_msgType="AE";
 $fpx_msgToken="01";
@@ -27,10 +30,7 @@ $fpx_checkSum="";
 $fpx_buyerName=$request->fpx_buyerName;
 $fpx_buyerBankId=$request->fpx_buyerBankId;
 $fpx_buyerBankBranch=$request->fpx_buyerBankBranch;
-$fpx_buyerAccNo="";
-$fpx_buyerId="";
 $fpx_makerName=$request->fpx_makerName;
-$fpx_buyerIban="";
 $fpx_productDesc=explode("_", $request->fpx_sellerExOrderNo)[0];
 $fpx_version="6.0";
 
