@@ -94,7 +94,7 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $result = curl_exec($ch);
 //echo "RESULT";
 //echo $result;
-
+dd($result);
 
 //close connection
 curl_close($ch);
