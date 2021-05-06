@@ -244,8 +244,6 @@ class PayController extends Controller
                         } else {
                             return view('errors.500');
                         }
-
-                        
                     }
                     break;
 
