@@ -22,7 +22,7 @@
     <div class="col-lg-6">
         <div class="card">
             <div class="card-body">
-                <img class="card-img-top img-fluid card-img" src="{{ URL::asset('images/derma/derma-1.jpg') }}"
+                <img class="card-img-top img-fluid card-img" src="{{ URL::asset('images/derma/utem-derma-1.jpg') }}"
                                     alt="Image Not Available">
             </div>
         </div>    
