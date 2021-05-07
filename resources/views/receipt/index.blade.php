@@ -192,7 +192,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
                                                         </tr>
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ number_format($transaction->amount , 2, '.', '') }}</td>
+                                                            <td class="alignright">RM  {{ number_format(($transaction->amount + 1) , 2, '.', '') }}</td>
                                                         </tr>
                                                     </tbody></table>
                                                 </td>
