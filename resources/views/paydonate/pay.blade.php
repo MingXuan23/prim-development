@@ -72,31 +72,6 @@
                                 <label>Pilih Bank</label>
                                 <select name="bankid" id="bankid" class="form-control" required>
                                     <option value="">Select bank</option>
-                                    <option value="ABB0234">Affin B2C - Test ID</option>
-                                    <option value="ABB0233">Affin Bank</option>
-                                    <option value="ABMB0212">Alliance Bank (Personal)</option>
-                                    <option value="AGRO01">AGRONet</option>
-                                    <option value="AMBB0209">AmBank</option>
-                                    <option value="BIMB0340">Bank Islam</option>
-                                    <option value="BMMB0341">Bank Muamalat</option>
-                                    <option value="BKRM0602">Bank Rakyat</option>
-                                    <option value="BSN0601">BSN</option>
-                                    <option value="BCBB0235">CIMB Clicks</option>
-                                    <option value="CIT0219">Citibank</option>
-                                    <option value="HLB0224">Hong Leong Bank</option>
-                                    <option value="HSBC0223">HSBC Bank</option>
-                                    <option value="KFH0346">KFH</option>
-                                    <option value="MBB0228">Maybank2E</option>
-                                    <option value="MB2U0227">Maybank2U</option>
-                                    <option value="OCBC0229">OCBC Bank</option>
-                                    <option value="PBB0233">Public Bank</option>
-                                    <option value="RHB0218">RHB Bank</option>
-                                    <option value="TEST0021">SBI Bank A</option>
-                                    <option value="TEST0022">SBI Bank B</option>
-                                    <option value="TEST0023">SBI Bank C</option>
-                                    <option value="SCB0216">Standard Chartered</option>
-                                    <option value="UOB0226">UOB Bank</option>
-                                    <option value="UOB0229">UOB Bank - Test ID</option>
                                 </select>
                             </div>
                         </div>
@@ -113,15 +88,6 @@
     </div>
 </div>
 </div>
-{{-- <div id="redirectModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-body">
-                <h4>You will be redirected to secure payment site. Do not close the window until the transaction complete.</h4>
-            </div>
-        </div>
-    </div>
-</div> --}}
 
 @endsection
 
@@ -152,11 +118,6 @@
         }
     }
 
-    // $(document).on('click', '.submit', function() {
-    //     $('#redirectModal').modal('show');
-    //     setTimeout("$('#redirectModal').modal('hide');", 3000);
-    // });
-
     $.ajax({
         type: 'GET',
         dataType: 'json',
@@ -164,6 +125,7 @@
         success: function(data) {
             for(var i = 0; i < data.data.length; i++){
                 // console.log(data.data[i].code);
+                $("#bankid").append("<option value='"+data.data[i].code+"'>"+data.data[i].nama+"</option>");
             }
         },
         error: function (data) {
