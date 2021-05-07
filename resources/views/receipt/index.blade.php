@@ -184,7 +184,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0">
                                                         <tbody><tr>
                                                             <td>{{ $donation->nama }}</td>
-                                                            <td class="alignright">RM {{ $transaction->amount }}</td>
+                                                            <td class="alignright">RM {{ number_format($transaction->amount , 2, '.', '') }}</td>
                                                         </tr>
                                                         <tr>
                                                             <td>Tax (Paid By UTeM)</td>
@@ -192,7 +192,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
                                                         </tr>
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ $transaction->amount }}</td>
+                                                            <td class="alignright">RM  {{ number_format($transaction->amount , 2, '.', '' }}</td>
                                                         </tr>
                                                     </tbody></table>
                                                 </td>
