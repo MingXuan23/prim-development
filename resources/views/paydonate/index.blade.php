@@ -4,6 +4,12 @@
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
+
+<style>
+    td {
+        white-space: normal !important; // To consider whitespace.
+    }
+</style>
 @endsection
 
 @section('content')
@@ -84,7 +90,7 @@
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th> Nama Derma </th>
-                                <th> Penerangan </th>
+                                <th > Penerangan </th>
                                 <th> Link Derma </th>
                                 <th> Action </th>
                             </tr>
