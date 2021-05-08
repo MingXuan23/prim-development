@@ -19,21 +19,21 @@
 
 <div class="container">
 <div class="row ">
-    <div class="col-lg-6">
-        <div class="card">
+    <div class="col-lg-6 ">
+        <div class="card h-100">
             <div class="card-body">
-                <img class="card-img-top img-fluid card-img" src="{{ URL::asset('images/derma/utem-derma-1.png') }}"
+                <img class="img-fluid card-img" src="{{ URL::asset('images/derma/utem-derma-1.png') }}"
                                     alt="Image Not Available">
             </div>
         </div>    
     </div>
     <div class="col-lg-6">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-body">
-                <h4>{{ $donation->nama }} </h4>
+                <h4 class="card-title">{{ $donation->nama }} </h4>
                     <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
                         {{csrf_field()}}
-                        <div class="card-body">
+                        {{-- <div class="card-body h-100"> --}}
                             <div class="form-group">
                                 <label>Nama</label>
                                 @auth
@@ -74,14 +74,16 @@
                                     <option value="">Select bank</option>
                                 </select>
                             </div>
-                        </div>
 
-                        <input type="hidden" name="desc" id="desc" value="Donation">
-                        <input type="hidden" name="o_id" id="o_id" value="{{ $donation->id }} ">
+                            <input type="hidden" name="desc" id="desc" value="Donation">
+                            <input type="hidden" name="o_id" id="o_id" value="{{ $donation->id }} ">
+    
+                            <button class="btn btn-success float-right submit" type="submit" onclick="return checkBank();">
+                                ALLAH suka kita SEDEKAH setiap hari. TERUSKAN
+                            </button>
+                        {{-- </div> --}}
 
-                        <button class="btn btn-success float-right submit" type="submit" onclick="return checkBank();">
-                            ALLAH suka kita SEDEKAH setiap hari. TERUSKAN
-                        </button>
+                      
                     </form>
             </div>
         </div>    
