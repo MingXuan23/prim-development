@@ -80,7 +80,7 @@
                         <input type="hidden" name="o_id" id="o_id" value="{{ $donation->id }} ">
 
                         <button class="btn btn-success float-right submit" type="submit" onclick="return checkBank();">
-                            Bayar Sekarang
+                            ALLAH suka kita SEDEKAH setiap hari. TERUSKAN
                         </button>
                     </form>
             </div>
