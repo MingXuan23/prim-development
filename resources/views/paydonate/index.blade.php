@@ -3,13 +3,11 @@
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+
 @include('layouts.datatable')
 
-<style>
-    td {
-        white-space: normal !important; // To consider whitespace.
-    }
-</style>
+
 @endsection
 
 @section('content')

@@ -266,6 +266,8 @@ class DonationController extends Controller
         $startdate  = $dt->toDateString($request->get('start_date'));
         $enddate    = $dt->toDateString($request->get('end_date'));
 
+        $storagePath  = $request->donation_poster->storeAs('donation-poster', 'donation-poster-'.time().'.jpg');
+
         $newdonate = Donation::create([
             'nama'           =>  $request->get('name'),
             'description'    =>  $request->get('description'),
@@ -274,6 +276,9 @@ class DonationController extends Controller
             'date_end'       =>  $enddate,
             'status'         =>  '1',
             'url'            =>  $str,
+            'tax_payer'      => $request->tax_payer,
+            'total_tax'      => $request->total_tax,
+            'donation_poster'   => basename($storagePath)
         ]);
 
         $newdonate->organization()->attach($request->get('organization'));

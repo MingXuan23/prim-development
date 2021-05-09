@@ -187,8 +187,8 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
                                                             <td class="alignright">RM {{ number_format($transaction->amount , 2, '.', '') }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Tax (Paid By UTeM)</td>
-                                                            <td class="alignright">RM 1.00</td>
+                                                            <td>Tax (Paid By {{ $donation->tax_payer }})</td>
+                                                            <td class="alignright">{{ $donation->total_tax }}</td>
                                                         </tr>
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
