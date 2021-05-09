@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('css')
-<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{ URL::asset('assets/libs/dropzone/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datepicker')
 
 @endsection
@@ -29,60 +29,66 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('donate.store') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('donate.store') }}" enctype="multipart/form-data" name="donation">
             {{csrf_field()}}
             <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            <option value="" disabled selected>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Nama Derma</label>
+                        <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                    <label>Tempoh Sah Derma</label>
+                    
+                        <div class="input-daterange input-group" id="date">
+                            <input type="text" class="form-control" name="start_date" placeholder="Tarikh Awal" autocomplete="off"/>
+                            <input type="text" class="form-control" name="end_date" placeholder="Tarikh Akhir" autocomplete="off"/>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="form-group">
-                    <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="" disabled selected>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Pembayar Cukai</label>
+                        <input type="text" name="tax_payer" class="form-control" placeholder="Masukkan Pembayar Cukai">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Jumlah Cukai</label>
+                        <input class="form-control input-mask text-left"
+                            data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
+                            im-insert="true" style="text-align: right;" name="total_tax" required>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Nama Derma</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
+                    <label>Poster Derma</label>
+                    <form action="#" class="dropzone">
+                        <div class="fallback">
+                            <input name="donation_poster" type="file">
+                        </div>
+                    </form>
                 </div>
-
+                
                 <div class="form-group">
                     <label>Penerangan</label>
                     <textarea name="description" class="form-control" placeholder="Penerangan" cols="30"
                         rows="5"></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label>Tarikh Mula</label>
-
-                    <div id="datepicker-start_date" class="input-group date" data-date-format="mm-dd-yyyy"
-                        data-provide="datepicker">
-                        <input class="form-control" id="start_date" name="start_date" type="text"
-                            placeholder="Pilih Tarikh Mula" autocomplete="off">
-                        <div class="input-group-addon">
-                            <i class="mdi mdi-calendar-today"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Tarikh Berakhir</label>
-
-                    <div id="datepicker-end_date" class="input-group date" data-date-format="mm-dd-yyyy"
-                        data-provide="datepicker">
-                        <input class="form-control" id="end_date" name="end_date" type="text"
-                            placeholder="Pilih Tarikh Berakhir" autocomplete="off">
-                        <div class="input-group-addon">
-                            <i class="mdi mdi-calendar-today"></i>
-                        </div>
-                    </div>
-                </div>
-
-
                 <div class="form-group mb-0">
-                    <div>
+                    <div class="text-right">
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
                             Simpan
                         </button>
@@ -98,35 +104,23 @@
 
 
 @section('script')
-<!-- Peity chart-->
-<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
 <!-- Plugin Js-->
-<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/dropzone/dropzone.min.js')}}"></script>
+
 
 <script>
     $(document).ready(function(){
 
+        $(".input-mask").inputmask();
+
         var today = new Date();
 
-        var start = $("#datepicker-start_date").datepicker({
-            changeMonth: true,
-            changeYear: true,
+        $('#date').datepicker({
+            toggleActive: true,
             startDate: today,
             todayHighlight:true,
-            format: 'dd-mm-yyyy'
-        });
-
-        $("#datepicker-end_date").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            startDate: today,
-            todayHighlight:true,
-            format: 'dd-mm-yyyy'
-        });
-
-        // console.log($("#start_date").val());
+          });
         
     });
 </script>
