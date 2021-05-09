@@ -66,4 +66,8 @@ return [
 
     ],
 
+    'links' => [
+        public_path('donation-poster') => storage_path('app\public\donation-poster'),
+    ],
+
 ];
