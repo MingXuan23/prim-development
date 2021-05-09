@@ -9,9 +9,7 @@
     <div class="col-sm-6">
         <div class="page-title-box">
             <h4 class="font-size-18">
-                @auth
-                    
-                @endauth
+               
             </h4>
         </div>
     </div>
@@ -31,35 +29,23 @@
         <div class="card h-100">
             <div class="card-body">
                 <h4 class="card-title">{{ $donation->nama }} </h4>
-                    <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
+                    <form class="form-validation" method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
                         {{csrf_field()}}
                         {{-- <div class="card-body h-100"> --}}
                             <div class="form-group">
                                 <label>Nama</label>
-                                @auth
-                                    <input type="text" name="name" class="form-control" placeholder="Nama" value="{{ $user->name }}" required>
-                                @endauth
-                                @guest
-                                    <input type="text" name="name" class="form-control" placeholder="Nama" value="" required>
-                                @endguest
+                                <input type="text" name="name" class="form-control" 
+                                    placeholder="Nama" value="{{ !empty(auth()->user()->id) ? $user->name : '' }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                @auth
-                                    <input type="email" parsley-type="email" name="email" class="form-control" placeholder="Email" value="{{ $user->email }}" required>
-                                @endauth
-                                @guest
-                                    <input type="email" parsley-type="email" name="email" class="form-control" placeholder="Email" value="" required>
-                                @endguest
+                                <input type="email" parsley-type="email" name="email" class="form-control" 
+                                    placeholder="Email" value="{{ !empty(auth()->user()->id) ? $user->email : '' }}" required>
                             </div>
                             <div class="form-group">
                                 <label>No Telefon</label>
-                                @auth
-                                    <input type="text" name="telno" class="form-control" data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$" placeholder="No Telefon" value="{{ $user->telno }}" required>
-                                @endauth
-                                @guest
-                                    <input type="text" name="telno" class="form-control" data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$" placeholder="No Telefon" value="" required>
-                                @endguest
+                                <input type="text" name="telno" class="form-control" data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$" 
+                                 placeholder="No Telefon" value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Amaun</label>
@@ -119,6 +105,10 @@
             return false;
         }
     }
+    
+    $(document).ready(function() {
+	    $('.form-validation').parsley();
+    });
 
     $.ajax({
         type: 'GET',
