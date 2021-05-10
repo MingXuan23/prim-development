@@ -191,7 +191,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
         </div>
         <div class="col-md-6 text-right">
             <p>
-                <em>Transaction Date: {{ date_format($request->fpx_fpxTxnTime, 'd/M/Y H:i') }}</em>
+                <em>Transaction Date: {{ date_format(date_create($request->fpx_fpxTxnTime), 'd/M/Y H:i') }}</em>
             </p>
             <p>
                 <em>Transaction #: {{ $request->fpx_fpxTxnId }}</em>
