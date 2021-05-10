@@ -141,6 +141,8 @@ class PayController extends Controller
     {
         // dd($request);
         // $user = Auth::id();
+        $user       = User::find(Auth::id());
+
         if ($request->desc == 'Donation') {
             $fpx_buyerEmail = $request->email;
             $telno = $request->telno;
@@ -148,9 +150,9 @@ class PayController extends Controller
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
         // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
-            $fpx_buyerEmail = "prim.utem@gmail.com";
-            $telno = "";
-            $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_buyerEmail       = "prim.utem@gmail.com";
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             // $fpx_buyerIban      = "";
         }
