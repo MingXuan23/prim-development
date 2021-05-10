@@ -80,6 +80,8 @@
         </div>
         @endif
 
+        <div class="flash-message"></div>
+
         <div class="table-responsive">
           <table id="donationTable" class="table table-bordered table-striped dt-responsive nowrap"
             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -127,18 +129,15 @@
 <!-- Peity chart-->
 <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
 
-<!-- Plugin Js-->
-<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
-<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
-
 <script>
   $(document).ready(function() {
+
+    var donationTable;
 
       fetch_data();
 
       function fetch_data(oid = '') {
-          $('#donationTable').DataTable({
+          donationTable = $('#donationTable').DataTable({
                   processing: true,
                   serverSide: true,
                   ajax: {
@@ -220,6 +219,7 @@
                 type: 'POST',
                 dataType: 'html',
                 data: {
+                    "_token": "{{ csrf_token() }}",
                     _method: 'DELETE'
                 },
                 url: "/donate/" + donation_id,
@@ -231,7 +231,9 @@
                         $('#confirmModal').modal('hide');
                     }, 2000);
 
-                    window.location.reload();
+                    $('div.flash-message').html(data);
+
+                    donationTable.ajax.reload();
                 },
                 error: function (data) {
                     $('div.flash-message').html(data);

@@ -126,7 +126,3 @@ Route::group(['prefix' => 'fpx'], function () {
 Route::get('/receipt', 'PayController@showReceipt');
 
 Route::get('list', 'LandingPageController@getDonationDatatable')->name('landing-page.getOrganizationDatatable');
-
-Route::get('/linkstorage', function () {
-    Artisan::call('storage:link');
-});

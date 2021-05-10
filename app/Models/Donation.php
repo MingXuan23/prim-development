@@ -3,14 +3,13 @@
 namespace App\Models;
 
 use App\User;
-use DonationTransactionTableSeeder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\URL;
 
 class Donation extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
 
     public $table = "donations";
     protected $fillable = ['nama', 'description', 'date_created', 'date_started', 'date_end', 'status', 'url', 'tax_payer', 'total_tax', 'donation_poster'];

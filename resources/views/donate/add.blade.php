@@ -2,6 +2,7 @@
 
 @section('css')
     <link href="{{ URL::asset('assets/libs/dropzone/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 @include('layouts.datepicker')
 
 @endsection
@@ -29,12 +30,12 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('donate.store') }}" enctype="multipart/form-data" name="donation">
+        <form class="form-validation" method="post" action="{{ route('donate.store') }}" enctype="multipart/form-data" name="donation">
             {{csrf_field()}}
             <div class="card-body">
                 <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label>Nama Organisasi</label>
+                    <div class="form-group required col-md-6">
+                        <label class="control-label">Nama Organisasi</label>
                         <select name="organization" id="organization" class="form-control">
                             <option value="" disabled selected>Pilih Organisasi</option>
                             @foreach($organization as $row)
@@ -42,20 +43,27 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>Nama Derma</label>
-                        <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
+                    <div class="form-group col-md-6 required">
+                        <label class="control-label">Nama Derma</label>
+                        <input type="text" name="name" class="form-control" placeholder="Nama Penuh" 
+                        data-parsley-required-message="Sila masukkan nama derma" required>
                     </div>
                 </div>
                 
                 <div class="form-row">
-                    <div class="form-group col-md-12">
-                    <label>Tempoh Sah Derma</label>
+                    <div class="form-group col-md-12 required">
+                    <label class="control-label">Tempoh Sah Derma</label>
                     
                         <div class="input-daterange input-group" id="date">
-                            <input type="text" class="form-control" name="start_date" placeholder="Tarikh Awal" autocomplete="off"/>
-                            <input type="text" class="form-control" name="end_date" placeholder="Tarikh Akhir" autocomplete="off"/>
+                            <input type="text" class="form-control" name="start_date" placeholder="Tarikh Awal" autocomplete="off" 
+                            data-parsley-required-message="Sila masukkan tarikh awal"
+                            data-parsley-errors-container=".errorMessage" required/>
+                            <input type="text" class="form-control" name="end_date" placeholder="Tarikh Akhir" autocomplete="off"
+                            data-parsley-required-message="Sila masukkan tarikh akhir"
+                            data-parsley-errors-container=".errorMessage" required/>
                         </div>
+                        <div class="errorMessage"></div>
+                        <div class="errorMessage"></div>
                     </div>
                 </div>
 
@@ -65,10 +73,10 @@
                         <input type="text" name="tax_payer" class="form-control" placeholder="Masukkan Pembayar Cukai">
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Jumlah Cukai</label>
+                        <label>Jumlah Cukai (RM)</label>
                         <input class="form-control input-mask text-left"
                             data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                            im-insert="true" style="text-align: right;" name="total_tax" required>
+                            im-insert="true" style="text-align: right;" name="total_tax">
                     </div>
                 </div>
 
@@ -107,10 +115,12 @@
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/dropzone/dropzone.min.js')}}"></script>
-
+<script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 
 <script>
     $(document).ready(function(){
+
+        $('.form-validation').parsley();
 
         $(".input-mask").inputmask();
 
