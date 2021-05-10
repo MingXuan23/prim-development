@@ -36,7 +36,9 @@ class DonationTableSeeder extends Seeder
                 "date_end"      => $end_date,
                 "date_created"  => $current_date,
                 "status"        => 1,
-                "url"           => $url[0]
+                "url"           => $url[0],
+                "tax_payer"     => "UTeM",
+                "total_tax"     => 1
             ),
             1 =>
             array(
@@ -47,7 +49,9 @@ class DonationTableSeeder extends Seeder
                 "date_end"      => $end_date,
                 "date_created"  => $current_date,
                 "status"        => 1,
-                "url"           => $url[1]
+                "url"           => $url[1],
+                "tax_payer"     => "UTeM",
+                "total_tax"     => 1
             ),
             2 =>
             array(
@@ -58,7 +62,9 @@ class DonationTableSeeder extends Seeder
                 "date_end"      => $end_date,
                 "date_created"  => $current_date,
                 "status"        => 1,
-                "url"           => $url[2]
+                "url"           => $url[2],
+                "tax_payer"     => "UTeM",
+                "total_tax"     => 1
             ),
             3 =>
             array(
@@ -69,7 +75,9 @@ class DonationTableSeeder extends Seeder
                 "date_end"      => $end_date,
                 "date_created"  => $current_date,
                 "status"        => 1,
-                "url"           => $url[3]
+                "url"           => $url[3],
+                "tax_payer"     => "UTeM",
+                "total_tax"     => 1
             ),
         ));
     }

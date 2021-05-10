@@ -28,7 +28,8 @@ class DonationRequest extends FormRequest
             'name'          =>  'required',
             'description'   =>  'required',
             'start_date'    =>  'required',
-            'end_date'      =>  'required'
+            'end_date'      =>  'required',
+            'donation_poster'   => 'mimes:jpeg,bmp,png,svg,jpg'
         ];
     }
 }
