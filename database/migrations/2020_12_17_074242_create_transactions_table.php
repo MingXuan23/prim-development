@@ -25,6 +25,7 @@ class CreateTransactionsTable extends Migration
             $table->string('email')->nullable();
             $table->string('telno')->nullable();
             $table->string('username')->nullable();
+            $table->string('fpx_checksum', 600)->nullable();
         });
     }
 
