@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class DonationController extends Controller
 {
@@ -159,12 +161,14 @@ class DonationController extends Controller
             ->orderBy('donations.nama')
             ->get();
 
-        // dd($listdonor);
-
         if (request()->ajax()) {
             return datatables()->of($listdonor)
                 ->editColumn('amount', function ($data) {
                     return number_format($data->amount, 2);
+                })
+                ->editColumn('datetime_created', function ($data) {
+                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created)->format('d/m/Y');
+                    return $formatedDate;
                 })
                 ->make(true);
         }
@@ -324,8 +328,9 @@ class DonationController extends Controller
 
     public function destroy($id)
     {
-        $result = Donation::find($id)->delete();
-
+        // dd($id);
+        $result = Donation::where('id', $id)->first()->delete();
+        
         if ($result) {
             Session::flash('success', 'Donation Delete Successfully');
             return View::make('layouts/flash-messages');
