@@ -1,9 +1,12 @@
 @extends('layouts.master')
 
 @section('css')
-<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
-@include('layouts.datatable')
+        <!-- DataTables -->
+        <link href="{{ URL::asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ URL::asset('assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
 
+        <!-- Responsive datatable examples -->
+        <link href="{{ URL::asset('assets/libs/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -82,22 +85,35 @@
 
 
 @section('script')
-<!-- Peity chart-->
-<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+<!-- Required datatable js -->
+<script src="{{ URL::asset('assets/libs/datatables.net/js/jquery.dataTables.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }} "></script>
 
-<!-- Plugin Js-->
-<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+<!-- Buttons examples -->
+<script src="{{ URL::asset('assets/libs/datatables.net-buttons/js/dataTables.buttons.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/jszip/jszip.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/pdfmake/pdfmake.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/pdfmake/vfs_fonts.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/datatables.net-buttons/js/buttons.print.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }} "></script>
 
-<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+<!-- Responsive examples -->
+<script src="{{ URL::asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }} "></script>
 
 <script>
     $(document).ready(function() {
 
         var donateid = $('#don').val();
 
-        $('#donorTable').DataTable({
+        var donor_table = $('#donorTable').DataTable({
                   processing: true,
                   serverSide: true,
+                  lengthChange: false,
+                  dom: 'Bfrtip',
+                  buttons: ['excel', 'pdf'],
                   ajax: {
                       url: "{{ route('donate.donorlist') }}",
                       data: {
@@ -109,6 +125,11 @@
                   order: [
                       [1, 'asc']
                   ],
+                  'columnDefs': [{
+                      "targets": [0,1,2,3,4,5],
+                      "className": "text-center",
+                      "width": "2%"
+                  }],
                   columns: [{
                       "data": null,
                       searchable: false,
@@ -139,8 +160,7 @@
                       searchable: false
                   }, ]
           });
-        
 
-});
+    });
 </script>
 @endsection
