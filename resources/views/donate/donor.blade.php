@@ -14,7 +14,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Senarai Penderma untuk {{ $listdonor->dname }}</h4>
+            <h4 class="font-size-18">Senarai Penderma untuk {{ $donation->nama }}</h4>
             <!-- <ol class="breadcrumb mb-0">
                   <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
               </ol> -->
@@ -60,7 +60,7 @@
                 </div>
                 @endif
 
-                <input hidden type="text" id="don" name="don" class="form-control" value="{{ $listdonor->id }}">
+                <input hidden type="text" id="don" name="don" class="form-control" value="{{ $donation->id }}">
 
                 <div class="table-responsive">
                     <table id="donorTable" class="table table-bordered table-striped dt-responsive nowrap"
@@ -104,62 +104,62 @@
 <script src="{{ URL::asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }} "></script>
 
 <script>
-    $(document).ready(function() {
+   $(document).ready(function() {
 
-        var donateid = $('#don').val();
+        let donateid = $('#don').val();
 
-        var donor_table = $('#donorTable').DataTable({
-                  processing: true,
-                  serverSide: true,
-                  lengthChange: false,
-                  dom: 'Bfrtip',
-                  buttons: ['excel', 'pdf'],
-                  ajax: {
-                      url: "{{ route('donate.donorlist') }}",
-                      data: {
-                          did: donateid,
-                      },
-                      type: 'GET',
+        let donor_table = $('#donorTable').DataTable({
+            processing: true,
+            serverSide: true,
+            lengthChange: false,
+            dom: 'Bfrtip',
+            buttons: ['excel', 'pdf'],
+            ajax: {
+                url: "{{ route('donate.donor-list') }}",
+                data: {
+                    id: donateid,
+                },
+                type: 'GET',
 
-                  },
-                  order: [
-                      [1, 'asc']
-                  ],
-                  'columnDefs': [{
-                      "targets": [0,1,2,3,4,5],
-                      "className": "text-center",
-                      "width": "2%"
-                  }],
-                  columns: [{
-                      "data": null,
-                      searchable: false,
-                      "sortable": false,
-                      render: function (data, type, row, meta) {
-                          return meta.row + meta.settings._iDisplayStart + 1;
-                      }
-                  }, {
-                      data: "username",
-                      name: 'username'
-                  }, {
-                      data: "email",
-                      name: 'email',
-                      orderable: false
-                  }, {
-                      data: "telno",
-                      name: 'telno',
-                      orderable: false
-                  }, {
-                      data: "datetime_created",
-                      name: 'datetime_created',
-                      orderable: false,
-                      searchable: false
-                  }, {
-                      data: 'amount',
-                      name: 'amount',
-                      orderable: false,
-                      searchable: false
-                  }, ]
-          });
+            },
+            order: [
+                [1, 'asc']
+            ],
+            'columnDefs': [{
+                "targets": [0, 1, 2, 3, 4, 5],
+                "className": "text-center",
+                "width": "2%"
+            }],
+            columns: [{
+                "data": null,
+                searchable: false,
+                "sortable": false,
+                render: function(data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            }, {
+                data: "username",
+                name: 'username'
+            }, {
+                data: "email",
+                name: 'email',
+                orderable: false
+            }, {
+                data: "telno",
+                name: 'telno',
+                orderable: false
+            }, {
+                data: "datetime_created",
+                name: 'datetime_created',
+                orderable: false,
+                searchable: false
+            }, {
+                data: 'amount',
+                name: 'amount',
+                orderable: false,
+                searchable: false
+            }, ]
+        });
 
     });
 </script>

@@ -8,6 +8,7 @@ use App\Models\Donation;
 use App\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\DonationRequest;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
@@ -19,10 +20,14 @@ use Illuminate\Support\Facades\View;
 class DonationController extends Controller
 {
     private $user;
+    private $donation;
+    private $transaction;
 
-    public function __construct(User $user)
+    public function __construct(User $user, Donation $donation, Transaction $transaction)
     {
         $this->user = $user;
+        $this->donation = $donation;
+        $this->transaction = $transaction;
     }
 
     public function index()
@@ -140,29 +145,17 @@ class DonationController extends Controller
 
     public function listAllDonor($id)
     {
-        $listdonor = DB::table('donations')
-            ->select('donations.id as id', 'donations.nama as dname')
-            ->where('donations.id', $id)
-            ->first();
+        $donation = $this->donation->getDonationById($id);
 
-        return view('donate.donor', compact('listdonor'));
+        return view('donate.donor', compact('donation'));
     }
 
     public function getDonorDatatable(Request $request)
     {
-        // $listdonor2 = $this->listAllDonor($request->did);
-        // dd($request->did);
-
-        $listdonor = DB::table('donations')
-            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
-            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
-            ->select('donations.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
-            ->where('donations.id', $request->did)
-            ->orderBy('donations.nama')
-            ->get();
+        $donor = $this->transaction->getDonorByDonationId($request->id);
 
         if (request()->ajax()) {
-            return datatables()->of($listdonor)
+            return datatables()->of($donor)
                 ->editColumn('amount', function ($data) {
                     return number_format($data->amount, 2);
                 })

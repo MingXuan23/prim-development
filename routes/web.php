@@ -38,7 +38,7 @@ Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchS
 Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
     Route::get('donor/{id}', 'DonationController@listAllDonor')->name('donate.details');
-    Route::get('donorList', 'DonationController@getDonorDatatable')->name('donate.donorlist');
+    Route::get('donor-list', 'DonationController@getDonorDatatable')->name('donate.donor-list');
     Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
     Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
     Route::get('history', 'DonationController@historyDonor')->name('historydonor');
