@@ -142,7 +142,6 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
 // $fpx_txnAmount=$request->fpx_txnAmount;
 // $fpx_txnCurrency=$request->fpx_txnCurrency;
 // $fpx_checkSum=$request->fpx_checkSum;
-dd($request->fpx_buyerBankBranch);
  $val="00";
  $ErrorCode=" Your signature has been verified successfully. "." ErrorCode :[00]";
 
@@ -186,7 +185,7 @@ dd($request->fpx_buyerBankBranch);
                 <br>
                 <abbr title="Phone">P:</abbr> {{ $user->telno }}
                 <br>
-                <abbr title="Bank">B:</abbr> {{ $request->$fpx_buyerBankBranch }}
+                <abbr title="Bank">B:</abbr> {{ $request->fpx_buyerBankBranch }}
             </address>
         </div>
         <div class="col-md-6 text-right">
