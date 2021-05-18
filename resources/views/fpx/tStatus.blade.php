@@ -142,7 +142,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
 // $fpx_txnAmount=$request->fpx_txnAmount;
 // $fpx_txnCurrency=$request->fpx_txnCurrency;
 // $fpx_checkSum=$request->fpx_checkSum;
-dd($request);
+dd($request->fpx_buyerBankBranch);
  $val="00";
  $ErrorCode=" Your signature has been verified successfully. "." ErrorCode :[00]";
 
