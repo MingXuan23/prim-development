@@ -186,7 +186,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
                 <br>
                 <abbr title="Phone">P:</abbr> {{ $user->telno }}
                 <br>
-                <abbr title="Bank">B:</abbr> {{ $fpx_buyerBankBranch }}
+                <abbr title="Bank">B:</abbr> {{ $request->$fpx_buyerBankBranch }}
             </address>
         </div>
         <div class="col-md-6 text-right">
