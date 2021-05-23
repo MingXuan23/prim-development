@@ -32,10 +32,6 @@
                     <li class="current-menu-item">
                         <a href="/">Utama</a>
                     </li>
-                    <li><a href="/organization-list">Derma</a></li>
-                    {{-- <li><a href="#pricing">Pricing</a></li> --}}
-                    <li><a href="#sekolah">Sekolah</a></li>
-                    {{-- <li><a href="#team">Modul</a></li> --}}
                     <li class="menu-item-has-children">
                         <a href="#">Organisasi</a>
                         <ul class="sub-menu">
@@ -43,6 +39,18 @@
                             <li><a href="blog-details.html">Sekolah JAIM</a></li>
                         </ul>
                     </li>
+                    {{-- <li><a href="/organization-list">Derma</a></li> --}}
+                    <li class="menu-item-has-children">
+                        <a href="#">Derma</a>
+                        <ul class="sub-menu">
+                            <li><a href="/organization-list">Derma Tahfiz UTeM</a></li>
+                            {{-- <li><a href="blog-details.html">Sekolah JAIM</a></li> --}}
+                        </ul>
+                    </li>
+                    {{-- <li><a href="#pricing">Pricing</a></li> --}}
+                    {{-- <li><a href="#sekolah">Sekolah</a></li> --}}
+                    {{-- <li><a href="#team">Modul</a></li> --}}
+                    
                     <li><a href="#contact">Hubungi Kami</a></li>
                 </ul>
             </div>
@@ -152,8 +160,7 @@
                 <div class="col-lg-6 col-md-10">
                     <div class="section-title text-center pb-10">
                         <h3 class="title">Organisasi</h3>
-                        <p class="text">Stop wasting time and money designing and managing a website that doesn’t get
-                            results. Happiness guaranteed!</p>
+                        <p class="text">Antara organisasi yang berdaftar dengan PRIM</p>
                     </div> <!-- section title -->
                 </div>
             </div> <!-- row -->
@@ -161,8 +168,8 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="portfolio-menu text-center mt-50">
                         <ul>
-                            <li> Semua Organisasi </li>
-                            <li data-filter=".branding-4" class="active">Masjid An-Najihah </li>
+                            <li data-filter=".branding-4" class="active"> Semua Organisasi </li>
+                            <li data-filter=".branding-4">Masjid An-Najihah </li>
                             <li data-filter=".marketing-4">Masjid Al-Alami</li>
                             <li data-filter=".planning-4">Tahfiz Iman</li>
                             <li data-filter=".research-4">Pusat Islam UTeM</li>
@@ -172,7 +179,83 @@
                 </div>
                 <div class="col-lg-9 col-md-9">
                     <div class="row no-gutters grid mt-50">
-                        <div class="col-lg-4 col-sm-6 branding-4 planning-4">
+                        
+                        <div class="branding-4">
+                            <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                <div class="carousel-inner" role="listbox">
+                                    <div style="max-width:100%; height:auto; !important;" >
+                                        <div class="carousel-item active">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/4.jpg') }}" alt="Second slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="marketing-4">
+                            <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                <div class="carousel-inner" role="listbox">
+                                    <div style="max-width:100%; height:auto; !important;" >
+                                        <div class="carousel-item active">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/4.jpg') }}" alt="Second slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="planning-4">
+                            <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                <div class="carousel-inner" role="listbox">
+                                    <div style="max-width:100%; height:auto; !important;" >
+                                        <div class="carousel-item active">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/4.jpg') }}" alt="Second slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="research-4">
+                            <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                <div class="carousel-inner" role="listbox">
+                                    <div style="max-width:100%; height:auto; !important;" >
+                                        <div class="carousel-item active">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/4.jpg') }}" alt="Second slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-50" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        {{-- <div class="col-lg-4 col-sm-6 branding-4 planning-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
                                     <img src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="blog image"
@@ -192,8 +275,8 @@
                                     </div>
                                 </div>
                             </div> <!-- single portfolio -->
-                        </div>
-                        <div class="col-lg-4 col-sm-6 marketing-4 research-4">
+                        </div> --}}
+                        {{-- <div class="col-lg-4 col-sm-6 marketing-4 research-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
                                     <img src="{{ URL::asset('assets/landing-page/img/blog/2.jpg') }}" alt="blog image"
@@ -297,73 +380,10 @@
                                     </div>
                                 </div>
                             </div> <!-- single portfolio -->
-                        </div>
-
-
-                        <!-- portfolio menu -->
-                        {{-- <div class="col-lg-4 col-sm-6 research-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/7.png') }}" alt="">
-                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                            <div class="portfolio-content">
-                                <div class="portfolio-icon">
-                                    <a class="image-popup" href="assets/images/portfolio/7.png"><i
-                                            class="lni lni-zoom-in"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                                <div class="portfolio-icon">
-                                    <a href="#"><i class="lni lni-link"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- single portfolio -->
-            </div>
-            <div class="col-lg-4 col-sm-6 branding-4 planning-4">
-                <div class="single-portfolio">
-                    <div class="portfolio-image">
-                        <img src="{{ URL::asset('assets/images/portfolio/8.png') }}" alt="">
-                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                            <div class="portfolio-content">
-                                <div class="portfolio-icon">
-                                    <a class="image-popup" href="assets/images/portfolio/8.png"><i
-                                            class="lni lni-zoom-in"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                                <div class="portfolio-icon">
-                                    <a href="#"><i class="lni lni-link"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- single portfolio -->
-            </div>
-            <div class="col-lg-4 col-sm-6 marketing-4">
-                <div class="single-portfolio">
-                    <div class="portfolio-image">
-                        <img src="{{ URL::asset('assets/images/portfolio/9.png') }}" alt="">
-                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                            <div class="portfolio-content">
-                                <div class="portfolio-icon">
-                                    <a class="image-popup" href="assets/images/portfolio/9.png"><i
-                                            class="lni lni-zoom-in"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                                <div class="portfolio-icon">
-                                    <a href="#"><i class="lni lni-link"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- single portfolio -->
-            </div> --}}
-        </div> <!-- row -->
-        </div>
-        </div> <!-- row -->
+                        </div> --}}
+                    </div> <!-- row -->
+                </div>
+            </div> <!-- row -->
         </div>
     </section>
     <!-- video area end -->
