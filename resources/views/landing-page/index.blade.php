@@ -794,8 +794,7 @@
                         <div class="testimonial-author d-sm-flex justify-content-between">
                             <div class="author-info d-flex align-items-center">
                                 <div class="author-image">
-                                    <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}"
-                                        alt="author">
+                                    <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}" alt="author">
                                 </div>
                                 <div class="author-name media-body">
                                     <h5 class="name">Mr. Jems Bond</h5>
@@ -816,7 +815,7 @@
                     </div> <!-- single testimonial -->
                 </div>
                 <div class="col-lg-6">
-                
+
                     <div class="single-testimonial">
                         <div class="testimonial-text">
                             <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
@@ -825,8 +824,7 @@
                         <div class="testimonial-author d-sm-flex justify-content-between">
                             <div class="author-info d-flex align-items-center">
                                 <div class="author-image">
-                                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}"
-                                        alt="author">
+                                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}" alt="author">
                                 </div>
                                 <div class="author-name media-body">
                                     <h5 class="name">Mr. Jems Bond</h5>
@@ -851,7 +849,7 @@
     </section>
     <!-- price plan area end -->
     <!--====== TESTIMONIAL PART START ======-->
-    
+
 
     {{-- <section id="testimonial" class="testimonial-area">
         <div class="container">
@@ -881,86 +879,84 @@
                                     <div class="author-info d-flex align-items-center">
                                         <div class="author-image">
                                             <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}"
-                                                alt="author">
-                                        </div>
-                                        <div class="author-name media-body">
-                                            <h5 class="name">Mr. Jems Bond</h5>
-                                            <span class="sub-title">CEO Mbuild Firm</span>
-                                        </div>
-                                    </div>
-                                    <div class="author-review">
-                                        <ul class="star">
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                        </ul>
-                                        <span class="review">( 7 Reviews )</span>
-                                    </div>
-                                </div>
-                            </div> <!-- single testimonial -->
-                            <div class="single-testimonial">
-                                <div class="testimonial-text">
-                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                                        volutpat nisl, sit amet convallis nunc turp.”</p>
-                                </div>
-                                <div class="testimonial-author d-sm-flex justify-content-between">
-                                    <div class="author-info d-flex align-items-center">
-                                        <div class="author-image">
-                                            <img src="{{ URL::asset('assets/images/testimonial/author-2.jpg') }}"
-                                                alt="author">
-                                        </div>
-                                        <div class="author-name media-body">
-                                            <h5 class="name">Mr. Jems Bond</h5>
-                                            <span class="sub-title">CEO Mbuild Firm</span>
-                                        </div>
-                                    </div>
-                                    <div class="author-review">
-                                        <ul class="star">
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                        </ul>
-                                        <span class="review">( 7 Reviews )</span>
-                                    </div>
-                                </div>
-                            </div> <!-- single testimonial -->
-                            <div class="single-testimonial">
-                                <div class="testimonial-text">
-                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                                        volutpat nisl, sit amet convallis nunc turp.”</p>
-                                </div>
-                                <div class="testimonial-author d-sm-flex justify-content-between">
-                                    <div class="author-info d-flex align-items-center">
-                                        <div class="author-image">
-                                            <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}"
-                                                alt="author">
-                                        </div>
-                                        <div class="author-name media-body">
-                                            <h5 class="name">Mr. Jems Bond</h5>
-                                            <span class="sub-title">CEO Mbuild Firm</span>
-                                        </div>
-                                    </div>
-                                    <div class="author-review">
-                                        <ul class="star">
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                            <li><i class="lni lni-star-filled"></i></li>
-                                        </ul>
-                                        <span class="review">( 7 Reviews )</span>
-                                    </div>
-                                </div>
-                            </div> <!-- single testimonial -->
-                        </div> <!-- testimonial content wrapper -->
-                    </div> <!-- testimonial right content -->
+    alt="author">
+    </div>
+    <div class="author-name media-body">
+        <h5 class="name">Mr. Jems Bond</h5>
+        <span class="sub-title">CEO Mbuild Firm</span>
+    </div>
+    </div>
+    <div class="author-review">
+        <ul class="star">
+            <li><i class="lni lni-star-filled"></i></li>
+            <li><i class="lni lni-star-filled"></i></li>
+            <li><i class="lni lni-star-filled"></i></li>
+            <li><i class="lni lni-star-filled"></i></li>
+            <li><i class="lni lni-star-filled"></i></li>
+        </ul>
+        <span class="review">( 7 Reviews )</span>
+    </div>
+    </div>
+    </div> <!-- single testimonial -->
+    <div class="single-testimonial">
+        <div class="testimonial-text">
+            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
+                volutpat nisl, sit amet convallis nunc turp.”</p>
+        </div>
+        <div class="testimonial-author d-sm-flex justify-content-between">
+            <div class="author-info d-flex align-items-center">
+                <div class="author-image">
+                    <img src="{{ URL::asset('assets/images/testimonial/author-2.jpg') }}" alt="author">
                 </div>
-            </div> <!-- row -->
-        </div> <!-- container -->
+                <div class="author-name media-body">
+                    <h5 class="name">Mr. Jems Bond</h5>
+                    <span class="sub-title">CEO Mbuild Firm</span>
+                </div>
+            </div>
+            <div class="author-review">
+                <ul class="star">
+                    <li><i class="lni lni-star-filled"></i></li>
+                    <li><i class="lni lni-star-filled"></i></li>
+                    <li><i class="lni lni-star-filled"></i></li>
+                    <li><i class="lni lni-star-filled"></i></li>
+                    <li><i class="lni lni-star-filled"></i></li>
+                </ul>
+                <span class="review">( 7 Reviews )</span>
+            </div>
+        </div>
+    </div> <!-- single testimonial -->
+    <div class="single-testimonial">
+        <div class="testimonial-text">
+            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
+                volutpat nisl, sit amet convallis nunc turp.”</p>
+        </div>
+        <div class="testimonial-author d-sm-flex justify-content-between">
+            <div class="author-info d-flex align-items-center">
+                <div class="author-image">
+                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}" alt="author">
+                </div>
+                <div class="author-name media-body">
+                    <h5 class="name">Mr. Jems Bond</h5>
+                    <span class="sub-title">CEO Mbuild Firm</span>
+                </div>
+            </div>
+            <div class="author-review">
+                <ul class="star">
+                    <li><i class="lni lni-star-filled"></i></li>
+                    <li><i class="lni lni-star-filled"></i></li>
+                    <li><i class="lni lni-star-filled"></i></li>
+                    <li><i class="lni lni-star-filled"></i></li>
+                    <li><i class="lni lni-star-filled"></i></li>
+                </ul>
+                <span class="review">( 7 Reviews )</span>
+            </div>
+        </div>
+    </div> <!-- single testimonial -->
+    </div> <!-- testimonial content wrapper -->
+    </div> <!-- testimonial right content -->
+    </div>
+    </div> <!-- row -->
+    </div> <!-- container -->
     </section> --}}
 
     <!--====== TESTIMONIAL PART ENDS ======-->
@@ -974,7 +970,7 @@
             <img src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg.jpg') }}" alt="">
         </div>
         <div class="bg-shape-3">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt="">
+            {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
             <div class="row justify-content-center">
@@ -1134,6 +1130,33 @@
                         </form>
                     </div><!-- //. contact area wrapper -->
                 </div>
+                <div class="col-lg-6">
+                    <div class="contact-area-wrapper" id="contact">
+                        <div class="mapouter">
+                            <div class="gmap_canvas"><iframe width="500" height="500" id="gmap_canvas"
+                                    src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                                    frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a
+                                    href="https://123movies-to.org"></a><br>
+                                <style>
+                                    .mapouter {
+                                        position: relative;
+                                        text-align: right;
+                                        height: 500px;
+                                        width: 600px;
+                                    }
+                                </style><a href="https://www.embedgooglemap.net">html code for google maps</a>
+                                <style>
+                                    .gmap_canvas {
+                                        overflow: hidden;
+                                        background: none !important;
+                                        height: 500px;
+                                        width: 600px;
+                                    }
+                                </style>
+                            </div>
+                        </div>
+                    </div><!-- //. contact area wrapper -->
+                </div>
             </div>
         </div>
     </section>
@@ -1143,13 +1166,13 @@
     <footer class="footer-area">
         <div class="footer-top">
             <div class="container">
-                <div class="row">
+                <div class="row justify-content-md-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-white.png') }}" alt=""></a>
-                            <p>Within coming figure things are. Pretended concluded did repulsive education
-                                smallness yet yet described. Had country man his pressed shewing. </p>
+                                    src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
+                            <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
+                                berdaftar. </p>
                             <ul class="social-icon">
                                 <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
                                 <li><a href="#"><i class="fab fa-twitter"></i></a></li>
@@ -1158,39 +1181,36 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget nav_menus_widget">
-                            <h4 class="widget-title">Useful Links</h4>
-                            <ul>
-                                <li><a href="index.html"><i class="fas fa-chevron-right"></i> Home</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> About Us</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> Service</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> Blog</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> Contact</a></li>
-                            </ul>
+                    <div class="col-lg-3 col-md-8">
+                        <div class="footer-widget about_widget">
+                            <h4 class="widget-title">Hubungi</h4>
+
+                            <p>Email : hishamudin.ali@gmail.com </p>
+
+                            <p>Phone : 06 - 270 1000</p>
+
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget nav_menus_widget">
-                            <h4 class="widget-title">Need Help?</h4>
-                            <ul>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> Faqs</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> Privacy</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> Policy</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> Support</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> Temrs</a></li>
-                            </ul>
+                        <div class="footer-widget about_widget">
+                            <h4 class="widget-title">Alamat</h4>
+                            <p> Universiti Teknikal Malaysia Melaka, Jalan Hang Tuah Jaya, 76100 Durian Tunggal, Melaka</p>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget nav_menus_widget">
-                            <h4 class="widget-title">Download</h4>
-                            <ul>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> For IOS</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> For Android</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> For Mac</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> For Window</a></li>
-                                <li><a href="#"><i class="fas fa-chevron-right"></i> For Linax</a></li>
+                        <div class="footer-widget about_widget">
+                            <a href="index.html" class="footer-logo"><img
+                                    src="{{ URL::asset('assets/landing-page/img/logo-utem.png') }}" alt=""></a>
+
+                            <a href="index.html" class="footer-logo"><img
+                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""></a>
+                            <ul class="social-icon">
+                                <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
+                                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                                <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
+                                <li><a href="#"><i class="fab fa-pinterest-p"></i></a></li>
                             </ul>
                         </div>
                     </div>
