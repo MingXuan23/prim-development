@@ -36,13 +36,12 @@ Route::post('parent/fetchClass', 'ParentController@fetchClass')->name('parent.fe
 Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchStd');
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
-    Route::get('donationlist', 'DonationController@indexDerma')->name('donate.organizationlist');
+    Route::get('', 'DonationController@indexDerma')->name('donate.index');
     Route::get('donor/{id}', 'DonationController@listAllDonor')->name('donate.details');
-    Route::get('donor-list', 'DonationController@getDonorDatatable')->name('donate.donor-list');
-    Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donationlist');
-    Route::get('urusDermaList', 'DonationController@indexUrusDerma')->name('donate.urusDermaList');
-    Route::get('history', 'DonationController@historyDonor')->name('historydonor');
-    Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('historydonorDT');
+    Route::get('donor/list/datatable', 'DonationController@getDonorDatatable')->name('donate.donor_datatable');
+    Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donation_list');
+    Route::get('history', 'DonationController@historyDonor')->name('donate.donor_history');
+    Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('donate.donor_history_datatable');
 });
 
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
@@ -73,7 +72,7 @@ Route::group(['middleware' => ['auth']], function () {
         'parent'             => 'ParentController',
         'pay'                => 'PayController',
         'organization'       => 'OrganizationController',
-        'donate'             => 'DonationController',
+        'donation'             => 'DonationController',
         'reminder'           => 'ReminderController',
         'activity'           => 'ActivityController'
     ]);

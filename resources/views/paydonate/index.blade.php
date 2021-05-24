@@ -127,7 +127,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url:"{{ route('donate.donationlist') }}",
+                    url:"{{ route('donate.donation_list') }}",
                     data:{ 
                         oid:oid,
                         hasOrganization: false

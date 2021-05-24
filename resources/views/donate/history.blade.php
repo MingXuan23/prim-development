@@ -96,7 +96,7 @@
                   processing: true,
                   serverSide: true,
                   ajax: {
-                      url: "{{ route('historydonorDT') }}",
+                      url: "{{ route('donate.donor_history_datatable') }}",
                       type: 'GET',
 
                   },'columnDefs': [{

@@ -179,29 +179,94 @@
                     </div> <!-- portfolio menu -->
                 </div>
                 <div class="col-lg-9 col-md-9">
-                    <div class="row no-gutters grid mt-50">
-                        <div class="col-lg-4 col-sm-6 branding-4 planning-4">
+                    <div class="row">
+                        <div class="col no-gutters grid mt-50">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="blog image"
-                                        width="277" height="277">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/1.png"><i
-                                                        class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
+                                    <div class="branding-4">
+                                        <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                            <div class="carousel-inner" role="listbox">
+                                                <div style="max-width:100%; height:auto; !important;" >
+                                                    <div class="carousel-item active">
+                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                                    </div>
+                                                    <div class="carousel-item">
+                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
+                                                    </div>
+                                                    <div class="carousel-item">
+                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                                    </div>
+                                                </div>
+                                                
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div> <!-- single portfolio -->
+                            </div>
+                        </div> <!-- row -->
+                        <div class="col no-gutters grid mt-50">
+                            <div class="marketing-4">
+                                <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                    <div class="carousel-inner" role="listbox">
+                                        <div style="max-width:100%; height:auto; !important;" >
+                                            <div class="carousel-item active">
+                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                            </div>
+                                            <div class="carousel-item">
+                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
+                                            </div>
+                                            <div class="carousel-item">
+                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-lg-4 col-sm-6 marketing-4 research-4">
+                    </div>
+                    <div class="row">
+                        <div class="col no-gutters grid mt-50">
+                        <div class="planning-4">
+                            <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                <div class="carousel-inner" role="listbox">
+                                    <div style="max-width:100%; height:auto; !important;" >
+                                        <div class="carousel-item active">
+                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
+                                        </div>
+                                        <div class="carousel-item">
+                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        </div> <!-- row -->
+                        <div class="col no-gutters grid mt-50">
+                            <div class="research-4">
+                                <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                    <div class="carousel-inner" role="listbox">
+                                        <div style="max-width:100%; height:auto; !important;" >
+                                            <div class="carousel-item active">
+                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                            </div>
+                                            <div class="carousel-item">
+                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
+                                            </div>
+                                            <div class="carousel-item">
+                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                        {{-- <div class="col-lg-4 col-sm-6 marketing-4 research-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
                                     <img src="{{ URL::asset('assets/landing-page/img/blog/2.jpg') }}" alt="blog image"
@@ -305,7 +370,7 @@
                                     </div>
                                 </div>
                             </div> <!-- single portfolio -->
-                        </div>
+                        </div> --}}
 
 
                         <!-- portfolio menu -->
@@ -369,7 +434,6 @@
                     </div>
                 </div> <!-- single portfolio -->
             </div> --}}
-        </div> <!-- row -->
         </div>
         </div> <!-- row -->
         </div>
