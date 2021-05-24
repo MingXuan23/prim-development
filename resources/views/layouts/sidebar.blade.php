@@ -25,21 +25,21 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('donate.index') }}" class=" waves-effect">
+                    <a href="{{ route('donation.index') }}" class=" waves-effect">
                         <i class="fas fa-money-bill-alt"></i>
                         <span>Urus Derma</span>
                     </a>
                 </li>
 
                 <li>
-                    <a href="{{ route('donate.organizationlist') }}" class=" waves-effect">
+                    <a href="{{ route('donate.index') }}" class=" waves-effect">
                         <i class="fas fa-hand-holding-heart"></i>
                         <span>Derma</span>
                     </a>
                 </li>
 
                 <li>
-                    <a href="{{ route('historydonor') }}" class=" waves-effect">
+                    <a href="{{ route('donate.donor_history') }}" class=" waves-effect">
                         <i class="mdi mdi-history"></i>
                         <span>Sejarah Derma</span>
                     </a>

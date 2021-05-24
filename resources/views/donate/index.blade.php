@@ -59,7 +59,7 @@
       {{-- <div class="card-header">List Of Applications</div> --}}
       <div>
         {{-- route('sekolah.create')  --}}
-        <a style="margin: 19px; float: right;" href="{{ route('donate.create') }}" class="btn btn-primary"> <i
+        <a style="margin: 19px; float: right;" href="{{ route('donation.create') }}" class="btn btn-primary"> <i
             class="fas fa-plus"></i> Tambah Derma</a>
       </div>
 
@@ -141,7 +141,7 @@
                   processing: true,
                   serverSide: true,
                   ajax: {
-                      url: "{{ route('donate.donationlist') }}",
+                      url: "{{ route('donate.donation_list') }}",
                       data: {
                           oid: oid,
                           hasOrganization: true

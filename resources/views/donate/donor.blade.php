@@ -115,7 +115,7 @@
             dom: 'Bfrtip',
             buttons: ['excel', 'pdf'],
             ajax: {
-                url: "{{ route('donate.donor-list') }}",
+                url: "{{ route('donate.donor_datatable') }}",
                 data: {
                     id: donateid,
                 },
