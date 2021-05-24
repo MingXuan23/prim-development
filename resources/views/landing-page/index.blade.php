@@ -169,8 +169,8 @@
                 <div class="col-lg-3 col-md-3">
                     <div class="portfolio-menu text-center mt-50">
                         <ul>
-                            <li> Semua Organisasi </li>
-                            <li data-filter=".branding-4" class="active">Masjid An-Najihah </li>
+                            <li class="active"> Semua Organisasi </li>
+                            <li data-filter=".branding-4" >Masjid An-Najihah </li>
                             <li data-filter=".marketing-4">Masjid Al-Alami</li>
                             <li data-filter=".planning-4">Tahfiz Iman</li>
                             <li data-filter=".research-4">Pusat Islam UTeM</li>
