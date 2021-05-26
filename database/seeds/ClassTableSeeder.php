@@ -18,7 +18,7 @@ class ClassTableSeeder extends Seeder
             0 =>
             array(
                 "id" => 1,
-                "nama" => "Bestari",
+                "nama" => " 1 Bestari",
                 "levelid" => 1,
             ),
         ));

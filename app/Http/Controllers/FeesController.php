@@ -6,15 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Fee;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class FeesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         //
@@ -24,26 +20,71 @@ class FeesController extends Controller
 
     public function parentpay()
     {
-        $fees = DB::table('fees')->orderBy('nama')->get();
-        return view('parent.fee.index', compact('fees'));
+        $userid = Auth::id();
+        $list = DB::table('organizations')
+            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            ->join('users', 'users.id', '=', 'organization_user.user_id')
+            ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+            ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+            ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->select('organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
+            ->where([
+                ['users.id', $userid],
+                ['organization_roles.id', '!=', 1],
+                ['organization_roles.id', '!=', 2],
+                ['organization_roles.id', '!=', 3],
+                ['organization_roles.id', '!=', 4],
+                ['organization_roles.id', '!=', 5],
+            ])
+            ->orderBy('classes.nama')
+            ->get();
+
+        $feesid     = DB::table('fees')
+                ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+                ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+                ->join('class_student', 'class_organization.class_id', '=', 'class_student.id')
+                ->join('students', 'class_student.student_id', '=', 'students.id')
+                ->select('fees.id as feeid', 'students.id as studentid')
+                ->first();
+
+        // dd($feesid);
+
+        $getfees    = DB::table('fees')->where('id', $feesid->feeid)->first();
+
+        $getcat = DB::table('fees')
+            ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+            ->join('details', 'details.id', '=', 'fees_details.details_id')
+            ->join('categories', 'categories.id', '=', 'details.category_id')
+            ->distinct('categories.nama')
+            ->select('fees.id as feeid', 'categories.id as cid', 'categories.nama as cnama')
+            ->orderBy('categories.id')
+            ->get();
+
+        $getdetail  = DB::table('fees')
+            ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+            ->join('details', 'details.id', '=', 'fees_details.details_id')
+            ->join('categories', 'categories.id', '=', 'details.category_id')
+            ->select('fees.id as feeid', 'categories.id as cid', 'categories.nama as cnama', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'details.totalamount as totalamount', 'details.id as did')
+            ->orderBy('details.nama')
+            ->get();
+        // return view('pentadbir.fee.pay', compact('getfees', 'getcat', 'getdetail'));
+
+        // dd($list);
+
+        // $fees = DB::table('fees')->orderBy('nama')->get();
+        return view('parent.fee.index', compact('list', 'getfees', 'getcat', 'getdetail'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('pentadbir.fee.add');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         //
@@ -60,7 +101,7 @@ class FeesController extends Controller
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('class_organization.id as id')
             ->orderBy('nama')
-            ->where('classes.nama', 'LIKE',  '%' .$yearstd . '%')
+            ->where('classes.nama', 'LIKE',  '%' . $yearstd . '%')
             ->get();
 
         // dd($listclass[0]->id);
@@ -121,46 +162,21 @@ class FeesController extends Controller
         return redirect('/fees')->with('success', 'New fees has been added successfully');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         //

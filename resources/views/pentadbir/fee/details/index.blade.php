@@ -88,7 +88,7 @@
                     <tr>
                         <td></td>
                         <td colspan="3"><b>Jumlah</b> </td>
-                        <td><b>{{ number_format($getdetail->sum('totalamount'), 2)  }}</b> </td>
+                        <td><b>{{ number_format($getdetail->where('cid', $row->cid)->sum('totalamount'), 2)  }}</b> </td>
                         <td></td>
                     </tr>
                 </table>
