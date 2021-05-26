@@ -53,7 +53,7 @@ class UsersTableSeeder extends Seeder
                 "id" => 3,
                 "email" => app()->environment('local') ? 'admin@gmail.com' : 'admin@gmail.com',
                 "password" => app()->environment('local') ? \Hash::make("Prim1234") : \Hash::make("Prim1234"),
-                "name" => "Admin",
+                "name" => "Admin Hisham",
                 "username" => "admin",
                 "icno" => "981313-10-2424",
                 "state" => "Selangor",
