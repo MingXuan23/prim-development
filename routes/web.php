@@ -72,9 +72,11 @@ Route::group(['middleware' => ['auth']], function () {
         'parent'             => 'ParentController',
         'pay'                => 'PayController',
         'organization'       => 'OrganizationController',
-        'donation'             => 'DonationController',
+        'donation'           => 'DonationController',
         'reminder'           => 'ReminderController',
-        'activity'           => 'ActivityController'
+        'activity'           => 'ActivityController',
+        'session'            => 'SessionController'
+
     ]);
 });
 
@@ -85,6 +87,10 @@ Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
 Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
 Route::get('successpay', 'PayController@successPay')->name('successpay');
+Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
+Route::get('feespay', 'PayController@fees_pay')->name('feespay');
+
+
 Route::get('feesparent', 'FeesController@parentpay')->name('parentpay');
 
 Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
@@ -101,7 +107,6 @@ Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-pag
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
 
-Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
 
 Route::group(['prefix' => 'notification'], function () {
     Route::get('/', 'HomeController@showNotification')->name('index.notification');
@@ -125,3 +130,10 @@ Route::group(['prefix' => 'fpx'], function () {
 Route::get('/receipt', 'PayController@showReceipt');
 
 Route::get('list', 'LandingPageController@getDonationDatatable')->name('landing-page.getOrganizationDatatable');
+
+
+Route::group(['prefix' => 'session'], function () {
+    Route::get('session/get', 'SessionController@accessSessionData')->name('getsession');
+    Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');
+    Route::get('session/remove', 'SessionController@deleteSessionData');
+});

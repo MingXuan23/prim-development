@@ -195,7 +195,7 @@
                                             <h6 class="mb-0 font-weight-bold"><a href="#" data-toggle="collapse"
                                                     data-target="#collapse{{ $row->cid }}" aria-expanded="true"
                                                     aria-controls="collapse{{ $row->cid }}"
-                                                    class="d-block position-relative text-dark text-uppercase collapsible-link py-2">Kategori
+                                                    class="d-block position-relative text-dark text-uppercase collapsible-link py-2">
                                                     {{ $row->cnama }}</a></h6>
                                         </div>
                                         <div id="collapse{{ $row->cid }}" aria-labelledby="heading{{ $row->cid }}"
@@ -308,43 +308,5 @@
 
 </script>
 
-    <script>
-
-        var stripe = Stripe("pk_test_51I6AHSI3fJ2mpqjYMBKV0ioR1R1IA9rhHNtq2ILk4fgBfAItGOHeA0PL610VW67w55b2jHxa1tst80iuGDEarPMN00tXSQAxs7");
-        var checkoutButton = document.getElementById("checkout-button");
-        var linkpay = $("#routepay").val();
-
-        checkoutButton.addEventListener("click", function () {
-
-            var submitForm = new FormData();
-            var allData = {
-                "_token": "{{ csrf_token() }}",
-                "bname": jQuery("#bname").val(),
-                "ttlpay": jQuery("#ttlpay").val(), 
-            }
-
-            jQuery.each(allData, function(key, value) {
-                submitForm.append(key, value);
-            });
-
-            jQuery.ajax({
-                type: 'POST',
-                url: linkpay,
-                data: submitForm,
-                processData: false,
-                contentType: false,
-                success: function(data) {
-                    var obj = JSON.parse(data);
-                    return stripe.redirectToCheckout({ sessionId: obj.id });
-                    
-                },
-                error: function(data) {
-
-                    console.error("Error:", data);
-                }
-            });
-        });
-
-        
-    </script>
+    
 @endsection

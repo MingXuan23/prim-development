@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\User;
 use App\Models\Donation;
 use App\Models\Organization;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -57,14 +58,14 @@ class PayController extends Controller
     public function donateindex(Request $request)
     {
         $user = "";
-        
+
         $donationId   = $request->id;
         $donation  = $this->donation->getDonationById($donationId);
 
         if (Auth::id()) {
             $user = $this->user->getUserById();
         }
-        
+
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
@@ -93,6 +94,53 @@ class PayController extends Controller
     //         ->get();
     //     return view('parent.fee.index', compact('getfees', 'getcat', 'getdetail'));
     // }
+
+    public function fees_pay(Request $request)
+    {
+        $size = count(collect($request)->get('id'));
+        $data = collect($request)->get('id');
+        // dd($data[0]);
+
+        $studentid  = array();
+        $feesid     = array();
+        $detailsid  = array();
+        for ($i = 0; $i < $size; $i++) {
+
+            //want seperate data from request
+            //case 0 = student id
+            //case 1 = fees id
+            //case 3 = details id
+            $case           = explode("-", $data[$i]);
+            $studentid[]    = $case[0];
+            $feesid[]       = $case[1];
+            $detailsid[]    = $case[2];
+        }
+        $res_student = array_unique($studentid);
+        $res_fee     = array_unique($feesid);
+        $res_details = array_unique($detailsid);
+
+        // $getstudent  = Student::whereIn('id', $res_student)->get();
+        $getstudent  = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->select('students.id as studentid', 'students.nama as studentname', 'fees.id as feeid')
+            ->whereIn('students.id', $res_student)
+            ->get();
+
+        $getfees     = DB::table('fees')->whereIn('id', $res_fee)->get();
+
+        $getdetails  = DB::table('details')
+            ->join('fees_details', 'fees_details.details_id', '=', 'details.id')
+            ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
+            ->select('details.id as detailsid', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'fees.id as feeid')
+            ->whereIn('details.id', $res_details)->get();
+        // dd($getdetails);
+
+        return view('parent.fee.pay', compact('getstudent', 'getfees', 'getdetails'))->render();
+    }
 
     public function billIndex()
     {
@@ -125,7 +173,7 @@ class PayController extends Controller
             $transaction->donation()->attach($id, ['payment_type_id' => 1]);
 
             /// ******************* utk bridge yuran ****************************
-            
+
             // dd('done');
             // return view('fpx.tStatus', compact('request', 'user'));
         }
@@ -148,7 +196,7 @@ class PayController extends Controller
             $telno = $request->telno;
             $fpx_buyerName = $request->name;
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -257,7 +305,7 @@ class PayController extends Controller
                     $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
                     $organization = $this->organization->getOrganizationByDonationId($donation->id);
                     $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
-                    
+
                     Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
 
                     return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));

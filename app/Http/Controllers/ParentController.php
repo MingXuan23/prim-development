@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\OrganizationRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,9 @@ class ParentController extends Controller
         $role   = DB::table('organization_roles')
             ->where('id', '!=', 1)
             ->where('id', '!=', 2)
+            ->where('id', '!=', 3)
+            ->where('id', '!=', 4)
+            ->where('id', '!=', 5)
             ->get();
 
 
@@ -112,9 +116,11 @@ class ParentController extends Controller
             ]);
 
         $user = Auth::user();
-        $role = Role::create(['name' => 'parent']);
+        // $role = Role::create(['name' => 'parent']);
 
-        $user->assignRole('parent');
+        $rolename = OrganizationRole::find($roles);
+
+        $user->assignRole($rolename->nama);
         return redirect('/parent')->with('success', 'New dependents has been added successfully');
     }
 
