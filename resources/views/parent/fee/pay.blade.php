@@ -185,9 +185,9 @@ catch(Exception $e){
                     </div>
                     <div class="col-6">
                         @php
-                        $i += $row3->price ;
+                        $i += $row3->quantity*$row3->price ;
                         @endphp
-                        <h4 class="float-right">RM{{ $row3->price }}</h4>
+                        <h4 class="float-right">RM{{ $row3->quantity*$row3->price }}</h4>
                     </div>
 
                     @endforeach
