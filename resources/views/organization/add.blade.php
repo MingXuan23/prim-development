@@ -44,6 +44,19 @@
                         <label>Email</label>
                         <input type="text" name="email" class="form-control" placeholder="Email">
                     </div>
+                    <div class="form-group">
+                        <label>Jenis Organisasi</label>
+                        <select name="type_org" id="type_org" class="form-control">
+                            <option value="" selected>Semua Jenis Organisasi</option>
+                            @foreach($type_org as $row)
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cas Pembayaran (RM)</label>
+                        <input type="text" name="fixed_charges" class="form-control" placeholder="0.00" value="0">
+                    </div>
                     <div class="row justify-content-center">
                         <div class="form-group col-md-8">
                             <label>Alamat</label>

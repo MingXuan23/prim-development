@@ -80,6 +80,15 @@
                 </li>
                 @endrole
 
+                @role('Superadmin')
+                <li>
+                    <a href="{{ route('organization.getAll') }}" class=" waves-effect">
+                        <i class="mdi mdi-account-group"></i>
+                        <span>Organisasi (All)</span>
+                    </a>
+                </li>
+                @endrole
+
                 @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('school.index') }}" class=" waves-effect">

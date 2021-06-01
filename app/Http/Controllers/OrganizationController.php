@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\OrganizationRequest;
 use App\Models\Organization;
+use App\Models\TypeOrganization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -12,65 +13,38 @@ use View;
 
 class OrganizationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         return view('organization.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        return view('organization.add');
+        $type_org = TypeOrganization::all();
+        return view('organization.add', compact('type_org'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(OrganizationRequest $request)
     {
 
         //create organization
         $organization = Organization::create($request->validated());
-        
+
         //attach foreign key to pivot table
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
 
         $user = Auth::user();
-        
+
         $user->assignRole('Admin');
 
         return redirect('/organization')->with('success', 'New organization has been added successfully');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $org = DB::table('organizations')->where('id', $id)->first();
@@ -78,13 +52,6 @@ class OrganizationController extends Controller
         return view('organization.update', compact('org'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(OrganizationRequest $request, $id)
     {
         Organization::where('id', $id)->update($request->validated());
@@ -92,12 +59,6 @@ class OrganizationController extends Controller
         return redirect('/organization')->with('success', 'Maklumat berjaya dikemaskini');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         $result = Organization::find($id)->delete();
@@ -131,9 +92,19 @@ class OrganizationController extends Controller
     public static function getOrganizationByUserId()
     {
         $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
 
-        return Organization::whereHas('user', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })->get();
+            return Organization::all();
+        } else {
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->get();
+        }
+    }
+
+    public function getAllOrganization()
+    {
+
+        return view('organization.index');
     }
 }

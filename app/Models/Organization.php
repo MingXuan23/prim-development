@@ -10,7 +10,7 @@ class Organization extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state'];
+    protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state', 'type_org', 'fixed_charges'];
 
     public $timestamps = false;
 
