@@ -3,8 +3,7 @@
 @section('css')
     <link href="{{ URL::asset('assets/libs/dropzone/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
-@include('layouts.datepicker')
-
+    <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -20,7 +19,6 @@
 </div>
 <div class="row">
     <div class="card col-md-12">
-
         @if(count($errors) > 0)
         <div class="alert alert-danger">
             <ul>
@@ -30,13 +28,15 @@
             </ul>
         </div>
         @endif
-        <form class="form-validation" method="post" action="{{ route('donate.store') }}" enctype="multipart/form-data" name="donation">
+        <form class="form-validation" method="post" action="{{ route('donation.store') }}" enctype="multipart/form-data" name="donation">
             {{csrf_field()}}
             <div class="card-body">
+                <p class="card-title-desc">Bahagian bertanda * wajib diisi</p>
                 <div class="form-row">
                     <div class="form-group required col-md-6">
                         <label class="control-label">Nama Organisasi</label>
-                        <select name="organization" id="organization" class="form-control">
+                        <select name="organization" id="organization" class="form-control"
+                        data-parsley-required-message="Sila masukkan nama organisasi" required>
                             <option value="" disabled selected>Pilih Organisasi</option>
                             @foreach($organization as $row)
                             <option value="{{ $row->id }}">{{ $row->nama }}</option>
@@ -45,8 +45,8 @@
                     </div>
                     <div class="form-group col-md-6 required">
                         <label class="control-label">Nama Derma</label>
-                        <input type="text" name="name" class="form-control" placeholder="Nama Penuh" 
-                        data-parsley-required-message="Sila masukkan nama derma" required>
+                        <input type="text" name="nama" class="form-control" placeholder="Nama Penuh" 
+                        data-parsley-required-message="Sila masukkan nama derma" value="" required>
                     </div>
                 </div>
                 
@@ -55,10 +55,10 @@
                     <label class="control-label">Tempoh Sah Derma</label>
                     
                         <div class="input-daterange input-group" id="date">
-                            <input type="text" class="form-control" name="start_date" placeholder="Tarikh Awal" autocomplete="off" 
+                            <input type="text" class="form-control" name="date_started" placeholder="Tarikh Awal" autocomplete="off" 
                             data-parsley-required-message="Sila masukkan tarikh awal"
                             data-parsley-errors-container=".errorMessage" required/>
-                            <input type="text" class="form-control" name="end_date" placeholder="Tarikh Akhir" autocomplete="off"
+                            <input type="text" class="form-control" name="date_end" placeholder="Tarikh Akhir" autocomplete="off"
                             data-parsley-required-message="Sila masukkan tarikh akhir"
                             data-parsley-errors-container=".errorMessage" required/>
                         </div>
@@ -103,7 +103,6 @@
                     </div>
                 </div>
             </div>
-
         </form>
     </div>
 </div>
@@ -116,12 +115,12 @@
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/dropzone/dropzone.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script>
 
 <script>
     $(document).ready(function(){
 
         $('.form-validation').parsley();
-
         $(".input-mask").inputmask();
 
         var today = new Date();
@@ -130,6 +129,7 @@
             toggleActive: true,
             startDate: today,
             todayHighlight:true,
+            format: 'dd/mm/yyyy'
           });
         
     });

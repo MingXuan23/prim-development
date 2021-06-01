@@ -231,4 +231,6 @@ return [
         'Datatables' => Yajra\Datatables\Facades\Datatables::class,
     ],
 
+    'date_format' => 'm/d/Y',
+
 ];
