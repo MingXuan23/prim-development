@@ -48,6 +48,7 @@ Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonat
 
 Route::group(['prefix' => 'organization'], function () {
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
+    Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
 });
 
 Route::group(['prefix' => 'activity'], function () {
