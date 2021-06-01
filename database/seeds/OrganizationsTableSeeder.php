@@ -26,7 +26,8 @@ class OrganizationsTableSeeder extends Seeder
                 "state" => "Melaka",
                 "type_org" => "public",
                 "created_at" => "2020-06-07 10:48:33",
-                "updated_at" => "2020-06-07 10:52:01"
+                "updated_at" => "2020-06-07 10:52:01",
+                "type_org" => "3"
             ),
             1 =>
             array(
@@ -40,7 +41,9 @@ class OrganizationsTableSeeder extends Seeder
                 "state" => "Perak",
                 "type_org" => "public",
                 "created_at" => "2020-06-07 10:48:33",
-                "updated_at" => "2020-06-07 10:52:01"
+                "updated_at" => "2020-06-07 10:52:01",
+                "type_org" => "3"
+
             ),
             2 =>
             array(
@@ -54,7 +57,9 @@ class OrganizationsTableSeeder extends Seeder
                 "state" => "Melaka",
                 "type_org" => "JAIM",
                 "created_at" => "2020-06-07 10:48:33",
-                "updated_at" => "2020-06-07 10:52:01"
+                "updated_at" => "2020-06-07 10:52:01",
+                "type_org" => "2"
+
             ),
         ));
     }
