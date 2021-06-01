@@ -126,9 +126,6 @@
 
 
 @section('script')
-<!-- Peity chart-->
-<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
-
 <script>
   $(document).ready(function() {
 
@@ -222,10 +219,7 @@
                     "_token": "{{ csrf_token() }}",
                     _method: 'DELETE'
                 },
-                url: "/donate/" + donation_id,
-                beforeSend: function() {
-                    $('#delete').text('Padam...');
-                },
+                url: "/donation/" + donation_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');

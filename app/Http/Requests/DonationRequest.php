@@ -24,12 +24,10 @@ class DonationRequest extends FormRequest
     public function rules()
     {
         return [
-            'organization'  =>  'required|not_in:0',
-            'name'          =>  'required',
-            'description'   =>  'required',
-            'start_date'    =>  'required',
-            'end_date'      =>  'required',
-            'donation_poster'   => 'mimes:jpeg,bmp,png,svg,jpg'
+            'nama'              => 'required',
+            'description'       => 'nullable',
+            'tax_payer'         => 'nullable',
+            'total_tax'         => 'nullable',
         ];
     }
 }
