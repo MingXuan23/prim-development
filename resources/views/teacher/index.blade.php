@@ -274,7 +274,7 @@
   
                       $('div.flash-message').html(data);
   
-                      donationTable.ajax.reload();
+                      teacherTable.ajax.reload();
                   },
                   error: function (data) {
                       $('div.flash-message').html(data);
