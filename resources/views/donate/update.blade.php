@@ -32,9 +32,9 @@
             {{csrf_field()}}
             {{ method_field('PATCH') }}
             <div class="card-body">
-                {{-- <p class="card-title-desc">Bahagian bertanda * wajib diisi</p> --}}
+                <p class="card-title-desc">Bahagian bertanda * wajib diisi</p>
                 
-                <div class="form-group">
+                <div class="form-group ">
                     <label class="control-label">Nama Derma</label>
                     <input type="text" name="nama" class="form-control" placeholder="Nama Penuh" 
                     data-parsley-required-message="Sila masukkan nama derma" value="{{ $donation->nama }}" required>
@@ -42,7 +42,7 @@
                 
                 <div class="form-row">
                     <div class="form-group col-md-6 required">
-                        <label>Tarikh Awal</label>
+                        <label class="control-label">Tarikh Awal</label>
                         <div>
                             <div class="input-group">
                                 <input type="text" name="date_started" class="form-control" placeholder="mm/dd/yyyy" id="start_date" 
@@ -57,7 +57,7 @@
                     </div>
 
                     <div class="form-group col-md-6 required">
-                        <label>Tarikh Awal</label>
+                        <label class="control-label">Tarikh Awal</label>
                         <div>
                             <div class="input-group">
                                 <input type="text" name="date_end" class="form-control" placeholder="mm/dd/yyyy" id="end_date" 
@@ -70,26 +70,6 @@
                             </div><!-- input-group -->
                         </div>
                     </div>
-
-                    {{-- <div class="form-group col-md-6 required">
-                        <label class="control-label">Tarikh Awal</label>
-                        <div id="start_date">
-                            <input type="text" class="form-control" name="date_started" placeholder="Tarikh Awal" autocomplete="off" 
-                            data-parsley-required-message="Sila masukkan tarikh awal"
-                            data-parsley-errors-container=".errorMessage" value="{{ \Carbon\Carbon::parse($donation->date_started)->format('d/m/Y') }}" required/>
-                        </div>
-                        <div class="errorMessage"></div>
-                    </div>
-                    
-                    <div class="form-group col-md-6 required">
-                    <label class="control-label">Tarikh Akhir</label>
-                        <div id="end_date">
-                            <input type="text" class="form-control" name="date_end" placeholder="Tarikh Akhir" autocomplete="off"
-                            data-parsley-required-message="Sila masukkan tarikh akhir"
-                            data-parsley-errors-container=".errorMessage" value="{{ \Carbon\Carbon::parse($donation->date_end)->format('d/m/Y') }}" required/>
-                        </div>
-                        <div class="errorMessage"></div>
-                    </div> --}}
                 </div>
 
                 <div class="form-row">
