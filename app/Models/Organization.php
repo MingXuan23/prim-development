@@ -44,4 +44,9 @@ class Organization extends Model
 
         return $organization;
     }
+
+    public function typeOrganization()
+    {
+        return $this->belongsTo('TypeOrganization');
+    }
 }
