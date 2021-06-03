@@ -32,27 +32,46 @@
             @method('PATCH')
             {{csrf_field()}}
             <div class="card-body">
-                <div class="form-group">
-                    <label>Nama Penuh</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh" value="{{ $student->studentname }}">
-                </div>
-                <div class="form-group">
-                    <label>Nombor Kad Pengenalan</label>
-                    <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan" value="{{ $student->icno }}">
-                </div>
 
                 <div class="form-group">
-                    <label>Nama Kelas</label>
-                    <select name="kelas" id="kelas" class="form-control">
-                        @foreach($listclass as $row)
-                        <option value="{{ $row->id }}" {{$student->classid == $row->id  ? 'selected' : ''}}> {{ $row->nama }} </option>
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                            @if($row->id == $student->organization_id)
+                            <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                            @else
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
-                {{-- <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                </div> --}}
+
+                <div id="dkelas" class="form-group">
+                    <label> Nama Kelas</label>
+                    <select name="classes" id="classes" class="form-control">
+                        <option value="" disabled selected>Pilih Kelas</option>
+                        @foreach($listclass as $row)
+                            @if($row->id == $student->classid)
+                            <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                            @else
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Nama Penuh</label>
+                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh"
+                        value="{{ $student->studentname }}">
+                </div>
+                <div class="form-group">
+                    <label>Nombor Kad Pengenalan</label>
+                    <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan"
+                        value="{{ $student->icno }}">
+                </div>
+
                 <div class="form-group mb-0">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -79,4 +98,44 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
+
+<script>
+    $(document).ready(function(){
+        
+        $('#organization').change(function(){
+        
+                // $('#kelas').val('');
+                // $('#murid').val('');
+                
+        });
+
+            $('#organization').change(function() {
+               
+                if($(this).val() != '')
+                {
+                    var organizationid    = $("#organization option:selected").val();
+                    var _token            = $('input[name="_token"]').val();
+                    $.ajax({
+                        url:"{{ route('parent.fetchClass') }}",
+                        method:"POST",
+                        data:{ oid:organizationid,
+                                _token:_token },
+                        success:function(result)
+                        {
+                             
+                            $('#classes').empty();
+                            $("#classes").append("<option value='' disabled selected> Pilih Kelas</option>");
+                            jQuery.each(result.success, function(key, value){
+                                // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
+
+                                $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
+                            });
+                        }
+
+                    })
+                }
+            });
+        });
+</script>
 @endsection

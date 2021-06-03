@@ -163,14 +163,14 @@
                     {
                         // alert($(this).val();)
                         // alert($("#sekolah option:selected").val());
-                        var schoolid    = $("#school option:selected").val();
+                        var oid    = $("#school option:selected").val();
                         var _token      = $('input[name="_token"]').val();
                         // console.log(schoolid);
         
                         $.ajax({
                             url:"{{ route('parent.fetchClass') }}",
                             method:"POST",
-                            data:{ schid:schoolid,
+                            data:{ oid:oid,
                                     _token:_token },
                             success:function(result)
                             {
