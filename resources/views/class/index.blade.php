@@ -3,13 +3,14 @@
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
+
 @endsection
 
 @section('content')
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Guru</h4>
+            <h4 class="font-size-18">Kelas</h4>
             <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
@@ -19,14 +20,13 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card card-primary">
-
             {{csrf_field()}}
             <div class="card-body">
 
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected>Semua Organisasi</option>
+                        <option value="" selected disabled>Pilih Organisasi</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
@@ -51,11 +51,11 @@
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
                         class="fas fa-plus"></i> Import</a>
-
-                <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
+                <a style="margin: 1px;" href="{{ route('exportclass') }}" class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a>
-                <a style="margin: 19px; float: right;" href="{{ route('teacher.create') }}" class="btn btn-primary"> <i
-                        class="fas fa-plus"></i> Tambah Guru</a>
+                {{-- href="{{ route('kelas.create') }}" {{ route('exportkelas') }}--}}
+                <a style="margin: 19px; float: right;" href="{{ route('class.create') }}" class="btn btn-primary"> <i
+                        class="fas fa-plus"></i> Tambah Kelas</a>
             </div>
 
             <div class="card-body">
@@ -76,17 +76,14 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap"
+                    <table id="classesTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
-                                <th>Nama Penuh</th>
-                                <th>Nama Pengguna</th>
-                                <th>Nombor Kad pengenalan</th>
-                                <th>Email</th>
-                                <th>Nombor Telefon</th>
-                                <th>Status</th>
+                                <th>Nama Kelas</th>
+                                <th>Bilangan Pelajar</th>
+                                <th>Tahap</th>
                                 <th>Details</th>
                             </tr>
                         </thead>
@@ -100,7 +97,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Padam Guru</h4>
+                        <h4 class="modal-title">Padam Kelas</h4>
                     </div>
                     <div class="modal-body">
                         Adakah anda pasti?
@@ -121,16 +118,22 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Murid</h5>
+                        <h5 class="modal-title">Import Kelas</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('importteacher') }}" method="post" enctype="multipart/form-data">
+                    {{-- {{ route('importkelas')}} --}}
+                    <form action="{{ route('importclass') }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
-
+                            {{-- <div class="form-group">
+                                            <label>Nama Kelas</label>
+                                            <select name="tahap" id="tahap" class="form-control">
+                                                <option value="1">Tahap 1</option>
+                                            </select>
+                                        </div> --}}
                             <div class="form-group">
                                 <input type="file" name="file" required>
                             </div>
@@ -146,8 +149,6 @@
         </div>
     </div>
 </div>
-
-
 @endsection
 
 
@@ -160,19 +161,20 @@
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
+
 <script>
     $(document).ready(function() {
   
-      var teacherTable;
+      var classesTable;
   
-        fetch_data();
+        // fetch_data();
   
         function fetch_data(oid = '') {
-            teacherTable = $('#teacherTable').DataTable({
+            classesTable = $('#classesTable').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('teacher.getTeacherDatatable') }}",
+                        url: "{{ route('class.getClassesDatatable') }}",
                         data: {
                             oid: oid,
                             hasOrganization: true
@@ -185,7 +187,7 @@
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [3,4,5,6,7], // your case first column
+                        "targets": [1,2,3,4], // your case first column
                         "className": "text-center",
                     },],
                     order: [
@@ -199,25 +201,14 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     }, {
-                        data: "name",
-                        name: 'name'
+                        data: "cnama",
+                        name: 'cnama'
                     }, {
-                        data: "username",
-                        name: 'username'
+                        data: "levelid",
+                        name: 'levelid'
                     }, {
-                        data: "icno",
-                        name: 'icno'
-                    }, {
-                        data: "email",
-                        name: 'email'
-                    }, {
-                        data: "telno",
-                        name: 'telno'
-                    }, {
-                        data: 'status',
-                        name: 'status',
-                        orderable: false,
-                        searchable: false
+                        data: "levelid",
+                        name: 'levelid'
                     }, {
                         data: 'action',
                         name: 'action',
@@ -229,7 +220,7 @@
   
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#teacherTable').DataTable().destroy();
+            $('#classesTable').DataTable().destroy();
             console.log(organizationid);
             fetch_data(organizationid);
         });
@@ -241,10 +232,10 @@
             }
         });
   
-        var teacher_id;
+        var class_id;
   
         $(document).on('click', '.btn-danger', function(){
-            teacher_id = $(this).attr('id');
+            class_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
         });
   
@@ -256,7 +247,7 @@
                       "_token": "{{ csrf_token() }}",
                       _method: 'DELETE'
                   },
-                  url: "/teacher/" + teacher_id,
+                  url: "/class/" + class_id,
                   success: function(data) {
                       setTimeout(function() {
                           $('#confirmModal').modal('hide');
@@ -264,7 +255,7 @@
   
                       $('div.flash-message').html(data);
   
-                      teacherTable.ajax.reload();
+                      classesTable.ajax.reload();
                   },
                   error: function (data) {
                       $('div.flash-message').html(data);
@@ -276,4 +267,5 @@
   
     });
 </script>
+
 @endsection

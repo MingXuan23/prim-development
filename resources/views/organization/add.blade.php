@@ -55,7 +55,9 @@
                     </div>
                     <div class="form-group">
                         <label>Cas Pembayaran (RM)</label>
-                        <input type="text" name="fixed_charges" class="form-control" placeholder="0.00" value="0">
+                        <input id="input-currency" class="form-control input-mask text-left"
+                            data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
+                            im-insert="true" style="text-align: right;" name="fixed_charges" required>
                     </div>
                     <div class="row justify-content-center">
                         <div class="form-group col-md-8">
@@ -95,4 +97,11 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
+<script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
+<script>
+    $(document).ready(function () {
+        $(".input-mask").inputmask();
+    });
+</script>
 @endsection

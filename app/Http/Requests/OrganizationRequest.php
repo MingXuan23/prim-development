@@ -27,12 +27,13 @@ class OrganizationRequest extends FormRequest
             'nama'         =>  'required',
             // 'code'         =>  'required',
             'telno'        =>  'required|numeric',
-            'email'        =>  'required|email,',
+            'email'        =>  'required',
             'address'      =>  'required',
             'postcode'     =>  'required',
             'state'        =>  'required',
             'type_org'     =>  'required',
             'fixed_charges'      =>  'required|numeric',
+            
         ];
     }
 }

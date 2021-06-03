@@ -15,8 +15,9 @@ class CreateClassTable extends Migration
     {
         Schema::create('classes', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('nama');
-            $table->integer('levelid');
+            $table->string('nama')->nullable();
+            $table->integer('levelid')->nullable();
+            $table->string('status')->nullable();
         });
     }
 

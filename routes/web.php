@@ -55,6 +55,10 @@ Route::group(['prefix' => 'teacher'], function () {
     Route::get('list', 'TeacherController@getTeacherDatatable')->name('teacher.getTeacherDatatable');
 });
 
+Route::group(['prefix' => 'class'], function () {
+    Route::get('list', 'ClassController@getClassesDatatable')->name('class.getClassesDatatable');
+});
+
 Route::group(['prefix' => 'activity'], function () {
     Route::get('list', 'ActivityController@getActivityDatatable')->name('ActivityDT');
 });

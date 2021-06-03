@@ -27,6 +27,7 @@ class OrganizationController extends Controller
     public function store(OrganizationRequest $request)
     {
 
+        // dd($request->type_org);
         //create organization
         $organization = Organization::create($request->validated());
 
@@ -34,8 +35,12 @@ class OrganizationController extends Controller
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
 
         $user = Auth::user();
-
         $user->assignRole('Admin');
+
+        if ($request->type_org == 1 || $request->type_org == 2) {
+            $organization->user()->attach(Auth::id(), ['start_date'=>now(), 'status' => 1, 'role_id' => 4]);
+            $user->assignRole('Pentadbir');
+        }
 
         return redirect('/organization')->with('success', 'New organization has been added successfully');
     }
