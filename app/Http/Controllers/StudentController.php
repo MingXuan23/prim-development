@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\StudentExport;
 use App\Imports\StudentImport;
+use App\Models\ClassModel;
 use App\Models\Organization;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -104,13 +105,16 @@ class StudentController extends Controller
             ->orderBy('classes.nama')
             ->get();
 
-        return view('student.add', compact('listclass'));
+        $organization = $this->getOrganizationByUserId();
+
+
+        return view('student.add', compact('listclass', 'organization'));
     }
 
     public function store(Request $request)
     {
         //
-        $classid = $request->get('kelas');
+        $classid = $request->get('classes');
 
         $co = DB::table('class_organization')
             ->select('id')
@@ -122,7 +126,7 @@ class StudentController extends Controller
         $this->validate($request, [
             'name'          =>  'required',
             'icno'          =>  'required|numeric',
-            'kelas'         =>  'required',
+            'classes'       =>  'required',
         ]);
 
         $student = new Student([
@@ -149,79 +153,50 @@ class StudentController extends Controller
 
     public function edit($id)
     {
-        //
-        $userid     = Auth::id();
-
-        $school = DB::table('organizations')
-            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            ->select('organizations.id as schoolid')
-            ->where('organization_user.user_id', $userid)
-            ->first();
-
-        $listclass = DB::table('classes')
-            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
-            ->select('classes.id as id', 'classes.nama', 'classes.levelid')
-            ->where([
-                ['class_organization.organization_id', $school->schoolid]
-            ])
-            ->orderBy('classes.nama')
-            ->get();
-
-
-
+        $listclass = ClassModel::all();
         $student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.id as classid', 'classes.nama as classname', 'class_student.status')
+            ->select('class_organization.organization_id', 'students.id as id', 'students.nama as studentname', 'students.icno', 'classes.id as classid', 'classes.nama as classname', 'class_student.status')
             ->where([
                 ['students.id', $id],
             ])
             ->orderBy('classes.nama')
             ->first();
-        // dd($listclass);
-        // $student = DB::table('students')->where('id', $id)->first();
 
-        return view('student.update', compact('student', 'listclass'));
+        $organization = $this->getOrganizationByUserId();
+
+        return view('student.update', compact('student', 'organization', 'listclass'));
     }
 
     public function update(Request $request, $id)
     {
         //
-        $classid = $request->get('kelas');
-
-        // $co = DB::table('class_student')
-        //     ->select('organclass_id')
-        //     ->where('student_id', $id)
-        //     ->first();
-
-        $co = DB::table('class_organization')
-            ->select('id')
-            ->where('class_id', $classid)
-            ->first();
+        $classid = $request->get('classes');
 
         $this->validate($request, [
             'name'          =>  'required',
             'icno'          =>  'required|numeric',
-            'kelas'         =>  'required',
+            'classes'       =>  'required',
         ]);
 
         $student = DB::table('students')
-            ->where('id', $id)
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status')
+            ->where([
+                ['students.id', $id],
+            ])
             ->update(
                 [
-                    'nama' => $request->get('name'),
-                    'icno' => $request->get('icno')
+                    'students.nama' => $request->get('name'),
+                    'students.icno' => $request->get('icno'),
+                    'classes.id'    => $classid,
                 ]
             );
 
-        $class = DB::table('class_student')
-            ->where('student_id', $id)
-            ->update(
-                [
-                    'organclass_id' => $co->id,
-                ]
-            );
 
         return redirect('/student')->with('success', 'The data has been updated!');
     }

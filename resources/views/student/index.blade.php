@@ -248,7 +248,6 @@
 
                                 $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
                             });
-                            studentTable.ajax.reload();
 
                         }
 
