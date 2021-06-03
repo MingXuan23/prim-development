@@ -38,7 +38,7 @@ class OrganizationController extends Controller
         $user->assignRole('Admin');
 
         if ($request->type_org == 1 || $request->type_org == 2) {
-            $organization->user()->attach(Auth::id(), ['start_date'=>now(), 'status' => 1, 'role_id' => 4]);
+            $organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 4]);
             $user->assignRole('Pentadbir');
         }
 
@@ -52,9 +52,10 @@ class OrganizationController extends Controller
 
     public function edit($id)
     {
+        $type_org = TypeOrganization::all();
         $org = DB::table('organizations')->where('id', $id)->first();
 
-        return view('organization.update', compact('org'));
+        return view('organization.update', compact('org', 'type_org'));
     }
 
     public function update(OrganizationRequest $request, $id)
