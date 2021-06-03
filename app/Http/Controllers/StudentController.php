@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Exports\StudentExport;
 use App\Imports\StudentImport;
+use App\Models\Organization;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class StudentController extends Controller
 {
@@ -51,7 +55,9 @@ class StudentController extends Controller
 
         // dd($listclass);
 
-        return view("pentadbir.student.index", compact('student', 'listclass'));
+        $organization = $this->getOrganizationByUserId();
+
+        return view("student.index", compact('student', 'listclass', 'organization'));
     }
 
     public function studentexport()
@@ -98,7 +104,7 @@ class StudentController extends Controller
             ->orderBy('classes.nama')
             ->get();
 
-        return view('pentadbir.student.add', compact('listclass'));
+        return view('student.add', compact('listclass'));
     }
 
     public function store(Request $request)
@@ -176,7 +182,7 @@ class StudentController extends Controller
         // dd($listclass);
         // $student = DB::table('students')->where('id', $id)->first();
 
-        return view('pentadbir.student.update', compact('student', 'listclass'));
+        return view('student.update', compact('student', 'listclass'));
     }
 
     public function update(Request $request, $id)
@@ -223,5 +229,99 @@ class StudentController extends Controller
     public function destroy($id)
     {
         //
+        $result = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status')
+            ->where([
+                ['students.id', $id],
+            ])
+            ->update(
+                [
+                    'class_student.status' => 0,
+                ]
+            );
+
+
+        if ($result) {
+            Session::flash('success', 'Guru Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Guru Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
+    public function getStudentDatatable(Request $request)
+    {
+        // dd($request->oid);
+
+        if (request()->ajax()) {
+            // $oid = $request->oid;
+            $classid = $request->classid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($classid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                    ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status')
+                    ->where([
+                        ['classes.id', $classid],
+                        ['class_student.status', 1],
+                    ])
+                    ->orderBy('students.nama');
+
+                $table = Datatables::of($data);
+
+                $table->addColumn('status', function ($row) {
+                    if ($row->status == '1') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                });
+
+                $table->rawColumns(['status', 'action']);
+                return $table->make(true);
+            }
+
+            // dd($data->oid);
+
+        }
+    }
+
+    public function getOrganizationByUserId()
+    {
+        $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
+
+            return Organization::all();
+        } else {
+            // user role guru 
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->get();
+        }
     }
 }
