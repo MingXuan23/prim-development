@@ -47,7 +47,7 @@
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="">Semua Organisasi</option>
+                        <option value="">Pilih Organisasi</option>
                         @foreach($organization as $row)
                             @if($row->id == $teacher->organization_id)
                             <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>

@@ -44,7 +44,7 @@
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected>Semua Organisasi</option>
+                        <option value="" selected>Pilih Organisasi</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
