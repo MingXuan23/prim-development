@@ -12,7 +12,7 @@ class Organization extends Model
 
     protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state', 'type_org', 'fixed_charges'];
 
-    public $timestamps = false;
+    // public $timestamps = false;
 
     protected $dates = ['deleted_at'];
 
