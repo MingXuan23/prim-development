@@ -10,7 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-use Yajra\DataTables\Facades\DataTables;
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class ClassController extends Controller
 {
