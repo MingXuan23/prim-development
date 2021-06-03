@@ -50,13 +50,13 @@ class ParentController extends Controller
     {
 
         // dd($request->get('schid'));
-        $schid = $request->get('schid');
+        $oid = $request->get('oid');
 
         $list = DB::table('organizations')
             ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.nama as nschool', 'classes.id as cid', 'classes.nama as cname')
-            ->where('organizations.id', $schid)
+            ->where('organizations.id', $oid)
             ->get();
 
         return response()->json(['success' => $list]);
