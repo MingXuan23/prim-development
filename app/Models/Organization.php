@@ -10,9 +10,9 @@ class Organization extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state'];
+    protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state', 'type_org', 'fixed_charges'];
 
-    public $timestamps = false;
+    // public $timestamps = false;
 
     protected $dates = ['deleted_at'];
 
@@ -43,5 +43,10 @@ class Organization extends Model
         })->first();
 
         return $organization;
+    }
+
+    public function typeOrganization()
+    {
+        return $this->belongsTo('TypeOrganization');
     }
 }

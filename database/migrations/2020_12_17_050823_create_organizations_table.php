@@ -22,10 +22,12 @@ class CreateOrganizationsTable extends Migration
             $table->string('address')->nullable();
             $table->string('postcode')->nullable();
             $table->string('state')->nullable();
-            $table->string('fixed_fees')->nullable();
-            $table->string('type_org')->nullable();
+            $table->string('fixed_charges')->nullable();
+            // $table->string('type_org')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->unsignedBigInteger('type_org');
+            $table->foreign('type_org')->references('id')->on('type_organizations')->onDelete('cascade');
         });
     }
 
@@ -36,6 +38,9 @@ class CreateOrganizationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('organizations');
+        Schema::dropIfExists('organizations', function (Blueprint $table)
+        {
+            $table->drop('type_org');
+        });
     }
 }

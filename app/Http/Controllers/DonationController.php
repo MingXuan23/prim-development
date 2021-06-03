@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organization;
-use App\Models\Reminder;
 use App\Models\Donation;
 use App\User;
 use Illuminate\Http\Request;
@@ -22,12 +21,14 @@ class DonationController extends Controller
     private $user;
     private $donation;
     private $transaction;
+    private $organization;
 
-    public function __construct(User $user, Donation $donation, Transaction $transaction)
+    public function __construct(User $user, Donation $donation, Transaction $transaction, Organization $organization)
     {
         $this->user = $user;
         $this->donation = $donation;
         $this->transaction = $transaction;
+        $this->organization = $organization;
     }
 
     public function index()
@@ -252,36 +253,31 @@ class DonationController extends Controller
 
     public function store(DonationRequest $request)
     {
-
-        // dd($request);
-
-        $link = explode(" ", $request->get('name'));
+        $link = explode(" ", $request->nama);
         $str = implode("-", $link);
-        // dd($str);
 
-        $dt = Carbon::now();
-        $startdate  = $dt->toDateString($request->get('start_date'));
-        $enddate    = $dt->toDateString($request->get('end_date'));
+        $start_date = Carbon::createFromFormat(config('app.date_format'), $request->date_started)->format('Y-m-d');
+        $end_date = Carbon::createFromFormat(config('app.date_format'), $request->date_end)->format('Y-m-d');
 
-        $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
-        $file_name = basename($storagePath);
+        $file_name = '';
+        
+        if (!is_null($request->donation_poster)) {
+            $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
+            $file_name = basename($storagePath);
+        }
 
-        $newdonate = Donation::create([
-            'nama'           =>  $request->get('name'),
-            'description'    =>  $request->get('description'),
-            'date_created'   =>  now(),
-            'date_started'   =>  $startdate,
-            'date_end'       =>  $enddate,
-            'status'         =>  '1',
-            'url'            =>  $str,
-            'tax_payer'      => $request->tax_payer,
-            'total_tax'      => $request->total_tax,
+        $donation = Donation::create($request->validated() + [
+            'date_created'      => now(),
+            'date_started'      => $start_date,
+            'date_end'          => $end_date,
+            'status'            => '1',
+            'url'               => $str,
             'donation_poster'   => $file_name
         ]);
 
-        $newdonate->organization()->attach($request->get('organization'));
+        $donation->organization()->attach($request->organization);
 
-        return redirect('/donate')->with('success', 'New donations has been added successfully');
+        return redirect('/donation')->with('success', 'Derma Berjaya Ditambah');
     }
 
     public function show($id)
@@ -291,44 +287,60 @@ class DonationController extends Controller
 
     public function edit($id)
     {
+        $organizations = $this->getOrganizationByUserId();
+        $organization = $this->organization->getOrganizationByDonationId($id);
         $donation = DB::table('donations')->where('id', $id)->first();
 
-        return view('donate.update', compact('donation'));
+        return view('donate.update', compact('donation', 'organization', 'organizations'));
     }
 
-    public function update(Request $request, $id)
+    public function update(DonationRequest $request, $id)
     {
-        $this->validate($request, [
-            'nama'          =>  'required',
-            'description'   =>  'required',
-            'start_date'    =>  'required',
-            'end_date'      =>  'required',
-        ]);
+        $link = explode(" ", $request->nama);
+        $str = implode("-", $link);
+
+        $start_date = Carbon::createFromFormat(config('app.date_format'), $request->date_started)->format('Y-m-d');
+        $end_date = Carbon::createFromFormat(config('app.date_format'), $request->date_end)->format('Y-m-d');
+
+        $file_name = '';
+        
+        if (!is_null($request->donation_poster)) {
+            
+            // Delete existing image before update with new image;
+            $donation = $this->donation->getDonationById($id);
+            $destination = public_path('donation-poster').  DIRECTORY_SEPARATOR  . $donation->donation_poster;
+            unlink($destination);
+
+            $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
+            $file_name = basename($storagePath);
+        }
 
         DB::table('donations')
             ->where('id', $id)
             ->update(
-                [
-                    'nama'          => $request->nama,
-                    'description'   => $request->description,
-                    'date_started'  => $request->start_date,
-                    'date_end'      => $request->end_date
-                ]
+                $request->validated() +
+            [
+                'date_created'      => now(),
+                'date_started'      => $start_date,
+                'date_end'          => $end_date,
+                'status'            => '1',
+                'url'               => $str,
+                'donation_poster'   => $file_name
+            ]
             );
 
-        return redirect('/donate')->with('success', 'Derma Telah Berjaya Dikemaskini');
+        return redirect('/donation')->with('success', 'Derma Telah Berjaya Dikemaskini');
     }
 
     public function destroy($id)
     {
-        // dd($id);
         $result = Donation::where('id', $id)->first()->delete();
         
         if ($result) {
-            Session::flash('success', 'Donation Delete Successfully');
+            Session::flash('success', 'Derma Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         } else {
-            Session::flash('error', 'Donation Delete Failed');
+            Session::flash('error', 'Derma Gagal Dipadam');
             return View::make('layouts/flash-messages');
         }
     }

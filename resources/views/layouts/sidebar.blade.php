@@ -10,7 +10,7 @@
                 <li class="menu-title">Main</li>
 
                 <li>
-                    <a href="/" class="waves-effect">
+                    <a href="/home" class="waves-effect">
                         <i class="ti-home"></i>
                         {{-- <span class="badge badge-pill badge-primary float-right">2</span> --}}
                         <span>Dashboard</span>
@@ -76,6 +76,15 @@
                     <a href="{{ route('parent.index') }}" class=" waves-effect">
                         <i class="fas fa-child"></i>
                         <span>Carian Tanggungan</span>
+                    </a>
+                </li>
+                @endrole
+
+                @role('Superadmin')
+                <li>
+                    <a href="{{ route('organization.getAll') }}" class=" waves-effect">
+                        <i class="mdi mdi-account-group"></i>
+                        <span>Organisasi (All)</span>
                     </a>
                 </li>
                 @endrole

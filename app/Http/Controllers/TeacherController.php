@@ -10,36 +10,28 @@ use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TeacherExport;
 use App\Imports\TeacherImport;
+use App\Models\Organization;
+use App\Models\OrganizationRole;
 use App\User;
 use Illuminate\Validation\Rule;
+use App\Models\TypeOrganization;
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class TeacherController extends Controller
 {
 
+    private $teacher;
+    public function __construct(Teacher $teacher)
+    {
+        $this->teacher = $teacher;
+    }
+
     public function index()
     {
-        //
-        $userid     = Auth::id();
-
-        $school = DB::table('organizations')
-            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            ->select('organizations.id as schoolid')
-            ->where('organization_user.user_id', $userid)
-            ->first();
-
-        // sekolah id
-        $listteacher = DB::table('users')
-            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            ->select('users.id as id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno', 'organization_user.status')
-            ->where([
-                ['organization_user.organization_id', $school->schoolid],
-                ['organization_user.role_id', 2]
-            ])
-            ->orderBy('users.name')
-            ->get();
-
-        // dd($listteacher);
-        return view("pentadbir.teacher.index", compact('listteacher'));
+        $organization = $this->getOrganizationByUserId();
+        return view('teacher.index', compact('organization'));
     }
 
     public function teacherexport()
@@ -56,13 +48,18 @@ class TeacherController extends Controller
         Excel::import(new TeacherImport, public_path('/uploads/excel/' . $namaFile));
 
         return redirect('/teacher')->with('success', 'New class has been added successfully');
-
     }
 
     public function create()
     {
         //
-        return view('pentadbir.teacher.add');
+        $organization = DB::table('organizations')
+            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+            ->where('organizations.type_org', '=', 1)
+            ->orWhere('organizations.type_org', '=', 2)
+            ->select('organizations.id as id', 'organizations.nama as nama')
+            ->get();
+        return view('teacher.add', compact('organization'));
     }
 
     public function store(Request $request)
@@ -74,6 +71,7 @@ class TeacherController extends Controller
             'icno'          =>  'required|numeric|unique:users',
             'email'         =>  'required|email|unique:users',
             'telno'         =>  'required|numeric',
+            'organization'  =>  'required',
         ]);
 
         $newteacher = new Teacher([
@@ -97,20 +95,21 @@ class TeacherController extends Controller
 
         $userid     = Auth::id();
 
-        // amik sekolah id untuk guru
-        $list = DB::table('organizations')
-            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            ->select('organizations.id as schoolid')
-            ->where('organization_user.user_id', $userid)
-            ->first();
-
+        // teacher active when first time login then will change status
         DB::table('organization_user')->insert([
-            'organization_id' => $list->schoolid,
-            'user_id'       => $newteacher->id,
-            'role_id'       => 2,
-            'start_date'    => now(),
-            'status'        => 0,
+            'organization_id'   => $request->get('organization'),
+            'user_id'           => $newteacher->id,
+            'role_id'           => 5,
+            'start_date'        => now(),
+            'status'            => 0,
         ]);
+
+        $user = Auth::user();
+
+        // role guru
+        $rolename = OrganizationRole::find(5);
+        $user->assignRole($rolename->nama);
+
 
         return redirect('/teacher')->with('success', 'New teacher has been added successfully');
     }
@@ -123,22 +122,37 @@ class TeacherController extends Controller
     public function edit($id)
     {
         //
-        $teacher = DB::table('users')->where('id', $id)->first();
+        // $teacher = $this->teacher->getOrganizationByUserId($id);
 
-        //$userinfo = User_info::find($id);
+        $teacher = DB::table('users')
+            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+            ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
+            ->where('users.id', $id)
+            ->where('organization_user.role_id', 5)
+            ->select('organizations.id as organization_id', 'users.id as uid', 'users.name as tcname', 'users.icno as icno', 'users.email as email', 'users.telno as telno', 'organization_user.role_id as role_id')
+            ->first();
+
+        $organization = DB::table('organizations')
+            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+            ->where('organizations.type_org', '=', 1)
+            ->orWhere('organizations.type_org', '=', 2)
+            ->select('organizations.id as id', 'organizations.nama as nama')
+            ->get();
+
         // dd($teacher);
-        return view('pentadbir.teacher.update', compact('teacher'));
+        return view('teacher.update', compact('teacher', 'organization'));
     }
 
     public function update(Request $request, $id)
     {
         //
         $uid = User::find($id);
+        // dd($id);
 
         $this->validate($request, [
             'name'          =>  'required',
             'icno'          =>  'required|numeric|unique:users,icno,' . $uid->id,
-            'email'         =>  'required|email|unique:users,email,' . $uid->id,
+            'email'         =>  'required|unique:users,email,' . $uid->id,
             'telno'         =>  'required|numeric',
         ]);
 
@@ -158,11 +172,101 @@ class TeacherController extends Controller
 
     public function destroy($id)
     {
-        //
-        // $uid = User::findOrFail($id);
-        // $uid->delete();
+        
+        $result = DB::table('users')
+            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+            ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
+            ->where('users.id', $id)
+            ->where('organization_user.role_id', 5)
+            ->update(
+                [
+                    'organization_user.status' => 0,
+                ]
+            );
 
-        // delete kat table orga user
-        // return redirect('/teacher');
+
+        if ($result) {
+            Session::flash('success', 'Guru Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Guru Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
+
+    public function getTeacherDatatable(Request $request)
+    {
+        // dd($request->oid);
+
+        if (request()->ajax()) {
+            $oid = $request->oid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('organizations')
+                    ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+                    ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+                    ->join('users', 'users.id', '=', 'organization_user.user_id')
+                    ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
+                    ->where('organizations.id', $oid)
+                    ->where('organization_user.role_id', 5)
+                    ->orderBy('users.name');
+            } elseif ($hasOrganizaton == "true") {
+                $data = DB::table('organizations')
+                    ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+                    ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+                    ->join('users', 'users.id', '=', 'organization_user.user_id')
+                    ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
+                    ->where('organization_user.role_id', 5)
+                    ->orderBy('users.name');
+            }
+
+            // dd($data->oid);
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == '1') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<a href="' . route('teacher.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
+        }
+    }
+
+    public function getOrganizationByUserId()
+    {
+        $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
+
+            return Organization::all();
+        } else {
+            // user role guru 
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->get();
+        }
     }
 }

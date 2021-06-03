@@ -44,6 +44,21 @@
                         <label>Email</label>
                         <input type="text" name="email" class="form-control" placeholder="Email">
                     </div>
+                    <div class="form-group">
+                        <label>Jenis Organisasi</label>
+                        <select name="type_org" id="type_org" class="form-control">
+                            <option value="" selected>Semua Jenis Organisasi</option>
+                            @foreach($type_org as $row)
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cas Pembayaran (RM)</label>
+                        <input id="input-currency" class="form-control input-mask text-left"
+                            data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
+                            im-insert="true" style="text-align: right;" name="fixed_charges" required>
+                    </div>
                     <div class="row justify-content-center">
                         <div class="form-group col-md-8">
                             <label>Alamat</label>
@@ -82,4 +97,11 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
+<script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
+<script>
+    $(document).ready(function () {
+        $(".input-mask").inputmask();
+    });
+</script>
 @endsection

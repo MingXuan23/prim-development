@@ -48,6 +48,7 @@
                             <tr style="text-align:center">
                                 <th>No</th>
                                 <th>Nama Organisasi</th>
+                                <th>Kod</th>
                                 <th>No Telefon</th>
                                 <th>Email</th>
                                 <th>Alamat</th>
@@ -115,6 +116,9 @@
                 }, {
                     data: "nama",
                     name: "nama"
+                },{
+                    data: "code",
+                    name: "code"
                 }, {
                     data: "telno",
                     name: "telno"

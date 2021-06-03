@@ -48,6 +48,15 @@ Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonat
 
 Route::group(['prefix' => 'organization'], function () {
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
+    Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
+});
+
+Route::group(['prefix' => 'teacher'], function () {
+    Route::get('list', 'TeacherController@getTeacherDatatable')->name('teacher.getTeacherDatatable');
+});
+
+Route::group(['prefix' => 'class'], function () {
+    Route::get('list', 'ClassController@getClassesDatatable')->name('class.getClassesDatatable');
 });
 
 Route::group(['prefix' => 'activity'], function () {
