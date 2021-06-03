@@ -9,7 +9,7 @@ class ClassModel extends Model
     //
     protected $table = 'classes';
 
-    protected $fillable = ['nama', 'levelid'];
+    protected $fillable = ['nama', 'levelid', 'status'];
 
     public $timestamps = false;
 }

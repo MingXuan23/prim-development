@@ -11,12 +11,11 @@
         <div class="page-title-box">
             <h4 class="font-size-18">Kelas</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Kelas >> Tambah Kelas</li>
+                <li class="breadcrumb-item active">Kelas >> Edit Kelas</li>
             </ol>
         </div>
     </div>
 </div>
-
 <div class="row">
     <div class="col-md-12">
         <div class="card card-primary">
@@ -30,19 +29,37 @@
                 </ul>
             </div>
             @endif
-            <form method="post" action="{{ route('class.store') }}" enctype="multipart/form-data">
+            <form method="post" action="{{ route('class.update', $class->id) }}" enctype="multipart/form-data">
+                @method('PATCH')
                 {{csrf_field()}}
                 <div class="card-body">
+
                     <div class="form-group">
-                        <label>Tahap Kelas</label>
-                        <select name="level" id="level" class="form-control">
-                            <option value="1">Tahap 1</option>
-                            <option value="2">Tahap 2</option>
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            <option value="" selected disabled>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                                @if($row->id == $class->organization_id)
+                                <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                                @else
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                @endif
+                            @endforeach
                         </select>
                     </div>
+
                     <div class="form-group">
                         <label>Nama Kelas</label>
-                        <input type="text" name="name" class="form-control" placeholder="Nama Kelas">
+                        <input type="text" name="name" class="form-control" placeholder="Nama Kelas"
+                            value="{{$class->nama}}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tahap Kelas</label>
+                        <select name="level" id="tahap" class="form-control">
+                            <option value="1" {{$class->levelid == 1  ? 'selected' : ''}}>Tahap 1</option>
+                            <option value="2" {{$class->levelid == 2  ? 'selected' : ''}}>Tahap 2</option>
+                        </select>
                     </div>
                     <div class="form-group mb-0">
                         <div>
@@ -53,6 +70,7 @@
                     </div>
                 </div>
                 <!-- /.card-body -->
+
             </form>
         </div>
     </div>
