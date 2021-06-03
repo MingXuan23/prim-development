@@ -35,27 +35,54 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label>Nama Organisasi</label>
-                        <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi" value="{{ $org->nama }}">
+                        <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi"
+                            value="{{ $org->nama }}">
                     </div>
                     <div class="form-group">
                         <label>No Telefon</label>
-                        <input type="text" name="telno" class="form-control" placeholder="No Telefon" value="{{ $org->telno }}">
+                        <input type="text" name="telno" class="form-control" placeholder="No Telefon"
+                            value="{{ $org->telno }}">
                     </div>
                     <div class="form-group">
                         <label>Email</label>
-                        <input type="text" name="email" class="form-control" placeholder="Email" value="{{ $org->email }}">
+                        <input type="text" name="email" class="form-control" placeholder="Email"
+                            value="{{ $org->email }}">
                     </div>
+                    <div class="form-group">
+                        <label>Jenis Organisasi</label>
+                        <select name="type_org" id="type_org" class="form-control">
+                            <option value="" selected>Semua Jenis Organisasi</option>
+                            @foreach($type_org as $row)
+                                @if($row->id == $org->type_org)
+                                <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                                @else
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cas Pembayaran (RM)</label>
+                        <input id="input-currency" class="form-control input-mask text-left"
+                            data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
+                            im-insert="true" style="text-align: right;" name="fixed_charges" required
+                            value="{{ $org->fixed_charges }}">
+                    </div>
+
                     <div class="row justify-content-center">
                         <div class="form-group col-md-8">
                             <label>Alamat</label>
-                            <textarea name="address" class="form-control" rows="4" placeholder="Alamat"> {{ $org->address }} </textarea>
+                            <textarea name="address" class="form-control" rows="4"
+                                placeholder="Alamat"> {{ $org->address }} </textarea>
                         </div>
                         <div class="form-group col">
                             <label>Poskod</label>
-                            <input type="text" name="postcode" class="form-control" placeholder="Poskod" value="{{ $org->postcode }}">
+                            <input type="text" name="postcode" class="form-control" placeholder="Poskod"
+                                value="{{ $org->postcode }}">
 
                             <label>Negeri</label>
-                            <input type="text" name="state" class="form-control" placeholder="Negeri" value="{{ $org->state }}">
+                            <input type="text" name="state" class="form-control" placeholder="Negeri"
+                                value="{{ $org->state }}">
                         </div>
 
                     </div>
