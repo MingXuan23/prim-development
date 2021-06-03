@@ -35,22 +35,20 @@ class FeesController extends Controller
             ->select('organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
             ->where([
                 ['users.id', $userid],
-                ['organization_roles.id', '!=', 1],
-                ['organization_roles.id', '!=', 2],
-                ['organization_roles.id', '!=', 3],
-                ['organization_roles.id', '!=', 4],
-                ['organization_roles.id', '!=', 5],
             ])
+            ->orWhere('organization_roles.id', '=', 6)
+            ->orWhere('organization_roles.id', '=', 7)
+            ->orWhere('organization_roles.id', '=', 8)
             ->orderBy('classes.nama')
             ->get();
 
         $feesid     = DB::table('fees')
-                ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
-                ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
-                ->join('class_student', 'class_organization.class_id', '=', 'class_student.id')
-                ->join('students', 'class_student.student_id', '=', 'students.id')
-                ->select('fees.id as feeid', 'students.id as studentid')
-                ->first();
+            ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('class_student', 'class_organization.class_id', '=', 'class_student.id')
+            ->join('students', 'class_student.student_id', '=', 'students.id')
+            ->select('fees.id as feeid', 'students.id as studentid')
+            ->first();
 
         // dd($feesid);
 

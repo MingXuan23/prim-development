@@ -126,10 +126,27 @@ class PayController extends Controller
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
             ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
-            ->select('students.id as studentid', 'students.nama as studentname', 'fees.id as feeid')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->select('students.id as studentid', 'students.nama as studentname', 'fees.id as feeid', 'organizations.id as organizationid')
             ->whereIn('students.id', $res_student)
             ->get();
 
+        $getstudent2  = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->select('students.id as studentid', 'students.nama as studentname', 'fees.id as feeid', 'organizations.id as organizationid')
+            ->whereIn('students.id', $res_student)
+            ->first();
+
+        $getorganization  = DB::table('organizations')
+            ->where('id', $getstudent2->organizationid)
+            ->first();
+
+        // dd($getorganization);
         $getfees     = DB::table('fees')->whereIn('id', $res_fee)->get();
 
         $getdetails  = DB::table('details')
@@ -139,7 +156,7 @@ class PayController extends Controller
             ->whereIn('details.id', $res_details)->get();
         // dd($getdetails);
 
-        return view('parent.fee.pay', compact('getstudent', 'getfees', 'getdetails'))->render();
+        return view('parent.fee.pay', compact('getstudent', 'getfees', 'getdetails', 'getorganization'))->render();
     }
 
     public function billIndex()

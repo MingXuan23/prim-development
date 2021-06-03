@@ -142,7 +142,8 @@ catch(Exception $e){
     <link href="{{ URL::asset('assets/css/app.min.css') }}" id="app-light" rel="stylesheet" type="text/css" />
     <style>
         span {
-            font-size: 22px;
+            font-size: 1.09375rem;
+            font-weight: bolder;
         }
     </style>
     <title>Pembayaran</title>
@@ -187,7 +188,7 @@ catch(Exception $e){
                         @php
                         $i += $row3->quantity*$row3->price ;
                         @endphp
-                        <h4 class="float-right">RM{{ $row3->quantity*$row3->price }}</h4>
+                        <h4 class="float-right">RM {{ number_format($row3->quantity*$row3->price, 2) }} </h4>
                     </div>
 
                     @endforeach
@@ -200,10 +201,19 @@ catch(Exception $e){
                 @endforeach
                 <div class="row mb-4">
                     <div class="col-6">
+                        <h5 class=" mb-3">Cas yang dikenakan </h5>
+                    </div>
+                    <div class="col-6">
+                        <h5 class="float-right mb-3">RM<span id="amount">
+                                {{ number_format($getorganization->fixed_charges, 2) }}</span> </h5>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-6">
                         <h4 class=" mb-3">Jumlah Amaun</h4>
                     </div>
                     <div class="col-6">
-                        <h4 class="float-right mb-3">RM<span id="amount">{{ $i }}</span> </h4>
+                        <h4 class="float-right mb-3">RM<span id="amount" style="font-size: 22px;"> {{ number_format($i + $getorganization->fixed_charges, 2) }}</span> </h4>
                     </div>
                 </div>
                 <div class="form-group">
