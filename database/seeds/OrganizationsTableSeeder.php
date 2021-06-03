@@ -24,10 +24,10 @@ class OrganizationsTableSeeder extends Seeder
                 "address" => "UTeM, Ayer Keroh",
                 "postcode" => "34400",
                 "state" => "Melaka",
-                "type_org" => "public",
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01",
-                "type_org" => "3"
+                "type_org" => "3",
+                "fixed_charges" => "3"
             ),
             1 =>
             array(
@@ -39,10 +39,10 @@ class OrganizationsTableSeeder extends Seeder
                 "address" => "Sungai Gedong, Bagan Serai",
                 "postcode" => "34400",
                 "state" => "Perak",
-                "type_org" => "public",
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01",
-                "type_org" => "3"
+                "type_org" => "3",
+                "fixed_charges" => "3"
 
             ),
             2 =>
@@ -55,10 +55,10 @@ class OrganizationsTableSeeder extends Seeder
                 "address" => "UTeM, Ayer Keroh",
                 "postcode" => "34400",
                 "state" => "Melaka",
-                "type_org" => "JAIM",
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01",
-                "type_org" => "2"
+                "type_org" => "3",
+                "fixed_charges" => "2"
 
             ),
         ));
