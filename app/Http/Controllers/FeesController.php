@@ -32,7 +32,7 @@ class FeesController extends Controller
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
             ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
-            ->select('organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
+            ->select('organizations.id as oid', 'organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
             ->where([
                 ['users.id', $userid],
             ])
