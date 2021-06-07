@@ -193,7 +193,7 @@ class StudentController extends Controller
                 [
                     'students.nama' => $request->get('name'),
                     'students.icno' => $request->get('icno'),
-                    'classes.id'    => $classid,
+                    'class_organization.class_id'    => $classid,
                 ]
             );
 

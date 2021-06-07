@@ -67,25 +67,32 @@
                 <div class="container-wrapper-scroll p-2 mb-3">
 
                     @foreach($list as $row)
+
+
                     <div class="col-md-12">
-                        <div id="accordionExample{{ $row->studentid }}" class="accordion shadow">
+                        <div id="accordionExample{{ $row->oid }}-{{ $row->studentid }}" class="accordion shadow">
                             <!-- Accordion item 1 -->
                             <div class="card">
-                                <div id="heading{{ $row->studentid }}" class="card-header bg-white shadow-sm border-0">
-                                    <h4 class="mb-0 font-weight-bold"><a href="#" data-toggle="collapse"
-                                            data-target="#collapse{{ $row->studentid }}" aria-expanded="false"
-                                            aria-controls="collapse{{ $row->studentid }}"
-                                            class="d-block position-relative text-dark collapsible-link py-2">
-                                            <span style="text-transform:uppercase;"> {{ $loop->iteration }}.
-                                                {{ $row->studentname }} </span>
-                                            <br>
-                                            <span> {{ $row->feename }} </span>
-                                            <span> {{ $row->nschool }} </span>
-                                        </a></h4>
+
+                                <div class="inputGroup">
+                                    <input id="option-{{ $row->oid }}-{{ $row->studentid }}" name="nameSchool" value="{{ $row->oid }}"
+                                        type="checkbox" data-toggle="collapse" data-target="#collapse{{ $row->oid }}-{{ $row->studentid }}"
+                                        aria-expanded="false" aria-controls="collapse{{ $row->oid }}-{{ $row->studentid }}"
+                                        class="d-block position-relative text-dark collapsible-link py-2"
+                                        onchange="checkOrganization(this)" />
+
+                                    <label for="option-{{ $row->oid }}-{{ $row->studentid }}">
+                                        <span style="font-size: 18px">{{ $loop->iteration }}.
+                                            {{ $row->studentname  }}</span>
+                                        <br>
+                                        <span> {{ $row->feename }} </span>
+                                        <span> {{ $row->nschool }} </span>
+                                    </label>
                                 </div>
 
-                                <div id="collapse{{ $row->studentid }}" aria-labelledby="heading{{ $row->studentid }}"
-                                    data-parent="#accordionExample{{ $row->studentid }}" class="collapse">
+
+                                <div id="collapse{{ $row->oid }}-{{ $row->studentid }}" aria-labelledby="heading{{ $row->oid }}-{{ $row->studentid }}"
+                                    data-parent="#accordionExample{{ $row->oid }}-{{ $row->studentid }}" class="collapse">
                                     <div class="card-body pl-0 pr-0">
 
                                         @foreach($getcat->where('feeid', $row->feeid) as $row1)
@@ -200,6 +207,10 @@
 
     var amt = 0;
     var total = 0;
+    $("#pay").html("0.00");
+    var myCheckboxes = new Array();
+    var organization_cb = new Array();
+    var oid;
 
     $('#btn-byr').click(function () {
       Swal.fire({
@@ -227,9 +238,56 @@
         }
       });
     }); //Parameter
+   
     
-    $("#pay").html("0.00");
-    var myCheckboxes = new Array();
+    function checkOrganization(element) {
+        var id = document.getElementById(element.id);
+        var name = document.getElementsByName(element.name);
+        // console.log(name[0].value);
+        oid = $('#'+element.id).val();
+
+        // console.log(oid);
+        if (id.checked) {
+            for(var i=0; i < name.length; i++){
+                
+                if(name[i].checked ){
+
+                    name[i].disabled = false;
+                }else{
+                    
+                    if(oid == name[i].value){
+                        name[i].disabled = false;
+                    }
+                    else{
+                        name[i].disabled = true;
+                    }
+                
+                }
+
+            } 
+        }else {
+            for(var i=0; i < name.length; i++){
+                name[i].disabled = false;
+            } 
+
+            total = 0;
+            amt = 0;
+
+            $("input[name='billcheck']:checkbox").prop('checked', false);
+            $("input[name='billcheck2']:checkbox").prop('checked', false);
+            $("#pay").html("0.00");
+            myCheckboxes = [];
+            if(total == 0){
+            document.getElementById('btn-byr').disabled = true;
+            }else{
+                document.getElementById('btn-byr').disabled = false;
+            }
+        } 
+        
+    }
+
+     
+    
 
     function checkD(element) {
         var id = element.id;
@@ -291,6 +349,24 @@
     if ($('input[name="billcheck"]').not(':checked').length == 0) {
             $('input[name="checkall"]').prop("checked", true);
     }
+
+
+    
+
+  
+        // $('.getid').children().prop('disabled', true);
+
+        // $('.getid').on("click",function(){
+        //     var id =  $(this).attr("id");
+        //     console.log(id);
+        // var id = "#"+$(".getid").attr("id");
+
+        //     $(".getid").children().prop('disabled', true);
+        //     //post code
+        // });
+
+    // var elem = $('a[href="'+id+'"]');
+    // elem.attr('disabled','disabled')
 
 </script>
 
