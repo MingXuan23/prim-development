@@ -26,7 +26,7 @@ class OrganizationsTableSeeder extends Seeder
                 "state" => "Melaka",
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01",
-                "type_org" => "3",
+                "type_org" => "4",
                 "fixed_charges" => "3.00"
             ),
             1 =>
@@ -41,7 +41,7 @@ class OrganizationsTableSeeder extends Seeder
                 "state" => "Perak",
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01",
-                "type_org" => "3",
+                "type_org" => "4",
                 "fixed_charges" => "3.00"
 
             ),
@@ -57,7 +57,7 @@ class OrganizationsTableSeeder extends Seeder
                 "state" => "Melaka",
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01",
-                "type_org" => "3",
+                "type_org" => "2",
                 "fixed_charges" => "2.00"
 
             ),
