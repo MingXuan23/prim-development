@@ -102,9 +102,6 @@
             }
         });
 
-        $(".checkSingle").click(function () {
-           
-        });
         $(document).on('change', '.checkSingle', function() {
           
             // console.log('asdf');
@@ -121,7 +118,7 @@
             }else {
                 $("#checkedAll").prop("checked", false);
             }
-    // your code
+            
         });
 
         $('#organization').change(function() {
@@ -137,12 +134,9 @@
                             _token:_token },
                     success:function(result)
                     {
-
                         $('.yearhide').show();       
                         $('#year').empty();
                         
-                        // console.log(result.success.type_org);
-
                         if(result.success.type_org == 1 || result.success.type_org == 2 ){
 
                             $("#year").append("<option value='' selected> Pilih Tahun</option>");
@@ -164,12 +158,6 @@
                         }
 
                         $('.cbhide').hide();
-                        
-                        // jQuery.each(result.success, function(key, value){
-                        //     // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
-                            
-
-                        // });
                     }
 
                 })
@@ -191,7 +179,6 @@
                            _token:_token },
                    success:function(result)
                    {
-
                        $('.cbhide').show();   
                        $('#cb_class').remove();
                        $(".cbhide label").remove();
@@ -199,10 +186,7 @@
 
                        // console.log(result.success.oid);
                        jQuery.each(result.success, function(key, value){
-                           // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
-                           
 
-                        //    console.log(value.items);
                            $(".cbhide").append("<label for='cb_class' style='margin-right: 22px;' class='form-check-label'> <input class='checkSingle form-check-input' type='checkbox' id='cb_class' name='cb_class' value='" + value.cid + "'/> " + value.cname + " </label>");
                           
                        });
@@ -211,11 +195,6 @@
                })
            }
        });
-
-       
-
-       
-
     });
 </script>
 @endsection
