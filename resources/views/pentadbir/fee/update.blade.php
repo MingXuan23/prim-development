@@ -27,33 +27,87 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('fees.store') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('fees.update', $fee->feeid) }}" enctype="multipart/form-data">
+            @method('PATCH')
             {{csrf_field()}}
             <div class="card-body">
                 <div class="form-group">
                     <label>Nama Yuran</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Yuran">
+                    <input type="text" name="name" class="form-control" placeholder="Nama Yuran"
+                        value="{{ $fee->feename }}">
                 </div>
 
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected>Pilih Organisasi</option>
+                        <option value="">Pilih Organisasi</option>
                         @foreach($organization as $row)
+                        @if($row->id == $fee->organization_id)
+                        <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                        @else
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
 
+                @if ($fee->type_org == 1 || $fee->type_org == 2)
                 <div class="yearhide form-group">
                     <label>Tahun</label>
                     <select name="year" id="year" class="form-control">
                         <option value="" selected>Pilih Tahun</option>
+                        @for ($i = 1; $i <= 5; $i++) @if ($getyear==$i) <option value="{{ $i }}" selected>Tahun {{ $i }}
+                            </option>
+                            @else
+                            <option value="{{ $i }}">Tahun {{ $i }}</option>
+                            @endif
+                            @endfor
                     </select>
                 </div>
+                @elseif($fee->type_org == 3)
+                <div class="yearhide form-group">
+                    <label>Tingkatan</label>
+                    <select name="year" id="year" class="form-control">
+                        <option value="" selected>Pilih Tingkatan</option>
+                        @for ($i = 1; $i <= 5; $i++) @if ($getyear==$i) <option value="{{ $i }}" selected>Tingkatan
+                            {{ $i }}</option>
+                            @else
+                            <option value="{{ $i }}">Tingkatan {{ $i }}</option>
+                            @endif
+                            @endfor
+                    </select>
+                </div>
+                @endif
+
+
 
                 <div class="cbhide form-check-inline">
+                    <label for='checkAll' style='margin-right: 22px;' class='form-check-label'> 
+                        <input class='form-check-input' type='checkbox' id='checkedAll' name='all' value='' /> Semua Kelas
+                    </label>
+                    @foreach ($getallclass as $row)
+                        @foreach ($getclass as $item)
+                            @if ($item->cid == $row->cid)
+                            <label for='cb_class' style='margin-right: 22px;' class='form-check-label'>
+                                <input class='checkSingle form-check-input' type='checkbox' id='cb_class' checked name='cb_class[]'
+                                    value='{{ $row->cid }}' /> {{ $row->classname }}
+                            </label>
+                            @else
+                            <label for='cb_class' style='margin-right: 22px;' class='form-check-label'>
+                                <input class='checkSingle form-check-input' type='checkbox' id='cb_classs' name='cb_class[]'
+                                    value='{{ $row->cid }}' /> {{ $row->classname }}
+                            </label>
+                            @endif
+                        @endforeach
 
+                        {{-- @foreach($getclass as $item)
+                            <label for='cb_class' style='margin-right: 22px;' class='form-check-label'>
+                                <input class='checkSingle form-check-input' type='checkbox' id='cb_class' checked name='cb_class[]'
+                                {{ $row->cid->contains($item->cid) ? 'checked' : '' }} value='{{ $row->cid }}' /> {{  $row->classname }}
+                            </label>
+                        @endforeach --}}
+
+                    @endforeach
                 </div>
 
                 <div class="form-group mb-0">
@@ -76,16 +130,19 @@
 @section('script')
 <!-- Peity chart-->
 <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script>
+
+<!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 
 <script>
     $(document).ready(function(){
         
-        $('.yearhide').hide();
-        $('.cbhide').hide();
+        // $('.yearhide').hide();
+
+        // $('.cbhide').hide();
 
         $(document).on('change', '#checkedAll', function() {
             if(this.checked){
