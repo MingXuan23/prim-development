@@ -110,15 +110,21 @@
 	    $('.form-validation').parsley();
     });
 
+    var arr = [];
+
     $.ajax({
         type: 'GET',
         dataType: 'json',
         url: "/fpx/getBankList",
         success: function(data) {
-            for(var i = 0; i < data.data.length; i++){
-                // console.log(data.data[i].code);
-                $("#bankid").append("<option value='"+data.data[i].code+"'>"+data.data[i].nama+"</option>");
+            jQuery.each(data.data, function(key, value){
+                arr.push(key);
+            });
+            for(var i = 0; i < arr.length; i++){
+                arr.sort();
+                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
             }
+
         },
         error: function (data) {
             // console.log(data);
