@@ -213,7 +213,7 @@ class PayController extends Controller
             $telno = $request->telno;
             $fpx_buyerName = $request->name;
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -224,10 +224,10 @@ class PayController extends Controller
 
         $fpx_msgType        = "AR";
         $fpx_msgToken       = "01";
-        $fpx_sellerExId     = "EX00012323";
+        $fpx_sellerExId     = "EX00011125";
         $fpx_sellerTxnTime  = date('YmdHis');
         $fpx_sellerOrderNo  = date('YmdHis') . rand(10000, 99999)  . $request->o_id;
-        $fpx_sellerId       = "SE00013841";
+        $fpx_sellerId       = "SE00045101";
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
         $fpx_buyerIban      = "";

@@ -8,7 +8,7 @@ For B2B1, message.token = 02 */
 
 $fpx_msgToken="01";
 $fpx_msgType="BE";
-$fpx_sellerExId="EX00012323";
+$fpx_sellerExId="EX00011125";
 $fpx_version="6.0";
 /* Generating signing String */
 $data=$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_version;
@@ -26,7 +26,7 @@ extract($_POST);
 $fields_string="";
 
 //set POST variables
-$url ='https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList';
+$url ='https://www.mepsfpx.com.my/FPXMain/RetrieveBankList';
 
 $fields = array(
                         'fpx_msgToken' => urlencode($fpx_msgToken),
@@ -89,8 +89,9 @@ while ($token !== false)
     $bank_list[$key1]=[ 'value' => $value1, 'nama' => '', 'key' => $key1 ];
     $token = strtok(",");
 }
+// dd($bank_list);
 
-$bank_list['ABB0234']['nama']   = $bank_list['ABB0234']['value'] == "A" ? "Affin B2C - Test ID" : "Affin B2C - Test ID (OFFLINE)";
+// $bank_list['ABB0234']['nama']   = $bank_list['ABB0234']['value'] == "A" ? "Affin B2C - Test ID" : "Affin B2C - Test ID (OFFLINE)";
 $bank_list['ABB0233']['nama']   = $bank_list['ABB0233']['value'] == "A" ? "Affin Bank" : "Affin Bank (OFFLINE)";
 $bank_list['ABMB0212']['nama']  = $bank_list['ABMB0212']['value'] == "A" ? "Alliance Bank (Personal)" : "Alliance Bank (OFFLINE)";
 $bank_list['AGRO01']['nama']    = $bank_list['AGRO01']['value']  == "A" ? "AGRONet" : "AGRONet (OFFLINE)";
@@ -100,7 +101,7 @@ $bank_list['BMMB0341']['nama']  = $bank_list['BMMB0341']['value'] == "A" ? "Bank
 $bank_list['BKRM0602']['nama']  = $bank_list['BKRM0602']['value'] == "A" ? "Bank Rakyat" : "Bank Rakyat (OFFLINE)";
 $bank_list['BSN0601']['nama']   = $bank_list['BSN0601']['value']  == "A" ? "BSN" : "BSN (OFFLINE)";
 $bank_list['BCBB0235']['nama']  = $bank_list['BCBB0235']['value'] == "A" ? "CIMB Clicks" : "CIMB Clicks (OFFLINE)";
-$bank_list['CIT0219']['nama']   = $bank_list['CIT0219']['value']  == "A" ? "Citibank" : "Citibank (OFFLINE)";
+// $bank_list['CIT0219']['nama']   = $bank_list['CIT0219']['value']  == "A" ? "Citibank" : "Citibank (OFFLINE)";
 $bank_list['HLB0224']['nama']   = $bank_list['HLB0224']['value']  == "A" ? "Hong Leong Bank" : "Hong Leong Bank (OFFLINE)";
 $bank_list['HSBC0223']['nama']  = $bank_list['HSBC0223']['value'] == "A" ? "HSBC Bank" : "HSBC Bank (OFFLINE)";
 $bank_list['KFH0346']['nama']   = $bank_list['KFH0346']['value']  == "A" ? "KFH" : "KFH (OFFLINE)";
@@ -109,13 +110,14 @@ $bank_list['MB2U0227']['nama']  = $bank_list['MB2U0227']['value'] == "A" ? "Mayb
 $bank_list['OCBC0229']['nama']  = $bank_list['OCBC0229']['value'] == "A" ? "OCBC Bank" : "OCBC Bank (OFFLINE)";
 $bank_list['PBB0233']['nama']   = $bank_list['PBB0233']['value']  == "A" ? "Public Bank" : "Public Bank (OFFLINE)";
 $bank_list['RHB0218']['nama']   = $bank_list['RHB0218']['value']  == "A" ? "RHB Bank" : "RHB Bank (OFFLINE)";
-$bank_list['TEST0021']['nama']  = $bank_list['TEST0021']['value'] == "A" ? "SBI Bank A" : "SBI Bank A (OFFLINE)";
-$bank_list['TEST0022']['nama']  = $bank_list['TEST0022']['value'] == "A" ? "SBI Bank B" : "SBI Bank B (OFFLINE)";
-$bank_list['TEST0023']['nama']  = $bank_list['TEST0023']['value'] == "A" ? "SBI Bank C" : "SBI Bank C (OFFLINE)";
+// $bank_list['TEST0021']['nama']  = $bank_list['TEST0021']['value'] == "A" ? "SBI Bank A" : "SBI Bank A (OFFLINE)";
+// $bank_list['TEST0022']['nama']  = $bank_list['TEST0022']['value'] == "A" ? "SBI Bank B" : "SBI Bank B (OFFLINE)";
+// $bank_list['TEST0023']['nama']  = $bank_list['TEST0023']['value'] == "A" ? "SBI Bank C" : "SBI Bank C (OFFLINE)";
 $bank_list['SCB0216']['nama']   = $bank_list['SCB0216']['value']  == "A" ? "Standard Chartered" : "Standard Chartered (OFFLINE)";
 $bank_list['UOB0226']['nama']   = $bank_list['UOB0226']['value']  == "A" ? "UOB Bank" : "UOB Bank (OFFLINE)";
-$bank_list['UOB0229']['nama']   = $bank_list['UOB0229']['value']  == "A" ? "UOB Bank - Test ID" : "UOB Bank - Test ID (OFFLINE)";
+// $bank_list['UOB0229']['nama']   = $bank_list['UOB0229']['value']  == "A" ? "UOB Bank - Test ID" : "UOB Bank - Test ID (OFFLINE)";
 // asort($bank_list);
+
 function compareByName($a, $b) {
     return strcasecmp($a["nama"], $b["nama"]);
 }
