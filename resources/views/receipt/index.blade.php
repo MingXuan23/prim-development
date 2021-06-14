@@ -194,7 +194,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
                                                         @endif --}}
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ !empty($donation->total_tax) ? number_format(($transaction->amount + $donation->total_tax) , 2, '.', '') : $transaction->amount }}</td>
+                                                            <td class="alignright">RM  {{ !empty($donation->total_tax) ? number_format(($transaction->amount) , 2, '.', '') : $transaction->amount }}</td>
                                                         </tr>
                                                     </tbody></table>
                                                 </td>
