@@ -139,6 +139,9 @@
                       "targets": [0], // your case first column
                       "className": "text-center",
                       "width": "2%"
+                  },{
+                      "targets": [2],
+                      "width": "10%"
                   },],
                 order: [[ 1, 'asc' ]],
                 columns:[

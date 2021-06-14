@@ -61,8 +61,9 @@ class User extends Authenticatable
     public function getUserById()
     {
         $id = Auth::id();
-        $user = User::find($id)->first();
-
+        // dd($id);
+        $user = auth()->user();
+        
         return $user;
     }
 }
