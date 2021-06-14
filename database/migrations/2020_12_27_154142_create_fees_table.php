@@ -19,7 +19,7 @@ class CreateFeesTable extends Migration
             $table->string('nama')->nullable();
             $table->string('status')->nullable();
             $table->double('totalamount', 8, 2)->nullable();
-
+            $table->timestamps();
             $table->unsignedBigInteger('yearfees_id');
             $table->foreign('yearfees_id')->references('id')->on('year_fees')->onDelete('cascade');
         });
