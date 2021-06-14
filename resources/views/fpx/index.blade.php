@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 <div class="container" style="margin-top: 5%;">
-    <form name="form1" id="form1" method="post" action="https://uat.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp">
+    <form name="form1" id="form1" method="post" action="https://www.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp">
         @csrf
         <div class="card">
                 <div class="card-body"> 
