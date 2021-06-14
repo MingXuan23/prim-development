@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\View;
 
 class StudentController extends Controller
 {
-
     public function index()
     {
         //
@@ -253,7 +252,6 @@ class StudentController extends Controller
             $userId = Auth::id();
 
             if ($classid != '' && !is_null($hasOrganizaton)) {
-
                 $data = DB::table('students')
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
@@ -294,7 +292,6 @@ class StudentController extends Controller
             }
 
             // dd($data->oid);
-
         }
     }
 
@@ -302,10 +299,9 @@ class StudentController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-
             return Organization::all();
         } else {
-            // user role guru 
+            // user role guru
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })->get();

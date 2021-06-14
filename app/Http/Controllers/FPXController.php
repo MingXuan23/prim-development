@@ -18,7 +18,7 @@ class FPXController extends AppBaseController
 
         $fpx_msgToken="01";
         $fpx_msgType="BE";
-        $fpx_sellerExId="EX00012323";
+        $fpx_sellerExId="EX00011125";
         $fpx_version="6.0";
         /* Generating signing String */
         $data=$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_version;
@@ -36,7 +36,7 @@ class FPXController extends AppBaseController
         $fields_string="";
 
         //set POST variables
-        $url ='https://uat.mepsfpx.com.my/FPXMain/RetrieveBankList';
+        $url ='https://www.mepsfpx.com.my/FPXMain/RetrieveBankList';
 
         $fields = array(
                     'fpx_msgToken' => urlencode($fpx_msgToken),
@@ -71,7 +71,7 @@ class FPXController extends AppBaseController
            
             //execute post
             $result = curl_exec($ch);
-
+            // dd($result);
             //close connection
             curl_close($ch);
 
@@ -97,38 +97,39 @@ class FPXController extends AppBaseController
                 list($key1, $value1)=explode("~", $token);
                 $count = $count + 1;
                 $value1=urldecode($value1);
-                $bank_list[$count]=['code' => $key1 , 'value' => $value1 , 'nama' => '' ];
+                $bank_list[$key1]=['code' => $key1 , 'value' => $value1 , 'nama' => '' ];
                 
                 $token = strtok(",");
             }
 
-            $bank_list[0]['nama']  = $bank_list[0]['value']  == "A" ? "Affin B2C - Test ID" : "Affin B2C - Test ID (OFFLINE)";
-            $bank_list[1]['nama']  = $bank_list[1]['value']  == "A" ? "Affin Bank" : "Affin Bank (OFFLINE)";
-            $bank_list[2]['nama']  = $bank_list[2]['value']  == "A" ? "Alliance Bank (Personal)" : "Alliance Bank (OFFLINE)";
-            $bank_list[3]['nama']  = $bank_list[3]['value']  == "A" ? "AGRONet" : "AGRONet (OFFLINE)";
-            $bank_list[4]['nama']  = $bank_list[4]['value']  == "A" ? "AmBank" : "AmBank (OFFLINE)";
-            $bank_list[5]['nama']  = $bank_list[5]['value']  == "A" ? "Bank Islam Sdn Bhd" : "Bank Islam Sdn Bhd (OFFLINE)";
-            $bank_list[6]['nama']  = $bank_list[6]['value']  == "A" ? "Bank Muamalat" : "Bank Muamalat (OFFLINE)";
-            $bank_list[7]['nama']  = $bank_list[7]['value']  == "A" ? "Bank Rakyat" : "Bank Rakyat (OFFLINE)";
-            $bank_list[8]['nama']  = $bank_list[8]['value']  == "A" ? "BSN" : "BSN (OFFLINE)";
-            $bank_list[9]['nama']  = $bank_list[9]['value']  == "A" ? "CIMB Clicks" : "CIMB Clicks (OFFLINE)";
-            $bank_list[10]['nama'] = $bank_list[10]['value'] == "A" ? "Citibank" : "Citibank (OFFLINE)";
-            $bank_list[11]['nama'] = $bank_list[11]['value'] == "A" ? "Hong Leong Bank" : "Hong Leong Bank (OFFLINE)";
-            $bank_list[12]['nama'] = $bank_list[12]['value'] == "A" ? "HSBC Bank" : "HSBC Bank (OFFLINE)";
-            $bank_list[13]['nama'] = $bank_list[13]['value'] == "A" ? "KFH" : "KFH (OFFLINE)";
-            $bank_list[14]['nama'] = $bank_list[14]['value'] == "A" ? "Maybank2E" : "Maybank2E (OFFLINE)";
-            $bank_list[15]['nama'] = $bank_list[15]['value'] == "A" ? "Maybank2U" : "Maybank2U (OFFLINE)";
-            $bank_list[16]['nama'] = $bank_list[16]['value'] == "A" ? "OCBC Bank" : "OCBC Bank (OFFLINE)";
-            $bank_list[17]['nama'] = $bank_list[17]['value'] == "A" ? "Public Bank" : "Public Bank (OFFLINE)";
-            $bank_list[18]['nama'] = $bank_list[18]['value'] == "A" ? "RHB Bank" : "RHB Bank (OFFLINE)";
-            $bank_list[19]['nama'] = $bank_list[19]['value'] == "A" ? "SBI Bank A" : "SBI Bank A (OFFLINE)";
-            $bank_list[20]['nama'] = $bank_list[20]['value'] == "A" ? "SBI Bank B" : "SBI Bank B (OFFLINE)";
-            $bank_list[21]['nama'] = $bank_list[21]['value'] == "A" ? "SBI Bank C" : "SBI Bank C (OFFLINE)";
-            $bank_list[22]['nama'] = $bank_list[22]['value'] == "A" ? "Standard Chartered" : "Standard Chartered (OFFLINE)";
-            $bank_list[23]['nama'] = $bank_list[23]['value'] == "A" ? "UOB Bank" : "UOB Bank (OFFLINE)";
-            $bank_list[24]['nama'] = $bank_list[24]['value'] == "A" ? "UOB Bank - Test ID" : "UOB Bank - Test ID (OFFLINE)";
             // asort($bank_list);
-
+            // dd($bank_list);
+            // $bank_list['ABB0234']['nama']  = $bank_list['ABB0234']['value']  == "A" ? "Affin B2C - Test ID" : "Affin B2C - Test ID (OFFLINE)";
+            $bank_list['ABB0233']['nama']  = $bank_list['ABB0233']['value']  == "A" ? "Affin Bank" : "Affin Bank (OFFLINE)";
+            $bank_list['ABMB0212']['nama']  = $bank_list['ABMB0212']['value']  == "A" ? "Alliance Bank (Personal)" : "Alliance Bank (OFFLINE)";
+            $bank_list['AGRO01']['nama']  = $bank_list['AGRO01']['value']  == "A" ? "AGRONet" : "AGRONet (OFFLINE)";
+            $bank_list['AMBB0209']['nama']  = $bank_list['AMBB0209']['value']  == "A" ? "AmBank" : "AmBank (OFFLINE)";
+            $bank_list['BIMB0340']['nama']  = $bank_list['BIMB0340']['value']  == "A" ? "Bank Islam Sdn Bhd" : "Bank Islam Sdn Bhd (OFFLINE)";
+            $bank_list['BMMB0341']['nama']  = $bank_list['BMMB0341']['value']  == "A" ? "Bank Muamalat" : "Bank Muamalat (OFFLINE)";
+            $bank_list['BKRM0602']['nama']  = $bank_list['BKRM0602']['value']  == "A" ? "Bank Rakyat" : "Bank Rakyat (OFFLINE)";
+            $bank_list['BSN0601']['nama']  = $bank_list['BSN0601']['value']  == "A" ? "BSN" : "BSN (OFFLINE)";
+            $bank_list['BCBB0235']['nama']  = $bank_list['BCBB0235']['value']  == "A" ? "CIMB Clicks" : "CIMB Clicks (OFFLINE)";
+            // $bank_list['CIT0219']['nama'] = $bank_list['CIT0219']['value'] == "A" ? "Citibank" : "Citibank (OFFLINE)";
+            $bank_list['HLB0224']['nama'] = $bank_list['HLB0224']['value'] == "A" ? "Hong Leong Bank" : "Hong Leong Bank (OFFLINE)";
+            $bank_list['HSBC0223']['nama'] = $bank_list['HSBC0223']['value'] == "A" ? "HSBC Bank" : "HSBC Bank (OFFLINE)";
+            $bank_list['KFH0346']['nama'] = $bank_list['KFH0346']['value'] == "A" ? "KFH" : "KFH (OFFLINE)";
+            $bank_list['MBB0228']['nama'] = $bank_list['MBB0228']['value'] == "A" ? "Maybank2E" : "Maybank2E (OFFLINE)";
+            $bank_list['MB2U0227']['nama'] = $bank_list['MB2U0227']['value'] == "A" ? "Maybank2U" : "Maybank2U (OFFLINE)";
+            $bank_list['OCBC0229']['nama'] = $bank_list['OCBC0229']['value'] == "A" ? "OCBC Bank" : "OCBC Bank (OFFLINE)";
+            $bank_list['PBB0233']['nama'] = $bank_list['PBB0233']['value'] == "A" ? "Public Bank" : "Public Bank (OFFLINE)";
+            $bank_list['RHB0218']['nama'] = $bank_list['RHB0218']['value'] == "A" ? "RHB Bank" : "RHB Bank (OFFLINE)";
+            // $bank_list[19]['nama'] = $bank_list[19]['value'] == "A" ? "SBI Bank A" : "SBI Bank A (OFFLINE)";
+            // $bank_list[20]['nama'] = $bank_list[20]['value'] == "A" ? "SBI Bank B" : "SBI Bank B (OFFLINE)";
+            // $bank_list[21]['nama'] = $bank_list[21]['value'] == "A" ? "SBI Bank C" : "SBI Bank C (OFFLINE)";
+            $bank_list['SCB0216']['nama'] = $bank_list['SCB0216']['value'] == "A" ? "Standard Chartered" : "Standard Chartered (OFFLINE)";
+            $bank_list['UOB0226']['nama'] = $bank_list['UOB0226']['value'] == "A" ? "UOB Bank" : "UOB Bank (OFFLINE)";
+            // $bank_list[21]['nama'] = $bank_list[21]['value'] == "A" ? "UOB Bank - Test ID" : "UOB Bank - Test ID (OFFLINE)";
+            
             function compareByName($a, $b)
             {
                 return strcasecmp($a["nama"], $b["nama"]);
