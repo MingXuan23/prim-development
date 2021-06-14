@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fee;
+use App\Models\Organization;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,7 @@ class FeesController extends Controller
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
             ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
-            ->select('organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
+            ->select('organizations.id as oid', 'organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
             ->where([
                 ['users.id', $userid],
             ])
@@ -80,7 +81,9 @@ class FeesController extends Controller
 
     public function create()
     {
-        return view('pentadbir.fee.add');
+        $organization = $this->getOrganizationByUserId();
+
+        return view('pentadbir.fee.add', compact('organization'));
     }
 
     public function store(Request $request)
@@ -179,4 +182,70 @@ class FeesController extends Controller
     {
         //
     }
+
+    public function getOrganizationByUserId()
+    {
+        $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
+
+            return Organization::all();
+        } else {
+            // user role guru 
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })->get();
+        }
+    }
+
+    public function fetchYear(Request $request)
+    {
+
+        // dd($request->get('schid'));
+        $oid = $request->get('oid');
+
+        // $list = DB::table('organizations')
+        //     ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
+        //     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+        //     ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname')
+        //     ->where('organizations.id', $oid)
+        //     ->get();
+
+        $list = DB::table('organizations')
+            ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
+            ->where('organizations.id', $oid)
+            ->first();
+
+
+
+        // dd($list);
+        return response()->json(['success' => $list]);
+    }
+
+    
+    public function fetchClass(Request $request)
+    {
+
+        // dd($request->get('schid'));
+        $oid    = $request->get('oid');
+        $year   = $request->get('year');
+
+        $list = DB::table('organizations')
+            ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname')
+            ->where('organizations.id', $oid)
+            ->where('classes.nama', 'LIKE',  '%' . $year . '%')
+            ->get();
+
+        // $list = DB::table('organizations')
+        //     ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
+        //     ->where('organizations.id', $oid)
+        //     ->first();
+
+
+
+        // dd($list);
+        return response()->json(['success' => $list]);
+    }
+
 }
