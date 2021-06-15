@@ -188,13 +188,13 @@
                                             <div class="carousel-inner" role="listbox">
                                                 <div style="max-width:100%; height:auto; !important;" >
                                                     <div class="carousel-item active">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1-min.jpg') }}" alt="First slide">
                                                     </div>
                                                     <div class="carousel-item">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
+                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5-min.jpg') }}" alt="Second slide">
                                                     </div>
                                                     <div class="carousel-item">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3-min.jpeg') }}" alt="Third slide">
                                                     </div>
                                                 </div>
                                                 
@@ -727,19 +727,19 @@
                         <!-- screenshort carousel -->
                         <div class="single-screenshort-item">
                             <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-1.jpg') }}" alt="">
+                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-1-min.jpg') }}" alt="">
                         </div><!-- //.single screenshort item -->
                         <div class="single-screenshort-item">
                             <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-2.jpg') }}" alt="">
+                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-2-min.jpg') }}" alt="">
                         </div><!-- //.single screenshort item -->
                         <div class="single-screenshort-item">
                             <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-3.jpg') }}" alt="">
+                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-3-min.jpg') }}" alt="">
                         </div><!-- //.single screenshort item -->
                         <div class="single-screenshort-item">
                             <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-4.jpg') }}" alt="">
+                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-4-min.jpg') }}" alt="">
                         </div><!-- //.single screenshort item -->
                     </div><!-- //. screenshort carousel -->
                 </div>
@@ -1019,7 +1019,7 @@
             <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="">
         </div>
         <div class="bg-shape-2">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg.jpg') }}" alt="">
+            <img src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg-min.jpg') }}" alt="">
         </div>
         <div class="bg-shape-3">
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}

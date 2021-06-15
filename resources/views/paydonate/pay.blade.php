@@ -35,7 +35,7 @@
                             <div class="form-group">
                                 <label>Nama</label>
                                 <input type="text" name="name" class="form-control" 
-                                    placeholder="Nama" value="{{ !empty(auth()->user()->id) ? $user->name : '' }}" required>
+                                    placeholder="Nama" style="text-transform:uppercase" value="{{ !empty(auth()->user()->id) ? $user->name : '' }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
