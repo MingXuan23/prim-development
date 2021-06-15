@@ -36,4 +36,28 @@ class OrganizationRequest extends FormRequest
             
         ];
     }
+
+    // public function rules()
+    // {
+    //     return [
+    //         'nama'         =>  'required',
+    //         // 'code'         =>  'required',
+    //         'telno'        =>  'required|numeric|digits_between:10,11',
+    //         'email'        =>  'required|email|unique:organizations',
+    //         'address'      =>  'required',
+    //         'postcode'     =>  'required',
+    //         'state'        =>  'required',
+    //         'type_org'     =>  'required',
+    //         'fixed_charges'      =>  'required|numeric',
+
+    //     ];
+    // }
+
+    // public function validated()
+    // {
+    //     return array_merge(parent::validated(), [
+    //         'telno' => '+6'.$this->input('telno'),
+    //         'code' => 'MS' . str_pad($this->route('organization.store'), 5, "0", STR_PAD_LEFT)
+    //     ]);
+    // }
 }

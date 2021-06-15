@@ -21,8 +21,8 @@ class FeesController extends Controller
         //
         $fees = DB::table('fees')->orderBy('nama')->get();
         $organization = $this->getOrganizationByUserId();
-
-        return view('pentadbir.fee.index', compact('fees', 'organization'));
+        $listcategory = DB::table('categories')->get();
+        return view('pentadbir.fee.index', compact('fees','listcategory','organization'));
     }
 
     public function parentpay()
@@ -179,7 +179,7 @@ class FeesController extends Controller
             DB::table('class_fees')->insert($array);
         }
 
-        return redirect('/fees')->with('success', 'New fees has been added successfully');
+        return redirect('/fees')->with('success', 'Yuran telah berjaya dimasukkan');
     }
 
     public function show($id)
