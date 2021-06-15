@@ -307,15 +307,15 @@
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0">
                                                         <tbody><tr>
                                                             <td>{{ $donationName }}</td>
-                                                            <td class="alignright">RM {{ $transactionAmount }}</td>
+                                                            <td class="alignright">RM {{ number_format($transactionAmount , 2, '.', '') }}</td>
                                                         </tr>
-                                                        <tr>
+                                                        {{-- <tr>
                                                             <td>Tax (Paid By JAIM)</td>
                                                             <td class="alignright">RM 1.00</td>
-                                                        </tr>
+                                                        </tr> --}}
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ $transactionAmount }}</td>
+                                                            <td class="alignright">RM  {{ number_format($transactionAmount , 2, '.', '') }}</td>
                                                         </tr>
                                                     </tbody></table>
                                                 </td>
