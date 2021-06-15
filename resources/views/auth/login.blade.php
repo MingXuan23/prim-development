@@ -19,8 +19,8 @@ Login
                     <div class="card overflow-hidden">
                         <div class="bg-primary">
                             <div class="text-primary text-center p-4">
-                                <h5 class="text-white font-size-20">Welcome Back!</h5>
-                                <p class="text-white-50">Sign in to continue to PRIM</p>
+                                <h5 class="text-white font-size-20">Selamat Datang!</h5>
+                                <p class="text-white-50">Log Masuk ke PRIM</p>
                                 <a href="index" class="logo logo-admin">
                                     <img src="assets/images/logo/prim-logo2.svg" height="60" alt="logo">
                                 </a>
@@ -42,8 +42,8 @@ Login
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="userpassword">Password</label>
-                                        <input type="password" name="password" class="form-control  @error('password') is-invalid @enderror" id="userpassword" value="" placeholder="Enter password">
+                                        <label for="userpassword">Kata Laluan</label>
+                                        <input type="password" name="password" class="form-control  @error('password') is-invalid @enderror" id="userpassword" value="" placeholder="Kata Laluan">
                                         @error('password')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -55,11 +55,11 @@ Login
                                         <div class="col-sm-6">
                                             <div class="custom-control custom-checkbox">
                                                 <input type="checkbox" class="custom-control-input" id="customControlInline">
-                                                <label class="custom-control-label" for="customControlInline">Remember me</label>
+                                                {{-- <label class="custom-control-label" for="customControlInline">Remember me</label> --}}
                                             </div>
                                         </div>
                                         <div class="col-sm-6 text-right">
-                                            <button class="btn btn-primary w-md waves-effect waves-light" type="submit">Log In</button>
+                                            <button class="btn btn-primary w-md waves-effect waves-light" type="submit">Log Masuk</button>
                                         </div>
                                     </div>
 
@@ -75,7 +75,7 @@ Login
                     </div>
 
                     <div class="mt-5 text-center">
-                        <p>Don't have an account ? <a href="/register" class="font-weight-medium text-primary"> Signup now </a> </p>
+                        <p>Masih belum daftar bersama kami? <a href="/register" class="font-weight-medium text-primary"> Daftar Sekarang </a> </p>
                     </div>
 
                 </div>

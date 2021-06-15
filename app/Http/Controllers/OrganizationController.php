@@ -20,14 +20,16 @@ class OrganizationController extends Controller
 
     public function create()
     {
-        $type_org = TypeOrganization::all();
+        // after launch remove where
+        $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
         return view('organization.add', compact('type_org'));
     }
 
     public function store(OrganizationRequest $request)
     {
-
-        // dd($request->type_org);
+        // $validated = $request->validated();
+        // $organization->update($request->validated());
+        // dd($request->validated());
         //create organization
         $organization = Organization::create($request->validated());
 
@@ -37,7 +39,7 @@ class OrganizationController extends Controller
         $user = Auth::user();
         $user->assignRole('Admin');
 
-        if ($request->type_org == 1 || $request->type_org == 2) {
+        if ($request->type_org == 1 || $request->type_org == 2 || $request->type_org == 3) {
             $organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 4]);
             $user->assignRole('Pentadbir');
         }
@@ -52,7 +54,8 @@ class OrganizationController extends Controller
 
     public function edit($id)
     {
-        $type_org = TypeOrganization::all();
+        // after launch remove where
+        $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
         $org = DB::table('organizations')->where('id', $id)->first();
 
         return view('organization.update', compact('org', 'type_org'));
