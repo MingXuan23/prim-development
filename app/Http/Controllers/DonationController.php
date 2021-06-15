@@ -346,4 +346,9 @@ class DonationController extends Controller
             return View::make('layouts/flash-messages');
         }
     }
+
+    public function test()
+    {
+        return "test";
+    }
 }
