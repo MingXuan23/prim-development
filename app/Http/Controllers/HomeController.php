@@ -10,6 +10,7 @@ use App\Http\Controllers\AppBaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\OrganizationController;
+use Mockery\Undefined;
 
 class HomeController extends AppBaseController
 {

@@ -15,14 +15,12 @@ class CategoryController extends Controller
         $listcategory = DB::table('categories')
             ->get();
         return view('pentadbir.fee.indexcategory', compact('listcategory'));
-
     }
 
     public function create()
     {
         //
         return view('pentadbir.fee.addcategory');
-
     }
 
     public function store(Request $request)
@@ -37,7 +35,6 @@ class CategoryController extends Controller
         ]);
 
         return redirect('/category')->with('success', 'New category has been added successfully');
-
     }
 
     public function show($id)
@@ -48,11 +45,26 @@ class CategoryController extends Controller
     public function edit($id)
     {
         //
+        $category = DB::table('categories')->where('id', $id)->first();
+        return view('pentadbir.fee.updatecategory', compact('category'));
     }
 
     public function update(Request $request, $id)
     {
         //
+        $this->validate($request, [
+            'name'         =>  'required',
+        ]);
+
+        $kategoriupdate    = DB::table('categories')
+            ->where('id', $id)
+            ->update(
+                [
+                    'nama'      => $request->get('name'),
+                ]
+            );
+
+        return redirect('/fees')->with('success', 'Data kategori telah dikemaskini!');
     }
 
     public function destroy($id)
