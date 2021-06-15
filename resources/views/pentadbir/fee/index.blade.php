@@ -9,8 +9,7 @@
         }
 
         .scrollheight {
-            height: 300px;
-            overflow: auto;
+            height: 400px;
         }
 
         @media (max-width: 576px) {
@@ -117,33 +116,16 @@
             </div> --}}
                     <div class="scrollheight">
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <tr style="text-align:center">
-                                    <th>Bil.</th>
-                                    <th>Nama Yuran</th>
-                                    <th>Jumlah Amaun (RM)</th>
-                                    <th>Action</th>
-                                </tr>
-
-                                @foreach ($fees as $row)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}.</td>
-                                        <td>{{ $row->nama }}</td>
-                                        <td> {{ number_format($row->totalamount, 2) ?? '0' }} </td>
-                                        <td>
-                                            <div class="d-flex justify-content-center">
-                                                <a href="{{ route('details.getfees', ['id' => $row->id]) }}"
-                                                    class="btn btn-primary m-1">Perincian</a>
-                                                <button class="btn btn-danger m-1"
-                                                    onclick="return confirm('Adakah anda pasti ?')">Buang</button>
-                                                {{-- <a href="{{ route('pay.index', ['id' => $row->id]) }}"
-                                                class="btn btn-success m-1">Bayar</a> --}}
-
-                                            </div>
-                                        </td>
-
+                            <table id="feesTable" class="table table-bordered table-striped dt-responsive nowrap"
+                                style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                <thead>
+                                    <tr style="text-align:center">
+                                        <th> No. </th>
+                                        <th>Nama Yuran</th>
+                                        <th>Jumlah Amaun (RM)</th>
+                                        <th>Action</th>
                                     </tr>
-                                @endforeach
+                                </thead>
                             </table>
                         </div>
                     </div>
