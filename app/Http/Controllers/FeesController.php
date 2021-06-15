@@ -22,7 +22,6 @@ class FeesController extends Controller
         $fees = DB::table('fees')->orderBy('nama')->get();
         $organization = $this->getOrganizationByUserId();
         $listcategory = DB::table('categories')->get();
-        
         return view('pentadbir.fee.index', compact('fees','listcategory','organization'));
     }
 
