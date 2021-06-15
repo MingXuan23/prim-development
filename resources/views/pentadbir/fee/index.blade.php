@@ -29,55 +29,18 @@
             <div class="page-title-box">
                 <h4 class="font-size-18">Yuran</h4>
                 <!-- <ol class="breadcrumb mb-0">
-                                                                                                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                                                                                                </ol> -->
+                                                                                                                                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                                                                                                                </ol> -->
             </div>
         </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <div class="card card-primary">
-
-            {{csrf_field()}}
-            <div class="card-body">
-
-                <div class="form-group">
-                    <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-
-            </div>
-
-            {{-- <div class="">
-                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
-                        class="fa fa-search"></i>
-                    Tapis</button>
-            </div> --}}
-
-        </div>
     </div>
-
-    <div class="col-md-12">
-        <div class="card">
-            {{-- <div class="card-header">List Of Applications</div> --}}
-            <div>
-                {{-- route('sekolah.create')  --}}
-                <a style="margin: 19px; float: right;" href="{{ route('fees.create') }}" class="btn btn-primary"> <i
-                        class="fas fa-plus"></i> Tambah Yuran</a>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card mb-3">
-                        <div class="card-body pb-1" style="background-color: #e6e6e6;border: 1px solid #dfdfdf;">
-                            <p class="text-muted mb-1">
-                                Langkah-langkah menambahkan yuran :
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-2">
+                <div class="card-body pb-1" style="background-color: #e6e6e6;border: 1px solid #dfdfdf;">
+                    <p class="text-muted mb-1">
+                        Langkah-langkah menambahkan yuran :
                     </p>
                     <ul class="text-muted">
                         <li>Tambah kategori yuran baru dengan klik butang senarai kategori.</li>
@@ -88,11 +51,40 @@
             </div>
         </div>
         <div class="col-md-12">
+            <div class="card card-primary mb-2">
+
+                {{ csrf_field() }}
+                <div class="card-body">
+
+                    <div class="form-group">
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            <option value="" selected disabled>Pilih Organisasi</option>
+                            @foreach ($organization as $row)
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+
+                </div>
+
+                {{-- <div class="">
+                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
+                        class="fa fa-search"></i>
+                    Tapis</button>
+            </div> --}}
+
+            </div>
+        </div>
+
+        <div class="col-md-12">
             <div class="card">
                 {{-- <div class="card-header">List Of Applications</div> --}}
                 <div>
                     {{-- route('sekolah.create') --}}
-                    <a class="btn btn-secondary mt-4 ml-4" data-toggle="modal" data-target="#categoryModal"> Senarai
+                    <a class="btn btn-secondary mt-4 ml-4" data-toggle="modal" data-target="#categoryModal">
+                        Senarai
                         Kategori</a>
 
                     <a href="{{ route('fees.create') }}" class="btn btn-primary mt-4 ml-2" data-toggle="modal"
@@ -173,7 +165,8 @@
                 <div class="modal-body">
                     <div class="scrollheight">
 
-                        <a href="{{ route('category.create') }}" class="btn btn-primary mb-3"> <i class="fas fa-plus"></i>
+                        <a href="{{ route('category.create') }}" class="btn btn-primary mb-3"> <i
+                                class="fas fa-plus"></i>
                             Tambah Kategori</a>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped">
@@ -236,32 +229,28 @@
                                     <label>Nama Yuran</label>
                                     <input type="text" name="name" class="form-control" placeholder="Nama Yuran">
                                 </div>
+
                                 <div class="form-group">
-                                    <label>Tahun</label>
-                                    <select name="year" id="year" class="form-control">
-                                        <option value="1">Tahun 1</option>
-                                        <option value="2">Tahun 2</option>
-                                        <option value="3">Tahun 3</option>
-                                        <option value="4">Tahun 4</option>
-                                        <option value="5">Tahun 5</option>
-                                        <option value="6">Tahun 6</option>
+                                    <label>Nama Organisasi</label>
+                                    <select name="organization" id="organizationdd" class="form-control">
+                                        <option value="" selected>Pilih Organisasi</option>
+                                        @foreach ($organization as $row)
+                                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 
-
-                                {{-- <div class="form-group">
-                                    <label>Kategori Yuran</label>
-                                    <select name="cat" id="cat" class="form-control">
-                                        @foreach ($cat as $row)
-                                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                        @endforeach
+                                <div class="yearhide form-group">
+                                    <label>Tahun</label>
+                                    <select name="year" id="year" class="form-control">
+                                        <option value="" selected>Pilih Tahun</option>
                                     </select>
-                                </div> --}}
+                                </div>
 
-                                {{-- <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                                </div> --}}
+                                <div class="cbhide form-check-inline">
+
+                                </div>
+
                                 <div class="form-group mb-0">
                                     <div>
                                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -283,8 +272,8 @@
             </div>
         </div>
 
-         {{-- confirmation delete modal --}}
-         <div id="deleteConfirmationModal" class="modal fade" role="dialog">
+        {{-- confirmation delete modal --}}
+        <div id="deleteConfirmationModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -303,7 +292,7 @@
         </div>
 
     </div>
-</div>
+    </div>
 @endsection
 
 
@@ -314,18 +303,18 @@
     <!-- Plugin Js-->
     <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js') }}"></script>
 
-<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+    <script src="{{ URL::asset('assets/js/pages/dashboard.init.js') }}"></script>
 
 
-<script>
-    $(document).ready(function() {
-  
-      var feesTable;
-  
-        // fetch_data();
-  
-        function fetch_data(oid = '') {
-            feesTable = $('#feesTable').DataTable({
+    <script>
+        $(document).ready(function() {
+
+            var feesTable;
+
+            // fetch_data();
+
+            function fetch_data(oid = '') {
+                feesTable = $('#feesTable').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
@@ -334,16 +323,16 @@
                             oid: oid,
                         },
                         type: 'GET',
-  
+
                     },
                     'columnDefs': [{
                         "targets": [0], // your case first column
                         "className": "text-center",
                         "width": "2%"
-                    },{
+                    }, {
                         "targets": [1], // your case first column
                         "className": "text-center",
-                    },{
+                    }, {
                         "targets": [2], // your case first column
                         "className": "text-center",
                         "width": "30%"
@@ -355,7 +344,7 @@
                         "data": null,
                         searchable: false,
                         "sortable": false,
-                        render: function (data, type, row, meta) {
+                        render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     }, {
@@ -371,58 +360,174 @@
                         name: 'action',
                         orderable: false,
                         searchable: false
-                    },]
-            });
-        }
-  
-        $('#organization').change(function() {
-            var organizationid = $("#organization option:selected").val();
-            $('#feesTable').DataTable().destroy();
-            console.log(organizationid);
-            fetch_data(organizationid);
-        });
-  
-        // csrf token for ajax
-        $.ajaxSetup({
-                headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }, ]
+                });
             }
+
+            $('#organization').change(function() {
+                var organizationid = $("#organization option:selected").val();
+                $('#feesTable').DataTable().destroy();
+                console.log(organizationid);
+                fetch_data(organizationid);
+            });
+
+            // csrf token for ajax
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            var teacher_id;
+
+            $(document).on('click', '.btn-danger', function() {
+                teacher_id = $(this).attr('id');
+                $('#deleteConfirmationModal').modal('show');
+            });
+
+            $('#delete').click(function() {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'html',
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        _method: 'DELETE'
+                    },
+                    url: "/teacher/" + teacher_id,
+                    success: function(data) {
+                        setTimeout(function() {
+                            $('#confirmModal').modal('hide');
+                        }, 2000);
+
+                        $('div.flash-message').html(data);
+
+                        feesTable.ajax.reload();
+                    },
+                    error: function(data) {
+                        $('div.flash-message').html(data);
+                    }
+                })
+            });
+
+            $('.alert').delay(3000).fadeOut();
+
+            $('.yearhide').hide();
+            $('.cbhide').hide();
+
+            $(document).on('change', '#checkedAll', function() {
+                if (this.checked) {
+                    $(".checkSingle").each(function() {
+                        this.checked = true;
+                    })
+                } else {
+                    $(".checkSingle").each(function() {
+                        this.checked = false;
+                    })
+                }
+            });
+
+            $(document).on('change', '.checkSingle', function() {
+
+                // console.log('asdf');
+                // $('#cb_class').not(this).prop('checked', this.checked);
+                if ($(this).is(":checked")) {
+                    var isAllChecked = 0;
+                    $(".checkSingle").each(function() {
+                        if (!this.checked)
+                            isAllChecked = 1;
+                    })
+                    if (isAllChecked == 0) {
+                        $("#checkedAll").prop("checked", true);
+                    }
+                } else {
+                    $("#checkedAll").prop("checked", false);
+                }
+
+            });
+
+            $('#organizationdd').change(function() {
+
+                if ($(this).val() != '') {
+                    var organizationid = $("#organizationdd option:selected").val();
+                    var _token = $('input[name="_token"]').val();
+                    $.ajax({
+                        url: "{{ route('fees.fetchYear') }}",
+                        method: "POST",
+                        data: {
+                            oid: organizationid,
+                            _token: _token
+                        },
+                        success: function(result) {
+                            $('.yearhide').show();
+                            $('#year').empty();
+
+                            if (result.success.type_org == 1 || result.success.type_org == 2) {
+
+                                $("#year").append(
+                                    "<option value='' selected> Pilih Tahun</option>");
+                                $("#year").append("<option value='1'>Tahun 1</option>");
+                                $("#year").append("<option value='2'>Tahun 2</option>");
+                                $("#year").append("<option value='3'>Tahun 3</option>");
+                                $("#year").append("<option value='4'>Tahun 4</option>");
+                                $("#year").append("<option value='5'>Tahun 5</option>");
+                                $("#year").append("<option value='6'>Tahun 6</option>");
+
+                            } else if (result.success.type_org == 3) {
+                                $("#year").append(
+                                    "<option value='' selected> Pilih Tingkatan</option>");
+                                $("#year").append("<option value='1'>Tingkatan 1</option>");
+                                $("#year").append("<option value='2'>Tingkatan 2</option>");
+                                $("#year").append("<option value='3'>Tingkatan 3</option>");
+                                $("#year").append("<option value='4'>Tingkatan 4</option>");
+                                $("#year").append("<option value='5'>Tingkatan 5</option>");
+                                $("#year").append("<option value='6'>Tingkatan 6</option>");
+                            }
+
+                            $('.cbhide').hide();
+                        }
+
+                    })
+                }
+            });
+
+            $('#year').change(function() {
+
+                if ($(this).val() != '') {
+                    var organizationid = $("#organizationdd option:selected").val();
+                    var year = $("#year option:selected").val();
+                    var _token = $('input[name="_token"]').val();
+                    $.ajax({
+                        url: "{{ route('fees.fetchClass') }}",
+                        method: "POST",
+                        data: {
+                            oid: organizationid,
+                            year: year,
+                            _token: _token
+                        },
+                        success: function(result) {
+                            $('.cbhide').show();
+                            $('#cb_class').remove();
+                            $(".cbhide label").remove();
+                            $(".cbhide").append(
+                                "<label for='checkAll' style='margin-right: 22px;' class='form-check-label'> <input class='form-check-input' type='checkbox' id='checkedAll' name='all' value=''/> Semua Kelas </label>"
+                            );
+
+                            // console.log(result.success.oid);
+                            jQuery.each(result.success, function(key, value) {
+
+                                $(".cbhide").append(
+                                    "<label for='cb_class' style='margin-right: 22px;' class='form-check-label'> <input class='checkSingle form-check-input' type='checkbox' id='cb_class' name='cb_class[]' value='" +
+                                    value.cid + "'/> " + value.cname + " </label>");
+
+                            });
+                        }
+
+                    })
+                }
+            });
+
         });
-  
-        var teacher_id;
-  
-        $(document).on('click', '.btn-danger', function(){
-            teacher_id = $(this).attr('id');
-            $('#deleteConfirmationModal').modal('show');
-        });
-  
-        $('#delete').click(function() {
-              $.ajax({
-                  type: 'POST',
-                  dataType: 'html',
-                  data: {
-                      "_token": "{{ csrf_token() }}",
-                      _method: 'DELETE'
-                  },
-                  url: "/teacher/" + teacher_id,
-                  success: function(data) {
-                      setTimeout(function() {
-                          $('#confirmModal').modal('hide');
-                      }, 2000);
-  
-                      $('div.flash-message').html(data);
-  
-                      feesTable.ajax.reload();
-                  },
-                  error: function (data) {
-                      $('div.flash-message').html(data);
-                  }
-              })
-          });
-          
-          $('.alert').delay(3000).fadeOut();
-  
-    });
-</script>
+
+    </script>
 
 @endsection

@@ -36,7 +36,7 @@ class CategoryController extends Controller
             'nama' => $request->get('name')
         ]);
 
-        return redirect('/category')->with('success', 'New category has been added successfully');
+        return redirect('/fees')->with('success', 'Kategori telah berjaya dimasukkan!');
     }
 
     public function show($id)
