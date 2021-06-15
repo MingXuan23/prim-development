@@ -186,15 +186,15 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
                                                             <td>{{ $donation->nama }}</td>
                                                             <td class="alignright">RM {{ number_format($transaction->amount , 2, '.', '') }}</td>
                                                         </tr>
-                                                        @if ($donation->tax_payer)
+                                                        {{-- @if ($donation->tax_payer)
                                                         <tr>
                                                             <td>Tax (Paid By {{ $donation->tax_payer }})</td>
                                                             <td class="alignright">{{ $donation->total_tax }}</td>
                                                         </tr>
-                                                        @endif
+                                                        @endif --}}
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ !empty($donation->total_tax) ? number_format(($transaction->amount + $donation->total_tax) , 2, '.', '') : $transaction->amount }}</td>
+                                                            <td class="alignright">RM  {{ number_format(($transaction->amount) , 2, '.', '')}}</td>
                                                         </tr>
                                                     </tbody></table>
                                                 </td>
