@@ -234,7 +234,7 @@
                     var organizationid    = $("#organization option:selected").val();
                     var _token            = $('input[name="_token"]').val();
                     $.ajax({
-                        url:"{{ route('parent.fetchClass') }}",
+                        url:"{{ route('student.fetchClass') }}",
                         method:"POST",
                         data:{ oid:organizationid,
                                 _token:_token },

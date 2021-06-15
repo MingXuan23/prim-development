@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\View;
 
 class StudentController extends Controller
 {
-
     public function index()
     {
         //
@@ -153,7 +152,6 @@ class StudentController extends Controller
 
     public function edit($id)
     {
-        $listclass = ClassModel::all();
         $student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
@@ -165,8 +163,16 @@ class StudentController extends Controller
             ->orderBy('classes.nama')
             ->first();
 
-        $organization = $this->getOrganizationByUserId();
+        $listclass = DB::table('classes')
+            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+            ->select('classes.id as id', 'classes.nama', 'classes.levelid')
+            ->where([
+                ['class_organization.organization_id', $student->organization_id]
+            ])
+            ->orderBy('classes.nama')
+            ->get();
 
+        $organization = $this->getOrganizationByUserId();
         return view('student.update', compact('student', 'organization', 'listclass'));
     }
 
@@ -181,6 +187,11 @@ class StudentController extends Controller
             'classes'       =>  'required',
         ]);
 
+        $getOrganizationClass = DB::table('class_organization')
+            ->where('class_id', $classid)
+            ->first();
+
+        // dd($getOrganizationClass);
         $student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
@@ -193,7 +204,7 @@ class StudentController extends Controller
                 [
                     'students.nama' => $request->get('name'),
                     'students.icno' => $request->get('icno'),
-                    'class_organization.class_id'    => $classid,
+                    'class_student.organclass_id'    => $getOrganizationClass->id,
                 ]
             );
 
@@ -241,7 +252,6 @@ class StudentController extends Controller
             $userId = Auth::id();
 
             if ($classid != '' && !is_null($hasOrganizaton)) {
-
                 $data = DB::table('students')
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
@@ -282,7 +292,6 @@ class StudentController extends Controller
             }
 
             // dd($data->oid);
-
         }
     }
 
@@ -290,13 +299,29 @@ class StudentController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-
             return Organization::all();
         } else {
-            // user role guru 
+            // user role guru
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })->get();
         }
+    }
+
+    public function fetchClass(Request $request)
+    {
+
+        // dd($request->get('schid'));
+        $oid = $request->get('oid');
+
+        $list = DB::table('organizations')
+            ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->select('organizations.nama as nschool', 'classes.id as cid', 'classes.nama as cname')
+            ->where('organizations.id', $oid)
+            ->get();
+
+        // dd($list);
+        return response()->json(['success' => $list]);
     }
 }

@@ -62,6 +62,28 @@
                 <li class="breadcrumb-item active">Sila pilih item untuk dibayar</li>
             </ol>
         </div>
+
+        <div class="col-md-12">
+            <div class="card card-primary">
+
+                {{csrf_field()}}
+                <div class="card-body">
+
+                    <div class="form-group">
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            <option value="" selected disabled>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
         <div class="col-md-12">
             <div class="row">
                 <div class="container-wrapper-scroll p-2 mb-3">
@@ -75,9 +97,11 @@
                             <div class="card">
 
                                 <div class="inputGroup">
-                                    <input id="option-{{ $row->oid }}-{{ $row->studentid }}" name="nameSchool" value="{{ $row->oid }}"
-                                        type="checkbox" data-toggle="collapse" data-target="#collapse{{ $row->oid }}-{{ $row->studentid }}"
-                                        aria-expanded="false" aria-controls="collapse{{ $row->oid }}-{{ $row->studentid }}"
+                                    <input id="option-{{ $row->oid }}-{{ $row->studentid }}" name="nameSchool"
+                                        value="{{ $row->oid }}" type="checkbox" data-toggle="collapse"
+                                        data-target="#collapse{{ $row->oid }}-{{ $row->studentid }}"
+                                        aria-expanded="false"
+                                        aria-controls="collapse{{ $row->oid }}-{{ $row->studentid }}"
                                         class="d-block position-relative text-dark collapsible-link py-2"
                                         onchange="checkOrganization(this)" />
 
@@ -91,8 +115,10 @@
                                 </div>
 
 
-                                <div id="collapse{{ $row->oid }}-{{ $row->studentid }}" aria-labelledby="heading{{ $row->oid }}-{{ $row->studentid }}"
-                                    data-parent="#accordionExample{{ $row->oid }}-{{ $row->studentid }}" class="collapse">
+                                <div id="collapse{{ $row->oid }}-{{ $row->studentid }}"
+                                    aria-labelledby="heading{{ $row->oid }}-{{ $row->studentid }}"
+                                    data-parent="#accordionExample{{ $row->oid }}-{{ $row->studentid }}"
+                                    class="collapse">
                                     <div class="card-body pl-0 pr-0">
 
                                         @foreach($getcat->where('feeid', $row->feeid) as $row1)

@@ -14,13 +14,15 @@ class CategoryController extends Controller
         // get id user
         $listcategory = DB::table('categories')
             ->get();
-        return view('pentadbir.fee.indexcategory', compact('listcategory'));
+        return view('pentadbir.fee.category.index', compact('listcategory'));
+
     }
 
     public function create()
     {
         //
-        return view('pentadbir.fee.addcategory');
+        return view('pentadbir.fee.category.add');
+
     }
 
     public function store(Request $request)
