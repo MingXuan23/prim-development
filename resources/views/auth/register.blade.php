@@ -123,7 +123,7 @@ Register
                                     <div class="form-group row">
                                         <div class="col-12 text-center">
                                             <button class="btn btn-light w-md waves-effect waves-light"
-                                            type="button" onclick="window.location='{{ url("/login") }}'">Kembali</button>
+                                            type="button" onclick="window.location='{{ url("/") }}'">Kembali</button>
 
                                             <button class="btn btn-primary w-md waves-effect waves-light"
                                                 type="submit">Daftar</button>
@@ -145,7 +145,7 @@ Register
                     </div>
 
                     <div class="mt-5 text-center">
-                        <p>Already have an account ? <a href="/login" class="font-weight-medium text-primary"> Login
+                        <p>Sudah berdaftar bersama PRIM? <a href="/login" class="font-weight-medium text-primary"> Log Masuk
                             </a> </p>
                     </div>
 
