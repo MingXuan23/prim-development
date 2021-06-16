@@ -82,6 +82,9 @@
                     </div>
                     <div class="form-group mb-0">
                         <div class="text-right">
+                            <a type="button" href="{{ url()->previous() }}" class="btn btn-secondary waves-effect waves-light mr-1">
+                                Kembali
+                            </a>
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
                                 Simpan
                             </button>
