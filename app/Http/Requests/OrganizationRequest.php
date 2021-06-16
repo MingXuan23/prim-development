@@ -11,6 +11,7 @@ class OrganizationRequest extends FormRequest
      *
      * @return bool
      */
+
     public function authorize()
     {
         return true;
@@ -25,9 +26,8 @@ class OrganizationRequest extends FormRequest
     {
         return [
             'nama'         =>  'required',
-            // 'code'         =>  'required',
             'telno'        =>  'required|numeric',
-            'email'        =>  'required',
+            'email'        =>  ['required', 'email', \Illuminate\Validation\Rule::unique('organizations')->ignore($this->id)],
             'address'      =>  'required',
             'postcode'     =>  'required',
             'state'        =>  'required',

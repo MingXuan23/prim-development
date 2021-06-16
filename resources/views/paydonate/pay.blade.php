@@ -78,7 +78,7 @@
                         </div>
                         <div class="form-group">
                             <label>No Telefon</label>
-                            <input type="text" name="telno" class="form-control"
+                            <input type="text" name="telno" class="form-control phone_no"
                                 data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$"
                                 placeholder="No Telefon" value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}"
                                 required>
@@ -117,21 +117,14 @@
 
 
 @section('script')
-<!-- Peity chart-->
-<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
-
-<!-- Plugin Js-->
-<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
-<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
-
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
-
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 
 <script>
     $(document).ready(function () {
         $(".input-mask").inputmask();
+        $('.phone_no').mask('+600000000000');
     });
 
     function checkBank() {
