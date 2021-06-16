@@ -55,6 +55,8 @@ class RegisterController extends Controller
             'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/'],
             'telno'             => ['required', 'numeric', 'digits_between:10,11'],
             
+        ],[
+            'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character',
         ]);
     }
 
