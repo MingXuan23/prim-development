@@ -42,7 +42,7 @@ class OrganizationController extends Controller
             $user->assignRole('Pentadbir');
         }
 
-        return redirect('/organization')->with('success', 'New organization has been added successfully');
+        return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
     }
 
     public function show($id)
@@ -63,7 +63,7 @@ class OrganizationController extends Controller
     {
         Organization::where('id', $id)->update($request->validated());
 
-        return redirect('/organization')->with('success', 'Maklumat berjaya dikemaskini');
+        return redirect('/organization')->with('success', 'Maklumat Organisasi Berjaya Dikemaskini');
     }
 
     public function destroy($id)
@@ -71,10 +71,10 @@ class OrganizationController extends Controller
         $result = Organization::find($id)->delete();
 
         if ($result) {
-            Session::flash('success', 'Organization Delete Successfully');
+            Session::flash('success', 'Organisasi Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         } else {
-            Session::flash('error', 'Organization Delete Failed');
+            Session::flash('error', 'Organisasi Tidak Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         }
     }
