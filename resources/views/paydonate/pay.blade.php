@@ -87,7 +87,7 @@
                             <label>Amaun</label>
                             <input id="input-currency" class="form-control input-mask text-left"
                                 data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                                im-insert="true" style="text-align: right;" name="amount" required>
+                                im-insert="true" style="text-align: right;" name="amount" min="0" required>
                         </div>
 
                         <div class="form-group">
