@@ -347,8 +347,8 @@ class DonationController extends Controller
         }
     }
 
-    public function test(){
-        
+    public function test()
+    {
+        echo "test";
     }
-
 }
