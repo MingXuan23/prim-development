@@ -28,6 +28,22 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+
+    /* URL FOR FPX USE*/
+    
+    'PRODUCTION_BE_URL' => env('PRODUCTION_BE_URL'),
+    'UAT_BE_URL' => env('UAT_BE_URL'),
+
+    'PRODUCTION_AR_AD_URL' => env('PRODUCTION_AR_AD_URL'),
+    'UAT_AR_AD_URL' => env('UAT_AR_AD_URL'),
+
+    'PRODUCTION_AE_AQ_URL' => env('PRODUCTION_AE_AQ_URL'),
+    'UAT_AE_AQ_URL' => env('UAT_AE_AQ_URL'),
+
+    'PRODUCTION_AX_URL' => env('PRODUCTION_AX_URL'),
+    'UAT_AX_URL' => env('UAT_AX_URL'),
+
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode
