@@ -52,11 +52,11 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name'              => ['required', 'string', 'max:255'],
             'email'             => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/'],
-            'telno'             => ['required', 'numeric', 'digits_between:10,11'],
+            'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
+            'telno'             => ['required', 'numeric', 'min:10'],
             
-        ],[
-            'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character',
+        ], [
+            'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character (@!$#%^&*())',
         ]);
     }
 
@@ -72,7 +72,7 @@ class RegisterController extends Controller
             'name'              => $data['name'],
             'email'             => $data['email'],
             'password'          => Hash::make($data['password']),
-            'telno'             => "+6".$data['telno'],
+            'telno'             => $data['telno'],
             'remember_token'    => $data['_token'],
 
         ]);

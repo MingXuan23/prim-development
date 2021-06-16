@@ -1,7 +1,6 @@
 @extends('layouts.master')
 
 @section('css')
-<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -32,23 +31,22 @@
             <form method="post" action="{{ route('organization.store') }} " enctype="multipart/form-data" class="form-validation">
                 {{csrf_field()}}
                 <div class="card-body">
-                    <p class="card-title-desc">Bahagian bertanda * wajib diisi</p>
-                    <div class="form-group required col-md-12">
+                    <div class="form-group">
                         <label class="control-label">Nama Organisasi</label>
                         <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi"
                         data-parsley-required-message="Sila masukkan nama organisasi" required>
                     </div>
-                    <div class="form-group required col-md-12">
+                    <div class="form-group ">
                         <label class="control-label">No Telefon</label>
                         <input type="tel" name="telno" class="form-control phone_no" placeholder="No Telefon"
                         data-parsley-required-message="Sila masukkan no telefon" required>
                     </div>
-                    <div class="form-group required col-md-12">
+                    <div class="form-group">
                         <label class="control-label">Email</label>
                         <input type="text" name="email" class="form-control" placeholder="Email"
                         data-parsley-required-message="Sila masukkan email" required>
                     </div>
-                    <div class="form-group required col-md-12">
+                    <div class="form-group ">
                         <label class="control-label">Jenis Organisasi</label>
                         <select name="type_org" id="type_org" class="form-control" 
                         data-parsley-required-message="Sila pilih jenis organisasi" required>
@@ -58,20 +56,20 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group required col-md-12">
+                    <div class="form-group ">
                         <label class="control-label">Cas Pembayaran (RM)</label>
                         <input id="input-currency" class="form-control input-mask text-left"
                             data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
                             im-insert="true" style="text-align: right;" name="fixed_charges" 
                             data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran" required>
                     </div>
-                    <div class="form-row col">
-                        <div class="form-group col-md-8 required">
+                    <div class="row justify-content-center">
+                        <div class="form-group col-md-8">
                             <label class="control-label">Alamat</label>
                             <textarea name="address" class="form-control" rows="4" placeholder="Alamat"
                             data-parsley-required-message="Sila masukkan alamat organisasi" required></textarea>
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col">
                             <label>Poskod</label>
                             <input type="text" name="postcode" class="form-control" placeholder="Poskod" 
                             data-parsley-required-message="Sila masukkan poskod" required>
