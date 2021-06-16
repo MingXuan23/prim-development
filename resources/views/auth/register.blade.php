@@ -92,7 +92,7 @@ Register
                                     <div class="form-group">
                                         <label for="telno">No. Telefon</label>
                                         <input type="text" name="telno" id="telno"
-                                            class="form-control @error('telno') is-invalid @enderror"
+                                            class="form-control phone_no @error('telno') is-invalid @enderror"
                                             placeholder="Nombor Telefon" max="11">
                                         @error('telno')
                                         <span class="invalid-feedback" role="alert">
@@ -156,3 +156,13 @@ Register
     </div>
 
     @endsection
+
+@section('script')
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.phone_no').mask('+600000000000');
+    });
+</script>
+@endsection
