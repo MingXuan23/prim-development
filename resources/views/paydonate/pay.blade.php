@@ -122,7 +122,7 @@
 <script>
     $(document).ready(function () {
         $(".input-mask").inputmask();
-        $('.phone_no').mask('+60 0000000000');
+        $('.phone_no').mask('+600000000000');
         $('.form-validation').parsley();
     });
 
