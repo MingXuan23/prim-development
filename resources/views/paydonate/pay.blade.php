@@ -64,35 +64,36 @@
                     <form class="form-validation" method="POST" action="{{ route('fpxIndex') }}"
                         enctype="multipart/form-data">
                         {{csrf_field()}}
-                        {{-- <div class="card-body h-100"> --}}
                         <div class="form-group">
                             <label>Nama</label>
                             <input type="text" name="name" id="name" class="form-control" placeholder="Nama"
-                                value="{{ !empty(auth()->user()->id) ? $user->name : '' }}" required>
+                                value="{{ !empty(auth()->user()->id) ? $user->name : '' }}"
+                                data-parsley-required-message="Sila masukkan nama penuh" required>
                         </div>
                         <div class="form-group">
                             <label>Email</label>
                             <input type="email" parsley-type="email" name="email" class="form-control"
                                 placeholder="Email" value="{{ !empty(auth()->user()->id) ? $user->email : '' }}"
-                                required>
+                                data-parsley-required-message="Sila masukkan email" required>
                         </div>
                         <div class="form-group">
                             <label>No Telefon</label>
                             <input type="text" name="telno" class="form-control phone_no"
-                                data-parsley-pattern="^(\+?6?01)[0|1|2|3|4|6|7|8|9]\-*[0-9]{7,8}$"
                                 placeholder="No Telefon" value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}"
-                                required>
+                                data-parsley-required-message="Sila masukkan no telefon" required>
                         </div>
                         <div class="form-group">
                             <label>Amaun</label>
                             <input id="input-currency" class="form-control input-mask text-left"
                                 data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                                im-insert="true" style="text-align: right;" name="amount" min="0" required>
+                                im-insert="true" style="text-align: right;" name="amount" 
+                                data-parsley-min="2"
+                                data-parsley-required-message="Sila masukkan amaun"
+                                data-parsley-error-message="Minimum jumlah untuk diderma adalah RM2.00" required>
                         </div>
-
                         <div class="form-group">
                             <label>Pilih Bank</label>
-                            <select name="bankid" id="bankid" class="form-control" required>
+                            <select name="bankid" id="bankid" class="form-control"  data-parsley-required-message="Sila pilih bank" required>
                                 <option value="">Select bank</option>
                             </select>
                         </div>
@@ -100,12 +101,9 @@
                         <input type="hidden" name="desc" id="desc" value="Donation">
                         <input type="hidden" name="o_id" id="o_id" value="{{ $donation->id }} ">
 
-                        <button class="btn btn-success float-right submit" type="submit" onclick="return checkBank();">
+                        <button class="btn btn-success float-right submit" type="submit">
                             ALLAH suka kita SEDEKAH setiap hari. TERUSKAN
                         </button>
-                        {{-- </div> --}}
-
-
                     </form>
                 </div>
             </div>
@@ -124,7 +122,8 @@
 <script>
     $(document).ready(function () {
         $(".input-mask").inputmask();
-        $('.phone_no').mask('+600000000000');
+        $('.phone_no').mask('+60 0000000000');
+        $('.form-validation').parsley();
     });
 
     function checkBank() {
