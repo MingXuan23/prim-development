@@ -83,7 +83,7 @@
         <div class="flash-message"></div>
 
         <div class="table-responsive">
-          <table id="donationTable" class="table table-bordered table-striped dt-responsive nowrap"
+          <table id="donationTable" class="table table-bordered table-striped dt-responsive"
             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>
               <tr style="text-align:center">
@@ -166,26 +166,35 @@
                       }
                   }, {
                       data: "nama",
-                      name: 'nama'
+                      name: 'nama',
+                      "width": "20%"
                   }, {
                       data: "description",
-                      name: 'description'
+                      name: 'description',
+                      "width": "30%"
                   }, {
                       data: "date_started",
-                      name: 'start_date'
+                      name: 'start_date',
+                      "className": "text-center",
+                      "width": "10%"
                   }, {
                       data: "date_end",
-                      name: 'end_date'
+                      name: 'end_date',
+                      "className": "text-center",
+                      "width": "10%"
                   }, {
                       data: 'status',
                       name: 'status',
                       orderable: false,
-                      searchable: false
+                      searchable: false,
+                      "className": "text-center",
                   }, {
                       data: 'action',
                       name: 'action',
                       orderable: false,
-                      searchable: false
+                      searchable: false,
+                      "className": "text-center",
+                      "width": "20%"
                   },]
           });
       }

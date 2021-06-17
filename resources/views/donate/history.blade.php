@@ -104,7 +104,7 @@
                       "className": "text-center",
                       "width": "2%"
                   },{
-                      "targets": [3], // your case first column
+                      "targets": [3,4], // your case first column
                       "className": "text-center",
                   },],
                   order: [
