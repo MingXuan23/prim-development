@@ -179,7 +179,7 @@ class PayController extends Controller
         $transaction->status        = 'Pending';
         $transaction->email         = $request->fpx_buyerEmail;
         $transaction->telno         = $request->telno;
-        $transaction->username      = $request->fpx_buyerName;
+        $transaction->username      = strtoupper($request->fpx_buyerName);
         $transaction->fpx_checksum  = $request->fpx_checkSum;
 
         if ($user) {
