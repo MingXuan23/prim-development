@@ -259,14 +259,12 @@ class DonationController extends Controller
         $start_date = Carbon::createFromFormat(config('app.date_format'), $request->date_started)->format('Y-m-d');
         $end_date = Carbon::createFromFormat(config('app.date_format'), $request->date_end)->format('Y-m-d');
 
-        // $file_name = '';
-        
-        // if (!is_null($request->donation_poster)) {
-        $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
-        //     $file_name = basename($storagePath);
-        // }
         $file_name = '';
-        $donation_model = $this->donation->addMedia($storagePath)->toMediaCollection('donation-poster');
+        
+        if (!is_null($request->donation_poster)) {
+            $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
+            $file_name = basename($storagePath);
+        }
 
         $donation = Donation::create($request->validated() + [
             'date_created'      => now(),
