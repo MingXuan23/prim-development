@@ -239,7 +239,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-            window.location = '/; 
+            window.location = '/'; 
         }
     },1000);
 </script>
