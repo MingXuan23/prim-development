@@ -224,10 +224,11 @@ class PayController extends Controller
 
         $fpx_msgType        = "AR";
         $fpx_msgToken       = "01";
-        $fpx_sellerExId     = "EX00011125";
+        $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
         $fpx_sellerTxnTime  = date('YmdHis');
         $fpx_sellerOrderNo  = date('YmdHis') . rand(10000, 99999)  . $request->o_id;
-        $fpx_sellerId       = "SE00045101";
+        $fpx_sellerId       = config('app.env') == 'production' ? "SE00045101" : "SE00013841";
+        ;
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
         $fpx_buyerIban      = "";
@@ -317,8 +318,7 @@ class PayController extends Controller
                 case 'Donation':
 
                     Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
-                    // $user       = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    // $user2      = User::find(Auth::id());
+
                     $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
                     $organization = $this->organization->getOrganizationByDonationId($donation->id);
                     $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);

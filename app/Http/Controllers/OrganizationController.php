@@ -27,11 +27,9 @@ class OrganizationController extends Controller
 
     public function store(OrganizationRequest $request)
     {
-        // $validated = $request->validated();
-        // $organization->update($request->validated());
-        // dd($request->validated());
-        //create organization
         $organization = Organization::create($request->validated());
+
+        Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($request->type_org, $organization->id)]);
 
         //attach foreign key to pivot table
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
@@ -44,7 +42,7 @@ class OrganizationController extends Controller
             $user->assignRole('Pentadbir');
         }
 
-        return redirect('/organization')->with('success', 'New organization has been added successfully');
+        return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
     }
 
     public function show($id)
@@ -65,7 +63,7 @@ class OrganizationController extends Controller
     {
         Organization::where('id', $id)->update($request->validated());
 
-        return redirect('/organization')->with('success', 'Maklumat berjaya dikemaskini');
+        return redirect('/organization')->with('success', 'Maklumat Organisasi Berjaya Dikemaskini');
     }
 
     public function destroy($id)
@@ -73,10 +71,10 @@ class OrganizationController extends Controller
         $result = Organization::find($id)->delete();
 
         if ($result) {
-            Session::flash('success', 'Organization Delete Successfully');
+            Session::flash('success', 'Organisasi Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         } else {
-            Session::flash('error', 'Organization Delete Failed');
+            Session::flash('error', 'Organisasi Tidak Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         }
     }
@@ -102,7 +100,6 @@ class OrganizationController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-
             return Organization::all();
         } else {
             return Organization::whereHas('user', function ($query) use ($userId) {
@@ -113,7 +110,17 @@ class OrganizationController extends Controller
 
     public function getAllOrganization()
     {
-
         return view('organization.index');
+    }
+
+    public function generateOrganizationCode($typeOrg, $id)
+    {
+        if ($typeOrg == 4) {
+            $code = 'MS' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 5) {
+            $code = 'NGO' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        }
+
+        return $code;
     }
 }
