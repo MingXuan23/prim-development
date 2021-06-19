@@ -177,9 +177,12 @@ class ClassController extends Controller
 
             return Organization::all();
         } else {
-            // user role guru 
+            // user role pentadbir n guru 
             return Organization::whereHas('user', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('user_id', $userId)->Where(function ($query) {
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5);
+                });
             })->get();
         }
     }

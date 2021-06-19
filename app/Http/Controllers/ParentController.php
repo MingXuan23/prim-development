@@ -3,17 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use App\Models\OrganizationRole;
+use App\Models\Parents;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class ParentController extends Controller
 {
     public function index()
     {
         //
+        $userId = Auth::id();
+        $organization = $this->getOrganizationByUserId();
+        return view('parent.index', compact('organization'));
+    }
+
+    public function indexDependent($id)
+    {
+        //
+        dd($id);
         $userId = Auth::id();
 
         // condition type sekolah pagi n jaim
@@ -81,10 +98,48 @@ class ParentController extends Controller
 
     public function create()
     {
-        //
+        $organization = $this->getOrganizationByUserId();
+
+        // $organization = DB::table('organizations')
+        //     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+        //     ->join('users', 'organization_user.user_id', '=', 'users.id')
+        //     ->where('organization_user.user_id', Auth::id())
+        //     ->Where(function ($query) {
+        //         $query->where('organization_user.role_id', '=', 1)
+        //             ->Orwhere('organization_user.role_id', '=', 2)
+        //             ->Orwhere('organization_user.role_id', '=', 4);
+        //     })
+        //     ->select('organizations.id as id', 'organizations.nama as nama')
+        //     ->distinct()
+        //     ->get();
+
+        return view('parent.add', compact('organization'));
     }
 
     public function store(Request $request)
+    {
+        $this->validate($request, [
+            'name'          =>  'required',
+            'icno'          =>  'required|unique:users',
+            'email'         =>  'required|email|unique:users',
+            'telno'         =>  'required',
+        ]);
+
+        $newparent = new Parents([
+            'name'           =>  strtoupper($request->get('name')),
+            'icno'           =>  $request->get('icno'),
+            'email'          =>  $request->get('email'),
+            'password'       =>  Hash::make('abc123'),
+            'telno'          =>  $request->get('telno'),
+            'remember_token' =>  Str::random(40),
+            // 'created_at'     =>  now(),
+        ]);
+        $newparent->save();
+
+        return redirect('/parent')->with('success', 'New parent has been added successfully');
+    }
+
+    public function storeDependent(Request $request)
     {
         //
         $this->validate($request, [
@@ -142,5 +197,51 @@ class ParentController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function getOrganizationByUserId()
+    {
+        $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
+
+            return Organization::all();
+        } else {
+            // user role guru 
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId)->Where(function ($query) {
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5);
+                });
+            })->get();
+        }
+    }
+
+    public function getParentDatatable(Request $request)
+    {
+        // dd($request->icno);
+
+
+        if (request()->ajax()) {
+
+            $userId = Auth::id();
+            // $data = Parents::where('icno', $request->icno)->first();
+            $data = DB::table('users')
+                ->where('icno', $request->icno)
+                ->get();
+
+            // dd($data);
+            $table = Datatables::of($data);
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<a href="' . route('parent.dependent', $row->id) . '" class="btn btn-success m-1"> <span class="fa fa-search"></span></a></div>';
+                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['action']);
+            return $table->make(true);
+        }
     }
 }

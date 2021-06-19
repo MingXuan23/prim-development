@@ -21,7 +21,7 @@ class OrganizationController extends Controller
     public function create()
     {
         // after launch remove where
-        $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
+        $type_org = TypeOrganization::all();
         return view('organization.add', compact('type_org'));
     }
 
@@ -115,9 +115,15 @@ class OrganizationController extends Controller
 
     public function generateOrganizationCode($typeOrg, $id)
     {
-        if ($typeOrg == 4) {
+        if ($typeOrg == 1) {
+            $code = 'SK' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 2) {
+            $code = 'SA' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        }elseif ($typeOrg == 3) {
+            $code = 'SM' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        }elseif ($typeOrg == 4) {
             $code = 'MS' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 5) {
+        }elseif ($typeOrg == 5) {
             $code = 'NGO' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
