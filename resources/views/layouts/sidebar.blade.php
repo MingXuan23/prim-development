@@ -168,7 +168,7 @@
 
                         @role('Superadmin|Ibu|bapa|Penjaga')
                         <li>
-                            <a href="{{ route('parentpay') }}" class=" waves-effect">
+                            <a href="{{ route('feesparentdev') }}" class=" waves-effect">
                                 <i class="far fa-credit-card"></i>
                                 <span>Test Bayar</span>
                             </a>

@@ -42,7 +42,7 @@
                         Langkah-langkah menambahkan yuran :
                     </p>
                     <ul class="text-muted">
-                        <li>Tambah kategori yuran baru dengan klik butang senarai kategori.</li>
+                        <li>Tambah kategori yuran baru dengan klik menu kategori.</li>
                         <li>Tambah yuran dengan klik butang tambah yuran.</li>
                         <li>Tambah perincian yuran bagi menetapkan setiap harga item bagi yuran yg dipilih.</li>
                     </ul>
@@ -82,14 +82,19 @@
                 {{-- <div class="card-header">List Of Applications</div> --}}
                 <div>
                     {{-- route('sekolah.create') --}}
-                    <a class="btn btn-secondary mt-4 ml-4" data-toggle="modal" data-target="#categoryModal">
+                    {{-- <a class="btn btn-secondary mt-4 ml-4" data-toggle="modal" data-target="#categoryModal">
                         Senarai
-                        Kategori</a>
-
-                    <a href="{{ route('fees.create') }}" class="btn btn-primary mt-4 ml-2" data-toggle="modal"
+                        Kategori</a> --}}
+{{-- 
+                    <a href="{{ route('fees.create') }}" class="btn btn-primary m-4 float-right" data-toggle="modal"
                         data-target="#feeModal"> <i class="fas fa-plus"></i>
                         Tambah
-                        Yuran</a>
+                        Yuran</a> --}}
+
+                        <a style="margin: 19px; float: right;" class="btn btn-primary" data-toggle="modal"
+                        data-target="#feeModal">
+                            <i class="fas fa-plus"></i> Tambah
+                            Yuran</a>
                 </div>
 
                 <div class="card-body">
