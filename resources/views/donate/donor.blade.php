@@ -126,8 +126,16 @@
                 [1, 'asc']
             ],
             'columnDefs': [{
-                "targets": [0, 1, 2, 3, 4, 5],
+                "targets": [2, 3, 4, 5],
                 "className": "text-center",
+                "width": "2%"
+            },{
+                "targets": [0],
+                "className": "text-center",
+                "width": "2%"
+            },
+            {
+                "targets": [1],
                 "width": "2%"
             }],
             columns: [{
@@ -151,13 +159,11 @@
             }, {
                 data: "datetime_created",
                 name: 'datetime_created',
-                orderable: false,
-                searchable: false
+                // orderable: false,
+                // searchable: false
             }, {
                 data: 'amount',
                 name: 'amount',
-                orderable: false,
-                searchable: false
             }, ]
         });
 

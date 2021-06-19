@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 <div class="container" style="margin-top: 5%;">
-    <form name="form1" id="form1" method="post" action="https://www.mepsfpx.com.my/FPXMain/seller2DReceiver.jsp">
+    <form name="form1" id="form1" method="post" action="{{ config('app.env') == 'production' ? config('app.PRODUCTION_AR_AD_URL') : config('app.UAT_AR_AD_URL') }}">
         @csrf
         <div class="card">
                 <div class="card-body"> 
@@ -16,6 +16,8 @@
                                                 <p>&nbsp;</p>
                                                 <input type="submit" style="cursor:hand" class="btn btn-primary" onclick="pay()"
                                                     value="Click to Pay" />
+                                                    <br>
+                                                    <br>
                                                 <p> <img src="assets/images/FPXButton.PNG" border="2" /></p>
                                                 <p class="main">&nbsp;</p>
                                                 <p class="main"><strong>* You must have Internet Banking Account in order to

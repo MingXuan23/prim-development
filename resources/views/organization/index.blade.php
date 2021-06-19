@@ -42,13 +42,13 @@
                 <div class="flash-message"></div>
 
                 <div class="table-responsive">
-                    <table id="organizationTable" class="table table-bordered table-striped dt-responsive nowrap" 
+                    <table id="organizationTable" class="table table-bordered table-striped dt-responsive wrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th>No</th>
                                 <th>Nama Organisasi</th>
-                                <th>Kod</th>
+                                {{-- <th>Kod</th> --}}
                                 <th>No Telefon</th>
                                 <th>Email</th>
                                 <th>Alamat</th>
@@ -103,6 +103,11 @@
                     url: "{{ route('organization.getOrganizationDatatable') }}",
                     type: 'GET',
                 },
+                'columnDefs': [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%"
+                  }],
                 order: [
                     [1, 'asc']
                 ],
@@ -115,24 +120,31 @@
                     }
                 }, {
                     data: "nama",
-                    name: "nama"
-                },{
-                    data: "code",
-                    name: "code"
-                }, {
+                    name: "nama",
+                    "width": "20%"
+                },
+                // {
+                //     data: "code",
+                //     name: "code"
+                // }, 
+                {
                     data: "telno",
-                    name: "telno"
+                    name: "telno",
+                    "width": "10%"
                 }, {
                     data: "email",
-                    name: "email"
+                    name: "email",
+                    "width": "10%"
                 }, {
                     data: "address",
-                    name: "address"
+                    name: "address",
+                    "width": "30%"
                 }, {
                     data: 'action',
                     name: 'action',
                     orderable: false,
-                    searchable: false
+                    searchable: false,
+                    "width": "10%"
                 },]
           });
 

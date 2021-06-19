@@ -148,70 +148,99 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
 // if val is 00 sucess 
 ?>
 @section('css')
-    <link href="{{ URL::asset('assets/css/receipt.css') }}" rel="stylesheet">
-@endsection 
+<link href="{{ URL::asset('assets/css/receipt.css') }}" rel="stylesheet">
+@endsection
 
 @section('content')
+<div>You are being redirected to our homepage in <span id="time">5</span> seconds</div>
+
 <table class="body-wrap">
-    <tbody><tr>
-        <td></td>
-        <td class="container" width="600">
-            <div class="content">
-                <table class="main" width="100%" cellpadding="0" cellspacing="0">
-                    <tbody><tr>
-                        <td class="content-wrap aligncenter">
-                            <table width="100%" cellpadding="0" cellspacing="0">
-                                <tbody><tr>
-                                    <td class="content-block">
-                                        <h2>{{ $organization->nama }}</h2>
-                                        <h3 style="font-size: 14px !important">{{ $organization->telno }} | {{ $organization->email }}</h3>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="content-block">
-                                        <table class="invoice">
-                                            <tbody>
-                                                <tr>
-                                                <td>
-                                                    Nama: {{ $transaction->username }}<br>
-                                                    Email: {{ $transaction->email }}<br>
-                                                    Donation ID: {{ $transaction->nama }}<br>
-                                                    Tarikh Derma: {{ date('d-m-Y', strtotime($transaction->datetime_created)) }}
+    <tbody>
+        <tr>
+            <td></td>
+            <td class="container" width="600">
+                <div class="content">
+                    <table class="main" width="100%" cellpadding="0" cellspacing="0">
+                        <tbody>
+                            <tr>
+                                <td class="content-wrap aligncenter">
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                            <tr>
+                                                <td class="content-block">
+                                                    <h2>{{ $organization->nama }}</h2>
+                                                    <h3 style="font-size: 14px !important">{{ $organization->telno }} |
+                                                        {{ $organization->email }}</h3>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td>
-                                                    <table class="invoice-items" cellpadding="0" cellspacing="0">
-                                                        <tbody><tr>
-                                                            <td>{{ $donation->nama }}</td>
-                                                            <td class="alignright">RM {{ number_format($transaction->amount , 2, '.', '') }}</td>
-                                                        </tr>
-                                                        {{-- @if ($donation->tax_payer)
+                                                <td class="content-block">
+                                                    <table class="invoice">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    Nama: {{ $transaction->username }}<br>
+                                                                    Email: {{ $transaction->email }}<br>
+                                                                    Donation ID: {{ $transaction->nama }}<br>
+                                                                    Tarikh Derma:
+                                                                    {{ date('d-m-Y', strtotime($transaction->datetime_created)) }}
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <table class="invoice-items" cellpadding="0"
+                                                                        cellspacing="0">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>{{ $donation->nama }}</td>
+                                                                                <td class="alignright">RM
+                                                                                    {{ number_format($transaction->amount , 2, '.', '') }}
+                                                                                </td>
+                                                                            </tr>
+                                                                            {{-- @if ($donation->tax_payer)
                                                         <tr>
-                                                            <td>Tax (Paid By {{ $donation->tax_payer }})</td>
-                                                            <td class="alignright">{{ $donation->total_tax }}</td>
-                                                        </tr>
-                                                        @endif --}}
-                                                        <tr class="total">
-                                                            <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ number_format(($transaction->amount) , 2, '.', '')}}</td>
-                                                        </tr>
-                                                    </tbody></table>
+                                                            <td>Tax (Paid By {{ $donation->tax_payer }})
+                                                                </td>
+                                                                <td class="alignright">{{ $donation->total_tax }}</td>
+                                                            </tr>
+                                                            @endif --}}
+                                                            <tr class="total">
+                                                                <td class="alignright" width="80%">Total</td>
+                                                                <td class="alignright">RM
+                                                                    {{ number_format(($transaction->amount) , 2, '.', '')}}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </td>
                                             </tr>
-                                        </tbody></table>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            </div>
-        </td>
-        <td></td>
-    </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</div>
+</td>
+<td></td>
+</tr>
 </tbody>
 </table>
+@endsection
+
+@section('script')
+<script>
+    var count = 5;
+    setInterval(function(){
+        count--;
+        document.getElementById('time').innerHTML = count;
+        if (count == 0) {
+            window.location = '/'; 
+        }
+    },1000);
+</script>
 @endsection

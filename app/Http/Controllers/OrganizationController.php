@@ -20,16 +20,16 @@ class OrganizationController extends Controller
 
     public function create()
     {
+        // after launch remove where
         $type_org = TypeOrganization::all();
         return view('organization.add', compact('type_org'));
     }
 
     public function store(OrganizationRequest $request)
     {
-
-        // dd($request->type_org);
-        //create organization
         $organization = Organization::create($request->validated());
+
+        Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($request->type_org, $organization->id)]);
 
         //attach foreign key to pivot table
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
@@ -37,12 +37,12 @@ class OrganizationController extends Controller
         $user = Auth::user();
         $user->assignRole('Admin');
 
-        if ($request->type_org == 1 || $request->type_org == 2) {
+        if ($request->type_org == 1 || $request->type_org == 2 || $request->type_org == 3) {
             $organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 4]);
             $user->assignRole('Pentadbir');
         }
 
-        return redirect('/organization')->with('success', 'New organization has been added successfully');
+        return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
     }
 
     public function show($id)
@@ -52,7 +52,8 @@ class OrganizationController extends Controller
 
     public function edit($id)
     {
-        $type_org = TypeOrganization::all();
+        // after launch remove where
+        $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
         $org = DB::table('organizations')->where('id', $id)->first();
 
         return view('organization.update', compact('org', 'type_org'));
@@ -62,7 +63,7 @@ class OrganizationController extends Controller
     {
         Organization::where('id', $id)->update($request->validated());
 
-        return redirect('/organization')->with('success', 'Maklumat berjaya dikemaskini');
+        return redirect('/organization')->with('success', 'Maklumat Organisasi Berjaya Dikemaskini');
     }
 
     public function destroy($id)
@@ -70,10 +71,10 @@ class OrganizationController extends Controller
         $result = Organization::find($id)->delete();
 
         if ($result) {
-            Session::flash('success', 'Organization Delete Successfully');
+            Session::flash('success', 'Organisasi Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         } else {
-            Session::flash('error', 'Organization Delete Failed');
+            Session::flash('error', 'Organisasi Tidak Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         }
     }
@@ -99,7 +100,6 @@ class OrganizationController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-
             return Organization::all();
         } else {
             return Organization::whereHas('user', function ($query) use ($userId) {
@@ -110,7 +110,23 @@ class OrganizationController extends Controller
 
     public function getAllOrganization()
     {
-
         return view('organization.index');
+    }
+
+    public function generateOrganizationCode($typeOrg, $id)
+    {
+        if ($typeOrg == 1) {
+            $code = 'SK' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 2) {
+            $code = 'SA' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        }elseif ($typeOrg == 3) {
+            $code = 'SM' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        }elseif ($typeOrg == 4) {
+            $code = 'MS' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        }elseif ($typeOrg == 5) {
+            $code = 'NGO' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        }
+
+        return $code;
     }
 }

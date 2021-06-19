@@ -29,65 +29,64 @@
             </div>
             @endif
             {{-- {{ route('sekolah.store') }} --}}
-            <form method="post" action="{{ route('organization.update', $org->id) }} " enctype="multipart/form-data">
+            <form method="post" action="{{ route('organization.update', $org->id) }} " enctype="multipart/form-data" class="form-validation">
                 @method('PATCH')
                 {{csrf_field()}}
                 <div class="card-body">
                     <div class="form-group">
+                        <input type="text" name="id" value="{{ $org->id }}" hidden>
                         <label>Nama Organisasi</label>
                         <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi"
-                            value="{{ $org->nama }}">
+                            value="{{ $org->nama }}" data-parsley-required-message="Sila masukkan nama organisasi" required>
                     </div>
                     <div class="form-group">
                         <label>No Telefon</label>
-                        <input type="text" name="telno" class="form-control" placeholder="No Telefon"
-                            value="{{ $org->telno }}">
+                        <input type="text" name="telno" class="form-control phone_no" placeholder="No Telefon"
+                            value="{{ $org->telno }}" data-parsley-required-message="Sila masukkan no telefon" required>
                     </div>
                     <div class="form-group">
                         <label>Email</label>
                         <input type="text" name="email" class="form-control" placeholder="Email"
-                            value="{{ $org->email }}">
+                            value="{{ $org->email }}" data-parsley-required-message="Sila masukkan email" required>
                     </div>
                     <div class="form-group">
                         <label>Jenis Organisasi</label>
-                        <select name="type_org" id="type_org" class="form-control">
-                            <option value="" selected>Semua Jenis Organisasi</option>
-                            @foreach($type_org as $row)
-                                @if($row->id == $org->type_org)
-                                <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
-                                @else
-                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                @endif
-                            @endforeach
-                        </select>
+                        <input type="text" name="type_org" class="form-control" placeholder="Email"
+                            value="{{ $org->type_org == 4 ? "Masjid" : "NGO"}}" disabled>
+                        <input type="text" name="type_org" value="{{ $org->type_org }}" hidden>
                     </div>
                     <div class="form-group">
                         <label>Cas Pembayaran (RM)</label>
                         <input id="input-currency" class="form-control input-mask text-left"
                             data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                            im-insert="true" style="text-align: right;" name="fixed_charges" required
-                            value="{{ $org->fixed_charges }}">
+                            im-insert="true" style="text-align: right;" name="fixed_charges"
+                            value="{{ $org->fixed_charges }}"
+                            data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran" required>
                     </div>
 
                     <div class="row justify-content-center">
                         <div class="form-group col-md-8">
                             <label>Alamat</label>
                             <textarea name="address" class="form-control" rows="4"
-                                placeholder="Alamat"> {{ $org->address }} </textarea>
+                                placeholder="Alamat"
+                                data-parsley-required-message="Sila masukkan alamat organisasi" required> {{ $org->address }} 
+                            </textarea>
                         </div>
                         <div class="form-group col">
                             <label>Poskod</label>
                             <input type="text" name="postcode" class="form-control" placeholder="Poskod"
-                                value="{{ $org->postcode }}">
+                                value="{{ $org->postcode }}"
+                                data-parsley-required-message="Sila masukkan poskod" required>
 
                             <label>Negeri</label>
                             <input type="text" name="state" class="form-control" placeholder="Negeri"
-                                value="{{ $org->state }}">
+                                value="{{ $org->state }}"
+                                data-parsley-required-message="Sila masukkan negeri" required>
                         </div>
 
                     </div>
                     <div class="form-group mb-0">
-                        <div>
+                        <div class="text-right">
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
                                 Simpan
                             </button>
@@ -103,11 +102,17 @@
 
 
 @section('script')
-<!-- Peity chart-->
-<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
 
-<!-- Plugin Js-->
-<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
-<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+<script>
+    $(document).ready(function () {
+        $('.form-validation').parsley();
+        $(".input-mask").inputmask();
+        $('.phone_no').mask('+600000000000');
+    });
+</script>
+
 @endsection

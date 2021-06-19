@@ -71,6 +71,13 @@ Route::group(['prefix' => 'fees'], function () {
 
 });
 
+Route::group(['prefix' => 'parent'], function () {
+    Route::get('dependent/{id}', 'ParentController@indexDependent')->name('parent.dependent');    
+    Route::get('list', 'ParentController@getParentDatatable')->name('parent.getParentDatatable');
+
+
+});
+
 Route::group(['prefix' => 'activity'], function () {
     Route::get('list', 'ActivityController@getActivityDatatable')->name('ActivityDT');
 });
