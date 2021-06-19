@@ -97,7 +97,7 @@ class DetailsController extends Controller
             'fees_id'    => $request->id
         ]);
 
-        // insert student first
+        // get student first from the fees
         $liststd =  DB::table('class_student')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
@@ -108,17 +108,16 @@ class DetailsController extends Controller
 
         // dd($liststd);
 
+        //store all student that have fees (req->id) 
         for ($i = 0; $i < count($liststd); $i++) {
             $array[] = array(
-                'status'            => 'Berhutang',
+                'status'            => 'Debt', // berhutang
                 'class_student_id'  => $liststd[$i]->cid,
                 'fees_details_id'   => $fdid
             );
         }
 
         DB::table('student_fees')->insert($array);
-
-
 
         // sum values
         $getsum  = DB::table('fees')

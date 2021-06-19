@@ -52,13 +52,8 @@ class TeacherController extends Controller
 
     public function create()
     {
-        //
-        $organization = DB::table('organizations')
-            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
-            ->where('organizations.type_org', '=', 1)
-            ->orWhere('organizations.type_org', '=', 2)
-            ->select('organizations.id as id', 'organizations.nama as nama')
-            ->get();
+        $organization = $this->getOrganizationByUserId();
+
         return view('teacher.add', compact('organization'));
     }
 
@@ -132,12 +127,7 @@ class TeacherController extends Controller
             ->select('organizations.id as organization_id', 'users.id as uid', 'users.name as tcname', 'users.icno as icno', 'users.email as email', 'users.telno as telno', 'organization_user.role_id as role_id')
             ->first();
 
-        $organization = DB::table('organizations')
-            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
-            ->where('organizations.type_org', '=', 1)
-            ->orWhere('organizations.type_org', '=', 2)
-            ->select('organizations.id as id', 'organizations.nama as nama')
-            ->get();
+        $organization = $this->getOrganizationByUserId();
 
         // dd($teacher);
         return view('teacher.update', compact('teacher', 'organization'));
@@ -172,7 +162,7 @@ class TeacherController extends Controller
 
     public function destroy($id)
     {
-        
+
         $result = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
             ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
@@ -216,15 +206,17 @@ class TeacherController extends Controller
                     ->where('organizations.id', $oid)
                     ->where('organization_user.role_id', 5)
                     ->orderBy('users.name');
-            } elseif ($hasOrganizaton == "true") {
-                $data = DB::table('organizations')
-                    ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-                    ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
-                    ->join('users', 'users.id', '=', 'organization_user.user_id')
-                    ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
-                    ->where('organization_user.role_id', 5)
-                    ->orderBy('users.name');
             }
+            // elseif ($hasOrganizaton == "true") {
+            //     $data = DB::table('organizations')
+            //         ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            //         ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+            //         ->join('users', 'users.id', '=', 'organization_user.user_id')
+            //         ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
+            //         ->where('organization_user.role_id', 5)
+            //         ->where('users.id', Auth::id())
+            //         ->orderBy('users.name');
+            // }
 
             // dd($data->oid);
             $table = Datatables::of($data);
@@ -263,9 +255,9 @@ class TeacherController extends Controller
 
             return Organization::all();
         } else {
-            // user role guru 
+            // user role pentadbir 
             return Organization::whereHas('user', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('user_id', $userId)->where('role_id', 4);
             })->get();
         }
     }

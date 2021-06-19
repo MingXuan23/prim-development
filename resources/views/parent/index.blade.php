@@ -9,7 +9,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Guru</h4>
+            <h4 class="font-size-18">Ibu Bapa/Penjaga</h4>
             <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
@@ -19,28 +19,16 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card card-primary">
-
             {{csrf_field()}}
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
+                    <label>Nombor Kad Pengenalan</label>
+                    <input type="text" id="icno" name="icno" class="form-control"
+                        placeholder="Masukkan Nombor Kad Pengenalan">
+                    {{-- <p><i> *tiada "-" </i>  </p> --}}
                 </div>
-
-
             </div>
-
-            {{-- <div class="">
-                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
-                        class="fa fa-search"></i>
-                    Tapis</button>
-            </div> --}}
 
         </div>
     </div>
@@ -52,10 +40,9 @@
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
                         class="fas fa-plus"></i> Import</a>
 
-                <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
-                        class="fas fa-plus"></i> Export</a>
-                <a style="margin: 19px; float: right;" href="{{ route('teacher.create') }}" class="btn btn-primary"> <i
-                        class="fas fa-plus"></i> Tambah Guru</a>
+                <a style="margin: 1px;" href="" class="btn btn-success"> <i class="fas fa-plus"></i> Export</a>
+                <a style="margin: 19px; float: right;" href="{{ route('parent.create') }}" class="btn btn-primary"> <i
+                        class="fas fa-plus"></i> Tambah Ibu Bapa</a>
             </div>
 
             <div class="card-body">
@@ -76,17 +63,15 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap"
+                    <table id="parentTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th>Nama Penuh</th>
-                                <th>Nama Pengguna</th>
                                 <th>Nombor Kad pengenalan</th>
                                 <th>Email</th>
                                 <th>Nombor Telefon</th>
-                                <th>Status</th>
                                 <th>Details</th>
                             </tr>
                         </thead>
@@ -100,7 +85,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Padam Guru</h4>
+                        <h4 class="modal-title">Padam Ibu Bapa/Penjaga</h4>
                     </div>
                     <div class="modal-body">
                         Adakah anda pasti?
@@ -121,12 +106,12 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Murid</h5>
+                        <h5 class="modal-title">Import Ibu Bapa/Penjaga</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('importteacher') }}" method="post" enctype="multipart/form-data">
+                    <form action="" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
@@ -154,28 +139,41 @@
 @section('script')
 <!-- Peity chart-->
 <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
-
-<!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
     $(document).ready(function() {
-  
-      var teacherTable;
-  
-        // fetch_data();
-  
-        function fetch_data(oid = '') {
-            teacherTable = $('#teacherTable').DataTable({
+        $('#icno').mask('000000-00-0000');
+        $('#parentTable').DataTable().destroy();
+        var timeout = null;
+        $('#icno').on('keyup', function() {
+            var text = this.value;
+            clearTimeout(timeout);
+            if(text.length == 14){
+                // console.log('asdas');
+                timeout = setTimeout(function() {
+                // Do AJAX shit here      
+                $('#parentTable').DataTable().destroy();
+                    fetch_data(text);
+                
+                // alert(text);
+                }, 100);
+            }
+            
+        });
+        var parentTable;
+
+        function fetch_data(icno = '') {
+            
+            parentTable = $('#parentTable').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('teacher.getTeacherDatatable') }}",
+                        url: "{{ route('parent.getParentDatatable') }}",
                         data: {
-                            oid: oid,
-                            hasOrganization: true
+                            icno: icno,
                         },
                         type: 'GET',
   
@@ -185,9 +183,12 @@
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [3,4,5,6,7], // your case first column
+                        "targets": [3,4,5], // your case first column
                         "className": "text-center",
-                    },],
+                    },{
+                        "targets": '_all',
+                        "defaultContent": ""
+                    }],
                     order: [
                         [1, 'asc']
                     ],
@@ -200,22 +201,22 @@
                         }
                     }, {
                         data: "name",
-                        name: 'name'
-                    }, {
-                        data: "username",
-                        name: 'username'
-                    }, {
+                        name: 'name',
+                        orderable: false,
+                        searchable: false
+                    },{
                         data: "icno",
-                        name: 'icno'
+                        name: 'icno',
+                        orderable: false,
+                        searchable: false
                     }, {
                         data: "email",
-                        name: 'email'
+                        name: 'email',
+                        orderable: false,
+                        searchable: false
                     }, {
                         data: "telno",
-                        name: 'telno'
-                    }, {
-                        data: 'status',
-                        name: 'status',
+                        name: 'telno',
                         orderable: false,
                         searchable: false
                     }, {
@@ -227,52 +228,14 @@
             });
         }
   
-        $('#organization').change(function() {
-            var organizationid = $("#organization option:selected").val();
-            $('#teacherTable').DataTable().destroy();
-            console.log(organizationid);
-            fetch_data(organizationid);
-        });
-  
         // csrf token for ajax
         $.ajaxSetup({
                 headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-  
-        var teacher_id;
-  
-        $(document).on('click', '.btn-danger', function(){
-            teacher_id = $(this).attr('id');
-            $('#deleteConfirmationModal').modal('show');
-        });
-  
-        $('#delete').click(function() {
-              $.ajax({
-                  type: 'POST',
-                  dataType: 'html',
-                  data: {
-                      "_token": "{{ csrf_token() }}",
-                      _method: 'DELETE'
-                  },
-                  url: "/teacher/" + teacher_id,
-                  success: function(data) {
-                      setTimeout(function() {
-                          $('#confirmModal').modal('hide');
-                      }, 2000);
-  
-                      $('div.flash-message').html(data);
-  
-                      teacherTable.ajax.reload();
-                  },
-                  error: function (data) {
-                      $('div.flash-message').html(data);
-                  }
-              })
-          });
-          
-          $('.alert').delay(3000).fadeOut();
+
+
   
     });
 </script>

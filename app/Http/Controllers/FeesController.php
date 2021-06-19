@@ -380,7 +380,7 @@ class FeesController extends Controller
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
                 $btn = $btn . '<a href="' . route('details.getfees', $row->feeid) . '" class="btn btn-primary m-1">Butiran</a>';
-                $btn = $btn . '<a href="' . route('fees.edit', $row->feeid) . '" class="btn btn-primary m-1">Edit</a>';
+                // $btn = $btn . '<a href="' . route('fees.edit', $row->feeid) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->feeid . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });
