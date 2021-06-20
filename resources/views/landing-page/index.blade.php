@@ -75,8 +75,7 @@
                 <div class="col-lg-7">
                     <div class="header-inner">
                         <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
-                            berdaftar.</p>
+                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi dan pengguna berdaftar.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
                             <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>

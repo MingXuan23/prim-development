@@ -279,9 +279,33 @@ class PayController extends Controller
         ));
     }
 
+    // callback for FPX
     public function paymentStatus(Request $request)
     {
-        return view('fpx.pStatus', compact('request'));
+        $case = explode("_", $request->fpx_sellerExOrderNo);
+
+        if ($request->fpx_debitAuthCode == '00') {
+            switch ($case[0]) {
+                    case 'School Fees':
+                        break;
+    
+                    case 'Donation':
+                        Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+                        
+                        // $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
+                        // $organization = $this->organization->getOrganizationByDonationId($donation->id);
+                        // $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
+                        
+                        // Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
+                        break;
+    
+                    default:
+                        return view('errors.500');
+                        break;
+                    }
+        } else {
+            Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
+        }
     }
 
     public function transactionReceipt(Request $request)
