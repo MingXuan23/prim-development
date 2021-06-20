@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/fontawesome.5.7.2.css') }}">
     <!-- flaticon -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/flaticon.css') }}">
-
-    <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/flaticon2.css') }}">
     <!-- animate.css -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/animate.css') }}">
     <!-- Owl Carousel -->

@@ -27,6 +27,12 @@ Route::get('/organization-list', 'LandingPageController@organizationList');
 Route::get('/activity-list', 'LandingPageController@activitylist');
 Route::get('/activity-details', 'LandingPageController@activitydetails');
 
+//landing donation page route
+Route::get('/derma', 'LandingPageController@indexDonation');
+Route::get('/derma/organization-list', 'LandingPageController@organizationListDonation');
+Route::get('/derma/activity-list', 'LandingPageController@activitylistDonation');
+Route::get('/derma/activity-details', 'LandingPageController@activitydetailsDonation');
+
 
 Route::resource('school', 'SchoolController');
 
