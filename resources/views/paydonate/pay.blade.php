@@ -60,7 +60,8 @@
         <div class="col-lg-6">
             <div class="card h-100">
                 <div class="card-body">
-                    <h4 class="card-title">{{ $donation->nama }} </h4>
+                    <h4 class="card-title" style="text-align: center; font-size: 18px">{{ $donation->nama }} </h4>
+                    <br>
                     <form class="form-validation" method="POST" action="{{ route('fpxIndex') }}"
                         enctype="multipart/form-data">
                         {{csrf_field()}}
@@ -78,33 +79,44 @@
                         </div>
                         <div class="form-group">
                             <label>No Telefon</label>
-                            <input type="text" name="telno" class="form-control phone_no"
-                                placeholder="No Telefon" value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}"
+                            <input type="text" name="telno" class="form-control phone_no" placeholder="No Telefon"
+                                value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}"
                                 data-parsley-required-message="Sila masukkan no telefon" required>
                         </div>
                         <div class="form-group">
                             <label>Amaun</label>
                             <input id="input-currency" class="form-control input-mask text-left"
                                 data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                                im-insert="true" style="text-align: right;" name="amount" 
-                                data-parsley-min="2"
+                                im-insert="true" style="text-align: right;" name="amount" data-parsley-min="2"
                                 data-parsley-required-message="Sila masukkan amaun"
                                 data-parsley-error-message="Minimum jumlah untuk diderma adalah RM2.00" required>
+                                <p><i>*Minimum RM 1</i> </p>
                         </div>
                         <div class="form-group">
                             <label>Pilih Bank</label>
-                            <select name="bankid" id="bankid" class="form-control"  data-parsley-required-message="Sila pilih bank" required>
+                            <select name="bankid" id="bankid" class="form-control"
+                                data-parsley-required-message="Sila pilih bank" required>
                                 <option value="">Select bank</option>
                             </select>
                         </div>
 
                         <input type="hidden" name="desc" id="desc" value="Donation">
                         <input type="hidden" name="o_id" id="o_id" value="{{ $donation->id }} ">
-
+                        
                         <button class="btn btn-success float-right submit" type="submit">
-                            ALLAH suka kita SEDEKAH setiap hari. TERUSKAN
+                            Teruskan
                         </button>
+                        <br><br>
+                        <div style="text-align: center;">
+                            <p><i>"<b>ALLAH</b> suka kita <b>SEDEKAH</b> setiap hari"</i></p>
+                            <img src="{{ URL::asset('assets/images/pic-donate.png') }}" width="150">
+                        </div>
+
                     </form>
+                    
+                </div>
+                <div class="row">
+                    
                 </div>
             </div>
         </div>

@@ -155,11 +155,13 @@
                         },
                         { 
                             data: "nama",
-                            name: 'nama'
+                            name: 'nama',
+                            "width": "20%"
                         },
                         { 
                             data: "description",
-                            name: 'description'
+                            name: 'description',
+                            "width": "30%"
                         },
                         {
                             data: 'URL', 
@@ -170,7 +172,8 @@
                             data: 'action', 
                             name: 'action', 
                             orderable: false, 
-                            searchable: false
+                            searchable: false,
+                            "width": "10%"
                         },
                     ]
             });

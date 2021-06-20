@@ -87,6 +87,68 @@ class FeesController extends Controller
         return view('parent.fee.index', compact('list', 'getfees', 'getcat', 'getdetail', 'organization'));
     }
 
+    public function devpay()
+    {
+        $userid = Auth::id();
+        $list = DB::table('organizations')
+            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            ->join('users', 'users.id', '=', 'organization_user.user_id')
+            ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+            ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+            ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->select('organizations.id as oid', 'organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
+            ->where([
+                ['users.id', $userid],
+            ])
+            ->orWhere('organization_roles.id', '=', 6)
+            ->orWhere('organization_roles.id', '=', 7)
+            ->orWhere('organization_roles.id', '=', 8)
+            ->orderBy('classes.nama')
+            ->get();
+
+        $feesid     = DB::table('fees')
+            ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('class_student', 'class_organization.class_id', '=', 'class_student.id')
+            ->join('students', 'class_student.student_id', '=', 'students.id')
+            ->select('fees.id as feeid', 'students.id as studentid')
+            ->first();
+
+        // dd($feesid);
+
+        $getfees    = DB::table('fees')->where('id', $feesid->feeid)->first();
+
+        $getcat = DB::table('fees')
+            ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+            ->join('details', 'details.id', '=', 'fees_details.details_id')
+            ->join('categories', 'categories.id', '=', 'details.category_id')
+            ->distinct('categories.nama')
+            ->select('fees.id as feeid', 'categories.id as cid', 'categories.nama as cnama')
+            ->orderBy('categories.id')
+            ->get();
+
+        $getdetail  = DB::table('fees')
+            ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+            ->join('details', 'details.id', '=', 'fees_details.details_id')
+            ->join('categories', 'categories.id', '=', 'details.category_id')
+            ->select('fees.id as feeid', 'categories.id as cid', 'categories.nama as cnama', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'details.totalamount as totalamount', 'details.id as did')
+            ->orderBy('details.nama')
+            ->get();
+        // return view('pentadbir.fee.pay', compact('getfees', 'getcat', 'getdetail'));
+
+        // dd($list);
+
+        // $fees = DB::table('fees')->orderBy('nama')->get();
+        $organization = $this->getOrganizationByUserId();
+
+        return view('parent.dev.index', compact('list', 'getfees', 'getcat', 'getdetail', 'organization'));
+    }
+
     public function create()
     {
         $organization = $this->getOrganizationByUserId();
@@ -380,7 +442,7 @@ class FeesController extends Controller
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
                 $btn = $btn . '<a href="' . route('details.getfees', $row->feeid) . '" class="btn btn-primary m-1">Butiran</a>';
-                $btn = $btn . '<a href="' . route('fees.edit', $row->feeid) . '" class="btn btn-primary m-1">Edit</a>';
+                // $btn = $btn . '<a href="' . route('fees.edit', $row->feeid) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->feeid . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });

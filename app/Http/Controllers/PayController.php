@@ -159,6 +159,70 @@ class PayController extends Controller
         return view('parent.fee.pay', compact('getstudent', 'getfees', 'getdetails', 'getorganization'))->render();
     }
 
+    public function dev_fees_pay(Request $request)
+    {
+        $size = count(collect($request)->get('id'));
+        $data = collect($request)->get('id');
+        // dd($data[0]);
+
+        $studentid  = array();
+        $feesid     = array();
+        $detailsid  = array();
+        for ($i = 0; $i < $size; $i++) {
+
+            //want seperate data from request
+            //case 0 = student id
+            //case 1 = fees id
+            //case 3 = details id
+            $case           = explode("-", $data[$i]);
+            $studentid[]    = $case[0];
+            $feesid[]       = $case[1];
+            $detailsid[]    = $case[2];
+        }
+        $res_student = array_unique($studentid);
+        $res_fee     = array_unique($feesid);
+        $res_details = array_unique($detailsid);
+
+        // $getstudent  = Student::whereIn('id', $res_student)->get();
+        $getstudent  = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->select('students.id as studentid', 'students.nama as studentname', 'fees.id as feeid', 'organizations.id as organizationid')
+            ->whereIn('students.id', $res_student)
+            ->get();
+
+        $getstudent2  = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->select('students.id as studentid', 'students.nama as studentname', 'fees.id as feeid', 'organizations.id as organizationid')
+            ->whereIn('students.id', $res_student)
+            ->first();
+
+        $getorganization  = DB::table('organizations')
+            ->where('id', $getstudent2->organizationid)
+            ->first();
+
+        // dd($getorganization);
+        $getfees     = DB::table('fees')->whereIn('id', $res_fee)->get();
+
+        $getdetails  = DB::table('details')
+            ->join('fees_details', 'fees_details.details_id', '=', 'details.id')
+            ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
+            ->select('details.id as detailsid', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'fees.id as feeid')
+            ->whereIn('details.id', $res_details)->get();
+        // dd($getdetails);
+
+        return view('parent.fee.pay', compact('getstudent', 'getfees', 'getdetails', 'getorganization'))->render();
+    }
+
     public function billIndex()
     {
         $data['users'] = User::where('id', '!=', Auth::id())->get();

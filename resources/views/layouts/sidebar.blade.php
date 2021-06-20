@@ -130,6 +130,16 @@
                         </li>
 
                         @endrole
+
+                        @role('Superadmin|Pentadbir|Guru')
+                        <li>
+                            <a href="{{ route('parent.index') }}" class=" waves-effect">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Ibu Bapa</span>
+                            </a>
+                        </li>
+
+                        @endrole
                     </ul>
                 </li>
                 @endrole
@@ -168,7 +178,7 @@
 
                         @role('Superadmin|Ibu|bapa|Penjaga')
                         <li>
-                            <a href="{{ route('parentpay') }}" class=" waves-effect">
+                            <a href="{{ route('feesparentdev') }}" class=" waves-effect">
                                 <i class="far fa-credit-card"></i>
                                 <span>Test Bayar</span>
                             </a>
@@ -178,25 +188,25 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Ibu|Bapa|Penjaga')
+                {{-- @role('Superadmin|Pentadbir|Ibu|Bapa|Penjaga')
                 <li>
-                    <a href="{{ route('parent.index') }}" class=" waves-effect">
+                    <a href="{{ route('parent.dependent') }}" class=" waves-effect">
                         <i class="fas fa-child"></i>
                         <span>Carian Tanggungan</span>
                     </a>
                 </li>
-                @endrole
+                @endrole --}}
 
 
 
-                @role('Superadmin|Pentadbir|Guru')
+                {{-- @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('chat-user') }}" class=" waves-effect">
                         <i class="mdi mdi-chat-outline"></i>
                         <span>Chat</span>
                     </a>
                 </li>
-                @endrole
+                @endrole --}}
 
                 @role('Superadmin|Ibu|Bapa|Penjaga')
                 <li>

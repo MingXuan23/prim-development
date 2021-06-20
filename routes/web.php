@@ -27,6 +27,12 @@ Route::get('/organization-list', 'LandingPageController@organizationList');
 Route::get('/activity-list', 'LandingPageController@activitylist');
 Route::get('/activity-details', 'LandingPageController@activitydetails');
 
+//landing donation page route
+Route::get('/derma', 'LandingPageController@indexDonation');
+Route::get('/derma/organization-list', 'LandingPageController@organizationListDonation');
+Route::get('/derma/activity-list', 'LandingPageController@activitylistDonation');
+Route::get('/derma/activity-details', 'LandingPageController@activitydetailsDonation');
+
 
 Route::resource('school', 'SchoolController');
 
@@ -71,6 +77,13 @@ Route::group(['prefix' => 'fees'], function () {
 
 });
 
+Route::group(['prefix' => 'parent'], function () {
+    Route::get('dependent/{id}', 'ParentController@indexDependent')->name('parent.dependent');    
+    Route::get('list', 'ParentController@getParentDatatable')->name('parent.getParentDatatable');
+
+
+});
+
 Route::group(['prefix' => 'activity'], function () {
     Route::get('list', 'ActivityController@getActivityDatatable')->name('ActivityDT');
 });
@@ -110,9 +123,11 @@ Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('tra
 Route::get('successpay', 'PayController@successPay')->name('successpay');
 Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
 Route::get('feespay', 'PayController@fees_pay')->name('feespay');
+Route::get('feespaydev', 'PayController@dev_fees_pay')->name('feespaydev');
 
 
 Route::get('feesparent', 'FeesController@parentpay')->name('parentpay');
+Route::get('feesparentdev', 'FeesController@parentpay')->name('feesparentdev');
 
 Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
