@@ -33,6 +33,9 @@ Route::get('/derma/organization-list', 'LandingPageController@organizationListDo
 Route::get('/derma/activity-list', 'LandingPageController@activitylistDonation');
 Route::get('/derma/activity-details', 'LandingPageController@activitydetailsDonation');
 
+// feedback
+Route::post('feedback', 'LandingPageController@storeMessage')->name('feedback.store');
+
 
 Route::resource('school', 'SchoolController');
 

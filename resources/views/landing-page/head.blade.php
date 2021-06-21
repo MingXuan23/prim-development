@@ -8,7 +8,7 @@
     <!-- flaticon -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/flaticon.css') }}">
 
-    <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/flaticon2.css') }}">
+    <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/flaticon3.css') }}">
     <!-- animate.css -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/animate.css') }}">
     <!-- Owl Carousel -->
@@ -27,3 +27,6 @@
          
      <!--====== Default CSS ======-->
      <link rel="stylesheet" href="{{ URL::asset('assets/css/default.css') }}">
+     
+    <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
+
