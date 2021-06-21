@@ -1,0 +1,50 @@
+@font-face {
+    font-family: "flaticon";
+    src: url("../font-2/flaticon.ttf?e0bdd8146b0c5645c140a57693b7bcbf") format("truetype"),
+url("../font-2/flaticon.woff?e0bdd8146b0c5645c140a57693b7bcbf") format("woff"),
+url("../font-2/flaticon.woff2?e0bdd8146b0c5645c140a57693b7bcbf") format("woff2"),
+url("../font-2/flaticon.eot?e0bdd8146b0c5645c140a57693b7bcbf#iefix") format("embedded-opentype"),
+url("../font-2/flaticon.svg?e0bdd8146b0c5645c140a57693b7bcbf#flaticon") format("svg");
+}
+
+i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
+    font-family: flaticon !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.flaticon-group:before {
+    content: "\f101";
+}
+.flaticon-group-1:before {
+    content: "\f102";
+}
+.flaticon-checked:before {
+    content: "\f103";
+}
+.flaticon-donation:before {
+    content: "\f104";
+}
+.flaticon-business-and-finance:before {
+    content: "\f105";
+}
+.flaticon-donation-1:before {
+    content: "\f106";
+}
+.flaticon-transaction:before {
+    content: "\f107";
+}
+.flaticon-fast-time:before {
+    content: "\f108";
+}
+.flaticon-tap:before {
+    content: "\f109";
+}
+.flaticon-save-money:before {
+    content: "\f10a";
+}
