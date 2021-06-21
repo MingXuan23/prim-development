@@ -22,5 +22,6 @@
     <link rel="stylesheet" href="{{ URL::asset('assets/libs/slick/slick.css') }}">
     <!-- Default CSS -->
     <link rel="stylesheet" href="{{ URL::asset('assets/css/default.css') }}">
+
     @include('layouts.datatable')
     @include('layouts.datatable-responsive')
