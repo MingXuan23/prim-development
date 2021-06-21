@@ -10,6 +10,8 @@
     <title> PRIM </title>
 
     @include('landing-page.head')
+    @include('layouts.datatable')
+    @include('layouts.datatable-responsive')
 </head>
 
 <body>
@@ -79,7 +81,7 @@
                             berdaftar.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
+                            <a href="/login" class="boxed-btn btn-rounded">Log Masuk</a>
                         </div>
                     </div>
                 </div>
@@ -364,7 +366,7 @@
                         </div>
                         <div class="content">
                             <h4 class="title">Fast & Secure</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
+                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p> 
                         </div>
                     </div><!-- //. single why us item -->
                 </div>
@@ -407,9 +409,8 @@
                     <div class="section-title">
                         <!-- section title -->
                         {{-- <span class="subtitle">Working Process</span> --}}
-                        <h3 class="title">Proses Sistem</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
+                        <h3 class="title">Organisasi</h3>
+                        <p>Antara organisasi yang berdaftar dengan PRIM </p>
                     </div><!-- //. section title -->
                 </div>
             </div>
@@ -418,52 +419,43 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="account-tab" data-toggle="tab" href="#account" role="tab"
-                                    aria-controls="account" aria-selected="true"><i class="flaticon-checked"></i> Daftar
-                                    Akaun <span class="number">1</span></a>
+                                <a class="nav-link active btn-organization" id="4" data-toggle="tab" href="#masjid" role="tab"
+                                    aria-controls="masjid" aria-selected="true"><i class="flaticon-checked"></i> Masjid <span class="number">1</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab"
-                                    aria-controls="settings" aria-selected="false"><i class="flaticon-settings-1"></i>
-                                    Log Masuk <span class="number">2</span></a>
+                                <a class="nav-link btn-organization" id="5" id="settings-tab" data-toggle="tab" href="#ngo" role="tab"
+                                    aria-controls="ngo" aria-selected="false"><i class="flaticon-settings-1"></i>
+                                    NGO <span class="number">2</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="chat-tab" data-toggle="tab" href="#chat" role="tab"
-                                    aria-controls="chat" aria-selected="false"><i class="flaticon-chat-1"></i> Mula
-                                    Gunakan Sistem <span class="number">3</span></a>
+                                <a class="nav-link btn-organization" id="chat-tab" data-toggle="tab" href="#anakyatim" role="tab"
+                                    aria-controls="anakyatim" aria-selected="false"><i class="flaticon-chat-1"></i> Anak Yatim <span class="number">3</span></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-organization" id="chat-tab" data-toggle="tab" href="#tahfiz" role="tab"
+                                    aria-controls="tahfiz" aria-selected="false"><i class="flaticon-chat-1"></i> Pusat Tahfiz <span class="number">4</span></a>
+                            </li>
+                            <li class="nav-item btn-organization">
+                                <a class="nav-link" id="chat-tab" data-toggle="tab" href="#lain" role="tab"
+                                    aria-controls="lain" aria-selected="false"><i class="flaticon-chat-1"></i> Lain-Lain <span class="number">5</span></a>
                             </li>
                         </ul>
                     </div>
                     <div class="tab-content wow slideInUp">
-                        <div class="tab-pane fade show active" id="account" role="tabpanel"
-                            aria-labelledby="account-tab">
+                        <div class="tab-pane fade show active" id="masjid" role="tabpanel"
+                            aria-labelledby="masjid-tab">
                             <div class="how-it-works-tab-content">
                                 <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="left-content-area">
-                                            <h4 class="title">Daftar </h4>
-                                            <p>Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="right-content-area">
-                                            <div class="img-wrapper">
-                                                <img src="{{ URL::asset('assets/landing-page/img/how-it-works-image.png') }}"
-                                                    alt="how it works image">
-                                            </div>
-                                        </div>
+                                    <div class="table-responsive">
+                                        <table id="tableDerma" class="table table-centered table-nowrap mb-0" id="organization">
+                                            <thead >
+                                                <th>Nama</th>
+                                                <th>No Phone</th>
+                                                <th></th>
+                                            </thead>
+                                            <tbody>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -537,6 +529,57 @@
             </div>
         </div>
     </section>
+    {{-- modal start --}}
+    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
+    aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title mt-0" id="myLargeModalLabel">Senarai Derma</h5>
+                    <button type="button" class="close" data-dismiss="modal"
+                        aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-centered table-nowrap mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    SUMBANGAN TABUNG PEMBIAYAAN PROGRAM PENSIJILAN TAHFIZ (PPT) UTeM 
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <button type="button" class="btn btn-success btn-sm waves-effect waves-light"
+                                                    data-toggle="modal" data-target=".bs-example-modal-lg">Bayar</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div>
+                                                    SUMBANGAN TABUNG PEMBIAYAAN PROGRAM PENSIJILAN TAHFIZ (PPT) UTeM 
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <button type="button" class="btn btn-success btn-sm waves-effect waves-light"
+                                                    data-toggle="modal" data-target=".bs-example-modal-lg">Bayar</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                      </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal end -->
     <!-- how it works area end -->
 
     <!-- screenshort area end -->
@@ -956,12 +999,12 @@
 
                             <a href="index.html" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""></a>
-                            <ul class="social-icon">
+                            {{-- <ul class="social-icon">
                                 <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
                                 <li><a href="#"><i class="fab fa-twitter"></i></a></li>
                                 <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
                                 <li><a href="#"><i class="fab fa-pinterest-p"></i></a></li>
-                            </ul>
+                            </ul> --}}
                         </div>
                     </div>
                 </div>
@@ -976,11 +1019,11 @@
                             <!-- copyright inner wrapper -->
                             <div class="left-content-area">
                                 <!-- left content area -->
-                                &copy; Copyrights 2019 Appside All rights reserved.
+                                &copy; Copyrights {{ now()->year  }} PRIM All rights reserved.
                             </div><!-- //. left content aera -->
                             <div class="right-content-area">
                                 <!-- right content area -->
-                                Designed by <strong>Love</strong>
+                                {{-- Designed by <strong>Love</strong> --}}
                             </div><!-- //. right content area -->
                         </div><!-- //.copyright inner wrapper -->
                     </div>
@@ -1021,3 +1064,58 @@
 </body>
 
 </html>
+
+<script>
+     $(document).ready(function() {
+        
+        window.onload=function(){
+            document.getElementById("4").click();
+        };
+
+        $(document).on('click', '.btn-organization', function(){
+            var type = $(this).attr("id");
+
+            var tableDerma = $('#tableDerma').DataTable({
+            "ordering": true,
+            "processing": true,
+            "serverSide": true,
+            "drawCallback": function( settings ) {
+                $("#tableDerma thead").remove();
+            },  
+            "bDestroy": true,
+            "searching": false,
+            "lengthChange": false,
+            "bInfo" : false,
+                ajax: {
+                    url: "{{ route('landingpage.donation.organization') }}",
+                    type: 'GET',
+                    data: {
+                        type: type,
+                    },
+                },
+                order: [
+                    [1, 'asc']
+                ],
+                responsive: {
+                    details: {
+                    type: 'column'
+                    }
+                },
+                columns: [{
+                    data: "nama",
+                    name: "nama"
+                },{
+                    data: "telno",
+                    name: "telno"
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                    
+                },]
+          });
+          
+        });
+    });
+</script>

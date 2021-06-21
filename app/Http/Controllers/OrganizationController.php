@@ -119,11 +119,11 @@ class OrganizationController extends Controller
             $code = 'SK' . str_pad($id, 5, '0', STR_PAD_LEFT);
         } elseif ($typeOrg == 2) {
             $code = 'SA' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        }elseif ($typeOrg == 3) {
+        } elseif ($typeOrg == 3) {
             $code = 'SM' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        }elseif ($typeOrg == 4) {
+        } elseif ($typeOrg == 4) {
             $code = 'MS' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        }elseif ($typeOrg == 5) {
+        } elseif ($typeOrg == 5) {
             $code = 'NGO' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
