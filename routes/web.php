@@ -28,13 +28,14 @@ Route::get('/activity-list', 'LandingPageController@activitylist');
 Route::get('/activity-details', 'LandingPageController@activitydetails');
 
 //landing donation page route
-Route::get('/derma', 'LandingPageController@indexDonation');
-Route::get('/derma/organization-list', 'LandingPageController@organizationListDonation');
-Route::get('/derma/activity-list', 'LandingPageController@activitylistDonation');
-Route::get('/derma/activity-details', 'LandingPageController@activitydetailsDonation');
-Route::get('/derma/organization-type', 'LandingPageController@getOrganizationDatatable')->name('landingpage.donation.organization');
-Route::get('/derma/organization-donation', 'LandingPageController@getDonationDatatable')->name('landingpage.donation.donation');
-
+Route::group(['prefix' => 'derma'], function () {
+    Route::get('', 'LandingPageController@indexDonation');
+    Route::get('/organization-list', 'LandingPageController@organizationListDonation');
+    Route::get('/activity-list', 'LandingPageController@activitylistDonation');
+    Route::get('/activity-details', 'LandingPageController@activitydetailsDonation');
+    Route::get('/organization-type', 'LandingPageController@getOrganizationDatatable')->name('landingpage.donation.organization');
+    Route::get('/organization-donation', 'LandingPageController@getDonationDatatable')->name('landingpage.donation.donation');
+});
 // feedback
 Route::post('feedback', 'LandingPageController@storeMessage')->name('feedback.store');
 
