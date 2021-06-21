@@ -227,13 +227,8 @@
                             <i class="flaticon-checked"></i>
                         </div>
                         <div class="content">
-<<<<<<< HEAD
-                            <h4 class="title">Fast & Secure</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p> 
-=======
                             <h4 class="title">Selamat <i>(Anti Scam)</i></h4>
                             <p>Organisasi yang mengutip derma adalah organisasi yang berdaftar bersama Bank Islam.</p>
->>>>>>> 8fa12de123f96c1b9041d6f9079910d01f15a809
                         </div>
                     </div><!-- //. single why us item -->
                 </div>
@@ -316,7 +311,7 @@
                             <div class="how-it-works-tab-content">
                                 <div class="row">
                                     <div class="table-responsive">
-                                        <table id="tableDerma" class="table table-centered table-nowrap mb-0" id="organization">
+                                        <table id="tableOrganization" class="table table-centered table-nowrap mb-0" id="organization">
                                             <thead >
                                                 <th>Nama</th>
                                                 <th>No Phone</th>
@@ -329,77 +324,13 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                            <div class="how-it-works-tab-content">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="left-content-area">
-                                            <h4 class="title">Login Account</h4>
-                                            <p>Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="right-content-area">
-                                            <div class="img-wrapper">
-                                                <img src="{{ URL::asset('assets/landing-page/img/how-it-works-image.png') }}"
-                                                    alt="how it works image">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="chat" role="tabpanel" aria-labelledby="chat-tab">
-                            <div class="how-it-works-tab-content">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="left-content-area">
-                                            <h4 class="title">Login Account</h4>
-                                            <p>Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="right-content-area">
-                                            <div class="img-wrapper">
-                                                <img src="{{ URL::asset('assets/landing-page/img/how-it-works-image.png') }}"
-                                                    alt="how it works image">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
     {{-- modal start --}}
-    <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog"
+    <div class="modal fade modal-derma" tabindex="-1" role="dialog"
     aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -412,9 +343,13 @@
                     <div class="container">
                         <div class="row">
                             <div class="table-responsive">
-                                <table class="table table-centered table-nowrap mb-0">
+                                <table id="tableDerma" class="table table-centered table-nowrap mb-0">
+                                    <thead>
+                                        <th>Nama</th>
+                                        <th>Action</th>
+                                    </thead>
                                     <tbody>
-                                        <tr>
+                                        {{-- <tr>
                                             <td>
                                                 <div>
                                                     SUMBANGAN TABUNG PEMBIAYAAN PROGRAM PENSIJILAN TAHFIZ (PPT) UTeM 
@@ -439,7 +374,7 @@
                                                     data-toggle="modal" data-target=".bs-example-modal-lg">Bayar</button>
                                                 </div>
                                             </td>
-                                        </tr>
+                                        </tr> --}}
                                     </tbody>
                                 </table>
                             </div>
@@ -767,16 +702,7 @@
 
                             <a href="index.html" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""></a>
-<<<<<<< HEAD
-                            {{-- <ul class="social-icon">
-                                <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                <li><a href="#"><i class="fab fa-pinterest-p"></i></a></li>
-                            </ul> --}}
-=======
                             
->>>>>>> 8fa12de123f96c1b9041d6f9079910d01f15a809
                         </div>
                     </div>
                 </div>
@@ -791,11 +717,7 @@
                             <!-- copyright inner wrapper -->
                             <div class="left-content-area">
                                 <!-- left content area -->
-<<<<<<< HEAD
-                                &copy; Copyrights {{ now()->year  }} PRIM All rights reserved.
-=======
                                 &copy; Copyrights <span id="year"></span> All rights reserved | PRIM
->>>>>>> 8fa12de123f96c1b9041d6f9079910d01f15a809
                             </div><!-- //. left content aera -->
                             <div class="right-content-area">
                                 <!-- right content area -->
@@ -870,12 +792,12 @@
         $(document).on('click', '.btn-organization', function(){
             var type = $(this).attr("id");
 
-            var tableDerma = $('#tableDerma').DataTable({
+            var tableOrganization = $('#tableOrganization').DataTable({
             "ordering": true,
             "processing": true,
             "serverSide": true,
             "drawCallback": function( settings ) {
-                $("#tableDerma thead").remove();
+                $("#tableOrganization thead").remove();
             },  
             "bDestroy": true,
             "searching": false,
@@ -903,6 +825,49 @@
                     data: "telno",
                     name: "telno"
                 }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                    
+                },]
+          });
+          
+        });
+
+        $(document).on('click', '.btn-donation', function(){
+            var id = $(this).attr("id");
+            
+            var tableDerma = $('#tableDerma').DataTable({
+            "ordering": true,
+            "processing": true,
+            "serverSide": true,
+            "drawCallback": function( settings ) {
+                $("#tableDerma thead").remove();
+            },  
+            "bDestroy": true,
+            "searching": false,
+            "lengthChange": false,
+            "bInfo" : false,
+                ajax: {
+                    url: "{{ route('landingpage.donation.donation') }}",
+                    type: 'GET',
+                    data: {
+                        id: id,
+                    },
+                },
+                order: [
+                    [1, 'asc']
+                ],
+                responsive: {
+                    details: {
+                    type: 'column'
+                    }
+                },
+                columns: [{
+                    data: "nama",
+                    name: "nama"
+                },{
                     data: 'action',
                     name: 'action',
                     orderable: false,
