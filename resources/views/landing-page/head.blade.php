@@ -20,13 +20,13 @@
     <!-- responsive -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/responsive.css') }}">
     <!-- box-list -->
-    <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/box-list.css') }}">
+    {{-- <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/box-list.css') }}"> --}}
 
      <!--====== Slick CSS ======-->
      <link rel="stylesheet" href="{{ URL::asset('assets/libs/slick/slick.css') }}">
          
      <!--====== Default CSS ======-->
      <link rel="stylesheet" href="{{ URL::asset('assets/css/default.css') }}">
-     
-    <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
 
+     <link href="{{ URL::asset('assets/css/app.min.css')}}" id="app-light" rel="stylesheet" type="text/css" />
+     <link href="{{ URL::asset('assets/css/icons.min.css')}}" rel="stylesheet" type="text/css" />

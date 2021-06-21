@@ -2,40 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Donation;
-use App\Models\Feedback;
 use App\Models\Organization;
 use App\Models\Transaction;
+use App\Models\Donation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
-class LandingPageController extends Controller
+class LandingPageController extends AppBaseController
 {
-    public function index()
+    private $organization;
+    private $donation;
+
+    public function __construct(Organization $organization, Donation $donation)
     {
-
-        return view('landing-page.index');
-        // return view('custom-errors.500');
-
+        $this->organization = $organization;
+        $this->donation = $donation;
     }
 
-    public function storeMessage(Request $request)
+    public function index()
     {
-        // dd($request);
-        $this->validate($request, [
-            'uname'         =>  'required',
-            'email'         =>  'required | email',
-            'message'       =>  'required',
-        ]);
-
-        $feedback = Feedback::create([
-            'name'      => $request->get('uname'),
-            'email'     => $request->get('email'),
-            'message'   => $request->get('message')
-        ]);
-
-        return redirect()->back()->with('alert', 'Terima kasih');
+        // return view('landing-page.index');
+        return view('custom-errors.500');
     }
 
     public function organizationList()
@@ -53,33 +41,33 @@ class LandingPageController extends Controller
         return view('landing-page.activitydetails');
     }
 
-    public function getDonationDatatable()
-    {
-        $data = DB::table('donations')
-            ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
-            ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
-            ->select('donations.id', 'donations.nama as nama_derma', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url', 'organizations.nama as nama_organisasi', 'organizations.email', 'organizations.address')
-            ->where('donations.status', 1)
-            ->orderBy('donations.nama')
-            ->get();
+    // public function getDonationDatatable()
+    // {
+    //     $data = DB::table('donations')
+    //         ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
+    //         ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
+    //         ->select('donations.id', 'donations.nama as nama_derma', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url', 'organizations.nama as nama_organisasi', 'organizations.email', 'organizations.address')
+    //         ->where('donations.status', 1)
+    //         ->orderBy('donations.nama')
+    //         ->get();
 
-        $table = Datatables::of($data);
+    //     $table = Datatables::of($data);
 
-        $table->addColumn('action', function ($row) {
-            $btn = '<div class="d-flex justify-content-center">';
-            $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="btn btn-success m-1">Bayar</a></div>';
-            return $btn;
-        });
-        $table->rawColumns(['action']);
-        return $table->make(true);
-    }
+    //     $table->addColumn('action', function ($row) {
+    //         $btn = '<div class="d-flex justify-content-center">';
+    //         $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="btn btn-success m-1">Bayar</a></div>';
+    //         return $btn;
+    //     });
+    //     $table->rawColumns(['action']);
+    //     return $table->make(true);
+    // }
 
     // ********************************Landing page Donation**********************************
 
     public function indexDonation()
     {
         $organization = Organization::all()->count();
-        $transactions = Transaction::where('nama', 'LIKE',  'Donation%')
+        $transactions = Transaction::where('nama', 'LIKE', 'Donation%')
             ->where('status', 'Success')
             ->get()->count();
         $donation = Donation::all()->count();
@@ -103,15 +91,45 @@ class LandingPageController extends Controller
         return view('landing-page.donation.activitydetails');
     }
 
-    public function getDonationDatatableDonation()
+    public function getOrganizationByType($type)
     {
-        $data = DB::table('donations')
-            ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
-            ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
-            ->select('donations.id', 'donations.nama as nama_derma', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url', 'organizations.nama as nama_organisasi', 'organizations.email', 'organizations.address')
-            ->where('donations.status', 1)
-            ->orderBy('donations.nama')
-            ->get();
+        try {
+            $organizations = $this->organization->getOrganizationByType($type);
+            return $organizations;
+        } catch (\Throwable $th) {
+            return $this->sendError($th->getMessage(), 500);
+        }
+    }
+
+    public function getDonationByOrganizationId($id)
+    {
+        try {
+            $donations = $this->donation->getDonationByOrganizationId($id);
+            return $donations;
+        } catch (\Throwable $th) {
+            return $this->sendError($th->getMessage(), 500);
+        }
+    }
+
+
+    public function getOrganizationDatatable(Request $request)
+    {
+        $data = $this->getOrganizationByType($request->type);
+        
+        $table = Datatables::of($data);
+
+        $table->addColumn('action', function ($row) {
+            $btn = '<div class="d-flex justify-content-center">';
+            $btn = $btn . '<a class="btn btn-info btn-sm btn-donation" data-toggle="modal" data-target=".modal-derma" id="'. $row->id . '">Derma</a></div>';
+            return $btn;
+        });
+        $table->rawColumns(['action']);
+        return $table->make(true);
+    }
+
+    public function getDonationDatatable(Request $request)
+    {
+        $data = $this->getDonationByOrganizationId($request->id);
 
         $table = Datatables::of($data);
 

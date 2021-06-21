@@ -32,6 +32,8 @@ Route::get('/derma', 'LandingPageController@indexDonation');
 Route::get('/derma/organization-list', 'LandingPageController@organizationListDonation');
 Route::get('/derma/activity-list', 'LandingPageController@activitylistDonation');
 Route::get('/derma/activity-details', 'LandingPageController@activitydetailsDonation');
+Route::get('/derma/organization-type', 'LandingPageController@getOrganizationDatatable')->name('landingpage.donation.organization');
+Route::get('/derma/organization-donation', 'LandingPageController@getDonationDatatable')->name('landingpage.donation.donation');
 
 // feedback
 Route::post('feedback', 'LandingPageController@storeMessage')->name('feedback.store');
@@ -77,14 +79,11 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('year', 'FeesController@fetchYear')->name('fees.fetchYear');
     Route::post('class', 'FeesController@fetchClass')->name('fees.fetchClass');
     Route::get('list', 'FeesController@getFeesDatatable')->name('fees.getFeesDatatable');
-
 });
 
 Route::group(['prefix' => 'parent'], function () {
-    Route::get('dependent/{id}', 'ParentController@indexDependent')->name('parent.dependent');    
+    Route::get('dependent/{id}', 'ParentController@indexDependent')->name('parent.dependent');
     Route::get('list', 'ParentController@getParentDatatable')->name('parent.getParentDatatable');
-
-
 });
 
 Route::group(['prefix' => 'activity'], function () {
