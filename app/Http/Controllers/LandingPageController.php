@@ -10,8 +10,8 @@ class LandingPageController extends Controller
 {
     public function index()
     {
-        // return view('landing-page.index');
-        return view('custom-errors.500');
+        return view('landing-page.index');
+        // return view('custom-errors.500');
 
     }
 

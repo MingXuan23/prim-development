@@ -75,8 +75,8 @@
                 <div class="col-lg-7">
                     <div class="header-inner">
                         <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
-                            berdaftar.</p>
+                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                            dan pengguna berdaftar.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
                             <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
@@ -99,7 +99,8 @@
                         {{-- <span class="subtitle">Tentang PRiM</span> --}}
                         <h3 class="title extra">Derma</h3>
                         <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b> sehari
-                            dalam <br> <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem PRIM.</p>
+                            dalam <br> <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem
+                            PRIM.</p>
                     </div><!-- //. section title -->
                 </div>
                 <div class="col-lg-6">
@@ -131,7 +132,9 @@
                                             style="margin-right: 10px"></i> Mempunyai akaun Bank Islam.</p>
                                     <p style="text-align: left;"> <i class="flaticon-checked"
                                             style="margin-right: 10px"></i> Mendaftar dengan Paynet melalui Bank Islam.
-                                        <br> <i> <a href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}" download> (klik untuk muat turun borang)</a> </i> </p>
+                                        <br> <i> <a
+                                                href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}"
+                                                download> (klik untuk muat turun borang)</a> </i> </p>
                                     <p style="text-align: left;"> <i class="flaticon-checked"
                                             style="margin-right: 10px"></i> Mendaftar sebagai organisasi di sistem PRIM.
                                     </p>
@@ -278,7 +281,7 @@
     <!-- counterup area start -->
     <section class="counterup-area">
         <div class="container">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-3 col-md-6">
                     <div class="single-counter-item">
                         <!-- single counter item -->
@@ -295,11 +298,11 @@
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
-                            <i class="fas fa-donate"></i>
+                            <i class="flaticon-donation"></i>
                         </div>
                         <div class="content">
                             <span class="count-num">567</span>
-                            <h4 class="title">Derma Terkumpul</h4>
+                            <h4 class="title">Jumlah transaksi</h4>
                         </div>
                     </div><!-- //. single counter item -->
                 </div>
@@ -311,19 +314,7 @@
                         </div>
                         <div class="content">
                             <span class="count-num">36,778</span>
-                            <h4 class="title">App Downloads</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="flaticon-trophy"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">30</span>
-                            <h4 class="title">Best Awards</h4>
+                            <h4 class="title">Derma berdaftar</h4>
                         </div>
                     </div><!-- //. single counter item -->
                 </div>
@@ -350,21 +341,22 @@
                     <div class="single-why-us-item margin-top-60 wow zoomIn">
                         <!-- single why us item -->
                         <div class="icon gdbg-1">
-                            <i class="flaticon-settings-1"></i>
+                            <i class="flaticon-tap"></i>
                         </div>
                         <div class="content">
-                            <h4 class="title">Easy Customize</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
+                            <h4 class="title">Mudah dan Mesra</h4>
+                            <p>Dengan hanya berkongsi <i> link </i> derma, penderma boleh terus menderma.</p>
                         </div>
                     </div><!-- //. single why us item -->
                     <div class="single-why-us-item wow zoomIn">
                         <!-- single why us item -->
                         <div class="icon gdbg-2">
-                            <i class="flaticon-checked"></i>
+                            <i class="flaticon-transaction"></i>
                         </div>
                         <div class="content">
-                            <h4 class="title">Fast & Secure</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
+                            <h4 class="title">Cepat</h4>
+                            <p>Tiada proses <i>settlement</i> untuk setiap transaksi bagi organisasi yang berdaftar
+                                bersama PRIM.</p>
                         </div>
                     </div><!-- //. single why us item -->
                 </div>
@@ -372,11 +364,11 @@
                     <div class="single-why-us-item margin-top-60 wow zoomIn">
                         <!-- single why us item -->
                         <div class="icon gdbg-3">
-                            <i class="flaticon-chat-1"></i>
+                            <i class="flaticon-checked"></i>
                         </div>
                         <div class="content">
-                            <h4 class="title">Live Chat</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
+                            <h4 class="title">Selamat <i>(Anti Scam)</i></h4>
+                            <p>Organisasi yang mengutip derma adalah organisasi yang berdaftar bersama Bank Islam.</p>
                         </div>
                     </div><!-- //. single why us item -->
                     <div class="single-why-us-item wow zoomIn">
@@ -385,8 +377,8 @@
                             <i class="flaticon-cloud"></i>
                         </div>
                         <div class="content">
-                            <h4 class="title">Secure Data</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
+                            <h4 class="title">Sistematik</h4>
+                            <p>Sistem pengurusan organisasi yang sistematik dan derma boleh dibuat secara online.</p>
                         </div>
                     </div><!-- //. single why us item -->
                 </div>
@@ -742,114 +734,7 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title">
-                        <!-- section title -->
-                        <span class="subtitle">Our Team</span>
-                        <h3 class="title">Meet The Team</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
-                    </div><!-- //. section title -->
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="team-carousel">
-                        <!-- team carousel -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/01.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Eiusmod Tempor</h4>
-                                <span class="post">CEO, Appside</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/02.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Maria Hexa</h4>
-                                <span class="post">CEO, Appside</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/03.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Scotty Hedge</h4>
-                                <span class="post">Creative Designer</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/04.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Lara Croft</h4>
-                                <span class="post">CEO, Appside</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/05.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Eiusmoy Smith</h4>
-                                <span class="post">Developer</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                    </div><!-- //. team carousel -->
-                </div>
-            </div>
+
             <div class="row">
                 <div class="col-lg-6">
                     <div class="contact-area-wrapper" id="contact">
