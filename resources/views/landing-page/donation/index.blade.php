@@ -10,8 +10,6 @@
     <title> PRIM </title>
 
     @include('landing-page.head')
-    @include('layouts.datatable')
-    @include('layouts.datatable-responsive')
 </head>
 
 <body>
@@ -284,24 +282,24 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active btn-organization" id="4" data-toggle="tab" href="#masjid" role="tab"
-                                    aria-controls="masjid" aria-selected="true"><i class="flaticon-checked"></i> Masjid <span class="number">1</span></a>
+                                    aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i> Masjid <span class="number">1</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="5" id="settings-tab" data-toggle="tab" href="#ngo" role="tab"
-                                    aria-controls="ngo" aria-selected="false"><i class="flaticon-settings-1"></i>
+                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#ngo" role="tab"
+                                    aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
                                     NGO <span class="number">2</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="chat-tab" data-toggle="tab" href="#anakyatim" role="tab"
-                                    aria-controls="anakyatim" aria-selected="false"><i class="flaticon-chat-1"></i> Anak Yatim <span class="number">3</span></a>
+                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#anakyatim" role="tab"
+                                    aria-controls="anakyatim" aria-selected="false"><i class="fas fa-child"></i>Rumah Anak Yatim <span class="number">3</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="chat-tab" data-toggle="tab" href="#tahfiz" role="tab"
-                                    aria-controls="tahfiz" aria-selected="false"><i class="flaticon-chat-1"></i> Pusat Tahfiz <span class="number">4</span></a>
+                                <a class="nav-link btn-organization" id="7 data-toggle="tab" href="#tahfiz" role="tab"
+                                    aria-controls="tahfiz" aria-selected="false"><i class="fas fa-quran"></i> Pusat Tahfiz <span class="number">4</span></a>
                             </li>
                             <li class="nav-item btn-organization">
-                                <a class="nav-link" id="chat-tab" data-toggle="tab" href="#lain" role="tab"
-                                    aria-controls="lain" aria-selected="false"><i class="flaticon-chat-1"></i> Lain-Lain <span class="number">5</span></a>
+                                <a class="nav-link" id="8" data-toggle="tab" href="#lain" role="tab"
+                                    aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i> Lain-Lain <span class="number">5</span></a>
                             </li>
                         </ul>
                     </div>
@@ -349,32 +347,6 @@
                                         <th>Action</th>
                                     </thead>
                                     <tbody>
-                                        {{-- <tr>
-                                            <td>
-                                                <div>
-                                                    SUMBANGAN TABUNG PEMBIAYAAN PROGRAM PENSIJILAN TAHFIZ (PPT) UTeM 
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div>
-                                                    <button type="button" class="btn btn-success btn-sm waves-effect waves-light"
-                                                    data-toggle="modal" data-target=".bs-example-modal-lg">Bayar</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div>
-                                                    SUMBANGAN TABUNG PEMBIAYAAN PROGRAM PENSIJILAN TAHFIZ (PPT) UTeM 
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div>
-                                                    <button type="button" class="btn btn-success btn-sm waves-effect waves-light"
-                                                    data-toggle="modal" data-target=".bs-example-modal-lg">Bayar</button>
-                                                </div>
-                                            </td>
-                                        </tr> --}}
                                     </tbody>
                                 </table>
                             </div>
@@ -761,48 +733,45 @@
     @include('landing-page.footer-script')
 
     <script>
-        var msg = '{{Session::get('alert')}}';
-        var exist = '{{Session::has('alert')}}';
-        if(exist){
-        //   alert(msg);
-          Swal.fire({
+    var msg = '{{Session::get('alert ')}}';var exist = '{{Session::has('alert ')}}';
+    
+    if (exist) {
+        Swal.fire({
             title: 'Terima Kasih',
             text: 'Kerana anda telah menghubungi kami!',
             type: 'success',
             confirmButtonColor: '#556ee6',
             cancelButtonColor: "#f46a6a"
         });
-        }
+    }
 
-        
+    $(document).ready(function() {
 
-      </script>
-    
-</body>
-
-</html>
-
-<script>
-     $(document).ready(function() {
-        
-        window.onload=function(){
+        window.onload = function() {
             document.getElementById("4").click();
         };
 
-        $(document).on('click', '.btn-organization', function(){
+        $(document).on('click', '.btn-organization', function() {
             var type = $(this).attr("id");
 
             var tableOrganization = $('#tableOrganization').DataTable({
-            "ordering": true,
-            "processing": true,
-            "serverSide": true,
-            "drawCallback": function( settings ) {
-                $("#tableOrganization thead").remove();
-            },  
-            "bDestroy": true,
-            "searching": false,
-            "lengthChange": false,
-            "bInfo" : false,
+                "ordering": true,
+                "processing": true,
+                "serverSide": true,
+                "bDestroy": true,
+                "searching": false,
+                "lengthChange": false,
+                "bInfo": false,
+                "drawCallback": function(settings) {
+                    $("#tableOrganization thead").remove();
+                },
+                "language": {
+                    "emptyTable": "Tiada maklumat untuk dipaparkan",
+                    "paginate": {
+                        "next": "Seterusnya",
+                        "previous": "Sebelumnya"
+                    }
+                },
                 ajax: {
                     url: "{{ route('landingpage.donation.organization') }}",
                     type: 'GET',
@@ -815,13 +784,13 @@
                 ],
                 responsive: {
                     details: {
-                    type: 'column'
+                        type: 'column'
                     }
                 },
                 columns: [{
                     data: "nama",
                     name: "nama"
-                },{
+                }, {
                     data: "telno",
                     name: "telno"
                 }, {
@@ -829,26 +798,33 @@
                     name: 'action',
                     orderable: false,
                     searchable: false
-                    
-                },]
-          });
-          
+
+                }, ]
+            });
+
         });
 
-        $(document).on('click', '.btn-donation', function(){
+        $(document).on('click', '.btn-donation', function() {
             var id = $(this).attr("id");
-            
+
             var tableDerma = $('#tableDerma').DataTable({
-            "ordering": true,
-            "processing": true,
-            "serverSide": true,
-            "drawCallback": function( settings ) {
-                $("#tableDerma thead").remove();
-            },  
-            "bDestroy": true,
-            "searching": false,
-            "lengthChange": false,
-            "bInfo" : false,
+                "ordering": true,
+                "processing": true,
+                "serverSide": true,
+                "bDestroy": true,
+                "searching": false,
+                "lengthChange": false,
+                "bInfo": false,
+                "drawCallback": function(settings) {
+                    $("#tableDerma thead").remove();
+                },
+                "language": {
+                    "emptyTable": "Tiada maklumat untuk dipaparkan",
+                    "paginate": {
+                        "next": "Seterusnya",
+                        "previous": "Sebelumnya"
+                    }
+                },
                 ajax: {
                     url: "{{ route('landingpage.donation.donation') }}",
                     type: 'GET',
@@ -861,21 +837,23 @@
                 ],
                 responsive: {
                     details: {
-                    type: 'column'
+                        type: 'column'
                     }
                 },
                 columns: [{
                     data: "nama",
                     name: "nama"
-                },{
+                }, {
                     data: 'action',
                     name: 'action',
                     orderable: false,
                     searchable: false
-                    
-                },]
-          });
-          
+
+                }, ]
+            });
+
         });
     });
-</script>
+    </script>
+</body>
+</html>
