@@ -77,8 +77,8 @@
                 <div class="col-lg-7">
                     <div class="header-inner">
                         <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
-                            berdaftar.</p>
+                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian <i>(online)</i> untuk pelbagai organisasi
+                            dan pengguna berdaftar.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
                             <a href="/login" class="boxed-btn btn-rounded">Log Masuk</a>
@@ -101,11 +101,13 @@
                         {{-- <span class="subtitle">Tentang PRiM</span> --}}
                         <h3 class="title extra">Derma</h3>
                         <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b> sehari
-                            dalam <br> <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem PRIM.</p>
+                            dalam <br> <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem
+                            PRIM.</p>
                     </div><!-- //. section title -->
                 </div>
                 <div class="col-lg-6">
-                    {{-- <h3 class="title extra" style="margin-bottom: 24px;">Syarat</h3> --}}
+                    <h3 class="title extra" style="margin-bottom: 24px;">Syarat-syarat</h3>
+
                     <div class="feature-area">
 
                         <div class="hover-inner">
@@ -114,7 +116,7 @@
                                     <i class="flaticon-donation"></i>
                                 </div>
                                 <div class="content">
-                                    <h4 class="title" style="text-align: left;"><a href="#">Penderma</a></h4>
+                                    <h4 class="title" style="text-align: left;">Penderma</h4>
                                     <p style="text-align: left;"> <i class="flaticon-checked"
                                             style="margin-right: 10px"></i> Mempunyai akaun dalam bank
                                         talian <i>(online banking)</i> dengan mana-mana bank di Malaysia.</p>
@@ -128,12 +130,14 @@
                                     <i class="flaticon-business-and-finance"></i>
                                 </div>
                                 <div class="content">
-                                    <h4 class="title" style="text-align: left;"><a href="#">Penerima Derma</a></h4>
+                                    <h4 class="title" style="text-align: left;">Penerima Derma</h4>
                                     <p style="text-align: left;"> <i class="flaticon-checked"
                                             style="margin-right: 10px"></i> Mempunyai akaun Bank Islam.</p>
                                     <p style="text-align: left;"> <i class="flaticon-checked"
                                             style="margin-right: 10px"></i> Mendaftar dengan Paynet melalui Bank Islam.
-                                        <br> <i> <a href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}" download> (klik untuk muat turun borang)</a> </i> </p>
+                                        <br> <i> <a
+                                                href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}"
+                                                download> (klik untuk muat turun borang)</a> </i> </p>
                                     <p style="text-align: left;"> <i class="flaticon-checked"
                                             style="margin-right: 10px"></i> Mendaftar sebagai organisasi di sistem PRIM.
                                     </p>
@@ -146,141 +150,11 @@
         </div>
     </section>
 
-    <!-- about us area end -->
-    <!-- portfolio area start -->
-    {{-- <section class="portfolio" class="portfolio-area portfolio-four pb-100">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-10">
-                    <div class="section-title text-center pb-10">
-                        <h3 class="title">Organisasi</h3>
-                        <p class="text">Stop wasting time and money designing and managing a website that doesn’t get
-                            results. Happiness guaranteed!</p>
-                    </div> <!-- section title -->
-                </div>
-            </div> <!-- row -->
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="portfolio-menu text-center mt-50">
-                        <ul>
-                            <li class="active"> Semua Organisasi </li>
-                            <li data-filter=".branding-4">Masjid An-Najihah </li>
-                            <li data-filter=".marketing-4">Masjid Al-Alami</li>
-                            <li data-filter=".planning-4">Tahfiz Iman</li>
-                            <li data-filter=".research-4">Pusat Islam UTeM</li>
-                        </ul>
-                    </div> <!-- portfolio menu -->
-                </div>
-                <div class="col-lg-9 col-md-9">
-                    <div class="row">
-                        <div class="col no-gutters grid mt-50">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <div class="branding-4">
-                                        <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                                            <div class="carousel-inner" role="listbox">
-                                                <div style="max-width:100%; height:auto; !important;">
-                                                    <div class="carousel-item active">
-                                                        <img class="d-block w-100"
-                                                            src="{{ URL::asset('assets/landing-page/img/blog/1-min.jpg') }}"
-    alt="First slide">
-    </div>
-    <div class="carousel-item">
-        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5-min.jpg') }}" alt="Second slide">
-    </div>
-    <div class="carousel-item">
-        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3-min.jpeg') }}" alt="Third slide">
-    </div>
-    </div>
-
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div> <!-- row -->
-    <div class="col no-gutters grid mt-50">
-        <div class="marketing-4">
-            <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                <div class="carousel-inner" role="listbox">
-                    <div style="max-width:100%; height:auto; !important;">
-                        <div class="carousel-item active">
-                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}"
-                                alt="First slide">
-                        </div>
-                        <div class="carousel-item">
-                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}"
-                                alt="Second slide">
-                        </div>
-                        <div class="carousel-item">
-                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}"
-                                alt="Third slide">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-    <div class="row">
-        <div class="col no-gutters grid mt-50">
-            <div class="planning-4">
-                <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                    <div class="carousel-inner" role="listbox">
-                        <div style="max-width:100%; height:auto; !important;">
-                            <div class="carousel-item active">
-                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}"
-                                    alt="First slide">
-                            </div>
-                            <div class="carousel-item">
-                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}"
-                                    alt="Second slide">
-                            </div>
-                            <div class="carousel-item">
-                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}"
-                                    alt="Third slide">
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div> <!-- row -->
-        <div class="col no-gutters grid mt-50">
-            <div class="research-4">
-                <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                    <div class="carousel-inner" role="listbox">
-                        <div style="max-width:100%; height:auto; !important;">
-                            <div class="carousel-item active">
-                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}"
-                                    alt="First slide">
-                            </div>
-                            <div class="carousel-item">
-                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}"
-                                    alt="Second slide">
-                            </div>
-                            <div class="carousel-item">
-                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}"
-                                    alt="Third slide">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    </div>
-    </div> <!-- row -->
-    </div>
-    </section> --}}
-    <!-- video area end -->
 
     <!-- counterup area start -->
     <section class="counterup-area">
         <div class="container">
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-lg-3 col-md-6">
                     <div class="single-counter-item">
                         <!-- single counter item -->
@@ -288,7 +162,7 @@
                             <i class="flaticon-group-1"></i>
                         </div>
                         <div class="content">
-                            <span class="count-num">14,567</span>
+                            <span class="count-num">{{ $organization }}</span>
                             <h4 class="title">Jumlah Organisasi</h4>
                         </div>
                     </div><!-- //. single counter item -->
@@ -297,11 +171,11 @@
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
-                            <i class="fas fa-donate"></i>
+                            <i class="flaticon-transaction"></i>
                         </div>
                         <div class="content">
-                            <span class="count-num">567</span>
-                            <h4 class="title">Derma Terkumpul</h4>
+                            <span class="count-num">{{ $transactions }}</span>
+                            <h4 class="title">Jumlah transaksi</h4>
                         </div>
                     </div><!-- //. single counter item -->
                 </div>
@@ -309,23 +183,11 @@
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
-                            <i class="flaticon-email"></i>
+                            <i class="flaticon-donation-1"></i>
                         </div>
                         <div class="content">
-                            <span class="count-num">36,778</span>
-                            <h4 class="title">App Downloads</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="flaticon-trophy"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">30</span>
-                            <h4 class="title">Best Awards</h4>
+                            <span class="count-num">{{ $donation }}</span>
+                            <h4 class="title">Derma berdaftar</h4>
                         </div>
                     </div><!-- //. single counter item -->
                 </div>
@@ -352,33 +214,40 @@
                     <div class="single-why-us-item margin-top-60 wow zoomIn">
                         <!-- single why us item -->
                         <div class="icon gdbg-1">
-                            <i class="flaticon-settings-1"></i>
+                            <i class="flaticon-tap"></i>
                         </div>
                         <div class="content">
-                            <h4 class="title">Easy Customize</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
+                            <h4 class="title">Mudah dan Mesra</h4>
+                            <p>Dengan hanya berkongsi <i> link </i> derma, penderma boleh terus menderma.</p>
                         </div>
                     </div><!-- //. single why us item -->
-                    <div class="single-why-us-item wow zoomIn">
+                    <div class="single-why-us-item  wow zoomIn">
                         <!-- single why us item -->
                         <div class="icon gdbg-2">
                             <i class="flaticon-checked"></i>
                         </div>
                         <div class="content">
+<<<<<<< HEAD
                             <h4 class="title">Fast & Secure</h4>
                             <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p> 
+=======
+                            <h4 class="title">Selamat <i>(Anti Scam)</i></h4>
+                            <p>Organisasi yang mengutip derma adalah organisasi yang berdaftar bersama Bank Islam.</p>
+>>>>>>> 8fa12de123f96c1b9041d6f9079910d01f15a809
                         </div>
                     </div><!-- //. single why us item -->
                 </div>
                 <div class="col-lg-4 col-md-12">
+
                     <div class="single-why-us-item margin-top-60 wow zoomIn">
                         <!-- single why us item -->
                         <div class="icon gdbg-3">
-                            <i class="flaticon-chat-1"></i>
+                            <i class="flaticon-fast-time"></i>
                         </div>
                         <div class="content">
-                            <h4 class="title">Live Chat</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
+                            <h4 class="title">Segera</h4>
+                            <p>Tiada proses <i>settlement</i> dan derma akan terus dikreditkan ke dalam akaun bank yang
+                                telah didaftarkan.</p>
                         </div>
                     </div><!-- //. single why us item -->
                     <div class="single-why-us-item wow zoomIn">
@@ -387,8 +256,8 @@
                             <i class="flaticon-cloud"></i>
                         </div>
                         <div class="content">
-                            <h4 class="title">Secure Data</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
+                            <h4 class="title">Sistematik</h4>
+                            <p>Sistem pengurusan organisasi yang sistematik dan derma boleh dibuat secara online.</p>
                         </div>
                     </div><!-- //. single why us item -->
                 </div>
@@ -785,139 +654,37 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title">
-                        <!-- section title -->
-                        <span class="subtitle">Our Team</span>
-                        <h3 class="title">Meet The Team</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
-                    </div><!-- //. section title -->
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="team-carousel">
-                        <!-- team carousel -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/01.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Eiusmod Tempor</h4>
-                                <span class="post">CEO, Appside</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/02.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Maria Hexa</h4>
-                                <span class="post">CEO, Appside</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/03.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Scotty Hedge</h4>
-                                <span class="post">Creative Designer</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/04.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Lara Croft</h4>
-                                <span class="post">CEO, Appside</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/05.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Eiusmoy Smith</h4>
-                                <span class="post">Developer</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                    </div><!-- //. team carousel -->
-                </div>
-            </div>
+
             <div class="row">
                 <div class="col-lg-6">
                     <div class="contact-area-wrapper" id="contact">
                         <!-- contact area wrapper -->
                         {{-- <span class="subtitle">Contact us</span> --}}
                         <h3 class="title">Hubungi Kami</h3>
-                        <p>Untuk sebarang pertanyaan dan pendaftaran, sila hubungi kami.</p>
-                        <form action="index.html" id="contact_form_submit" class="contact-form sec-margin">
+                        <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi form ini.</p>
+                        <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"
+                            enctype="multipart/form-data">
+
+                            @csrf
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="uname" placeholder="Nama Penuh">
+                                        <input type="text" class="form-control" id="uname" name="uname"
+                                            placeholder="Nama Penuh" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="email" placeholder="Email">
+                                        <input type="email" class="form-control" id="email" name="email"
+                                            placeholder="Email" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="form-group textarea">
                                         <textarea name="message" id="message" class="form-control" cols="30" rows="10"
-                                            placeholder="Mesej"></textarea>
+                                            placeholder="Mesej" required></textarea>
                                     </div>
-                                    <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Submit Now</button>
+                                    <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>
                                 </div>
                             </div>
                         </form>
@@ -964,13 +731,14 @@
                         <div class="footer-widget about_widget">
                             <a href="index.html" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
-                            <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
-                                berdaftar. </p>
-                            <ul class="social-icon">
-                                <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                <li><a href="#"><i class="fab fa-pinterest-p"></i></a></li>
+                            <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b> sehari
+                                dalam <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem
+                                PRIM. </p>
+                            <ul class="social-icon" style="text-align: center; ">
+                                <li><a href="https://www.facebook.com/MyUTeM/"><i class="fab fa-facebook-f"></i></a></li>
+                                <li><a href="https://www.instagram.com/myutem/"><i class="fab fa-instagram"></i></a></li>
+                                <li><a href="https://twitter.com/myutem"><i class="fab fa-twitter"></i></a></li>
+                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i class="fab fa-youtube"></i></a></li>
                             </ul>
                         </div>
                     </div>
@@ -995,16 +763,20 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-utem.png') }}" alt=""></a>
+                                    src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt=""></a>
 
                             <a href="index.html" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""></a>
+<<<<<<< HEAD
                             {{-- <ul class="social-icon">
                                 <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
                                 <li><a href="#"><i class="fab fa-twitter"></i></a></li>
                                 <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
                                 <li><a href="#"><i class="fab fa-pinterest-p"></i></a></li>
                             </ul> --}}
+=======
+                            
+>>>>>>> 8fa12de123f96c1b9041d6f9079910d01f15a809
                         </div>
                     </div>
                 </div>
@@ -1019,7 +791,11 @@
                             <!-- copyright inner wrapper -->
                             <div class="left-content-area">
                                 <!-- left content area -->
+<<<<<<< HEAD
                                 &copy; Copyrights {{ now()->year  }} PRIM All rights reserved.
+=======
+                                &copy; Copyrights <span id="year"></span> All rights reserved | PRIM
+>>>>>>> 8fa12de123f96c1b9041d6f9079910d01f15a809
                             </div><!-- //. left content aera -->
                             <div class="right-content-area">
                                 <!-- right content area -->
@@ -1061,6 +837,25 @@
     </div>
     <!-- back to top area end -->
     @include('landing-page.footer-script')
+
+    <script>
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
+        if(exist){
+        //   alert(msg);
+          Swal.fire({
+            title: 'Terima Kasih',
+            text: 'Kerana anda telah menghubungi kami!',
+            type: 'success',
+            confirmButtonColor: '#556ee6',
+            cancelButtonColor: "#f46a6a"
+        });
+        }
+
+        
+
+      </script>
+    
 </body>
 
 </html>

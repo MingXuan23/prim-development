@@ -8,7 +8,7 @@
     <!-- flaticon -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/flaticon.css') }}">
 
-    <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/flaticon2.css') }}">
+    <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/flaticon3.css') }}">
     <!-- animate.css -->
     <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/animate.css') }}">
     <!-- Owl Carousel -->
