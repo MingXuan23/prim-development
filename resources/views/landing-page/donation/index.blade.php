@@ -311,9 +311,10 @@
                                     <div class="table-responsive">
                                         <table id="tableOrganization" class="table table-centered table-nowrap mb-0" id="organization">
                                             <thead >
-                                                <th>Nama</th>
-                                                <th>No Phone</th>
-                                                <th></th>
+                                                <th >Nama</th>
+                                                <th >No Phone</th>
+                                                <th >Email</th>
+                                                <th ></th>
                                             </thead>
                                             <tbody>
                                             </tbody>
@@ -793,6 +794,10 @@
                 }, {
                     data: "telno",
                     name: "telno"
+                },{
+                    data: "email",
+                    name: "email",
+                    className: "desktop"
                 }, {
                     data: 'action',
                     name: 'action',

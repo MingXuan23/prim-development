@@ -286,12 +286,14 @@ class PayController extends Controller
             // $fpx_buyerIban      = "";
         }
 
+        $organization = $this->organization->getOrganizationByDonationId($request->o_id);
+
         $fpx_msgType        = "AR";
         $fpx_msgToken       = "01";
         $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
         $fpx_sellerTxnTime  = date('YmdHis');
         $fpx_sellerOrderNo  = date('YmdHis') . rand(10000, 99999)  . $request->o_id;
-        $fpx_sellerId       = config('app.env') == 'production' ? "SE00045101" : "SE00013841";
+        $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         ;
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
