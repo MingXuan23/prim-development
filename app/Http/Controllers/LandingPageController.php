@@ -27,6 +27,24 @@ class LandingPageController extends AppBaseController
         return view('custom-errors.maintenance');
     }
 
+    public function storeMessage(Request $request)
+    {
+        // dd($request);
+        $this->validate($request, [
+            'uname'         =>  'required',
+            'email'         =>  'required | email',
+            'message'       =>  'required',
+        ]);
+
+        $feedback = Feedback::create([
+            'name'      => $request->get('uname'),
+            'email'     => $request->get('email'),
+            'message'   => $request->get('message')
+        ]);
+
+        return redirect()->back()->with('alert', 'Terima kasih');
+    }
+
     public function organizationList()
     {
         return view('landing-page.organization_list');

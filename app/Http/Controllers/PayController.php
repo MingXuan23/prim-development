@@ -357,7 +357,7 @@ class PayController extends Controller
     
                     case 'Donation':
                         Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
-                        
+                        Log::info("Transaction Callback : " . $request->fpx_sellerExOrderNo);
                         // $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
                         // $organization = $this->organization->getOrganizationByDonationId($donation->id);
                         // $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
