@@ -91,8 +91,10 @@
                         <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
                             ibu bapa serta penjaga dengan pihak sekolah.</p>
                         <div class="btn-wrapper wow fadeInUp">
-                            <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
+                            <a href="#organization" class="boxed-btn btn-rounded">Derma</a>
+
+                            {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
+                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
                         </div>
                     </div>
                 </div>
