@@ -23,6 +23,9 @@
 <!-- Default CSS -->
 <link rel="stylesheet" href="{{ URL::asset('assets/css/default.css') }}">
 
+<link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
+
+
 @include('layouts.datatable')
 @include('layouts.datatable-responsive')
 

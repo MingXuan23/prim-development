@@ -394,12 +394,13 @@
                             <div class="how-it-works-tab-content">
                                 <div class="row">
                                     <div class="table-responsive">
-                                        <table id="tableOrganization" class="table table-centered table-nowrap mb-0" id="organization">
-                                            <thead >
-                                                <th >Nama</th>
-                                                <th >No Phone</th>
-                                                <th >Email</th>
-                                                <th ></th>
+                                        <table id="tableOrganization" class="table table-centered table-nowrap mb-0"
+                                            id="organization">
+                                            <thead>
+                                                <th>Nama</th>
+                                                <th>No Phone</th>
+                                                <th>Email</th>
+                                                <th></th>
                                             </thead>
                                             <tbody>
                                             </tbody>
@@ -629,7 +630,8 @@
     @include('landing-page.footer-script')
 
     <script>
-        var msg = '{{Session::get('alert ')}}';var exist = '{{Session::has('alert ')}}';
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
     
     if (exist) {
         Swal.fire({
