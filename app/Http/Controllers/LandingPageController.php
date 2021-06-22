@@ -23,7 +23,8 @@ class LandingPageController extends AppBaseController
     public function index()
     {
         // return view('landing-page.index');
-        return view('custom-errors.500');
+        // return view('custom-errors.500');
+        return view('custom-errors.maintenance');
     }
 
     public function organizationList()
