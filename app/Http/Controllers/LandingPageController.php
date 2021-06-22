@@ -120,7 +120,9 @@ class LandingPageController extends AppBaseController
 
         $table->addColumn('action', function ($row) {
             $btn = '<div class="d-flex justify-content-center">';
-            $btn = $btn . '<a class="btn btn-outline-primary waves-effect waves-light btn-sm btn-donation" data-toggle="modal" data-target=".modal-derma" id="'. $row->id . '">Derma</a></div>';
+            // $btn = $btn . '<a class="btn btn-outline-primary waves-effect waves-light btn-sm btn-donation" data-toggle="modal" data-target=".modal-derma" id="'. $row->id . '">Derma</a></div>';
+            $btn = $btn . '<a href="#" class="boxed-btn btn-rounded btn-donation" data-toggle="modal" data-target=".modal-derma" id="'. $row->id . '" style="color: white;">Derma</a></div>';
+
             return $btn;
         });
         $table->rawColumns(['action']);
@@ -135,7 +137,7 @@ class LandingPageController extends AppBaseController
 
         $table->addColumn('action', function ($row) {
             $btn = '<div class="d-flex justify-content-center">';
-            $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="btn btn-outline-success btn-sm waves-effect waves-light m-1">Bayar</a></div>';
+            $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Bayar</a></div>';
             return $btn;
         });
         $table->rawColumns(['action']);
