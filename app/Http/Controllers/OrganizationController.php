@@ -125,6 +125,10 @@ class OrganizationController extends Controller
             $code = 'MS' . str_pad($id, 5, '0', STR_PAD_LEFT);
         } elseif ($typeOrg == 5) {
             $code = 'NGO' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 6) {
+            $code = 'RAY' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 7) {
+            $code = 'PT' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
         return $code;

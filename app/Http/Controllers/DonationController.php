@@ -334,8 +334,12 @@ class DonationController extends Controller
 
     public function destroy($id)
     {
-        $result = Donation::where('id', $id)->first()->delete();
+        // dd($id);
+        $result = DB::table('donations')
+                    ->where('id', '=', $id)
+                    ->delete();
         
+
         if ($result) {
             Session::flash('success', 'Derma Berjaya Dipadam');
             return View::make('layouts/flash-messages');
