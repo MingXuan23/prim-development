@@ -693,10 +693,7 @@
                     data: "email",
                     name: "email",
                     className: "desktop"
-                }, {
-                    data: "email",
-                    name: "email"
-                }, {
+                },{
                     data: 'action',
                     name: 'action',
                     orderable: false,
