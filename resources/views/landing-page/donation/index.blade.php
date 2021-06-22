@@ -75,11 +75,11 @@
                 <div class="col-lg-7">
                     <div class="header-inner">
                         <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian <i>(online)</i> untuk pelbagai organisasi
-                            dan pengguna berdaftar.</p>
+                        <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
+                            ibu bapa serta penjaga dengan pihak sekolah.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                            <a href="/login" class="boxed-btn btn-rounded">Log Masuk</a>
+                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
                         </div>
                     </div>
                 </div>
@@ -88,15 +88,97 @@
     </header>
     <!-- header area end  -->
 
+    <section class="team-member-area" id="team">
+        <div class="bg-shape-1">
+            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="">
+        </div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="section-title">
+                        <!-- section title -->
+                        {{-- <span class="subtitle">Our Team</span> --}}
+                        <h3 class="title">Tentang PRiM</h3>
+                        <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
+                            ibu bapa serta penjaga dengan pihak sekolah. PRiM menyediakan gerbang pembayaran yuran
+                            sekolah secara dalam talian dan juga pengumuman kelas dan sekolah. Di samping itu, PRiM juga
+                            menyediakan perkhidmatan lain dalam talian seperti kutipan derma bagi organisasi berdaftar.
+                        </p>
+                    </div><!-- //. section title -->
+                </div>
+            </div>
+
+            <div class="about-us-area style-two">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="section-title left-aligned">
+                                <!-- section title -->
+                                {{-- <span class="subtitle">Tentang PRiM</span> --}}
+                                <h3 class="title extra" style="margin-top: 24px;">Derma</h3>
+                                <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b>
+                                    sehari
+                                    dalam <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam
+                                    sistem
+                                    PRiM.</p>
+                            </div><!-- //. section title -->
+                        </div>
+                        <div class="col-lg-6">
+                            <h3 class="title extra" style="margin-bottom: 24px; margin-top: 24px;">Syarat-syarat</h3>
+                            <div class="feature-area">
+
+                                <div class="hover-inner">
+                                    <div class="single-feature-list border wow zoomIn">
+                                        <div class="icon icon-bg-4">
+                                            <i class="flaticon-donation"></i>
+                                        </div>
+                                        <div class="content">
+                                            <h4 class="title" style="text-align: left;">Penderma</h4>
+                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                                    style="margin-right: 10px"></i> Mempunyai akaun dalam bank
+                                                talian <i>(online banking)</i> dengan mana-mana bank di Malaysia.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br><br>
+                                <div class="hover-inner">
+                                    <div class="single-feature-list border wow zoomIn">
+                                        <div class="icon icon-bg-2">
+                                            <i class="flaticon-business-and-finance"></i>
+                                        </div>
+                                        <div class="content">
+                                            <h4 class="title" style="text-align: left;">Penerima Derma</h4>
+                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                                    style="margin-right: 10px"></i> Mempunyai akaun Bank Islam.</p>
+                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                                    style="margin-right: 10px"></i> Mendaftar dengan Paynet melalui Bank
+                                                Islam.
+                                                <br> <i> <a
+                                                        href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}"
+                                                        download> (klik untuk muat turun borang)</a> </i> </p>
+                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                                    style="margin-right: 10px"></i> Mendaftar sebagai organisasi di
+                                                sistem PRiM.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- about us area start -->
 
-    <section class="about-us-area style-two">
+    {{-- <section class="about-us-area style-two">
         <div class="container">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="section-title left-aligned">
                         <!-- section title -->
-                        {{-- <span class="subtitle">Tentang PRiM</span> --}}
                         <h3 class="title extra">Derma</h3>
                         <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b> sehari
                             dalam <br> <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem
@@ -135,18 +217,18 @@
                                             style="margin-right: 10px"></i> Mendaftar dengan Paynet melalui Bank Islam.
                                         <br> <i> <a
                                                 href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}"
-                                                download> (klik untuk muat turun borang)</a> </i> </p>
-                                    <p style="text-align: left;"> <i class="flaticon-checked"
-                                            style="margin-right: 10px"></i> Mendaftar sebagai organisasi di sistem PRIM.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    download> (klik untuk muat turun borang)</a> </i> </p>
+    <p style="text-align: left;"> <i class="flaticon-checked" style="margin-right: 10px"></i> Mendaftar sebagai
+        organisasi di sistem PRIM.
+    </p>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </section> --}}
 
 
     <!-- counterup area start -->
@@ -272,7 +354,7 @@
                         <!-- section title -->
                         {{-- <span class="subtitle">Working Process</span> --}}
                         <h3 class="title">Organisasi</h3>
-                        <p>Antara organisasi yang berdaftar dengan PRIM </p>
+                        <p>Antara organisasi yang berdaftar dengan PRiM </p>
                     </div><!-- //. section title -->
                 </div>
             </div>
@@ -281,8 +363,9 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active btn-organization" id="4" data-toggle="tab" href="#masjid" role="tab"
-                                    aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i> Masjid <span class="number">1</span></a>
+                                <a class="nav-link active btn-organization" id="4" data-toggle="tab" href="#masjid"
+                                    role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
+                                    Masjid <span class="number">1</span></a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#ngo" role="tab"
@@ -290,22 +373,24 @@
                                     NGO <span class="number">2</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#anakyatim" role="tab"
-                                    aria-controls="anakyatim" aria-selected="false"><i class="fas fa-child"></i>Rumah Anak Yatim <span class="number">3</span></a>
+                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#anakyatim"
+                                    role="tab" aria-controls="anakyatim" aria-selected="false"><i
+                                        class="fas fa-child"></i>Rumah Anak Yatim <span class="number">3</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7 data-toggle="tab" href="#tahfiz" role="tab"
-                                    aria-controls="tahfiz" aria-selected="false"><i class="fas fa-quran"></i> Pusat Tahfiz <span class="number">4</span></a>
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#tahfiz" role="tab"
+                                    aria-controls="tahfiz" aria-selected="false"><i class="fas fa-quran"></i> Pusat
+                                    Tahfiz <span class="number">4</span></a>
                             </li>
                             <li class="nav-item btn-organization">
                                 <a class="nav-link" id="8" data-toggle="tab" href="#lain" role="tab"
-                                    aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i> Lain-Lain <span class="number">5</span></a>
+                                    aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i> Lain-Lain
+                                    <span class="number">5</span></a>
                             </li>
                         </ul>
                     </div>
                     <div class="tab-content wow slideInUp">
-                        <div class="tab-pane fade show active" id="masjid" role="tabpanel"
-                            aria-labelledby="masjid-tab">
+                        <div class="tab-pane fade show active" id="masjid" role="tabpanel" aria-labelledby="masjid-tab">
                             <div class="how-it-works-tab-content">
                                 <div class="row">
                                     <div class="table-responsive">
@@ -329,14 +414,13 @@
         </div>
     </section>
     {{-- modal start --}}
-    <div class="modal fade modal-derma" tabindex="-1" role="dialog"
-    aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal fade modal-derma" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title mt-0" id="myLargeModalLabel">Senarai Derma</h5>
-                    <button type="button" class="close" data-dismiss="modal"
-                        aria-hidden="true">×</button>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 </div>
                 <div class="modal-body">
                     <div class="container">
@@ -352,209 +436,17 @@
                                 </table>
                             </div>
                         </div>
-                      </div>
+                    </div>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal end -->
     <!-- how it works area end -->
 
-    <!-- screenshort area end -->
-
-    <!-- testimonial area start -->
-    {{-- <section class="testimonial-area">
-            <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-    <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="section-title ">
-                    <!-- section title -->
-                    <span class="subtitle">Testimonial</span>
-                    <h3 class="title extra">Testimonial</h3>
-                    <p>Apa kata pengguna-pengguna kami</p>
-                </div><!-- //. section title -->
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="testimonial-carousel">
-
-                    <div class="single-testimonial-item">
-                        <!-- single testimonial item -->
-                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/01.jpg') }}" alt="">
-                        <div class="hover">
-                            <!-- hover -->
-                            <div class="hover-inner">
-                                <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                    dolor tempor incididunt .</p>
-                                <div class="author-meta">
-                                    <h4 class="name">Riley Cassidy</h4>
-                                    <span class="post">Chief executive</span>
-                                </div>
-                            </div>
-                        </div><!-- //. hover -->
-                    </div><!-- //. single testimonial item -->
-                    <div class="single-testimonial-item">
-                        <!-- single testimonial item -->
-                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/02.jpg') }}" alt="">
-                        <div class="hover">
-                            <!-- hover -->
-                            <div class="hover-inner">
-                                <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                    dolor tempor incididunt .</p>
-                                <div class="author-meta">
-                                    <h4 class="name">Archie Tracey</h4>
-                                    <span class="post">Technician</span>
-                                </div>
-                            </div>
-                        </div><!-- //. hover -->
-                    </div><!-- //. single testimonial item -->
-                    <div class="single-testimonial-item">
-                        <!-- single testimonial item -->
-                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/03.jpg') }}" alt="">
-                        <div class="hover">
-                            <!-- hover -->
-                            <div class="hover-inner">
-                                <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                    dolor tempor incididunt .</p>
-                                <div class="author-meta">
-                                    <h4 class="name">Brodie Hopley</h4>
-                                    <span class="post">Chief Elevator</span>
-                                </div>
-                            </div>
-                        </div><!-- //. hover -->
-                    </div><!-- //. single testimonial item -->
-
-                </div>
-            </div>
-        </div>
-    </div>
-    </section> --}}
-    <!-- testimonial area end -->
-
-    <!-- price plan area end -->
-    <!--====== TESTIMONIAL PART START ======-->
-
-
-    {{-- <section id="testimonial" class="testimonial-area">
-        <div class="container">
-            
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="contact-area-wrapper" id="contact">
-                        <!-- contact area wrapper -->
-                        <span class="subtitle">Contact us</span>
-                        <h3 class="title">Testimonial</h3>
-                        <p>Apa kata pelanggan kami...</p>
-                       
-                    </div><!-- //. contact area wrapper -->
-                </div>
-                <div class="col-lg-6">
-                    <div class="testimonial-right-content mt-50">
-                        <div class="quota">
-                            <i class="lni lni-quotation"></i>
-                        </div>
-                        <div class="testimonial-content-wrapper testimonial-active">
-                            <div class="single-testimonial">
-                                <div class="testimonial-text">
-                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                                        volutpat nisl, sit amet convallis nunc turp.”</p>
-                                </div>
-                                <div class="testimonial-author d-sm-flex justify-content-between">
-                                    <div class="author-info d-flex align-items-center">
-                                        <div class="author-image">
-                                            <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}"
-    alt="author">
-    </div>
-    <div class="author-name media-body">
-        <h5 class="name">Mr. Jems Bond</h5>
-        <span class="sub-title">CEO Mbuild Firm</span>
-    </div>
-    </div>
-    <div class="author-review">
-        <ul class="star">
-            <li><i class="lni lni-star-filled"></i></li>
-            <li><i class="lni lni-star-filled"></i></li>
-            <li><i class="lni lni-star-filled"></i></li>
-            <li><i class="lni lni-star-filled"></i></li>
-            <li><i class="lni lni-star-filled"></i></li>
-        </ul>
-        <span class="review">( 7 Reviews )</span>
-    </div>
-    </div>
-    </div> <!-- single testimonial -->
-    <div class="single-testimonial">
-        <div class="testimonial-text">
-            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                volutpat nisl, sit amet convallis nunc turp.”</p>
-        </div>
-        <div class="testimonial-author d-sm-flex justify-content-between">
-            <div class="author-info d-flex align-items-center">
-                <div class="author-image">
-                    <img src="{{ URL::asset('assets/images/testimonial/author-2.jpg') }}" alt="author">
-                </div>
-                <div class="author-name media-body">
-                    <h5 class="name">Mr. Jems Bond</h5>
-                    <span class="sub-title">CEO Mbuild Firm</span>
-                </div>
-            </div>
-            <div class="author-review">
-                <ul class="star">
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                </ul>
-                <span class="review">( 7 Reviews )</span>
-            </div>
-        </div>
-    </div> <!-- single testimonial -->
-    <div class="single-testimonial">
-        <div class="testimonial-text">
-            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                volutpat nisl, sit amet convallis nunc turp.”</p>
-        </div>
-        <div class="testimonial-author d-sm-flex justify-content-between">
-            <div class="author-info d-flex align-items-center">
-                <div class="author-image">
-                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}" alt="author">
-                </div>
-                <div class="author-name media-body">
-                    <h5 class="name">Mr. Jems Bond</h5>
-                    <span class="sub-title">CEO Mbuild Firm</span>
-                </div>
-            </div>
-            <div class="author-review">
-                <ul class="star">
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                </ul>
-                <span class="review">( 7 Reviews )</span>
-            </div>
-        </div>
-    </div> <!-- single testimonial -->
-    </div> <!-- testimonial content wrapper -->
-    </div> <!-- testimonial right content -->
-    </div>
-    </div> <!-- row -->
-    </div> <!-- container -->
-    </section> --}}
-
     <!--====== TESTIMONIAL PART ENDS ======-->
 
     <!-- team member area start -->
     <section class="team-member-area" id="team">
-        <div class="bg-shape-1">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="">
-        </div>
         <div class="bg-shape-2">
             <img src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg-min.jpg') }}" alt="">
         </div>
@@ -641,12 +533,15 @@
                                     src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
                             <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b> sehari
                                 dalam <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem
-                                PRIM. </p>
+                                PRiM. </p>
                             <ul class="social-icon" style="text-align: center; ">
-                                <li><a href="https://www.facebook.com/MyUTeM/"><i class="fab fa-facebook-f"></i></a></li>
-                                <li><a href="https://www.instagram.com/myutem/"><i class="fab fa-instagram"></i></a></li>
+                                <li><a href="https://www.facebook.com/MyUTeM/"><i class="fab fa-facebook-f"></i></a>
+                                </li>
+                                <li><a href="https://www.instagram.com/myutem/"><i class="fab fa-instagram"></i></a>
+                                </li>
                                 <li><a href="https://twitter.com/myutem"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i class="fab fa-youtube"></i></a></li>
+                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i
+                                            class="fab fa-youtube"></i></a></li>
                             </ul>
                         </div>
                     </div>
@@ -675,7 +570,7 @@
 
                             <a href="index.html" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""></a>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -690,7 +585,7 @@
                             <!-- copyright inner wrapper -->
                             <div class="left-content-area">
                                 <!-- left content area -->
-                                &copy; Copyrights <span id="year"></span> All rights reserved | PRIM
+                                &copy; Copyrights <span id="year"></span> All rights reserved | PRiM
                             </div><!-- //. left content aera -->
                             <div class="right-content-area">
                                 <!-- right content area -->
@@ -734,7 +629,7 @@
     @include('landing-page.footer-script')
 
     <script>
-    var msg = '{{Session::get('alert ')}}';var exist = '{{Session::has('alert ')}}';
+        var msg = '{{Session::get('alert ')}}';var exist = '{{Session::has('alert ')}}';
     
     if (exist) {
         Swal.fire({
@@ -799,6 +694,9 @@
                     name: "email",
                     className: "desktop"
                 }, {
+                    data: "email",
+                    name: "email"
+                }, {
                     data: 'action',
                     name: 'action',
                     orderable: false,
@@ -861,4 +759,5 @@
     });
     </script>
 </body>
+
 </html>
