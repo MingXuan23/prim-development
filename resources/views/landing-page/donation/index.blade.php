@@ -322,27 +322,27 @@
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
-                                    Masjid <span class="number">1</span></a>
+                                    Masjid </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi" role="tab"
                                     aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
-                                    NGO <span class="number">2</span></a>
+                                    NGO </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="anakyatim" aria-selected="false"><i
-                                        class="fas fa-child"></i>Rumah Anak Yatim <span class="number">3</span></a>
+                                        class="fas fa-child"></i>Rumah Anak Yatim </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi" role="tab"
                                     aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i> Pusat
-                                    Tahfiz <span class="number">4</span></a>
+                                    Tahfiz </a>
                             </li>
                             <li class="nav-item btn-organization">
                                 <a class="nav-link" id="8" data-toggle="tab" href="#organisasi" role="tab"
                                     aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i> Lain-Lain
-                                    <span class="number">5</span></a>
+                                    </a>
                             </li>
                         </ul>
                     </div>
