@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class PayController extends Controller
 {
@@ -250,8 +251,9 @@ class PayController extends Controller
             $transaction->user_id   = Auth::id();
         }
         if ($transaction->save()) {
-            $id = substr($request->fpx_sellerOrderNo, -1);
-            $transaction->donation()->attach($id, ['payment_type_id' => 1]);
+            // $id = substr($request->fpx_sellerOrderNo, -1);
+            $id = explode("_", $request->fpx_sellerOrderNo);
+            $transaction->donation()->attach($id[1], ['payment_type_id' => 1]);
 
             /// ******************* utk bridge yuran ****************************
 
@@ -292,7 +294,7 @@ class PayController extends Controller
         $fpx_msgToken       = "01";
         $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
         $fpx_sellerTxnTime  = date('YmdHis');
-        $fpx_sellerOrderNo  = date('YmdHis') . rand(10000, 99999)  . $request->o_id;
+        $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
         $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
@@ -356,6 +358,7 @@ class PayController extends Controller
     
                     case 'Donation':
                         Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+                        Log::useDailyFiles(storage_path().'/logs/transaction_callback.log');
                         Log::info("Transaction Callback : " . $request->fpx_sellerExOrderNo);
                         // $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
                         // $organization = $this->organization->getOrganizationByDonationId($donation->id);
@@ -409,6 +412,7 @@ class PayController extends Controller
                     Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
 
                     $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
+                    
                     $organization = $this->organization->getOrganizationByDonationId($donation->id);
                     $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
 

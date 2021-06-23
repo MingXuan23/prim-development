@@ -363,7 +363,7 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active btn-organization" id="4" data-toggle="tab" href="#masjid"
+                                <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#masjid"
                                     role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
                                     Masjid <span class="number">1</span></a>
                             </li>
