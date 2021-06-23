@@ -320,6 +320,11 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi" role="tab"
+                                    aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i> Pusat
+                                    Tahfiz </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
                                     Masjid </a>
@@ -333,11 +338,6 @@
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="anakyatim" aria-selected="false"><i
                                         class="fas fa-child"></i>Rumah Anak Yatim </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi" role="tab"
-                                    aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i> Pusat
-                                    Tahfiz </a>
                             </li>
                             <li class="nav-item btn-organization">
                                 <a class="nav-link" id="8" data-toggle="tab" href="#organisasi" role="tab"
@@ -588,9 +588,9 @@
 
     $(document).ready(function() {
 
-        // window.onload = function() {
-        //     document.getElementById("4").click();
-        // };
+        window.onload = function() {
+            document.getElementById("7").click();
+        };
 
         $(document).on('click', '.btn-organization', function() {
             var type = $(this).attr("id");
