@@ -320,34 +320,34 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#masjid"
+                                <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
                                     Masjid <span class="number">1</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#ngo" role="tab"
+                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi" role="tab"
                                     aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
                                     NGO <span class="number">2</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#anakyatim"
+                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="anakyatim" aria-selected="false"><i
                                         class="fas fa-child"></i>Rumah Anak Yatim <span class="number">3</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#tahfiz" role="tab"
-                                    aria-controls="tahfiz" aria-selected="false"><i class="fas fa-quran"></i> Pusat
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi" role="tab"
+                                    aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i> Pusat
                                     Tahfiz <span class="number">4</span></a>
                             </li>
                             <li class="nav-item btn-organization">
-                                <a class="nav-link" id="8" data-toggle="tab" href="#lain" role="tab"
+                                <a class="nav-link" id="8" data-toggle="tab" href="#organisasi" role="tab"
                                     aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i> Lain-Lain
                                     <span class="number">5</span></a>
                             </li>
                         </ul>
                     </div>
                     <div class="tab-content wow slideInUp">
-                        <div class="tab-pane fade show" id="masjid" role="tabpanel" aria-labelledby="masjid-tab">
+                        <div class="tab-pane fade show" id="organisasi" role="tabpanel" aria-labelledby="masjid-tab">
                             <div class="how-it-works-tab-content">
                                 <div class="row">
                                     <div class="table-responsive">
