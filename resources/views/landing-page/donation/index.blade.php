@@ -347,7 +347,7 @@
                         </ul>
                     </div>
                     <div class="tab-content wow slideInUp">
-                        <div class="tab-pane fade show active" id="masjid" role="tabpanel" aria-labelledby="masjid-tab">
+                        <div class="tab-pane fade show" id="masjid" role="tabpanel" aria-labelledby="masjid-tab">
                             <div class="how-it-works-tab-content">
                                 <div class="row">
                                     <div class="table-responsive">
@@ -588,9 +588,9 @@
 
     $(document).ready(function() {
 
-        window.onload = function() {
-            document.getElementById("4").click();
-        };
+        // window.onload = function() {
+        //     document.getElementById("4").click();
+        // };
 
         $(document).on('click', '.btn-organization', function() {
             var type = $(this).attr("id");
