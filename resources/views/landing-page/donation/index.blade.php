@@ -10,6 +10,22 @@
     <title> PRIM </title>
 
     @include('landing-page.head')
+    <style>
+        .map-responsive {
+            overflow: hidden;
+            padding-bottom: 56.25%;
+            position: relative;
+            height: 0;
+        }
+
+        .map-responsive iframe {
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+    </style>
 </head>
 
 <body>
@@ -30,26 +46,23 @@
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
                     <li class="current-menu-item">
-                        <a href="/">Utama</a>
+                        <a href="/derma">Utama</a>
                     </li>
-                    <li class="menu-item-has-children">
-                        <a href="#">Organisasi</a>
-                        <ul class="sub-menu">
-                            <li><a href="/organization-list">Masjid</a></li>
-                            <li><a href="blog-details.html">Sekolah JAIM</a></li>
-                        </ul>
+                    <li><a href="#team">Info</a></li>
+
+                    <li>
+                        <a href="#organization">Organisasi</a>
+
                     </li>
                     {{-- <li><a href="/organization-list">Derma</a></li> --}}
-                    <li class="menu-item-has-children">
+                    {{-- <li class="menu-item-has-children">
                         <a href="#">Derma</a>
                         <ul class="sub-menu">
                             <li><a href="/organization-list">Derma Tahfiz UTeM</a></li>
                             {{-- <li><a href="blog-details.html">Sekolah JAIM</a></li> --}}
-                        </ul>
-                    </li>
+
                     {{-- <li><a href="#pricing">Pricing</a></li> --}}
                     {{-- <li><a href="#sekolah">Sekolah</a></li> --}}
-                    {{-- <li><a href="#team">Modul</a></li> --}}
 
                     <li><a href="#contact">Hubungi Kami</a></li>
                 </ul>
@@ -78,8 +91,10 @@
                         <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
                             ibu bapa serta penjaga dengan pihak sekolah.</p>
                         <div class="btn-wrapper wow fadeInUp">
-                            <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
+                            <a href="#organization" class="boxed-btn btn-rounded">Derma</a>
+
+                            {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
+                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
                         </div>
                     </div>
                 </div>
@@ -172,64 +187,6 @@
     </section>
 
     <!-- about us area start -->
-
-    {{-- <section class="about-us-area style-two">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="section-title left-aligned">
-                        <!-- section title -->
-                        <h3 class="title extra">Derma</h3>
-                        <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b> sehari
-                            dalam <br> <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem
-                            PRIM.</p>
-                    </div><!-- //. section title -->
-                </div>
-                <div class="col-lg-6">
-                    <h3 class="title extra" style="margin-bottom: 24px;">Syarat-syarat</h3>
-
-                    <div class="feature-area">
-
-                        <div class="hover-inner">
-                            <div class="single-feature-list border wow zoomIn">
-                                <div class="icon icon-bg-4">
-                                    <i class="flaticon-donation"></i>
-                                </div>
-                                <div class="content">
-                                    <h4 class="title" style="text-align: left;">Penderma</h4>
-                                    <p style="text-align: left;"> <i class="flaticon-checked"
-                                            style="margin-right: 10px"></i> Mempunyai akaun dalam bank
-                                        talian <i>(online banking)</i> dengan mana-mana bank di Malaysia.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <br><br>
-                        <div class="hover-inner">
-                            <div class="single-feature-list border wow zoomIn">
-                                <div class="icon icon-bg-2">
-                                    <i class="flaticon-business-and-finance"></i>
-                                </div>
-                                <div class="content">
-                                    <h4 class="title" style="text-align: left;">Penerima Derma</h4>
-                                    <p style="text-align: left;"> <i class="flaticon-checked"
-                                            style="margin-right: 10px"></i> Mempunyai akaun Bank Islam.</p>
-                                    <p style="text-align: left;"> <i class="flaticon-checked"
-                                            style="margin-right: 10px"></i> Mendaftar dengan Paynet melalui Bank Islam.
-                                        <br> <i> <a
-                                                href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}"
-    download> (klik untuk muat turun borang)</a> </i> </p>
-    <p style="text-align: left;"> <i class="flaticon-checked" style="margin-right: 10px"></i> Mendaftar sebagai
-        organisasi di sistem PRIM.
-    </p>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </section> --}}
-
 
     <!-- counterup area start -->
     <section class="counterup-area">
@@ -342,7 +299,7 @@
     <!-- why choose area end -->
 
     <!-- how it works area start -->
-    <section class="how-it-work-area">
+    <section class="how-it-work-area" id="organization">
         <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
         <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
         <div class="shape-3"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
@@ -493,28 +450,15 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="contact-area-wrapper" id="contact">
-                        <div class="mapouter">
-                            <div class="gmap_canvas"><iframe width="500" height="500" id="gmap_canvas"
-                                    src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                    frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a
-                                    href="https://123movies-to.org"></a><br>
-                                <style>
-                                    .mapouter {
-                                        position: relative;
-                                        text-align: right;
-                                        height: 500px;
-                                        width: 600px;
-                                    }
-                                </style><a href="https://www.embedgooglemap.net">html code for google maps</a>
-                                <style>
-                                    .gmap_canvas {
-                                        overflow: hidden;
-                                        background: none !important;
-                                        height: 500px;
-                                        width: 600px;
-                                    }
-                                </style>
-                            </div>
+                        <div class="map-responsive">
+                            <iframe
+                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                                width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""
+                                aria-hidden="false" tabindex="0">
+                            </iframe>
+
+                            <br>
+
                         </div>
                     </div><!-- //. contact area wrapper -->
                 </div>
@@ -532,9 +476,36 @@
                         <div class="footer-widget about_widget">
                             <a href="index.html" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
-                            <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b> sehari
-                                dalam <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam sistem
-                                PRiM. </p>
+                            <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk
+                                menghubungkan ibu bapa serta penjaga dengan pihak sekolah.</p>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-8">
+                        <div class="footer-widget about_widget">
+                            <h4 class="widget-title">Hubungi</h4>
+                            <p>Email : admin@prim.my </p>
+                            <p>Phone : 06 - 270 1000</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-widget about_widget">
+                            <h4 class="widget-title">Alamat</h4>
+                            <p> Universiti Teknikal Malaysia Melaka, Hang Tuah Jaya, 76100 Durian Tunggal, Melaka
+                            </p>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-widget about_widget" style="text-align: center">
+                            <a href="#" class="footer-logo"><img
+                                    src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt=""
+                                    style="max-width: 70%"></a>
+
+                            <a href="#" class="footer-logo"><img
+                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""
+                                    style="max-width: 70%"></a>
+
                             <ul class="social-icon" style="text-align: center; ">
                                 <li><a href="https://www.facebook.com/MyUTeM/"><i class="fab fa-facebook-f"></i></a>
                                 </li>
@@ -544,34 +515,6 @@
                                 <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i
                                             class="fab fa-youtube"></i></a></li>
                             </ul>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-8">
-                        <div class="footer-widget about_widget">
-                            <h4 class="widget-title">Hubungi</h4>
-
-                            <p>Email : admin@prim.my </p>
-                            <p>Phone : 06 - 270 1000</p>
-
-
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget about_widget">
-                            <h4 class="widget-title">Alamat</h4>
-                            <p> Universiti Teknikal Malaysia Melaka, Jalan Hang Tuah Jaya, 76100 Durian Tunggal, Melaka
-                            </p>
-
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget about_widget">
-                            <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt=""></a>
-
-                            <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""></a>
-
                         </div>
                     </div>
                 </div>
