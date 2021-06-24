@@ -131,12 +131,12 @@
             <div class="col-lg-6">
                 <div class="h-100">
                     <div class="card-body">
-                        {{-- <img class="img-fluid card-img"
-                            src="{{ URL::asset('/donation-poster/'.$donation->donation_poster) }}"
-                        alt="Image Not Available"> --}}
                         <img class="img-fluid card-img"
+                            src="{{ URL::asset('/donation-poster/'.$donation->donation_poster) }}"
+                        alt="Image Not Available">
+                        {{-- <img class="img-fluid card-img"
                             src="{{ URL::asset('/donation-poster/donation-poster-1623917363.jpg') }}"
-                            alt="Image Not Available">
+                            alt="Image Not Available"> --}}
                     </div>
                 </div>
             </div>
