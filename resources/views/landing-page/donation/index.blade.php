@@ -320,9 +320,9 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi" role="tab"
-                                    aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i> Pusat
-                                    Tahfiz </a>
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i>
+                                    Pusat Tahfiz </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
@@ -330,19 +330,19 @@
                                     Masjid </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi" role="tab"
-                                    aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
+                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
                                     NGO </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="anakyatim" aria-selected="false"><i
-                                        class="fas fa-child"></i>Rumah Anak Yatim </a>
+                                        class="fas fa-home"></i> Rumah Anak Yatim </a>
                             </li>
                             <li class="nav-item btn-organization">
                                 <a class="nav-link" id="8" data-toggle="tab" href="#organisasi" role="tab"
                                     aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i> Lain-Lain
-                                    </a>
+                                </a>
                             </li>
                         </ul>
                     </div>
