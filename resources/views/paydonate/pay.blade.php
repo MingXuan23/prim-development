@@ -32,20 +32,6 @@
         text-transform: none;
     }
 
-    .bg-img {
-        /* The image used */
-        background-image: url("img_nature.jpg");
-
-        /* Control the height of the image */
-        min-height: 380px;
-
-        /* Center and scale the image nicely */
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        position: relative;
-    }
-
     @media only screen and (max-width: 800px) {
 
         #bg-ballon {
@@ -68,13 +54,11 @@
     .boxed-btn {
         display: inline-block;
         text-align: center;
-        height: 60px;
         line-height: 60px;
         font-size: 16px;
         text-transform: capitalize;
         font-weight: 600;
         color: #fff;
-        width: 202px;
         background-color: #500ade;
         padding: 0 20px;
         -webkit-transition: all .3s ease-in;
@@ -95,7 +79,7 @@
     a,
     a:active,
     a:focus,
-    a:hover {
+    a:hover,button {
         text-decoration: none;
         outline: 0;
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -156,25 +140,25 @@
                             {{csrf_field()}}
                             <div class="form-group">
                                 <label>Nama</label>
-                                <input type="text" name="name" id="name" class="form-control" placeholder="Nama"
+                                <input type="text" name="name" id="name" style="text-align: -webkit-left;" class="form-control" placeholder="Nama"
                                     value="{{ !empty(auth()->user()->id) ? $user->name : '' }}"
                                     data-parsley-required-message="Sila masukkan nama penuh" required>
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="email" parsley-type="email" name="email" class="form-control"
+                                <input type="email" parsley-type="email" style="text-align: -webkit-left;" name="email" class="form-control"
                                     placeholder="Email" value="{{ !empty(auth()->user()->id) ? $user->email : '' }}"
                                     data-parsley-required-message="Sila masukkan email" required>
                             </div>
                             <div class="form-group">
                                 <label>No Telefon</label>
-                                <input type="text" name="telno" class="form-control phone_no" placeholder="No Telefon"
+                                <input type="text" name="telno" style="text-align: -webkit-left;" class="form-control phone_no" placeholder="No Telefon"
                                     value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}"
                                     data-parsley-required-message="Sila masukkan no telefon" required>
                             </div>
                             <div class="form-group">
                                 <label>Amaun</label>
-                                <input id="input-currency" class="form-control input-mask text-left"
+                                <input id="input-currency" style="text-align: -webkit-left;" class="form-control input-mask text-left"
                                     data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
                                     im-insert="true" style="text-align: right;" name="amount" data-parsley-min="2"
                                     data-parsley-required-message="Sila masukkan amaun"
@@ -183,7 +167,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Pilih Bank</label>
-                                <select name="bankid" id="bankid" class="form-control"
+                                <select name="bankid" id="bankid" style="text-align: -webkit-left;" class="form-control"
                                     data-parsley-required-message="Sila pilih bank" required>
                                     <option value="">Select bank</option>
                                 </select>
