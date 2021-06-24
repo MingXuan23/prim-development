@@ -57,7 +57,7 @@
         line-height: 60px;
         font-size: 16px;
         text-transform: capitalize;
-        font-weight: 600;
+        font-weight: 500;
         color: #fff;
         background-color: #500ade;
         padding: 0 20px;
