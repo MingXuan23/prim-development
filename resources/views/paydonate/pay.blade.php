@@ -1,6 +1,9 @@
 @extends('layouts.master')
 
 @section('css')
+
+<link rel="stylesheet" href="">
+<link href="{{ URL::asset('assets/css/normalize.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 <style>
     #name {

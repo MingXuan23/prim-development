@@ -1,1 +1,376 @@
-!function(e){var r={};function a(t){if(r[t])return r[t].exports;var o=r[t]={i:t,l:!1,exports:{}};return e[t].call(o.exports,o,o.exports,a),o.l=!0,o.exports}a.m=e,a.c=r,a.d=function(e,r,t){a.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},a.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},a.t=function(e,r){if(1&r&&(e=a(e)),8&r)return e;if(4&r&&"object"==typeof e&&e&&e.__esModule)return e;var t=Object.create(null);if(a.r(t),Object.defineProperty(t,"default",{enumerable:!0,value:e}),2&r&&"string"!=typeof e)for(var o in e)a.d(t,o,function(r){return e[r]}.bind(null,o));return t},a.n=function(e){var r=e&&e.__esModule?function(){return e.default}:function(){return e};return a.d(r,"a",r),r},a.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},a.p="/",a(a.s=44)}({44:function(e,r,a){e.exports=a(45)},45:function(e,r){!function(e){"use strict";var r=function(){};r.prototype.createLineChart=function(e,r,a,t,o,i){Morris.Line({element:e,data:r,xkey:a,ykeys:t,labels:o,hideHover:"auto",gridLineColor:"rgba(108, 120, 151, 0.1)",resize:!0,lineColors:i,lineWidth:2})},r.prototype.createBarChart=function(e,r,a,t,o,i){Morris.Bar({element:e,data:r,xkey:a,ykeys:t,labels:o,gridLineColor:"rgba(108, 120, 151, 0.1)",barSizeRatio:.4,resize:!0,hideHover:"auto",barColors:i})},r.prototype.createAreaChart=function(e,r,a,t,o,i,n,c){Morris.Area({element:e,pointSize:0,lineWidth:0,data:t,xkey:o,ykeys:i,labels:n,resize:!0,gridLineColor:"rgba(108, 120, 151, 0.1)",hideHover:"auto",lineColors:c,fillOpacity:.6,behaveLikeLine:!0})},r.prototype.createDonutChart=function(e,r,a){Morris.Donut({element:e,data:r,resize:!0,colors:a})},r.prototype.createStackedChart=function(e,r,a,t,o,i){Morris.Bar({element:e,data:r,xkey:a,ykeys:t,stacked:!0,labels:o,hideHover:"auto",barSizeRatio:.4,resize:!0,gridLineColor:"rgba(108, 120, 151, 0.1)",barColors:i})},r.prototype.init=function(){this.createLineChart("morris-line-example",[{y:"2012",a:50,b:80,c:20},{y:"2013",a:130,b:100,c:80},{y:"2014",a:80,b:60,c:70},{y:"2015",a:70,b:200,c:140},{y:"2016",a:180,b:140,c:150},{y:"2017",a:105,b:100,c:80},{y:"2018",a:250,b:150,c:200}],"y",["a","b","c"],["Activated","Pending","Deactivated"],["#ccc","#3c4ccf","#02a499"]);this.createBarChart("morris-bar-example",[{y:"2011",a:100,b:90},{y:"2012",a:75,b:65},{y:"2013",a:50,b:40},{y:"2014",a:75,b:65},{y:"2015",a:50,b:40},{y:"2016",a:75,b:65},{y:"2017",a:100,b:90},{y:"2018",a:90,b:75}],"y",["a","b"],["Series A","Series B"],["#3c4ccf","#02a499"]);this.createAreaChart("morris-area-example",0,0,[{y:"2012",a:0,b:0,c:0},{y:"2013",a:150,b:45,c:15},{y:"2014",a:60,b:150,c:195},{y:"2015",a:180,b:36,c:21},{y:"2016",a:90,b:60,c:360},{y:"2017",a:75,b:240,c:120},{y:"2018",a:30,b:30,c:30}],"y",["a","b","c"],["Series A","Series B","Series C"],["#ccc","#3c4ccf","#02a499"]);this.createDonutChart("morris-donut-example",[{label:"Download Sales",value:12},{label:"In-Store Sales",value:30},{label:"Mail-Order Sales",value:20}],["#f0f1f4","#3c4ccf","#02a499"]);this.createStackedChart("morris-bar-stacked",[{y:"2007",a:45,b:180},{y:"2008",a:75,b:65},{y:"2009",a:100,b:90},{y:"2010",a:75,b:65},{y:"2011",a:100,b:90},{y:"2012",a:75,b:65},{y:"2013",a:50,b:40},{y:"2014",a:75,b:65},{y:"2015",a:50,b:40},{y:"2016",a:75,b:65},{y:"2017",a:100,b:90},{y:"2018",a:80,b:65}],"y",["a","b"],["Series A","Series B"],["#3c4ccf","#f0f1f4"])},e.MorrisCharts=new r,e.MorrisCharts.Constructor=r}(window.jQuery),function(e){"use strict";window.jQuery.MorrisCharts.init()}()}});
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./resources/js/pages/morris.init.js":
+/*!*******************************************!*\
+  !*** ./resources/js/pages/morris.init.js ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/*
+Template Name: Veltrix - Responsive Bootstrap 4 Admin Dashboard
+Author: Themesbrand
+Website: https://themesbrand.com/
+Contact: themesbrand@gmail.com
+File: morris  Js File
+*/
+!function ($) {
+  "use strict";
+
+  var MorrisCharts = function MorrisCharts() {}; //creates line chart
+
+
+  MorrisCharts.prototype.createLineChart = function (element, data, xkey, ykeys, labels, lineColors) {
+    Morris.Line({
+      element: element,
+      data: data,
+      xkey: xkey,
+      ykeys: ykeys,
+      labels: labels,
+      hideHover: 'auto',
+      gridLineColor: 'rgba(108, 120, 151, 0.1)',
+      resize: true,
+      //defaulted to true
+      lineColors: lineColors,
+      lineWidth: 2
+    });
+  }, //creates Bar chart
+  MorrisCharts.prototype.createBarChart = function (element, data, xkey, ykeys, labels, lineColors) {
+    Morris.Bar({
+      element: element,
+      data: data,
+      xkey: xkey,
+      ykeys: ykeys,
+      labels: labels,
+      gridLineColor: 'rgba(108, 120, 151, 0.1)',
+      barSizeRatio: 0.4,
+      resize: true,
+      hideHover: 'auto',
+      barColors: lineColors
+    });
+  }, //creates area chart
+  MorrisCharts.prototype.createAreaChart = function (element, pointSize, lineWidth, data, xkey, ykeys, labels, lineColors) {
+    Morris.Area({
+      element: element,
+      pointSize: 0,
+      lineWidth: 0,
+      data: data,
+      xkey: xkey,
+      ykeys: ykeys,
+      labels: labels,
+      resize: true,
+      gridLineColor: 'rgba(108, 120, 151, 0.1)',
+      hideHover: 'auto',
+      lineColors: lineColors,
+      fillOpacity: .6,
+      behaveLikeLine: true
+    });
+  }, //creates Donut chart
+  MorrisCharts.prototype.createDonutChart = function (element, data, colors) {
+    Morris.Donut({
+      element: element,
+      data: data,
+      resize: true,
+      colors: colors
+    });
+  }, //creates Stacked chart
+  MorrisCharts.prototype.createStackedChart = function (element, data, xkey, ykeys, labels, lineColors) {
+    Morris.Bar({
+      element: element,
+      data: data,
+      xkey: xkey,
+      ykeys: ykeys,
+      stacked: true,
+      labels: labels,
+      hideHover: 'auto',
+      barSizeRatio: 0.4,
+      resize: true,
+      //defaulted to true
+      gridLineColor: 'rgba(108, 120, 151, 0.1)',
+      barColors: lineColors
+    });
+  }, MorrisCharts.prototype.init = function () {
+    //create line chart
+    var $data = [{
+      y: '2012',
+      a: 50,
+      b: 80,
+      c: 20
+    }, {
+      y: '2013',
+      a: 130,
+      b: 100,
+      c: 80
+    }, {
+      y: '2014',
+      a: 80,
+      b: 60,
+      c: 70
+    }, {
+      y: '2015',
+      a: 70,
+      b: 200,
+      c: 140
+    }, {
+      y: '2016',
+      a: 180,
+      b: 140,
+      c: 150
+    }, {
+      y: '2017',
+      a: 105,
+      b: 100,
+      c: 80
+    }, {
+      y: '2018',
+      a: 250,
+      b: 150,
+      c: 200
+    }];
+    this.createLineChart('morris-line-example', $data, 'y', ['a', 'b', 'c'], ['Activated', 'Pending', 'Deactivated'], ['#ccc', '#3c4ccf', '#02a499']); //creating bar chart
+
+    var $barData = [{
+      y: '2011',
+      a: 100,
+      b: 90
+    }, {
+      y: '2012',
+      a: 75,
+      b: 65
+    }, {
+      y: '2013',
+      a: 50,
+      b: 40
+    }, {
+      y: '2014',
+      a: 75,
+      b: 65
+    }, {
+      y: '2015',
+      a: 50,
+      b: 40
+    }, {
+      y: '2016',
+      a: 75,
+      b: 65
+    }, {
+      y: '2017',
+      a: 100,
+      b: 90
+    }, {
+      y: '2018',
+      a: 90,
+      b: 75
+    }];
+    this.createBarChart('morris-bar-example', $barData, 'y', ['a', 'b'], ['Series A', 'Series B'], ['#3c4ccf', '#02a499']); //creating area chart
+
+    var $areaData = [{
+      y: '2012',
+      a: 0,
+      b: 0,
+      c: 0
+    }, {
+      y: '2013',
+      a: 150,
+      b: 45,
+      c: 15
+    }, {
+      y: '2014',
+      a: 60,
+      b: 150,
+      c: 195
+    }, {
+      y: '2015',
+      a: 180,
+      b: 36,
+      c: 21
+    }, {
+      y: '2016',
+      a: 90,
+      b: 60,
+      c: 360
+    }, {
+      y: '2017',
+      a: 75,
+      b: 240,
+      c: 120
+    }, {
+      y: '2018',
+      a: 30,
+      b: 30,
+      c: 30
+    }];
+    this.createAreaChart('morris-area-example', 0, 0, $areaData, 'y', ['a', 'b', 'c'], ['Series A', 'Series B', 'Series C'], ['#ccc', '#3c4ccf', '#02a499']); //creating donut chart
+
+    var $donutData = [{
+      label: "Download Sales",
+      value: 12
+    }, {
+      label: "In-Store Sales",
+      value: 30
+    }, {
+      label: "Mail-Order Sales",
+      value: 20
+    }];
+    this.createDonutChart('morris-donut-example', $donutData, ['#f0f1f4', '#3c4ccf', '#02a499']); //creating Stacked chart
+
+    var $stckedData = [{
+      y: '2007',
+      a: 45,
+      b: 180
+    }, {
+      y: '2008',
+      a: 75,
+      b: 65
+    }, {
+      y: '2009',
+      a: 100,
+      b: 90
+    }, {
+      y: '2010',
+      a: 75,
+      b: 65
+    }, {
+      y: '2011',
+      a: 100,
+      b: 90
+    }, {
+      y: '2012',
+      a: 75,
+      b: 65
+    }, {
+      y: '2013',
+      a: 50,
+      b: 40
+    }, {
+      y: '2014',
+      a: 75,
+      b: 65
+    }, {
+      y: '2015',
+      a: 50,
+      b: 40
+    }, {
+      y: '2016',
+      a: 75,
+      b: 65
+    }, {
+      y: '2017',
+      a: 100,
+      b: 90
+    }, {
+      y: '2018',
+      a: 80,
+      b: 65
+    }];
+    this.createStackedChart('morris-bar-stacked', $stckedData, 'y', ['a', 'b'], ['Series A', 'Series B'], ['#3c4ccf', '#f0f1f4']);
+  }, //init
+  $.MorrisCharts = new MorrisCharts(), $.MorrisCharts.Constructor = MorrisCharts;
+}(window.jQuery), //initializing 
+function ($) {
+  "use strict";
+
+  $.MorrisCharts.init();
+}(window.jQuery);
+
+/***/ }),
+
+/***/ 22:
+/*!*************************************************!*\
+  !*** multi ./resources/js/pages/morris.init.js ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! D:\laragon\www\prim\resources\js\pages\morris.init.js */"./resources/js/pages/morris.init.js");
+
+
+/***/ })
+
+/******/ });
