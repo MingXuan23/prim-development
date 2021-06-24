@@ -79,7 +79,8 @@
     a,
     a:active,
     a:focus,
-    a:hover,button {
+    a:hover,
+    button {
         text-decoration: none;
         outline: 0;
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -102,9 +103,17 @@
         background-position: center;
     }
 
-    /* body {
-        overflow-y: hidden;
-    } */
+    body::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    body {
+        -ms-overflow-style: none;
+        /* IE and Edge */
+        scrollbar-width: none;
+        /* Firefox */
+    }
 </style>
 
 @endsection
@@ -140,8 +149,8 @@
                             {{csrf_field()}}
                             <div class="form-group">
                                 <label>Nama</label>
-                                <input type="text" name="name" id="name"  class="form-control text-left" placeholder="Nama"
-                                    value="{{ !empty(auth()->user()->id) ? $user->name : '' }}"
+                                <input type="text" name="name" id="name" class="form-control text-left"
+                                    placeholder="Nama" value="{{ !empty(auth()->user()->id) ? $user->name : '' }}"
                                     data-parsley-required-message="Sila masukkan nama penuh" required>
                             </div>
                             <div class="form-group">
@@ -152,7 +161,8 @@
                             </div>
                             <div class="form-group">
                                 <label>No Telefon</label>
-                                <input type="text" name="telno" class="form-control phone_no text-left" placeholder="No Telefon"
+                                <input type="text" name="telno" class="form-control phone_no text-left"
+                                    placeholder="No Telefon"
                                     value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}"
                                     data-parsley-required-message="Sila masukkan no telefon" required>
                             </div>
@@ -169,7 +179,7 @@
                                 <label>Pilih Bank</label>
                                 <select name="bankid" id="bankid" class="form-control text-left"
                                     data-parsley-required-message="Sila pilih bank" required>
-                                    <option value="">Select bank</option>
+                                    <option value="">Pilih bank</option>
                                 </select>
 
                             </div>
