@@ -10,31 +10,26 @@
     ::-webkit-input-placeholder {
         /* WebKit browsers */
         text-transform: none;
-        text-align:left;  
     }
 
     :-moz-placeholder {
         /* Mozilla Firefox 4 to 18 */
         text-transform: none;
-        text-align:left; 
     }
 
     ::-moz-placeholder {
         /* Mozilla Firefox 19+ */
         text-transform: none;
-        text-align:left;  
     }
 
     :-ms-input-placeholder {
         /* Internet Explorer 10+ */
         text-transform: none;
-        text-align:left;  
     }
 
     ::placeholder {
         /* Recent browsers */
         text-transform: none;
-        text-align:left;  
     }
 
     @media only screen and (max-width: 800px) {
@@ -145,19 +140,19 @@
                             {{csrf_field()}}
                             <div class="form-group">
                                 <label>Nama</label>
-                                <input type="text" name="name" id="name"  class="form-control" placeholder="Nama"
+                                <input type="text" name="name" id="name"  class="form-control text-left" placeholder="Nama"
                                     value="{{ !empty(auth()->user()->id) ? $user->name : '' }}"
                                     data-parsley-required-message="Sila masukkan nama penuh" required>
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="email" parsley-type="email" name="email" class="form-control"
+                                <input type="email" parsley-type="email" name="email" class="form-control text-left"
                                     placeholder="Email" value="{{ !empty(auth()->user()->id) ? $user->email : '' }}"
                                     data-parsley-required-message="Sila masukkan email" required>
                             </div>
                             <div class="form-group">
                                 <label>No Telefon</label>
-                                <input type="text" name="telno" class="form-control phone_no" placeholder="No Telefon"
+                                <input type="text" name="telno" class="form-control phone_no text-left" placeholder="No Telefon"
                                     value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}"
                                     data-parsley-required-message="Sila masukkan no telefon" required>
                             </div>
@@ -172,7 +167,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Pilih Bank</label>
-                                <select name="bankid" id="bankid" class="form-control"
+                                <select name="bankid" id="bankid" class="form-control text-left"
                                     data-parsley-required-message="Sila pilih bank" required>
                                     <option value="">Select bank</option>
                                 </select>
