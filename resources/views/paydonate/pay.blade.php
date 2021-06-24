@@ -10,26 +10,31 @@
     ::-webkit-input-placeholder {
         /* WebKit browsers */
         text-transform: none;
+        text-align:left;  
     }
 
     :-moz-placeholder {
         /* Mozilla Firefox 4 to 18 */
         text-transform: none;
+        text-align:left; 
     }
 
     ::-moz-placeholder {
         /* Mozilla Firefox 19+ */
         text-transform: none;
+        text-align:left;  
     }
 
     :-ms-input-placeholder {
         /* Internet Explorer 10+ */
         text-transform: none;
+        text-align:left;  
     }
 
     ::placeholder {
         /* Recent browsers */
         text-transform: none;
+        text-align:left;  
     }
 
     @media only screen and (max-width: 800px) {
