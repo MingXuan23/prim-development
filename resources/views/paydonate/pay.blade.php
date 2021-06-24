@@ -46,7 +46,7 @@
         position: relative;
     }
 
-    @media only screen and (max-width: 600px) {
+    @media only screen and (max-width: 800px) {
 
         #bg-ballon {
             visibility: hidden;
@@ -57,6 +57,11 @@
             display: none;
             background-color: #500ade
         }
+
+        body {
+            overflow-y: scroll !important;
+        }
+
 
     }
 
@@ -106,6 +111,17 @@
     .form-control {
         border-radius: 0.75rem !important;
     }
+
+    .bg-form {
+        background-image: url("{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}");
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    /* body {
+        overflow-y: hidden;
+    } */
+
 </style>
 
 @endsection
@@ -116,18 +132,9 @@
 @endsection
 
 @section('content')
-<div class="row align-items-center">
-    <div class="col-sm-6">
-        <div class="page-title-box">
-            <h4 class="font-size-18">
-
-            </h4>
-        </div>
-    </div>
-</div>
 <div class="bg-shape-1">
     <div class="container border rounded p-3 mb-2 card">
-        <div class="row">
+        <div class="row bg-form"">
             <div class="col-lg-6">
                 <div class="h-100">
                     <div class="card-body">
@@ -140,7 +147,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-6 >
                 <div class="h-100">
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: center; font-size: 18px">{{ $donation->nama }} </h4>
@@ -189,8 +196,7 @@
                             <br>
 
                             <div class="col-sm-12">
-                                <a href="#" class="boxed-btn btn-rounded btn-donation"
-                                    style="color: white;">Derma</a>
+                                <a href="#" class="boxed-btn btn-rounded btn-donation" style="color: white;">Derma</a>
                             </div>
 
                             <br>
