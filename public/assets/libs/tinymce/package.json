@@ -2,7 +2,7 @@
   "_args": [
     [
       "tinymce@5.7.0",
-      "D:\\laragon\\www\\prim-development"
+      "D:\\laragon\\www\\prim"
     ]
   ],
   "_from": "tinymce@5.7.0",
@@ -26,7 +26,7 @@
   ],
   "_resolved": "https://registry.npmjs.org/tinymce/-/tinymce-5.7.0.tgz",
   "_spec": "5.7.0",
-  "_where": "D:\\laragon\\www\\prim-development",
+  "_where": "D:\\laragon\\www\\prim",
   "author": {
     "name": "Tiny Technologies, Inc"
   },
