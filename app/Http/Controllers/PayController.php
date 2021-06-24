@@ -358,8 +358,10 @@ class PayController extends Controller
     
                     case 'Donation':
                         Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
-                        Log::useDailyFiles(storage_path().'/logs/transaction_callback.log');
-                        Log::info("Transaction Callback : " . $request->fpx_sellerExOrderNo);
+
+                        $request->fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
+                        \Log::channel('PRIM_transaction')->info("Transaction Callback : " .  $request->fpx_sellerExOrderNo . " , " . $status);
+
                         // $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
                         // $organization = $this->organization->getOrganizationByDonationId($donation->id);
                         // $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
@@ -439,5 +441,14 @@ class PayController extends Controller
         // $organization = $this->organization->getOrganizationByDonationId(3);
         // dd($organization);
         return view('receipt.index');
+    }
+
+    public function testLog()
+    {
+        $exOrderNo = "Donation_20210624144608";
+        $fpx_debitAuthCode = "00";
+        $fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
+        
+        \Log::channel('PRIM_transaction')->info("Transaction Callback : " . $exOrderNo . " , " . $status);
     }
 }
