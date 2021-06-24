@@ -160,14 +160,14 @@
                                 <label>Amaun</label>
                                 <input id="input-currency" style="text-align: -webkit-left;" class="form-control input-mask text-left"
                                     data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                                    im-insert="true" style="text-align: right;" name="amount" data-parsley-min="2"
+                                    im-insert="true" name="amount" data-parsley-min="2"
                                     data-parsley-required-message="Sila masukkan amaun"
                                     data-parsley-error-message="Minimum jumlah untuk diderma adalah RM2.00" required>
                                 <p><i>*Minimum RM 2</i> </p>
                             </div>
                             <div class="form-group">
                                 <label>Pilih Bank</label>
-                                <select name="bankid" id="bankid" style="text-align: -webkit-left;" class="form-control"
+                                <select name="bankid" id="bankid" style="text-align: -webkit-left;" class="form-control text-left"
                                     data-parsley-required-message="Sila pilih bank" required>
                                     <option value="">Select bank</option>
                                 </select>
