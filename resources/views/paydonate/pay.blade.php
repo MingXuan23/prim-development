@@ -121,7 +121,6 @@
     /* body {
         overflow-y: hidden;
     } */
-
 </style>
 
 @endsection
@@ -134,21 +133,21 @@
 @section('content')
 <div class="bg-shape-1">
     <div class="container border rounded p-3 mb-2 card">
-        <div class="row bg-form"">
-            <div class="col-lg-6">
+        <div class="row bg-form">
+            <div class=" col-lg-6">
                 <div class="h-100">
                     <div class="card-body">
                         <img class="img-fluid card-img"
                             src="{{ URL::asset('/donation-poster/'.$donation->donation_poster) }}"
-                        alt="Image Not Available">
+                            alt="Image Not Available">
                         {{-- <img class="img-fluid card-img"
                             src="{{ URL::asset('/donation-poster/donation-poster-1623917363.jpg') }}"
-                            alt="Image Not Available"> --}}
+                        alt="Image Not Available"> --}}
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6 >
-                <div class="h-100">
+            <div class="col-lg-6">
+                <div class=" h-100">
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: center; font-size: 18px">{{ $donation->nama }} </h4>
                         <br>
