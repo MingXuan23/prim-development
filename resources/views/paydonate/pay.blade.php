@@ -195,7 +195,10 @@
                             <br>
 
                             <div class="col-sm-12">
-                                <a href="#" class="boxed-btn btn-rounded btn-donation" style="color: white;">Derma</a>
+                                {{-- <a id="bayar" href="" class="boxed-btn btn-rounded btn-donation" style="color: white;">Derma</a> --}}
+                                <button class="boxed-btn btn-rounded btn-donation submit" type="submit">
+                                    Derma
+                                </button>
                             </div>
 
                             <br>
@@ -229,6 +232,8 @@
         $(".input-mask").inputmask();
         $('.phone_no').mask('+600000000000');
         $('.form-validation').parsley();
+
+
     });
 
     function checkBank() {
