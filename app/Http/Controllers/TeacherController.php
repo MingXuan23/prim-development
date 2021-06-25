@@ -157,6 +157,14 @@ class TeacherController extends Controller
                 ]
             );
 
+        DB::table('organization_user')
+            ->where('user_id', $id)
+            ->update(
+                [
+                    'organization_id'      => $request->get('organization'),
+                ]
+            );
+
         return redirect('/teacher')->with('success', 'The data has been updated!');
     }
 
