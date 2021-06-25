@@ -276,10 +276,10 @@ class PayController extends Controller
 
         if ($request->desc == 'Donation') {
             $fpx_buyerEmail = $request->email;
-            $telno = $request->telno;
+            $telno = "+6" . $request->telno;
             $fpx_buyerName = $request->name;
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -353,26 +353,26 @@ class PayController extends Controller
 
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
-                    case 'School Fees':
-                        break;
-    
-                    case 'Donation':
-                        Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+                case 'School Fees':
+                    break;
 
-                        $request->fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
-                        \Log::channel('PRIM_transaction')->info("Transaction Callback : " .  $request->fpx_sellerExOrderNo . " , " . $status);
+                case 'Donation':
+                    Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
 
-                        // $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
-                        // $organization = $this->organization->getOrganizationByDonationId($donation->id);
-                        // $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
-                        
-                        // Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
-                        break;
-    
-                    default:
-                        return view('errors.500');
-                        break;
-                    }
+                    $request->fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
+                    \Log::channel('PRIM_transaction')->info("Transaction Callback : " .  $request->fpx_sellerExOrderNo . " , " . $status);
+
+                    // $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
+                    // $organization = $this->organization->getOrganizationByDonationId($donation->id);
+                    // $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
+
+                    // Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
+                    break;
+
+                default:
+                    return view('errors.500');
+                    break;
+            }
         } else {
             Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
         }
@@ -414,7 +414,7 @@ class PayController extends Controller
                     Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
 
                     $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
-                    
+
                     $organization = $this->organization->getOrganizationByDonationId($donation->id);
                     $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
 
@@ -448,7 +448,7 @@ class PayController extends Controller
         $exOrderNo = "Donation_20210624144608";
         $fpx_debitAuthCode = "00";
         $fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
-        
+
         \Log::channel('PRIM_transaction')->info("Transaction Callback : " . $exOrderNo . " , " . $status);
     }
 }
