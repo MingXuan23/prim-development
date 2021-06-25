@@ -87,6 +87,7 @@
         text-decoration: none;
         outline: 0;
         font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        border: transparent;
     }
 
     .btn-donation {
@@ -116,6 +117,11 @@
         /* IE and Edge */
         scrollbar-width: none;
         /* Firefox */
+    }
+
+    select {
+        text-align: -moz-left !important;
+        text-align: -webkit-left !important;
     }
 </style>
 
@@ -147,7 +153,7 @@
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: center; font-size: 18px">{{ $donation->nama }} </h4>
                         <br>
-                        <form class="form-validation" method="POST" action="{{ route('fpxIndex') }}"
+                        <form id="bayarform" class="form-validation" method="POST" action="{{ route('fpxIndex') }}"
                             enctype="multipart/form-data">
                             {{csrf_field()}}
                             <div class="form-group">
@@ -180,7 +186,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Pilih Bank</label>
-                                <select name="bankid" id="bankid" class="form-control text-left"
+                                <select name="bankid" id="bankid" class="form-control"
                                     data-parsley-required-message="Sila pilih bank" required>
                                     <option value="">Pilih bank</option>
                                 </select>
@@ -192,7 +198,6 @@
                             <br>
 
                             <div class="col-sm-12">
-                                {{-- <a id="bayar" href="" class="boxed-btn btn-rounded btn-donation" style="color: white;">Derma</a> --}}
                                 <button class="boxed-btn btn-rounded btn-donation submit" type="submit">
                                     Derma
                                 </button>
@@ -227,7 +232,7 @@
 <script>
     $(document).ready(function () {
         $(".input-mask").inputmask();
-        $('.phone_no').mask('+600000000000');
+        $('.phone_no').mask('01000000000');
         $('.form-validation').parsley();
 
 
