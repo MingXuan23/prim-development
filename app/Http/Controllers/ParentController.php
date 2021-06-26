@@ -19,6 +19,14 @@ use Illuminate\Support\Facades\View;
 
 class ParentController extends Controller
 {
+
+    private $user;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
     public function index()
     {
         //
@@ -30,11 +38,10 @@ class ParentController extends Controller
     public function indexDependent($id)
     {
         //
-        dd($id);
-        $userId = Auth::id();
+        // dd($id);
+        $userId = $id;
+        $organization = $this->getOrganizationByUserId();
 
-        // condition type sekolah pagi n jaim
-        $school = DB::table('organizations')->get();
         $role   = DB::table('organization_roles')
             ->where('id', '!=', 1)
             ->where('id', '!=', 2)
@@ -60,7 +67,7 @@ class ParentController extends Controller
             ->orderBy('students.nama')
             ->get();
 
-        return view('parent.dependent.index', compact('list', 'school', 'role'));
+        return view('parent.dependent.index', compact('list', 'role', 'organization', 'userId'));
     }
 
     public function fetchClass(Request $request)
@@ -143,13 +150,13 @@ class ParentController extends Controller
     {
         //
         $this->validate($request, [
-            'school'        =>  'required',
+            'organization'  =>  'required',
             'classes'       =>  'required',
             'student'       =>  'required',
         ]);
 
-        $userId = Auth::id();
-        $schid = $request->get('school');
+        $userId = $request->get('parentid');
+        $schid = $request->get('organization');
         $roles = $request->get('roles');
 
         $ouid = DB::table('organization_user')->insertGetId([
@@ -170,7 +177,9 @@ class ParentController extends Controller
 
             ]);
 
-        $user = Auth::user();
+        // $user = User::find($userId);
+
+        $user = $this->user->getUser($userId);
         // $role = Role::create(['name' => 'parent']);
 
         $rolename = OrganizationRole::find($roles);

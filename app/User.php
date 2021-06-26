@@ -64,4 +64,11 @@ class User extends Authenticatable
         
         return $user;
     }
+
+    public function getUser($id)
+    {
+        $user = User::find($id);
+        return $user;
+    }
+
 }
