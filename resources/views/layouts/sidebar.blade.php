@@ -147,7 +147,7 @@
 
 
 
-                @role('Superadmin|Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru|Ibu|Bapa|Penjaga')
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -155,6 +155,8 @@
                         <span>Yuran</span>
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
+
+                        @role('Superadmin|Pentadbir|Guru')
                         <li>
                             <a href="{{ route('category.index') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-list-ul"></i>
@@ -167,7 +169,9 @@
                                 <span>Urus</span>
                             </a>
                         </li>
-                        @role('Superadmin|Ibu|bapa|Penjaga')
+                        @endrole
+
+                        @role('Superadmin|Ibu|Bapa|Penjaga')
                         <li>
                             <a href="{{ route('parentpay') }}" class=" waves-effect">
                                 <i class="far fa-credit-card"></i>
@@ -176,7 +180,7 @@
                         </li>
                         @endrole
 
-                        @role('Superadmin|Ibu|bapa|Penjaga')
+                        @role('Superadmin|Ibu|Bapa|Penjaga')
                         <li>
                             <a href="{{ route('feesparentdev') }}" class=" waves-effect">
                                 <i class="far fa-credit-card"></i>
