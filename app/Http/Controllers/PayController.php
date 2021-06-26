@@ -472,15 +472,21 @@ class PayController extends Controller
                     $transaction->transac_no = $request->fpx_fpxTxnId;
                     $transaction->status = "Success";
 
-                    $list = $request->student_fees_id;
-                    // $transaction->save();
-                    // dd($res_student);
+                    $res_student = DB::table('student_fees')
+                        ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
+                        ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
+                        ->select('student_fees.id as student_fees_id')
+                        ->where('transactions.id', $transaction->id)
+                        ->get();
+                        
+                    $list = $res_student;
+
                     if ($transaction->save()) {
 
                         for ($i = 0; $i < count($list); $i++) {
 
                             $res  = DB::table('student_fees')
-                                ->where('id', $list[$i])
+                                ->where('id', $list[$i]->student_fees_id)
                                 ->update(['status' => 'Paid']);
                         }
 
