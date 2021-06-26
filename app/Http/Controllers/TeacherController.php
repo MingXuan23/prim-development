@@ -88,8 +88,6 @@ class TeacherController extends Controller
                 ]
             );
 
-        $userid     = Auth::id();
-
         // teacher active when first time login then will change status
         DB::table('organization_user')->insert([
             'organization_id'   => $request->get('organization'),
@@ -99,7 +97,7 @@ class TeacherController extends Controller
             'status'            => 0,
         ]);
 
-        $user = Auth::user();
+        $user = User::find($newteacher->id);
 
         // role guru
         $rolename = OrganizationRole::find(5);
