@@ -21,14 +21,14 @@ class Transaction extends Model
     public static function getTransactionByOrganizationIdAndStatus($organizationId)
     {
         $transaction = Transaction::select('*')
-                        ->join('donation_transaction', 'transactions.id', '=', 'donation_transaction.transaction_id')
-                        ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-                        ->join('donation_organization', 'donations.id', '=', 'donation_organization.donation_id')
-                        ->join('organizations', 'donation_organization.organization_id', '=', 'organizations.id')
-                        ->where(([
-                            ['organizations.id','=' ,$organizationId],
-                            ['transactions.status', '=', 'Success']
-                        ]));
+            ->join('donation_transaction', 'transactions.id', '=', 'donation_transaction.transaction_id')
+            ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
+            ->join('donation_organization', 'donations.id', '=', 'donation_organization.donation_id')
+            ->join('organizations', 'donation_organization.organization_id', '=', 'organizations.id')
+            ->where(([
+                ['organizations.id', '=', $organizationId],
+                ['transactions.status', '=', 'Success']
+            ]));
 
         return $transaction;
     }
@@ -36,9 +36,9 @@ class Transaction extends Model
     public static function getTotalDonorByDay($organizationId)
     {
         $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
-                    ->whereRaw('date(transactions.datetime_created) = curdate()')
-                    ->select(DB::raw('count(transactions.id) as donor'))
-                    ->first();
+            ->whereRaw('date(transactions.datetime_created) = curdate()')
+            ->select(DB::raw('count(transactions.id) as donor'))
+            ->first();
 
         return $donors;
     }
@@ -46,9 +46,9 @@ class Transaction extends Model
     public static function getTotalDonorByWeek($organizationId)
     {
         $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
-                    ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
-                    ->select(DB::raw('count(transactions.id) as donor'))
-                    ->first();
+            ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
+            ->select(DB::raw('count(transactions.id) as donor'))
+            ->first();
 
         return $donors;
     }
@@ -56,10 +56,10 @@ class Transaction extends Model
     public static function getTotalDonorByMonth($organizationId)
     {
         $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
-                    ->whereRaw('year(transactions.datetime_created) = year(curdate())')
-                    ->whereRaw('month(transactions.datetime_created) = month(curdate())')
-                    ->select(DB::raw('count(transactions.id) as donor'))
-                    ->first();
+            ->whereRaw('year(transactions.datetime_created) = year(curdate())')
+            ->whereRaw('month(transactions.datetime_created) = month(curdate())')
+            ->select(DB::raw('count(transactions.id) as donor'))
+            ->first();
 
         return $donors;
     }
@@ -67,9 +67,9 @@ class Transaction extends Model
     public static function getTotalDonationByDay($organizationId)
     {
         $totalDonation = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
-                        ->whereRaw('date(transactions.datetime_created) = curdate()')
-                        ->select(DB::raw('sum(transactions.amount) as donation_amount'))
-                        ->first();
+            ->whereRaw('date(transactions.datetime_created) = curdate()')
+            ->select(DB::raw('sum(transactions.amount) as donation_amount'))
+            ->first();
 
         return $totalDonation;
     }
@@ -77,9 +77,9 @@ class Transaction extends Model
     public static function getTotalDonationByWeek($organizationId)
     {
         $totalDonation = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
-                        ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
-                        ->select(DB::raw('sum(transactions.amount) as donation_amount'))
-                        ->first();
+            ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
+            ->select(DB::raw('sum(transactions.amount) as donation_amount'))
+            ->first();
 
         return $totalDonation;
     }
@@ -87,10 +87,10 @@ class Transaction extends Model
     public static function getTotalDonationByMonth($organizationId)
     {
         $totalDonation = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
-                        ->whereRaw('year(transactions.datetime_created) = year(curdate())')
-                        ->whereRaw('month(transactions.datetime_created) = month(curdate())')
-                        ->select(DB::raw('sum(transactions.amount) as donation_amount'))
-                        ->first();
+            ->whereRaw('year(transactions.datetime_created) = year(curdate())')
+            ->whereRaw('month(transactions.datetime_created) = month(curdate())')
+            ->select(DB::raw('sum(transactions.amount) as donation_amount'))
+            ->first();
 
         return $totalDonation;
     }
@@ -98,11 +98,11 @@ class Transaction extends Model
     public static function getLastestTransaction($organizationId)
     {
         $result = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
-                ->select(['*',DB::raw('max(datetime_created) as latest')])
-                ->groupBy('transactions.id')
-                ->orderBy('latest', 'desc')
-                ->take(4)
-                ->get();
+            ->select(['*', DB::raw('max(datetime_created) as latest')])
+            ->groupBy('transactions.id')
+            ->orderBy('latest', 'desc')
+            ->take(4)
+            ->get();
 
         return $result;
     }
@@ -110,7 +110,7 @@ class Transaction extends Model
     public static function getTransaction($organizationId)
     {
         $result = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
-                    ->get();
+            ->get();
 
         return $result;
     }

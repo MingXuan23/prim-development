@@ -98,6 +98,7 @@ class PayController extends Controller
 
     public function fees_pay(Request $request)
     {
+        // ************  id from value checkbox  **************
         $size = count(collect($request)->get('id'));
         $data = collect($request)->get('id');
         // dd($data[0]);
@@ -111,6 +112,8 @@ class PayController extends Controller
             //case 0 = student id
             //case 1 = fees id
             //case 3 = details id
+            //format req X-X-X
+
             $case           = explode("-", $data[$i]);
             $studentid[]    = $case[0];
             $feesid[]       = $case[1];
@@ -121,6 +124,9 @@ class PayController extends Controller
         $res_details = array_unique($detailsid);
 
         // $getstudent  = Student::whereIn('id', $res_student)->get();
+
+        // ************************* get student from array student id *******************************
+
         $getstudent  = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
@@ -131,6 +137,8 @@ class PayController extends Controller
             ->select('students.id as studentid', 'students.nama as studentname', 'fees.id as feeid', 'organizations.id as organizationid')
             ->whereIn('students.id', $res_student)
             ->get();
+
+        // ************************* get organization from array student id *******************************
 
         $getstudent2  = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -147,8 +155,11 @@ class PayController extends Controller
             ->where('id', $getstudent2->organizationid)
             ->first();
 
-        // dd($getorganization);
+        // ************************* get fees from array fees id *******************************
+
         $getfees     = DB::table('fees')->whereIn('id', $res_fee)->get();
+
+        // ************************* get details from array details id *******************************
 
         $getdetails  = DB::table('details')
             ->join('fees_details', 'fees_details.details_id', '=', 'details.id')
@@ -157,7 +168,21 @@ class PayController extends Controller
             ->whereIn('details.id', $res_details)->get();
         // dd($getdetails);
 
-        return view('parent.fee.pay', compact('getstudent', 'getfees', 'getdetails', 'getorganization'))->render();
+        // ************************* get student_fees_id from array *******************************
+
+        $getstudentfees  = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees', 'student_fees.class_student_id', '=', 'class_student.id')
+            ->join('fees_details', 'fees_details.id', '=', 'student_fees.fees_details_id')
+            ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
+            ->join('details', 'details.id', '=', 'fees_details.details_id')
+            ->select('student_fees.id as student_fees_id')
+            ->whereIn('students.id', $res_student)
+            ->whereIn('fees.id', $res_fee)
+            ->whereIn('details.id', $res_details)
+            ->get();
+
+        return view('parent.fee.pay', compact('getstudent', 'getfees', 'getdetails', 'getorganization', 'getstudentfees'))->render();
     }
 
     public function dev_fees_pay(Request $request)
@@ -250,15 +275,32 @@ class PayController extends Controller
         if ($user) {
             $transaction->user_id   = Auth::id();
         }
+
+        $list = $request->student_fees_id;
+
+        $id = explode("_", $request->fpx_sellerOrderNo);
         if ($transaction->save()) {
             // $id = substr($request->fpx_sellerOrderNo, -1);
-            $id = explode("_", $request->fpx_sellerOrderNo);
-            $transaction->donation()->attach($id[1], ['payment_type_id' => 1]);
+            // ******* save bridge transaction *********
+            // type = S for school fees and D for donation
+            if (substr($request->fpx_sellerExOrderNo, 0, 1) == 'S') {
 
-            /// ******************* utk bridge yuran ****************************
+                // dd($request->student_fees_id);
+                // ********* student fee id
 
-            // dd('done');
-            // return view('fpx.tStatus', compact('request', 'user'));
+                for ($i = 0; $i < count($list); $i++) {
+
+                    $array[] = array(
+                        'student_fees_id' => $list[$i],
+                        'payment_type_id' => 1,
+                        'transactions_id' => $transaction->id,
+                    );
+                }
+                DB::table('fees_transactions')->insert($array);
+            } else {
+
+                $transaction->donation()->attach($id[1], ['payment_type_id' => 1]);
+            }
         }
     }
 
@@ -273,18 +315,25 @@ class PayController extends Controller
         // dd($request);
         // $user = Auth::id();
         $user       = User::find(Auth::id());
+        $getstudentfees = "";
 
         if ($request->desc == 'Donation') {
             $fpx_buyerEmail = $request->email;
             $telno = "+6" . $request->telno;
             $fpx_buyerName = $request->name;
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
+
             // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $getstudentfees = $request->student_fees_id;
+            $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999);
+
+            // dd($getstudentfees[0]);
             // $fpx_buyerIban      = "";
         }
 
@@ -294,7 +343,6 @@ class PayController extends Controller
         $fpx_msgToken       = "01";
         $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
         $fpx_sellerTxnTime  = date('YmdHis');
-        $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
         $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
@@ -342,7 +390,8 @@ class PayController extends Controller
             'fpx_productDesc',
             'fpx_version',
             'telno',
-            'data'
+            'data',
+            'getstudentfees'
         ));
     }
 
@@ -385,21 +434,35 @@ class PayController extends Controller
 
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
-                case 'School Fees':
+                case 'School':
                     $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
                     $user2 = User::find(Auth::id());
+
                     $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
                     $transaction->transac_no = $request->fpx_fpxTxnId;
                     $transaction->status = "Success";
 
+                    $list = $request->student_fees_id;
+                    // $transaction->save();
+                    // dd($res_student);
                     if ($transaction->save()) {
-                        $res = DB::table('fees_transactions')->insert(array(
-                            0 => array(
-                                'student_fees_id' => 1,
-                                'payment_type_id' => 1,
-                                'transactions_id' => $transaction->id,
-                            ),
-                        ));
+
+                        for ($i = 0; $i < count($list); $i++) {
+
+                            $res  = DB::table('student_fees')
+                                ->where('id', $list[$i])
+                                ->update(['status' => 'Paid']);
+                        }
+
+
+
+                        // $res = DB::table('fees_transactions')->insert(array(
+                        //     0 => array(
+                        //         'student_fees_id' => 1,
+                        //         'payment_type_id' => 1,
+                        //         'transactions_id' => $transaction->id,
+                        //     ),
+                        // ));
 
                         if ($res) {
                             return view('fpx.tStatus', compact('request', 'user'));
