@@ -31,18 +31,22 @@
                     </ul>
                 </div>
                 @endif
-                <form method="post" action="{{ route('parent.store')}}" enctype="multipart/form-data">
+                <form method="post" action="{{ route('parent.storeDependent')}}" enctype="multipart/form-data">
                     {{csrf_field()}}
                     <div class="card-body">
 
                         <div class="form-group">
-                            <label>Nama Sekolah</label>
-                            <select name="school" id="school" class="form-control">
-                                <option value="" disabled selected>Pilih Sekolah</option>
-                                @foreach($school as $row)
+                            <label>Nama Organisasi</label>
+                            <select name="organization" id="organization" class="form-control">
+                                <option value="" selected disabled>Pilih Organisasi</option>
+                                @foreach($organization as $row)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
                                 @endforeach
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="hidden" name="parentid" value="{{ $userId }}">
                         </div>
 
                         <div id="dkelas" class="form-group">
@@ -154,7 +158,7 @@
 <script>
     $(document).ready(function(){
         
-                $('#school').change(function(){
+                $('#organization').change(function(){
         
                     // $('#kelas').val('');
                     // $('#murid').val('');
@@ -163,7 +167,7 @@
                     {
                         // alert($(this).val();)
                         // alert($("#sekolah option:selected").val());
-                        var oid    = $("#school option:selected").val();
+                        var oid    = $("#organization option:selected").val();
                         var _token      = $('input[name="_token"]').val();
                         // console.log(schoolid);
         

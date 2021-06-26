@@ -21,9 +21,9 @@ class OrganizationController extends Controller
     public function create()
     {
         // after launch remove where
-        // $type_org = TypeOrganization::all();
+        $type_org = TypeOrganization::all();
         // $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
-        $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
+        // $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
 
         return view('organization.add', compact('type_org'));
     }
