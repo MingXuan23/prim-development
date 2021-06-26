@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Mail\DonationReceipt;
+use App\Models\Dev\DevTransaction;
 use App\Models\Transaction;
 use App\User;
 use App\Models\Donation;
@@ -261,6 +262,35 @@ class PayController extends Controller
             // return view('fpx.tStatus', compact('request', 'user'));
         }
     }
+    public function transactionDev(Request $request)
+    {
+        $user       = User::find(Auth::id());
+        $transaction = new DevTransaction();
+        $transaction->nama          = $request->fpx_sellerExOrderNo;
+        $transaction->description   = $request->fpx_sellerOrderNo;
+        $transaction->transac_no    = $request->fpx_fpxTxnId;
+        $transaction->datetime_created = now();
+        $transaction->amount        = $request->fpx_txnAmount;
+        $transaction->status        = 'Pending';
+        $transaction->email         = $request->fpx_buyerEmail;
+        $transaction->telno         = $request->telno;
+        $transaction->username      = strtoupper($request->fpx_buyerName);
+        $transaction->fpx_checksum  = $request->fpx_checkSum;
+
+        if ($user) {
+            $transaction->user_id   = Auth::id();
+        }
+        if ($transaction->save()) {
+            // $id = substr($request->fpx_sellerOrderNo, -1);
+            $id = explode("_", $request->fpx_sellerOrderNo);
+            $transaction->donation()->attach($id[1], ['payment_type_id' => 1]);
+
+            /// ******************* utk bridge yuran ****************************
+
+            // dd('done');
+            // return view('fpx.tStatus', compact('request', 'user'));
+        }
+    }
 
     public function successPay()
     {
@@ -279,7 +309,7 @@ class PayController extends Controller
             $telno = "+6" . $request->telno;
             $fpx_buyerName = $request->name;
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -441,14 +471,5 @@ class PayController extends Controller
         // $organization = $this->organization->getOrganizationByDonationId(3);
         // dd($organization);
         return view('receipt.index');
-    }
-
-    public function testLog()
-    {
-        $exOrderNo = "Donation_20210624144608";
-        $fpx_debitAuthCode = "00";
-        $fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
-
-        \Log::channel('PRIM_transaction')->info("Transaction Callback : " . $exOrderNo . " , " . $status);
     }
 }
