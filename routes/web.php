@@ -120,6 +120,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
 Route::post('trn', 'PayController@transaction')->name('trn');
+Route::post('trn-dev', 'PayController@transactionDev')->name('trn-dev');
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');

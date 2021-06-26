@@ -47,7 +47,9 @@ $fpx_checkSum = strtoupper(bin2hex($binary_signature));
 $fields_string="";
 
 //set POST variables
-$url = config('app.env') == 'production' ? config('app.PRODUCTION_AE_AQ_URL') : config('app.UAT_AE_AQ_URL');
+$url = ($fpx_buyerBankId == 'TEST0021' ||  $fpx_buyerBankId == 'TEST0022' || $fpx_buyerBankId == 'TEST0023') 
+        ? config('app.UAT_AE_AQ_URL') 
+        : config('app.PRODUCTION_AE_AQ_URL');
 
 $fields = array(
 						'fpx_msgType' => urlencode("AE"),
