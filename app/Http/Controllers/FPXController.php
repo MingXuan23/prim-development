@@ -163,4 +163,8 @@ class FPXController extends AppBaseController
             return $this->sendError($th->getMessage(), 500);
         }
     }
+
+    public function testGit()
+    {
+    }
 }
