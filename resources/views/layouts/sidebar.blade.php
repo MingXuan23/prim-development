@@ -208,14 +208,14 @@
                 </li>
                 @endrole --}}
 
-                @role('Superadmin|Ibu|Bapa|Penjaga')
+                {{-- @role('Superadmin|Ibu|Bapa|Penjaga')
                 <li>
                     <a href="{{ route('billIndex') }}" class=" waves-effect">
                         <i class="mdi"></i>
                         <span>Bill Design</span>
                     </a>
                 </li>
-                @endrole
+                @endrole --}}
 
 
                 <!-- <li>

@@ -87,6 +87,7 @@ class FeesController extends Controller
         return view('parent.fee.index', compact('list', 'getfees', 'getcat', 'getdetail', 'organization'));
     }
 
+    //DEVELOPMENT CONTROLLER
     public function devpay()
     {
         $userid = Auth::id();
@@ -147,6 +148,44 @@ class FeesController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         return view('parent.dev.index', compact('list', 'getfees', 'getcat', 'getdetail', 'organization'));
+    }
+
+    public function devreceipt(Request $request){
+
+        $feesid = $request->feesid;
+        $amount = $request->amount;
+
+        $userid = Auth::id();
+        $list = DB::table('organizations')
+        ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+        ->join('users', 'users.id', '=', 'organization_user.user_id')
+        ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+        ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+        ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+        ->join('class_student', 'class_student.student_id', '=', 'students.id')
+        ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+        ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+        ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+        ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
+        ->select('organizations.id as oid', 'organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
+        ->where([
+            ['users.id', $userid],
+        ])
+        ->orWhere('organization_roles.id', '=', 6)
+        ->orWhere('organization_roles.id', '=', 7)
+        ->orWhere('organization_roles.id', '=', 8)
+        ->orderBy('classes.nama')
+        ->get();
+
+        $feesid     = DB::table('fees')
+        ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+        ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+        ->join('class_student', 'class_organization.class_id', '=', 'class_student.id')
+        ->join('students', 'class_student.student_id', '=', 'students.id')
+        ->select('fees.id as feeid', 'students.id as studentid')
+        ->first();
+        
+        return view('parent.dev.receipt',compact('feesid'));
     }
 
     public function create()

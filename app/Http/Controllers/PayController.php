@@ -220,7 +220,7 @@ class PayController extends Controller
             ->whereIn('details.id', $res_details)->get();
         // dd($getdetails);
 
-        return view('parent.fee.pay', compact('getstudent', 'getfees', 'getdetails', 'getorganization'))->render();
+        return view('parent.dev.pay', compact('getstudent', 'getfees', 'getdetails', 'getorganization'))->render();
     }
 
     public function billIndex()

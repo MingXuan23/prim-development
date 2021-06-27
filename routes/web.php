@@ -117,11 +117,12 @@ Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('tra
 Route::get('successpay', 'PayController@successPay')->name('successpay');
 Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
 Route::get('feespay', 'PayController@fees_pay')->name('feespay');
-Route::get('feespaydev', 'PayController@dev_fees_pay')->name('feespaydev');
-
 
 Route::get('feesparent', 'FeesController@parentpay')->name('parentpay');
-Route::get('feesparentdev', 'FeesController@parentpay')->name('feesparentdev');
+
+Route::get('feespaydev', 'PayController@dev_fees_pay')->name('feespaydev');
+Route::get('feesparentdev', 'FeesController@devpay')->name('feesparentdev');
+Route::post('receiptdev', 'FeesController@devreceipt')->name('receiptdev');
 
 Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
