@@ -36,6 +36,15 @@
 
         <script src="{{ URL::asset('assets/js/portfolio.js') }}"></script>
 
+        <script src="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.js')}}"></script>
+
+
+        <script>
+                var d = new Date();
+                    var n = d.getFullYear();
+                    document.getElementById('year').innerHTML = n;
+            </script>
+            
         @yield('script')
 
         @yield('script-bottom')

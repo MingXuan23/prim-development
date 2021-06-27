@@ -58,6 +58,21 @@ return [
             'engine' => null,
         ],
 
+        'mysql_dev' => [
+            'driver' => 'mysql',
+            'host' => env('DB_DEV_HOST', 'rvzlfyn2pcmd9wq5.chr7pe7iynqr.eu-west-1.rds.amazonaws.com'),
+            'port' => env('DB_DEV_PORT', '3306'),
+            'database' => env('DB_DEV_DATABASE', 'primary_app_db'),
+            'username' => env('DB_DEV_USERNAME', 'xjnc1vgcbqvyq5vg'),
+            'password' => env('DB_DEV_PASSWORD', 'i9sjwy1iiy884o0t'),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),

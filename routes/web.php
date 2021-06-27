@@ -27,6 +27,18 @@ Route::get('/organization-list', 'LandingPageController@organizationList');
 Route::get('/activity-list', 'LandingPageController@activitylist');
 Route::get('/activity-details', 'LandingPageController@activitydetails');
 
+//landing donation page route
+Route::group(['prefix' => 'derma'], function () {
+    Route::get('', 'LandingPageController@indexDonation');
+    Route::get('/organization-list', 'LandingPageController@organizationListDonation');
+    Route::get('/activity-list', 'LandingPageController@activitylistDonation');
+    Route::get('/activity-details', 'LandingPageController@activitydetailsDonation');
+    Route::get('/organization-type', 'LandingPageController@getOrganizationDatatable')->name('landingpage.donation.organization');
+    Route::get('/organization-donation', 'LandingPageController@getDonationDatatable')->name('landingpage.donation.donation');
+});
+// feedback
+Route::post('feedback', 'LandingPageController@storeMessage')->name('feedback.store');
+
 
 Route::resource('school', 'SchoolController');
 
@@ -68,14 +80,12 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('year', 'FeesController@fetchYear')->name('fees.fetchYear');
     Route::post('class', 'FeesController@fetchClass')->name('fees.fetchClass');
     Route::get('list', 'FeesController@getFeesDatatable')->name('fees.getFeesDatatable');
-
 });
 
 Route::group(['prefix' => 'parent'], function () {
-    Route::get('dependent/{id}', 'ParentController@indexDependent')->name('parent.dependent');    
+    Route::get('dependent/{id}', 'ParentController@indexDependent')->name('parent.dependent');
     Route::get('list', 'ParentController@getParentDatatable')->name('parent.getParentDatatable');
-
-
+    Route::post('dependent', 'ParentController@storeDependent')->name('parent.storeDependent');
 });
 
 Route::group(['prefix' => 'activity'], function () {
@@ -110,6 +120,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
 Route::post('trn', 'PayController@transaction')->name('trn');
+Route::post('trn-dev', 'PayController@transactionDev')->name('trn-dev');
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');

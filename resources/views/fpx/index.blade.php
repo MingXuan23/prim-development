@@ -1,11 +1,12 @@
 @extends('layouts.master')
 
 <div class="container" style="margin-top: 5%;">
-    <form name="form1" id="form1" method="post" action="{{ config('app.env') == 'production' ? config('app.PRODUCTION_AR_AD_URL') : config('app.UAT_AR_AD_URL') }}">
+    <form name="form1" id="form1" method="post"
+        action="{{ config('app.env') == 'production' ? config('app.PRODUCTION_AR_AD_URL') : config('app.UAT_AR_AD_URL') }}">
         @csrf
         <div class="card">
-                <div class="card-body"> 
-                    <table border="0" cellpadding="2" cellspacing="1" width="100%">
+            <div class="card-body">
+                <table border="0" cellpadding="2" cellspacing="1" width="100%">
                     <tbody>
                         <tr class="infoBoxContents">
                             <td valign="top" width="30%">
@@ -14,20 +15,23 @@
                                         <tr>
                                             <td height="164" align="center" class="main"><b>Payment Method via FPX</b>
                                                 <p>&nbsp;</p>
-                                                <input type="submit" style="cursor:hand" class="btn btn-primary" onclick="pay()"
-                                                    value="Click to Pay" />
-                                                    <br>
-                                                    <br>
+                                                <input type="submit" style="cursor:hand" class="btn btn-primary"
+                                                    onclick="pay()" value="Click to Pay" />
+                                                <br>
+                                                <br>
                                                 <p> <img src="assets/images/FPXButton.PNG" border="2" /></p>
                                                 <p class="main">&nbsp;</p>
-                                                <p class="main"><strong>* You must have Internet Banking Account in order to
+                                                <p class="main"><strong>* You must have Internet Banking Account in
+                                                        order to
                                                         make transaction using FPX.</strong></p>
                                                 <p>&nbsp;</p>
-                                                <p class="main"><strong>* Please ensure that your browser's pop up blocker has
+                                                <p class="main"><strong>* Please ensure that your browser's pop up
+                                                        blocker has
                                                         been disabled to avoid any interruption during making
                                                         transaction.</strong></p>
                                                 <p>&nbsp;</p>
-                                                <p class="main"><strong>* You will be redirected to secure payment site. Do not close browser / refresh page until you receive
+                                                <p class="main"><strong>* You will be redirected to secure payment site.
+                                                        Do not close browser / refresh page until you receive
                                                         response.</strong></p>
                                                 <p>&nbsp;</p>
                                             </td>
@@ -40,7 +44,7 @@
                 </table>
             </div>
         </div>
-       
+
 
         <input type=hidden value="{{ $fpx_msgType }}" name="fpx_msgType">
         <input type=hidden value="{{ $fpx_msgToken }}" name="fpx_msgToken">
@@ -64,6 +68,14 @@
         <input type=hidden value="{{ $fpx_version }}" name="fpx_version">
         <input type=hidden value="{{ $fpx_productDesc }}" name="fpx_productDesc">
         <input type=hidden value="{{ $telno }}" name="telno">
+
+        @if (substr($fpx_sellerExOrderNo, 0, 1) == 'S')
+            @foreach ($getstudentfees as $student_fees_id)
+            <input type="hidden" name="student_fees_id[]" value="{{ $student_fees_id }}">
+            @endforeach
+        @endif
+
+
     </form>
 
 </div>
@@ -82,7 +94,7 @@
 
     function pay(){
         $.ajax({
-                url: "{{ route('trn') }}",
+                url: "{{ config('app.env') == 'production' ? route('trn') : route('trn-dev') }}",
                 type: "post",
                 data: values ,
                 success: function (response) {

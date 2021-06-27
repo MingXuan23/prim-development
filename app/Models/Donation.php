@@ -81,4 +81,13 @@ class Donation extends Model
 
         return $donation;
     }
+
+    public function getDonationByOrganizationId($id)
+    {
+        $donation = Donation::with(["organization"])->whereHas('organization', function ($query) use ($id) {
+            $query->where("organizations.id", $id);
+        })->get();
+
+        return $donation;
+    }
 }

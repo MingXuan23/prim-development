@@ -36,6 +36,11 @@ class Organization extends Model
         return $this->hasMany(Activity::class);
     }
 
+    public function typeOrganization()
+    {
+        return $this->belongsTo('TypeOrganization');
+    }
+
     public function getOrganizationByDonationId($donationId)
     {
         $organization = Organization::with(["donation"])->whereHas('donation', function ($query) use ($donationId) {
@@ -45,8 +50,9 @@ class Organization extends Model
         return $organization;
     }
 
-    public function typeOrganization()
+    public function getOrganizationByType($type)
     {
-        return $this->belongsTo('TypeOrganization');
+        $organizations = Organization::where("type_org", $type)->get();
+        return $organizations;
     }
 }

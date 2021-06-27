@@ -37,6 +37,7 @@ class DonationReceipt extends Mailable
     public function build()
     {
         return $this->view('mail.receipt')
+                    ->subject("Resit Derma " . $this->donation->nama)
                     ->with([
                         'organizationName'  => $this->organization->nama,
                         'organizationTelNo'   => $this->organization->telno,

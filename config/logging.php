@@ -95,6 +95,12 @@ return [
             'driver' => 'monolog',
             'handler' => NullHandler::class,
         ],
+
+        'PRIM_transaction' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/transaction.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];

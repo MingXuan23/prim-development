@@ -22,6 +22,9 @@ class OrganizationController extends Controller
     {
         // after launch remove where
         $type_org = TypeOrganization::all();
+        // $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
+        // $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
+
         return view('organization.add', compact('type_org'));
     }
 
@@ -53,7 +56,9 @@ class OrganizationController extends Controller
     public function edit($id)
     {
         // after launch remove where
-        $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
+        // $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
+        $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
+
         $org = DB::table('organizations')->where('id', $id)->first();
 
         return view('organization.update', compact('org', 'type_org'));
@@ -119,12 +124,16 @@ class OrganizationController extends Controller
             $code = 'SK' . str_pad($id, 5, '0', STR_PAD_LEFT);
         } elseif ($typeOrg == 2) {
             $code = 'SA' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        }elseif ($typeOrg == 3) {
+        } elseif ($typeOrg == 3) {
             $code = 'SM' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        }elseif ($typeOrg == 4) {
+        } elseif ($typeOrg == 4) {
             $code = 'MS' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        }elseif ($typeOrg == 5) {
+        } elseif ($typeOrg == 5) {
             $code = 'NGO' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 6) {
+            $code = 'RAY' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 7) {
+            $code = 'PT' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
         return $code;

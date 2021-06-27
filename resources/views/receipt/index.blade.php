@@ -13,11 +13,12 @@ extract($_POST);
 
 $fpx_msgType="AE";
 $fpx_msgToken="01";
-$fpx_sellerExId="EX00012323";
+$fpx_sellerExId= config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 $fpx_sellerExOrderNo=$request->fpx_sellerExOrderNo;
 $fpx_sellerTxnTime=$request->fpx_fpxTxnTime;
 $fpx_sellerOrderNo=$request->fpx_sellerOrderNo;
-$fpx_sellerId="SE00013841";
+// $fpx_sellerId="SE00013841";
+$fpx_sellerId=$request->fpx_sellerId;
 $fpx_sellerBankCode="01";
 $fpx_txnCurrency="MYR";
 $fpx_txnAmount=$request->fpx_txnAmount;
@@ -46,7 +47,9 @@ $fpx_checkSum = strtoupper(bin2hex($binary_signature));
 $fields_string="";
 
 //set POST variables
-$url ='https://uat.mepsfpx.com.my/FPXMain/sellerNVPTxnStatus.jsp';
+$url = ($fpx_buyerBankId == 'TEST0021' ||  $fpx_buyerBankId == 'TEST0022' || $fpx_buyerBankId == 'TEST0023') 
+        ? config('app.UAT_AE_AQ_URL') 
+        : config('app.PRODUCTION_AE_AQ_URL');
 
 $fields = array(
 						'fpx_msgType' => urlencode("AE"),
@@ -239,7 +242,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-            window.location = '/'; 
+            window.location = '/derma'; 
         }
     },1000);
 </script>
