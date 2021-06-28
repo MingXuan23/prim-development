@@ -152,6 +152,10 @@
                                             <p style="text-align: left;"> <i class="flaticon-checked"
                                                     style="margin-right: 10px"></i> Mempunyai akaun dalam bank
                                                 talian <i>(online banking)</i> dengan mana-mana bank di Malaysia.</p>
+                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                                    style="margin-right: 10px"></i> Penderma akan menerima email
+                                                daripada pihak FPX dan sistem PRiM sebagai bukti pembayaran.</p>
+
                                         </div>
                                     </div>
                                 </div>
@@ -401,6 +405,44 @@
     </div><!-- /.modal end -->
     <!-- how it works area end -->
 
+    <section class="screenshort-area">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="section-title">
+                        <!-- section title -->
+                        {{-- <span class="subtitle">Screenshots</span> --}}
+                        <h3 class="title extra">Kerjasama</h3>
+                        <p>Laman web ini telah diakui dan disahkan selamat untuk digunakan.</p>
+                    </div><!-- //. section title -->
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4 text-sm-center align-self-center">
+                            <img src="{{ URL::asset('assets/landing-page/img/logo-fpx.png') }}" alt=""
+                                style="max-width:40%">
+                        </div>
+
+                        <div class="col-lg-4 text-sm-center align-self-center">
+                            <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt=""
+                                style="max-width:70%">
+
+                        </div>
+
+                        <div class="col-lg-4 text-sm-center align-self-center">
+                            <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt=""
+                                style="max-width:70%">
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!--====== TESTIMONIAL PART ENDS ======-->
 
     <!-- team member area start -->
@@ -425,7 +467,7 @@
 
                             @csrf
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <div class="form-group">
                                         <input type="text" class="form-control" id="uname" name="uname"
                                             placeholder="Nama Penuh" required>
@@ -437,6 +479,14 @@
                                             placeholder="Email" required>
                                     </div>
                                 </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control phone_no" id="telno" name="telno"
+                                            placeholder="Nombor Telefon" required>
+                                    </div>
+                                </div>
+
                                 <div class="col-lg-12">
                                     <div class="form-group textarea">
                                         <textarea name="message" id="message" class="form-control" cols="30" rows="10"
@@ -591,6 +641,9 @@
         window.onload = function() {
             document.getElementById("7").click();
         };
+
+        $('.phone_no').mask('00000000000');
+
 
         $(document).on('click', '.btn-organization', function() {
             var type = $(this).attr("id");
