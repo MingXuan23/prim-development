@@ -172,7 +172,7 @@
                                 <label>No Telefon</label>
                                 <input type="text" name="telno" class="form-control phone_no text-left"
                                     placeholder="No Telefon"
-                                    value="{{ !empty(auth()->user()->id) ? $user->telno : '' }}"
+                                    value="{{ !empty(auth()->user()->id) ?  substr($user->telno , 2) : '' }}"
                                     data-parsley-required-message="Sila masukkan no telefon" required>
                             </div>
                             <div class="form-group">
