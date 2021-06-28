@@ -409,48 +409,14 @@
     </div><!-- /.modal end -->
     <!-- how it works area end -->
 
-    <section class="screenshort-area">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title">
-                        <!-- section title -->
-                        {{-- <span class="subtitle">Screenshots</span> --}}
-                        <h3 class="title extra">Kerjasama</h3>
-                        <p>Laman web ini telah diakui dan disahkan selamat untuk digunakan.</p>
-                    </div><!-- //. section title -->
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-4 text-sm-center align-self-center">
-                            <img src="{{ URL::asset('assets/landing-page/img/logo-fpx.png') }}" alt=""
-                                style="max-width:40%">
-                        </div>
-
-                        <div class="col-lg-4 text-sm-center align-self-center">
-                            <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt=""
-                                style="max-width:70%">
-
-                        </div>
-
-                        <div class="col-lg-4 text-sm-center align-self-center">
-                            <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt=""
-                                style="max-width:70%">
-
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!--====== TESTIMONIAL PART ENDS ======-->
 
     <!-- team member area start -->
     <section class="team-member-area" id="team">
+        
+        <div class="bg-shape-3 fa-rotate-180" style="top: 0px !important;right:0px;">
+            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width:45%">
+        </div>
         <div class="bg-shape-2">
             <img src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg-min.jpg') }}" alt="">
         </div>
@@ -458,6 +424,42 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
+
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="section-title">
+                            <!-- section title -->
+                            {{-- <span class="subtitle">Screenshots</span> --}}
+                            <h3 class="title extra">Kerjasama</h3>
+                            <p>Laman web ini telah diakui dan disahkan selamat untuk digunakan.</p>
+                        </div><!-- //. section title -->
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-lg-12">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-fpx.png') }}" alt=""
+                                    style="max-width:40%">
+                            </div>
+    
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt=""
+                                    style="max-width:70%">
+    
+                            </div>
+    
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt=""
+                                    style="max-width:70%">
+    
+                            </div>
+    
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="row">
                 <div class="col-lg-6">
