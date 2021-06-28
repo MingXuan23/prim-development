@@ -8,8 +8,5 @@ class Feedback extends Model
 {
     //
     //sadss
-    protected $fillable = ['name', 'email', 'message']; 
-
+    protected $fillable = ['name', 'telno', 'email', 'message'];
 }
-
-

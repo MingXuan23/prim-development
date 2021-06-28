@@ -37,6 +37,7 @@
         <script src="{{ URL::asset('assets/js/portfolio.js') }}"></script>
 
         <script src="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.js')}}"></script>
+        <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
 
         <script>

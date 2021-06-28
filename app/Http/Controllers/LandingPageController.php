@@ -35,12 +35,14 @@ class LandingPageController extends AppBaseController
             'uname'         =>  'required',
             'email'         =>  'required | email',
             'message'       =>  'required',
+            'telno'         =>  'required',
         ]);
 
         $feedback = Feedback::create([
             'name'      => $request->get('uname'),
             'email'     => $request->get('email'),
-            'message'   => $request->get('message')
+            'telno'     => $request->get('telno'),
+            'message'   => $request->get('message'),
         ]);
 
         return redirect()->back()->with('alert', 'Terima kasih');
