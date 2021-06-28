@@ -179,6 +179,10 @@
                                                     style="margin-right: 10px"></i> Mendaftar sebagai organisasi di
                                                 sistem PRiM.
                                             </p>
+                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                                    style="margin-right: 10px"></i> Organisasi akan menerima email
+                                                daripada pihak FPX dan sistem PRiM sebagai bukti menerima bayaran.
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
