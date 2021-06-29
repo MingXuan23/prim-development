@@ -94,7 +94,7 @@
 
     function pay(){
         $.ajax({
-                url: "{{ config('app.env') == 'production' ? route('trn') : route('trn-dev') }}",
+                url: "{{ route('trn') }}",
                 type: "post",
                 data: values ,
                 success: function (response) {
