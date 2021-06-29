@@ -466,7 +466,7 @@ class PayController extends Controller
                 case 'School':
 
                     if ($request->fpx_buyerBankId == 'TEST0021') {
-                        $response = Http::post('devtrans', [
+                        $response = Http::post('https://dev.prim.my/api/devtrans', [
                             $request
                         ]);
                     } else {
@@ -554,6 +554,9 @@ class PayController extends Controller
         // $organization = $this->organization->getOrganizationByDonationId(3);
         // dd($organization);
         // return view('receipt.index');
-        dd($request);
+        // Log::
+        // dd($request);
+        \Log::channel('PRIM_transaction_fees')->info("Transaction Request Fees : "  . $request);
+
     }
 }
