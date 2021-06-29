@@ -17,5 +17,4 @@ jobs:
         server: ftp.prim.my
         username: admin@prim.my
         password: ${{ secrets.ftp_password }}
-        exclude: ./public
         server-dir:  /dev.prim.my/lsapp/
