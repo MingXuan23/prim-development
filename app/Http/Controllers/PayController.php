@@ -290,7 +290,6 @@ class PayController extends Controller
                 // ********* student fee id
 
                 for ($i = 0; $i < count($list); $i++) {
-
                     $array[] = array(
                         'student_fees_id' => $list[$i],
                         'payment_type_id' => 1,
@@ -299,7 +298,6 @@ class PayController extends Controller
                 }
                 DB::table('fees_transactions')->insert($array);
             } else {
-
                 $transaction->donation()->attach($id[1], ['payment_type_id' => 1]);
             }
         }
@@ -354,7 +352,7 @@ class PayController extends Controller
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
 
-            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -467,7 +465,6 @@ class PayController extends Controller
                 case 'School':
 
                     if ($request->fpx_buyerBankId == 'TEST0021') {
-
                         $response = Http::post('devtrans', [
                             $request
                         ]);
