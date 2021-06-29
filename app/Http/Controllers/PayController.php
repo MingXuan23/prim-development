@@ -468,7 +468,7 @@ class PayController extends Controller
                     dd($request);
                     if ($request->fpx_buyerBankId == 'TEST0021') {
                         $response = Http::post('https://dev.prim.my/api/devtrans', [
-                            $request
+                            'req' => $request
                         ]);
                     } else {
                     }
