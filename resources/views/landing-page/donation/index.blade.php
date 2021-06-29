@@ -88,10 +88,10 @@
                 <div class="col-lg-7">
                     <div class="header-inner">
                         <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
-                            ibu bapa serta penjaga dengan pihak sekolah.</p>
+                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                            berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
                         <div class="btn-wrapper wow fadeInUp">
-                            <a href="#organization" class="boxed-btn btn-rounded">Derma</a>
+                            <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
 
                             {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
                             <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
@@ -413,7 +413,7 @@
 
     <!-- team member area start -->
     <section class="team-member-area" id="team">
-        
+
         <div class="bg-shape-3 fa-rotate-180" style="top: 0px !important;right:0px;">
             <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width:45%">
         </div>
@@ -443,19 +443,19 @@
                                 <img src="{{ URL::asset('assets/landing-page/img/logo-fpx.png') }}" alt=""
                                     style="max-width:40%">
                             </div>
-    
+
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
                                 <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt=""
                                     style="max-width:70%">
-    
+
                             </div>
-    
+
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
                                 <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt=""
                                     style="max-width:70%">
-    
+
                             </div>
-    
+
                         </div>
                     </div>
                 </div>
