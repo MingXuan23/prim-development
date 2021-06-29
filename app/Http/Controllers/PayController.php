@@ -558,6 +558,5 @@ class PayController extends Controller
         // Log::
         // dd($request);
         \Log::channel('PRIM_transaction_fees')->info("Transaction Request Fees : "  . $request);
-
     }
 }
