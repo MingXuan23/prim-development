@@ -16,8 +16,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\AppBaseController;
 
-class PayController extends Controller
+class PayController extends AppBaseController
 {
     private $donation;
     private $user;
@@ -468,7 +469,7 @@ class PayController extends Controller
                     dd($request);
                     if ($request->fpx_buyerBankId == 'TEST0021') {
                         $response = Http::post('https://dev.prim.my/api/devtrans', [
-                            'req' => $request
+                            $this->sendResponse($request->toArray(), "Success")
                         ]);
                     } else {
                     }
@@ -558,8 +559,7 @@ class PayController extends Controller
         // Log::
         // dd($request);
 
-        return $request;
-        // \Log::channel('PRIM_transaction_fees')->info("Transaction Request Fees : "  . $request);
-
+        // return $request;
+        \Log::channel('PRIM_api')->info("API Request : "  . $request);
     }
 }
