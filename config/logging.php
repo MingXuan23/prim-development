@@ -101,6 +101,7 @@ return [
             'path' => storage_path('logs/transaction.log'),
             'level' => 'info',
         ],
+        
         'PRIM_api' => [
             'driver' => 'single',
             'path' => storage_path('logs/api_log.log'),
