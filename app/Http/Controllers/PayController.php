@@ -557,6 +557,8 @@ class PayController extends Controller
         // return view('receipt.index');
         // Log::
         // dd($request);
-        \Log::channel('PRIM_transaction_fees')->info("Transaction Request Fees : "  . $request);
+
+        return $request;
+        // \Log::channel('PRIM_transaction_fees')->info("Transaction Request Fees : "  . $request);
     }
 }
