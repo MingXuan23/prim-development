@@ -466,7 +466,7 @@ class PayController extends AppBaseController
             switch ($case[0]) {
                 case 'School':
 
-                    dd($request);
+                    // dd($request);
                     if ($request->fpx_buyerBankId == 'TEST0021') {
                         $response = Http::post('https://dev.prim.my/api/devtrans', [
                             $this->sendResponse($request->toArray(), "Success")
