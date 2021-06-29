@@ -465,47 +465,55 @@ class PayController extends Controller
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
                 case 'School':
-                    $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $user2 = User::find(Auth::id());
 
-                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $transaction->transac_no = $request->fpx_fpxTxnId;
-                    $transaction->status = "Success";
+                    if ($request->fpx_buyerBankId == 'TEST0021') {
 
-                    $res_student = DB::table('student_fees')
-                        ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
-                        ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
-                        ->select('student_fees.id as student_fees_id')
-                        ->where('transactions.id', $transaction->id)
-                        ->get();
-                        
-                    $list = $res_student;
-
-                    if ($transaction->save()) {
-
-                        for ($i = 0; $i < count($list); $i++) {
-
-                            $res  = DB::table('student_fees')
-                                ->where('id', $list[$i]->student_fees_id)
-                                ->update(['status' => 'Paid']);
-                        }
-
-
-
-                        // $res = DB::table('fees_transactions')->insert(array(
-                        //     0 => array(
-                        //         'student_fees_id' => 1,
-                        //         'payment_type_id' => 1,
-                        //         'transactions_id' => $transaction->id,
-                        //     ),
-                        // ));
-
-                        if ($res) {
-                            return view('fpx.tStatus', compact('request', 'user'));
-                        } else {
-                            return view('errors.500');
-                        }
+                        $response = Http::post('devtrans', [
+                            $request
+                        ]);
+                    } else {
                     }
+                    // $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    // $user2 = User::find(Auth::id());
+
+                    // $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    // $transaction->transac_no = $request->fpx_fpxTxnId;
+                    // $transaction->status = "Success";
+
+                    // $res_student = DB::table('student_fees')
+                    //     ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
+                    //     ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
+                    //     ->select('student_fees.id as student_fees_id')
+                    //     ->where('transactions.id', $transaction->id)
+                    //     ->get();
+
+                    // $list = $res_student;
+
+                    // if ($transaction->save()) {
+
+                    //     for ($i = 0; $i < count($list); $i++) {
+
+                    //         $res  = DB::table('student_fees')
+                    //             ->where('id', $list[$i]->student_fees_id)
+                    //             ->update(['status' => 'Paid']);
+                    //     }
+
+
+
+                    //     // $res = DB::table('fees_transactions')->insert(array(
+                    //     //     0 => array(
+                    //     //         'student_fees_id' => 1,
+                    //     //         'payment_type_id' => 1,
+                    //     //         'transactions_id' => $transaction->id,
+                    //     //     ),
+                    //     // ));
+
+                    //     if ($res) {
+                    //         return view('fpx.tStatus', compact('request', 'user'));
+                    //     } else {
+                    //         return view('errors.500');
+                    //     }
+                    // }
                     break;
 
                 case 'Donation':
@@ -540,5 +548,14 @@ class PayController extends Controller
         // $organization = $this->organization->getOrganizationByDonationId(3);
         // dd($organization);
         return view('receipt.index');
+    }
+
+    public function devtrans(Request $request)
+    {
+        // $donation = $this->donation->getDonationByTransactionName("Donation_23210315210448");
+        // $organization = $this->organization->getOrganizationByDonationId(3);
+        // dd($organization);
+        // return view('receipt.index');
+        dd($request);
     }
 }
