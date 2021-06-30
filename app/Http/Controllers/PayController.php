@@ -355,7 +355,7 @@ class PayController extends AppBaseController
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
 
-            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -466,8 +466,8 @@ class PayController extends AppBaseController
             // ]);
 
             // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
-            return Redirect::to('https://dev.prim.my/api/devtrans', array('data' => $request->toArray()));
-            // dd($response);
+            return Redirect::away('https://dev.prim.my/api/devtrans')->with($request->toArray());
+        // dd($response);
         } else {
             $case = explode("_", $request->fpx_sellerExOrderNo);
             // $text = explode("/", $request->fpx_buyerIban);
@@ -556,7 +556,7 @@ class PayController extends AppBaseController
         return view('receipt.index');
     }
 
-    public function devtrans(Request $request)
+    public function devtrans($request)
     {
         // $donation = $this->donation->getDonationByTransactionName("Donation_23210315210448");
         // $organization = $this->organization->getOrganizationByDonationId(3);
@@ -565,6 +565,7 @@ class PayController extends AppBaseController
         // dd($request);
 
         // return $request;
+        dd($request);
         \Log::channel('PRIM_api')->info("API Request : "  . $request);
         return view('parent.fee.receipt');
     }
