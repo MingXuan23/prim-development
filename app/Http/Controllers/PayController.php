@@ -354,7 +354,7 @@ class PayController extends AppBaseController
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
 
-        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -459,86 +459,87 @@ class PayController extends AppBaseController
 
     public function transactionReceipt(Request $request)
     {
-        $case = explode("_", $request->fpx_sellerExOrderNo);
-        // $text = explode("/", $request->fpx_buyerIban);
-
-        if ($request->fpx_debitAuthCode == '00') {
-            switch ($case[0]) {
-                case 'School':
-
-                     // dd($request);
-                    if ($request->fpx_buyerBankId == 'TEST0021') {
-                        $response = Http::post('https://dev.prim.my/api/devtrans', [
-                            $this->sendResponse($request->toArray, "Success")
-                        ]);
-                    } else {
-                    }
-                    // $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    // $user2 = User::find(Auth::id());
-
-                    // $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    // $transaction->transac_no = $request->fpx_fpxTxnId;
-                    // $transaction->status = "Success";
-
-                    // $res_student = DB::table('student_fees')
-                    //     ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
-                    //     ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
-                    //     ->select('student_fees.id as student_fees_id')
-                    //     ->where('transactions.id', $transaction->id)
-                    //     ->get();
-
-                    // $list = $res_student;
-
-                    // if ($transaction->save()) {
-
-                    //     for ($i = 0; $i < count($list); $i++) {
-
-                    //         $res  = DB::table('student_fees')
-                    //             ->where('id', $list[$i]->student_fees_id)
-                    //             ->update(['status' => 'Paid']);
-                    //     }
-
-
-
-                    //     // $res = DB::table('fees_transactions')->insert(array(
-                    //     //     0 => array(
-                    //     //         'student_fees_id' => 1,
-                    //     //         'payment_type_id' => 1,
-                    //     //         'transactions_id' => $transaction->id,
-                    //     //     ),
-                    //     // ));
-
-                    //     if ($res) {
-                    //         return view('fpx.tStatus', compact('request', 'user'));
-                    //     } else {
-                    //         return view('errors.500');
-                    //     }
-                    // }
-                    break;
-
-                case 'Donation':
-
-                    Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
-
-                    $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
-
-                    $organization = $this->organization->getOrganizationByDonationId($donation->id);
-                    $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
-
-                    Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
-
-                    return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
-
-                    break;
-                default:
-                    return view('errors.500');
-                    break;
-            }
-            return view('errors.500');
+        if ($request->fpx_buyerBankId == 'TEST0021') {
+            $response = Http::post('https://dev.prim.my/api/devtrans', [
+                $this->sendResponse($request->toArray, "Success")
+            ]);
         } else {
-            Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
-            $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-            return view('fpx.transactionFailed', compact('request', 'user'));
+            $case = explode("_", $request->fpx_sellerExOrderNo);
+            // $text = explode("/", $request->fpx_buyerIban);
+
+            if ($request->fpx_debitAuthCode == '00') {
+                switch ($case[0]) {
+                    case 'School':
+
+                        // dd($request);
+
+                        // $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                        // $user2 = User::find(Auth::id());
+
+                        // $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                        // $transaction->transac_no = $request->fpx_fpxTxnId;
+                        // $transaction->status = "Success";
+
+                        // $res_student = DB::table('student_fees')
+                        //     ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
+                        //     ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
+                        //     ->select('student_fees.id as student_fees_id')
+                        //     ->where('transactions.id', $transaction->id)
+                        //     ->get();
+
+                        // $list = $res_student;
+
+                        // if ($transaction->save()) {
+
+                        //     for ($i = 0; $i < count($list); $i++) {
+
+                        //         $res  = DB::table('student_fees')
+                        //             ->where('id', $list[$i]->student_fees_id)
+                        //             ->update(['status' => 'Paid']);
+                        //     }
+
+
+
+                        //     // $res = DB::table('fees_transactions')->insert(array(
+                        //     //     0 => array(
+                        //     //         'student_fees_id' => 1,
+                        //     //         'payment_type_id' => 1,
+                        //     //         'transactions_id' => $transaction->id,
+                        //     //     ),
+                        //     // ));
+
+                        //     if ($res) {
+                        //         return view('fpx.tStatus', compact('request', 'user'));
+                        //     } else {
+                        //         return view('errors.500');
+                        //     }
+                        // }
+                        break;
+
+                    case 'Donation':
+
+                        Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+
+                        $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
+
+                        $organization = $this->organization->getOrganizationByDonationId($donation->id);
+                        $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
+
+                        Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
+
+                        return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
+
+                        break;
+                    default:
+                        return view('errors.500');
+                        break;
+                }
+                return view('errors.500');
+            } else {
+                Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
+                $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                return view('fpx.transactionFailed', compact('request', 'user'));
+            }
         }
     }
 
@@ -555,7 +556,7 @@ class PayController extends AppBaseController
         // $donation = $this->donation->getDonationByTransactionName("Donation_23210315210448");
         // $organization = $this->organization->getOrganizationByDonationId(3);
         // dd($organization);
-        // return view('receipt.index');
+        return view('parent.fee.receipt');
         // Log::
         // dd($request);
 
