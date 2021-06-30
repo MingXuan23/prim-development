@@ -461,11 +461,12 @@ class PayController extends AppBaseController
     public function transactionReceipt(Request $request)
     {
         if ($request->fpx_buyerBankId == 'TEST0021') {
-            $response = Http::post('https://dev.prim.my/api/devtrans', [
-                $this->sendResponse($request->toArray(), "Success")
-            ]);
+            // $response = Http::post('https://dev.prim.my/api/devtrans', [
+            //     $this->sendResponse($request->toArray(), "Success")
+            // ]);
 
             // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
+            return Redirect::to('https://dev.prim.my/api/devtrans', array('data' => $request->toArray()));
             // dd($response);
         } else {
             $case = explode("_", $request->fpx_sellerExOrderNo);
@@ -565,7 +566,6 @@ class PayController extends AppBaseController
 
         // return $request;
         \Log::channel('PRIM_api')->info("API Request : "  . $request);
-        // return view('parent.fee.receipt');
-        return redirect()->route('Receipt view')->with( $request );
+        return view('parent.fee.receipt');
     }
 }
