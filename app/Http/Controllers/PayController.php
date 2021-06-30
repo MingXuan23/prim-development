@@ -463,6 +463,8 @@ class PayController extends AppBaseController
             $response = Http::post('https://dev.prim.my/api/devtrans', [
                 $this->sendResponse($request->toArray, "Success")
             ]);
+
+            dd($response);
         } else {
             $case = explode("_", $request->fpx_sellerExOrderNo);
             // $text = explode("/", $request->fpx_buyerIban);
