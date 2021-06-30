@@ -461,11 +461,11 @@ class PayController extends AppBaseController
     public function transactionReceipt(Request $request)
     {
         if ($request->fpx_buyerBankId == 'TEST0021') {
-            // $response = Http::post('https://dev.prim.my/api/devtrans', [
-            //     $this->sendResponse($request->toArray(), "Success")
-            // ]);
+            $response = Http::post('https://dev.prim.my/api/devtrans', [
+                $this->sendResponse($request->toArray(), "Success")
+            ]);
 
-            return Redirect::away('https://dev.prim.my/api/devtrans', [$request->toArray()]);
+            // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
             // dd($response);
         } else {
             $case = explode("_", $request->fpx_sellerExOrderNo);
