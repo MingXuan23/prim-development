@@ -464,7 +464,7 @@ class PayController extends AppBaseController
                 $this->sendResponse($request->toArray, "Success")
             ]);
 
-            dd($response);
+            // dd($response);
         } else {
             $case = explode("_", $request->fpx_sellerExOrderNo);
             // $text = explode("/", $request->fpx_buyerIban);
