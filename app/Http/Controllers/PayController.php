@@ -464,7 +464,7 @@ class PayController extends AppBaseController
             // $response = Http::post('https://dev.prim.my/api/devtrans', [
             //     $this->sendResponse($request->toArray(), "Success")
             // ]);
-            Redirect::away('https://dev.prim.my/api/devtrans')->with($request);
+            return Redirect::away('https://dev.prim.my/api/devtrans')->with($request);
         // dd($response);
         } else {
             $case = explode("_", $request->fpx_sellerExOrderNo);

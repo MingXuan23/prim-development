@@ -17,5 +17,4 @@ use Illuminate\Http\Request;
 //     return $request->user();
 // });
 
-Route::post('devtrans', 'PayController@devtrans')->name('devtrans');
-
+Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
