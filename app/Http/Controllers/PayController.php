@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Redirect;
 
 class PayController extends AppBaseController
 {
@@ -354,7 +355,7 @@ class PayController extends AppBaseController
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
 
-            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail       = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -460,11 +461,11 @@ class PayController extends AppBaseController
     public function transactionReceipt(Request $request)
     {
         if ($request->fpx_buyerBankId == 'TEST0021') {
-            $response = Http::post('https://dev.prim.my/api/devtrans', [
-                $this->sendResponse($request->toArray(), "Success")
-            ]);
-
-            // dd($response);
+            // $response = Http::post('https://dev.prim.my/api/devtrans', [
+            //     $this->sendResponse($request->toArray(), "Success")
+            // ]);
+            Redirect::away('https://dev.prim.my/api/devtrans')->with(['request' => $request]);
+        // dd($response);
         } else {
             $case = explode("_", $request->fpx_sellerExOrderNo);
             // $text = explode("/", $request->fpx_buyerIban);

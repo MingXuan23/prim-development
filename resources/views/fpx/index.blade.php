@@ -15,8 +15,10 @@
                                         <tr>
                                             <td height="164" align="center" class="main"><b>Payment Method via FPX</b>
                                                 <p>&nbsp;</p>
-                                                <input type="submit" style="cursor:hand" class="btn btn-primary"
-                                                    onclick="pay()" value="Click to Pay" />
+                                                <div><strong>You are being redirected to secure payment site in <span id="time">5</span> seconds</strong></div>
+
+                                                {{-- <input type="submit" style="cursor:hand" class="btn btn-primary"
+                                                    onclick="pay()" value="Click to Pay" /> --}}
                                                 <br>
                                                 <br>
                                                 <p> <img src="assets/images/FPXButton.PNG" border="2" /></p>
@@ -82,7 +84,6 @@
 
 @section('script')
 <script>
-    // console.log('hihi');
     var values = $("#form1").serialize();
     
     // function redirectFPX() {
@@ -91,21 +92,28 @@
     // }
     
     // setTimeout("redirectFPX();",3000);
+    var count = 5;
+    setInterval(function(){
+        count--;
+        document.getElementById('time').innerHTML = count;
+        if (count == 0) {
+            $('#form1').submit();
+            pay();
+        }
+    },1000);
 
     function pay(){
-        $.ajax({
-                url: "{{ route('trn') }}",
-                type: "post",
-                data: values ,
-                success: function (response) {
-                // You will get response from your PHP page (what you echo or print)
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.log(textStatus, errorThrown);
-                }
-            });
-
+    $.ajax({
+            url: "{{ route('trn') }}",
+            type: "post",
+            data: values ,
+            success: function (response) {
+            // You will get response from your PHP page (what you echo or print)
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log(textStatus, errorThrown);
+            }
+        });
     }
-    
 </script>
 @endsection
