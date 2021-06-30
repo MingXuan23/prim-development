@@ -24,5 +24,6 @@ class VerifyCsrfToken extends Middleware
         'https://uat.mepsfpx.com.my',
         'https://prim.my/transactionReceipt',
         'https://prim.my/paymentStatus',
+        'https://dev.prim.my/devtrans',
     ];
 }
