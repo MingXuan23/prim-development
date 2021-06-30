@@ -565,6 +565,7 @@ class PayController extends AppBaseController
 
         // return $request;
         \Log::channel('PRIM_api')->info("API Request : "  . $request);
-        return view('parent.fee.receipt');
+        // return view('parent.fee.receipt');
+        return redirect()->route('Receipt view')->with( $request );
     }
 }

@@ -179,3 +179,6 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
+
+
+Route::view('Receipt view','parent.fee.receipt')->name('Receipt view');
