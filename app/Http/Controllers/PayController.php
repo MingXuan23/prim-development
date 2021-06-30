@@ -558,11 +558,11 @@ class PayController extends AppBaseController
         // $donation = $this->donation->getDonationByTransactionName("Donation_23210315210448");
         // $organization = $this->organization->getOrganizationByDonationId(3);
         // dd($organization);
-        return view('parent.fee.receipt');
         // Log::
         // dd($request);
 
         // return $request;
         \Log::channel('PRIM_api')->info("API Request : "  . $request);
+        return view('parent.fee.receipt');
     }
 }
