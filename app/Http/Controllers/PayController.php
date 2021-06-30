@@ -461,7 +461,7 @@ class PayController extends AppBaseController
     {
         if ($request->fpx_buyerBankId == 'TEST0021') {
             $response = Http::post('https://dev.prim.my/api/devtrans', [
-                $this->sendResponse($request->toArray, "Success")
+                $this->sendResponse($request->toArray(), "Success")
             ]);
 
             // dd($response);
