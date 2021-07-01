@@ -473,7 +473,44 @@ class PayController extends AppBaseController
 
             // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
             // return Redirect::away('https://dev.prim.my/api/devtrans')->with($request->toArray());
-            dd($request);
+
+            $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+            $transaction->transac_no = $request->fpx_fpxTxnId;
+            $transaction->status = "Success";
+
+            $res_student = DB::table('student_fees')
+                ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
+                ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
+                ->select('student_fees.id as student_fees_id')
+                ->where('transactions.id', $transaction->id)
+                ->get();
+
+            $list = $res_student;
+
+            if ($transaction->save()) {
+
+                for ($i = 0; $i < count($list); $i++) {
+
+                    $res  = DB::table('student_fees')
+                        ->where('id', $list[$i]->student_fees_id)
+                        ->update(['status' => 'Paid']);
+                }
+
+                //call function 
+
+                if ($res) {
+
+                    // return view('parent.fee.receipt');
+
+                    // return view('fpx.tStatus', compact('request', 'user'));
+
+                    $this->getDetailReceipt($transaction->id);
+                } else {
+                    return view('errors.500');
+                }
+            }
+
+            // dd($request);
         } else {
             $case = explode("_", $request->fpx_sellerExOrderNo);
             // $text = explode("/", $request->fpx_buyerIban);
@@ -571,8 +608,43 @@ class PayController extends AppBaseController
         // dd($request);
 
         // return $request;
-        dd($request);
+        // dd($request);
         \Log::channel('PRIM_api')->info("API Request : "  . $request);
         return view('parent.fee.receipt');
     }
+
+    public function getDetailReceipt($id)
+    {
+        $userid = Auth::id();
+        $getstudent = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees', 'student_fees.class_student_id', '=', 'class_student.id')
+            ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
+            ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
+            ->select('students.id as studentid', 'students.nama as studentnama')
+            ->where('class_student.status', '1')
+            ->where('transactions.id', $id)
+            ->where('student_fees.', 'Paid')
+            ->get();
+
+        $getparent = DB::table('users')
+            ->where('id', $userid)
+            ->first();
+
+        $get_transaction = Transaction::where('id', $id)->first();
+
+        // $get_detail_fee = DB::table('transactions')
+        // ->join('fees_transactions', 'fees_transactions.transactions_id', '=', 'transactions.id')
+        // ->join('student_fees', 'student_fees.id', '=', 'fees_transactions.student_fees_id')
+        // ->join()
+
+        dd($getstudent);
+
+    }
+
+    public function viewReceipt()
+    {
+        return view('parent.fee.receipt');
+    }
+
 }
