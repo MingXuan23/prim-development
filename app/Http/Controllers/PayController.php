@@ -476,7 +476,7 @@ class PayController extends AppBaseController
                 switch ($case[0]) {
                     case 'School':
 
-                        // dd($request);
+                        dd($request);
 
                         // $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
                         // $user2 = User::find(Auth::id());
