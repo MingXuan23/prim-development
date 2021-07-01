@@ -2,7 +2,7 @@
 
 <div class="container" style="margin-top: 5%;">
     <form name="form1" id="form1" method="post"
-        action="{{ config('app.env') == 'production' ? config('app.PRODUCTION_AR_AD_URL') : config('app.UAT_AR_AD_URL') }}">
+        action="{{ $fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL')}}">
         @csrf
         <div class="card">
             <div class="card-body">
