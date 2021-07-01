@@ -128,6 +128,7 @@ Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('tra
 Route::get('successpay', 'PayController@successPay')->name('successpay');
 Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
 Route::get('feespay', 'PayController@fees_pay')->name('feespay');
+Route::get('receiptfee', 'PayController@viewReceipt')->name('receiptfee');
 
 Route::get('feesparent', 'FeesController@parentpay')->name('parentpay');
 
