@@ -504,7 +504,19 @@ class PayController extends AppBaseController
 
                     // return view('fpx.tStatus', compact('request', 'user'));
 
-                    return $this->getDetailReceipt($transaction->id);
+                    $getstudent = DB::table('students')
+                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                        ->join('student_fees', 'student_fees.class_student_id', '=', 'class_student.id')
+                        ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
+                        ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
+                        ->select('students.id as studentid', 'students.nama as studentnama')
+                        ->where('class_student.status', '1')
+                        ->where('transactions.id', $transaction->id)
+                        ->where('student_fees.', 'Paid')
+                        ->get();
+                        
+                    dd($getstudent);
+                    // return $this->getDetailReceipt($transaction->id);
                 } else {
                     return view('errors.500');
                 }
@@ -639,12 +651,10 @@ class PayController extends AppBaseController
         // ->join()
 
         dd($getstudent);
-
     }
 
     public function viewReceipt()
     {
         return view('parent.fee.receipt');
     }
-
 }
