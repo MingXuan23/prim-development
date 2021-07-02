@@ -265,7 +265,7 @@
       });
     }); //Parameter
    
-    ///*************** function for if different organization *****************
+    
     function checkOrganization(element) {
         var id = document.getElementById(element.id);
         var name = document.getElementsByName(element.name);
