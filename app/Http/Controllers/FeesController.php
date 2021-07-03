@@ -28,6 +28,9 @@ class FeesController extends Controller
     public function parentpay()
     {
         $userid = Auth::id();
+
+        // ************************* get list dependent from user id  *******************************
+
         $list = DB::table('organizations')
             ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
             ->join('users', 'users.id', '=', 'organization_user.user_id')
@@ -49,6 +52,7 @@ class FeesController extends Controller
             ->orderBy('classes.nama')
             ->get();
 
+        
         $feesid     = DB::table('fees')
             ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
             ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
@@ -61,6 +65,9 @@ class FeesController extends Controller
 
         $getfees    = DB::table('fees')->where('id', $feesid->feeid)->first();
 
+
+        // ************************* get list category  *******************************
+
         $getcat = DB::table('fees')
             ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
             ->join('details', 'details.id', '=', 'fees_details.details_id')
@@ -70,6 +77,8 @@ class FeesController extends Controller
             ->orderBy('categories.id')
             ->get();
 
+        // ************************* get details of fee  *******************************
+// join table student fees where debt
         $getdetail  = DB::table('fees')
             ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
             ->join('details', 'details.id', '=', 'fees_details.details_id')
