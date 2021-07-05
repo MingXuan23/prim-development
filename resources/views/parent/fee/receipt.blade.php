@@ -94,6 +94,10 @@
                             <span>{{ $student->feename }}</span>
                         </center>
 
+                        @foreach ($getcategory as $category)
+
+                        <span>{{ $category->catname }}</span>
+
                         <table class="table table-bordered table-striped" style="">
                             <tr>
                                 <th>Bil</th>
@@ -102,21 +106,25 @@
                                 <th>Amaun per item</th>
                                 <th>Amaun</th>
                             </tr>
-                            @foreach ($getdetail->where('studentid', $student->studentid) as $item)
+                            @foreach ($getdetail->where('studentid', $student->studentid)->where('catid',
+                            $category->catid) as $item)
                             <tr>
                                 <td> {{ $loop->iteration }}</td>
                                 <td>{{ $item->detailsname }}</td>
                                 <td>{{ $item->quantity }}</td>
-                                <td>{{ $item->detailsprice }}</td>
-                                <td>{{ $item->totalamount }}</td>
+                                <td> RM{{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
+                                <td> RM{{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
                             </tr>
                             @endforeach
 
                         </table>
+                        @endforeach
+
+
 
                         @endforeach
 
-                        
+
                     </div>
                 </div>
             </div>
