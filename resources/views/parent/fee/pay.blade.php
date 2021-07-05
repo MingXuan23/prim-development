@@ -199,7 +199,9 @@ catch(Exception $e){
             font-weight: bolder;
         }
     </style>
-    <title>Pembayaran</title>
+    <title>PRiM | Pembayaran</title>
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
+
 </head>
 
 <body>
