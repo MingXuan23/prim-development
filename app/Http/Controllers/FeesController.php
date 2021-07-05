@@ -81,9 +81,11 @@ class FeesController extends Controller
 // join table student fees where debt
         $getdetail  = DB::table('fees')
             ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+            ->join('student_fees', 'student_fees.fees_details_id', '=', 'fees_details.id')
             ->join('details', 'details.id', '=', 'fees_details.details_id')
             ->join('categories', 'categories.id', '=', 'details.category_id')
             ->select('fees.id as feeid', 'categories.id as cid', 'categories.nama as cnama', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'details.totalamount as totalamount', 'details.id as did')
+            ->where('student_fees.status', 'Debt')
             ->orderBy('details.nama')
             ->get();
         // return view('pentadbir.fee.pay', compact('getfees', 'getcat', 'getdetail'));
