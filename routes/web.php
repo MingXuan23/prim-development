@@ -38,7 +38,7 @@ Route::group(['prefix' => 'derma'], function () {
 });
 
 //landing fees page route
-Route::group(['prefix' => 'fees'], function () {
+Route::group(['prefix' => 'yuran'], function () {
     Route::get('', 'LandingPageController@indexFees');
 });
 // feedback
