@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta content="Parental Relationship Information Management" name="description" />
+    <meta content="UTeM" name="author" />
     <title>PRiM | Resit Pembayaran</title>
 
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
@@ -128,13 +129,15 @@
                             @endforeach
 
                             <div class="pt-3" style="font-size: 18px">
-                                Jumlah Bayaran RM{{  number_format((float)$get_transaction->amount, 2, '.', '') }}
+                                <b>
+                                    Jumlah Bayaran RM{{  number_format((float)$get_transaction->amount, 2, '.', '') }}
+                                </b>
                             </div>
                             <span><i>*Termasuk cas yang dikenakan oleh organisasi</i></span>
 
                             <div class="col-12 pt-5 text-center">
-                                <button class="btn btn-primary p-2 w-10 mx-2 btn-fill"
-                                    style="font-size:18px" onclick="window.print();">
+                                <button class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px"
+                                    onclick="window.print();">
                                     <span class="mdi mdi-file-pdf"> Print </span>
                                 </button>
                                 <a href="/home">
