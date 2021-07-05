@@ -628,7 +628,7 @@ class PayController extends AppBaseController
             ->distinct()
             ->where('class_student.status', '1')
             ->where('transactions.id', $id)
-            ->where('student_fees.', 'Paid')
+            ->where('student_fees.status', 'Paid')
             ->get();
 
         // details parents
@@ -651,7 +651,7 @@ class PayController extends AppBaseController
             ->select('students.id as studentid', 'students.nama as studentnama')
             ->where('class_student.status', '1')
             ->where('transactions.id', $id)
-            ->where('student_fees.', 'Paid')
+            ->where('student_fees.status', 'Paid')
             ->get();
 
         $get_fee_organization = DB::table('transactions')
