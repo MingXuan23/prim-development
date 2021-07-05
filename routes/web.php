@@ -36,6 +36,11 @@ Route::group(['prefix' => 'derma'], function () {
     Route::get('/organization-type', 'LandingPageController@getOrganizationDatatable')->name('landingpage.donation.organization');
     Route::get('/organization-donation', 'LandingPageController@getDonationDatatable')->name('landingpage.donation.donation');
 });
+
+//landing fees page route
+Route::group(['prefix' => 'yuran'], function () {
+    Route::get('', 'LandingPageController@indexFees');
+});
 // feedback
 Route::post('feedback', 'LandingPageController@storeMessage')->name('feedback.store');
 
