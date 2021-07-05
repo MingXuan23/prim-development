@@ -649,7 +649,7 @@ class PayController extends AppBaseController
             ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
             ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
             ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
-            ->select('students.id as studentid', 'students.nama as studentnama', 'fees.id as feeid', 'fees.nama as feename',)
+            ->select('students.id as studentid', 'students.nama as studentnama', 'fees.id as feeid', 'fees.nama as feename')
             ->distinct()
             ->where('class_student.status', '1')
             ->where('transactions.id', $id)
@@ -657,6 +657,14 @@ class PayController extends AppBaseController
             ->orderBy('fees.nama')
             ->get();
 
+        // list category by fees
+        $getcategory = DB::table('categories')
+            ->join('details', 'details.category_id', '=', 'categories.id')
+            ->join('fees_details', 'fees_details.details_id', '=', 'details.id')
+            ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
+            ->select('categories.nama as catname', 'fees.id as feeid', 'fees.nama as feename')
+            ->orderBy('categories.id as catid', 'categories.nama as catname')
+            ->get();
 
         // get detail item by transaction
         $getdetail = DB::table('students')
@@ -667,7 +675,8 @@ class PayController extends AppBaseController
             ->join('fees_details', 'fees_details.id', '=', 'student_fees.fees_details_id')
             ->join('details', 'details.id', '=', 'fees_details.details_id')
             ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
-            ->select('students.id as studentid', 'students.nama as studentnama', 'details.nama as detailsname', 'details.price as detailsprice', 'details.quantity as quantity', 'details.totalamount as totalamount')
+            ->join('categories', 'categories.id', '=', 'details.category_id')
+            ->select('students.id as studentid', 'students.nama as studentnama', 'details.nama as detailsname', 'details.price as detailsprice', 'details.quantity as quantity', 'details.totalamount as totalamount', 'categories.id as catid')
             ->where('class_student.status', '1')
             ->where('transactions.id', $id)
             ->where('student_fees.status', 'Paid')
@@ -676,7 +685,7 @@ class PayController extends AppBaseController
 
 
 
-        return view('parent.fee.receipt', compact('getparent', 'get_transaction', 'get_fee_organization', 'getstudent', 'getdetail'));
+        return view('parent.fee.receipt', compact('getparent', 'get_transaction', 'get_fee_organization', 'getcategory', 'getstudent', 'getdetail'));
     }
 
     public function viewReceipt()
