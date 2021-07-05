@@ -70,12 +70,15 @@
                                 <td class="py-2">:</td>
                                 <td class="py-2">{{ $getparent->name }}</td>
                                 <td class="py-2" colspan="3"></td>
-                                <td class="py-2">Jenis</td>
+                                <td class="py-2">No. Kad Pengenalan</td>
                                 <td class="py-2">:</td>
-                                <td class="py-2">Bapa</td>
+                                <td class="py-2">{{ $getparent->icno }}</td>
                             </tr>
-                            <tr style="background-color:#e9ecef">
-                                <th colspan="9" class="text-center">{{ $get_fee_organization->oname }}</th>
+                            <tr>
+                                <td class="py-2">Bayaran Kepada</td>
+                                <td class="py-2">:</td>
+                                <td class="py-2">{{ $get_fee_organization->oname }}</td>
+                                <td class="py-2" colspan="3"></td>
                             </tr>
                             <tr style="background-color:#e9ecef">
                                 <th colspan="9" class="text-center">Maklumat Yuran</th>
@@ -99,21 +102,23 @@
                         <span>{{ $category->catname }}</span>
 
                         <table class="table table-bordered table-striped" style="">
-                            <tr>
-                                <th>Bil</th>
+                            <tr style="text-align: center">
+                                <th style="width:3%">Bil</th>
                                 <th>Item</th>
                                 <th>Kuantiti</th>
-                                <th>Amaun per item</th>
-                                <th>Amaun</th>
+                                <th>Amaun per item (RM)</th>
+                                <th>Amaun (RM)</th>
                             </tr>
                             @foreach ($getdetail->where('studentid', $student->studentid)->where('catid',
                             $category->catid) as $item)
                             <tr>
-                                <td> {{ $loop->iteration }}</td>
+                                <td style="text-align: center"> {{ $loop->iteration }}.</td>
                                 <td>{{ $item->detailsname }}</td>
-                                <td>{{ $item->quantity }}</td>
-                                <td> RM{{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
-                                <td> RM{{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
+                                <td style="text-align: center">{{ $item->quantity }}</td>
+                                <td style="text-align: center">
+                                    RM{{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
+                                <td style="text-align: center">
+                                    RM{{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
                             </tr>
                             @endforeach
 
