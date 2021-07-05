@@ -662,8 +662,8 @@ class PayController extends AppBaseController
             ->join('details', 'details.category_id', '=', 'categories.id')
             ->join('fees_details', 'fees_details.details_id', '=', 'details.id')
             ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
-            ->select('categories.nama as catname', 'fees.id as feeid', 'fees.nama as feename')
-            ->orderBy('categories.id as catid', 'categories.nama as catname')
+            ->select('categories.id as catid', 'categories.nama as catname', 'fees.id as feeid', 'fees.nama as feename')
+            ->orderBy('categories.nama as catname')
             ->get();
 
         // get detail item by transaction
