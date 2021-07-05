@@ -86,12 +86,14 @@
                                     </td>
                                 </tr> --}}
                         </table>
+                        @foreach ($getstudent as $student)
                         <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
-                            Syuhaidi Bin Halim
+                            {{ $student->studentnama }}
                         </div>
                         <center class="my-2">
-                            <span>Yuran Tingkatan 4</span>
+                            <span>{{ $student->feename }}</span>
                         </center>
+
                         <table class="table table-bordered table-striped" style="">
                             <tr>
                                 <th>Bil</th>
@@ -100,36 +102,21 @@
                                 <th>Amaun per item</th>
                                 <th>Amaun</th>
                             </tr>
+                            @foreach ($getdetail->where('studentid', $student->studentid) as $item)
                             <tr>
-                                <td>1</td>
-                                <td>Buku Latihan</td>
-                                <td>4</td>
-                                <td>RM 5.00</td>
-                                <td>RM 20.00</td>
+                                <td> {{ $loop->iteration }}</td>
+                                <td>{{ $item->detailsname }}</td>
+                                <td>{{ $item->quantity }}</td>
+                                <td>{{ $item->detailsprice }}</td>
+                                <td>{{ $item->totalamount }}</td>
                             </tr>
+                            @endforeach
+
                         </table>
-                        <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
-                            Iqmal Rizal
-                        </div>
-                        <center class="my-2">
-                            <span>Yuran Tingkatan 3</span>
-                        </center>
-                        <table class="table table-bordered table-striped" style="">
-                            <tr>
-                                <th>Bil</th>
-                                <th>Item</th>
-                                <th>Kuantiti</th>
-                                <th>Amaun per item</th>
-                                <th>Amaun</th>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>Buku Latihan</td>
-                                <td>4</td>
-                                <td>RM 5.00</td>
-                                <td>RM 20.00</td>
-                            </tr>
-                        </table>
+
+                        @endforeach
+
+                        
                     </div>
                 </div>
             </div>
