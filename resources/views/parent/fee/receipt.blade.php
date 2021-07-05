@@ -24,134 +24,136 @@
 </head>
 
 <body>
-
-    <div class="row mt-3">
-        <div class="col-12">
-            <div class="card mb-1">
-                <div class="card-body py-5">
-                    <div class="row">
-                        <div class="col-2 p-0">
-                            <center>
-                                <img src="{{ URL::asset('assets/images/logo/prim-logo.svg') }}" height="80" alt="" />
-                            </center>
-                        </div>
-                        <div class="col-6 p-0">
-                            <h4>PRIM</h4>
-                            <p>Jalan Hang Tuah Jaya,
-                                <br />
-                                76100 Durian Tunggal, Melaka
-                            </p>
-                        </div>
-                        <div class="col-4">
-                            <table style="width: 100%">
-                                <tr style="background-color:#e9ecef">
-                                    <th colspan="6" class="text-center">Resit</th>
-                                </tr>
-                                <tr>
-                                    <td>No Resit</td>
-                                    <td style="width: 50px">:</td>
-                                    <td>{{ $get_transaction->description }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Tarikh</td>
-                                    <td style="width: 50px">:</td>
-                                    <td>{{ $get_transaction->datetime_created->format('j M Y H:i:s A')}}</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-12 pt-3">
-                            <table style="width:100%" class="infotbl">
-                                <tr style="background-color:#e9ecef">
-                                    <th colspan="9" class="text-center">Maklumat Penjaga</th>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Nama</td>
-                                    <td class="py-2">:</td>
-                                    <td class="py-2">{{ $getparent->name }}</td>
-                                    <td class="py-2" colspan="3"></td>
-                                    <td class="py-2">No. Kad Pengenalan</td>
-                                    <td class="py-2">:</td>
-                                    <td class="py-2">{{ $getparent->icno }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="py-2">Bayaran Kepada</td>
-                                    <td class="py-2">:</td>
-                                    <td class="py-2">{{ $get_fee_organization->oname }}</td>
-                                    <td class="py-2" colspan="3"></td>
-                                </tr>
-                                <tr style="background-color:#e9ecef">
-                                    <th colspan="9" class="text-center">Maklumat Yuran</th>
-                                </tr>
-                                {{-- <tr style="border-bottom:2px solid #e0e0e0">
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card mb-1">
+                    <div class="card-body py-5">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <center>
+                                    <img src="{{ URL::asset('assets/images/logo/prim-logo.svg') }}" height="80"
+                                        alt="" />
+                                </center>
+                            </div>
+                            <div class="col-6 p-0">
+                                <h4>PRIM</h4>
+                                <p>Jalan Hang Tuah Jaya,
+                                    <br />
+                                    76100 Durian Tunggal, Melaka
+                                </p>
+                            </div>
+                            <div class="col-4">
+                                <table style="width: 100%">
+                                    <tr style="background-color:#e9ecef">
+                                        <th colspan="6" class="text-center">Resit</th>
+                                    </tr>
+                                    <tr>
+                                        <td>No Resit</td>
+                                        <td style="width: 50px">:</td>
+                                        <td>{{ $get_transaction->description }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Tarikh</td>
+                                        <td style="width: 50px">:</td>
+                                        <td>{{ $get_transaction->datetime_created->format('j M Y H:i:s A')}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-12 pt-3">
+                                <table style="width:100%" class="infotbl">
+                                    <tr style="background-color:#e9ecef">
+                                        <th colspan="9" class="text-center">Maklumat Penjaga</th>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Nama</td>
+                                        <td class="py-2">:</td>
+                                        <td class="py-2">{{ $getparent->name }}</td>
+                                        <td class="py-2" colspan="3"></td>
+                                        <td class="py-2">No. Kad Pengenalan</td>
+                                        <td class="py-2">:</td>
+                                        <td class="py-2">{{ $getparent->icno }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2">Bayaran Kepada</td>
+                                        <td class="py-2">:</td>
+                                        <td class="py-2">{{ $get_fee_organization->oname }}</td>
+                                        <td class="py-2" colspan="3"></td>
+                                    </tr>
+                                    <tr style="background-color:#e9ecef">
+                                        <th colspan="9" class="text-center">Maklumat Yuran</th>
+                                    </tr>
+                                    {{-- <tr style="border-bottom:2px solid #e0e0e0">
                                         <td colspan="9" class="pt-2" style="font-size: 18px">
                                             Syuhaidi Bin Halim
                                         </td>
                                     </tr> --}}
-                            </table>
-                            @foreach ($getstudent as $student)
-                            <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
-                                {{ $student->studentnama }}
-                            </div>
-                            <center class="my-2">
-                                <span>{{ $student->feename }}</span>
-                            </center>
+                                </table>
+                                @foreach ($getstudent as $student)
+                                <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
+                                    {{ $student->studentnama }}
+                                </div>
+                                <center class="my-2">
+                                    <span>{{ $student->feename }}</span>
+                                </center>
 
-                            @foreach ($getcategory as $category)
+                                @foreach ($getcategory as $category)
 
-                            <span>{{ $category->catname }}</span>
+                                <span>{{ $category->catname }}</span>
 
-                            <table class="table table-bordered table-striped" style="">
-                                <tr style="text-align: center">
-                                    <th style="width:3%">Bil</th>
-                                    <th>Item</th>
-                                    <th>Kuantiti</th>
-                                    <th>Amaun per item (RM)</th>
-                                    <th>Amaun (RM)</th>
-                                </tr>
-                                @foreach ($getdetail->where('studentid', $student->studentid)->where('catid',
-                                $category->catid) as $item)
-                                <tr>
-                                    <td style="text-align: center"> {{ $loop->iteration }}.</td>
-                                    <td>{{ $item->detailsname }}</td>
-                                    <td style="text-align: center">{{ $item->quantity }}</td>
-                                    <td style="text-align: center">
-                                        {{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
-                                    <td style="text-align: center">
-                                        {{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
-                                </tr>
+                                <table class="table table-bordered table-striped" style="">
+                                    <tr style="text-align: center">
+                                        <th style="width:3%">Bil</th>
+                                        <th>Item</th>
+                                        <th>Kuantiti</th>
+                                        <th>Amaun per item (RM)</th>
+                                        <th>Amaun (RM)</th>
+                                    </tr>
+                                    @foreach ($getdetail->where('studentid', $student->studentid)->where('catid',
+                                    $category->catid) as $item)
+                                    <tr>
+                                        <td style="text-align: center"> {{ $loop->iteration }}.</td>
+                                        <td>{{ $item->detailsname }}</td>
+                                        <td style="text-align: center">{{ $item->quantity }}</td>
+                                        <td style="text-align: center">
+                                            {{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
+                                        <td style="text-align: center">
+                                            {{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
+                                    </tr>
+                                    @endforeach
+
+                                </table>
                                 @endforeach
 
-                            </table>
-                            @endforeach
 
 
+                                @endforeach
 
-                            @endforeach
+                                <div class="pt-3" style="font-size: 18px">
+                                    <b>
+                                        Jumlah Bayaran
+                                        RM{{  number_format((float)$get_transaction->amount, 2, '.', '') }}
+                                    </b>
+                                </div>
+                                <span><i>*Termasuk cas yang dikenakan oleh organisasi</i></span>
 
-                            <div class="pt-3" style="font-size: 18px">
-                                <b>
-                                    Jumlah Bayaran RM{{  number_format((float)$get_transaction->amount, 2, '.', '') }}
-                                </b>
-                            </div>
-                            <span><i>*Termasuk cas yang dikenakan oleh organisasi</i></span>
-
-                            <div class="col-12 pt-5 text-center">
-                                <button class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px"
-                                    onclick="window.print();">
-                                    <span class="mdi mdi-file-pdf"> Print </span>
-                                </button>
-                                <a href="/home">
-                                    <button class="btn btn-danger p-2 w-10 mx-2" style="font-size:18px;">
-                                        <span class="mdi mdi-chevron-left-circle"> Kembali</span>
+                                <div class="col-12 pt-5 text-center">
+                                    <button class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px"
+                                        onclick="window.print();">
+                                        <span class="mdi mdi-file-pdf"> Print </span>
                                     </button>
-                                </a>
+                                    <a href="/home">
+                                        <button class="btn btn-danger p-2 w-10 mx-2" style="font-size:18px;">
+                                            <span class="mdi mdi-chevron-left-circle"> Kembali</span>
+                                        </button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 </body>
 
