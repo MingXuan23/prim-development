@@ -116,9 +116,9 @@
                                 <td>{{ $item->detailsname }}</td>
                                 <td style="text-align: center">{{ $item->quantity }}</td>
                                 <td style="text-align: center">
-                                    RM{{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
+                                    {{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
                                 <td style="text-align: center">
-                                    RM{{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
+                                    {{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
                             </tr>
                             @endforeach
 
