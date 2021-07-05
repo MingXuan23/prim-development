@@ -504,19 +504,7 @@ class PayController extends AppBaseController
 
                     // return view('fpx.tStatus', compact('request', 'user'));
 
-                    $getstudent = DB::table('students')
-                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                        ->join('student_fees', 'student_fees.class_student_id', '=', 'class_student.id')
-                        ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
-                        ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
-                        ->select('students.id as studentid', 'students.nama as studentnama')
-                        ->where('class_student.status', '1')
-                        ->where('transactions.id', $transaction->id)
-                        ->where('student_fees.', 'Paid')
-                        ->get();
-                        
-                    dd($getstudent);
-                    // return $this->getDetailReceipt($transaction->id);
+                    return $this->getDetailReceipt($transaction->id);
                 } else {
                     return view('errors.500');
                 }
@@ -627,30 +615,59 @@ class PayController extends AppBaseController
 
     public function getDetailReceipt($id)
     {
+        // parent user id
         $userid = Auth::id();
+
+        // list student by transaction
         $getstudent = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees', 'student_fees.class_student_id', '=', 'class_student.id')
             ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
             ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
             ->select('students.id as studentid', 'students.nama as studentnama')
+            ->distinct()
             ->where('class_student.status', '1')
             ->where('transactions.id', $id)
             ->where('student_fees.', 'Paid')
             ->get();
 
+        // details parents
         $getparent = DB::table('users')
             ->where('id', $userid)
             ->first();
 
+        // details transaction
         $get_transaction = Transaction::where('id', $id)->first();
 
-        // $get_detail_fee = DB::table('transactions')
-        // ->join('fees_transactions', 'fees_transactions.transactions_id', '=', 'transactions.id')
-        // ->join('student_fees', 'student_fees.id', '=', 'fees_transactions.student_fees_id')
-        // ->join()
+        // get detail item by transaction
+        $getdetail = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees', 'student_fees.class_student_id', '=', 'class_student.id')
+            ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
+            ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
+            ->join('fees_details', 'fees_details.id', '=', 'student_fees.fees_details_id')
+            ->join('details', 'details.id', '=', 'fees_details.details_id')
+            ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
+            ->select('students.id as studentid', 'students.nama as studentnama')
+            ->where('class_student.status', '1')
+            ->where('transactions.id', $id)
+            ->where('student_fees.', 'Paid')
+            ->get();
 
-        dd($getstudent);
+        $get_fee_organization = DB::table('transactions')
+            ->join('fees_transactions', 'fees_transactions.transactions_id', '=', 'transactions.id')
+            ->join('student_fees', 'student_fees.id', '=', 'fees_transactions.student_fees_id')
+            ->join('fees_details', 'fees_details.id', '=', 'student_fees.fees_details_id')
+            ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
+            ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_fees.class_organization_id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->select('fees.id as feeid', 'fees.nama as feename', 'organizations.id as oid', 'organizations.nama as oname')
+            ->where('transactions.id', $id)
+            ->first();
+
+
+        return view('parent.fee.receipt', compact('getparent', 'get_transaction', 'get_fee_organization'));
     }
 
     public function viewReceipt()
