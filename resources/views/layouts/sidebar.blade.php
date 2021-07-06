@@ -157,6 +157,12 @@
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
 
                         @role('Superadmin|Pentadbir|Guru')
+                        {{-- <li>
+                            <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
+                                <i class="fas fa-list-ul"></i>
+                                <span>Laporan</span>
+                            </a>
+                        </li> --}}
                         <li>
                             <a href="{{ route('category.index') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-list-ul"></i>
@@ -180,49 +186,49 @@
                         </li>
                         @endrole
 
-                        @role('Superadmin|Ibu|Bapa|Penjaga')
+                        {{-- @role('Superadmin|Ibu|Bapa|Penjaga')
                         <li>
                             <a href="{{ route('feesparentdev') }}" class=" waves-effect">
-                                <i class="far fa-credit-card"></i>
-                                <span>Test Bayar</span>
-                            </a>
-                        </li>
-                        @endrole
-                    </ul>
+                        <i class="far fa-credit-card"></i>
+                        <span>Test Bayar</span>
+                        </a>
                 </li>
-                @endrole
+                @endrole --}}
+            </ul>
+            </li>
+            @endrole
 
-                {{-- @role('Superadmin|Pentadbir|Ibu|Bapa|Penjaga')
+            {{-- @role('Superadmin|Pentadbir|Ibu|Bapa|Penjaga')
                 <li>
                     <a href="{{ route('parent.dependent') }}" class=" waves-effect">
-                        <i class="fas fa-child"></i>
-                        <span>Carian Tanggungan</span>
-                    </a>
-                </li>
-                @endrole --}}
+            <i class="fas fa-child"></i>
+            <span>Carian Tanggungan</span>
+            </a>
+            </li>
+            @endrole --}}
 
 
 
-                {{-- @role('Superadmin|Pentadbir|Guru')
+            {{-- @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('chat-user') }}" class=" waves-effect">
-                        <i class="mdi mdi-chat-outline"></i>
-                        <span>Chat</span>
-                    </a>
-                </li>
-                @endrole --}}
+            <i class="mdi mdi-chat-outline"></i>
+            <span>Chat</span>
+            </a>
+            </li>
+            @endrole --}}
 
-                {{-- @role('Superadmin|Ibu|Bapa|Penjaga')
+            {{-- @role('Superadmin|Ibu|Bapa|Penjaga')
                 <li>
                     <a href="{{ route('billIndex') }}" class=" waves-effect">
-                        <i class="mdi"></i>
-                        <span>Bill Design</span>
-                    </a>
-                </li>
-                @endrole --}}
+            <i class="mdi"></i>
+            <span>Bill Design</span>
+            </a>
+            </li>
+            @endrole --}}
 
 
-                <!-- <li>
+            <!-- <li>
                     <a href="" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Derma</span>

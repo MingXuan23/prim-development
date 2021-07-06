@@ -85,6 +85,11 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('year', 'FeesController@fetchYear')->name('fees.fetchYear');
     Route::post('class', 'FeesController@fetchClass')->name('fees.fetchClass');
     Route::get('list', 'FeesController@getFeesDatatable')->name('fees.getFeesDatatable');
+    Route::get('report', 'FeesController@feesReport')->name('fees.report');
+    Route::get('/getTransaction', 'FeesController@getTransactionByOrganizationIdAndStatus')->name('fees.get_transaction');
+    Route::get('/latestTransaction', 'FeesController@getLatestTransaction')->name('fees.latest_transaction');
+    Route::get('/totalCatA', 'FeesController@getTotalCatA')->name('fees.totalCatA');
+    Route::get('/totalCatB', 'FeesController@getTotalCatB')->name('fees.totalCatB');
 });
 
 Route::group(['prefix' => 'parent'], function () {
