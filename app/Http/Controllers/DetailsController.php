@@ -78,12 +78,12 @@ class DetailsController extends Controller
 
         // price must in decimal
         
-        $no = (doubleval($request->get('price')));
-        $total = $no * $request->get('quantity');
+        $price = (doubleval($request->get('price')));
+        $total = $price * $request->get('quantity');
         // dd($total);
         $detail = new Detail([
             'nama'         =>  $request->get('name'),
-            'price'        =>  $request->get('price'),
+            'price'        =>  $price,
             'quantity'     =>  $request->get('quantity'),
             'totalamount'  =>  $total,
             'category_id'  =>  $request->get('cat'),
