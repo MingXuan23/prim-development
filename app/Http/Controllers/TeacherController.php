@@ -63,9 +63,9 @@ class TeacherController extends Controller
 
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required|numeric|unique:users',
+            'icno'          =>  'required|unique:users',
             'email'         =>  'required|email|unique:users',
-            'telno'         =>  'required|numeric',
+            'telno'         =>  'required',
             'organization'  =>  'required',
         ]);
 
@@ -139,9 +139,9 @@ class TeacherController extends Controller
 
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required|numeric|unique:users,icno,' . $uid->id,
+            'icno'          =>  'required|unique:users,icno,' . $uid->id,
             'email'         =>  'required|unique:users,email,' . $uid->id,
-            'telno'         =>  'required|numeric',
+            'telno'         =>  'required',
         ]);
 
         $teacherupdate    = DB::table('users')
