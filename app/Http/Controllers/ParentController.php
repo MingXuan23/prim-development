@@ -185,7 +185,7 @@ class ParentController extends Controller
         $rolename = OrganizationRole::find($roles);
 
         $user->assignRole($rolename->nama);
-        return redirect('/parent')->with('success', 'New dependents has been added successfully');
+        return redirect('dependent/'.$userId)->with('success', 'New dependents has been added successfully');
     }
 
     public function show($id)
