@@ -49,9 +49,11 @@ class FeesController extends AppBaseController
             ->where([
                 ['users.id', $userid],
             ])
-            ->orWhere('organization_roles.id', '=', 6)
-            ->orWhere('organization_roles.id', '=', 7)
-            ->orWhere('organization_roles.id', '=', 8)
+            ->where(function ($query) {
+                $query->where('organization_roles.id', '=', 6)
+                    ->orWhere('organization_roles.id', '=', 7)
+                    ->orWhere('organization_roles.id', '=', 8);
+            })
             ->orderBy('classes.nama')
             ->get();
 
