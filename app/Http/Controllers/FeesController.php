@@ -427,8 +427,17 @@ class FeesController extends AppBaseController
         if (Auth::user()->hasRole('Superadmin')) {
 
             return Organization::all();
+        } else if (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru')) {
+
+            // user role pentadbir n guru 
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId)->Where(function ($query) {
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5);
+                });
+            })->get();
         } else {
-            // user role guru 
+            // user role ibu bapa
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->where('role_id', '6')->OrWhere('role_id', '7')->OrWhere('role_id', '8');
             })->get();
