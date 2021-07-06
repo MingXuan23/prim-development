@@ -63,7 +63,7 @@
             </ol>
         </div>
 
-        <div class="col-md-12">
+        {{-- <div class="col-md-12">
             <div class="card card-primary">
 
                 {{csrf_field()}}
@@ -82,7 +82,7 @@
 
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <div class="col-md-12">
             <div class="row">
