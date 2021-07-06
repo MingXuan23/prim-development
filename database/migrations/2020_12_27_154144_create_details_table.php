@@ -15,10 +15,10 @@ class CreateDetailsTable extends Migration
     {
         Schema::create('details', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('nama')->nullable();
-            $table->integer('price')->nullable();
-            $table->integer('quantity')->nullable();
+            $table->string('nama')->nullable();           
+            $table->double('price', 8, 2)->nullable();
 
+            $table->integer('quantity')->nullable();
             $table->double('totalamount', 8, 2)->nullable();
 
             $table->unsignedBigInteger('category_id');

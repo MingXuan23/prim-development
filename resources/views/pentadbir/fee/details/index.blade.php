@@ -71,7 +71,7 @@
                         <td>{{ $loop->iteration }}.</td>
                         <td>{{ $row2->dnama }}</td>
                         <td>{{ $row2->quantity }}</td>
-                        <td>{{ $row2->price }}</td>
+                        <td>{{ number_format( $row2->price, 2)  }}</td>
                         <td>{{ number_format($row2->totalamount, 2)  }}</td>
                         <td>
                             <div class="d-flex justify-content-center">
@@ -88,7 +88,8 @@
                     <tr>
                         <td></td>
                         <td colspan="3"><b>Jumlah</b> </td>
-                        <td><b>{{ number_format($getdetail->where('cid', $row->cid)->sum('totalamount'), 2)  }}</b> </td>
+                        <td><b>{{ number_format($getdetail->where('cid', $row->cid)->sum('totalamount'), 2)  }}</b>
+                        </td>
                         <td></td>
                     </tr>
                 </table>
