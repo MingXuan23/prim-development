@@ -40,7 +40,7 @@
 
                 <div class="form-group">
                     <label>Nombor Kad Pengenalan</label>
-                    <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan" max="12"
+                    <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan"
                         value="{{$teacher->icno}}">
                 </div>
 
@@ -66,7 +66,7 @@
 
                 <div class="form-group">
                     <label>No Telefon</label>
-                    <input type="text" name="telno" class="form-control" placeholder="No Telefon" max="11"
+                    <input type="text" id="telno" name="telno" class="form-control" placeholder="No Telefon" max="11"
                         value="{{$teacher->telno}}">
                 </div>
                 <div class="form-group mb-0">
@@ -92,4 +92,12 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#icno').mask('000000-00-0000');
+        $('#telno').mask('+600000000000');
+
+    });
+</script>
 @endsection
