@@ -41,7 +41,7 @@ class DetailsController extends Controller
             ->get();
 
         // dd($getdetail);
-        return view('pentadbir.fee.details.index', compact('getfees', 'getcat', 'getdetail'));
+        return view('details.index', compact('getfees', 'getcat', 'getdetail'));
     }
 
     public function create(Request $request)
@@ -51,7 +51,7 @@ class DetailsController extends Controller
         $getfees = $request->id;
         $cat = DB::table('categories')->get();
 
-        return view('pentadbir.fee.details.add', compact('cat', 'getfees'));
+        return view('details.add', compact('cat', 'getfees'));
     }
 
     public function store(Request $request)
