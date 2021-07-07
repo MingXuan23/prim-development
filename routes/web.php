@@ -98,6 +98,12 @@ Route::group(['prefix' => 'parent'], function () {
     Route::post('dependent', 'ParentController@storeDependent')->name('parent.storeDependent');
 });
 
+Route::group(['prefix' => 'category'], function () {
+    Route::get('list', 'CategoryController@getCategoryDatatable')->name('category.getCategoryDatatable');
+    Route::get('/{id}/getDetails', 'CategoryController@getCategoryDetails')->name('category.getCategoryDetails');
+    Route::get('getDetailsDT', 'CategoryController@getCategoryDetailsDatatable')->name('category.getCategoryDetailsDatatable');
+});
+
 Route::group(['prefix' => 'activity'], function () {
     Route::get('list', 'ActivityController@getActivityDatatable')->name('ActivityDT');
 });
