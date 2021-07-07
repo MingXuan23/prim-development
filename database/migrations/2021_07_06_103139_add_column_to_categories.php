@@ -15,6 +15,8 @@ class AddColumnToCategories extends Migration
     {
         Schema::table('categories', function (Blueprint $table) {
             //
+            $table->double('totalamount', 8, 2)->nullable();
+
             $table->unsignedBigInteger('organization_id')->index();
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
