@@ -9,7 +9,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Tambah Butiran Yuran</h4>
+            <h4 class="font-size-18">Butiran {{ $cat->nama }}</h4>
             {{-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Murid >> Tambah Murid</li>
             </ol> --}}
@@ -28,7 +28,7 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('details.store', ['id' => $getfees]) }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('details.store', ['id' => $cat->id]) }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
                 <div class="form-group">
@@ -37,7 +37,11 @@
                 </div>
                 <div class="form-group">
                     <label>Harga</label>
-                    <input type="text" name="price" class="form-control" placeholder="Harga">
+                    <input type="text" name="price" class="form-control" placeholder="Harga" >
+                </div>
+
+                <div class="form-group">
+                    <input type="hidden" name="category" class="form-control" placeholder="Category" value="{{ $cat->id}}">
                 </div>
 
                 <div class="form-group">
@@ -45,14 +49,6 @@
                     <input type="text" name="quantity" class="form-control" placeholder="Kuantiti">
                 </div>
 
-                <div class="form-group">
-                    <label>Kategori</label>
-                    <select name="cat" id="cat" class="form-control">
-                        @foreach($cat as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
                 <div class="form-group mb-0">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
