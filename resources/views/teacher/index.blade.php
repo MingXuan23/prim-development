@@ -165,8 +165,10 @@
   
         var teacherTable;
   
-        $("#organization").prop("selectedIndex", 1).trigger('change');
-        fetch_data($("#organization").val());
+        if($("#organization").val() != ""){
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+            fetch_data($("#organization").val());
+        }
 
         function fetch_data(oid = '') {
             teacherTable = $('#teacherTable').DataTable({

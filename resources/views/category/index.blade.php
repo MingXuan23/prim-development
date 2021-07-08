@@ -131,6 +131,12 @@
   
       var categoryTable;
   
+        if($("#organization").val() != ""){
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+            fetch_data($("#organization").val());
+        }
+        
+
         // fetch_data();
   
         function fetch_data(oid = '') {

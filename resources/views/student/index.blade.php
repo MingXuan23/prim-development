@@ -164,8 +164,12 @@
         
         var studentTable;
 
-        $("#organization").prop("selectedIndex", 1).trigger('change');
-        fetchClass($("#organization").val());
+        if($("#organization").val() != ""){
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+            fetchClass($("#organization").val());
+        }
+
+        
         // fetch_data();
         // alert($("#organization").val());
 
