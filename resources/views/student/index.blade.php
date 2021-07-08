@@ -162,16 +162,12 @@
 <script>
     $(document).ready(function(){
         
-        $('#organization').change(function(){
-        
-                // $('#kelas').val('');
-                // $('#murid').val('');
-                
-        });
-
         var studentTable;
-  
+
+        $("#organization").prop("selectedIndex", 1).trigger('change');
+        fetchClass($("#organization").val());
         // fetch_data();
+        // alert($("#organization").val());
 
             function fetch_data(cid = '') {
                 studentTable = $('#studentTable').DataTable({
@@ -227,33 +223,33 @@
                 });
             }
 
-            $('#organization').change(function() {
+            // $('#organization').change(function() {
                
-                if($(this).val() != '')
-                {
-                    var organizationid    = $("#organization option:selected").val();
-                    var _token            = $('input[name="_token"]').val();
-                    $.ajax({
-                        url:"{{ route('student.fetchClass') }}",
-                        method:"POST",
-                        data:{ oid:organizationid,
-                                _token:_token },
-                        success:function(result)
-                        {
-                             
-                            $('#classes').empty();
-                            $("#classes").append("<option value='' disabled selected> Pilih Kelas</option>");
-                            jQuery.each(result.success, function(key, value){
-                                // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
+            //     var organizationid    = $("#organization").prop("selectedIndex", 1).val();
+            //     var _token            = $('input[name="_token"]').val();
 
-                                $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
-                            });
+            //     alert(organizationid);
+                
+            // });
 
-                        }
-
-                    })
-                }
-            });
+            function fetchClass(organizationid = ''){
+                var _token            = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('student.fetchClass') }}",
+                    method:"POST",
+                    data:{ oid:organizationid,
+                            _token:_token },
+                    success:function(result)
+                    {
+                        $('#classes').empty();
+                        $("#classes").append("<option value='' disabled selected> Pilih Kelas</option>");
+                        jQuery.each(result.success, function(key, value){
+                            // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
+                            $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
+                        });
+                    }
+                })
+            }
 
             $('#classes').change(function() {
                 var organizationid    = $("#organization option:selected").val();
