@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use App\Http\Jajahan\Jajahan;
 use View;
 
 class OrganizationController extends Controller
@@ -22,10 +23,15 @@ class OrganizationController extends Controller
     {
         // after launch remove where
         $type_org = TypeOrganization::all();
-        // $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
-        // $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
 
-        return view('organization.add', compact('type_org'));
+        $states = Jajahan::negeri();
+        return view('organization.add', compact('type_org', 'states'));
+    }
+
+    public function getDistrict(Request $request)
+    {
+        $districts = Jajahan::daerah($request->state_id);
+        return $districts;
     }
 
     public function store(OrganizationRequest $request)
@@ -137,5 +143,11 @@ class OrganizationController extends Controller
         }
 
         return $code;
+    }
+
+    public function testRepeater()
+    {
+        $states = Jajahan::negeri();
+        return view('test.repeater', compact('states'));
     }
 }
