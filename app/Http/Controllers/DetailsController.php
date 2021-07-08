@@ -48,10 +48,10 @@ class DetailsController extends Controller
     {
         //
         // dd($request);
-        $getfees = $request->id;
-        $cat = DB::table('categories')->get();
+        $categoryid = $request->id;
+        $cat = DB::table('categories')->where('id', $categoryid)->first();
 
-        return view('details.add', compact('cat', 'getfees'));
+        return view('details.add', compact('cat'));
     }
 
     public function store(Request $request)
@@ -67,17 +67,16 @@ class DetailsController extends Controller
         // dd($liststd);
 
         // dd($request->id);
-
+        $categoryid = $request->get('category');
 
         $this->validate($request, [
             'name'         =>  'required',
             'price'        =>  'required',
             'quantity'     =>  'required',
-            'cat'          =>  'required',
         ]);
 
         // price must in decimal
-        
+
         $price = (doubleval($request->get('price')));
         $total = $price * $request->get('quantity');
         // dd($total);
@@ -86,56 +85,67 @@ class DetailsController extends Controller
             'price'        =>  $price,
             'quantity'     =>  $request->get('quantity'),
             'totalamount'  =>  $total,
-            'category_id'  =>  $request->get('cat'),
+            'category_id'  =>  $categoryid,
         ]);
 
         $detail->save();
 
-        $fdid = DB::table('fees_details')->insertGetId([
-            'status'     => 1,
-            'details_id' => $detail->id,
-            'fees_id'    => $request->id
-        ]);
-
-        // get student first from the fees
-        $liststd =  DB::table('class_student')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
-            ->select('class_student.id as cid')
-            ->where('class_fees.fees_id', $request->id)
-            ->get();
-
-        // dd($liststd);
-
-        //store all student that have fees (req->id) 
-        for ($i = 0; $i < count($liststd); $i++) {
-            $array[] = array(
-                'status'            => 'Debt', // berhutang
-                'class_student_id'  => $liststd[$i]->cid,
-                'fees_details_id'   => $fdid
-            );
-        }
-
-        DB::table('student_fees')->insert($array);
-
-        // sum values
-        $getsum  = DB::table('fees')
-            ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
-            ->join('details', 'details.id', '=', 'fees_details.details_id')
-            ->join('categories', 'categories.id', '=', 'details.category_id')
-            ->where('fees.id', $request->id)
+        // sum values of details by category
+        $getsum  = DB::table('categories')
+            ->join('details', 'details.category_id', '=', 'categories.id')
+            ->where('details.category_id', $categoryid)
             ->sum('details.totalamount');
 
-        // dd($getsum);
-        // update total amount
-
-        $fees = DB::table('fees')
-            ->where('id', $request->id)
+        $cat = DB::table('categories')
+            ->where('id', $categoryid)
             ->update(['totalamount' => $getsum]);
 
 
-        return redirect('/getdetails/' . $request->id)->with('success', 'New details has been added successfully');
+        // $fdid = DB::table('fees_details')->insertGetId([
+        //     'status'     => 1,
+        //     'details_id' => $detail->id,
+        //     'fees_id'    => $request->id
+        // ]);
+
+        // // get student first from the fees
+        // $liststd =  DB::table('class_student')
+        //     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+        //     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+        //     ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+        //     ->select('class_student.id as cid')
+        //     ->where('class_fees.fees_id', $request->id)
+        //     ->get();
+
+        // // dd($liststd);
+
+        // //store all student that have fees (req->id) 
+        // for ($i = 0; $i < count($liststd); $i++) {
+        //     $array[] = array(
+        //         'status'            => 'Debt', // berhutang
+        //         'class_student_id'  => $liststd[$i]->cid,
+        //         'fees_details_id'   => $fdid
+        //     );
+        // }
+
+        // DB::table('student_fees')->insert($array);
+
+        // // sum values
+        // $getsum  = DB::table('fees')
+        //     ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+        //     ->join('details', 'details.id', '=', 'fees_details.details_id')
+        //     ->join('categories', 'categories.id', '=', 'details.category_id')
+        //     ->where('fees.id', $request->id)
+        //     ->sum('details.totalamount');
+
+        // // dd($getsum);
+        // // update total amount
+
+        // $fees = DB::table('fees')
+        //     ->where('id', $request->id)
+        //     ->update(['totalamount' => $getsum]);
+
+
+        return redirect('category/' .$categoryid. '/getDetails')->with('success', 'New details has been added successfully');
     }
 
     public function show($id)

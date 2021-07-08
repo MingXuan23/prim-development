@@ -18,17 +18,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            {{-- <div class="card-header">List Of Applications</div> --}}
-            <div>
-
-                <a style="margin: 19px; float: right;" href="{{ route('details.create', ['id' => $getfees->id] ) }}"
-                    class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Butiran Yuran</a>
-                {{-- <a style="margin: 19px; float: left;" href="{{ route('category.index') }}" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Tambah Kategori</a> --}}
-            </div>
-
-
-
+            
             <div class="card-body">
 
                 @if(count($errors) > 0)
@@ -46,15 +36,10 @@
                 </div>
                 @endif
 
-                {{-- <div align="right">
-                            <a href="{{route('admin.create')}}" class="btn btn-primary">Add</a>
-                <br />
-                <br />
-            </div> --}}
             @foreach($getcat as $row)
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
-                    <div>
+                    <div class="pt-3">
                         <label for="" style="font-size: 16px"><b>Kategori {{ $row->cnama}}</b> </label>
                     </div>
                     <tr style="text-align:center">
@@ -68,12 +53,12 @@
 
                     @foreach($getdetail->where('cid', $row->cid) as $row2)
                     <tr>
-                        <td>{{ $loop->iteration }}.</td>
+                        <td style="text-align:center">{{ $loop->iteration }}.</td>
                         <td>{{ $row2->dnama }}</td>
-                        <td>{{ $row2->quantity }}</td>
-                        <td>{{ number_format( $row2->price, 2)  }}</td>
-                        <td>{{ number_format($row2->totalamount, 2)  }}</td>
-                        <td>
+                        <td style="text-align:center">{{ $row2->quantity }}</td>
+                        <td style="text-align:center">{{ number_format( $row2->price, 2)  }}</td>
+                        <td style="text-align:center">{{ number_format($row2->totalamount, 2)  }}</td>
+                        <td style="text-align:center">
                             <div class="d-flex justify-content-center">
                                 <a href="" class="btn btn-primary m-1">Edit</a>
                                 <button class="btn btn-danger m-1"
@@ -88,7 +73,7 @@
                     <tr>
                         <td></td>
                         <td colspan="3"><b>Jumlah</b> </td>
-                        <td><b>{{ number_format($getdetail->where('cid', $row->cid)->sum('totalamount'), 2)  }}</b>
+                        <td style="text-align:center"><b>{{ number_format($getdetail->where('cid', $row->cid)->sum('totalamount'), 2)  }}</b>
                         </td>
                         <td></td>
                     </tr>

@@ -101,6 +101,7 @@ Route::group(['prefix' => 'parent'], function () {
 });
 
 Route::group(['prefix' => 'category'], function () {
+    Route::post('details', 'CategoryController@getDetails')->name('category.getDetails');
     Route::get('list', 'CategoryController@getCategoryDatatable')->name('category.getCategoryDatatable');
     Route::get('/{id}/getDetails', 'CategoryController@getCategoryDetails')->name('category.getCategoryDetails');
     Route::get('getDetailsDT', 'CategoryController@getCategoryDetailsDatatable')->name('category.getCategoryDetailsDatatable');

@@ -187,4 +187,17 @@ class CategoryController extends Controller
             })->get();
         }
     }
+
+    public function getDetails(Request $request)
+    {
+
+        $categoryid = $request->get('cid');
+
+        $list = DB::table('details')
+            ->where('category_id', $categoryid)
+            ->orderBy('details.nama')
+            ->get();
+
+        return response()->json(['categorylist' => $list]);
+    }
 }
