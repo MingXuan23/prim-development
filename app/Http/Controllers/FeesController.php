@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Psy\Command\WhereamiCommand;
 use App\Http\Controllers\AppBaseController;
-
+use App\Models\Category;
 
 class FeesController extends AppBaseController
 {
@@ -214,22 +214,27 @@ class FeesController extends AppBaseController
 
     public function store(Request $request)
     {
+        // dd($request->toArray());
         //class return array
-        $class = $request->get('cb_class');
+        $class      = $request->get('cb_class');
+        $details    = $request->get('cb_details');
 
-        // dd($aa[0]);
+        $oid        = $request->get('organization');
+
+        $date       = Carbon::now();
+        $timestemp  = $date->toDateTimeString();
+        $year       = Carbon::createFromFormat('Y-m-d H:i:s', $timestemp)->year;
 
         $this->validate($request, [
             'name'              =>  'required',
             'year'              =>  'required',
+            'category'          =>  'required',
             'cb_class'          =>  'required',
             'organization'      =>  'required',
             // 'cat'          =>  'required',
         ]);
 
-        $yearstd = $request->get('year');
-        $year   = $request->get('year');
-        $oid    = $request->get('organization');
+
 
         // get list class checked from checkbox
         $list = DB::table('organizations')
@@ -240,12 +245,6 @@ class FeesController extends AppBaseController
             ->whereIn('classes.id',  $class)
             ->get();
 
-        // dd($list);
-
-        $date       = Carbon::now();
-        $timestemp  = $date->toDateTimeString();
-        $year       = Carbon::createFromFormat('Y-m-d H:i:s', $timestemp)->year;
-        // dd($year);
 
         $yearfees = DB::table('year_fees')
             ->select('id')
@@ -274,8 +273,9 @@ class FeesController extends AppBaseController
                     'status' => '1'
                 );
             }
-
             DB::table('class_fees')->insert($array);
+
+            $this->feesDetails($fee->id, $details);
         } else {
 
             $fee = new Fee([
@@ -295,9 +295,79 @@ class FeesController extends AppBaseController
             }
 
             DB::table('class_fees')->insert($array);
+            
+            $this->feesDetails($fee->id, $details);
         }
 
         return redirect('/fees')->with('success', 'Yuran telah berjaya dimasukkan');
+    }
+
+    public function feesDetails($id, $details)
+    {
+        //********************************************* ***********************************************/
+
+        // dd($id);
+        // get list details checked from checkbox
+        $listdetails = DB::table('details')
+            ->join('categories', 'categories.id', '=', 'details.category_id')
+            ->select('details.*')
+            ->where('details.id', $details)
+            ->get();
+
+        // dd($listdetails);
+
+
+        for ($i = 0; $i < count($listdetails); $i++) {
+            $array[] = array(
+                    'status'     => 1,
+                    'details_id' => $listdetails[$i]->id,
+                    'fees_id'    => $id
+            );
+        }
+
+        DB::table('fees_details')->insert($array);
+
+
+        $fdid = DB::table('fees_details')->where('fees_id', $id)->get();
+
+        // // get student first from the fees
+        $liststd =  DB::table('class_student')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->select('class_student.id as cid')
+            ->where('class_fees.fees_id', $id)
+            ->get();
+
+        // // dd($liststd);
+
+        // //store all student that have fees (req->id) 
+        for ($i = 0; $i < count($liststd); $i++) {
+            $arraystudent[] = array(
+                'status'            => 'Debt', // berhutang
+                'class_student_id'  => $liststd[$i]->cid,
+                'fees_details_id'   => $fdid[$i]->id
+            );
+        }
+
+        DB::table('student_fees')->insert($arraystudent);
+
+        // // sum values
+        $getsum  = DB::table('fees')
+            ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+            ->join('details', 'details.id', '=', 'fees_details.details_id')
+            ->join('categories', 'categories.id', '=', 'details.category_id')
+            ->where('fees.id', $id)
+            ->sum('details.totalamount');
+
+        // dd($getsum);
+        // update total amount
+
+        $fees = DB::table('fees')
+            ->where('id', $id)
+            ->update(['totalamount' => $getsum]);
+
+        //********************************************* ***********************************************/
     }
 
     public function show($id)
@@ -451,13 +521,14 @@ class FeesController extends AppBaseController
 
         // dd($request->get('schid'));
         $oid = $request->get('oid');
+        $category = Category::where('organization_id', $oid)->get();
 
         $list = DB::table('organizations')
             ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
             ->where('organizations.id', $oid)
             ->first();
 
-        return response()->json(['success' => $list]);
+        return response()->json(['success' => $list, 'category' => $category]);
     }
 
 
