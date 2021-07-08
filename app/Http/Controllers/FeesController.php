@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Fee;
 use App\Models\Organization;
+use App\Models\Transaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,8 +14,10 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Psy\Command\WhereamiCommand;
+use App\Http\Controllers\AppBaseController;
 
-class FeesController extends Controller
+
+class FeesController extends AppBaseController
 {
     public function index()
     {
@@ -22,7 +25,7 @@ class FeesController extends Controller
         $fees = DB::table('fees')->orderBy('nama')->get();
         $organization = $this->getOrganizationByUserId();
         $listcategory = DB::table('categories')->get();
-        return view('pentadbir.fee.index', compact('fees','listcategory','organization'));
+        return view('pentadbir.fee.index', compact('fees', 'listcategory', 'organization'));
     }
 
     public function parentpay()
@@ -46,13 +49,15 @@ class FeesController extends Controller
             ->where([
                 ['users.id', $userid],
             ])
-            ->orWhere('organization_roles.id', '=', 6)
-            ->orWhere('organization_roles.id', '=', 7)
-            ->orWhere('organization_roles.id', '=', 8)
+            ->where(function ($query) {
+                $query->where('organization_roles.id', '=', 6)
+                    ->orWhere('organization_roles.id', '=', 7)
+                    ->orWhere('organization_roles.id', '=', 8);
+            })
             ->orderBy('classes.nama')
             ->get();
 
-        
+
         $feesid     = DB::table('fees')
             ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
             ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
@@ -78,12 +83,14 @@ class FeesController extends Controller
             ->get();
 
         // ************************* get details of fee  *******************************
-// join table student fees where debt
+        // join table student fees where debt
         $getdetail  = DB::table('fees')
             ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
+            ->join('student_fees', 'student_fees.fees_details_id', '=', 'fees_details.id')
             ->join('details', 'details.id', '=', 'fees_details.details_id')
             ->join('categories', 'categories.id', '=', 'details.category_id')
             ->select('fees.id as feeid', 'categories.id as cid', 'categories.nama as cnama', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'details.totalamount as totalamount', 'details.id as did')
+            ->where('student_fees.status', 'Debt')
             ->orderBy('details.nama')
             ->get();
         // return view('pentadbir.fee.pay', compact('getfees', 'getcat', 'getdetail'));
@@ -159,42 +166,43 @@ class FeesController extends Controller
         return view('parent.dev.index', compact('list', 'getfees', 'getcat', 'getdetail', 'organization'));
     }
 
-    public function devreceipt(Request $request){
+    public function devreceipt(Request $request)
+    {
 
         $feesid = $request->feesid;
         $amount = $request->amount;
 
         $userid = Auth::id();
         $list = DB::table('organizations')
-        ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-        ->join('users', 'users.id', '=', 'organization_user.user_id')
-        ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
-        ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
-        ->join('students', 'students.id', '=', 'organization_user_student.student_id')
-        ->join('class_student', 'class_student.student_id', '=', 'students.id')
-        ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-        ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-        ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
-        ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
-        ->select('organizations.id as oid', 'organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
-        ->where([
-            ['users.id', $userid],
-        ])
-        ->orWhere('organization_roles.id', '=', 6)
-        ->orWhere('organization_roles.id', '=', 7)
-        ->orWhere('organization_roles.id', '=', 8)
-        ->orderBy('classes.nama')
-        ->get();
+            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            ->join('users', 'users.id', '=', 'organization_user.user_id')
+            ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+            ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+            ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('class_fees', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->select('organizations.id as oid', 'organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename', 'fees.id as feeid', 'fees.nama as feename')
+            ->where([
+                ['users.id', $userid],
+            ])
+            ->orWhere('organization_roles.id', '=', 6)
+            ->orWhere('organization_roles.id', '=', 7)
+            ->orWhere('organization_roles.id', '=', 8)
+            ->orderBy('classes.nama')
+            ->get();
 
         $feesid     = DB::table('fees')
-        ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
-        ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
-        ->join('class_student', 'class_organization.class_id', '=', 'class_student.id')
-        ->join('students', 'class_student.student_id', '=', 'students.id')
-        ->select('fees.id as feeid', 'students.id as studentid')
-        ->first();
-        
-        return view('parent.dev.receipt',compact('feesid'));
+            ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+            ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            ->join('class_student', 'class_organization.class_id', '=', 'class_student.id')
+            ->join('students', 'class_student.student_id', '=', 'students.id')
+            ->select('fees.id as feeid', 'students.id as studentid')
+            ->first();
+
+        return view('parent.dev.receipt', compact('feesid'));
     }
 
     public function create()
@@ -331,7 +339,7 @@ class FeesController extends Controller
             ->orderBy('classes.nama')
             ->get();
 
-            // $getclassid = $getclass->cid;
+        // $getclassid = $getclass->cid;
 
         // dd($getclass);
         $organization = $this->getOrganizationByUserId();
@@ -421,8 +429,17 @@ class FeesController extends Controller
         if (Auth::user()->hasRole('Superadmin')) {
 
             return Organization::all();
+        } else if (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru')) {
+
+            // user role pentadbir n guru 
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId)->Where(function ($query) {
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5);
+                });
+            })->get();
         } else {
-            // user role guru 
+            // user role ibu bapa
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->where('role_id', '6')->OrWhere('role_id', '7')->OrWhere('role_id', '8');
             })->get();
@@ -497,6 +514,136 @@ class FeesController extends Controller
 
             $table->rawColumns(['action']);
             return $table->make(true);
+        }
+    }
+
+    public function feesReport()
+    {
+        $organizations = $this->getOrganizationByUserId();
+
+        return view('parent.fee.report', compact('organizations'));
+    }
+
+    public function getLatestTransaction(Request $request)
+    {
+        $organizationID = $request->id;
+
+        try {
+            $response = Transaction::getLastestTransaction_fees($organizationID);
+
+            // dd($response);
+            if (request()->ajax()) {
+                return datatables()->of($response)
+                    ->editColumn('latest', function ($response) {
+                        //change over here
+                        return date('d/m/Y', strtotime($response->latest));
+                    })
+                    ->make(true);
+            }
+        } catch (\Throwable $th) {
+            return $this->sendError($th->getMessage(), 500);
+        }
+    }
+
+    public function getTransactionByOrganizationIdAndStatus(Request $request)
+    {
+        $organizationID = $request->id;
+        try {
+            $response = Transaction::getTransaction_fees($organizationID);
+            // dd($response);
+
+            return $this->sendResponse($response, "Success");
+        } catch (\Throwable $th) {
+            return $this->sendError($th->getMessage(), 500);
+        }
+    }
+
+    public function getTotalCatB(Request $request)
+    {
+        $organizationID = $request->id;
+        $duration = $request->duration;
+
+        if ($duration == "day") {
+            try {
+                $response = Transaction::getTotalDonationByDay_CatB($organizationID);
+                $val = $response->getData()->donation_amount;
+                $response = json_decode($response, true);
+                $response['donation_amount'] = $val;
+                $response['duration'] = 'day';
+
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
+        } elseif ($duration == "week") {
+            try {
+                $response = Transaction::getTotalDonationByWeek_CatB($organizationID);
+                $val = $response->getData()->donation_amount;
+                $response = json_decode($response, true);
+                $response['donation_amount'] = $val;
+                $response['duration'] = 'week';
+
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
+        } elseif ($duration == "month") {
+            try {
+                $response = Transaction::getTotalDonationByMonth_CatB($organizationID);
+                $val = $response->getData()->donation_amount;
+                $response = json_decode($response, true);
+                $response['donation_amount'] = $val;
+                $response['duration'] = 'month';
+
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
+        }
+    }
+
+    public function getTotalCatA(Request $request)
+    {
+        $organizationID = $request->id;
+        $duration = $request->duration;
+
+        if ($duration == "day") {
+            try {
+                $response = Transaction::getTotalDonorByDay_CatA($organizationID);
+                // dd($response->getData()->donor);
+                $val = $response->getData()->donor;
+                $response = json_decode($response, true);
+                $response['donor'] = $val;
+                $response['duration'] = 'day';
+
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
+        } elseif ($duration == "week") {
+            try {
+                $response = Transaction::getTotalDonorByWeek_CatA($organizationID);
+                $val = $response->getData()->donor;
+                $response = json_decode($response, true);
+                $response['donor'] = $val;
+                $response['duration'] = 'week';
+
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
+        } elseif ($duration == "month") {
+            try {
+                $response = Transaction::getTotalDonorByMonth_CatA($organizationID);
+                $val = $response->getData()->donor;
+                $response = json_decode($response, true);
+                $response['donor'] = $val;
+                $response['duration'] = 'month';
+
+                return $this->sendResponse($response, "Success");
+            } catch (\Throwable $th) {
+                return $this->sendError($th->getMessage(), 500);
+            }
         }
     }
 }

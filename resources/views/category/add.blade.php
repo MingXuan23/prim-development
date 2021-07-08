@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('css')
-        <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -32,11 +32,28 @@
             <form method="post" action="{{ route('category.store') }}" enctype="multipart/form-data">
                 {{csrf_field()}}
                 <div class="card-body">
-                    
+
+                    <div class="form-group">
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            <option value="" selected>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label>Nama Kategori</label>
                         <input type="text" name="name" class="form-control" placeholder="Nama Kategori">
                     </div>
+
+                    <div class="form-group">
+                        <label>Penerangan</label>
+                        <textarea name="description" class="form-control" placeholder="Penerangan" cols="30"
+                            rows="5"></textarea>
+                    </div>
+
                     <div class="form-group mb-0">
                         <div>
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -54,11 +71,11 @@
 
 
 @section('script')
-        <!-- Peity chart-->
-        <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+<!-- Peity chart-->
+<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
 
-        <!-- Plugin Js-->
-        <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+<!-- Plugin Js-->
+<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
-        <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 @endsection

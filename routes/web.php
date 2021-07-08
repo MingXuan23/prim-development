@@ -36,6 +36,11 @@ Route::group(['prefix' => 'derma'], function () {
     Route::get('/organization-type', 'LandingPageController@getOrganizationDatatable')->name('landingpage.donation.organization');
     Route::get('/organization-donation', 'LandingPageController@getDonationDatatable')->name('landingpage.donation.donation');
 });
+
+//landing fees page route
+Route::group(['prefix' => 'yuran'], function () {
+    Route::get('', 'LandingPageController@indexFees');
+});
 // feedback
 Route::post('feedback', 'LandingPageController@storeMessage')->name('feedback.store');
 
@@ -80,12 +85,23 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('year', 'FeesController@fetchYear')->name('fees.fetchYear');
     Route::post('class', 'FeesController@fetchClass')->name('fees.fetchClass');
     Route::get('list', 'FeesController@getFeesDatatable')->name('fees.getFeesDatatable');
+    Route::get('report', 'FeesController@feesReport')->name('fees.report');
+    Route::get('/getTransaction', 'FeesController@getTransactionByOrganizationIdAndStatus')->name('fees.get_transaction');
+    Route::get('/latestTransaction', 'FeesController@getLatestTransaction')->name('fees.latest_transaction');
+    Route::get('/totalCatA', 'FeesController@getTotalCatA')->name('fees.totalCatA');
+    Route::get('/totalCatB', 'FeesController@getTotalCatB')->name('fees.totalCatB');
 });
 
 Route::group(['prefix' => 'parent'], function () {
     Route::get('dependent/{id}', 'ParentController@indexDependent')->name('parent.dependent');
     Route::get('list', 'ParentController@getParentDatatable')->name('parent.getParentDatatable');
     Route::post('dependent', 'ParentController@storeDependent')->name('parent.storeDependent');
+});
+
+Route::group(['prefix' => 'category'], function () {
+    Route::get('list', 'CategoryController@getCategoryDatatable')->name('category.getCategoryDatatable');
+    Route::get('/{id}/getDetails', 'CategoryController@getCategoryDetails')->name('category.getCategoryDetails');
+    Route::get('getDetailsDT', 'CategoryController@getCategoryDetailsDatatable')->name('category.getCategoryDetailsDatatable');
 });
 
 Route::group(['prefix' => 'activity'], function () {

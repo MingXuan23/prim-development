@@ -28,6 +28,11 @@ class LandingPageController extends AppBaseController
         return view('custom-errors.maintenance');
     }
 
+    public function indexFees()
+    {
+        return view('landing-page.fees.index');
+    }
+
     public function storeMessage(Request $request)
     {
         // dd($request);
