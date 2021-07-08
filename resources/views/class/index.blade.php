@@ -167,7 +167,8 @@
   
       var classesTable;
   
-        // fetch_data();
+        $("#organization").prop("selectedIndex", 1).trigger('change');
+        fetch_data($("#organization").val());
   
         function fetch_data(oid = '') {
             classesTable = $('#classesTable').DataTable({
