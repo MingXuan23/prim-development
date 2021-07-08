@@ -139,7 +139,8 @@ $(document).ready(function () {
         'inner-text-input': 'inner-default'
       },
       show: function show() {
-        console.log('inner show');
+        console.log('inners show');
+        getDistrict(state_id); //addons
         $(this).slideDown();
       },
       hide: function hide(deleteElement) {

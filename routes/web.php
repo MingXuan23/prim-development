@@ -66,6 +66,8 @@ Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonat
 Route::group(['prefix' => 'organization'], function () {
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
+    Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
+    Route::get('testRepeater', 'OrganizationController@testRepeater');
 });
 
 Route::group(['prefix' => 'teacher'], function () {

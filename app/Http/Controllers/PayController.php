@@ -360,7 +360,7 @@ class PayController extends AppBaseController
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
-            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail      = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -488,15 +488,13 @@ class PayController extends AppBaseController
             $list = $res_student;
 
             if ($transaction->save()) {
-
                 for ($i = 0; $i < count($list); $i++) {
-
                     $res  = DB::table('student_fees')
                         ->where('id', $list[$i]->student_fees_id)
                         ->update(['status' => 'Paid']);
                 }
 
-                //call function 
+                //call function
 
                 if ($res) {
 
@@ -627,7 +625,7 @@ class PayController extends AppBaseController
         $get_transaction = Transaction::where('id', $id)->first();
 
 
-        // get fee and organization name 
+        // get fee and organization name
         $get_fee_organization = DB::table('transactions')
             ->join('fees_transactions', 'fees_transactions.transactions_id', '=', 'transactions.id')
             ->join('student_fees', 'student_fees.id', '=', 'fees_transactions.student_fees_id')
