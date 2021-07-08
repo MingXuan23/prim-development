@@ -15,8 +15,14 @@
     </div>
 </div>
 <div class="row">
+
     <div class="col-md-12">
         <div class="card">
+            <div>
+                {{-- route('sekolah.create')  --}}
+                <a style="margin: 19px; float: right;" href="{{ route('details.create', ['id' => request()->id] ) }}" class="btn btn-primary"> <i
+                    class="fas fa-plus"></i> Tambah Butiran</a>
+              </div>
             <div class="card-body">
 
 
