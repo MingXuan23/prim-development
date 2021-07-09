@@ -56,7 +56,7 @@
                 </div>
                 <div class="form-group">
                     <label>Nombor Kad Pengenalan</label>
-                    <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
+                    <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
                 </div>
 
 
@@ -88,10 +88,15 @@
 
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
+    $(document).ready(function() {
+        $('#icno').mask('000000-00-0000');
+
+    });
+
     $(document).ready(function(){
         
         $("#organization").prop("selectedIndex", 1).trigger('change');
