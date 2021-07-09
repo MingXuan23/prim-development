@@ -666,6 +666,7 @@ class PayController extends AppBaseController
             ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
             ->select('categories.id as catid', 'categories.nama as catname')
             ->distinct()
+            ->where('transactions.id', $id)
             ->orderBy('categories.nama')
             ->get();
 
