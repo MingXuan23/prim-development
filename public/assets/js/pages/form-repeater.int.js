@@ -140,12 +140,18 @@ $(document).ready(function () {
       },
       show: function show() {
         console.log('inners show');
-        getDistrict(state_id); //addons
+        getCategory(organization_id); //addons
+        // $('#btnDelete').show();
+
         $(this).slideDown();
       },
       hide: function hide(deleteElement) {
         console.log('inner delete');
         $(this).slideUp(deleteElement);
+        is_clicked--;
+        $('#btnAdd').show();
+        // $('#btnDelete').hide();
+
       }
     }]
   });

@@ -43,7 +43,7 @@
                 <ul class="text-muted">
                     <li>Tambah kategori yuran baru dengan klik menu kategori.</li>
                     <li>Tambah yuran dengan klik butang tambah yuran.</li>
-                    <li>Tambah perincian yuran bagi menetapkan setiap harga item bagi yuran yg dipilih.</li>
+                    <li>Butang butiran untuk maklumat yuran.</li>
                 </ul>
             </div>
         </div>
@@ -95,20 +95,18 @@
                 </div>
                 @endif
 
-                <div class="scrollheight">
-                    <div class="table-responsive">
-                        <table id="feesTable" class="table table-bordered table-striped dt-responsive nowrap"
-                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                            <thead>
-                                <tr style="text-align:center">
-                                    <th> No. </th>
-                                    <th>Nama Yuran</th>
-                                    <th>Jumlah Amaun (RM)</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table id="feesTable" class="table table-bordered table-striped dt-responsive nowrap"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th> No. </th>
+                                <th>Nama Yuran</th>
+                                <th>Jumlah Amaun (RM)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
@@ -135,6 +133,10 @@
             var feesTable;
 
             // fetch_data();
+            if($("#organization").val() != ""){
+                $("#organization").prop("selectedIndex", 1).trigger('change');
+                fetch_data($("#organization").val());
+            }
 
             function fetch_data(oid = '') {
                 feesTable = $('#feesTable').DataTable({
