@@ -265,7 +265,7 @@ catch(Exception $e){
                 </div>
                 <div class="row mb-4">
                     <div class="col-6">
-                        <h4 class=" mb-3">Jumlah Amaun</h4>
+                        <h4 class=" mb-3">Jumlah Bayaran</h4>
                     </div>
                     <div class="col-6">
                         <h4 class="float-right mb-3">RM<span id="amount" style="font-size: 22px;">
