@@ -89,6 +89,7 @@
                                         </td>
                                     </tr> --}}
                                 </table>
+
                                 @foreach ($getstudent as $student)
                                 <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
                                     {{ $student->studentnama }}
@@ -105,9 +106,9 @@
                                     <tr style="text-align: center">
                                         <th style="width:3%">Bil</th>
                                         <th>Item</th>
-                                        <th>Kuantiti</th>
-                                        <th>Amaun per item (RM)</th>
-                                        <th>Amaun (RM)</th>
+                                        <th style="width:10%">Kuantiti</th>
+                                        <th style="width:20%">Amaun per item (RM)</th>
+                                        <th style="width:20%">Amaun (RM)</th>
                                     </tr>
                                     @foreach ($getdetail->where('studentid', $student->studentid)->where('catid',
                                     $category->catid) as $item)
@@ -122,6 +123,14 @@
                                     </tr>
                                     @endforeach
 
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="3"><b>Jumlah</b> </td>
+                                        <td style="text-align:center">
+                                            <b>{{ number_format($getdetail->where('catid', $student->categoryid)->sum('totalamount'), 2)  }}</b>
+                                        </td>
+                                    </tr>
+
                                 </table>
                                 @endforeach
 
@@ -129,13 +138,20 @@
 
                                 @endforeach
 
-                                <div class="pt-3" style="font-size: 18px">
-                                    <b>
-                                        Jumlah Bayaran
-                                        RM{{  number_format((float)$get_transaction->amount, 2, '.', '') }}
-                                    </b>
-                                </div>
-                                <span><i>*Termasuk cas yang dikenakan oleh organisasi</i></span>
+                                <table style="width:100%" class="infotbl">
+                                    <tr>
+                                        <td colspan="4"><b>Cas yang dikenakan oleh organisasi (RM) </b> </td>
+                                        <td style="text-align:center">
+                                            <b>{{  number_format((float)$get_fee_organization->fixed_charges, 2, '.', '') }}</b>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4"><b>Jumlah Bayaran (RM) </b> </td>
+                                        <td style="text-align:center">
+                                            <b>{{  number_format((float)$get_transaction->amount, 2, '.', '') }}</b>
+                                        </td>
+                                    </tr>
+                                </table>
 
                                 <div class="col-12 pt-5 text-center">
                                     <button class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px"
