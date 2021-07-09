@@ -146,7 +146,7 @@
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right">
-                                            Cas yang dikenakan oleh organisasi
+                                            Cas yang dikenakan oleh organisasi (RM)
                                         </td>
                                         <td style="text-align:center;width:20%">
                                             {{  number_format((float)$get_fee_organization->fixed_charges, 2, '.', '') }}
@@ -154,7 +154,7 @@
                                     </tr>
                                     <tr>
                                         <td></td>
-                                        <td colspan="3" style="text-align:right"><b>Jumlah Bayaran </b> </td>
+                                        <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran (RM)</b> </td>
                                         <td style="text-align:center; width:20%; font-size:18px">
                                             <b>{{  number_format((float)$get_transaction->amount, 2, '.', '') }}</b>
                                         </td>
