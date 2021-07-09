@@ -118,7 +118,9 @@
                                     $category->catid) as $item)
                                     <tr>
                                         <td style="text-align: center"> {{ $loop->iteration }}.</td>
-                                        <td class="pl-2">{{ $item->detailsname }}</td>
+                                        <td>
+                                            <div class="pl-2"> {{ $item->detailsname }} </div>
+                                        </td>
                                         <td style="text-align: center">{{ $item->quantity }}</td>
                                         <td style="text-align: center">
                                             {{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
@@ -154,7 +156,8 @@
                                     </tr>
                                     <tr>
                                         <td></td>
-                                        <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran (RM)</b> </td>
+                                        <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran
+                                                (RM)</b> </td>
                                         <td style="text-align:center; width:20%; font-size:18px">
                                             <b>{{  number_format((float)$get_transaction->amount, 2, '.', '') }}</b>
                                         </td>
