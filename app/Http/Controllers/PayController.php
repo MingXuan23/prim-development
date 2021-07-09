@@ -634,7 +634,7 @@ class PayController extends AppBaseController
             ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_fees.class_organization_id')
             ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
-            ->select('organizations.id as oid', 'organizations.nama as oname')
+            ->select('organizations.id as oid', 'organizations.nama as oname' , 'organizations.fixed_charges')
             ->where('transactions.id', $id)
             ->first();
 
