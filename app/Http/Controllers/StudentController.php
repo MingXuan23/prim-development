@@ -319,6 +319,7 @@ class StudentController extends Controller
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.nama as nschool', 'classes.id as cid', 'classes.nama as cname')
             ->where('organizations.id', $oid)
+            ->orderBy('classes.nama')
             ->get();
 
         // dd($list);
