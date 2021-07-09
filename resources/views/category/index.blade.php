@@ -131,6 +131,12 @@
   
       var categoryTable;
   
+        if($("#organization").val() != ""){
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+            fetch_data($("#organization").val());
+        }
+        
+
         // fetch_data();
   
         function fetch_data(oid = '') {
@@ -176,7 +182,15 @@
                         data: 'totalamount',
                         name: 'totalamount',
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        defaultContent: 0,
+                        render: function(data, type, full) {
+                            if(data){
+                                return parseFloat(data).toFixed(2);
+                            }else{
+                                return 0;
+                            }
+                        }
                     }, {
                         data: 'action',
                         name: 'action',

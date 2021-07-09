@@ -97,7 +97,7 @@
                                     <span>{{ $student->feename }}</span>
                                 </center>
 
-                                @foreach ($getcategory as $category)
+                                @foreach ($getcategory->where('catid', $student->categoryid) as $category)
 
                                 <span>{{ $category->catname }}</span>
 
@@ -158,4 +158,3 @@
 </body>
 
 </html>
-

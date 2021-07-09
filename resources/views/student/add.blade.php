@@ -56,7 +56,7 @@
                 </div>
                 <div class="form-group">
                     <label>Nombor Kad Pengenalan</label>
-                    <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
+                    <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
                 </div>
 
 
@@ -88,18 +88,19 @@
 
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
+    $(document).ready(function() {
+        $('#icno').mask('000000-00-0000');
+
+    });
+
     $(document).ready(function(){
         
-        $('#organization').change(function(){
-        
-                // $('#kelas').val('');
-                // $('#murid').val('');
-                
-        });
+        $("#organization").prop("selectedIndex", 1).trigger('change');
+        fetchClass($("#organization").val());
 
             $('#organization').change(function() {
                
@@ -127,6 +128,25 @@
                     })
                 }
             });
+
+            function fetchClass(organizationid = ''){
+                var _token            = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('student.fetchClass') }}",
+                    method:"POST",
+                    data:{ oid:organizationid,
+                            _token:_token },
+                    success:function(result)
+                    {
+                        $('#classes').empty();
+                        $("#classes").append("<option value='' disabled selected> Pilih Kelas</option>");
+                        jQuery.each(result.success, function(key, value){
+                            // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
+                            $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
+                        });
+                    }
+                })
+            }
         });
 </script>
 @endsection

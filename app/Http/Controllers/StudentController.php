@@ -124,7 +124,7 @@ class StudentController extends Controller
 
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required|numeric',
+            'icno'          =>  'required',
             'classes'       =>  'required',
         ]);
 
