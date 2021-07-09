@@ -102,7 +102,9 @@
 
                                 @foreach ($getcategory as $category)
 
-                                <span class="pt-2 pb-2">{{ $category->catname }}</span>
+                                <div class="pt-2 pb-2">
+                                    Kategori : {{ $category->catname }}
+                                </div>
 
                                 <table class="table table-bordered table-striped" style="">
                                     <tr style="text-align: center">
@@ -144,7 +146,7 @@
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right">
-                                            Cas yang dikenakan oleh organisasi (RM)
+                                            Cas yang dikenakan oleh organisasi
                                         </td>
                                         <td style="text-align:center;width:20%">
                                             {{  number_format((float)$get_fee_organization->fixed_charges, 2, '.', '') }}
@@ -152,8 +154,8 @@
                                     </tr>
                                     <tr>
                                         <td></td>
-                                        <td colspan="3" style="text-align:right"><b>Jumlah Bayaran (RM) </b> </td>
-                                        <td style="text-align:center; width:20%">
+                                        <td colspan="3" style="text-align:right"><b>Jumlah Bayaran </b> </td>
+                                        <td style="text-align:center; width:20%; font-size:18px">
                                             <b>{{  number_format((float)$get_transaction->amount, 2, '.', '') }}</b>
                                         </td>
                                     </tr>
