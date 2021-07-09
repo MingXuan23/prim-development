@@ -158,41 +158,30 @@
 <script>
     $(document).ready(function(){
         
-                $('#organization').change(function(){
-        
-                    // $('#kelas').val('');
-                    // $('#murid').val('');
-        
-                    if($(this).val() != '')
+        if($("#organization").val() != ""){
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+            fetch_data($("#organization").val());
+        }
+
+        function fetch_data(oid = ''){ 
+            var _token      = $('input[name="_token"]').val();
+                // console.log(schoolid);   
+                $.ajax({
+                    url:"{{ route('parent.fetchClass') }}",
+                    method:"POST",
+                    data:{ oid:oid,
+                            _token:_token },
+                    success:function(result)
                     {
-                        // alert($(this).val();)
-                        // alert($("#sekolah option:selected").val());
-                        var oid    = $("#organization option:selected").val();
-                        var _token      = $('input[name="_token"]').val();
-                        // console.log(schoolid);
-        
-                        $.ajax({
-                            url:"{{ route('parent.fetchClass') }}",
-                            method:"POST",
-                            data:{ oid:oid,
-                                    _token:_token },
-                            success:function(result)
-                            {
-                                $('#classes').empty();
-                                $("#classes").append("<option value='0'> Pilih Kelas</option>");
-        
-                                jQuery.each(result.success, function(key, value){
-                                    // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
-                                    $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
-                                });
-                            }
-        
-                        })
-        
-                    }
-        
-        
-                });
+                        $('#classes').empty();
+                        $("#classes").append("<option value='0'> Pilih Kelas</option>");    
+                        jQuery.each(result.success, function(key, value){
+                            // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
+                            $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
+                        });
+                    }   
+                })    
+        }
 
                 $('#classes').change(function(){
 
