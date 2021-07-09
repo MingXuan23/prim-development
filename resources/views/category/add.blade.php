@@ -38,7 +38,12 @@
                         <select name="organization" id="organization" class="form-control">
                             <option value="" selected>Pilih Organisasi</option>
                             @foreach($organization as $row)
+                            @if ($loop->first)
+                            <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                            @else
                             <option value="{{ $row->id }}">{{ $row->nama }}</option>
+
+                            @endif
                             @endforeach
                         </select>
                     </div>
