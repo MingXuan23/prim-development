@@ -48,7 +48,7 @@
                                     <div class="col-md-10 col-8">
                                         <div class="form-group">
                                             <label>Daerah</label>
-                                                <select name="district" class="inner form-control district"
+                                                <select name="district" id="district" class="inner form-control district"
                                             data-parsley-required-message="Sila masukkan daerah" required>
                                             <option value="">Pilih Daerah</option>
                                         </select>
@@ -99,6 +99,7 @@
     });
 
     var state_id;
+    var nextRowID = 0;
 
     function getDistrict (state_id){
         $.ajax({
@@ -109,6 +110,7 @@
                 },
                 success: function(data) {
                     // $('.district').empty();
+                    var id = ++nextRowID;
                     for(var i = 0; i < data.length; i++){
                         data.sort();
                         $(".district").append("<option value='"+ i +"'>"+ data[i] +"</option>");

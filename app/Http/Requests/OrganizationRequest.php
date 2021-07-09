@@ -30,6 +30,7 @@ class OrganizationRequest extends FormRequest
             'email'        =>  ['required', 'email', \Illuminate\Validation\Rule::unique('organizations')->ignore($this->id)],
             'address'      =>  'required',
             'postcode'     =>  'required',
+            'district'     =>  'required',
             'state'        =>  'required',
             'type_org'     =>  'required',
             'fixed_charges'      =>  'required|numeric',
