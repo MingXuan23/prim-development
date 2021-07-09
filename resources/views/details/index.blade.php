@@ -60,7 +60,6 @@
                         <td style="text-align:center">{{ number_format($row2->totalamount, 2)  }}</td>
                         <td style="text-align:center">
                             <div class="d-flex justify-content-center">
-                                <a href="" class="btn btn-primary m-1">Edit</a>
                                 <button class="btn btn-danger m-1"
                                     onclick="return confirm('Adakah anda pasti ?')">Buang</button>
 
