@@ -648,7 +648,7 @@ class PayController extends AppBaseController
             ->join('fees', 'fees.id', '=', 'fees_details.fees_id')
             ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
             ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
-            ->select('students.id as studentid', 'students.nama as studentnama', 'fees.id as feeid', 'fees.nama as feename', 'details.category_id as categoryid')
+            ->select('students.id as studentid', 'students.nama as studentnama', 'fees.id as feeid', 'fees.nama as feename')
             ->distinct()
             ->where('class_student.status', '1')
             ->where('transactions.id', $id)
