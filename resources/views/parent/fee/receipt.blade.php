@@ -100,7 +100,7 @@
                                     </span>
                                 </center>
 
-                                @foreach ($getcategory->where('catid', $student->categoryid) as $category)
+                                @foreach ($getcategory as $category)
 
                                 <span class="pt-2 pb-2">{{ $category->catname }}</span>
 
@@ -144,10 +144,10 @@
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right">
-                                            Cas yang dikenakan oleh organisasi (RM) 
+                                            Cas yang dikenakan oleh organisasi (RM)
                                         </td>
                                         <td style="text-align:center;width:20%">
-                                            <b>{{  number_format((float)$get_fee_organization->fixed_charges, 2, '.', '') }}</b>
+                                            {{  number_format((float)$get_fee_organization->fixed_charges, 2, '.', '') }}
                                         </td>
                                     </tr>
                                     <tr>
