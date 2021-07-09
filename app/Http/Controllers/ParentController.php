@@ -64,7 +64,7 @@ class ParentController extends Controller
             ->where([
                 ['users.id', $userId],
             ])
-            ->orderBy('students.nama')
+            ->orderBy('classes.nama')
             ->get();
 
         return view('parent.dependent.index', compact('list', 'role', 'organization', 'userId'));
@@ -81,6 +81,7 @@ class ParentController extends Controller
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.nama as nschool', 'classes.id as cid', 'classes.nama as cname')
             ->where('organizations.id', $oid)
+            ->orderBy('classes.nama')
             ->get();
 
         return response()->json(['success' => $list]);
