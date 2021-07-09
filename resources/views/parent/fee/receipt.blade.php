@@ -129,7 +129,7 @@
                                         <td></td>
                                         <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
                                         <td style="text-align:center">
-                                            <b>{{ number_format($getdetail->where('catid', $student->categoryid)->sum('totalamount'), 2)  }}</b>
+                                            <b>{{ number_format($getdetail->where('catid', $category->catid)->sum('totalamount'), 2)  }}</b>
                                         </td>
                                     </tr>
 
