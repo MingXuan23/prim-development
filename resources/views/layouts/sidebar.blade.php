@@ -134,7 +134,7 @@
                         @role('Superadmin|Pentadbir|Guru')
                         <li>
                             <a href="{{ route('parent.index') }}" class=" waves-effect">
-                                <i class="fas fa-user-graduate"></i>
+                                <i class="fas fa-user-friends"></i>
                                 <span>Ibu Bapa</span>
                             </a>
                         </li>
