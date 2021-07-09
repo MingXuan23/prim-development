@@ -63,11 +63,11 @@
                             im-insert="true" style="text-align: right;" name="fixed_charges" 
                             data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran" required>
                     </div>
-                        <div class="form-group">
-                            <label class="control-label">Alamat</label>
-                            <textarea name="address" class="form-control" rows="4" placeholder="Alamat"
-                            data-parsley-required-message="Sila masukkan alamat organisasi" required></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label class="control-label">Alamat</label>
+                        <textarea name="address" class="form-control" rows="4" placeholder="Alamat"
+                        data-parsley-required-message="Sila masukkan alamat organisasi" required></textarea>
+                    </div>
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
@@ -76,7 +76,7 @@
                               data-parsley-required-message="Sila masukkan negeri" required>
                               <option value="">Pilih Negeri</option>
                                   @for ($i = 0; $i < count($states); $i++)
-                                    <option value="{{ $states[$i]['id'] }}">{{ $states[$i]['name']}}</option>
+                                    <option id="{{ $states[$i]['id'] }}" value="{{ ucfirst(strtolower($states[$i]['name'])) }}">{{ ucfirst(strtolower($states[$i]['name'])) }}</option>
                                   @endfor
                               </select>
                             </div>
@@ -134,9 +134,15 @@
         $('.input-mask').inputmask();
         $('.phone_no').mask('+600000000000');
 
-        $('#state').on('change', function(e) {
-            var state_id = e.target.value;
-            console.log(state_id);
+        function toTitleCase(str) {
+            var lcStr = str.toLowerCase();
+            return lcStr.replace(/(?:^|\s)\w/g, function(match) {
+                return match.toUpperCase();
+            });
+        }
+
+        $('#state').on('change', function() {
+            var state_id = $(this).children(":selected").attr("id");
             $.ajax({
                 url: "{{ route('organization.get-district') }}",
                 type: "POST",
@@ -147,7 +153,8 @@
                     $('#district').empty();
                     for(var i = 0; i < data.length; i++){
                         data.sort();
-                        $("#district").append("<option value='"+ i +"'>"+ data[i] +"</option>");
+                        let district = toTitleCase(data[i]);
+                        $("#district").append("<option value='"+ district +"'>"+ district +"</option>");
                     }
                 }
             })

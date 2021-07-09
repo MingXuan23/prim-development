@@ -26,7 +26,6 @@ class Jajahan
             ['name' => 'WP KUALA LUMPUR', 'name_long' => 'WILAYAH PERSEKUTUAN KUALA LUMPUR', 'id' => '14', 'code2' => 'KL', 'code3' => 'KUL', 'capital' => 'KUALA LUMPUR'],
             ['name' => 'WP LABUAN', 'name_long' => 'WILAYAH PERSEKUTUAN LABUAN', 'id' => '15', 'code2' => 'LB', 'code3' => 'LBU', 'capital' => 'LABUAN'],
             ['name' => 'WP PUTRAJAYA', 'name_long' => 'WILAYAH PERSEKUTUAN PUTRAJAYA', 'id' => '16', 'code2' => 'PJ', 'code3' => 'PTJ', 'capital' => 'PUTRAJAYA'],
-            ['name' => 'LUAR NEGARA', 'name_long' => 'LUAR NEGARA', 'id' => '98', 'code2' => 'LN', 'code3' => 'LNE', 'capital' => '-']
         ];
 
         return $items;

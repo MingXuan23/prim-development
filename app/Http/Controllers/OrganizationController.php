@@ -67,7 +67,9 @@ class OrganizationController extends Controller
 
         $org = DB::table('organizations')->where('id', $id)->first();
 
-        return view('organization.update', compact('org', 'type_org'));
+        $states = Jajahan::negeri();
+
+        return view('organization.update', compact('org', 'type_org', 'states'));
     }
 
     public function update(OrganizationRequest $request, $id)
