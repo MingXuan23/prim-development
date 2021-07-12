@@ -147,6 +147,8 @@
 <script src="{{ URL::asset('assets/js/pages/form-advanced.init.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/spectrum-colorpicker2/spectrum.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
 <script>
     // $(document).ready(function(){
@@ -157,10 +159,9 @@
     // });
 
     $(document).ready(function () {
-        $(".input-mask").inputmask();
-        $('.phone_no').mask('01000000000');
         $('.form-validation').parsley();
 
+        $("#organizationdd").prop("selectedIndex", 1).trigger('change');
 
     });
 
