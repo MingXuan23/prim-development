@@ -92,6 +92,9 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/latestTransaction', 'FeesController@getLatestTransaction')->name('fees.latest_transaction');
     Route::get('/totalCatA', 'FeesController@getTotalCatA')->name('fees.totalCatA');
     Route::get('/totalCatB', 'FeesController@getTotalCatB')->name('fees.totalCatB');
+    Route::get('/A', 'FeesController@CategoryA')->name('fees.A');
+    Route::get('/B', 'FeesController@CategoryB')->name('fees.B');
+    Route::get('/C', 'FeesController@CategoryC')->name('fees.C');
 });
 
 Route::group(['prefix' => 'parent'], function () {

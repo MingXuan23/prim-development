@@ -155,7 +155,30 @@
                         <span>Yuran</span>
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
+                        @role('Superadmin')
 
+                        <li>
+                            <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Kategori A</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('fees.B') }}" class=" waves-effect" aria-expanded="true">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Kategori B</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('fees.C') }}" class=" waves-effect" aria-expanded="true">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Kategori C</span>
+                            </a>
+                        </li>
+                        @endrole
+                        
                         @role('Superadmin|Pentadbir|Guru')
                         {{-- <li>
                             <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
@@ -175,6 +198,7 @@
                                 <span>Urus</span>
                             </a>
                         </li>
+
                         @endrole
 
                         @role('Superadmin|Ibu|Bapa|Penjaga')
