@@ -731,4 +731,67 @@ class FeesController extends AppBaseController
             }
         }
     }
+
+
+    public function CategoryA()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.category_A.index', compact('organization'));
+    }
+
+    public function createCategoryA()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.category_A.add', compact('organization'));
+    }
+
+    public function StoreCategoryA(Request $request)
+    {
+        $organization = $this->getOrganizationByUserId();
+
+    }
+
+    public function CategoryB()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.category_B.index', compact('organization'));
+    }
+
+    public function createCategoryB()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.category_B.add', compact('organization'));
+    }
+
+
+    public function StoreCategoryB()
+    {
+
+    }
+
+    public function CategoryC()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.category_C.index', compact('organization'));
+    }
+
+    public function createCategoryC()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.category_C.add', compact('organization'));
+    }
+
+
+    public function StoreCategoryC()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.category_A.index', compact('organization'));
+    }
 }
