@@ -62,7 +62,7 @@
                             <label class="form-label">Kategori Yuran</label>
                             <div data-repeater-item class="inner mb-3 row">
                                 <div class="col-md-10 col-sm-8">
-                                    <select name="category[]" id="category" class="inner cat form-control" data-parsley-required-message="Sila pilih kategori" required>
+                                    <select name="category[]" class="inner cat form-control" data-parsley-required-message="Sila pilih kategori" required>
                                         <option value="" selected>Pilih Kategori</option>
                                     </select>
                                 </div>
@@ -162,7 +162,6 @@
         $('.form-validation').parsley();
 
         $("#organizationdd").prop("selectedIndex", 1).trigger('change');
-
     });
 
     $(document).on('change', '.cat', function(e) {
@@ -260,6 +259,7 @@
         var is_clicked = 0;
         var is_changed = 0;
         var category_length = 0;
+        var is_clicked_add = 0;
 
 
         // ************************** checkbox category ********************************
@@ -377,7 +377,42 @@
 
         // ************************** retrieve dropdown category and dropdown year student ********************************
 
-        function getCategory (organization_id){
+        // loopCategory(category_length);
+
+        // function loopCategory(length){
+        //     console.log("length: " + length);
+        //         for(let i=1; i <= category_length; i++){
+        //             $('#btnAdd').trigger('click');
+        //         }
+        // }
+
+        getCategoryLengthAndLoop();
+
+        function getCategoryLengthAndLoop(){
+                var _token          = $('input[name="_token"]').val();
+
+                $.ajax({
+                    url: "{{ route('fees.fetchYear') }}",
+                    method: "POST",
+                    data: {
+                        oid: organization_id,
+                        _token: _token
+                    },
+                    success: function(result) {
+                        let length = result.category.length;
+                        
+                        for(let i=1; i <= length; i++){
+                            $('#btnAdd').trigger('click');
+                            is_clicked_add++;
+                            // $(".cat").prop("selectedIndex", 2).trigger('change');
+                        }
+                        
+                    }
+            });
+        }
+
+
+        function getCategory(organization_id){
 
             console.log(organization_id);
             var _token          = $('input[name="_token"]').val();
@@ -392,20 +427,27 @@
                 success: function(result) {
                     is_clicked++;
                     category_length = result.category.length;
-                    console.log("cc"+category_length);
+                    console.log("cc: "+ category_length);
 
                     if(is_clicked > 1 && is_clicked == category_length){
 
                         $('.categoryhide').show();
-                        $('#category').empty();
+                        $('.cat').empty();
                         $('.yearhide').show();
                         $('#year').empty();
                         if(result.category){
                             // $("#category").append("<option value='' selected> Pilih Kategori</option>");
 
                             jQuery.each(result.category, function(key, value) {
-                                $(".cat").append("<option value='" + value.id + "'> " + value.nama + "</option>");
+                                    $(".cat").append("<option value='" + value.id + "'> " + value.nama + "</option>");
                             });
+
+                            for(let i=0; i < category_length; i++){
+                                console.log(is_clicked_add);
+                                $('select[name="outer-group[0][inner-group]['+ i +'][category]"] option:eq("1")');
+                                    // $("input[name*='inner-group["+ i +"]']").options.selectedIndex = 2;
+
+                            }
 
                             // $('.cbhidedetails').hide();
                             if (result.success.type_org == 1 || result.success.type_org == 2) {
@@ -467,13 +509,14 @@
                     
                     // $('.cbhidedetails').hide();
                     $('.cbhide').hide();
+                    
+                    
                 }
             })
         }
 
-    // });
-
         
+       
 </script>
 
 <script src="{{ URL::asset('assets/js/pages/form-repeater.int.js')}}"></script>
