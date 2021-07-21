@@ -89,7 +89,7 @@ class FeesController extends AppBaseController
             ->join('details', 'details.id', '=', 'fees_details.details_id')
             ->join('categories', 'categories.id', '=', 'details.category_id')
             ->select('fees.id as feeid', 'categories.id as cid', 'categories.nama as cnama', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'details.totalamount as totalamount', 'details.id as did')
-           
+
             ->orderBy('details.nama')
             ->get();
         // return view('pentadbir.fee.pay', compact('getfees', 'getcat', 'getdetail'));
@@ -750,7 +750,6 @@ class FeesController extends AppBaseController
     public function StoreCategoryA(Request $request)
     {
         $organization = $this->getOrganizationByUserId();
-
     }
 
     public function CategoryB()
@@ -768,9 +767,9 @@ class FeesController extends AppBaseController
     }
 
 
-    public function StoreCategoryB()
+    public function StoreCategoryB(Request $request)
     {
-
+        dd($request);
     }
 
     public function CategoryC()
@@ -787,11 +786,54 @@ class FeesController extends AppBaseController
         return view('fee.category_C.add', compact('organization'));
     }
 
-
-    public function StoreCategoryC()
+    public function StoreCategoryC(Request $request)
     {
         $organization = $this->getOrganizationByUserId();
 
         return view('fee.category_A.index', compact('organization'));
+    }
+
+    public function fetchClassYear(Request $request)
+    {
+
+        // dd($request->get('level'));
+        $level = $request->get('level');
+        $oid = $request->get('oid');
+        if ($level == "1") {
+            $list = DB::table('organizations')
+                ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
+                ->where('organizations.id', $oid)
+                ->first();
+
+            $class_organization = DB::table('classes')
+                ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+                ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
+                ->distinct()
+                ->where('classes.levelid', $level)
+                ->where('class_organization.organization_id', $oid)
+                ->get();
+
+            // dd($class_organization);
+
+            return response()->json(['data' => $list, 'datayear' => $class_organization]);
+        } else if ($level == "2") {
+
+            $list = DB::table('organizations')
+                ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
+                ->where('organizations.id', $oid)
+                ->first();
+
+            $class_organization = DB::table('classes')
+                ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+                ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
+                ->distinct()
+                ->where('classes.levelid', $level)
+                ->where('class_organization.organization_id', $oid)
+                ->get();
+
+            // dd($class_organization);
+
+            return response()->json(['data' => $list, 'datayear' => $class_organization]);
+        }
     }
 }

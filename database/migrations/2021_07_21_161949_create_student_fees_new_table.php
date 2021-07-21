@@ -16,8 +16,8 @@ class CreateStudentFeesNewTable extends Migration
         Schema::create('student_fees_new', function (Blueprint $table) {
             $table->id();
             $table->string('status');
-            $table->unsignedBigInteger('Yuran_id');
-            $table->unsignedBigInteger('KM_id');
+            $table->unsignedBigInteger('fees_id');
+            $table->unsignedBigInteger('class_student_id');
         });
     }
 
