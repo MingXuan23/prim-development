@@ -18,14 +18,14 @@ class CreateFeesNewTable extends Migration
             $table->string('name');
             $table->string('desc');
             $table->string('category');
-            $table->integer('kuantiti');
+            $table->integer('quantity');
             $table->float('price');
             $table->float('totalAmount');
             $table->date('start_date');
             $table->date('end_date');
             $table->string('status');
             $table->json('target');
-            $table->unsignedBigInteger('Organisasi_id');
+            $table->unsignedBigInteger('organization_id');
         });
     }
 

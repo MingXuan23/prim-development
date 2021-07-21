@@ -14,7 +14,7 @@ class AddForeignKeyToFeesNewTable extends Migration
     public function up()
     {
         Schema::table('fees_new', function (Blueprint $table) {
-            $table->foreign('Organisasi_id', 'fees_new_ibfk_1')->references('id')->on('organizations')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->foreign('organization_id', 'fees_new_ibfk_1')->references('id')->on('organizations')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
 

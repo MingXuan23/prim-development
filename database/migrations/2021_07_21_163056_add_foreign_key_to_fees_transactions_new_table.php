@@ -14,9 +14,9 @@ class AddForeignKeyToFeesTransactionsNewTable extends Migration
     public function up()
     {
         Schema::table('fees_transactions_new', function (Blueprint $table) {
-            $table->foreign('Yuran_murid_id', 'transactions_fees_new_ibfk_1')->references('id')->on('student_fees_new')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->foreign('Payment_type_id', 'transactions_fees_new_ibfk_2')->references('id')->on('payment_type')->onUpdate('CASCADE')->onDelete('CASCADE');
-            $table->foreign('Transaction_id', 'transactions_fees_new_ibfk_3')->references('id')->on('transactions')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->foreign('student_fees_id', 'transactions_fees_new_ibfk_1')->references('id')->on('student_fees_new')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->foreign('payment_type_id', 'transactions_fees_new_ibfk_2')->references('id')->on('payment_type')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->foreign('transactions_id', 'transactions_fees_new_ibfk_3')->references('id')->on('transactions')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
     }
 

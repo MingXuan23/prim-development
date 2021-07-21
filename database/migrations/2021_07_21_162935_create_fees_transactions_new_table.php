@@ -15,9 +15,9 @@ class CreateFeesTransactionsNewTable extends Migration
     {
         Schema::create('fees_transactions_new', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('Yuran_murid_id');
-            $table->unsignedBigInteger('Payment_type_id');
-            $table->unsignedBigInteger('Transaction_id');
+            $table->unsignedBigInteger('student_fees_id');
+            $table->unsignedBigInteger('payment_type_id');
+            $table->unsignedBigInteger('transactions_id');
         });
     }
 
