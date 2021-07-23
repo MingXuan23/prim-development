@@ -769,7 +769,74 @@ class FeesController extends AppBaseController
 
     public function StoreCategoryB(Request $request)
     {
-        dd($request);
+        // dd($request->toArray());
+        $gender      = "";
+        $class      = $request->get('cb_class');
+        $level      = $request->get('level');
+        $year       = $request->get('year');
+        $name       = $request->get('name');
+        $price          = $request->get('price');
+        $quantity       = $request->get('quantity');
+        $desc           = $request->get('description');
+        $oid            = $request->get('organization');
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
+        $total          = $price * $quantity;
+        $category       = "Category B";
+
+        if ($level == "All_Level") {
+            return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
+        } else if ($year == "All_Year") {
+            return $this->allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
+        } else {
+            return $this->allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category);
+        }
+    }
+
+
+
+    public function getCategoryBDatatable(Request $request)
+    {
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $userId = Auth::id();
+
+            if ($oid != '') {
+
+                // $data = DB::table('fees')->orderBy('nama')->get();
+                $data     = DB::table('fees_new')
+                    ->where('organization_id', $oid)
+                    ->where('category', "Category B")
+                    ->where('status', "1")
+                    ->get();
+
+                // dd($data);
+            }
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == '1') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
+        }
     }
 
     public function CategoryC()
@@ -788,9 +855,72 @@ class FeesController extends AppBaseController
 
     public function StoreCategoryC(Request $request)
     {
-        $organization = $this->getOrganizationByUserId();
+        // dd($request->toArray());
+        $gender     = $request->get('gender');
+        $class      = $request->get('cb_class');
+        $level      = $request->get('level');
+        $year       = $request->get('year');
+        $name       = $request->get('name');
+        $price          = $request->get('price');
+        $quantity       = $request->get('quantity');
+        $desc           = $request->get('description');
+        $oid            = $request->get('organization');
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
+        $total          = $price * $quantity;
+        $category       = "Category C";
 
-        return view('fee.category_A.index', compact('organization'));
+        if ($level == "All_Level") {
+            return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
+        } else if ($year == "All_Year") {
+            return $this->allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
+        } else {
+            return $this->allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category);
+        }
+    }
+
+    public function getCategoryCDatatable(Request $request)
+    {
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $userId = Auth::id();
+
+            if ($oid != '') {
+
+                // $data = DB::table('fees')->orderBy('nama')->get();
+                $data     = DB::table('fees_new')
+                    ->where('organization_id', $oid)
+                    ->where('category', "Category C")
+                    ->where('status', "1")
+                    ->get();
+
+                // dd($data);
+            }
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == '1') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
+        }
     }
 
     public function fetchClassYear(Request $request)
@@ -834,6 +964,210 @@ class FeesController extends AppBaseController
             // dd($class_organization);
 
             return response()->json(['data' => $list, 'datayear' => $class_organization]);
+        }
+    }
+
+    public function allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category)
+    {
+        if ($gender) {
+            $list = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->join('students', 'students.id', '=', 'class_student.student_id')
+                ->select('class_student.id as class_student_id')
+                ->where('class_organization.organization_id', $oid)
+                ->where('classes.status', "1")
+                ->where('students.gender', $gender)
+                ->get();
+
+            $data = array(
+                'data' => $level,
+                'gender' => $gender
+            );
+        } else {
+            $list = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('class_student.id as class_student_id')
+                ->where('class_organization.organization_id', $oid)
+                ->where('classes.status', "1")
+                ->get();
+
+            $data = array(
+                'data' => $level
+            );
+        }
+
+        $target = json_encode($data);
+
+        $fees = DB::table('fees_new')->insertGetId([
+            'name'          => $name,
+            'desc'          => $desc,
+            'category'      => $category,
+            'quantity'      => $quantity,
+            'price'         => $price,
+            'totalAmount'       => $total,
+            'start_date'        => $date_started,
+            'end_date'          => $date_end,
+            'status'            => "1",
+            'target'            => $target,
+            'organization_id'   => $oid,
+
+        ]);
+
+        for ($i = 0; $i < count($list); $i++) {
+            $array[] = array(
+                'status' => '1',
+                'fees_id' => $fees,
+                'class_student_id' => $list[$i]->class_student_id,
+
+            );
+        }
+        DB::table('student_fees_new')->insert($array);
+        if ($category == "Category B") {
+            return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
+        } else {
+            return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
+        }
+    }
+
+    public function allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category)
+    {
+        if ($gender) {
+            $list = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->join('students', 'students.id', '=', 'class_student.student_id')
+                ->select('class_student.id as class_student_id')
+                ->where('class_organization.organization_id', $oid)
+                ->where('classes.levelid', $level)
+                ->where('classes.status', "1")
+                ->where('students.gender', $gender)
+                ->get();
+            $data = array(
+                'data' => $level,
+                'gender' => $gender
+            );
+        } else {
+            $list = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('class_student.id as class_student_id')
+                ->where('class_organization.organization_id', $oid)
+                ->where('classes.levelid', $level)
+                ->where('classes.status', "1")
+                ->get();
+            $data = array(
+                'data' => $level
+            );
+        }
+
+        $target = json_encode($data);
+
+        $fees = DB::table('fees_new')->insertGetId([
+            'name'          => $name,
+            'desc'          => $desc,
+            'category'      => $category,
+            'quantity'      => $quantity,
+            'price'         => $price,
+            'totalAmount'       => $total,
+            'start_date'        => $date_started,
+            'end_date'          => $date_end,
+            'status'            => "1",
+            'target'            => $target,
+            'organization_id'   => $oid,
+
+        ]);
+
+        for ($i = 0; $i < count($list); $i++) {
+            $array[] = array(
+                'status' => '1',
+                'fees_id' => $fees,
+                'class_student_id' => $list[$i]->class_student_id,
+
+            );
+        }
+        DB::table('student_fees_new')->insert($array);
+        if ($category == "Category B") {
+            return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
+        } else {
+            return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
+        }
+    }
+
+    public function allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category)
+    {
+        // get list class checked from checkbox
+
+        $list = DB::table('classes')
+            ->where('status', "1")
+            ->whereIn('id',  $class)
+            ->get();
+
+        // dd(count($list));
+        for ($i = 0; $i < count($list); $i++) {
+            $class_arr[] = $list[$i]->nama;
+        }
+
+        if ($gender) {
+            $list_student = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->join('students', 'students.id', '=', 'class_student.student_id')
+                ->select('class_student.id as class_student_id')
+                ->where('class_organization.organization_id', $oid)
+                ->where('classes.status', "1")
+                ->where('students.gender', $gender)
+                ->whereIn('classes.id',  $class)
+                ->get();
+            $data = array(
+                'data' => $class_arr,
+                'gender' => $gender
+            );
+        } else {
+            $list_student = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('class_student.id as class_student_id')
+                ->where('class_organization.organization_id', $oid)
+                ->where('classes.status', "1")
+                ->whereIn('classes.id',  $class)
+                ->get();
+            $data = array(
+                'data' => $class_arr
+            );
+        }
+
+        $target = json_encode($data);
+
+        $fees = DB::table('fees_new')->insertGetId([
+            'name'          => $name,
+            'desc'          => $desc,
+            'category'      => $category,
+            'quantity'      => $quantity,
+            'price'         => $price,
+            'totalAmount'       => $total,
+            'start_date'        => $date_started,
+            'end_date'          => $date_end,
+            'status'            => "1",
+            'target'            => $target,
+            'organization_id'   => $oid,
+
+        ]);
+
+        for ($i = 0; $i < count($list_student); $i++) {
+            $array[] = array(
+                'status' => '1',
+                'fees_id' => $fees,
+                'class_student_id' => $list_student[$i]->class_student_id,
+
+            );
+        }
+        DB::table('student_fees_new')->insert($array);
+        if ($category == "Category B") {
+            return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
+        } else {
+            return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
         }
     }
 }

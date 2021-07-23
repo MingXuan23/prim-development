@@ -101,10 +101,13 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/B', 'FeesController@CategoryB')->name('fees.B');
     Route::get('/add/B', 'FeesController@createCategoryB')->name('fees.createB');
     Route::post('/store/B', 'FeesController@StoreCategoryB')->name('fees.storeB');
+    Route::get('listB', 'FeesController@getCategoryBDatatable')->name('fees.getCategoryBDatatable');
 
     Route::get('/C', 'FeesController@CategoryC')->name('fees.C');
     Route::get('/add/C', 'FeesController@createCategoryC')->name('fees.createC');
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
+    Route::get('listC', 'FeesController@getCategoryCDatatable')->name('fees.getCategoryCDatatable');
+
 
 });
 
