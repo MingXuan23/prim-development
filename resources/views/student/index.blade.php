@@ -227,14 +227,14 @@
                 });
             }
 
-            // $('#organization').change(function() {
+            $('#organization').change(function() {
                
-            //     var organizationid    = $("#organization").prop("selectedIndex", 1).val();
-            //     var _token            = $('input[name="_token"]').val();
+                var organizationid    = $("#organization").val();
+                var _token            = $('input[name="_token"]').val();
 
-            //     alert(organizationid);
+                fetchClass(organizationid);
                 
-            // });
+            });
 
             function fetchClass(organizationid = ''){
                 var _token            = $('input[name="_token"]').val();

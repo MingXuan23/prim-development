@@ -28,8 +28,8 @@
             </ul>
         </div>
         @endif
-        <form class="form-validation" method="POST" action="{{ route('fees.storeB') }}" enctype="multipart/form-data" name="ff">
-            
+        <form class="form-validation" method="POST" action="{{ route('fees.storeB') }}" enctype="multipart/form-data">
+
             @csrf
             <div class="card-body">
 
@@ -95,7 +95,7 @@
                         data-parsley-required-message="Sila pilih tahap"
                         data-parsley-required-message="Sila pilih tahap" required>
                         <option value="" disabled selected>Pilih Tahap</option>
-                        <option value="All">Semua Tahap</option>
+                        <option value="All_Level">Semua Tahap</option>
                         <option value="1">Tahap 1</option>
                         <option value="2">Tahap 2</option>
                     </select>
@@ -103,8 +103,7 @@
 
                 <div class="yearhide form-group">
                     <label>Tahun</label>
-                    <select name="year" id="year" class="form-control" data-parsley-required-message="Sila pilih tahun"
-                        required>
+                    <select name="year" id="year" class="form-control">
                         <option value="" disabled selected>Pilih Tahun</option>
                     </select>
                 </div>
@@ -220,32 +219,33 @@
                 var oid     = $("#organization option:selected").val();
                 var _token  = $('input[name="_token"]').val();
 
-                $.ajax({
-                    url: "{{ route('fees.fetchClassYear') }}",
-                    method: "GET",
-                    data: {
-                        level: level,
-                        oid: oid,
-                        _token: _token
-                    },
-                    success: function(result) {
+                if(level=="All_Level"){
+                    $('.yearhide').hide();
+                    $('.cbhide').hide();
+                    $('#cb_class').remove();
+                    $(".cbhide label").remove();
+                    $('#year').empty();
 
-                        if(level=="All"){
-                            $('.yearhide').hide();
+                }else{
+                    $.ajax({
+                        url: "{{ route('fees.fetchClassYear') }}",
+                        method: "GET",
+                        data: {
+                            level: level,
+                            oid: oid,
+                            _token: _token
+                        },
+                        success: function(result) {
 
-                        }else{
                             $('.yearhide').show();
                             $('#year').empty();
-                            $("#year").append("<option value='' selected> Semua Tahun</option>");
-
+                            $("#year").append("<option value='All_Year' selected> Semua Tahun</option>");
                             jQuery.each(result.datayear, function(key, value) {
                                 $("#year").append("<option value='"+ value.year +"'> Tahun " + value.year + "</option>");
-
                             });
                         }
-                        
-                    }
-                })
+                    })
+                }
             }
         });
 
@@ -266,18 +266,27 @@
                         _token: _token
                     },
                     success: function(result) {
-                        $('.cbhide').show();
-                        $('#cb_class').remove();
-                        $(".cbhide label").remove();
-                        $(".cbhide").append(
-                            "<label for='checkAll' style='margin-right: 22px;' class='form-check-label'> <input class='form-check-input' type='checkbox' id='checkedAll' name='all' value=''/> Semua Kelas </label>"
-                        );
-                        // console.log(result.success.oid);
-                        jQuery.each(result.success, function(key, value) {
+
+                        if(year == "All_Year"){
+                            $('.cbhide').hide();
+                            $('#cb_class').remove();
+                            $(".cbhide label").remove();
+                        }else{
+                            $('.cbhide').show();
+                            $('#cb_class').remove();
+                            $(".cbhide label").remove();
                             $(".cbhide").append(
-                                "<label for='cb_class' style='margin-right: 22px;' class='form-check-label'> <input class='checkSingle form-check-input' data-parsley-required-message='Sila pilih kelas' type='checkbox' id='cb_class' name='cb_class[]' value='" +
-                                value.cid + "'/> " + value.cname + " </label>");
-                        });
+                                "<label for='checkAll' style='margin-right: 22px;' class='form-check-label'> <input class='form-check-input' type='checkbox' id='checkedAll' name='all_classes' value=''/> Semua Kelas </label>"
+                            );
+                            // console.log(result.success.oid);
+                            jQuery.each(result.success, function(key, value) {
+                                $(".cbhide").append(
+                                    "<label for='cb_class' style='margin-right: 22px;' class='form-check-label'> <input class='checkSingle form-check-input' data-parsley-required-message='Sila pilih kelas' data-parsley-errors-container='.errorMessageCB' type='checkbox' id='cb_class' name='cb_class[]' value='" +
+                                    value.cid + "'/> " + value.cname + " </label><br> <div class='errorMessageCB'></div>");
+                            });
+                            $("#cb_class").attr('required', '');  
+                        }
+                        
                     }
                 })
             }

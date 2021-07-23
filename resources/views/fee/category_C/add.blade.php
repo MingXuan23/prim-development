@@ -28,8 +28,9 @@
             </ul>
         </div>
         @endif
-        <form class="form-validation" method="post" action="{{ route('fees.storeC') }}" enctype="multipart/form-data">
-            {{csrf_field()}}
+        <form class="form-validation" method="POST" action="{{ route('fees.storeC') }}" enctype="multipart/form-data">
+
+            @csrf
             <div class="card-body">
 
 
@@ -44,12 +45,17 @@
                         <label>Harga (RM)</label>
                         <input class="form-control input-mask text-left"
                             data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                            im-insert="true" name="price">
+                            im-insert="true" name="price" data-parsley-required-message="Sila masukkan harga"
+                            data-parsley-errors-container=".errorMessagePrice" required>
                         <i>*Harga per kuantiti</i>
+                        <div class="errorMessagePrice"></div>
                     </div>
                     <div class="form-group col-md-6">
                         <label>Kuantiti</label>
-                        <input type="text" name="quantity" class="form-control" placeholder="Kuantiti">
+                        <input type="text" name="quantity" class="form-control" placeholder="Kuantiti"
+                            data-parsley-required-message="Sila masukkan kuantiti" required>
+
+
                     </div>
 
                 </div>
@@ -75,7 +81,7 @@
                 <div class="form-group">
                     <label class="control-label">Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control"
-                        data-parsley-required-message="Sila masukkan nama organisasi" required>
+                        data-parsley-required-message="Sila pilih organisasi" required>
                         <option value="" disabled selected>Pilih Organisasi</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
@@ -86,9 +92,10 @@
                 <div class="form-group">
                     <label>Tahap</label>
                     <select name="level" id="level" class="form-control"
+                        data-parsley-required-message="Sila pilih tahap"
                         data-parsley-required-message="Sila pilih tahap" required>
-                        <option value="" selected>Pilih Tahap</option>
-                        <option value="All">Semua Tahap</option>
+                        <option value="" disabled selected>Pilih Tahap</option>
+                        <option value="All_Level">Semua Tahap</option>
                         <option value="1">Tahap 1</option>
                         <option value="2">Tahap 2</option>
                     </select>
@@ -96,9 +103,8 @@
 
                 <div class="yearhide form-group">
                     <label>Tahun</label>
-                    <select name="year" id="year" class="form-control" data-parsley-required-message="Sila pilih tahun"
-                        required>
-                        <option value="" selected>Pilih Tahun</option>
+                    <select name="year" id="year" class="form-control">
+                        <option value="" disabled selected>Pilih Tahun</option>
                     </select>
                 </div>
 
@@ -106,15 +112,14 @@
 
                 </div>
 
-
                 <div class="genderhide form-group">
                     <label>Jantina</label>
                     <div class="radio">
-                        <label class="radio-inline pl-2"><input type="radio" name="optradio"> Lelaki </label>
-                        <label class="radio-inline pl-2"><input type="radio" name="optradio"> Perempuan </label>
+                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="M"> Lelaki </label>
+                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="F"> Perempuan </label>
                     </div>
                 </div>
-
+                
                 <div class="form-group">
                     <label>Penerangan</label>
                     <textarea name="description" class="form-control" placeholder="Penerangan" cols="30"
@@ -143,6 +148,7 @@
 <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
 
 <!-- Plugin Js-->
+<script src="{{ URL::asset('assets/libs/dropzone/dropzone.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
@@ -166,6 +172,19 @@
             format: 'dd/mm/yyyy',
             orientation: 'bottom'
           });
+
+          // ************************** organization on change ********************************
+
+        $('#organization').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            $('.yearhide').hide();
+            $("#level").prop("selectedIndex", 1).trigger('change');
+            
+        });
+            
+        if($("#organization").val() != ""){
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+        }
 
 
           // ************************** checkbox class ********************************
@@ -208,32 +227,33 @@
                 var oid     = $("#organization option:selected").val();
                 var _token  = $('input[name="_token"]').val();
 
-                $.ajax({
-                    url: "{{ route('fees.fetchClassYear') }}",
-                    method: "GET",
-                    data: {
-                        level: level,
-                        oid: oid,
-                        _token: _token
-                    },
-                    success: function(result) {
+                if(level=="All_Level"){
+                    $('.yearhide').hide();
+                    $('.cbhide').hide();
+                    $('#cb_class').remove();
+                    $(".cbhide label").remove();
+                    $('#year').empty();
 
-                        if(level=="All"){
-                            $('.yearhide').hide();
+                }else{
+                    $.ajax({
+                        url: "{{ route('fees.fetchClassYear') }}",
+                        method: "GET",
+                        data: {
+                            level: level,
+                            oid: oid,
+                            _token: _token
+                        },
+                        success: function(result) {
 
-                        }else{
                             $('.yearhide').show();
                             $('#year').empty();
-                            $("#year").append("<option value='' selected> Semua Tahun</option>");
-
+                            $("#year").append("<option value='All_Year' selected> Semua Tahun</option>");
                             jQuery.each(result.datayear, function(key, value) {
                                 $("#year").append("<option value='"+ value.year +"'> Tahun " + value.year + "</option>");
-
                             });
                         }
-                        
-                    }
-                })
+                    })
+                }
             }
         });
 
@@ -254,18 +274,27 @@
                         _token: _token
                     },
                     success: function(result) {
-                        $('.cbhide').show();
-                        $('#cb_class').remove();
-                        $(".cbhide label").remove();
-                        $(".cbhide").append(
-                            "<label for='checkAll' style='margin-right: 22px;' class='form-check-label'> <input class='form-check-input' type='checkbox' id='checkedAll' name='all' value=''/> Semua Kelas </label>"
-                        );
-                        // console.log(result.success.oid);
-                        jQuery.each(result.success, function(key, value) {
+
+                        if(year == "All_Year"){
+                            $('.cbhide').hide();
+                            $('#cb_class').remove();
+                            $(".cbhide label").remove();
+                        }else{
+                            $('.cbhide').show();
+                            $('#cb_class').remove();
+                            $(".cbhide label").remove();
                             $(".cbhide").append(
-                                "<label for='cb_class' style='margin-right: 22px;' class='form-check-label'> <input class='checkSingle form-check-input' data-parsley-required-message='Sila pilih kelas' type='checkbox' id='cb_class' name='cb_class[]' value='" +
-                                value.cid + "'/> " + value.cname + " </label>");
-                        });
+                                "<label for='checkAll' style='margin-right: 22px;' class='form-check-label'> <input class='form-check-input' type='checkbox' id='checkedAll' name='all_classes' value=''/> Semua Kelas </label>"
+                            );
+                            // console.log(result.success.oid);
+                            jQuery.each(result.success, function(key, value) {
+                                $(".cbhide").append(
+                                    "<label for='cb_class' style='margin-right: 22px;' class='form-check-label'> <input class='checkSingle form-check-input' data-parsley-required-message='Sila pilih kelas' data-parsley-errors-container='.errorMessageCB' type='checkbox' id='cb_class' name='cb_class[]' value='" +
+                                    value.cid + "'/> " + value.cname + " </label><br> <div class='errorMessageCB'></div>");
+                            });
+                            $("#cb_class").attr('required', '');  
+                        }
+                        
                     }
                 })
             }
