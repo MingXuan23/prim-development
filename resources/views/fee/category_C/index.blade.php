@@ -71,7 +71,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap"
+                    <table id="categoryC" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
@@ -79,6 +79,7 @@
                                 <th>Nama Butiran</th>
                                 <th>Penerangan</th>
                                 <th>Jumlah Amaun (RM)</th>
+                                <th>Rujukan</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -127,7 +128,7 @@
 <script>
     $(document).ready(function() {
   
-        var categoryA;
+        var categoryC;
   
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
@@ -135,14 +136,13 @@
         }
 
         function fetch_data(oid = '') {
-            categoryA = $('#categoryA').DataTable({
+            categoryC = $('#categoryC').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('teacher.getTeacherDatatable') }}",
+                        url: "{{ route('fees.getCategoryCDatatable') }}",
                         data: {
-                            oid: oid,
-                            hasOrganization: true
+                            oid: oid
                         },
                         type: 'GET',
   
@@ -173,6 +173,11 @@
                         name: 'desc',
                         orderable: false,
                         searchable: false,
+                    }, {
+                        data: "totalAmount",
+                        name: 'totalAmount',
+                        orderable: false,
+                        searchable: false,
                         defaultContent: 0,
                         render: function(data, type, full) {
                             if(data){
@@ -181,7 +186,15 @@
                                 return 0;
                             }
                         }
-                    },  {
+                    }, {
+                        data: "target",
+                        name: 'target',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, full) {
+                            return data;
+                        }
+                    }, {
                         data: 'status',
                         name: 'status',
                         orderable: false,
@@ -191,13 +204,17 @@
                         name: 'action',
                         orderable: false,
                         searchable: false
-                    },]
+                    },],
+                    error: function (error) {
+                        alert('error');
+                        alert(error.toString());
+                    }
             });
         }
   
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#categoryA').DataTable().destroy();
+            $('#categoryC').DataTable().destroy();
             // console.log(organizationid);
             fetch_data(organizationid);
         });

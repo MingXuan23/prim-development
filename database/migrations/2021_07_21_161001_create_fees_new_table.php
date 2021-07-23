@@ -15,16 +15,16 @@ class CreateFeesNewTable extends Migration
     {
         Schema::create('fees_new', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('desc');
-            $table->string('category');
-            $table->integer('quantity');
-            $table->float('price');
-            $table->float('totalAmount');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->string('status');
-            $table->json('target');
+            $table->string('name')->nullable();
+            $table->string('desc')->nullable();
+            $table->string('category')->nullable();
+            $table->integer('quantity')->nullable();
+            $table->float('price')->nullable();
+            $table->float('totalAmount')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->string('status')->nullable();
+            $table->json('target')->nullable();
             $table->unsignedBigInteger('organization_id');
         });
     }

@@ -80,8 +80,8 @@
     <!-- header area start  -->
     <header class="header-area header-bg-2 style-two" id="home">
         <div class="header-right-image  wow zoomIn" style="text-align: right">
-            <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image" style="padding-bottom: 358px;
-            max-width: 63%;">
+            <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="padding-bottom: 482px;
+            max-width: 70%;">
         </div>
         <div class="container">
             <div class="row">
