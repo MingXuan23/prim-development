@@ -74,31 +74,88 @@ class PayController extends AppBaseController
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
-    // public function parentpay(Request $request)
-    // {
-    //     $feesid     = $request->id;
-    //     $getfees    = DB::table('fees')->where('id', $feesid)->first();
+    // pay fees latest 15 july code
+    public function pay(Request $request)
+    {
 
-    //     $getcat = DB::table('fees')
-    //         ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
-    //         ->join('details', 'details.id', '=', 'fees_details.details_id')
-    //         ->join('categories', 'categories.id', '=', 'details.category_id')
-    //         ->distinct('categories.nama')
-    //         ->select('categories.id as cid', 'categories.nama as cnama')
-    //         ->where('fees.id', $feesid)
-    //         ->orderBy('categories.id')
-    //         ->get();
+        // dd($request->toArray());
+        // ************  id from value checkbox  **************
+        $size = count(collect($request)->get('id'));
+        $data = collect($request)->get('id');
+        // dd($data[0]);
 
-    //     $getdetail  = DB::table('fees')
-    //         ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
-    //         ->join('details', 'details.id', '=', 'fees_details.details_id')
-    //         ->join('categories', 'categories.id', '=', 'details.category_id')
-    //         ->select('categories.id as cid', 'categories.nama as cnama', 'details.nama as dnama', 'details.quantity as quantity', 'details.price as price', 'details.totalamount as totalamount', 'details.id as did')
-    //         ->where('fees.id', $feesid)
-    //         ->orderBy('details.nama')
-    //         ->get();
-    //     return view('parent.fee.index', compact('getfees', 'getcat', 'getdetail'));
-    // }
+        $studentid  = array();
+        $feesid     = array();
+        for ($i = 0; $i < $size; $i++) {
+
+            //want seperate data from request
+            //case 0 = student id
+            //case 1 = fees id
+            //format req X-X
+
+            $case           = explode("-", $data[$i]);
+            $studentid[]    = $case[0];
+            $feesid[]       = $case[1];
+        }
+        $res_student = array_unique($studentid);
+        $res_fee     = array_unique($feesid);
+
+        // $getstudent  = Student::whereIn('id', $res_student)->get();
+
+        // ************************* get student from array student id *******************************
+
+        $getstudent  = DB::table('students')
+            ->select('id as studentid', 'nama as studentname')
+            ->whereIn('id', $res_student)
+            ->get();
+
+        // ************************* get organization from array student id *******************************
+
+        $getstudent2  = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->select('students.id as studentid', 'students.nama as studentname', 'fees_new.id as feeid', 'fees_new.organization_id as organizationid')
+            ->whereIn('students.id', $res_student)
+            ->first();
+
+        $getorganization  = DB::table('organizations')
+            ->where('id', $getstudent2->organizationid)
+            ->first();
+
+        // ************************* get fees from array fees id *******************************
+
+
+        $getfees     = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->select('fees_new.category', 'students.id as studentid')
+            ->distinct()
+            ->whereIn('fees_new.id', $res_fee)
+            ->get();
+
+        $getfees_bystudent     = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.category', 'students.id as studentid')
+            ->whereIn('fees_new.id', $res_fee)
+            ->get();
+
+        // ************************* get student_fees_id from array *******************************
+
+        $getstudentfees  = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->select('student_fees_new.id')
+            ->whereIn('students.id', $res_student)
+            ->whereIn('fees_new.id', $res_fee)
+            ->get();
+
+        return view('fee.pay.pay', compact('getstudent', 'getorganization', 'getfees', 'getfees_bystudent', 'getstudentfees'))->render();
+    }
 
     public function fees_pay(Request $request)
     {
@@ -360,7 +417,7 @@ class PayController extends AppBaseController
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
-        // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+            // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
             $fpx_buyerEmail      = "prim.utem@gmail.com";
             $telno               = $user->telno;
@@ -634,7 +691,7 @@ class PayController extends AppBaseController
             ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_fees.class_organization_id')
             ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
-            ->select('organizations.id as oid', 'organizations.nama as oname' , 'organizations.fixed_charges')
+            ->select('organizations.id as oid', 'organizations.nama as oname', 'organizations.fixed_charges')
             ->where('transactions.id', $id)
             ->first();
 

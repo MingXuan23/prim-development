@@ -210,14 +210,14 @@
                         </li>
                         @endrole
 
-                        {{-- @role('Superadmin|Ibu|Bapa|Penjaga')
+                        @role('Superadmin|Ibu|Bapa|Penjaga')
                         <li>
-                            <a href="{{ route('feesparentdev') }}" class=" waves-effect">
-                        <i class="far fa-credit-card"></i>
-                        <span>Test Bayar</span>
-                        </a>
-                </li>
-                @endrole --}}
+                            <a href="{{ route('dependent_fees') }}" class=" waves-effect">
+                                <i class="far fa-credit-card"></i>
+                                <span>Bayar - Baru</span>
+                            </a>
+                        </li>
+                        @endrole
             </ul>
             </li>
             @endrole

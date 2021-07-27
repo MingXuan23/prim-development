@@ -1170,4 +1170,63 @@ class FeesController extends AppBaseController
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
         }
     }
+
+    public function dependent_fees()
+    {
+        $userid = Auth::id();
+
+        // ************************* get list dependent from user id  *******************************
+
+        $list = DB::table('organizations')
+            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            ->join('users', 'users.id', '=', 'organization_user.user_id')
+            ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+            ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->select('organizations.id as oid', 'organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname')
+            ->where([
+                ['users.id', 4],
+            ])
+            ->where(function ($query) {
+                $query->where('organization_user.role_id', 6);
+            })
+            ->orderBy('organizations.id')
+            ->orderBy('classes.nama')
+            ->get();
+
+        // ************************* get list fees  *******************************
+
+        // $getfees = DB::table('fees_new')
+        //     ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+        //     ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+        //     ->join('students', 'students.id', '=', 'class_student.student_id')
+        //     ->select('fees_new.id as feeid', 'fees_new.category as category_fee', 'students.id as studentid')
+        //     ->orderBy('students.id')
+        //     ->orderBy('fees_new.category')
+        //     ->get();
+
+        $getfees     = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->select('fees_new.category', 'students.id as studentid')
+            ->distinct()
+            ->orderBy('students.id')
+            ->orderBy('fees_new.category')
+            ->get();
+
+        $getfees_bystudent     = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->select('fees_new.*', 'students.id as studentid')
+            ->get();
+
+        $allfees = DB::table('fees_new')->get();
+
+        // dd($getfees);
+        return view('fee.pay.index', compact('list', 'getfees', 'getfees_bystudent'));
+    }
 }
