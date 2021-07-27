@@ -42,15 +42,6 @@ class ParentController extends Controller
         $userId = $id;
         $organization = $this->getOrganizationByUserId();
 
-        $role   = DB::table('organization_roles')
-            ->where('id', '!=', 1)
-            ->where('id', '!=', 2)
-            ->where('id', '!=', 3)
-            ->where('id', '!=', 4)
-            ->where('id', '!=', 5)
-            ->get();
-
-
         $list = DB::table('organizations')
             ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
             ->join('users', 'users.id', '=', 'organization_user.user_id')
@@ -67,7 +58,7 @@ class ParentController extends Controller
             ->orderBy('classes.nama')
             ->get();
 
-        return view('parent.dependent.index', compact('list', 'role', 'organization', 'userId'));
+        return view('parent.dependent.index', compact('list', 'organization', 'userId'));
     }
 
     public function fetchClass(Request $request)
@@ -158,35 +149,51 @@ class ParentController extends Controller
 
         $userId = $request->get('parentid');
         $schid = $request->get('organization');
-        $roles = $request->get('roles');
-
-        $ouid = DB::table('organization_user')->insertGetId([
-            'organization_id'   => $schid,
-            'user_id'           => $userId,
-            'role_id'           => $roles,
-            'start_date'        => now(),
-            'status'            => 1,
-        ]);
-
-        // dd($schid);
         $stdid = $request->get('student');
 
-        $list = DB::table('organization_user_student')
-            ->insert([
-                'organization_user_id'  => $ouid,
-                'student_id'            => $stdid
+        $check_parent = DB::table('organization_user')
+            ->where('organization_id', $schid)
+            ->where('user_id', $userId)
+            ->where('role_id', 6)
+            ->where('status', 1)
+            ->first();
 
+        // dd($check_parent);
+        if ($check_parent) {
+            $ouid = $check_parent->id;
+        } else {
+            $ouid = DB::table('organization_user')->insertGetId([
+                'organization_id'   => $schid,
+                'user_id'           => $userId,
+                'role_id'           => 6,
+                'start_date'        => now(),
+                'status'            => 1,
             ]);
+        }
 
-        // $user = User::find($userId);
+        $check_std = DB::table('organization_user_student')
+            ->where('organization_user_id', $ouid)
+            ->where('student_id', $stdid)
+            ->first();
+
+        if ($check_std) {
+            return redirect('/parent/dependent/' . $userId)->withErrors('Tanggungan ini telahpun ditambah');
+        } else {
+            DB::table('organization_user_student')
+                ->insert([
+                    'organization_user_id'  => $ouid,
+                    'student_id'            => $stdid
+
+                ]);
+        }
 
         $user = $this->user->getUser($userId);
         // $role = Role::create(['name' => 'parent']);
 
-        $rolename = OrganizationRole::find($roles);
-
+        $rolename = OrganizationRole::find(6);
         $user->assignRole($rolename->nama);
-        return redirect('/parent/dependent/'.$userId)->with('success', 'New dependents has been added successfully');
+
+        return redirect('/parent/dependent/' . $userId)->with('success', 'Tanggungan telah berjaya ditambah');
     }
 
     public function show($id)
