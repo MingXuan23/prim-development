@@ -29,29 +29,19 @@ class OrganizationRolesTableSeeder extends Seeder
             2 =>
             array(
                 "id" => 6,
-                "nama" => "Ibu",
-            ),
-            3 =>
-            array(
-                "id" => 7,
-                "nama" => "Bapa",
-            ),
-            4 =>
-            array(
-                "id" => 8,
                 "nama" => "Penjaga",
             ),
-            5 =>
+            3 =>
             array(
                 "id" => 1,
                 "nama" => "Superadmin",
             ),
-            6 =>
+            4 =>
             array(
                 "id" => 2,
                 "nama" => "Admin",
             ),
-            7 =>
+            5 =>
             array(
                 "id" => 3,
                 "nama" => "Jaim",
