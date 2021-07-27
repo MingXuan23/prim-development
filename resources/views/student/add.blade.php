@@ -58,7 +58,13 @@
                     <label>Nombor Kad Pengenalan</label>
                     <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
                 </div>
-
+                <div class="form-group">
+                    <label>Jantina</label>
+                    <div class="radio">
+                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="M"> Lelaki </label>
+                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="F"> Perempuan </label>
+                    </div>
+                </div>
 
                 {{-- <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="exampleCheck1">

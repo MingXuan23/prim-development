@@ -64,22 +64,7 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label>Peranan</label>
-                            <select name="roles" id="roles" class="form-control">
-                                <option value="" disabled selected>Pilih Peranan</option>
-                                @foreach($role as $row)
-                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                    </div> --}}
                     </div>
-                    <!-- /.card-body -->
 
                     <div class="">
                         <button style="float: right" type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
@@ -105,7 +90,6 @@
                             <th>Nama Tanggungan</th>
                             <th>Nama Sekolah</th>
                             <th>Kelas</th>
-                            <th>Peranan</th>
                             <th>Details</th>
                         </tr>
 
@@ -115,7 +99,6 @@
                             <td>{{ $row->studentname }}</td>
                             <td>{{ $row->nschool }}</td>
                             <td>{{ $row->classname }}</td>
-                            <td>{{ $row->rolename }}</td>
 
                             <td>
                                 <div class="d-flex justify-content-center">
@@ -183,41 +166,41 @@
                 })    
         }
 
-                $('#classes').change(function(){
-
-                    if($(this).val() != '')
+        $('#classes').change(function(){
+            if($(this).val() != '')
+            {
+                var classid   = $("#classes option:selected").val();
+                var _token    = $('input[name="_token"]').val();
+            
+                console.log(classid);
+                $.ajax({
+                    url:"{{ route('parent.fetchStd') }}",
+                    method:"POST",
+                    data:{ cid: classid,
+                            _token: _token },
+                    success:function(result)
                     {
-                        var classid   = $("#classes option:selected").val();
-                        var _token    = $('input[name="_token"]').val();
-                    
-                        console.log(classid);
-                        $.ajax({
-                            url:"{{ route('parent.fetchStd') }}",
-                            method:"POST",
-                            data:{ cid: classid,
-                                    _token: _token },
-                            success:function(result)
-                            {
-                                // $('#murid').val("0");
-                                $('#student').empty();
-                                $("#student").append("<option value='0'> Pilih Murid</option>");
-                                
-                                jQuery.each(result.success, function(key, value){
-
-                                    $("#student").append("<option value='"+ value.sid +"'>" + value.namestd + "</option>");
-                                
-                                });
-
-                            }
-
-                        })
-
+                        // $('#murid').val("0");
+                        $('#student').empty();
+                        $("#student").append("<option value='0'> Pilih Murid</option>");
+                        
+                        jQuery.each(result.success, function(key, value){
+                            $("#student").append("<option value='"+ value.sid +"'>" + value.namestd + "</option>");
+                        
+                        });
                     }
+                })
+            }
+        });
 
-                });
-        
+        $('#organization').change(function(){
+            if($(this).val() != '')
+            {
+                fetch_data($("#organization").val());
+            }
+        });
                 
-            });
+    });
         
         
 </script>

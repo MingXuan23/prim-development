@@ -84,11 +84,11 @@ Route::group(['prefix' => 'student'], function () {
 });
 
 Route::group(['prefix' => 'fees'], function () {
-    Route::post('year', 'FeesController@fetchYear')->name('fees.fetchYear');
-    Route::get('classyear', 'FeesController@fetchClassYear')->name('fees.fetchClassYear');
-    Route::post('class', 'FeesController@fetchClass')->name('fees.fetchClass');
-    Route::get('list', 'FeesController@getFeesDatatable')->name('fees.getFeesDatatable');
-    Route::get('report', 'FeesController@feesReport')->name('fees.report');
+    Route::post('/year', 'FeesController@fetchYear')->name('fees.fetchYear');
+    Route::get('/classyear', 'FeesController@fetchClassYear')->name('fees.fetchClassYear');
+    Route::post('/class', 'FeesController@fetchClass')->name('fees.fetchClass');
+    Route::get('/list', 'FeesController@getFeesDatatable')->name('fees.getFeesDatatable');
+    Route::get('/report', 'FeesController@feesReport')->name('fees.report');
     Route::get('/getTransaction', 'FeesController@getTransactionByOrganizationIdAndStatus')->name('fees.get_transaction');
     Route::get('/latestTransaction', 'FeesController@getLatestTransaction')->name('fees.latest_transaction');
     Route::get('/totalCatA', 'FeesController@getTotalCatA')->name('fees.totalCatA');
@@ -101,14 +101,15 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/B', 'FeesController@CategoryB')->name('fees.B');
     Route::get('/add/B', 'FeesController@createCategoryB')->name('fees.createB');
     Route::post('/store/B', 'FeesController@StoreCategoryB')->name('fees.storeB');
-    Route::get('listB', 'FeesController@getCategoryBDatatable')->name('fees.getCategoryBDatatable');
+    Route::get('/listB', 'FeesController@getCategoryBDatatable')->name('fees.getCategoryBDatatable');
 
     Route::get('/C', 'FeesController@CategoryC')->name('fees.C');
     Route::get('/add/C', 'FeesController@createCategoryC')->name('fees.createC');
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
-    Route::get('listC', 'FeesController@getCategoryCDatatable')->name('fees.getCategoryCDatatable');
+    Route::get('/listC', 'FeesController@getCategoryCDatatable')->name('fees.getCategoryCDatatable');
 
-
+    Route::get('/dependent', 'FeesController@dependent_fees')->name('dependent_fees');
+    Route::get('/pay', 'PayController@pay')->name('pay');
 });
 
 Route::group(['prefix' => 'parent'], function () {

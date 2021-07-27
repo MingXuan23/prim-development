@@ -29,34 +29,22 @@ class RoleTableSeeder extends Seeder
             2 =>
             array(
                 "id" => 6,
-                "name" => "Ibu",
-                "guard_name" => "web"
-            ),
-            3 =>
-            array(
-                "id" => 7,
-                "name" => "Bapa",
-                "guard_name" => "web"
-            ),
-            4 =>
-            array(
-                "id" => 8,
                 "name" => "Penjaga",
                 "guard_name" => "web"
             ),
-            5 =>
+            3 =>
             array(
                 "id" => 1,
                 "name" => "Superadmin",
                 "guard_name" => "web"
             ),
-            6 =>
+            4 =>
             array(
                 "id" => 2,
                 "name" => "Admin",
                 "guard_name" => "web"
             ),
-            7 =>
+            5 =>
             array(
                 "id" => 3,
                 "name" => "Jaim",
