@@ -38,11 +38,11 @@
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected>Pilih Organisasi</option>
                         @foreach($organization as $row)
-                            @if($row->id == $student->organization_id)
-                            <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
-                            @else
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endif
+                        @if($row->id == $student->organization_id)
+                        <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                        @else
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
@@ -52,11 +52,11 @@
                     <select name="classes" id="classes" class="form-control">
                         <option value="" disabled selected>Pilih Kelas</option>
                         @foreach($listclass as $row)
-                            @if($row->id == $student->classid)
-                            <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
-                            @else
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endif
+                        @if($row->id == $student->classid)
+                        <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                        @else
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
@@ -71,7 +71,15 @@
                     <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan"
                         value="{{ $student->icno }}">
                 </div>
-
+                <div class="form-group">
+                    <label>Jantina</label>
+                    <div class="radio">
+                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="M"
+                                {{ ($student->gender =="M")? "checked" : "" }}> Lelaki </label>
+                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="F"
+                                {{ ($student->gender =="F")? "checked" : "" }}> Perempuan </label>
+                    </div>
+                </div>
                 <div class="form-group mb-0">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">

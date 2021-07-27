@@ -131,6 +131,7 @@ class StudentController extends Controller
         $student = new Student([
             'nama'          =>  $request->get('name'),
             'icno'          =>  $request->get('icno'),
+            'gender'        =>  $request->get('gender'),
         ]);
 
         $student->save();
@@ -156,7 +157,7 @@ class StudentController extends Controller
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('class_organization.organization_id', 'students.id as id', 'students.nama as studentname', 'students.icno', 'classes.id as classid', 'classes.nama as classname', 'class_student.status')
+            ->select('class_organization.organization_id', 'students.id as id', 'students.nama as studentname', 'students.icno', 'students.gender', 'classes.id as classid', 'classes.nama as classname', 'class_student.status')
             ->where([
                 ['students.id', $id],
             ])
@@ -183,7 +184,7 @@ class StudentController extends Controller
 
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required|numeric',
+            'icno'          =>  'required',
             'classes'       =>  'required',
         ]);
 
@@ -204,6 +205,7 @@ class StudentController extends Controller
                 [
                     'students.nama' => $request->get('name'),
                     'students.icno' => $request->get('icno'),
+                    'students.icno' => $request->get('gender'),
                     'class_student.organclass_id'    => $getOrganizationClass->id,
                 ]
             );
@@ -231,10 +233,10 @@ class StudentController extends Controller
 
 
         if ($result) {
-            Session::flash('success', 'Guru Berjaya Dipadam');
+            Session::flash('success', 'Murid Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         } else {
-            Session::flash('error', 'Guru Gagal Dipadam');
+            Session::flash('error', 'Murid Gagal Dipadam');
             return View::make('layouts/flash-messages');
         }
     }
