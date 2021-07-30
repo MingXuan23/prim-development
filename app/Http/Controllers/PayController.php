@@ -645,15 +645,15 @@ class PayController extends AppBaseController
             // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
             // return Redirect::away('https://dev.prim.my/api/devtrans')->with($request->toArray());
 
-            $userid = User::find(Auth::id());
+            $userid = Auth::id();
             $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
             $transaction->transac_no = $request->fpx_fpxTxnId;
             $transaction->status = "Success";
 
-            $res_student = DB::table('student_fees')
-                ->join('fees_transactions', 'fees_transactions.student_fees_id', '=', 'student_fees.id')
+            $res_student = DB::table('student_fees_new')
+                ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
                 ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
-                ->select('student_fees.id as student_fees_id')
+                ->select('student_fees_new.id as student_fees_id')
                 ->where('transactions.id', $transaction->id)
                 ->get();
 
@@ -668,14 +668,14 @@ class PayController extends AppBaseController
                 ->where('fees_new_organization_user.transaction_id', $transaction->id)
                 ->get();
 
-            $list_student_fees_id = ($res_student) ? $res_student : "";
-            $list_parent_fees_id = ($res_parent) ? $res_parent : "";
+            $res_student ? $list_student_fees_id = $res_student : $list_student_fees_id = "";
+            $res_parent ? $list_parent_fees_id = $res_parent : $list_student_fees_id = "";
 
             if ($transaction->save()) {
 
                 if ($list_student_fees_id) {
                     for ($i = 0; $i < count($list_student_fees_id); $i++) {
-                        $res  = DB::table('student_fees')
+                        $res  = DB::table('student_fees_new')
                             ->where('id', $list_student_fees_id[$i]->student_fees_id)
                             ->update(['status' => 'Paid']);
                     }
