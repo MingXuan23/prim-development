@@ -216,6 +216,60 @@ catch(Exception $e){
             $i =0 ;
             @endphp
             <div class="card-text p-4">
+
+
+                <h4 class=" mb-3" style="text-align: center">
+                    {{ $getfees_category_A ? $getorganization->nama :  ""}}</h4>
+
+                @if ($getfees_category_A)
+
+                @foreach($getfees_category_A as $row2)
+                <hr>
+                <h4 class=" mb-3 mt-3">--{{ $row2->category }}--</h4>
+
+                <div class="row">
+
+
+                    @foreach($getfees_category_A_byparent as $row3)
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4>{{ $loop->iteration }}. {{ $row3->name }}</h4>
+                            </div>
+                            <div class="col-12">
+                                <h5 class="mt-0" style="color:#8699ad">
+                                    Kuantiti x{{ $row3->quantity }}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        @php
+                        $i += $row3->quantity*$row3->price ;
+                        @endphp
+                        <h4 class="float-right">RM {{ number_format($row3->quantity*$row3->price, 2) }} </h4>
+                    </div>
+
+                    @endforeach
+
+
+
+                </div>
+                @endforeach
+
+                @foreach ($get_fees_by_parent as $get_fees_by_parents)
+
+                <input type="hidden" name="parent_fees_id[]" value="{{ $get_fees_by_parents->id }}">
+
+                @endforeach
+
+                @endif
+
+
+                @if ($getstudent)
+
+                <hr>
+
                 @foreach($getstudent as $row)
                 <h4 class=" mb-3" style="text-align: center">{{$row->studentname}}</h4>
 
@@ -255,6 +309,17 @@ catch(Exception $e){
                 @endforeach
                 <hr>
                 @endforeach
+
+
+
+                @foreach ($getstudentfees as $studentfees)
+
+                <input type="hidden" name="student_fees_id[]" value="{{ $studentfees->id }}">
+
+                @endforeach
+
+                @endif
+
                 <div class="row mb-4">
                     <div class="col-6">
                         <h5 class=" mb-3">Cas yang dikenakan </h5>
@@ -273,6 +338,7 @@ catch(Exception $e){
                                 {{ number_format($i + $getorganization->fixed_charges, 2) }}</span> </h4>
                     </div>
                 </div>
+
                 <div class="form-group">
                     <label for="sel1">Sila Pilih Bank:</label>
 
@@ -286,11 +352,23 @@ catch(Exception $e){
                         </select>
                 </div>
 
+                @if ($getfees_category_A)
+                @foreach ($get_fees_by_parent as $get_fees_by_parents)
+
+                <input type="hidden" name="parent_fees_id[]" value="{{ $get_fees_by_parents->id }}">
+
+                @endforeach
+                @endif
+
+                @if ($getstudent)
                 @foreach ($getstudentfees as $studentfees)
 
                 <input type="hidden" name="student_fees_id[]" value="{{ $studentfees->id }}">
 
                 @endforeach
+                @endif
+
+
                 <ul>
                     <li>
                         <p>Minimum Transaction is RM1 and Maximum Transaction is RM30,000.</p>

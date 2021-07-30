@@ -71,7 +71,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap"
+                    <table id="categoryA" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
@@ -79,6 +79,7 @@
                                 <th>Nama Butiran</th>
                                 <th>Penerangan</th>
                                 <th>Jumlah Amaun (RM)</th>
+                                <th>Rujukan</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -139,10 +140,10 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('teacher.getTeacherDatatable') }}",
+                        url: "{{ route('fees.getCategoryDatatable') }}",
                         data: {
                             oid: oid,
-                            hasOrganization: true
+                            category:'A'
                         },
                         type: 'GET',
   
@@ -173,6 +174,11 @@
                         name: 'desc',
                         orderable: false,
                         searchable: false,
+                    }, {
+                        data: "totalAmount",
+                        name: 'totalAmount',
+                        orderable: false,
+                        searchable: false,
                         defaultContent: 0,
                         render: function(data, type, full) {
                             if(data){
@@ -181,7 +187,15 @@
                                 return 0;
                             }
                         }
-                    },  {
+                    }, {
+                        data: "target",
+                        name: 'target',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, full) {
+                            return data;
+                        }
+                    }, {
                         data: 'status',
                         name: 'status',
                         orderable: false,
@@ -191,7 +205,11 @@
                         name: 'action',
                         orderable: false,
                         searchable: false
-                    },]
+                    },],
+                    error: function (error) {
+                        alert('error');
+                        alert(error.toString());
+                    }
             });
         }
   
