@@ -1281,7 +1281,7 @@ class FeesController extends AppBaseController
             ->where('fees_new_organization_user.status', 'Debt')
             ->get();
 
-        // dd($getfees);
+        // dd($getfees_category_A);
         return view('fee.pay.index', compact('list', 'organization', 'getfees', 'getfees_bystudent', 'getfees_category_A', 'getfees_category_A_byparent'));
     }
 }

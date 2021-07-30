@@ -214,7 +214,7 @@ class PayController extends AppBaseController
                 ->select('fees_new.category', 'organization_user.organization_id')
                 ->distinct()
                 ->orderBy('fees_new.category')
-                ->where('organization_user.user_id', 4)
+                ->where('organization_user.user_id', $res_parent)
                 ->where('organization_user.role_id', 6)
                 ->where('organization_user.status', 1)
                 ->whereIn('fees_new.id', $res_fee_A)
@@ -225,7 +225,7 @@ class PayController extends AppBaseController
                 ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
                 ->select('fees_new.*')
                 ->orderBy('fees_new.category')
-                ->where('organization_user.user_id', 4)
+                ->where('organization_user.user_id', $res_parent)
                 ->where('organization_user.role_id', 6)
                 ->where('organization_user.status', 1)
                 ->whereIn('fees_new.id', $res_fee_A)
@@ -235,11 +235,13 @@ class PayController extends AppBaseController
                 ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
                 ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
                 ->select('fees_new_organization_user.*')
-                ->where('organization_user.user_id', 4)
+                ->where('organization_user.user_id', $res_parent)
                 ->where('organization_user.role_id', 6)
                 ->where('organization_user.status', 1)
                 ->whereIn('fees_new.id', $res_fee_A)
                 ->get();
+
+            dd($getfees_category_A);
         }
         return view('fee.pay.pay', compact('getstudent', 'getorganization', 'getfees', 'getfees_bystudent', 'getstudentfees', 'getfees_category_A', 'getfees_category_A_byparent', 'get_fees_by_parent'))->render();
     }

@@ -147,7 +147,7 @@
 
 
 
-                @role('Superadmin|Pentadbir|Guru|Ibu|Bapa|Penjaga')
+                @role('Superadmin|Pentadbir|Guru|Penjaga')
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -155,7 +155,7 @@
                         <span>Yuran</span>
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
-                        @role('Superadmin')
+                        @role('Superadmin|Pentadbir|Guru')
 
                         <li>
                             <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
