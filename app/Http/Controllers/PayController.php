@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AppBaseController;
+use App\Models\Fee_New;
 use Illuminate\Support\Facades\Redirect;
 
 class PayController extends AppBaseController
@@ -680,7 +681,7 @@ class PayController extends AppBaseController
 
                 if ($list_parent_fees_id) {
                     for ($i = 0; $i < count($list_parent_fees_id); $i++) {
-                        
+
                         $res = DB::table('fees_new_organization_user')
                             ->where('id', $list_parent_fees_id[$i]->id)
                             ->update([
@@ -805,6 +806,110 @@ class PayController extends AppBaseController
         // dd($request);
         \Log::channel('PRIM_api')->info("API Request : "  . $request);
         return view('parent.fee.receipt');
+    }
+
+    public function ReceiptFees($transaction_id)
+    {
+        // parent user id
+
+        // dd($transaction_id);
+        $userid = Auth::id();
+        $id = $transaction_id;
+        // $userid = 4;
+
+        // details parents
+        $getparent = DB::table('users')
+            ->where('id', $userid)
+            ->first();
+
+        // details transaction
+        $get_transaction = Transaction::where('id', $id)->first();
+
+        // details students by transactions 
+        $get_student = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+            ->select('students.*')
+            ->distinct()
+            ->orderBy('students.id')
+            ->orderBy('fees_new.category')
+            ->where('fees_transactions_new.transactions_id', $id)
+            ->where('student_fees_new.status', 'Paid')
+            ->get();
+
+        // get category fees by transactions
+        $get_category = DB::table('fees_new')
+            ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+            ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->select('fees_new.category', 'students.id as studentid')
+            ->distinct()
+            ->orderBy('students.id')
+            ->orderBy('fees_new.category')
+            ->where('fees_transactions_new.transactions_id', $id)
+            ->where('student_fees_new.status', 'Paid')
+            ->get();
+
+        // get fees
+        $get_fees = DB::table('fees_new')
+            ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+            ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->select('fees_new.*', 'students.id as studentid')
+            ->orderBy('students.id')
+            ->orderBy('fees_new.category')
+            ->where('fees_transactions_new.transactions_id', $id)
+            ->where('student_fees_new.status', 'Paid')
+            ->get();
+
+        // get transaction for fees category A
+        $getfees_categoryA  = DB::table('fees_new')
+            ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+            ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+            ->select('fees_new.*')
+            ->orderBy('fees_new.name')
+            ->where('organization_user.user_id', $userid)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
+            ->where('fees_new_organization_user.status', 'Paid')
+            ->where('fees_new_organization_user.transaction_id', $id)
+            ->get();
+
+        // dd($getfees_categoryA);
+        if ($get_category) {
+            $oid = DB::table('fees_new')
+                ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+                ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+                ->select('fees_new.organization_id')
+                ->distinct()
+                ->where('fees_transactions_new.transactions_id', $id)
+                ->where('student_fees_new.status', 'Paid')
+                ->first();
+
+            $get_organization = DB::table('organizations')->where('id', $oid->organization_id)->first();
+        }
+        if ($getfees_categoryA) {
+            $oid = DB::table('fees_new')
+                ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+                ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+                ->select('fees_new.organization_id')
+                ->distinct()
+                ->where('organization_user.user_id', $userid)
+                ->where('organization_user.role_id', 6)
+                ->where('organization_user.status', 1)
+                ->where('fees_new_organization_user.status', 'Paid')
+                ->where('fees_new_organization_user.transaction_id', $id)
+                ->first();
+
+            $get_organization = DB::table('organizations')->where('id', $oid->organization_id)->first();
+        }
+        // dd($get_fees);
+
+        return view('fee.pay.receipt', compact('getparent', 'get_transaction', 'get_student', 'get_category', 'get_fees', 'getfees_categoryA', 'get_organization'));
     }
 
     public function getDetailReceipt($id)
