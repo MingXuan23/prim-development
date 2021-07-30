@@ -699,7 +699,7 @@ class PayController extends AppBaseController
 
                     // return view('fpx.tStatus', compact('request', 'user'));
 
-                    return $this->getDetailReceipt($transaction->id);
+                    return $this->ReceiptFees($transaction->id);
                 } else {
                     return view('errors.500');
                 }
