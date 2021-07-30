@@ -241,7 +241,7 @@ class PayController extends AppBaseController
                 ->whereIn('fees_new.id', $res_fee_A)
                 ->get();
 
-            dd($getfees_category_A);
+            // dd($getfees_category_A);
         }
         return view('fee.pay.pay', compact('getstudent', 'getorganization', 'getfees', 'getfees_bystudent', 'getstudentfees', 'getfees_category_A', 'getfees_category_A_byparent', 'get_fees_by_parent'))->render();
     }
