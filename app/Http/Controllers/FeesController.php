@@ -1210,12 +1210,9 @@ class FeesController extends AppBaseController
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.id as oid', 'organizations.nama as nschool', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname')
-            ->where([
-                ['users.id', 4],
-            ])
-            ->where(function ($query) {
-                $query->where('organization_user.role_id', 6);
-            })
+            ->where('organization_user.user_id', $userid)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
             ->orderBy('organizations.id')
             ->orderBy('classes.nama')
             ->get();
@@ -1228,7 +1225,7 @@ class FeesController extends AppBaseController
             ->join('students', 'students.id', '=', 'organization_user_student.student_id')
             ->select('organizations.*', 'organization_user.user_id')
             ->distinct()
-            ->where('organization_user.user_id', 4)
+            ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
             ->orderBy('organizations.nama')
@@ -1246,6 +1243,7 @@ class FeesController extends AppBaseController
             ->distinct()
             ->orderBy('students.id')
             ->orderBy('fees_new.category')
+            ->where('student_fees_new.status', 'Debt')
             ->get();
 
         $getfees_bystudent     = DB::table('students')
@@ -1253,6 +1251,8 @@ class FeesController extends AppBaseController
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
             ->select('fees_new.*', 'students.id as studentid')
+            ->where('student_fees_new.status', 'Debt')
+
             ->get();
 
         // ************************* get fees category A  *******************************
@@ -1260,12 +1260,13 @@ class FeesController extends AppBaseController
         $getfees_category_A = DB::table('fees_new')
             ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
-            ->select('fees_new.category','organization_user.organization_id')
+            ->select('fees_new.category', 'organization_user.organization_id')
             ->distinct()
             ->orderBy('fees_new.category')
-            ->where('organization_user.user_id', 4)
+            ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
+            ->where('fees_new_organization_user.status', 'Debt')
             ->get();
 
         // dd($getfees_category_A);
@@ -1274,9 +1275,10 @@ class FeesController extends AppBaseController
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
             ->select('fees_new.*')
             ->orderBy('fees_new.category')
-            ->where('organization_user.user_id', 4)
+            ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
+            ->where('fees_new_organization_user.status', 'Debt')
             ->get();
 
         // dd($getfees);

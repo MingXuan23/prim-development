@@ -77,7 +77,7 @@
                                     <tr>
                                         <td class="py-2">Bayaran Kepada</td>
                                         <td class="py-2">:</td>
-                                        <td class="py-2">{{ $get_fee_organization->oname }}</td>
+                                        <td class="py-2">{{ $get_organization->nama }}</td>
                                         <td class="py-2" colspan="3"></td>
                                     </tr>
                                     <tr style="background-color:#e9ecef">
@@ -90,20 +90,20 @@
                                     </tr> --}}
                                 </table>
 
-                                @foreach ($getstudent as $student)
+                                
                                 <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
-                                    {{ $student->studentnama }}
+                                    {{ $get_organization->nama }}
                                 </div>
-                                <center class="my-2">
+                                {{-- <center class="my-2">
                                     <span style="font-weight: bold;text-transform: uppercase;">
                                         {{ $student->feename }}
-                                    </span>
-                                </center>
+                                </span>
+                                </center> --}}
 
-                                @foreach ($getcategory as $category)
+                                
 
                                 <div class="pt-2 pb-2">
-                                    Kategori : {{ $category->catname }}
+                                    Kategori A
                                 </div>
 
                                 <table class="table table-bordered table-striped" style="">
@@ -114,18 +114,17 @@
                                         <th style="width:20%">Amaun per item (RM)</th>
                                         <th style="width:20%">Amaun (RM)</th>
                                     </tr>
-                                    @foreach ($getdetail->where('studentid', $student->studentid)->where('catid',
-                                    $category->catid) as $item)
+                                    @foreach ($getfees_categoryA as $item)
                                     <tr>
                                         <td style="text-align: center"> {{ $loop->iteration }}.</td>
                                         <td>
-                                            <div class="pl-2"> {{ $item->detailsname }} </div>
+                                            <div class="pl-2"> {{ $item->name }} </div>
                                         </td>
                                         <td style="text-align: center">{{ $item->quantity }}</td>
                                         <td style="text-align: center">
-                                            {{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
+                                            {{  number_format((float)$item->price, 2, '.', '') }} </td>
                                         <td style="text-align: center">
-                                            {{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
+                                            {{  number_format((float)$item->totalAmount, 2, '.', '')  }}</td>
                                     </tr>
                                     @endforeach
 
@@ -133,7 +132,66 @@
                                         <td></td>
                                         <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
                                         <td style="text-align:center">
-                                            <b>{{ number_format($getdetail->where('catid', $category->catid)->sum('totalamount'), 2)  }}</b>
+                                            <b>{{ number_format($getfees_categoryA->sum('totalAmount'), 2)  }}</b>
+                                           
+                                        </td>
+                                    </tr>
+
+                                </table>
+                                
+
+
+
+                               
+
+                                
+
+
+                                {{-- ******** --}}
+                                @foreach ($get_student as $student)
+                                <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
+                                    {{ $student->nama }}
+                                </div>
+                                {{-- <center class="my-2">
+                                    <span style="font-weight: bold;text-transform: uppercase;">
+                                        {{ $student->feename }}
+                                </span>
+                                </center> --}}
+
+                                @foreach ($get_category as $category)
+
+                                <div class="pt-2 pb-2">
+                                    {{ $category->category }}
+                                </div>
+
+                                <table class="table table-bordered table-striped" style="">
+                                    <tr style="text-align: center">
+                                        <th style="width:3%">Bil.</th>
+                                        <th>Item</th>
+                                        <th style="width:10%">Kuantiti</th>
+                                        <th style="width:20%">Amaun per item (RM)</th>
+                                        <th style="width:20%">Amaun (RM)</th>
+                                    </tr>
+                                    @foreach ($get_fees->where('studentid', $student->id)->where('category', $category->category) as $item)
+                                    <tr>
+                                        <td style="text-align: center"> {{ $loop->iteration }}.</td>
+                                        <td>
+                                            <div class="pl-2"> {{ $item->name }} </div>
+                                        </td>
+                                        <td style="text-align: center">{{ $item->quantity }}</td>
+                                        <td style="text-align: center">
+                                            {{  number_format((float)$item->price, 2, '.', '') }} </td>
+                                        <td style="text-align: center">
+                                            {{  number_format((float)$item->totalAmount, 2, '.', '')  }}</td>
+                                    </tr>
+                                    @endforeach
+
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
+                                        <td style="text-align:center">
+                                            <b>{{ number_format($get_fees->where('studentid', $student->id)->where('category', $category->category)->sum('totalAmount'), 2)  }}</b>
+                                           
                                         </td>
                                     </tr>
 
@@ -151,7 +209,7 @@
                                             Cas yang dikenakan oleh organisasi (RM)
                                         </td>
                                         <td style="text-align:center;width:20%">
-                                            {{  number_format((float)$get_fee_organization->fixed_charges, 2, '.', '') }}
+                                            {{  number_format((float)$get_organization->fixed_charges, 2, '.', '') }}
                                         </td>
                                     </tr>
                                     <tr>
