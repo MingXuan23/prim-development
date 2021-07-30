@@ -15,7 +15,8 @@
                                         <tr>
                                             <td height="164" align="center" class="main"><b>Payment Method via FPX</b>
                                                 <p>&nbsp;</p>
-                                                <div><strong>You are being redirected to secure payment site in <span id="time">5</span> seconds</strong></div>
+                                                <div><strong>You are being redirected to secure payment site in <span
+                                                            id="time">5</span> seconds</strong></div>
 
                                                 {{-- <input type="submit" style="cursor:hand" class="btn btn-primary"
                                                     onclick="pay()" value="Click to Pay" /> --}}
@@ -72,9 +73,19 @@
         <input type=hidden value="{{ $telno }}" name="telno">
 
         @if (substr($fpx_sellerExOrderNo, 0, 1) == 'S')
+
+        @if ($getstudentfees)
             @foreach ($getstudentfees as $student_fees_id)
             <input type="hidden" name="student_fees_id[]" value="{{ $student_fees_id }}">
             @endforeach
+        @endif
+
+        @if ($getparentfees)
+            @foreach ($getparentfees as $parent_fees_id)
+            <input type="hidden" name="parent_fees_id[]" value="{{ $parent_fees_id }}">
+            @endforeach
+        @endif
+
         @endif
 
 
