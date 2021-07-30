@@ -140,9 +140,10 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('fees.getCategoryBDatatable') }}",
+                        url: "{{ route('fees.getCategoryDatatable') }}",
                         data: {
-                            oid: oid
+                            oid: oid,
+                            category:'B'
                         },
                         type: 'GET',
   

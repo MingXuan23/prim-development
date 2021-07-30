@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\View;
 use Psy\Command\WhereamiCommand;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Category;
+use App\Models\Fee_New;
 
 class FeesController extends AppBaseController
 {
@@ -749,7 +750,115 @@ class FeesController extends AppBaseController
 
     public function StoreCategoryA(Request $request)
     {
-        $organization = $this->getOrganizationByUserId();
+
+        $dt = Carbon::now();
+        $price          = $request->get('price');
+        $quantity       = $request->get('quantity');
+        $oid            = $request->get('organization');
+        $date_started   = $dt->toDateString($request->get('date_started'));
+        $date_end       = $dt->toDateString($request->get('date_end'));
+        $total          = $price * $quantity;
+
+        $data = array(
+            'data' => 'All'
+        );
+
+        $target = json_encode($data);
+
+        $fee = new Fee_New([
+            'name'              =>  $request->get('name'),
+            'desc'              =>  $request->get('description'),
+            'category'          =>  "Kategory A",
+            'quantity'          =>  $request->get('quantity'),
+            'price'             =>  $request->get('price'),
+            'totalAmount'       =>  $total,
+            'start_date'        =>  $date_started,
+            'end_date'          =>  $date_end,
+            'status'            =>  "1",
+            'target'            =>  $target,
+            'organization_id'   =>  $oid,
+        ]);
+
+        if ($fee->save()) {
+            $parent_id = DB::table('organization_user')
+                ->where('organization_id', $oid)
+                ->where('role_id', 6)
+                ->where('status', 1)
+                ->get();
+
+            for ($i = 0; $i < count($parent_id); $i++) {
+                $array[] = array(
+                    'status' => 'Debt',
+                    'fees_new_id' => $fee->id,
+                    'organization_user_id' => $parent_id[$i]->id,
+
+                );
+            }
+            DB::table('fees_new_organization_user')->insert($array);
+
+            return redirect('/fees/A')->with('success', 'Yuran Kategori A telah berjaya dimasukkan');
+        }
+    }
+
+    public function getCategoryDatatable(Request $request)
+    {
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $category = $request->category;
+            $userId = Auth::id();
+
+            if ($oid != '') {
+
+                // $data = DB::table('fees')->orderBy('nama')->get();
+
+                if ($category == "A") {
+                    $data     = DB::table('fees_new')
+                        ->where('organization_id', $oid)
+                        ->where('category', "Kategory A")
+                        ->where('status', "1")
+                        ->get();
+                } else if ($category == "B") {
+                    $data     = DB::table('fees_new')
+                        ->where('organization_id', $oid)
+                        ->where('category', "Kategory B")
+                        ->where('status', "1")
+                        ->get();
+                } else {
+                    $data     = DB::table('fees_new')
+                        ->where('organization_id', $oid)
+                        ->where('category', "Kategory C")
+                        ->where('status', "1")
+                        ->get();
+                }
+
+
+                // dd($data);
+            }
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == '1') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
+        }
     }
 
     public function CategoryB()
@@ -770,6 +879,8 @@ class FeesController extends AppBaseController
     public function StoreCategoryB(Request $request)
     {
         // dd($request->toArray());
+        $dt = Carbon::now();
+
         $gender      = "";
         $class      = $request->get('cb_class');
         $level      = $request->get('level');
@@ -779,10 +890,10 @@ class FeesController extends AppBaseController
         $quantity       = $request->get('quantity');
         $desc           = $request->get('description');
         $oid            = $request->get('organization');
-        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
-        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
+        $date_started   = $dt->toDateString($request->get('date_started'));
+        $date_end       = $dt->toDateString($request->get('date_end'));
         $total          = $price * $quantity;
-        $category       = "Category B";
+        $category       = "Kategory B";
 
         if ($level == "All_Level") {
             return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
@@ -790,52 +901,6 @@ class FeesController extends AppBaseController
             return $this->allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
         } else {
             return $this->allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category);
-        }
-    }
-
-
-
-    public function getCategoryBDatatable(Request $request)
-    {
-        if (request()->ajax()) {
-            $oid = $request->oid;
-            $userId = Auth::id();
-
-            if ($oid != '') {
-
-                // $data = DB::table('fees')->orderBy('nama')->get();
-                $data     = DB::table('fees_new')
-                    ->where('organization_id', $oid)
-                    ->where('category', "Category B")
-                    ->where('status', "1")
-                    ->get();
-
-                // dd($data);
-            }
-            $table = Datatables::of($data);
-
-            $table->addColumn('status', function ($row) {
-                if ($row->status == '1') {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
-                    return $btn;
-                } else {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
-                    return $btn;
-                }
-            });
-
-            $table->addColumn('action', function ($row) {
-                $token = csrf_token();
-                $btn = '<div class="d-flex justify-content-center">';
-                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
-                return $btn;
-            });
-
-            $table->rawColumns(['status', 'action']);
-            return $table->make(true);
         }
     }
 
@@ -856,6 +921,8 @@ class FeesController extends AppBaseController
     public function StoreCategoryC(Request $request)
     {
         // dd($request->toArray());
+        $dt = Carbon::now();
+
         $gender     = $request->get('gender');
         $class      = $request->get('cb_class');
         $level      = $request->get('level');
@@ -865,10 +932,10 @@ class FeesController extends AppBaseController
         $quantity       = $request->get('quantity');
         $desc           = $request->get('description');
         $oid            = $request->get('organization');
-        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
-        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
+        $date_started   = $dt->toDateString($request->get('date_started'));
+        $date_end       = $dt->toDateString($request->get('date_end'));
         $total          = $price * $quantity;
-        $category       = "Category C";
+        $category       = "Kategory C";
 
         if ($level == "All_Level") {
             return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
@@ -876,50 +943,6 @@ class FeesController extends AppBaseController
             return $this->allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
         } else {
             return $this->allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category);
-        }
-    }
-
-    public function getCategoryCDatatable(Request $request)
-    {
-        if (request()->ajax()) {
-            $oid = $request->oid;
-            $userId = Auth::id();
-
-            if ($oid != '') {
-
-                // $data = DB::table('fees')->orderBy('nama')->get();
-                $data     = DB::table('fees_new')
-                    ->where('organization_id', $oid)
-                    ->where('category', "Category C")
-                    ->where('status', "1")
-                    ->get();
-
-                // dd($data);
-            }
-            $table = Datatables::of($data);
-
-            $table->addColumn('status', function ($row) {
-                if ($row->status == '1') {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
-                    return $btn;
-                } else {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
-                    return $btn;
-                }
-            });
-
-            $table->addColumn('action', function ($row) {
-                $token = csrf_token();
-                $btn = '<div class="d-flex justify-content-center">';
-                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
-                return $btn;
-            });
-
-            $table->rawColumns(['status', 'action']);
-            return $table->make(true);
         }
     }
 
@@ -1015,16 +1038,17 @@ class FeesController extends AppBaseController
 
         ]);
 
+        // dd($oid);
         for ($i = 0; $i < count($list); $i++) {
             $array[] = array(
-                'status' => '1',
+                'status' => 'Debt',
                 'fees_id' => $fees,
                 'class_student_id' => $list[$i]->class_student_id,
 
             );
         }
         DB::table('student_fees_new')->insert($array);
-        if ($category == "Category B") {
+        if ($category == "Kategory B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
@@ -1081,14 +1105,14 @@ class FeesController extends AppBaseController
 
         for ($i = 0; $i < count($list); $i++) {
             $array[] = array(
-                'status' => '1',
+                'status' => 'Debt',
                 'fees_id' => $fees,
                 'class_student_id' => $list[$i]->class_student_id,
 
             );
         }
         DB::table('student_fees_new')->insert($array);
-        if ($category == "Category B") {
+        if ($category == "Kategory B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
@@ -1157,14 +1181,14 @@ class FeesController extends AppBaseController
 
         for ($i = 0; $i < count($list_student); $i++) {
             $array[] = array(
-                'status' => '1',
+                'status' => 'Debt',
                 'fees_id' => $fees,
                 'class_student_id' => $list_student[$i]->class_student_id,
 
             );
         }
         DB::table('student_fees_new')->insert($array);
-        if ($category == "Category B") {
+        if ($category == "Kategory B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
@@ -1196,22 +1220,29 @@ class FeesController extends AppBaseController
             ->orderBy('classes.nama')
             ->get();
 
-        // ************************* get list fees  *******************************
+        // ************************* get list organization by parent  *******************************
 
-        // $getfees = DB::table('fees_new')
-        //     ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
-        //     ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
-        //     ->join('students', 'students.id', '=', 'class_student.student_id')
-        //     ->select('fees_new.id as feeid', 'fees_new.category as category_fee', 'students.id as studentid')
-        //     ->orderBy('students.id')
-        //     ->orderBy('fees_new.category')
-        //     ->get();
+        $organization = DB::table('organizations')
+            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+            ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+            ->select('organizations.*', 'organization_user.user_id')
+            ->distinct()
+            ->where('organization_user.user_id', 4)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
+            ->orderBy('organizations.nama')
+            ->get();
+
+
+        // dd($organization);
+        // ************************* get list fees  *******************************
 
         $getfees     = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-            ->select('fees_new.category', 'students.id as studentid')
+            ->select('fees_new.category', 'fees_new.organization_id', 'students.id as studentid')
             ->distinct()
             ->orderBy('students.id')
             ->orderBy('fees_new.category')
@@ -1224,9 +1255,31 @@ class FeesController extends AppBaseController
             ->select('fees_new.*', 'students.id as studentid')
             ->get();
 
-        $allfees = DB::table('fees_new')->get();
+        // ************************* get fees category A  *******************************
+
+        $getfees_category_A = DB::table('fees_new')
+            ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+            ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+            ->select('fees_new.category','organization_user.organization_id')
+            ->distinct()
+            ->orderBy('fees_new.category')
+            ->where('organization_user.user_id', 4)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
+            ->get();
+
+        // dd($getfees_category_A);
+        $getfees_category_A_byparent  = DB::table('fees_new')
+            ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+            ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+            ->select('fees_new.*')
+            ->orderBy('fees_new.category')
+            ->where('organization_user.user_id', 4)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
+            ->get();
 
         // dd($getfees);
-        return view('fee.pay.index', compact('list', 'getfees', 'getfees_bystudent'));
+        return view('fee.pay.index', compact('list', 'organization', 'getfees', 'getfees_bystudent', 'getfees_category_A', 'getfees_category_A_byparent'));
     }
 }
