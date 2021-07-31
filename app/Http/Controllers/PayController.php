@@ -82,6 +82,7 @@ class PayController extends AppBaseController
         $getorganization_category       = "";
         $getfees_category_A             = "";
         $getfees_category_A_byparent    = "";
+        $get_fees_by_parent             = "";
 
         $getstudent         = "";
         $getorganization    = "";
@@ -652,7 +653,7 @@ class PayController extends AppBaseController
 
             $res_student = DB::table('student_fees_new')
                 ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
-                ->join('transactions', 'transactions.id', '=', 'fees_transactions.transactions_id')
+                ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
                 ->select('student_fees_new.id as student_fees_id')
                 ->where('transactions.id', $transaction->id)
                 ->get();
@@ -876,8 +877,9 @@ class PayController extends AppBaseController
             ->where('fees_new_organization_user.transaction_id', $id)
             ->get();
 
-        // dd($getfees_categoryA);
-        if ($get_category) {
+        // $getfees_categoryA ? $getfees_categoryA = 1 : $getfees_categoryA = "";
+        // dd(count($getfees_categoryA));
+        if (count($get_category) != 0) {
             $oid = DB::table('fees_new')
                 ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
                 ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
@@ -889,7 +891,9 @@ class PayController extends AppBaseController
 
             $get_organization = DB::table('organizations')->where('id', $oid->organization_id)->first();
         }
-        if ($getfees_categoryA) {
+
+        if (count($getfees_categoryA) != 0) {
+            // dd($getfees_categoryA);
             $oid = DB::table('fees_new')
                 ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
                 ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
