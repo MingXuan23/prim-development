@@ -155,7 +155,7 @@
                                 </span>
                                 </center> --}}
 
-                                @foreach ($get_category as $category)
+                                @foreach ($get_category->where('studentid', $student->id) as $category)
 
                                 <div class="pt-2 pb-2">
                                     {{ $category->category }}

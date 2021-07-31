@@ -851,6 +851,8 @@ class PayController extends AppBaseController
             ->where('student_fees_new.status', 'Paid')
             ->get();
 
+        // dd($get_category);
+
         // get fees
         $get_fees = DB::table('fees_new')
             ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
