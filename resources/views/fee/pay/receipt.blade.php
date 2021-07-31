@@ -90,17 +90,12 @@
                                     </tr> --}}
                                 </table>
 
-                                
+                                @if (count($getfees_categoryA) != 0)
                                 <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
                                     {{ $get_organization->nama }}
                                 </div>
-                                {{-- <center class="my-2">
-                                    <span style="font-weight: bold;text-transform: uppercase;">
-                                        {{ $student->feename }}
-                                </span>
-                                </center> --}}
 
-                                
+
 
                                 <div class="pt-2 pb-2">
                                     Kategori A
@@ -133,19 +128,21 @@
                                         <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
                                         <td style="text-align:center">
                                             <b>{{ number_format($getfees_categoryA->sum('totalAmount'), 2)  }}</b>
-                                           
+
                                         </td>
                                     </tr>
 
                                 </table>
-                                
+                                @endif
 
 
 
-                               
 
-                                
 
+
+
+
+                                @if (count($get_student) != 0)
 
                                 {{-- ******** --}}
                                 @foreach ($get_student as $student)
@@ -172,7 +169,8 @@
                                         <th style="width:20%">Amaun per item (RM)</th>
                                         <th style="width:20%">Amaun (RM)</th>
                                     </tr>
-                                    @foreach ($get_fees->where('studentid', $student->id)->where('category', $category->category) as $item)
+                                    @foreach ($get_fees->where('studentid', $student->id)->where('category',
+                                    $category->category) as $item)
                                     <tr>
                                         <td style="text-align: center"> {{ $loop->iteration }}.</td>
                                         <td>
@@ -191,7 +189,7 @@
                                         <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
                                         <td style="text-align:center">
                                             <b>{{ number_format($get_fees->where('studentid', $student->id)->where('category', $category->category)->sum('totalAmount'), 2)  }}</b>
-                                           
+
                                         </td>
                                     </tr>
 
@@ -201,6 +199,7 @@
 
 
                                 @endforeach
+                                @endif
 
                                 <table style="width:100%" class="infotbl">
                                     <tr>
