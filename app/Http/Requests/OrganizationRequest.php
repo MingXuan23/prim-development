@@ -33,6 +33,7 @@ class OrganizationRequest extends FormRequest
             'district'     =>  'required',
             'state'        =>  'required',
             'type_org'     =>  'required',
+            'city'         =>  'required',
             'fixed_charges'      =>  'required|numeric',
             
         ];
