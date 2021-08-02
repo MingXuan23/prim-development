@@ -1,6 +1,8 @@
 @extends('layouts.master')
 
 @section('css')
+<link href="{{ URL::asset('assets/libs/dropzone/dropzone.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -28,78 +30,124 @@
             </div>
             @endif
             {{-- {{ route('sekolah.store') }} --}}
-            <form method="post" action="{{ route('organization.store') }} " enctype="multipart/form-data" class="form-validation">
+            <form method="post" action="{{ route('organization.store') }} " enctype="multipart/form-data"
+                class="form-validation">
                 {{csrf_field()}}
                 <div class="card-body">
-                    <div class="form-group">
-                        <label class="control-label">Nama Organisasi</label>
-                        <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi"
-                        data-parsley-required-message="Sila masukkan nama organisasi" required>
-                    </div>
-                    <div class="form-group ">
-                        <label class="control-label">No Telefon</label>
-                        <input type="tel" name="telno" class="form-control phone_no" placeholder="No Telefon"
-                        data-parsley-required-message="Sila masukkan no telefon" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label">Email</label>
-                        <input type="text" name="email" class="form-control" placeholder="Email"
-                        data-parsley-required-message="Sila masukkan email" required>
-                    </div>
-                    <div class="form-group ">
-                        <label class="control-label">Jenis Organisasi</label>
-                        <select name="type_org" id="type_org" class="form-control" 
-                        data-parsley-required-message="Sila pilih jenis organisasi" required>
-                            <option value="" selected>Semua Jenis Organisasi</option>
-                            @foreach($type_org as $row)
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label">Cas Pembayaran (RM)</label>
-                        <input id="input-currency" class="form-control input-mask text-left"
-                            data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                            im-insert="true" style="text-align: right;" name="fixed_charges" 
-                            data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label">Alamat</label>
-                        <textarea name="address" class="form-control" rows="4" placeholder="Alamat"
-                        data-parsley-required-message="Sila masukkan alamat organisasi" required></textarea>
-                    </div>
                     <div class="row">
                         <div class="col">
-                            <div class="form-group">
-                              <label>Negeri</label>
-                              <select name="state" id="state" class="form-control"
-                              data-parsley-required-message="Sila masukkan negeri" required>
-                              <option value="">Pilih Negeri</option>
-                                  @for ($i = 0; $i < count($states); $i++)
-                                    <option id="{{ $states[$i]['id'] }}" value="{{ ucfirst(strtolower($states[$i]['name'])) }}">{{ ucfirst(strtolower($states[$i]['name'])) }}</option>
-                                  @endfor
-                              </select>
+                            <div class="form-group required">
+                                <label class="control-label">Nama Organisasi</label>
+                                <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi"
+                                    data-parsley-required-message="Sila masukkan nama organisasi" required>
                             </div>
-                          </div>
-                        <div class="col">
-                            <div class="form-group">
-                                <label>Daerah</label>
-                                <select name="district" id="district" class="form-control"
-                                      data-parsley-required-message="Sila masukkan daerah" required>
-                                      <option value="">Pilih Daerah</option>
-                                </select>
-                              </div>
                         </div>
-                      </div>
-                      <div class="form-group">
-                        <label>Poskod</label>
-                        <input type="text" name="postcode" class="form-control" placeholder="Poskod" 
-                        data-parsley-required-message="Sila masukkan poskod" required>
-                      </div>
-                      
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Jenis Organisasi</label>
+                                <select name="type_org" id="type_org" class="form-control"
+                                    data-parsley-required-message="Sila pilih jenis organisasi" required>
+                                    <option value="" selected>Pilih Jenis Organisasi</option>
+                                    @foreach($type_org as $row)
+                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Email</label>
+                                <input type="text" name="email" class="form-control" placeholder="Email"
+                                    data-parsley-required-message="Sila masukkan email" required>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">No Telefon</label>
+                                <input type="tel" name="telno" class="form-control phone_no" placeholder="No Telefon"
+                                    data-parsley-required-message="Sila masukkan no telefon" required>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label">Cas Pembayaran (RM) <span style="color:#d00"> *</span></label>
+                        <input id="input-currency" class="form-control input-mask text-left"
+                            data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
+                            im-insert="true" style="text-align: right;" name="fixed_charges"
+                            data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Logo Organisasi</label>
+                        <form action="#" class="dropzone">
+                            <div class="fallback">
+                                <input name="organization_picture" type="file">
+                            </div>
+                        </form>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Negeri</label>
+                                <select name="state" id="state" class="form-control"
+                                    data-parsley-required-message="Sila masukkan negeri" required>
+                                    <option value="">Pilih Negeri</option>
+                                    @for ($i = 0; $i < count($states); $i++) <option id="{{ $states[$i]['id'] }}"
+                                        value="{{ ucfirst(strtolower($states[$i]['name'])) }}">
+                                        {{ ucfirst(strtolower($states[$i]['name'])) }}</option>
+                                        @endfor
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Daerah</label>
+                                <select name="district" id="district" class="form-control"
+                                    data-parsley-required-message="Sila masukkan daerah" required>
+                                    <option value="">Pilih Daerah</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Poskod</label>
+                                <input type="text" name="postcode" class="form-control postcode" placeholder="Poskod"
+                                    data-parsley-required-message="Sila masukkan poskod" required>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Bandar</label>
+                                <input type="text" name="city" class="form-control" placeholder="Bandar"
+                                    data-parsley-required-message="Sila masukkan bandar" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label"> Alamat <span style="color:#d00"> *</span> </label>
+                        <textarea name="address" class="form-control" rows="4" placeholder="Alamat"
+                            data-parsley-required-message="Sila masukkan alamat organisasi" required></textarea>
+                    </div>
+                    
                     <div class="form-group mb-0">
                         <div class="text-right">
-                            <a type="button" href="{{ url()->previous() }}" class="btn btn-secondary waves-effect waves-light mr-1">
+                            <a type="button" href="{{ url()->previous() }}"
+                                class="btn btn-secondary waves-effect waves-light mr-1">
                                 Kembali
                             </a>
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -122,7 +170,6 @@
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
 <script>
-
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -133,6 +180,7 @@
         $('.form-validation').parsley();
         $('.input-mask').inputmask();
         $('.phone_no').mask('+600000000000');
+        $('.postcode').mask('99999');
 
         function toTitleCase(str) {
             var lcStr = str.toLowerCase();
