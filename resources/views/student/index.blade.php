@@ -125,6 +125,14 @@
 
                             {{ csrf_field() }}
                             <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="kelas" id="kelas" class="form-control">
+                                    @foreach($organization as $row)
+                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label>Nama Kelas</label>
                                 <select name="kelas" id="kelas" class="form-control">
                                     @foreach($listclass as $row)
