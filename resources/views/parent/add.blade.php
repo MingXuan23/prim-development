@@ -4,9 +4,9 @@
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 
 <style>
-    #name {
+    /* #name {
         text-transform: uppercase;
-    }
+    } */
 
     ::-webkit-input-placeholder {
         /* WebKit browsers */
@@ -87,7 +87,7 @@
                 <input type="checkbox" class="form-check-input" id="exampleCheck1">
                 <label class="form-check-label" for="exampleCheck1">Check me out</label>
                 </div> --}}
-                <div class="form-group mb-0">
+                <div class="form-group mb-0 text-right">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
                             Simpan

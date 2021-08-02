@@ -134,7 +134,7 @@
                                                     data-parent="#accordionExample{{ $organizations->id }}-{{ $organizations->user_id }}"
                                                     class="collapse show">
                                                     <div class="card-body pl-0 pr-0">
-                                                        @foreach($getfees_category_A_byparent as $item)
+                                                        @foreach($getfees_category_A_byparent->where('organization_id', $organizations->id) as $item)
                                                         <div class="inputGroup">
                                                             <input
                                                                 id="option-{{ $item->id }}-{{ $organizations->user_id }}"

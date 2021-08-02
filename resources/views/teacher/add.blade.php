@@ -32,16 +32,6 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Penuh</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
-                </div>
-
-                <div class="form-group">
-                    <label>Nombor Kad Pengenalan</label>
-                    <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
-                </div>
-
-                <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected>Pilih Organisasi</option>
@@ -55,6 +45,18 @@
                         @endforeach
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label>Nama Penuh</label>
+                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
+                </div>
+
+                <div class="form-group">
+                    <label>Nombor Kad Pengenalan</label>
+                    <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
+                </div>
+
+
 
                 <div class="form-group">
                     <label>Email</label>

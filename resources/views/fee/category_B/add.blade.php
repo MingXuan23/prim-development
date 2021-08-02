@@ -33,6 +33,16 @@
             @csrf
             <div class="card-body">
 
+                <div class="form-group">
+                    <label class="control-label">Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control"
+                        data-parsley-required-message="Sila pilih organisasi" required>
+                        <option value="" disabled selected>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
                 <div class="form-group">
                     <label>Nama Butiran</label>
@@ -78,16 +88,6 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="control-label">Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control"
-                        data-parsley-required-message="Sila pilih organisasi" required>
-                        <option value="" disabled selected>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
 
                 <div class="form-group">
                     <label>Tahap</label>
