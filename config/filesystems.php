@@ -68,6 +68,7 @@ return [
 
     'links' => [
         public_path('donation-poster') => storage_path('app\public\donation-poster'),
+        public_path('organization-picture') => storage_path('app\public\organization-picture'),
     ],
 
 ];
