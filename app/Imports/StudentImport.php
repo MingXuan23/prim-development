@@ -5,9 +5,10 @@ namespace App\Imports;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class StudentImport implements ToModel, WithValidation
+class StudentImport implements ToModel, WithValidation, WithHeadingRow
 {
     public function __construct($class_id)
     {
@@ -37,8 +38,9 @@ class StudentImport implements ToModel, WithValidation
             ->first();
 
         $student = new Student([
-            'nama' => $row[0],
-            'icno' => $row[1],
+            'nama' => $row["nama"],
+            'icno' => $row["ic"],
+            'gender' => $row["jantina"],
         ]);
 
         $student->save();

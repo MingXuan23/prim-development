@@ -168,7 +168,6 @@ class FeesController extends AppBaseController
 
     public function devreceipt(Request $request)
     {
-
         $feesid = $request->feesid;
         $amount = $request->amount;
 
@@ -245,7 +244,7 @@ class FeesController extends AppBaseController
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname', 'class_organization.id as co_id')
             ->where('organizations.id', $oid)
-            ->whereIn('classes.id',  $class)
+            ->whereIn('classes.id', $class)
             ->get();
 
         // dd($list);
@@ -255,7 +254,6 @@ class FeesController extends AppBaseController
             ->first();
 
         if ($yearfees == '') {
-
             $tahun = DB::table('year_fees')->insertGetId([
                 'nama'   => $year
             ]);
@@ -280,7 +278,6 @@ class FeesController extends AppBaseController
 
             $this->feesDetails($fee->id, $category);
         } else {
-
             $fee = new Fee([
                 'nama'     =>  $feename,
                 'status'   =>  1,
@@ -353,9 +350,8 @@ class FeesController extends AppBaseController
 
         // dd($fdid);
 
-        // //store all student that have fees (req->id) 
+        // //store all student that have fees (req->id)
         for ($i = 0; $i < count($liststd); $i++) {
-
             for ($j = 0; $j < count($fdid); $j++) {
                 $arraystudent[] = array(
                     'status'            => 'Debt', // berhutang
@@ -392,7 +388,7 @@ class FeesController extends AppBaseController
 
     public function edit($id)
     {
-        // get type org 
+        // get type org
         // get year from class name
         $fee = DB::table('fees')
             ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
@@ -411,7 +407,7 @@ class FeesController extends AppBaseController
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as classname')
             ->where('organizations.id', $fee->organization_id)
-            ->where('classes.nama', 'LIKE',  '%' . $getyear . '%')
+            ->where('classes.nama', 'LIKE', '%' . $getyear . '%')
             ->orderBy('classes.nama')
             ->get();
 
@@ -443,7 +439,7 @@ class FeesController extends AppBaseController
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname', 'class_organization.id as co_id')
             ->where('organizations.id', $request->get('organization'))
-            ->whereIn('classes.id',  $class)
+            ->whereIn('classes.id', $class)
             ->get()->toArray();
 
         // $getclassfees = DB::table('class_fees')->where('class_organization_id', $list->co_id->array())->get();
@@ -451,7 +447,7 @@ class FeesController extends AppBaseController
         // dd(count($req));
         // dd($req[0]);
 
-        //get all class that have been store with that fees 
+        //get all class that have been store with that fees
         $getclassfees = DB::table('fees')
             ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
             ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
@@ -474,7 +470,6 @@ class FeesController extends AppBaseController
                 ->first();
 
             for ($j = 0; $j < count($getclassfees); $j++) {
-
                 if (is_null($query)) {
                     // dd('haha');
 
@@ -484,14 +479,12 @@ class FeesController extends AppBaseController
                         'fees_id'               =>  $id
                     ]);
                 } elseif ($req[$i]->co_id != $getclassfees[$j]) {
-
                     DB::table('class_fees')
                         ->where('fees_id', $id)
                         ->update([
                             'status'                =>  '0'
                         ]);
                 } else {
-
                     DB::table('class_fees')
                         ->where('fees_id', $id)
                         ->update([
@@ -512,11 +505,10 @@ class FeesController extends AppBaseController
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-
             return Organization::all();
-        } else if (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru')) {
+        } elseif (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru')) {
 
-            // user role pentadbir n guru 
+            // user role pentadbir n guru
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
                     $query->where('organization_user.role_id', '=', 4)
@@ -559,7 +551,7 @@ class FeesController extends AppBaseController
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname')
             ->where('organizations.id', $oid)
-            ->where('classes.nama', 'LIKE',  '%' . $year . '%')
+            ->where('classes.nama', 'LIKE', '%' . $year . '%')
             ->orderBy('classes.nama')
             ->get();
 
@@ -750,7 +742,6 @@ class FeesController extends AppBaseController
 
     public function StoreCategoryA(Request $request)
     {
-
         $dt = Carbon::now();
         $price          = $request->get('price');
         $quantity       = $request->get('quantity');
@@ -764,7 +755,7 @@ class FeesController extends AppBaseController
         );
 
         $target = json_encode($data);
-
+        dd($target);
         $fee = new Fee_New([
             'name'              =>  $request->get('name'),
             'desc'              =>  $request->get('description'),
@@ -817,7 +808,7 @@ class FeesController extends AppBaseController
                         ->where('category', "Kategory A")
                         ->where('status', "1")
                         ->get();
-                } else if ($category == "B") {
+                } elseif ($category == "B") {
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategory B")
@@ -897,7 +888,7 @@ class FeesController extends AppBaseController
 
         if ($level == "All_Level") {
             return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
-        } else if ($year == "All_Year") {
+        } elseif ($year == "All_Year") {
             return $this->allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
         } else {
             return $this->allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category);
@@ -939,7 +930,7 @@ class FeesController extends AppBaseController
 
         if ($level == "All_Level") {
             return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
-        } else if ($year == "All_Year") {
+        } elseif ($year == "All_Year") {
             return $this->allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
         } else {
             return $this->allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category);
@@ -969,8 +960,7 @@ class FeesController extends AppBaseController
             // dd($class_organization);
 
             return response()->json(['data' => $list, 'datayear' => $class_organization]);
-        } else if ($level == "2") {
-
+        } elseif ($level == "2") {
             $list = DB::table('organizations')
                 ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
                 ->where('organizations.id', $oid)
@@ -1125,7 +1115,7 @@ class FeesController extends AppBaseController
 
         $list = DB::table('classes')
             ->where('status', "1")
-            ->whereIn('id',  $class)
+            ->whereIn('id', $class)
             ->get();
 
         // dd(count($list));
@@ -1142,7 +1132,7 @@ class FeesController extends AppBaseController
                 ->where('class_organization.organization_id', $oid)
                 ->where('classes.status', "1")
                 ->where('students.gender', $gender)
-                ->whereIn('classes.id',  $class)
+                ->whereIn('classes.id', $class)
                 ->get();
             $data = array(
                 'data' => $class_arr,
@@ -1155,7 +1145,7 @@ class FeesController extends AppBaseController
                 ->select('class_student.id as class_student_id')
                 ->where('class_organization.organization_id', $oid)
                 ->where('classes.status', "1")
-                ->whereIn('classes.id',  $class)
+                ->whereIn('classes.id', $class)
                 ->get();
             $data = array(
                 'data' => $class_arr

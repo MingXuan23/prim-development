@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('css')
-<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -33,7 +33,7 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label class="control-label">Nama Organisasi</label>
+                    <label class="control-label required">Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control"
                         data-parsley-required-message="Sila masukkan nama organisasi" required>
                         <option value="" disabled selected>Pilih Organisasi</option>
@@ -44,7 +44,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Nama Butiran</label>
+                    <label class="control-label required">Nama Butiran</label>
                     <input type="text" name="name" class="form-control"
                         data-parsley-required-message="Sila masukkan nama butiran" required placeholder="Nama Butiran">
                 </div>
@@ -53,23 +53,22 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label>Harga (RM)</label>
+                        <label class="control-label required">Harga (RM)</label>
                         <input class="form-control input-mask text-left"
                             data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
                             im-insert="true" name="price">
                         <i>*Harga per kuantiti</i>
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Kuantiti</label>
+                        <label class="control-label required">Kuantiti</label>
                         <input type="text" name="quantity" class="form-control quantity text-left"  data-inputmask="'alias': 'numeric'" placeholder="Kuantiti">
                     </div>
 
                 </div>
 
-
                 <div class="form-row">
-                    <div class="form-group col-md-12 required">
-                        <label class="control-label">Tempoh Aktif</label>
+                    <div class="form-group col-md-12">
+                        <label class="control-label required">Tempoh Aktif</label>
 
                         <div class="input-daterange input-group" id="date">
                             <input type="text" class="form-control" name="date_started" placeholder="Tarikh Awal"
