@@ -32,15 +32,15 @@
                         <div class="row">
                             <div class="col-2 p-0">
                                 <center>
-                                    <img src="{{ URL::asset('assets/images/logo/prim-logo.svg') }}" height="80"
+                                    <img src="{{ URL::asset('/organization-picture/'.$get_organization->organization_picture) }}" height="80"
                                         alt="" />
                                 </center>
                             </div>
                             <div class="col-6 p-0">
-                                <h4>PRIM</h4>
-                                <p>Jalan Hang Tuah Jaya,
+                                <h4>{{ $get_organization->nama }}</h4>
+                                <p>{{ $get_organization->address }},
                                     <br />
-                                    76100 Durian Tunggal, Melaka
+                                    {{ $get_organization->postcode }} {{ $get_organization->city }}, {{ $get_organization->state }}
                                 </p>
                             </div>
                             <div class="col-4">
@@ -66,19 +66,14 @@
                                         <th colspan="9" class="text-center">Maklumat Penjaga</th>
                                     </tr>
                                     <tr>
-                                        <td class="py-2">Nama</td>
+                                        <td class="py-3">Nama</td>
                                         <td class="py-2">:</td>
-                                        <td class="py-2">{{ $getparent->name }}</td>
+                                        <td class="py-2 w-50">{{ $getparent->name }}</td>
                                         <td class="py-2" colspan="3"></td>
-                                        <td class="py-2">No. Kad Pengenalan</td>
+                                        <td class="py-2">No. Kad Pengenalan
+                                        </td>
                                         <td class="py-2">:</td>
                                         <td class="py-2">{{ $getparent->icno }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2">Bayaran Kepada</td>
-                                        <td class="py-2">:</td>
-                                        <td class="py-2">{{ $get_organization->nama }}</td>
-                                        <td class="py-2" colspan="3"></td>
                                     </tr>
                                     <tr style="background-color:#e9ecef">
                                         <th colspan="9" class="text-center">Maklumat Yuran</th>

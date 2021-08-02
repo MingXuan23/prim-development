@@ -19,6 +19,7 @@
         "maatwebsite/excel": "^3.1",
         "pragmarx/countries": "^0.7.2",
         "silviolleite/laravelpwa": "^2.0",
+        "spatie/laravel-medialibrary": "^7.20",
         "spatie/laravel-permission": "^3.18",
         "stripe/stripe-php": "^7.67",
         "yajra/laravel-datatables-oracle": "^9.15"
