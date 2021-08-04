@@ -216,7 +216,7 @@
                         <li>
                             <a href="{{ route('dependent_fees') }}" class=" waves-effect">
                                 <i class="far fa-credit-card"></i>
-                                <span>Bayar - Baru</span>
+                                <span>Bayar</span>
                             </a>
                         </li>
                         @endrole
