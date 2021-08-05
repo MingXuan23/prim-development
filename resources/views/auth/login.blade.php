@@ -63,11 +63,11 @@ Login
                                         </div>
                                     </div>
 
-                                    <!-- <div class="form-group mt-2 mb-0 row">
+                                    <div class="form-group mt-2 mb-0 row">
                                         <div class="col-12 mt-4">
-                                            <a href="pages-recoverpw"><i class="mdi mdi-lock"></i> Forgot your password?</a>
+                                            <a href="{{ route('password.request') }}"><i class="mdi mdi-lock"></i> 	Lupa Kata Laluan?</a>
                                         </div>
-                                    </div> -->
+                                    </div>
                                 </form>
                             </div>
                         </div>
