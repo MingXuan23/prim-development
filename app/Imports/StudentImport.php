@@ -19,14 +19,14 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
     public function rules(): array
     {
         return [
-            '1' => 'unique:students,icno'
+            'no_kp' => 'unique:students,icno'
         ];
     }
 
     public function customValidationMessages()
     {
         return [
-            '1.unique' => 'Terdapat maklumat murid yang telah wujud',
+            'no_kp.unique' => 'Terdapat maklumat murid yang telah wujud',
         ];
     }
 
@@ -39,8 +39,9 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
 
         $student = new Student([
             'nama' => $row["nama"],
-            'icno' => $row["ic"],
+            'icno' => $row["no_kp"],
             'gender' => $row["jantina"],
+            'email' => $row["email"]
         ]);
 
         $student->save();
