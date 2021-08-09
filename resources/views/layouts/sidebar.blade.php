@@ -158,6 +158,13 @@
                         @role('Superadmin|Pentadbir|Guru')
 
                         <li>
+                            <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
+                                <i class="fas fa-list-ul"></i>
+                                <span>Laporan</span>
+                            </a>
+                        </li>
+
+                        <li>
                             <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-user-cog"></i>
                                 <span>Kategori A</span>
@@ -177,49 +184,51 @@
                                 <span>Kategori C</span>
                             </a>
                         </li>
+
+
                         @endrole
-                        
+
 
                         {{-- <li>
                             <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
-                                <i class="fas fa-list-ul"></i>
-                                <span>Laporan</span>
-                            </a>
-                        </li> --}}
-                        {{-- @role('Superadmin|Pentadbir|Guru')
+                        <i class="fas fa-list-ul"></i>
+                        <span>Laporan</span>
+                        </a>
+                </li> --}}
+                {{-- @role('Superadmin|Pentadbir|Guru')
                         
                         <li>
                             <a href="{{ route('category.index') }}" class=" waves-effect" aria-expanded="true">
-                                <i class="fas fa-list-ul"></i>
-                                <span>Kategori</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('fees.index') }}" class=" waves-effect" aria-expanded="true">
-                                <i class="fas fa-user-cog"></i>
-                                <span>Urus</span>
-                            </a>
-                        </li>
+                <i class="fas fa-list-ul"></i>
+                <span>Kategori</span>
+                </a>
+                </li>
+                <li>
+                    <a href="{{ route('fees.index') }}" class=" waves-effect" aria-expanded="true">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Urus</span>
+                    </a>
+                </li>
 
-                        @endrole --}}
+                @endrole --}}
 
-                        {{-- @role('Superadmin|Ibu|Bapa|Penjaga')
+                {{-- @role('Superadmin|Ibu|Bapa|Penjaga')
                         <li>
                             <a href="{{ route('parentpay') }}" class=" waves-effect">
-                                <i class="far fa-credit-card"></i>
-                                <span>Bayar</span>
-                            </a>
-                        </li>
-                        @endrole --}}
+                <i class="far fa-credit-card"></i>
+                <span>Bayar</span>
+                </a>
+                </li>
+                @endrole --}}
 
-                        @role('Superadmin|Penjaga')
-                        <li>
-                            <a href="{{ route('dependent_fees') }}" class=" waves-effect">
-                                <i class="far fa-credit-card"></i>
-                                <span>Bayar</span>
-                            </a>
-                        </li>
-                        @endrole
+                @role('Superadmin|Penjaga')
+                <li>
+                    <a href="{{ route('dependent_fees') }}" class=" waves-effect">
+                        <i class="far fa-credit-card"></i>
+                        <span>Bayar</span>
+                    </a>
+                </li>
+                @endrole
             </ul>
             </li>
             @endrole

@@ -87,12 +87,10 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('/year', 'FeesController@fetchYear')->name('fees.fetchYear');
     Route::get('/classyear', 'FeesController@fetchClassYear')->name('fees.fetchClassYear');
     Route::post('/class', 'FeesController@fetchClass')->name('fees.fetchClass');
-    Route::get('/list', 'FeesController@getFeesDatatable')->name('fees.getFeesDatatable');
+
+    Route::get('/list', 'FeesController@getTypeDatatable')->name('fees.getTypeDatatable');
     Route::get('/report', 'FeesController@feesReport')->name('fees.report');
-    Route::get('/getTransaction', 'FeesController@getTransactionByOrganizationIdAndStatus')->name('fees.get_transaction');
-    Route::get('/latestTransaction', 'FeesController@getLatestTransaction')->name('fees.latest_transaction');
-    Route::get('/totalCatA', 'FeesController@getTotalCatA')->name('fees.totalCatA');
-    Route::get('/totalCatB', 'FeesController@getTotalCatB')->name('fees.totalCatB');
+    Route::get('/report/{type}/class/{class_id}', 'FeesController@reportByClass')->name('fees.reportByClass');
 
     Route::get('/A', 'FeesController@CategoryA')->name('fees.A');
     Route::get('/add/A', 'FeesController@createCategoryA')->name('fees.createA');
@@ -110,7 +108,8 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/pay', 'PayController@pay')->name('pay');
 
     Route::get('/categoryDT', 'FeesController@getCategoryDatatable')->name('fees.getCategoryDatatable');
-
+    Route::get('/student', 'FeesController@getstudentDatatable')->name('fees.getstudentDatatable');
+    Route::get('/studentfees', 'FeesController@student_fees')->name('fees.studentfees');
 });
 
 Route::group(['prefix' => 'parent'], function () {
