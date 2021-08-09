@@ -61,8 +61,8 @@
                 <div class="form-group">
                     <label>Jantina</label>
                     <div class="radio">
-                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="M"> Lelaki </label>
-                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="F"> Perempuan </label>
+                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="L"> Lelaki </label>
+                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="P"> Perempuan </label>
                     </div>
                 </div>
 

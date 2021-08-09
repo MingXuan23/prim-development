@@ -654,7 +654,7 @@ class PayController extends AppBaseController
             $res_student = DB::table('student_fees_new')
                 ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
                 ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
-                ->select('student_fees_new.id as student_fees_id')
+                ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
                 ->where('transactions.id', $transaction->id)
                 ->get();
 
@@ -676,15 +676,37 @@ class PayController extends AppBaseController
 
                 if ($list_student_fees_id) {
                     for ($i = 0; $i < count($list_student_fees_id); $i++) {
+
+                        // ************************* update student fees status fees by transactions *************************
                         $res  = DB::table('student_fees_new')
                             ->where('id', $list_student_fees_id[$i]->student_fees_id)
                             ->update(['status' => 'Paid']);
+
+                        // ************************* check the student if have still debt *************************
+
+                        $check_debt = DB::table('students')
+                            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                            ->select('students.*')
+                            ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
+                            ->where('student_fees_new.status', 'Debt')
+                            ->get();
+
+
+                        // ************************* update status fees for student if all fees completed paid*************************
+
+                        if (count($check_debt) == 0) {
+                            DB::table('class_student')
+                                ->where('id', $list_student_fees_id[$i]->class_student_id)
+                                ->update(['fees_status' => 'Completed']);
+                        }
                     }
                 }
 
                 if ($list_parent_fees_id) {
                     for ($i = 0; $i < count($list_parent_fees_id); $i++) {
 
+                        // ************************* update status fees for parent *************************
                         $res = DB::table('fees_new_organization_user')
                             ->where('id', $list_parent_fees_id[$i]->id)
                             ->update([
@@ -698,7 +720,12 @@ class PayController extends AppBaseController
                 // return view('parent.fee.receipt');
                 // return view('fpx.tStatus', compact('request', 'user'));
 
-                return $this->ReceiptFees($transaction->id);
+
+                if ($res) {
+                    return $this->ReceiptFees($transaction->id);
+                } else {
+                    return view('errors.500');
+                }
             } else {
                 return view('errors.500');
             }

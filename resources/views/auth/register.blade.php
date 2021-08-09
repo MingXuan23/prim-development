@@ -9,9 +9,9 @@ Register
 <body>
 
     <style>
-        #name {
+        /* #name {
             text-transform: uppercase;
-        }
+        } */
 
         ::-webkit-input-placeholder {
             /* WebKit browsers */

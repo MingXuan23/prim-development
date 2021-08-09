@@ -75,9 +75,9 @@
                     <label>Jantina</label>
                     <div class="radio">
                         <label class="radio-inline pl-2"><input type="radio" name="gender" value="M"
-                                {{ ($student->gender =="M")? "checked" : "" }}> Lelaki </label>
+                                {{ ($student->gender =="L")? "checked" : "" }}> Lelaki </label>
                         <label class="radio-inline pl-2"><input type="radio" name="gender" value="F"
-                                {{ ($student->gender =="F")? "checked" : "" }}> Perempuan </label>
+                                {{ ($student->gender =="P")? "checked" : "" }}> Perempuan </label>
                     </div>
                 </div>
                 <div class="form-group mb-0">
