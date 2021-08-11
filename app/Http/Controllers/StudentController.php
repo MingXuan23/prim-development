@@ -7,6 +7,7 @@ use App\Imports\StudentImport;
 use App\Models\ClassModel;
 use App\Models\Organization;
 use App\Models\Student;
+use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,45 +20,18 @@ class StudentController extends Controller
 {
     public function index()
     {
-        //
-        $userid     = Auth::id();
-
-        $school = DB::table('organizations')
-            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            ->select('organizations.id as schoolid')
-            ->where('organization_user.user_id', $userid)
-            ->first();
-
-        // dd($userid);
-
-        $student = DB::table('students')
-            ->join('class_student', 'class_student.student_id', '=', 'students.id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status')
-            ->where([
-                ['class_organization.organization_id', $school->schoolid],
-            ])
-            ->orderBy('classes.nama')
-            ->orderBy('students.nama')
-            ->get();
-
+        $organization = $this->getOrganizationByUserId();
 
         $listclass = DB::table('classes')
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('classes.id as id', 'classes.nama', 'classes.levelid')
             ->where([
-                ['class_organization.organization_id', $school->schoolid]
+                ['class_organization.organization_id', $organization[0]->id]
             ])
             ->orderBy('classes.nama')
             ->get();
 
-
-        // dd($listclass);
-
-        $organization = $this->getOrganizationByUserId();
-
-        return view("student.index", compact('student', 'listclass', 'organization'));
+        return view("student.index", compact('listclass', 'organization'));
     }
 
     public function studentexport()
@@ -326,5 +300,99 @@ class StudentController extends Controller
 
         // dd($list);
         return response()->json(['success' => $list]);
+    }
+
+    public function getStudentDatatableFees(Request $request)
+    {
+        // dd($request->oid);
+
+        if (request()->ajax()) {
+            // $oid = $request->oid;
+            $classid = $request->classid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($classid != '' && !is_null($hasOrganizaton)) {
+                $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                    ->select('students.*', 'class_student.fees_status')
+                    ->where([
+                        ['classes.id', $classid],
+                        ['class_student.status', 1],
+                    ])
+                    ->orderBy('students.nama');
+
+                $table = Datatables::of($data);
+
+                $table->addColumn('gender', function ($row) {
+                    if ($row->gender == 'L') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . 'Lelaki</div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . 'Perempuan</div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('status', function ($row) {
+                    if ($row->fees_status == 'Completed') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success">Selesai</span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Belum Selesai </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+
+                $table->rawColumns(['gender', 'status']);
+                return $table->make(true);
+            }
+
+            // dd($data->oid);
+        }
+    }
+
+    public function generatePDFByClass(Request $request)
+    {
+        $class_id = $request->class_id;
+        $class = ClassModel::where('id', $class_id)->first();
+
+        $get_organization = DB::table('organizations')
+            ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->select('organizations.*', 'classes.nama as classname')
+            ->where([
+                ['classes.id', $class_id],
+            ])
+            ->first();
+
+        $data = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->select('students.*', 'class_student.fees_status')
+            ->where([
+                ['classes.id', $class_id],
+                ['class_student.status', 1],
+            ])
+            ->orderBy('students.nama')
+            ->get();
+
+        $pdf = PDF::loadView('fee.report-search.template-pdf', compact('data', 'get_organization'));
+
+        return $pdf->download($class->nama . '.pdf');
     }
 }
