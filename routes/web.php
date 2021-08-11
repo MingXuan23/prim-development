@@ -89,6 +89,7 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('/class', 'FeesController@fetchClass')->name('fees.fetchClass');
 
     Route::get('/list', 'FeesController@getTypeDatatable')->name('fees.getTypeDatatable');
+    Route::get('/listparent', 'FeesController@getParentDatatable')->name('fees.getParentDatatable');
     Route::get('/report', 'FeesController@feesReport')->name('fees.report');
     Route::get('/report/{type}/class/{class_id}', 'FeesController@reportByClass')->name('fees.reportByClass');
 
@@ -110,6 +111,7 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/categoryDT', 'FeesController@getCategoryDatatable')->name('fees.getCategoryDatatable');
     Route::get('/student', 'FeesController@getstudentDatatable')->name('fees.getstudentDatatable');
     Route::get('/studentfees', 'FeesController@student_fees')->name('fees.studentfees');
+    Route::get('/dependent', 'FeesController@parent_dependent')->name('fees.parent_dependent');
 });
 
 Route::group(['prefix' => 'parent'], function () {

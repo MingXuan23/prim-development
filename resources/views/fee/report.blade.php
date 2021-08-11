@@ -38,53 +38,65 @@
                         @endforeach
                     </select>
                 </div>
-                
-                <h4 class="card-title mb-4 te">Jumlah bilangan murid mengikut</h4>
-
-                <div class="row justify-content-center">
+                <br>
+                <div class="row">
                     <div class="col-sm-6">
-                        <div class="text-center">
-                            <h5 class="mb-0 font-size-20">{{ $student_complete }} / {{ $all_student }}</h5>
-                            <span id="completed" hidden>{{ $student_complete }}</span>
-                            <p class="text-muted">Selesai Membayar Yuran</p>
+                        <h4 class="card-title mb-4 text-center">Carta pie untuk pembayaran yuran <br> murid mengikut
+                            pecahan kelas </h4>
+
+                        <div class="row justify-content-center">
+                            <div class="col-sm-6">
+                                <div class="text-center">
+                                    <h5 class="mb-0 font-size-20">{{ $student_complete }} / {{ $all_student }}</h5>
+                                    <p class="text-muted">Selesai Membayar Yuran</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="text-center">
+                                    <h5 class="mb-0 font-size-20">{{ $student_notcomplete }} / {{ $all_student }}</h5>
+                                    <p class="text-muted">Belum Selesai Membayar Yuran</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pie-chart-yuran" style="width:500px;height:250px; margin: 0 auto;">
+                            <div id="pie-chart-container" class="flot-charts flot-charts-height">
+                            </div>
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        <div class="text-center">
-                            <h5 class="mb-0 font-size-20">{{ $student_notcomplete }} / {{ $all_student }}</h5>
-                            <span id="notcompleted" hidden>{{ $student_notcomplete }}</span>
-                            <p class="text-muted">Belum Selesai Membayar Yuran</p>
+                        <h4 class="card-title mb-4 text-center">Carta pie untuk pembayaran yuran <br> Kategori A
+                            mengikut keluarga </h4>
+
+                        <div class="row justify-content-center">
+                            <div class="col-sm-6">
+                                <div class="text-center">
+                                    <h5 class="mb-0 font-size-20">{{ $parent_complete }} / {{ $all_parent }}</h5>
+                                    <p class="text-muted">Selesai Membayar Yuran</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="text-center">
+                                    <h5 class="mb-0 font-size-20">{{ $parent_notcomplete }} / {{ $all_parent }}</h5>
+                                    <p class="text-muted">Belum Selesai Membayar Yuran</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="pie-chart-yuran-category-A" style="width:500px;height:250px; margin: 0 auto;">
+                            <div id="pie-chart-container" class="flot-charts flot-charts-height">
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                {{-- 
-                <div>
-                    <div id="pie-chart-yuran" style="width:500px;height:400px;">
-
-                    </div>
-                </div> --}}
-
-                <div id="pie-chart-yuran" style="width:500px;height:250px; margin: 0 auto;">
-                    <div id="pie-chart-container" class="flot-charts flot-charts-height">
-                    </div>
-                </div>
-
-
             </div>
-
-            {{-- <div class="">
-                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
-                        class="fa fa-search"></i>
-                    Tapis</button>
-            </div> --}}
 
         </div>
     </div>
 
     <div class="col-md-12">
         <div class="card">
-            <div class="card-body">
+            <div id="table" class="card-body">
 
                 @if(count($errors) > 0)
                 <div class="alert alert-danger">
@@ -101,6 +113,11 @@
                 </div>
                 @endif
 
+                <div class="card-title text-center">
+                    <span id="type-name"> </span>
+                </div>
+
+                <br>
                 <div class="table-responsive">
                     <table id="reportClass" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -113,6 +130,41 @@
                             </tr>
                         </thead>
                     </table>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="table-parent" class="table table-bordered table-striped dt-responsive nowrap"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th> No. </th>
+                                <th>Nama Penjaga</th>
+                                <th>No. Telefon</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Senarai Nama Tanggungan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -144,12 +196,28 @@
         var completed       = parseInt(<?php echo $student_complete; ?>);
         var notcompleted    = parseInt(<?php echo $student_notcomplete; ?>);
 
+        var parent_completed       = parseInt(<?php echo $parent_complete; ?>);
+        var parent_notcompleted    = parseInt(<?php echo $parent_notcomplete; ?>);
+
+        $('#table').hide();
+        $('#reportClass').hide();
+        $('#table-parent').hide();
+        $('#type-name').hide();
+
         var data = [{
             label: "Belum Selesai",  
             data: notcompleted,
         }, {
             label: "Selesai",  
             data: completed,
+        }];
+
+        var data_category_A = [{
+            label: "Belum Selesai",  
+            data: parent_notcompleted,
+        }, {
+            label: "Selesai",  
+            data: parent_completed,
         }];
 
         var options = {
@@ -176,18 +244,46 @@
 
         $.plot($("#pie-chart-yuran"), data, options);
 
+        $.plot($("#pie-chart-yuran-category-A"), data_category_A, options);
+
+        
 
         $("#pie-chart-yuran").bind("plotclick", function(event, pos, item){
             // alert(item.datapoint);
             // console.log(item);
             // console.log(item.datapoint[1][0][1]);
             $('#reportClass').DataTable().destroy();
+            $('#table-parent').hide();
+            $('#table-parent_wrapper').hide();
+            $('#table').show();
+            $('#reportClass').show();
 
-            console.log(item.series.label);
             var type = item.series.label;
             fetch_data(type);
 
+            document.getElementById("type-name").innerHTML="Senarai Kelas Yang " + type + " Membayar Yuran";
+            $('#type-name').show();
+
         });
+
+        $("#pie-chart-yuran-category-A").bind("plotclick", function(event, pos, item){
+            // alert(item.datapoint);
+            // console.log(item);
+            // console.log(item.datapoint[1][0][1]);
+            $('#table-parent').DataTable().destroy();
+            $('#reportClass').hide();
+            $('#reportClass_wrapper').hide();
+
+            $('#table').show();
+            $('#table-parent').show();
+            
+            var type = item.series.label;
+            fetch_data_parent(type);
+
+            document.getElementById("type-name").innerHTML="Senarai Penjaga Yang " + type + " Membayar Yuran";
+            $('#type-name').show();
+        });
+
 
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
@@ -247,6 +343,106 @@
             });
         }
 
+        // category A (parent)
+        function fetch_data_parent(type = '') {
+            $('#table-parent').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('fees.getParentDatatable') }}",
+                        data: {
+                            type: type,
+                        },
+                        type: 'GET',
+  
+                    },
+                    'columnDefs': [{
+                        "targets": [0], // your case first column
+                        "className": "text-center",
+                        "width": "2%"
+                    },{
+                        "targets": [1,2,3,4], // your case first column
+                        "className": "text-center",
+                    },],
+                    order: [
+                        [1, 'asc']
+                    ],
+                    columns: [{
+                        "data": null,
+                        searchable: false,
+                        "sortable": false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    }, {
+                        data: "name",
+                        name: 'name'
+                    }, {
+                        data: "telno",
+                        name: 'telno',
+                        orderable: false,
+                        searchable: false
+                    },  {
+                        data: "email",
+                        name: 'email',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },],
+                    error: function (error) {
+                        alert('error');
+                        alert(error.toString());
+                    }
+            });
+        }
+
+        // modal for dependent by parent
+        var user_id;
+        $(document).on('click', '.user-id', function(){
+            user_id = $(this).attr('id');
+
+            $.ajax({
+                url: "{{ route('fees.parent_dependent') }}",
+                type: 'get',
+                data: {
+                    data : user_id
+                },
+                success: function(response){ 
+
+                    var html="";
+                    $('.modal-body').empty();
+
+                    html += '<table class="table table-bordered" >';
+                        html += '<tr style="text-align:center">';
+                        html += '<th> Nama Murid </th>';
+                        html += '<th> Kelas </th>';
+                        html += '</tr>';
+                    for(var i=0; i < response.length; i++){
+
+                        html += '<tr>';
+                        html += '<td><div style="text-align:center">'+response[i].nama +'</div></td>';  
+                        html += '<td><div  style="text-align:center">'+response[i].classname+'</div></td>';  
+                        html += '</tr>';
+                    }
+                    html += '</table>';      
+                    
+                // Add response in Modal body
+                    $('.modal-body').append(html) 
+
+                // Display Modal
+                    $('#modelId').modal('show');
+
+                }
+            });
+
+
+
+        });
+
         // csrf token for ajax
         $.ajaxSetup({
                 headers: {
@@ -254,9 +450,7 @@
             }
         });
   
-        var teacher_id;
-  
-          $('.alert').delay(3000).fadeOut();
+        $('.alert').delay(3000).fadeOut();
   
     });
 </script>
