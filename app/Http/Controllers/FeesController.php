@@ -221,8 +221,36 @@ class FeesController extends AppBaseController
 
     public function feesReport()
     {
-        $organizations = $this->getOrganizationByUserId();
+        $organization = $this->getOrganizationByUserId();
 
+        $all_student = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->where('class_organization.organization_id', 20)
+            ->count();
+
+        // dd($all_student);
+        $student_complete = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->where('class_organization.organization_id', 20)
+            ->where('class_student.fees_status', 'Completed')
+            ->count();
+
+        $student_notcomplete = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->where('class_organization.organization_id', 20)
+            ->where('class_student.fees_status', 'Not Complete')
+            ->count();
+
+        // dd($all_student);
+
+        return view('fee.report', compact('organization', 'all_student', 'student_complete', 'student_notcomplete'));
+    }
+
+    public function feesReportByOrganizationId(Request $request)
+    {
         $all_student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
@@ -246,7 +274,7 @@ class FeesController extends AppBaseController
 
         // dd($all_student);
 
-        return view('fee.report', compact('all_student', 'student_complete', 'student_notcomplete'));
+        return view('fee.report', compact('organization', 'all_student', 'student_complete', 'student_notcomplete'));
     }
 
     public function reportByClass($type, $class_id)
@@ -273,7 +301,7 @@ class FeesController extends AppBaseController
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                     ->select('classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
-                    ->where('class_organization.organization_id', 10)
+                    ->where('class_organization.organization_id', 20)
                     ->where('class_student.fees_status', 'Completed')
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
@@ -284,7 +312,7 @@ class FeesController extends AppBaseController
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                     ->select('classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
-                    ->where('class_organization.organization_id', 10)
+                    ->where('class_organization.organization_id', 20)
                     ->where('class_student.fees_status', 'Not Complete')
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
@@ -301,7 +329,7 @@ class FeesController extends AppBaseController
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                     ->select('classes.nama', DB::raw('COUNT(students.id) as totalallstudent'))
-                    ->where('class_organization.organization_id', 10)
+                    ->where('class_organization.organization_id', 20)
                     ->where('classes.id', $row->id)
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
@@ -929,7 +957,7 @@ class FeesController extends AppBaseController
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-            ->select('fees_new.*', 'students.id as studentid','student_fees_new.status')
+            ->select('fees_new.*', 'students.id as studentid', 'student_fees_new.status')
             ->where('students.id', $student_id)
             ->orderBy('fees_new.name')
             ->get();
