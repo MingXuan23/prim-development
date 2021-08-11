@@ -244,9 +244,29 @@ class FeesController extends AppBaseController
             ->where('class_student.fees_status', 'Not Complete')
             ->count();
 
+        $all_parent =  DB::table('organization_user')
+            ->where('organization_id', 20)
+            ->where('role_id', 6)
+            ->where('status', 1)
+            ->count();
+
+        $parent_complete =  DB::table('organization_user')
+            ->where('organization_id', 20)
+            ->where('role_id', 6)
+            ->where('status', 1)
+            ->where('fees_status', 'Completed')
+            ->count();
+
+        $parent_notcomplete =  DB::table('organization_user')
+            ->where('organization_id', 20)
+            ->where('role_id', 6)
+            ->where('status', 1)
+            ->where('fees_status', 'Not Complete')
+            ->count();
+
         // dd($all_student);
 
-        return view('fee.report', compact('organization', 'all_student', 'student_complete', 'student_notcomplete'));
+        return view('fee.report', compact('organization', 'all_student', 'student_complete', 'student_notcomplete', 'all_parent', 'parent_complete', 'parent_notcomplete'));
     }
 
     public function feesReportByOrganizationId(Request $request)
@@ -354,6 +374,51 @@ class FeesController extends AppBaseController
         }
     }
 
+    public function getParentDatatable(Request $request)
+    {
+        // dd($request->oid);
+
+        if (request()->ajax()) {
+            $type = $request->type;
+            // dd($type);
+            $userId = Auth::id();
+
+            if ($type == 'Selesai') {
+
+                $data = DB::table('users')
+                    ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                    ->select('users.*', 'organization_user.organization_id')
+                    ->where('organization_user.organization_id', 20)
+                    ->where('organization_user.role_id', 6)
+                    ->where('organization_user.status', 1)
+                    ->where('organization_user.fees_status', 'Completed')
+                    ->get();
+            } else {
+                $data = DB::table('users')
+                    ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                    ->select('users.*', 'organization_user.organization_id')
+                    ->where('organization_user.organization_id', 20)
+                    ->where('organization_user.role_id', 6)
+                    ->where('organization_user.status', 1)
+                    ->where('organization_user.fees_status', 'Not Complete')
+                    ->get();
+            }
+
+            // dd($first);
+            $table = Datatables::of($data);
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<a class="btn btn-primary m-1 user-id" id="' . $row->id . '-' . $row->organization_id . '">Butiran</a></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['action']);
+            return $table->make(true);
+        }
+    }
+
     public function getstudentDatatable(Request $request)
     {
         // dd($request->oid);
@@ -448,7 +513,12 @@ class FeesController extends AppBaseController
                     'organization_user_id' => $parent_id[$i]->id,
 
                 );
+
+                $fees_parent = DB::table('organization_user')
+                    ->where('id', $parent_id[$i]->id)
+                    ->update(['fees_status' => 'Not Complete']);
             }
+
             DB::table('fees_new_organization_user')->insert($array);
 
             return redirect('/fees/A')->with('success', 'Yuran Kategori A telah berjaya dimasukkan');
@@ -963,5 +1033,30 @@ class FeesController extends AppBaseController
             ->get();
 
         return response()->json($getfees_bystudent, 200);
+    }
+
+    public function parent_dependent(Request $request)
+    {
+        $case = explode("-", $request->data);
+
+        $user_id         = $case[0];
+        $organization_id = $case[1];
+
+        $get_dependents = DB::table('organizations')
+            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+            ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->select('students.*', 'classes.nama as classname')
+            ->where('organization_user.user_id', $user_id)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.organization_id', $organization_id)
+            ->where('organization_user.status', 1)
+            ->where('class_student.status', 1)
+            ->get();
+
+        return response()->json($get_dependents, 200);
     }
 }
