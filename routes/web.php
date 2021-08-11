@@ -112,6 +112,10 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/student', 'FeesController@getstudentDatatable')->name('fees.getstudentDatatable');
     Route::get('/studentfees', 'FeesController@student_fees')->name('fees.studentfees');
     Route::get('/dependent', 'FeesController@parent_dependent')->name('fees.parent_dependent');
+
+    Route::get('/search-report', 'FeesController@searchreport')->name('fees.searchreport');
+    Route::get('/list-student', 'StudentController@getStudentDatatableFees')->name('fees.getStudentDatatableFees');
+    Route::get('/download-PDF', 'StudentController@generatePDFByClass')->name('fees.generatePDFByClass');
 });
 
 Route::group(['prefix' => 'parent'], function () {

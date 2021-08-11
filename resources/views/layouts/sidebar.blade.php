@@ -165,6 +165,13 @@
                         </li>
 
                         <li>
+                            <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
+                                <i class="fas fa-search"></i>
+                                <span>Carian Laporan</span>
+                            </a>
+                        </li>
+                        
+                        <li>
                             <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-user-cog"></i>
                                 <span>Kategori A</span>

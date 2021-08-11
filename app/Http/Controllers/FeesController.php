@@ -1059,4 +1059,21 @@ class FeesController extends AppBaseController
 
         return response()->json($get_dependents, 200);
     }
+
+    public function searchreport()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        $listclass = DB::table('classes')
+            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+            ->select('classes.id as id', 'classes.nama', 'classes.levelid')
+            ->where([
+                ['class_organization.organization_id', $organization[0]->id]
+            ])
+            ->orderBy('classes.nama')
+            ->get();
+            
+        return view('fee.report-search.index', compact('organization', 'listclass'));
+
+    }
 }
