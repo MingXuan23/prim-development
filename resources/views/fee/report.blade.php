@@ -29,7 +29,16 @@
 
             {{csrf_field()}}
             <div class="card-body">
-
+                <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected disabled>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                
                 <h4 class="card-title mb-4 te">Jumlah bilangan murid mengikut</h4>
 
                 <div class="row justify-content-center">
