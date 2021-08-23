@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
@@ -18,8 +19,15 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
 
     public function rules(): array
     {
+        // return [
+        //     'no_kp' => 'unique:students,icno'
+        // ];
+
         return [
-            'no_kp' => 'unique:students,icno'
+            'no_kp' => [
+                'required',
+                 Rule::unique('students', 'icno')
+            ],
         ];
     }
 
@@ -27,6 +35,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
     {
         return [
             'no_kp.unique' => 'Terdapat maklumat murid yang telah wujud',
+            'no_kp.required' => 'Maklumat murid diperlukan',
         ];
     }
 

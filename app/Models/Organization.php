@@ -52,7 +52,11 @@ class Organization extends Model
 
     public function getOrganizationByType($type)
     {
-        $organizations = Organization::where("type_org", $type)->get();
+        if ($type == 8) {
+            $organizations = Organization::where('organizations.nama', 'like', '%'.'UNIVERSITI'.'%');
+        } else {
+            $organizations = Organization::where("type_org", $type)->get();
+        }
         return $organizations;
     }
 }
