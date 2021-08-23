@@ -205,7 +205,7 @@
 
                             <br>
                             <div style="text-align: center;">
-                                <p><i>"<b>ALLAH</b> suka kita <b>SEDEKAH</b> setiap hari"</i></p>
+                                <p><i>"The  <b>POWER</b> of <b>GIVING</b>"</i></p>
                                 <img src="{{ URL::asset('assets/images/pic-donate.png') }}" width="150">
                             </div>
 
