@@ -170,4 +170,20 @@ class LandingPageController extends AppBaseController
         $table->rawColumns(['action']);
         return $table->make(true);
     }
+
+    public function customOrganizationTabbing(Request $request)
+    {
+        $data = Donation::where('donations.nama', 'like', '%'.'COVID-19'.'%');
+        
+        $table = Datatables::of($data);
+        $table->addColumn('email', 'zuraini@utem.edu.my');
+        $table->addColumn('telno', '+60125290235');
+        $table->addColumn('action', function ($row) {
+            $btn = '<div class="d-flex justify-content-center">';
+            $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Bayar</a></div>';
+            return $btn;
+        });
+        $table->rawColumns(['action']);
+        return $table->make(true);
+    }
 }

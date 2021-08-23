@@ -659,57 +659,112 @@
         $(document).on('click', '.btn-organization', function() {
             var type = $(this).attr("id");
 
-            var tableOrganization = $('#tableOrganization').DataTable({
-                "ordering": true,
-                "processing": true,
-                "serverSide": true,
-                "bDestroy": true,
-                "searching": false,
-                "lengthChange": false,
-                "bInfo": false,
-                "drawCallback": function(settings) {
-                    $("#tableOrganization thead").remove();
-                },
-                "language": {
-                    "emptyTable": "Tiada maklumat untuk dipaparkan",
-                    "paginate": {
-                        "next": "Seterusnya",
-                        "previous": "Sebelumnya"
-                    }
-                },
-                ajax: {
-                    url: "{{ route('landingpage.donation.organization') }}",
-                    type: 'GET',
-                    data: {
-                        type: type,
+            if (type == 8){
+                var tableOrganization = $('#tableOrganization').DataTable({
+                    "ordering": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "bDestroy": true,
+                    "searching": false,
+                    "lengthChange": false,
+                    "bInfo": false,
+                    "drawCallback": function(settings) {
+                        $("#tableOrganization thead").remove();
                     },
-                },
-                order: [
-                    [1, 'asc']
-                ],
-                responsive: {
-                    details: {
-                        type: 'column'
-                    }
-                },
-                columns: [{
-                    data: "nama",
-                    name: "nama"
-                }, {
-                    data: "telno",
-                    name: "telno"
-                },{
-                    data: "email",
-                    name: "email",
-                    className: "desktop"
-                },{
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
+                    "language": {
+                        "emptyTable": "Tiada maklumat untuk dipaparkan",
+                        "paginate": {
+                            "next": "Seterusnya",
+                            "previous": "Sebelumnya"
+                        }
+                    },
+                    ajax: {
+                        url: "{{ route('landingpage.donation.custom') }}",
+                        type: 'GET',
+                        data: {
+                            type: type,
+                        },
+                    },
+                    order: [
+                        [1, 'asc']
+                    ],
+                    responsive: {
+                        details: {
+                            type: 'column'
+                        }
+                    },
+                    columns: [{
+                        data: "nama",
+                        name: "nama"
+                    }, {
+                        data: "telno",
+                        name: "telno"
+                    },{
+                        data: "email",
+                        name: "email",
+                        className: "desktop"
+                    },{
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
 
-                }, ]
-            });
+                    }, ]
+                });
+            } else {
+                var tableOrganization = $('#tableOrganization').DataTable({
+                    "ordering": true,
+                    "processing": true,
+                    "serverSide": true,
+                    "bDestroy": true,
+                    "searching": false,
+                    "lengthChange": false,
+                    "bInfo": false,
+                    "drawCallback": function(settings) {
+                        $("#tableOrganization thead").remove();
+                    },
+                    "language": {
+                        "emptyTable": "Tiada maklumat untuk dipaparkan",
+                        "paginate": {
+                            "next": "Seterusnya",
+                            "previous": "Sebelumnya"
+                        }
+                    },
+                    ajax: {
+                        url: "{{ route('landingpage.donation.organization') }}",
+                        type: 'GET',
+                        data: {
+                            type: type,
+                        },
+                    },
+                    order: [
+                        [1, 'asc']
+                    ],
+                    responsive: {
+                        details: {
+                            type: 'column'
+                        }
+                    },
+                    columns: [{
+                        data: "nama",
+                        name: "nama"
+                    }, {
+                        data: "telno",
+                        name: "telno"
+                    },{
+                        data: "email",
+                        name: "email",
+                        className: "desktop"
+                    },{
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+
+                    }, ]
+                });
+            }
+
 
         });
 
