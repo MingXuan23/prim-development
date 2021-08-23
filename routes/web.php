@@ -35,6 +35,7 @@ Route::group(['prefix' => 'derma'], function () {
     Route::get('/activity-details', 'LandingPageController@activitydetailsDonation');
     Route::get('/organization-type', 'LandingPageController@getOrganizationDatatable')->name('landingpage.donation.organization');
     Route::get('/organization-donation', 'LandingPageController@getDonationDatatable')->name('landingpage.donation.donation');
+    Route::get('/organization-donation-custom', 'LandingPageController@customOrganizationTabbing')->name('landingpage.donation.custom');
 });
 
 //landing fees page route

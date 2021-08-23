@@ -205,12 +205,10 @@
 
                             <br>
                             <div style="text-align: center;">
-                                <p><i>"The  <b>POWER</b> of <b>GIVING</b>"</i></p>
+                                <p><i>"The  <b>POWER</b> of <b>GIVING</b> everyday"</i></p>
                                 <img src="{{ URL::asset('assets/images/pic-donate.png') }}" width="150">
                             </div>
-
                         </form>
-
                     </div>
                     <div class="row">
 
