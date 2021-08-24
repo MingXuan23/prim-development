@@ -48,13 +48,13 @@
                             <div class="col-sm-6">
                                 <div class="text-center">
                                     <h5 class="mb-0 font-size-20">{{ $student_complete }} / {{ $all_student }}</h5>
-                                    <p class="text-muted">Selesai Membayar Yuran</p>
+                                    <p class="text-muted">Orang Selesai Membayar</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-center">
                                     <h5 class="mb-0 font-size-20">{{ $student_notcomplete }} / {{ $all_student }}</h5>
-                                    <p class="text-muted">Belum Selesai Membayar Yuran</p>
+                                    <p class="text-muted">Orang Belum Selesai Membayar</p>
                                 </div>
                             </div>
                         </div>
@@ -72,13 +72,13 @@
                             <div class="col-sm-6">
                                 <div class="text-center">
                                     <h5 class="mb-0 font-size-20">{{ $parent_complete }} / {{ $all_parent }}</h5>
-                                    <p class="text-muted">Selesai Membayar Yuran</p>
+                                    <p class="text-muted">Orang Selesai Membayar</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-center">
                                     <h5 class="mb-0 font-size-20">{{ $parent_notcomplete }} / {{ $all_parent }}</h5>
-                                    <p class="text-muted">Belum Selesai Membayar Yuran</p>
+                                    <p class="text-muted">Orang Belum Selesai Membayar</p>
                                 </div>
                             </div>
                         </div>
