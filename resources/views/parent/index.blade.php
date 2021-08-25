@@ -158,7 +158,7 @@
         $('#telno').on('keyup', function() {
             var text = this.value;
             clearTimeout(timeout);
-            if(text.length == 12){
+            if(text.length == 12 || text.length == 13){
                 // console.log('asdas');
                 timeout = setTimeout(function() {
                 // Do AJAX shit here      
