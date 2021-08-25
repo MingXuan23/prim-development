@@ -22,10 +22,17 @@
             {{csrf_field()}}
             <div class="card-body">
 
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label>Nombor Kad Pengenalan</label>
                     <input type="text" id="icno" name="icno" class="form-control"
                         placeholder="Masukkan Nombor Kad Pengenalan">
+                    <p><i> *tiada "-" </i>  </p> 
+                </div> --}}
+
+                <div class="form-group">
+                    <label>Nombor Telefon</label>
+                    <input type="text" id="telno" name="telno" class="form-control"
+                        placeholder="Masukkan Nombor Telefon">
                     {{-- <p><i> *tiada "-" </i>  </p> --}}
                 </div>
             </div>
@@ -145,13 +152,13 @@
 
 <script>
     $(document).ready(function() {
-        $('#icno').mask('000000-00-0000');
+        $('#telno').mask('+600000000000');
         $('#parentTable').DataTable().destroy();
         var timeout = null;
-        $('#icno').on('keyup', function() {
+        $('#telno').on('keyup', function() {
             var text = this.value;
             clearTimeout(timeout);
-            if(text.length == 14){
+            if(text.length == 12){
                 // console.log('asdas');
                 timeout = setTimeout(function() {
                 // Do AJAX shit here      
@@ -165,7 +172,7 @@
         });
         var parentTable;
 
-        function fetch_data(icno = '') {
+        function fetch_data(telno = '') {
             
             parentTable = $('#parentTable').DataTable({
                     processing: true,
@@ -173,7 +180,7 @@
                     ajax: {
                         url: "{{ route('parent.getParentDatatable') }}",
                         data: {
-                            icno: icno,
+                            telno: telno,
                         },
                         type: 'GET',
   

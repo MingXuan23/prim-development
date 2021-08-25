@@ -233,18 +233,28 @@ class ParentController extends Controller
         }
     }
 
+    public function getParentByTel($telno)
+    {
+        return  DB::table('users')
+                ->leftJoin('organization_user', 'users.id', '=', 'organization_user.user_id')
+                ->where('organization_user.role_id', '=', '6')
+                ->where('users.telno', $telno)
+                ->get();
+    }
+
     public function getParentDatatable(Request $request)
     {
         // dd($request->icno);
-
 
         if (request()->ajax()) {
 
             $userId = Auth::id();
             // $data = Parents::where('icno', $request->icno)->first();
-            $data = DB::table('users')
+            /* $data = DB::table('users')
                 ->where('icno', $request->icno)
-                ->get();
+                ->get(); */
+
+            $data = $this->getParentByTel($request->telno);
 
             // dd($data);
             $table = Datatables::of($data);
