@@ -50,8 +50,8 @@ class StudentController extends Controller
         $file       = $request->file('file');
         $namaFile   = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
-
-        Excel::import(new StudentImport($classID), public_path('/uploads/excel/' . $namaFile));
+        $public_path = $_SERVER['DOCUMENT_ROOT'];
+        Excel::import(new StudentImport($classID), $public_path . '/uploads/excel/' . $namaFile);
         return redirect('/student')->with('success', 'New student has been added successfully');
     }
 
