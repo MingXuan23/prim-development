@@ -83,7 +83,6 @@
                                 <th> No. </th>
                                 <th>Nama Kelas</th>
                                 <th>Bilangan Pelajar</th>
-                                <th>Tahap</th>
                                 <th>Details</th>
                             </tr>
                         </thead>
@@ -190,7 +189,7 @@
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [1,2,3,4], // your case first column
+                        "targets": [1,2,3], // your case first column
                         "className": "text-center",
                     },],
                     order: [
@@ -207,11 +206,10 @@
                         data: "cnama",
                         name: 'cnama'
                     }, {
-                        data: "levelid",
-                        name: 'levelid'
-                    }, {
-                        data: "levelid",
-                        name: 'levelid'
+                        data: "totalstudent",
+                        name: 'totalstudent',
+                        orderable: false,
+                        searchable: false,
                     }, {
                         data: 'action',
                         name: 'action',

@@ -157,6 +157,26 @@ class ClassController extends Controller
             // dd($data->oid);
             $table = Datatables::of($data);
 
+            $table->addColumn('totalstudent', function ($row) {
+
+                $list_student = DB::table('class_organization')
+                    ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                    ->join('students', 'students.id', '=', 'class_student.student_id')
+                    ->select('classes.nama', DB::raw('COUNT(students.id) as totalstudent'))
+                    ->where('classes.id', $row->cid)
+                    ->groupBy('classes.nama')
+                    ->first();
+
+                if ($list_student) {
+                    $btn = '<div class="d-flex justify-content-center">' . $list_student->totalstudent . '</div>';
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center"> 0 </div>';
+                    return $btn;
+                }
+            });
+
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
@@ -165,7 +185,7 @@ class ClassController extends Controller
                 return $btn;
             });
 
-            $table->rawColumns(['action']);
+            $table->rawColumns(['totalstudent', 'action']);
             return $table->make(true);
         }
     }

@@ -92,6 +92,7 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/list', 'FeesController@getTypeDatatable')->name('fees.getTypeDatatable');
     Route::get('/listparent', 'FeesController@getParentDatatable')->name('fees.getParentDatatable');
     Route::get('/report', 'FeesController@feesReport')->name('fees.report');
+    Route::get('/reportByOid', 'FeesController@feesReportByOrganizationId')->name('fees.reportByOid');
     Route::get('/report/{type}/class/{class_id}', 'FeesController@reportByClass')->name('fees.reportByClass');
 
     Route::get('/A', 'FeesController@CategoryA')->name('fees.A');
@@ -106,7 +107,7 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/add/C', 'FeesController@createCategoryC')->name('fees.createC');
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
 
-    Route::get('/dependent_fee', 'FeesController@dependent_fees')->name('dependent_fees');
+    Route::get('/dependent_fees', 'FeesController@dependent_fees')->name('dependent_fees');
     Route::get('/pay', 'PayController@pay')->name('pay');
 
     Route::get('/categoryDT', 'FeesController@getCategoryDatatable')->name('fees.getCategoryDatatable');

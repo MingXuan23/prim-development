@@ -226,39 +226,39 @@ class FeesController extends AppBaseController
         $all_student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->where('class_organization.organization_id', 20)
+            ->where('class_organization.organization_id', 22)
             ->count();
 
         // dd($all_student);
         $student_complete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->where('class_organization.organization_id', 20)
+            ->where('class_organization.organization_id', 22)
             ->where('class_student.fees_status', 'Completed')
             ->count();
 
         $student_notcomplete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->where('class_organization.organization_id', 20)
+            ->where('class_organization.organization_id', 22)
             ->where('class_student.fees_status', 'Not Complete')
             ->count();
 
         $all_parent =  DB::table('organization_user')
-            ->where('organization_id', 20)
+            ->where('organization_id', 22)
             ->where('role_id', 6)
             ->where('status', 1)
             ->count();
 
         $parent_complete =  DB::table('organization_user')
-            ->where('organization_id', 20)
+            ->where('organization_id', 22)
             ->where('role_id', 6)
             ->where('status', 1)
             ->where('fees_status', 'Completed')
             ->count();
 
         $parent_notcomplete =  DB::table('organization_user')
-            ->where('organization_id', 20)
+            ->where('organization_id', 22)
             ->where('role_id', 6)
             ->where('status', 1)
             ->where('fees_status', 'Not Complete')
@@ -271,30 +271,51 @@ class FeesController extends AppBaseController
 
     public function feesReportByOrganizationId(Request $request)
     {
+        $oid = $request->oid;
+
         $all_student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->where('class_organization.organization_id', 10)
+            ->where('class_organization.organization_id', $oid)
             ->count();
 
         // dd($all_student);
         $student_complete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->where('class_organization.organization_id', 10)
+            ->where('class_organization.organization_id', $oid)
             ->where('class_student.fees_status', 'Completed')
             ->count();
 
         $student_notcomplete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->where('class_organization.organization_id', 10)
+            ->where('class_organization.organization_id', $oid)
             ->where('class_student.fees_status', 'Not Complete')
             ->count();
 
-        // dd($all_student);
+        $all_parent =  DB::table('organization_user')
+            ->where('organization_id', $oid)
+            ->where('role_id', 6)
+            ->where('status', 1)
+            ->count();
 
-        return view('fee.report', compact('organization', 'all_student', 'student_complete', 'student_notcomplete'));
+        $parent_complete =  DB::table('organization_user')
+            ->where('organization_id', $oid)
+            ->where('role_id', 6)
+            ->where('status', 1)
+            ->where('fees_status', 'Completed')
+            ->count();
+
+        $parent_notcomplete =  DB::table('organization_user')
+            ->where('organization_id', $oid)
+            ->where('role_id', 6)
+            ->where('status', 1)
+            ->where('fees_status', 'Not Complete')
+            ->count();
+
+        return response()->json(['all_student' => $all_student, 'student_complete' => $student_complete, 'student_notcomplete' => $student_notcomplete, 'all_parent' => $all_parent, 'parent_complete' => $parent_complete, 'parent_notcomplete' => $parent_notcomplete], 200);
+
     }
 
     public function reportByClass($type, $class_id)
@@ -311,6 +332,7 @@ class FeesController extends AppBaseController
 
         if (request()->ajax()) {
             $type = $request->type;
+            $oid = $request->oid;
             // dd($type);
             $userId = Auth::id();
 
@@ -320,8 +342,8 @@ class FeesController extends AppBaseController
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
-                    ->where('class_organization.organization_id', 20)
+                    ->select('class_organization.organization_id as oid', 'classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
+                    ->where('class_organization.organization_id', $oid)
                     ->where('class_student.fees_status', 'Completed')
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
@@ -331,8 +353,8 @@ class FeesController extends AppBaseController
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
-                    ->where('class_organization.organization_id', 20)
+                    ->select('class_organization.organization_id as oid', 'classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
+                    ->where('class_organization.organization_id', $oid)
                     ->where('class_student.fees_status', 'Not Complete')
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
@@ -349,7 +371,7 @@ class FeesController extends AppBaseController
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                     ->select('classes.nama', DB::raw('COUNT(students.id) as totalallstudent'))
-                    ->where('class_organization.organization_id', 20)
+                    ->where('class_organization.organization_id', $row->oid)
                     ->where('classes.id', $row->id)
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
@@ -380,6 +402,7 @@ class FeesController extends AppBaseController
 
         if (request()->ajax()) {
             $type = $request->type;
+            $oid = $request->oid;
             // dd($type);
             $userId = Auth::id();
 
@@ -388,7 +411,7 @@ class FeesController extends AppBaseController
                 $data = DB::table('users')
                     ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
                     ->select('users.*', 'organization_user.organization_id')
-                    ->where('organization_user.organization_id', 20)
+                    ->where('organization_user.organization_id', $oid)
                     ->where('organization_user.role_id', 6)
                     ->where('organization_user.status', 1)
                     ->where('organization_user.fees_status', 'Completed')
@@ -397,7 +420,7 @@ class FeesController extends AppBaseController
                 $data = DB::table('users')
                     ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
                     ->select('users.*', 'organization_user.organization_id')
-                    ->where('organization_user.organization_id', 20)
+                    ->where('organization_user.organization_id', $oid)
                     ->where('organization_user.role_id', 6)
                     ->where('organization_user.status', 1)
                     ->where('organization_user.fees_status', 'Not Complete')
@@ -1072,8 +1095,7 @@ class FeesController extends AppBaseController
             ])
             ->orderBy('classes.nama')
             ->get();
-            
-        return view('fee.report-search.index', compact('organization', 'listclass'));
 
+        return view('fee.report-search.index', compact('organization', 'listclass'));
     }
 }

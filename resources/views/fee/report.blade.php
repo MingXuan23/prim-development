@@ -47,14 +47,16 @@
                         <div class="row justify-content-center">
                             <div class="col-sm-6">
                                 <div class="text-center">
-                                    <h5 class="mb-0 font-size-20">{{ $student_complete }} / {{ $all_student }}</h5>
-                                    <p class="text-muted">Selesai Membayar Yuran</p>
+                                    <h5 class="mb-0 font-size-20" id="student-complete">0 /
+                                        0</h5>
+                                    <p class="text-muted">Orang Selesai Membayar</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-center">
-                                    <h5 class="mb-0 font-size-20">{{ $student_notcomplete }} / {{ $all_student }}</h5>
-                                    <p class="text-muted">Belum Selesai Membayar Yuran</p>
+                                    <h5 class="mb-0 font-size-20" id="student-not-complete">0 /
+                                        0</h5>
+                                    <p class="text-muted">Orang Belum Selesai Membayar</p>
                                 </div>
                             </div>
                         </div>
@@ -71,14 +73,16 @@
                         <div class="row justify-content-center">
                             <div class="col-sm-6">
                                 <div class="text-center">
-                                    <h5 class="mb-0 font-size-20">{{ $parent_complete }} / {{ $all_parent }}</h5>
-                                    <p class="text-muted">Selesai Membayar Yuran</p>
+                                    <h5 class="mb-0 font-size-20" id="parent-complete">0 /
+                                        0</h5>
+                                    <p class="text-muted">Orang Selesai Membayar</p>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="text-center">
-                                    <h5 class="mb-0 font-size-20">{{ $parent_notcomplete }} / {{ $all_parent }}</h5>
-                                    <p class="text-muted">Belum Selesai Membayar Yuran</p>
+                                    <h5 class="mb-0 font-size-20" id="parent-not-complete">0 /
+                                        0</h5>
+                                    <p class="text-muted">Orang Belum Selesai Membayar</p>
                                 </div>
                             </div>
                         </div>
@@ -193,104 +197,148 @@
         var reportClass;
         var colors = ["#E0E0E0", '#02a499'];
 
-        var completed       = parseInt(<?php echo $student_complete; ?>);
-        var notcompleted    = parseInt(<?php echo $student_notcomplete; ?>);
+        var completed;
+        var notcompleted;
 
-        var parent_completed       = parseInt(<?php echo $parent_complete; ?>);
-        var parent_notcompleted    = parseInt(<?php echo $parent_notcomplete; ?>);
+        var parent_completed;
+        var parent_notcompleted;
+
+        var oid;
 
         $('#table').hide();
         $('#reportClass').hide();
         $('#table-parent').hide();
         $('#type-name').hide();
 
-        var data = [{
-            label: "Belum Selesai",  
-            data: notcompleted,
-        }, {
-            label: "Selesai",  
-            data: completed,
-        }];
 
-        var data_category_A = [{
-            label: "Belum Selesai",  
-            data: parent_notcompleted,
-        }, {
-            label: "Selesai",  
-            data: parent_completed,
-        }];
+        function data_pie(oid) {
 
-        var options = {
-        series: {
-            pie: {
-            show: true,
-            }
-        },
-        legend: {
-            show: true,
-            backgroundColor: "transparent"
-        },
-        grid: {
-            hoverable: true,
-            clickable: true
-        },
-            colors: colors,
-            tooltip: true,
-            tooltipOpts: {
-                content: "%s, %p.0%",
-                defaultTheme: false
-            }
-        };
+            $.ajax({
+                url: "{{ route('fees.reportByOid') }}",
+                type: 'get',
+                data: {
+                    oid : oid
+                },
+                success: function(response){ 
+                    // console.log(response.student_notcomplete);
+                    completed       = response.student_complete;
+                    notcompleted    = response.student_notcomplete;
 
-        $.plot($("#pie-chart-yuran"), data, options);
+                    parent_completed       = response.parent_complete;
+                    parent_notcompleted    = response.parent_notcomplete;
 
-        $.plot($("#pie-chart-yuran-category-A"), data_category_A, options);
+                    document.getElementById("student-complete").innerHTML = completed +" / "+ response.all_student;
+                    document.getElementById("student-not-complete").innerHTML = notcompleted +" / "+ response.all_student;
+                    document.getElementById("parent-complete").innerHTML = parent_completed +" / "+ response.all_parent;
+                    document.getElementById("parent-not-complete").innerHTML = parent_notcompleted +" / "+ response.all_parent;
+
+                    var data = [{
+                        label: "Belum Selesai",  
+                        data: notcompleted,
+                    }, {
+                        label: "Selesai",  
+                        data: completed,
+                    }];
+
+                    var data_category_A = [{
+                        label: "Belum Selesai",  
+                        data: parent_notcompleted,
+                    }, {
+                        label: "Selesai",  
+                        data: parent_completed,
+                    }];
+
+                    var options = {
+                    series: {
+                        pie: {
+                        show: true,
+                        }
+                    },
+                    legend: {
+                        show: true,
+                        backgroundColor: "transparent"
+                    },
+                    grid: {
+                        hoverable: true,
+                        clickable: true
+                    },
+                        colors: colors,
+                        tooltip: true,
+                        tooltipOpts: {
+                            content: "%s, %p.0%",
+                            defaultTheme: false
+                        }
+                    };
+
+                    $.plot($("#pie-chart-yuran"), data, options);
+
+                    $.plot($("#pie-chart-yuran-category-A"), data_category_A, options);
+
+                    
+
+                    $("#pie-chart-yuran").bind("plotclick", function(event, pos, item){
+                        // alert(item.datapoint);
+                        // console.log(item);
+                        // console.log(item.datapoint[1][0][1]);
+                        $('#reportClass').DataTable().destroy();
+                        $('#table-parent').hide();
+                        $('#table-parent_wrapper').hide();
+                        $('#table').show();
+                        $('#reportClass').show();
+
+                        var type = item.series.label;
+                        oid = $("#organization option:selected").val();
+                        
+                        fetch_data(oid, type);
+
+                        document.getElementById("type-name").innerHTML="Senarai Kelas Yang " + type + " Membayar Yuran";
+                        $('#type-name').show();
+
+                    });
+
+                    $("#pie-chart-yuran-category-A").bind("plotclick", function(event, pos, item){
+                        // alert(item.datapoint);
+                        // console.log(item);
+                        // console.log(item.datapoint[1][0][1]);
+                        $('#table-parent').DataTable().destroy();
+                        $('#reportClass').hide();
+                        $('#reportClass_wrapper').hide();
+
+                        $('#table').show();
+                        $('#table-parent').show();
+                        
+                        var type = item.series.label;
+                        oid = $("#organization option:selected").val();
+
+                        fetch_data_parent(oid, type);
+
+                        document.getElementById("type-name").innerHTML="Senarai Penjaga Yang " + type + " Membayar Yuran";
+                        $('#type-name').show();
+                    });
+                    
+                }
+            });
+        }
+        
 
         
 
-        $("#pie-chart-yuran").bind("plotclick", function(event, pos, item){
-            // alert(item.datapoint);
-            // console.log(item);
-            // console.log(item.datapoint[1][0][1]);
-            $('#reportClass').DataTable().destroy();
-            $('#table-parent').hide();
-            $('#table-parent_wrapper').hide();
-            $('#table').show();
-            $('#reportClass').show();
-
-            var type = item.series.label;
-            fetch_data(type);
-
-            document.getElementById("type-name").innerHTML="Senarai Kelas Yang " + type + " Membayar Yuran";
-            $('#type-name').show();
-
-        });
-
-        $("#pie-chart-yuran-category-A").bind("plotclick", function(event, pos, item){
-            // alert(item.datapoint);
-            // console.log(item);
-            // console.log(item.datapoint[1][0][1]);
-            $('#table-parent').DataTable().destroy();
-            $('#reportClass').hide();
-            $('#reportClass_wrapper').hide();
-
-            $('#table').show();
-            $('#table-parent').show();
-            
-            var type = item.series.label;
-            fetch_data_parent(type);
-
-            document.getElementById("type-name").innerHTML="Senarai Penjaga Yang " + type + " Membayar Yuran";
-            $('#type-name').show();
-        });
+        
 
 
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
             // fetch_data($("#organization").val());
+            oid = $("#organization option:selected").val();
+            data_pie(oid);
         }
 
-        function fetch_data(type = '') {
+        $('#organization').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            data_pie(organizationid);
+        });
+
+        function fetch_data(oid, type) {
             reportClass = $('#reportClass').DataTable({
                     processing: true,
                     serverSide: true,
@@ -298,6 +346,7 @@
                         url: "{{ route('fees.getTypeDatatable') }}",
                         data: {
                             type: type,
+                            oid: oid,
                         },
                         type: 'GET',
   
@@ -344,7 +393,7 @@
         }
 
         // category A (parent)
-        function fetch_data_parent(type = '') {
+        function fetch_data_parent(oid, type) {
             $('#table-parent').DataTable({
                     processing: true,
                     serverSide: true,
@@ -352,6 +401,7 @@
                         url: "{{ route('fees.getParentDatatable') }}",
                         data: {
                             type: type,
+                            oid: oid,
                         },
                         type: 'GET',
   
