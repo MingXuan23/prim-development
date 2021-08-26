@@ -90,4 +90,5 @@ class Donation extends Model
 
         return $donation;
     }
+
 }
