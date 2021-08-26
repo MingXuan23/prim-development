@@ -25,7 +25,6 @@ class CreateDonationsTable extends Migration
             $table->string('tax_payer')->nullable();
             $table->float('total_tax')->nullable();
             $table->string('donation_poster')->nullable();
-            $table->string('donation_type')->nullable();
         });
     }
 
