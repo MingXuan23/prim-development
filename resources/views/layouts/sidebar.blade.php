@@ -101,7 +101,7 @@
                     </a>
 
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
-                        @role('Superadmin|Pentadbir|Guru')
+                        @role('Superadmin|Pentadbir')
                         <li>
                             <a href="{{ route('teacher.index') }}" class=" waves-effect">
                                 <i class="fas fa-chalkboard-teacher"></i>

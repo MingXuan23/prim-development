@@ -197,7 +197,6 @@ class TeacherController extends Controller
 
         if (request()->ajax()) {
             $oid = $request->oid;
-
             $hasOrganizaton = $request->hasOrganization;
 
             $userId = Auth::id();
@@ -223,7 +222,7 @@ class TeacherController extends Controller
             //         ->where('users.id', Auth::id())
             //         ->orderBy('users.name');
             // }
-
+            // dd($data);
             // dd($data->oid);
             $table = Datatables::of($data);
 
