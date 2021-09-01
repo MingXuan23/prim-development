@@ -138,6 +138,15 @@ class LandingPageController extends AppBaseController
         }
     }
 
+    public function getOrganizationByDonationId($id)
+    {
+        try {
+            $organizations = $this->organization->getOrganizationByDonationId($id);
+            return $organizations;
+        } catch (\Throwable $th) {
+            return $this->sendError($th->getMessage(), 500);
+        }
+    }
 
     public function getOrganizationDatatable(Request $request)
     {
@@ -173,11 +182,18 @@ class LandingPageController extends AppBaseController
 
     public function customOrganizationTabbing(Request $request)
     {
-        $data = Donation::where('donations.nama', 'like', '%'.'COVID-19'.'%');
-        
+        $data = Donation::where('donations.donation_type', $request->type);
         $table = Datatables::of($data);
-        $table->addColumn('email', 'zuraini@utem.edu.my');
-        $table->addColumn('telno', '+60125290235');
+        $table->addColumn('email', function($row){
+            $data1 = $this->getOrganizationByDonationId($row->id);
+            $data2 = $data1->email;
+            return $data2;
+        });
+        $table->addColumn('telno', function($row){
+            $data1 = $this->getOrganizationByDonationId($row->id);
+            $data2 = $data1->telno;
+            return $data2;
+        });
         $table->addColumn('action', function ($row) {
             $btn = '<div class="d-flex justify-content-center">';
             $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Bayar</a></div>';
