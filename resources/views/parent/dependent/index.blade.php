@@ -74,7 +74,7 @@
                     </div>
 
                     <div class="">
-                        <button style="float: right" type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Simpan</button>
+                        <button style="margin: 19px; float: right;" type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Simpan</button>
                     </div>
                 </form>
             </div>
