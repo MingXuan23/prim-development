@@ -32,6 +32,12 @@
                 </div>
                 @endif
                 
+                @if(\Session::has('success'))
+                <div class="alert alert-success">
+                    <p>{{ \Session::get('success') }}</p>
+                </div>
+                @endif
+                
                 <form method="post" action="{{ route('parent.storeDependent')}}" enctype="multipart/form-data">
                     {{csrf_field()}}
                     <div class="card-body">
