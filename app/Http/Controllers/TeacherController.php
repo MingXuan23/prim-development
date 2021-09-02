@@ -19,6 +19,9 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 
+use function PHPUnit\Framework\isEmpty;
+use function PHPUnit\Framework\isNull;
+
 class TeacherController extends Controller
 {
 
@@ -59,26 +62,49 @@ class TeacherController extends Controller
 
     public function store(Request $request)
     {
-        //
-
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required|unique:users',
-            'email'         =>  'required|email|unique:users',
+            'icno'          =>  'required',
+            'email'         =>  'required',
             'telno'         =>  'required',
             'organization'  =>  'required',
         ]);
 
-        $newteacher = new Teacher([
-            'name'           =>  $request->get('name'),
-            'icno'           =>  $request->get('icno'),
-            'email'          =>  $request->get('email'),
-            'password'       =>  Hash::make('abc123'),
-            'telno'          =>  $request->get('telno'),
-            'remember_token' =>  $request->get('_token'),
-            // 'created_at'     =>  now(),
-        ]);
-        $newteacher->save();
+        //check if parent role exists
+        $ifExits = DB::table('users as u')
+                    ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+                    ->where('ou.role_id', '=', '6')
+                    ->where('u.email', '=', "{$request->get('email')}")
+                    ->where('u.icno', '=', "{$request->get('icno')}")
+                    ->where('u.telno', '=', "{$request->get('telno')}")
+                    ->get();
+        
+        // dd($ifExits);
+
+        if (!$ifExits) // if not parent
+        {
+            $this->validate($request, [
+                'icno'          =>  'required|unique:users',
+                'email'         =>  'required|email|unique:users',
+            ]);
+    
+            $newteacher = new Teacher([
+                'name'           =>  $request->get('name'),
+                'icno'           =>  $request->get('icno'),
+                'email'          =>  $request->get('email'),
+                'password'       =>  Hash::make('abc123'),
+                'telno'          =>  $request->get('telno'),
+                'remember_token' =>  $request->get('_token'),
+                // 'created_at'     =>  now(),
+            ]);
+            $newteacher->save();
+        }
+        else // if parent
+        {
+            $newteacher = DB::table('users')
+                            ->where('email', '=', "{$request->get('email')}")
+                            ->first();
+        }
 
         $username    = DB::table('users')
             ->where('id', $newteacher->id)
