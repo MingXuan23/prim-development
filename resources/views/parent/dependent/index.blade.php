@@ -31,14 +31,15 @@
                     </ul>
                 </div>
                 @endif
+                
                 <form method="post" action="{{ route('parent.storeDependent')}}" enctype="multipart/form-data">
                     {{csrf_field()}}
                     <div class="card-body">
 
                         <div class="form-group">
-                            <label>Nama Organisasi</label>
+                            <label>Nama Sekolah</label>
                             <select name="organization" id="organization" class="form-control">
-                                <option value="" selected disabled>Pilih Organisasi</option>
+                                <option value="" selected>Pilih Sekolah</option>
                                 @foreach($organization as $row)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
                                 @endforeach
@@ -67,8 +68,7 @@
                     </div>
 
                     <div class="">
-                        <button style="float: right" type="submit" class="btn btn-primary"><i class="fas fa-save"></i>
-                            Simpan</button>
+                        <button style="float: right" type="submit" class="btn btn-primary"><i class="fas fa-save"></i>Simpan</button>
                     </div>
                 </form>
             </div>
@@ -84,13 +84,13 @@
 
                 <div class="card-body">
 
-                    <table class="table table-bordered table-striped">
-                        <tr style="text-align:center">
+                    <table class="table table-bordered table-striped text-center">
+                        <tr>
                             <th>Bil.</th>
                             <th>Nama Tanggungan</th>
                             <th>Nama Sekolah</th>
                             <th>Kelas</th>
-                            <th>Details</th>
+                            <th>Aksi</th>
                         </tr>
 
                         @foreach($list as $row)
@@ -101,18 +101,16 @@
                             <td>{{ $row->classname }}</td>
 
                             <td>
-                                <div class="d-flex justify-content-center">
-                                    <a href="" class="btn btn-primary m-1">Edit</a>
+                                {{-- <div class="d-flex justify-content-center">
+                                    <a href="" class="btn btn-primary m-1">Edit</a> --}}
 
                                     <form action="" method="POST">
                                         <input type="hidden" name="_method" value="DELETE">
                                         {{ csrf_field() }}
-                                        <button class="btn btn-danger m-1"
-                                            onclick="return confirm('Adakah anda pasti ?')">Delete</button>
+                                        <button class="btn btn-danger m-1" onclick="return confirm('Adakah anda pasti ?')">Delete</button>
                                     </form>
                                 </div>
                             </td>
-
                         </tr>
                         @endforeach
 

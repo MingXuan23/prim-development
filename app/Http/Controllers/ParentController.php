@@ -35,11 +35,12 @@ class ParentController extends Controller
         return view('parent.index', compact('organization'));
     }
 
-    public function indexDependent($id)
+    public function indexDependent()
     {
         //
-        // dd($id);
-        $userId = $id;
+        // $userId = $id;
+        $userId =  Auth::id();
+        
         $organization = $this->getOrganizationByUserId();
 
         $list = DB::table('organizations')
@@ -57,6 +58,8 @@ class ParentController extends Controller
             ])
             ->orderBy('classes.nama')
             ->get();
+        
+        //dd($userId, $organization, $list);
 
         return view('parent.dependent.index', compact('list', 'organization', 'userId'));
     }
@@ -97,43 +100,74 @@ class ParentController extends Controller
 
     public function create()
     {
-        $organization = $this->getOrganizationByUserId();
+        $user_id = Auth::id();
 
-        // $organization = DB::table('organizations')
-        //     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-        //     ->join('users', 'organization_user.user_id', '=', 'users.id')
-        //     ->where('organization_user.user_id', Auth::id())
-        //     ->Where(function ($query) {
-        //         $query->where('organization_user.role_id', '=', 1)
-        //             ->Orwhere('organization_user.role_id', '=', 2)
-        //             ->Orwhere('organization_user.role_id', '=', 4);
-        //     })
-        //     ->select('organizations.id as id', 'organizations.nama as nama')
-        //     ->distinct()
-        //     ->get();
-
+        $organization = DB::table('organizations as o')
+                        ->leftJoin('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+                        ->where('ou.user_id', '=', "{$user_id}")
+                        ->select('o.id')
+                        ->first();
+        // dd($organization);
         return view('parent.add', compact('organization'));
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
+            'oid'           => 'required',
             'name'          =>  'required',
-            'icno'          =>  'required|unique:users',
-            'email'         =>  'required|email|unique:users',
+            'icno'          =>  'required',
+            'email'         =>  'required',
             'telno'         =>  'required',
         ]);
 
-        $newparent = new Parents([
-            'name'           =>  strtoupper($request->get('name')),
-            'icno'           =>  $request->get('icno'),
-            'email'          =>  $request->get('email'),
-            'password'       =>  Hash::make('abc123'),
-            'telno'          =>  $request->get('telno'),
-            'remember_token' =>  Str::random(40),
-            // 'created_at'     =>  now(),
+        // check if teacher role exists
+        $ifExits = DB::table('users as u')
+                    ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+                    ->where('ou.role_id', '=', '5')
+                    ->where('u.email', '=', "{$request->get('email')}")
+                    ->where('u.icno', '=', "{$request->get('icno')}")
+                    ->where('u.telno', '=', "{$request->get('telno')}")
+                    ->get();
+        
+        if(count($ifExits) == 0) // if not teacher
+        {
+            $this->validate($request, [
+                'icno'          =>  'required|unique:users',
+                'email'         =>  'required|email|unique:users',
+            ]);
+
+            $newparent = new Parents([
+                'name'           =>  strtoupper($request->get('name')),
+                'icno'           =>  $request->get('icno'),
+                'email'          =>  $request->get('email'),
+                'password'       =>  Hash::make('abc123'),
+                'telno'          =>  $request->get('telno'),
+                'remember_token' =>  Str::random(40),
+                // 'created_at'     =>  now(),
+            ]);
+            $newparent->save();
+        }
+        else // add parent role
+        {
+            $newparent = DB::table('users')
+                        ->where('email', '=', "{$request->get('email')}")
+                        ->first();
+        }
+
+        DB::table('organization_user')->insert([
+            'organization_id'   => $request->get('oid'),
+            'user_id'           => $newparent->id,
+            'role_id'           => 6,
+            'start_date'        => now(),
+            'status'            => 1,
         ]);
-        $newparent->save();
+
+        $user = User::find($newparent->id);
+
+        // role parent
+        $rolename = OrganizationRole::find(6);
+        $user->assignRole($rolename->nama);
 
         return redirect('/parent')->with('success', 'New parent has been added successfully');
     }
@@ -147,7 +181,7 @@ class ParentController extends Controller
             'student'       =>  'required',
         ]);
 
-        $userId = $request->get('parentid');
+        $userId = Auth::id();
         $schid = $request->get('organization');
         $stdid = $request->get('student');
 
@@ -220,25 +254,40 @@ class ParentController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-
             return Organization::all();
         } else {
-            // user role guru 
-            return Organization::whereHas('user', function ($query) use ($userId) {
-                $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->where('organization_user.role_id', '=', 4)
-                        ->Orwhere('organization_user.role_id', '=', 5);
-                });
-            })->get();
+            // user role parent
+            $organizations = DB::table('organizations')
+                                ->where('type_org', '=', '1')
+                                ->orWhere('type_org', '=', '2')
+                                ->orWhere('type_org', '=', '3')
+                                ->get();
+            // dd($organizations);
+
+            return $organizations;
+
+            // return Organization::whereHas('user', function ($query) use ($userId) {
+            //     $query->where('user_id', $userId)->Where(function ($query) {
+            //         $query->where('organization_user.role_id', '=', 4)
+            //             ->Orwhere('organization_user.role_id', '=', 5);
+            //     });
+            // })->get();
         }
     }
 
     public function getParentByTel($telno)
     {
+        $parent =  DB::table('users')
+        ->leftJoin('organization_user', 'users.id', '=', 'organization_user.user_id')
+        ->where('organization_user.role_id', '=', '6')
+        ->where('users.telno', '=' ,$telno)
+        ->get();
+        dd($parent);
+
         return  DB::table('users')
                 ->leftJoin('organization_user', 'users.id', '=', 'organization_user.user_id')
                 ->where('organization_user.role_id', '=', '6')
-                ->where('users.telno', $telno)
+                ->where('users.telno', '=' ,$telno)
                 ->get();
     }
 

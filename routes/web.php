@@ -121,7 +121,7 @@ Route::group(['prefix' => 'fees'], function () {
 });
 
 Route::group(['prefix' => 'parent'], function () {
-    Route::get('dependent/{id}', 'ParentController@indexDependent')->name('parent.dependent');
+    Route::get('dependent', 'ParentController@indexDependent')->name('parent.dependent');
     Route::get('list', 'ParentController@getParentDatatable')->name('parent.getParentDatatable');
     Route::post('dependent', 'ParentController@storeDependent')->name('parent.storeDependent');
 });

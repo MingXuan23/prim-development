@@ -230,6 +230,13 @@
 
                 @role('Superadmin|Penjaga')
                 <li>
+                    <a href="{{ route('parent.dependent') }}" class=" waves-effect">
+                    <i class="fas fa-child"></i>
+                    <span>Carian Tanggungan</span>
+                    </a>
+                </li>
+                
+                <li>
                     <a href="{{ route('dependent_fees') }}" class=" waves-effect">
                         <i class="far fa-credit-card"></i>
                         <span>Bayar</span>
@@ -240,16 +247,9 @@
             </li>
             @endrole
 
-            {{-- @role('Superadmin|Pentadbir|Ibu|Bapa|Penjaga')
-                <li>
-                    <a href="{{ route('parent.dependent') }}" class=" waves-effect">
-            <i class="fas fa-child"></i>
-            <span>Carian Tanggungan</span>
-            </a>
-            </li>
-            @endrole --}}
-
-
+            @role('Superadmin|Penjaga')
+                
+            @endrole
 
             {{-- @role('Superadmin|Pentadbir|Guru')
                 <li>

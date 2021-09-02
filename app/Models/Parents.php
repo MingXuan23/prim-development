@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Organization;
 use Illuminate\Database\Eloquent\Model;
 
 class Parents extends Model

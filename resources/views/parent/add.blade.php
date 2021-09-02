@@ -61,12 +61,12 @@
         <form method="post" action="{{ route('parent.store') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
-
+                <input id="oid" name="oid" type="hidden" value="{{ $organization->id }}">
                 <div class="form-group">
                     <label>Nama Penuh</label>
                     <input type="text" id="name" name="name" class="form-control" placeholder="Nama Penuh">
                 </div>
-
+                
                 <div class="form-group">
                     <label>Nombor Kad Pengenalan</label>
                     <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">

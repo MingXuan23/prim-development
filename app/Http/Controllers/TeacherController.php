@@ -81,7 +81,7 @@ class TeacherController extends Controller
         
         // dd($ifExits);
 
-        if (!$ifExits) // if not parent
+        if (count($ifExits) == 0) // if not parent
         {
             $this->validate($request, [
                 'icno'          =>  'required|unique:users',
