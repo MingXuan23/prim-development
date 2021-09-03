@@ -37,31 +37,44 @@ class ParentController extends Controller
 
     public function indexDependent()
     {
-        //
-        // $userId = $id;
         $userId =  Auth::id();
         
         $organization = $this->getOrganizationByUserId();
 
-        $list = DB::table('organizations')
-            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            ->join('users', 'users.id', '=', 'organization_user.user_id')
-            ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
-            ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
-            ->join('students', 'students.id', '=', 'organization_user_student.student_id')
-            ->join('class_student', 'class_student.student_id', '=', 'students.id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('organizations.nama as nschool', 'students.nama as studentname', 'classes.nama as classname', 'organization_roles.nama as rolename')
-            ->where([
-                ['users.id', $userId],
-            ])
-            ->orderBy('classes.nama')
-            ->get();
-        
-        //dd($userId, $organization, $list);
+        return view('parent.dependent.index', compact('organization', 'userId'));
+    }
 
-        return view('parent.dependent.index', compact('list', 'organization', 'userId'));
+    public function getDependentDataTable()
+    {
+        $userId =  Auth::id();
+
+        $list = DB::table('organizations')
+                ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+                ->join('users', 'users.id', '=', 'organization_user.user_id')
+                ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+                ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+                ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('organization_user_student.id as ousid', 'organizations.nama as sekolah', 'students.nama as nama', 'classes.nama as kelas', 'organization_roles.nama as rolename')
+                ->where([
+                    ['users.id', $userId],
+                ])
+                ->orderBy('classes.nama')
+                ->get();
+
+        if(request()->ajax())
+        {
+            return datatables()->of($list)
+                ->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<button id="' . $row->ousid . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                })
+                ->make(true);
+        }
     }
 
     public function fetchClass(Request $request)
@@ -243,6 +256,31 @@ class ParentController extends Controller
         }
 
         return redirect('/parent/dependent/')->with('success', 'Tanggungan telah berjaya ditambah');
+    }
+
+    public function deleteDependent($id)
+    {
+        // dd($id);
+        $user = DB::table('students as s')
+                    ->leftJoin('organization_user_student as ous', 's.id', "=", 'ous.student_id')
+                    ->select('s.id as sid')
+                    ->where('ous.id', '=', $id)
+                    ->first();
+        // dd($user->sid);
+        $result = DB::table('organization_user_student')->where('id', '=', $id)->delete();
+
+        $ifSuccess = DB::table('students')
+                        ->where('id', '=', $user->sid)
+                        ->update(['parent_tel' => null]);
+
+        if ($result && $ifSuccess) {
+            Session::flash('success', 'Tanggungan Berjaya Dipadam');
+
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Tanggungan Tidak Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        }
     }
 
     public function show($id)

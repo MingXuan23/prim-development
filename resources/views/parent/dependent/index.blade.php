@@ -1,5 +1,5 @@
 @extends('layouts.master')
-
+@include('layouts.datatable');
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection
@@ -37,6 +37,8 @@
                     <p>{{ \Session::get('success') }}</p>
                 </div>
                 @endif
+                
+                <div class="flash-message"></div>
                 
                 <form method="post" action="{{ route('parent.storeDependent')}}" enctype="multipart/form-data">
                     {{csrf_field()}}
@@ -80,56 +82,41 @@
             </div>
         </div>
 
-        <div class="col-md-12">
-            <div class="card">
-                {{-- <div class="card-header">List Of Applications</div> --}}
-                <div>
-                    {{-- <a style="margin: 19px; float: right;" href="{{ route('acc.create') }}" class="btn
-                    btn-primary"> <i class="fas fa-plus"></i> Pengesahan</a> --}}
-                </div>
-
-                <div class="card-body">
-
-                    <table class="table table-bordered table-striped text-center">
-                        <tr>
-                            <th>Bil.</th>
-                            <th>Nama Tanggungan</th>
-                            <th>Nama Sekolah</th>
-                            <th>Kelas</th>
-                            <th>Aksi</th>
-                        </tr>
-
-                        @foreach($list as $row)
-                        <tr>
-                            <td>{{ $loop->iteration }}.</td>
-                            <td>{{ $row->studentname }}</td>
-                            <td>{{ $row->nschool }}</td>
-                            <td>{{ $row->classname }}</td>
-
-                            <td>
-                                {{-- <div class="d-flex justify-content-center">
-                                    <a href="" class="btn btn-primary m-1">Edit</a> --}}
-
-                                    <form action="" method="POST">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        {{ csrf_field() }}
-                                        <button class="btn btn-danger m-1" onclick="return confirm('Adakah anda pasti ?')">Delete</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-
-                    </table>
-                </div>
-            </div>
-
+        <div class="table-responsive">
+            <table id="dependentTable" class="table table-bordered table-striped dt-responsive wrap"
+                style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                <thead>
+                    <tr style="text-align:center">
+                        <th>No</th>
+                        <th>Nama Tanggungan</th>
+                        <th>Sekolah</th>
+                        <th>Kelas</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
-
-
-
 </div>
+{{-- confirmation delete modal --}}
+<div id="deleteConfirmationModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Padam Tanggungan</h4>
+            </div>
+            <div class="modal-body">
+                Adakah anda pasti?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
+                    name="delete">Padam</button>
+                <button type="button" data-dismiss="modal" class="btn">Batal</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{-- end confirmation delete modal --}}
 @endsection
 
 
@@ -203,9 +190,96 @@
                 fetch_data($("#organization").val());
             }
         });
-                
+        
+        var dependentTable = $('#dependentTable').DataTable({
+            ordering: true,
+            processing: true,
+            serverSide: true,
+                ajax: {
+                    url: "{{ route('parent.getDependentDataTable') }}",
+                    type: 'GET',
+                },
+                'columnDefs': [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%"
+                  }],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function (data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "nama",
+                    name: "nama",
+                    "width": "20%"
+                },
+                {
+                    data: "sekolah",
+                    name: "sekolah",
+                    "width": "10%"
+                }, {
+                    data: "kelas",
+                    name: "kelas",
+                    "width": "10%"
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    "width": "10%"
+                },]
+          });
+
+        // csrf token for ajax
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        var ouid;
+
+        $(document).on('click', '.btn-danger', function(){
+            ouid = $(this).attr('id');
+            $('#deleteConfirmationModal').modal('show');
+        });
+
+        var url = "{{route('parent.deleteDependent',  ':ouid')}}";
+          $('#delete').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    _method: 'DELETE'
+                },
+                url: url.replace(':ouid', ouid),
+                beforeSend: function() {
+                    $('#delete').text('Padam...');
+                },
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+
+                    $('div.flash-message').html(data);
+
+                    dependentTable.ajax.reload();
+                },
+                error: function (data) {
+                    $('div.flash-message').html(data);
+                }
+            })
+        });
+
+        $('.alert').delay(3000).fadeOut();
+
     });
-        
-        
 </script>
 @endsection
