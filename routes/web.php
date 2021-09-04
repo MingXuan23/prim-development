@@ -122,13 +122,13 @@ Route::group(['prefix' => 'fees'], function () {
 
 Route::group(['prefix' => 'parent'], function () {
     Route::get('list', 'ParentController@getParentDatatable')->name('parent.getParentDatatable');
+    Route::get('dependent', 'ParentController@indexDependent')->name('parent.dependent');
+    Route::post('dependent', 'ParentController@storeDependent')->name('parent.storeDependent');
+    Route::delete('dependent/{id}', 'ParentController@deleteDependent')->name('parent.deleteDependent');
 });
 
 Route::group(['prefix' => 'dependent'], function () {
-    Route::get('dependent', 'ParentController@indexDependent')->name('parent.dependent');
     Route::get('list', 'ParentController@getDependentDataTable')->name('parent.getDependentDataTable');
-    Route::post('dependent', 'ParentController@storeDependent')->name('parent.storeDependent');
-    Route::delete('dependent/{id}', 'ParentController@deleteDependent')->name('parent.deleteDependent');
 });
 
 Route::group(['prefix' => 'category'], function () {

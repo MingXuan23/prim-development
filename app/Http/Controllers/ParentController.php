@@ -236,24 +236,25 @@ class ParentController extends Controller
             $ouid = $ou->id;
         }
 
-        $check_std = DB::table('organization_user_student')
-            ->where('organization_user_id', $ouid)
-            ->where('student_id', $stdid)
-            ->first();
+        // $check_std = DB::table('organization_user_student')
+        //     ->where('organization_user_id', $ouid)
+        //     ->where('student_id', $stdid)
+        //     ->first();
 
-        if ($check_std) {
-            return redirect('/parent/dependent')->withErrors('Tanggungan ini telahpun ditambah');
-        } else {
-            DB::table('organization_user_student')
+        // if ($check_std) {
+        //     return redirect('/parent/dependent')->withErrors('Tanggungan ini telahpun ditambah');
+        // } else {
+            
+        // }
+        DB::table('organization_user_student')
                 ->insert([
                     'organization_user_id'  => $ouid,
                     'student_id'            => $stdid
                 ]);
             
-                DB::table('students')
-                ->where('id', $stdid)
-                ->update(['parent_tel' => "{$user_tel}"]);
-        }
+        DB::table('students')
+            ->where('id', $stdid)
+            ->update(['parent_tel' => "{$user_tel}"]);
 
         return redirect('/parent/dependent/')->with('success', 'Tanggungan telah berjaya ditambah');
     }
