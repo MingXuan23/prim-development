@@ -24,12 +24,12 @@
                     </a>
                 </li>
 
-                <li>
+                {{-- <li>
                     <a href="{{ route('organization.index') }}" class=" waves-effect">
                         <i class="mdi mdi-account-group"></i>
                         <span>Chat</span>
                     </a>
-                </li>
+                </li> --}}
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
