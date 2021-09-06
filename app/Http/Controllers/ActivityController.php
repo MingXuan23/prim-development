@@ -30,15 +30,15 @@ class ActivityController extends Controller
 
     public function getActivityDatatable(Request $request)
     {
-        // $oid = 0;
+        $oid = $request->oid;
+        // dd($request->oid);
         
-        $listactivity = Organization::find(1)->activity;
-        // $listactivity = DB::table('organizations')
-        // ->join('activities', 'activities.organization_id', '=', 'organizations.id')
-        // ->select('activities.name as aname')
-        // ->where('organizations.id', 1)
-        // ->orderBy('activities.name')
-        // ->get();
+        // $listactivity = Organization::find(1)->activity;
+        $listactivity = DB::table('organizations')
+        ->join('activities', 'activities.organization_id', '=', 'organizations.id')
+        ->where('organizations.id', $oid)
+        ->orderBy('activities.name')
+        ->get();
         // dd($listactivity);
 
         if (request()->ajax()) {
@@ -81,11 +81,14 @@ class ActivityController extends Controller
 
     public function create()
     {
-        return view('activity.add');
+        $organization = $this->getOrganizationByUserId();
+        return view('activity.add', compact('organization'));
     }
 
     public function store(Request $request)
     {
+        //dd($request->organization);
+        $oid = $request->organization;
         //
         $dt = Carbon::now();
         $startdate  = $dt->toDateString($request->get('start_date'));
@@ -98,7 +101,7 @@ class ActivityController extends Controller
             'date_start'     =>  $startdate,
             'date_end'       =>  $enddate,
             'status'         =>  '1',
-            'organization_id' =>  2,
+            'organization_id' =>  $oid,
         ]);
 
         return redirect('/activity')->with('success', 'New activity has been added successfully');

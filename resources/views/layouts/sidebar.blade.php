@@ -77,8 +77,6 @@
                     </ul>
                 </li>
 
-
-
                 @role('Jaim')
                 <li>
                     <a href="{{ route('jaim.index') }}" class=" waves-effect">
@@ -252,10 +250,6 @@
                 @endrole
             </ul>
             </li>
-            @endrole
-
-            @role('Superadmin|Penjaga')
-                
             @endrole
 
             {{-- @role('Superadmin|Pentadbir|Guru')
