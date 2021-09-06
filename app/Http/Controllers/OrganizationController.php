@@ -76,7 +76,9 @@ class OrganizationController extends Controller
     {
         // after launch remove where
         // $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
-        $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
+        // $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
+
+        $type_org = TypeOrganization::all();
 
         $org = DB::table('organizations')->where('id', $id)->first();
 

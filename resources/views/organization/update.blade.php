@@ -32,6 +32,7 @@
             <form method="post" action="{{ route('organization.update', $org->id) }} " enctype="multipart/form-data" class="form-validation">
                 @method('PATCH')
                 {{csrf_field()}}
+                <input type="text" name="type_org" value="{{ $org->type_org }}" hidden>
                 <div class="card-body">
                     <div class="form-group">
                         <input type="text" name="id" value="{{ $org->id }}" hidden>
@@ -49,12 +50,7 @@
                         <input type="text" name="email" class="form-control" placeholder="Email"
                             value="{{ $org->email }}" data-parsley-required-message="Sila masukkan email" required>
                     </div>
-                    <div class="form-group">
-                        <label>Jenis Organisasi</label>
-                        <input type="text" name="type_org" class="form-control" placeholder="Email"
-                            value="{{ $org->type_org == 4 ? "Masjid" : "NGO"}}" disabled>
-                        <input type="text" name="type_org" value="{{ $org->type_org }}" hidden>
-                    </div>
+                    
                     <div class="form-group">
                         <label>Cas Pembayaran (RM)</label>
                         <input id="input-currency" class="form-control input-mask text-left"
@@ -62,11 +58,6 @@
                             im-insert="true" style="text-align: right;" name="fixed_charges"
                             value="{{ $org->fixed_charges }}"
                             data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label">Alamat</label>
-                        <textarea name="address" class="form-control" rows="4" placeholder="Alamat"
-                        data-parsley-required-message="Sila masukkan alamat organisasi" required>{{ $org->address }}</textarea>
                     </div>
 
                     <div class="row">
@@ -96,12 +87,29 @@
                               </div>
                         </div>
                       </div>
-                      <div class="form-group">
-                        <label>Poskod</label>
-                        <input type="text" name="postcode" class="form-control" placeholder="Poskod" 
-                        data-parsley-required-message="Sila masukkan poskod" value="{{ $org->postcode }}" required>
-                      </div>
-                      
+                      <div class="row">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Poskod</label>
+                                <input type="text" name="postcode" class="form-control postcode" placeholder="Poskod"
+                                    data-parsley-required-message="Sila masukkan poskod" value="{{ $org->postcode }}" required>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Bandar</label>
+                                <input type="text" name="city" class="form-control" placeholder="Bandar"
+                                    data-parsley-required-message="Sila masukkan bandar" value="{{ $org->city }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="control-label">Alamat</label>
+                        <textarea name="address" class="form-control" rows="4" placeholder="Alamat"
+                        data-parsley-required-message="Sila masukkan alamat organisasi" required>{{ $org->address }}</textarea>
+                    </div>
+
                     <div class="form-group mb-0">
                         <div class="text-right">
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
