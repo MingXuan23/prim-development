@@ -109,6 +109,10 @@
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetchClass($("#organization").val());
         }
+        else
+        {
+            fetch_data();
+        }
   
         function fetch_data(oid = '') {
             $('#activityTable').DataTable({
