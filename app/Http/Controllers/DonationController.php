@@ -69,20 +69,23 @@ class DonationController extends Controller
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
                 }
-            } elseif ($hasOrganizaton == "false") {
+            } 
+            elseif ($hasOrganizaton == "false") {
                 $data = DB::table('donations')
                     ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
                     ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
                     ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url')
                     ->where('donations.status', 1)
                     ->orderBy('donations.nama');
-            } elseif ($hasOrganizaton == "true") {
+            } 
+            elseif ($hasOrganizaton == "true") {
                 $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
                     ->join('donations', 'donations.id', '=', 'donation_organization.donation_id')
                     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
                     ->join('users', 'users.id', '=', 'organization_user.user_id')
                     ->select('donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status')
+                    ->distinct()
                     ->where('users.id', $userId)
                     ->orderBy('donations.nama');
             }
@@ -247,8 +250,9 @@ class DonationController extends Controller
     public function create()
     {
         $organization = $this->getOrganizationByUserId();
+        $donation_type = DB::table('donation_type')->get();
 
-        return view('donate.add', compact('organization'));
+        return view('donate.add', compact('organization', 'donation_type'));
     }
 
     public function store(DonationRequest $request)
@@ -272,7 +276,8 @@ class DonationController extends Controller
             'date_end'          => $end_date,
             'status'            => '1',
             'url'               => $str,
-            'donation_poster'   => $file_name
+            'donation_poster'   => $file_name,
+            'donation_type'     => $request->donation_type
         ]);
 
         $donation->organization()->attach($request->organization);
@@ -290,8 +295,14 @@ class DonationController extends Controller
         $organizations = $this->getOrganizationByUserId();
         $organization = $this->organization->getOrganizationByDonationId($id);
         $donation = DB::table('donations')->where('id', $id)->first();
+        $donation_type = DB::table('donation_type')->get();
+        $current_type = DB::table('donation_type')
+                        ->where('id', '=', $donation->donation_type)
+                        ->select('nama')
+                        ->first();
+        // dd($current_type);
 
-        return view('donate.update', compact('donation', 'organization', 'organizations'));
+        return view('donate.update', compact('donation', 'organization', 'organizations', 'donation_type', 'current_type'));
     }
 
     public function update(DonationRequest $request, $id)
@@ -325,7 +336,8 @@ class DonationController extends Controller
                 'date_end'          => $end_date,
                 'status'            => '1',
                 'url'               => $str,
-                'donation_poster'   => $file_name
+                'donation_poster'   => $file_name,
+                'donation_type'     => $request->donation_type
             ]
             );
 

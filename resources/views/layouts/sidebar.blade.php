@@ -37,12 +37,12 @@
                         <span>Derma</span>
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
-                        {{-- <li>
+                        <li>
                             <a href="{{ route('donation.index') }}" class=" waves-effect">
                                 <i class="fas fa-user-cog"></i>
                                 <span>Urus Derma</span>
                             </a>
-                        </li> --}}
+                        </li>
 
                         <li>
                             <a href="{{ route('donate.index') }}" class=" waves-effect">
@@ -76,6 +76,7 @@
                         </li>
                     </ul>
                 </li>
+
 
                 @role('Jaim')
                 <li>

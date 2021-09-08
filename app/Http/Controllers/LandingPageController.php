@@ -182,6 +182,7 @@ class LandingPageController extends AppBaseController
 
     public function customOrganizationTabbing(Request $request)
     {
+        // dd($request->type);
         $data = Donation::where('donations.donation_type', $request->type);
         $table = Datatables::of($data);
         $table->addColumn('email', function($row){

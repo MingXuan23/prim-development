@@ -319,7 +319,7 @@
                         <!-- section title -->
                         {{-- <span class="subtitle">Working Process</span> --}}
                         <h3 class="title">Organisasi</h3>
-                        <p>Antara organisasi yang berdaftar dengan PRiM </p>
+                        <p>Antara derma yang berdaftar dengan PRiM </p>
                     </div><!-- //. section title -->
                 </div>
             </div>
@@ -328,35 +328,50 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hand-holding-usd"></i>
-                                    Tabung Covid-19 </a>
+                                <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-school"></i>
+                                    Kebajikan Pelajar </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
+                                <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hamburger"></i>
+                                    FoodBank </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hand-holding-usd"></i>
+                                    Aktiviti STEM </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i>
                                     Pusat Tahfiz </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
+                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
                                     Masjid </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi"
+                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
                                     NGO </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-church"></i>
+                                    Rumah Ibadat </a>
+                            </li>
+                            {{-- <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="anakyatim" aria-selected="false"><i
                                         class="fas fa-home"></i> Rumah Anak Yatim </a>
-                            </li>
-                            {{-- <li class="nav-item btn-organization">
+                            </li> --}}
+                            <li class="nav-item btn-organization">
                                 <a class="nav-link" id="8" data-toggle="tab" href="#organisasi" role="tab"
                                     aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i> Lain-Lain
                                 </a>
-                            </li> --}}
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content wow slideInUp">

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDonationTypeColumnToDonations extends Migration
+class AddForeignKeyToDonations extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddDonationTypeColumnToDonations extends Migration
     public function up()
     {
         Schema::table('donations', function (Blueprint $table) {
-            $table->string('donation_type')->nullable();
+            $table->unsignedBigInteger('donation_type');
+            $table->foreign('donation_type')->references('id')->on('donation_type')->onDelete('cascade');
         });
     }
 
@@ -26,7 +27,7 @@ class AddDonationTypeColumnToDonations extends Migration
     public function down()
     {
         Schema::table('donations', function (Blueprint $table) {
-            //
+            $table->dropForeign('donation_type');
         });
     }
 }

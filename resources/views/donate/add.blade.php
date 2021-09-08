@@ -32,21 +32,32 @@
             {{csrf_field()}}
             <div class="card-body">
                 <p class="card-title-desc">Bahagian bertanda * wajib diisi</p>
-                <div class="form-row">
-                    <div class="form-group required col-md-6">
-                        <label class="control-label">Nama Organisasi</label>
+                <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <label class="control-label">Nama Organisasi</label>
                         <select name="organization" id="organization" class="form-control"
                         data-parsley-required-message="Sila masukkan nama organisasi" required>
                             <option value="" disabled selected>Pilih Organisasi</option>
                             @foreach($organization as $row)
                             <option value="{{ $row->id }}">{{ $row->nama }}</option>
                             @endforeach
-                        </select>
-                    </div>
+                        </select>  
+                </div>
+                <div class="form-row">
                     <div class="form-group col-md-6 required">
                         <label class="control-label">Nama Derma</label>
                         <input type="text" name="nama" class="form-control" placeholder="Nama Penuh" 
                         data-parsley-required-message="Sila masukkan nama derma" value="" required>
+                    </div>
+                    <div class="form-group required col-md-6">
+                        <label class="control-label">Jenis Derma</label>
+                        <select name="donation_type" id="donation_type" class="form-control"
+                        data-parsley-required-message="Sila masukkan nama organisasi" required>
+                            <option value="" disabled selected>Pilih Jenis Derma</option>
+                            @foreach($donation_type as $row)
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 

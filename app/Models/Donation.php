@@ -12,7 +12,7 @@ class Donation extends Model
     use SoftDeletes;
 
     public $table = "donations";
-    protected $fillable = ['nama', 'description', 'date_created', 'date_started', 'date_end', 'status', 'url', 'tax_payer', 'total_tax', 'donation_poster'];
+    protected $fillable = ['nama', 'description', 'date_created', 'date_started', 'date_end', 'status', 'url', 'tax_payer', 'total_tax', 'donation_poster', 'donation_type'];
     
     public $timestamps = false;
 
