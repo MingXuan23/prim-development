@@ -367,10 +367,10 @@
                                     role="tab" aria-controls="anakyatim" aria-selected="false"><i
                                         class="fas fa-home"></i> Rumah Anak Yatim </a>
                             </li> --}}
-                            <li class="nav-item btn-organization">
-                                <a class="nav-link" id="8" data-toggle="tab" href="#organisasi" role="tab"
-                                    aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i> Lain-Lain
-                                </a>
+                            <li class="nav-item">
+                                <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i>
+                                    Lain-Lain </a>
                             </li>
                         </ul>
                     </div>
@@ -665,7 +665,7 @@
     $(document).ready(function() {
 
         window.onload = function() {
-            document.getElementById("8").click();
+            document.getElementById("1").click();
         };
 
         $('.phone_no').mask('00000000000');
@@ -726,62 +726,6 @@
 
                     }, ]
                 });
-            
-
-            // else {
-            //     var tableOrganization = $('#tableOrganization').DataTable({
-            //         "ordering": true,
-            //         "processing": true,
-            //         "serverSide": true,
-            //         "bDestroy": true,
-            //         "searching": false,
-            //         "lengthChange": false,
-            //         "bInfo": false,
-            //         "drawCallback": function(settings) {
-            //             $("#tableOrganization thead").remove();
-            //         },
-            //         "language": {
-            //             "emptyTable": "Tiada maklumat untuk dipaparkan",
-            //             "paginate": {
-            //                 "next": "Seterusnya",
-            //                 "previous": "Sebelumnya"
-            //             }
-            //         },
-            //         ajax: {
-            //             url: "{{ route('landingpage.donation.organization') }}",
-            //             type: 'GET',
-            //             data: {
-            //                 type: type,
-            //             },
-            //         },
-            //         order: [
-            //             [1, 'asc']
-            //         ],
-            //         responsive: {
-            //             details: {
-            //                 type: 'column'
-            //             }
-            //         },
-            //         columns: [{
-            //             data: "nama",
-            //             name: "nama"
-            //         }, {
-            //             data: "telno",
-            //             name: "telno"
-            //         },{
-            //             data: "email",
-            //             name: "email",
-            //             className: "desktop"
-            //         },{
-            //             data: 'action',
-            //             name: 'action',
-            //             orderable: false,
-            //             searchable: false
-
-            //         }, ]
-            //     });
-            // }
-
 
         });
 
