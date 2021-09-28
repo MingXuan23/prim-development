@@ -29,7 +29,7 @@ class TeacherExport implements FromCollection
         ->select('users.name', 'users.icno', 'users.email', 'users.telno')
         ->where([
             ['organization_user.organization_id', $school->schoolid],
-            ['organization_user.role_id', 2]
+            ['organization_user.role_id', 5]
         ])
         ->orderBy('users.name')
         ->get();
