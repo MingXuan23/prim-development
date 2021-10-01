@@ -238,7 +238,11 @@ class DonationController extends Controller
     {
         $user = "";
 
-        $donation = Donation::where('url', $link)->first();
+        //$donation = Donation::where('url', $link)->first();
+        $donation = DB::table('donations')
+                        ->where('url', '=' , $link)
+                        ->first();
+        // dd($donation);
 
         if (Auth::id()) {
             $user = $this->user->getUserById();
