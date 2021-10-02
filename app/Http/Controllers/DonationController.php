@@ -284,6 +284,8 @@ class DonationController extends Controller
             'donation_type'     => $request->donation_type
         ]);
 
+        Donation::where('id', $donation->id)->update(['code' => $this->generateDonationCode($donation->id, $request->donation_type)]);
+
         $donation->organization()->attach($request->organization);
 
         return redirect('/donation')->with('success', 'Derma Berjaya Ditambah');
@@ -363,6 +365,46 @@ class DonationController extends Controller
             Session::flash('error', 'Derma Gagal Dipadam');
             return View::make('layouts/flash-messages');
         }
+    }
+
+    public function generateDonationCode($id, $donation_type)
+    {
+        switch($donation_type)
+        {
+            case 1:
+                $code = 'STU' . str_pad($id, 3, '0', STR_PAD_LEFT);
+                break;
+            
+            case 2:
+                $code = 'FB' . str_pad($id, 3, '0', STR_PAD_LEFT);
+                break;
+            
+            case 3:
+                $code = 'STEM' . str_pad($id, 3, '0', STR_PAD_LEFT);
+                break;
+            
+            case 4:
+                $code = 'THFZ' . str_pad($id, 3, '0', STR_PAD_LEFT);
+                break;
+            
+            case 5:
+                $code = 'MJD' . str_pad($id, 3, '0', STR_PAD_LEFT);
+                break;
+            
+            case 6:
+                $code = 'RIBD' . str_pad($id, 3, '0', STR_PAD_LEFT);
+                break;
+            
+            case 7:
+                $code = 'NGO' . str_pad($id, 3, '0', STR_PAD_LEFT);
+                break;
+            
+            case 8:
+                $code = 'LA' . str_pad($id, 3, '0', STR_PAD_LEFT);
+                break;
+        }
+
+        return $code;
     }
 
     public function test()
