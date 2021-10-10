@@ -6,8 +6,10 @@ use App\ClassModel;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class ClassExport implements FromCollection
+class ClassExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -36,5 +38,13 @@ class ClassExport implements FromCollection
             ->get();
 
         return $listclass;
+    }
+
+    public function headings(): array
+    {
+        return [
+            'Nama Kelas',
+            'Tahap Kelas',
+        ];
     }
 }

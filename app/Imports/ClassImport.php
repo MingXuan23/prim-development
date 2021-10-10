@@ -6,8 +6,9 @@ use App\Models\ClassModel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class ClassImport implements ToModel
+class ClassImport implements ToModel, WithHeadingRow
 {
     /**
     * @param array $row
@@ -18,8 +19,9 @@ class ClassImport implements ToModel
     {
         $newclass = new ClassModel([
             //
-            'nama'      =>$row[0],
-            'levelid'   =>$row[1],
+            'nama'      =>$row['nama_kelas'],
+            'levelid'   =>$row['tahap_kelas'],
+            'status'    => 1,
         ]);
 
         $newclass->save();

@@ -165,6 +165,7 @@ class ClassController extends Controller
                     ->join('students', 'students.id', '=', 'class_student.student_id')
                     ->select('classes.nama', DB::raw('COUNT(students.id) as totalstudent'))
                     ->where('classes.id', $row->cid)
+                    ->where('class_student.status', 1)
                     ->groupBy('classes.nama')
                     ->first();
 
