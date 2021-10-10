@@ -6,8 +6,10 @@ use App\Models\Teacher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class TeacherExport implements FromCollection
+class TeacherExport implements FromCollection, ShouldAutoSize, WithHeadings
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -35,5 +37,15 @@ class TeacherExport implements FromCollection
         ->get();
         
         return $listteacher;
+    }
+
+    public function headings(): array
+    {
+        return [
+            'Nama',
+            'No. kp',
+            'email',
+            'No. Tel Bimbit'
+        ];
     }
 }

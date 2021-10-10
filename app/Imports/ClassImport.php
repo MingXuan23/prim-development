@@ -37,7 +37,5 @@ class ClassImport implements ToModel
             'class_id'        => $newclass->id,
             'start_date'      => now(),
         ]);
-
-
     }
 }

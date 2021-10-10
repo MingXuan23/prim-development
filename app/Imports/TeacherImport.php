@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class TeacherImport implements ToModel
+class TeacherImport implements ToModel, WithHeadingRow
 {
     /**
      * @param array $row
@@ -19,10 +20,10 @@ class TeacherImport implements ToModel
     {
         $newteacher = new Teacher([
             //
-            'name'      => $row[0],
-            'icno'      => $row[1],
-            'email'     => $row[2],
-            'telno'     => $row[3],
+            'name'      => $row['nama'],
+            'icno'      => $row['no_kp'],
+            'email'     => $row['email'],
+            'telno'     => $row['no_tel_bimbit'],
             'password'  => Hash::make('abc123'),
 
         ]);
@@ -50,7 +51,7 @@ class TeacherImport implements ToModel
         DB::table('organization_user')->insert([
             'organization_id' => $list->schoolid,
             'user_id'       => $newteacher->id,
-            'role_id'       => 2,
+            'role_id'       => 5,
             'start_date'    => now(),
             'status'        => 0,
         ]);
