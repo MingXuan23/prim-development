@@ -193,7 +193,7 @@ Route::post('/importteacher', 'TeacherController@teacherimport')->name('importte
 Route::get('/exportclass', 'ClassController@classexport')->name('exportclass');
 Route::post('/importclass', 'ClassController@classimport')->name('importclass');
 
-Route::get('/exportstudent', 'StudentController@studentexport')->name('exportstudent');
+Route::post('/exportstudent', 'StudentController@studentexport')->name('exportstudent');
 Route::post('/importstudent', 'StudentController@studentimport')->name('importstudent');
 
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');

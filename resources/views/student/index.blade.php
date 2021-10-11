@@ -26,8 +26,10 @@
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
                         class="fas fa-plus"></i> Import</a>
-                <a style="margin: 1px;" href="{{ route('exportstudent') }} " class="btn btn-success"> <i
+                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
                         class="fas fa-plus"></i> Export</a>
+                <!-- <a style="margin: 1px;" href="{{ route('exportstudent') }} " class="btn btn-success"> <i
+                        class="fas fa-plus"></i> Export</a> -->
                 {{-- {{ route('exportmurid') }} {{ route('murid.create') }} --}}
                 <a style="margin: 19px; float: right;" href="{{ route('student.create') }}" class="btn btn-primary"> <i
                         class="fas fa-plus"></i> Tambah Murid</a>
@@ -149,6 +151,45 @@
                             </div>
                         </div>
 
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Export Murid</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{-- {{ route('exportstudent') }} --}}
+                    <form action="{{ route('exportstudent') }}" method="post">
+                        <div class="modal-body">
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="organ" id="organ" class="form-control">
+                                    @foreach($organization as $row)
+                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Kelas</label>
+                                <select name="kelas" id="kelas" class="form-control">
+                                    @foreach($listclass as $row)
+                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -313,6 +354,10 @@
                 });
                 
                 $('.alert').delay(3000).fadeOut();
+
+                $('#buttonExport').click(function() {
+                    $('#modelId1').modal('hide');
+                });
 
         });
         

@@ -26,7 +26,8 @@ class StudentController extends Controller
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('classes.id as id', 'classes.nama', 'classes.levelid')
             ->where([
-                ['class_organization.organization_id', $organization[0]->id]
+                ['class_organization.organization_id', $organization[0]->id],
+                ['classes.status', 1]
             ])
             ->orderBy('classes.nama')
             ->get();
@@ -34,9 +35,15 @@ class StudentController extends Controller
         return view("student.index", compact('listclass', 'organization'));
     }
 
-    public function studentexport()
+    public function studentexport(Request $request)
     {
-        return Excel::download(new StudentExport, 'student.xlsx');
+        $this->validate($request, [
+            'organ'          =>  'required',
+            'kelas'          =>  'required',
+        ]);
+
+        // dd($request->kelas, $request->organ);
+        return Excel::download(new StudentExport($request->organ, $request->kelas), 'student.xlsx');
     }
 
     public function studentimport(Request $request)
