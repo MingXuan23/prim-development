@@ -48,6 +48,13 @@ class TeacherController extends Controller
         $namaFile   = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
 
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        if (! in_array($etx, $formats)) {
+
+            return redirect('/teacher')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+
         Excel::import(new TeacherImport, public_path('/uploads/excel/' . $namaFile));
 
         return redirect('/teacher')->with('success', 'New class has been added successfully');

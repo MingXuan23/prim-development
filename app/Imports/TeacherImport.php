@@ -6,16 +6,45 @@ use App\Models\Teacher;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Validators\Failure;
 
-class TeacherImport implements ToModel, WithHeadingRow
+class TeacherImport implements ToModel, WithHeadingRow, WithValidation
 {
     /**
      * @param array $row
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
+    public function rules(): array
+    {
+        return [
+            'no_kp' => [
+                'required',
+                Rule::unique('users', 'icno')
+            ],
+            'eamil' => [
+                'required',
+                Rule::unique('users', 'email')
+            ],
+        ];
+    }
+
+    public function customValidationMessages()
+    {
+        return [
+            'no_kp.unique' => 'Terdapat maklumat guru yang telah wujud',
+            'no_kp.required' => 'Maklumat guru diperlukan',
+            'email.unique' => 'Terdapat maklumat guru yang telah wujud',
+            'email.required' => 'Maklumat guru diperlukan',
+        ];
+    }
+
     public function model(array $row)
     {
         $newteacher = new Teacher([

@@ -34,6 +34,13 @@ class ClassController extends Controller
         $namaFile   = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
 
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        if (! in_array($etx, $formats)) {
+
+            return redirect('/class')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+
         Excel::import(new ClassImport, public_path('/uploads/excel/' . $namaFile));
 
         return redirect('/class')->with('success', 'New class has been added successfully');

@@ -52,12 +52,22 @@ class StudentController extends Controller
             'kelas'          =>  'required',
         ]);
 
+        // dd($request->kelas);
+
         $classID = $request->get('kelas');
 
         $file       = $request->file('file');
         $namaFile   = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
         $public_path = $_SERVER['DOCUMENT_ROOT'];
+        
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        if (! in_array($etx, $formats)) {
+
+            return redirect('/student')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+
         Excel::import(new StudentImport($classID), $public_path . '/uploads/excel/' . $namaFile);
         return redirect('/student')->with('success', 'New student has been added successfully');
     }
