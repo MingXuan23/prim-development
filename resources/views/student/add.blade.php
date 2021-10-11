@@ -59,6 +59,10 @@
                     <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
                 </div>
                 <div class="form-group">
+                    <label>Email Pelajar&nbsp(optional)</label>
+                    <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
+                </div>
+                <div class="form-group">
                     <label>Jantina</label>
                     <div class="radio">
                         <label class="radio-inline pl-2"><input type="radio" name="gender" value="L"> Lelaki </label>

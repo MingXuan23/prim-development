@@ -358,10 +358,7 @@
                 $('#buttonExport').click(function() {
                     $('#modelId1').modal('hide');
                 });
-
         });
-        
-        
 </script>
 
 @endsection

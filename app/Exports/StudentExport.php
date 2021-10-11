@@ -40,7 +40,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('students.nama as studentname', 'students.icno', 'classes.nama as classname')
+            ->select('students.nama as studentname', 'students.icno', 'classes.nama as classname', 'students.email')
             ->where([
                 ['class_organization.organization_id', $this->organId],
                 ['classes.id', $this->kelasId],
@@ -60,6 +60,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
             'Nama',
             'No. Kp',
             'Kelas',
+            'email'
         ];
     }
 }

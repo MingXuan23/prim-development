@@ -72,6 +72,10 @@
                         value="{{ $student->icno }}">
                 </div>
                 <div class="form-group">
+                    <label>Email Pelajar&nbsp(optional)</label>
+                    <input type="text" name="email" class="form-control" placeholder="Email Pelajar" value="{{ $student->email }}">
+                </div>
+                <div class="form-group">
                     <label>Jantina</label>
                     <div class="radio">
                         <label class="radio-inline pl-2"><input type="radio" name="gender" value="M"

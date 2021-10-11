@@ -113,6 +113,7 @@ class StudentController extends Controller
             'nama'          =>  $request->get('name'),
             'icno'          =>  $request->get('icno'),
             'gender'        =>  $request->get('gender'),
+            'email'         =>  $request->get('email'),
         ]);
 
         $student->save();
@@ -138,7 +139,7 @@ class StudentController extends Controller
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('class_organization.organization_id', 'students.id as id', 'students.nama as studentname', 'students.icno', 'students.gender', 'classes.id as classid', 'classes.nama as classname', 'class_student.status')
+            ->select('class_organization.organization_id', 'students.id as id', 'students.nama as studentname', 'students.icno', 'students.gender', 'classes.id as classid', 'classes.nama as classname', 'class_student.status', 'students.email')
             ->where([
                 ['students.id', $id],
             ])
@@ -187,10 +188,10 @@ class StudentController extends Controller
                     'students.nama' => $request->get('name'),
                     'students.icno' => $request->get('icno'),
                     'students.gender' => $request->get('gender'),
+                    'students.email' => $request->get('email'),
                     'class_student.organclass_id'    => $getOrganizationClass->id,
                 ]
             );
-
 
         return redirect('/student')->with('success', 'The data has been updated!');
     }
