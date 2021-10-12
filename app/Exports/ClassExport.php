@@ -32,7 +32,8 @@ class ClassExport implements FromCollection, WithHeadings, ShouldAutoSize
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('classes.nama', 'classes.levelid')
             ->where([
-                ['class_organization.organization_id', $school->schoolid]
+                ['class_organization.organization_id', $school->schoolid],
+                ['classes.status', 1]
             ])
             ->orderBy('classes.nama')
             ->get();

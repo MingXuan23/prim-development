@@ -1,5 +1,5 @@
 @extends('layouts.master')
-@include('layouts.datatable');
+@include('layouts.datatable')
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @endsection

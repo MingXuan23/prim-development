@@ -88,6 +88,7 @@ class ParentController extends Controller
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.nama as nschool', 'classes.id as cid', 'classes.nama as cname')
             ->where('organizations.id', $oid)
+            ->where('classes.status', 1)
             ->orderBy('classes.nama')
             ->get();
 
@@ -134,7 +135,7 @@ class ParentController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'oid'           => 'required',
+            'oid'           =>  'required',
             'name'          =>  'required',
             'icno'          =>  'required',
             'email'         =>  'required',
