@@ -28,7 +28,7 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
                 'required',
                 Rule::unique('users', 'icno')
             ],
-            'eamil' => [
+            'email' => [
                 'required',
                 Rule::unique('users', 'email')
             ],

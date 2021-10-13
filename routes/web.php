@@ -196,6 +196,8 @@ Route::post('/importclass', 'ClassController@classimport')->name('importclass');
 Route::post('/exportstudent', 'StudentController@studentexport')->name('exportstudent');
 Route::post('/importstudent', 'StudentController@studentimport')->name('importstudent');
 
+Route::post('/importparent', 'ParentController@parentImport')->name('importparent');
+
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');

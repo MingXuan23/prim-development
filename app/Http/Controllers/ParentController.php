@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Imports\ParentsImport;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
 use App\Models\Parents;
 use App\User;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -312,13 +314,22 @@ class ParentController extends Controller
             return Organization::all();
         } else {
             // user role parent
-            $organizations = DB::table('organizations')
-                                ->where('type_org', '=', '1')
-                                ->orWhere('type_org', '=', '2')
-                                ->orWhere('type_org', '=', '3')
-                                ->get();
+            // $organizations = DB::table('organizations')
+            //                     ->where('type_org', '=', '1')
+            //                     ->orWhere('type_org', '=', '2')
+            //                     ->orWhere('type_org', '=', '3')
+            //                     ->get();
             // dd($organizations);
 
+            //dd($userId);
+            $organizations = DB::table('organization_user as ou')
+                ->leftJoin('organizations as o', 'ou.organization_id', '=', 'o.id')
+                ->select('o.*')
+                ->distinct()
+                ->where('ou.user_id', '=', $userId)
+                ->whereBetween('o.type_org', [1, 3])
+                ->get();
+            // dd($organizations);
             return $organizations;
 
             // return Organization::whereHas('user', function ($query) use ($userId) {
@@ -374,5 +385,24 @@ class ParentController extends Controller
             $table->rawColumns(['action']);
             return $table->make(true);
         }
+    }
+
+    public function parentImport(Request $request)
+    {
+        // dd($request->organ);
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        if (! in_array($etx, $formats)) {
+
+            return redirect('/parent')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+
+        Excel::import(new ParentsImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+
+        return redirect('/parent')->with('success', 'Parents have been added successfully');
     }
 }

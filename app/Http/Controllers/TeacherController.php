@@ -57,7 +57,7 @@ class TeacherController extends Controller
 
         Excel::import(new TeacherImport, public_path('/uploads/excel/' . $namaFile));
 
-        return redirect('/teacher')->with('success', 'New class has been added successfully');
+        return redirect('/teacher')->with('success', 'Techers have been added successfully');
     }
 
     public function create()
