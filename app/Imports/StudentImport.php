@@ -26,10 +26,6 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
 
     public function rules(): array
     {
-        // return [
-        //     'no_kp' => 'unique:students,icno'
-        // ];
-
         return [
             'no_kp' => [
                 'required',

@@ -25,31 +25,22 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
 
     public function collection()
     {
-        //dd($this->organId, $this->kelasId);
-        // return Student::all();
-
-        // $userid = Auth::id();
-
-        // $school = DB::table('organizations')
-        //     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-        //     ->select('organizations.id as schoolid')
-        //     ->where('organization_user.user_id', $userid)
-        //     ->first();
-
-        $liststudent = DB::table('students')
-            ->join('class_student', 'class_student.student_id', '=', 'students.id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('students.nama as studentname', 'students.icno', 'classes.nama as classname', 'students.email')
-            ->where([
-                ['class_organization.organization_id', $this->organId],
-                ['classes.id', $this->kelasId],
-                ['class_student.status', 1]
-            ])
-            ->orderBy('classes.nama')
-            ->get();
-
-        // dd($liststudent);
+        $liststudent = DB::table('organization_user_student as ous')
+        ->join('students', 'students.id', '=', 'ous.student_id')
+        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+        ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+        ->join('classes as c', 'c.id', '=', 'co.class_id')
+        ->join('organization_user as ou', 'ou.id', 'ous.organization_user_id')
+        ->join('users', 'users.id', 'ou.user_id')
+        ->select('students.nama', 'students.icno', 'students.gender', 'students.email as student_email', 'users.name', 'users.email', 'users.telno')
+        ->where([
+            ['co.organization_id', $this->organId],
+            ['c.id', $this->kelasId],
+            ['cs.status', 1],
+            ['ou.role_id', 6],
+        ])
+        ->orderBy('students.nama')
+        ->get();
 
         return $liststudent;
     }
@@ -59,8 +50,11 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
         return [
             'Nama',
             'No. Kp',
-            'Kelas',
-            'email'
+            'Jantina',
+            'email',
+            'Name Penjaga',
+            'Email Penjaga',
+            'No. Tel Bimbit Penjaga',
         ];
     }
 }
