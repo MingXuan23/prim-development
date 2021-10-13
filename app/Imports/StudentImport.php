@@ -77,7 +77,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                 // 'icno'           =>  $row['no_kp_penjaga'],
                 'email'          =>  $row['email_penjaga'],
                 'password'       =>  Hash::make('abc123'),
-                'telno'          =>  $row['no_tel_bimbit_penjaga'],
+                'telno'          =>  '+6' . $row['no_tel_bimbit_penjaga'],
                 'remember_token' =>  Str::random(40),
             ]);
             $parent->save();

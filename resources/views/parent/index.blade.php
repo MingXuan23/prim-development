@@ -47,7 +47,7 @@
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
                         class="fas fa-plus"></i> Import</a>
 
-                <a style="margin: 1px;" href="" class="btn btn-success"> <i class="fas fa-plus"></i> Export</a>
+                <!-- <a style="margin: 1px;" href="" class="btn btn-success"> <i class="fas fa-plus"></i> Export</a> -->
                 <a style="margin: 19px; float: right;" href="{{ route('parent.create') }}" class="btn btn-primary"> <i
                         class="fas fa-plus"></i> Tambah Ibu Bapa</a>
             </div>

@@ -337,7 +337,7 @@ class ParentController extends Controller
         ->where('organization_user.role_id', '=', '6')
         ->where('users.telno', '=' ,$telno)
         ->get();
-        // dd($parent);
+        // dd($telno);
 
         return  DB::table('users')
                 ->leftJoin('organization_user', 'users.id', '=', 'organization_user.user_id')
