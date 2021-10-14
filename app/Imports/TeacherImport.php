@@ -21,6 +21,12 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
+
+    public function __construct($organId)
+    {
+        $this->organId = $organId;        
+    }
+    
     public function rules(): array
     {
         return [

@@ -55,7 +55,7 @@ class TeacherController extends Controller
             return redirect('/teacher')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
 
-        Excel::import(new TeacherImport, public_path('/uploads/excel/' . $namaFile));
+        Excel::import(new TeacherImport($request->organ), public_path('/uploads/excel/' . $namaFile));
 
         return redirect('/teacher')->with('success', 'Techers have been added successfully');
     }
