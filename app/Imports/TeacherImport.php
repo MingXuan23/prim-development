@@ -16,7 +16,7 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\Failure;
 
-class TeacherImport implements ToModel, WithHeadingRow//, WithValidation
+class TeacherImport implements ToModel, WithHeadingRow, WithValidation
 {
     /**
      * @param array $row
@@ -29,29 +29,29 @@ class TeacherImport implements ToModel, WithHeadingRow//, WithValidation
         $this->organId = $organId;        
     }
 
-    // public function rules(): array
-    // {
-    //     return [
-    //         'no_kp' => [
-    //             'required',
-    //             Rule::unique('users', 'icno')
-    //         ],
-    //         'email' => [
-    //             'required',
-    //             Rule::unique('users', 'email')
-    //         ],
-    //     ];
-    // }
+    public function rules(): array
+    {
+        return [
+            'no_kp' => [
+                'required',
+                // Rule::unique('users', 'icno')
+            ],
+            'email' => [
+                'required',
+                // Rule::unique('users', 'email')
+            ],
+        ];
+    }
 
-    // public function customValidationMessages()
-    // {
-    //     return [
-    //         'no_kp.unique' => 'Terdapat maklumat guru yang telah wujud',
-    //         'no_kp.required' => 'Maklumat guru diperlukan',
-    //         'email.unique' => 'Terdapat maklumat guru yang telah wujud',
-    //         'email.required' => 'Maklumat guru diperlukan',
-    //     ];
-    // }
+    public function customValidationMessages()
+    {
+        return [
+            // 'no_kp.unique' => 'Terdapat maklumat guru yang telah wujud',
+            'no_kp.required' => 'Maklumat guru diperlukan',
+            // 'email.unique' => 'Terdapat maklumat guru yang telah wujud',
+            'email.required' => 'Maklumat guru diperlukan',
+        ];
+    }
 
     public function model(array $row)
     {
