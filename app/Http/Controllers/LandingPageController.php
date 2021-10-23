@@ -173,7 +173,8 @@ class LandingPageController extends AppBaseController
 
         $table->addColumn('action', function ($row) {
             $btn = '<div class="d-flex justify-content-center">';
-            $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Bayar</a></div>';
+            //$btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Bayar</a></div>';
+            $btn = $btn . '<a href="#" class="boxed-btn btn-rounded btn-donation" data-toggle="modal" data-target=".modal-derma" id="'. $row->id . '" style="color: white;">Derma</a></div>';
             return $btn;
         });
         $table->rawColumns(['action']);
