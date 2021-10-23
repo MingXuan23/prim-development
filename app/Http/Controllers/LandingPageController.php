@@ -198,8 +198,10 @@ class LandingPageController extends AppBaseController
             return $data2;
         });
         $table->addColumn('action', function ($row) {
+            // dd($row->url);
             $btn = '<div class="d-flex justify-content-center">';
-            $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Jom&nbsp;Derma</a></div>';
+            // $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Jom&nbsp;Derma</a></div>';
+            $btn = $btn . '<a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Jom&nbsp;Derma</a></div>';
             return $btn;
         });
         $table->rawColumns(['action']);
