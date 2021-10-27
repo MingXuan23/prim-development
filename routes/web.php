@@ -190,7 +190,7 @@ Route::post('receiptdev', 'FeesController@devreceipt')->name('receiptdev');
 Route::post('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
 
-Route::get('/exportclass', 'ClassController@classexport')->name('exportclass');
+Route::post('/exportclass', 'ClassController@classexport')->name('exportclass');
 Route::post('/importclass', 'ClassController@classimport')->name('importclass');
 
 Route::post('/exportstudent', 'StudentController@studentexport')->name('exportstudent');

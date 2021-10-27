@@ -15,7 +15,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
     * @return \Illuminate\Support\Collection
     */
 
-    protected $organId, $kelasId;
+    // protected $organId, $kelasId;
 
     public function __construct($organId, $kelasId)
     {
@@ -41,6 +41,8 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
         ])
         ->orderBy('students.nama')
         ->get();
+
+        // dd($liststudent);
 
         return $liststudent;
     }
