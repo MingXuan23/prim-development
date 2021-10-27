@@ -187,7 +187,7 @@ Route::get('feespaydev', 'PayController@dev_fees_pay')->name('feespaydev');
 Route::get('feesparentdev', 'FeesController@devpay')->name('feesparentdev');
 Route::post('receiptdev', 'FeesController@devreceipt')->name('receiptdev');
 
-Route::get('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
+Route::post('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
 
 Route::get('/exportclass', 'ClassController@classexport')->name('exportclass');

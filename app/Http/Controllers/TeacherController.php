@@ -37,9 +37,9 @@ class TeacherController extends Controller
         return view('teacher.index', compact('organization'));
     }
 
-    public function teacherexport()
+    public function teacherexport(Request $request)
     {
-        return Excel::download(new TeacherExport, 'teacher.xlsx');
+        return Excel::download(new TeacherExport($request->organ), 'teacher.xlsx');
     }
 
     public function teacherimport(Request $request)

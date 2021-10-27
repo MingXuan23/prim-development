@@ -14,23 +14,21 @@ class TeacherExport implements FromCollection, ShouldAutoSize, WithHeadings
     /**
      * @return \Illuminate\Support\Collection
      */
+
+    public function __construct($organId)
+    {
+        $this->organId = $organId;
+    }
+
     public function collection()
     {
-        // return Teacher::all(['name', 'icno', 'email', 'telno'])->where;
 
-        $userid     = Auth::id();
-
-        $school = DB::table('organizations')
-            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            ->select('organizations.id as schoolid')
-            ->where('organization_user.user_id', $userid)
-            ->first();
-
+        // dd($this->organId);
         $listteacher = DB::table('users')
         ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
         ->select('users.name', 'users.icno', 'users.email', 'users.telno')
         ->where([
-            ['organization_user.organization_id', $school->schoolid],
+            ['organization_user.organization_id', $this->organId],
             ['organization_user.role_id', 5]
         ])
         ->orderBy('users.name')
