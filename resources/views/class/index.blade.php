@@ -134,6 +134,14 @@
                                             </select>
                                         </div> --}}
                             <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="organ" id="organ" class="form-control">
+                                    @foreach($organization as $row)
+                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <input type="file" name="file" required>
                             </div>
 

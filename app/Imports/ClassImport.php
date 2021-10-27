@@ -15,8 +15,15 @@ class ClassImport implements ToModel, WithHeadingRow
     *
     * @return \Illuminate\Database\Eloquent\Model|null
     */
+    public function __construct($organId)
+    {
+        $this->organId = $organId;        
+    }
+
     public function model(array $row)
     {
+
+        // dd($this->organId);
         $newclass = new ClassModel([
             //
             'nama'      =>$row['nama_kelas'],
@@ -26,16 +33,8 @@ class ClassImport implements ToModel, WithHeadingRow
 
         $newclass->save();
 
-        $userid     = Auth::id();
-
-        $school = DB::table('organizations')
-            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            ->select('organizations.id as schoolid')
-            ->where('organization_user.user_id', $userid)
-            ->first();
-
         DB::table('class_organization')->insert([
-            'organization_id' => $school->schoolid,
+            'organization_id' => $this->organId,
             'class_id'        => $newclass->id,
             'start_date'      => now(),
         ]);

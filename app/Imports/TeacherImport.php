@@ -55,9 +55,6 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
 
     public function model(array $row)
     {
-
-        // dd($this->organId);
-        $userid     = Auth::id();
         // check if parent role exists
         $ifExits = DB::table('users as u')
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
@@ -96,18 +93,8 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
                 ]
             );
 
-
-        $userid     = Auth::id();
-
-        // amik sekolah id untuk guru
-        $list = DB::table('organizations')
-            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            ->select('organizations.id as schoolid')
-            ->where('organization_user.user_id', $userid)
-            ->first();
-
         DB::table('organization_user')->insert([
-            'organization_id' => $list->schoolid,
+            'organization_id' => $this->organId,
             'user_id'       => $newteacher->id,
             'role_id'       => 5,
             'start_date'    => now(),

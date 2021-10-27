@@ -41,7 +41,7 @@ class ClassController extends Controller
             return redirect('/class')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
 
-        Excel::import(new ClassImport, public_path('/uploads/excel/' . $namaFile));
+        Excel::import(new ClassImport($request->organ), public_path('/uploads/excel/' . $namaFile));
 
         return redirect('/class')->with('success', 'New class has been added successfully');
     }
