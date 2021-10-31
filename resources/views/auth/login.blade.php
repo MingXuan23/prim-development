@@ -83,3 +83,13 @@ Login
         </div>
     </div>
 @endsection
+
+@section('script')
+<!-- <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#username').mask('+600000000000');
+    });
+</script> -->
+@endsection
