@@ -11,6 +11,7 @@
         "php": "^7.2.5|^8.0",
         "arcanedev/log-viewer": "7.x",
         "barryvdh/laravel-dompdf": "^0.9.0",
+        "doctrine/dbal": "2.*",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0",
