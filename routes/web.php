@@ -63,6 +63,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
 });
 
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
+Route::get('sumbangan_anonymous/{link}', 'DonationController@anonDonation')->name('ANONdonate');
 
 Route::group(['prefix' => 'organization'], function () {
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');

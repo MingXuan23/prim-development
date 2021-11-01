@@ -370,7 +370,7 @@
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i>
-                                    Lain-Lain </a>
+                                    Derma Khas </a>
                             </li>
                         </ul>
                     </div>
