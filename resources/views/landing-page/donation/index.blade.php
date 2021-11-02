@@ -328,6 +328,11 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
+                                <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i>
+                                    Derma Khas </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-school"></i>
                                     Kebajikan Pelajar </a>
@@ -367,11 +372,6 @@
                                     role="tab" aria-controls="anakyatim" aria-selected="false"><i
                                         class="fas fa-home"></i> Rumah Anak Yatim </a>
                             </li> --}}
-                            <li class="nav-item">
-                                <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i>
-                                    Derma Khas </a>
-                            </li>
                         </ul>
                     </div>
                     <div class="tab-content wow slideInUp">
@@ -665,7 +665,7 @@
     $(document).ready(function() {
 
         window.onload = function() {
-            document.getElementById("1").click();
+            document.getElementById("8").click();
         };
 
         $('.phone_no').mask('00000000000');
