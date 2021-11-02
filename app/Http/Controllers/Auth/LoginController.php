@@ -31,10 +31,10 @@ class LoginController extends Controller
     protected $redirectTo = RouteServiceProvider::HOME;
 
     // Login attempt
-    protected $maxAttempts = 3;
+    // protected $maxAttempts = 3;
 
     // Denied login in minutes
-    protected $decayMinutes = 3;
+    // protected $decayMinutes = 3;
 
     /**
      * Create a new controller instance.
@@ -62,4 +62,50 @@ class LoginController extends Controller
 
         return redirect('/derma');
     }
+
+    public function startsWith($string, $startString) {
+        $len = strlen($startString);
+        return (substr($string, 0, $len) === $startString);
+    }
+
+    /**
+     * Get the needed authorization credentials from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    protected function credentials(Request $request)
+    {
+        $phone = $request->get('email');
+        if(is_numeric($request->get('email'))){
+            
+            if(!$this->startsWith((string)$request->get('email'),"+60") && !$this->startsWith((string)$request->get('email'),"60")){
+                if(strlen((string)$request->get('email')) == 10)
+                {
+                    $phone = str_pad($request->get('email'), 12, "+60", STR_PAD_LEFT);
+                } 
+                elseif(strlen((string)$request->get('email')) == 11)
+                {
+                    $phone = str_pad($request->get('email'), 13, "+60", STR_PAD_LEFT);
+                }   
+            } else if($this->startsWith((string)$request->get('email'),"60")){
+                if(strlen((string)$request->get('email')) == 11)
+                {
+                    $phone = str_pad($request->get('email'), 12, "+", STR_PAD_LEFT);
+                } 
+                elseif(strlen((string)$request->get('email')) == 12)
+                {
+                    $phone = str_pad($request->get('email'), 13, "+", STR_PAD_LEFT);
+                }   
+            }
+            // dd($phone);
+            return ['telno'=>$phone,'password'=>$request->get('password')];
+        }
+        // //elseif (filter_var($request->get('email'), FILTER_VALIDATE_EMAIL)) {
+        //     return ['email' => $request->get('email'), 'password'=>$request->get('password')];
+        // }
+        return ['email' => $request->get('email'), 'password'=>$request->get('password')];
+
+    }
 }
+
