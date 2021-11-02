@@ -251,21 +251,12 @@ class DonationController extends Controller
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
-    public function anonDonation($link)
+    public function anonymouIndex($link)
     {
-        $user = "";
-
-        //$donation = Donation::where('url', $link)->first();
         $donation = DB::table('donations')
                         ->where('url', '=' , $link)
                         ->first();
-        // dd($donation);
-
-        if (Auth::id()) {
-            $user = $this->user->getUserById();
-        }
-
-        return view('paydonate.anon', compact('donation', 'user'));
+        return view('paydonate.anonymous.index', compact('donation'));
     }
 
     public function create()

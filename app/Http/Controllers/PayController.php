@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Fee_New;
 use Illuminate\Support\Facades\Redirect;
+use phpDocumentor\Reflection\Types\Null_;
 
 class PayController extends AppBaseController
 {
@@ -379,9 +380,20 @@ class PayController extends AppBaseController
 
 
         if ($request->desc == 'Donation') {
-            $fpx_buyerEmail = $request->email;
-            $telno = "+6" . $request->telno;
-            $fpx_buyerName = $request->name;
+
+            if(isset($request->email))
+            {
+                $fpx_buyerEmail = $request->email;
+                $telno = "+6" . $request->telno;
+                $fpx_buyerName = $request->name;
+            }
+            else
+            {
+                $fpx_buyerEmail =  "prim.utem@gmail.com";
+                $telno = NULL;
+                $fpx_buyerName = "Penderma Anonymous";
+            }
+
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
             $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
@@ -638,7 +650,10 @@ class PayController extends AppBaseController
                     $organization = $this->organization->getOrganizationByDonationId($donation->id);
                     $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
 
-                    Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
+                    if($request->fpx_buyerName != "Penderma Anonymous")
+                    {
+                        Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
+                    }
 
                     return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
 
