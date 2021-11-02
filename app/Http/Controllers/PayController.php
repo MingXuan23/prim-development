@@ -389,7 +389,7 @@ class PayController extends AppBaseController
             }
             else
             {
-                $fpx_buyerEmail =  "prim.utem@gmail.com";
+                $fpx_buyerEmail =  NULL;
                 $telno = NULL;
                 $fpx_buyerName = "Penderma Anonymous";
             }
@@ -650,7 +650,7 @@ class PayController extends AppBaseController
                     $organization = $this->organization->getOrganizationByDonationId($donation->id);
                     $transaction = $this->transaction->getTransactionByName($request->fpx_sellerExOrderNo);
 
-                    if($request->fpx_buyerName != "Penderma Anonymous")
+                    if($transaction->username != "Penderma Anonymous" && $transaction->email != NULL)
                     {
                         Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
                     }
