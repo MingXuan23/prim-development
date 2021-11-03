@@ -358,12 +358,12 @@
                                     Masjid </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
                                     NGO </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
+                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-church"></i>
                                     Rumah Ibadat </a>
                             </li>
