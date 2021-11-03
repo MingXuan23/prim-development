@@ -32,8 +32,20 @@
 <style>
     .btn-donation {
         color: white;
-        width: 132px;
-        height: 45px;
-        line-height: 45px;
+        width: 100%;
+        height: 100%;
+        line-height: 20px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .btn-donation2 {
+        color: white;
+        width: 100%;
+        height: 100%;
+        line-height: 20px;
+        margin-top: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
     }
 </style>

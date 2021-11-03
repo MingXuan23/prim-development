@@ -202,8 +202,8 @@ class LandingPageController extends AppBaseController
             // dd($row->url);
             $btn = '<div class="d-flex justify-content-center">';
             // $btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Jom&nbsp;Derma</a></div>';
-            $btn = $btn . '<a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Jom&nbsp;Derma</a></div>';
-            $btn = $btn . '<a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Anonymous&nbsp;</a></div>';
+            $btn = $btn . '<a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a></div>';
+            $btn = $btn . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div>';
             return $btn;
         });
         $table->rawColumns(['action']);
