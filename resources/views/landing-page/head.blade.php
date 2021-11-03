@@ -47,5 +47,6 @@
         margin-top: 5px;
         padding-top: 5px;
         padding-bottom: 5px;
+        background-color: #852aff;
     }
 </style>
