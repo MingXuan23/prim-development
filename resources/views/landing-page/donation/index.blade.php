@@ -639,12 +639,6 @@
                 }
             });
         });
-
-        function owlCarousel()
-        {
-            
-        }
-
     });
     </script>
 </body>
