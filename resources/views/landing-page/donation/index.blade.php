@@ -603,7 +603,6 @@
         $(document).on('click', '.btn-organization', function() {
             var type = $(this).attr("id");
             typedonation = type;
-            owlCarousel();
             $.ajax({
                 url: "{{ route('landingpage.donation.bytabbing') }}",
                 type: 'GET',
@@ -634,8 +633,6 @@
                             }
                         }, 
                     });
-
-                    console.log(result);
                 }
             });
         });
