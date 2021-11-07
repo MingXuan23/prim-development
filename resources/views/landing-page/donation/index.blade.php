@@ -377,19 +377,43 @@
                     <div class="tab-content wow slideInUp">
                         <div class="tab-pane fade show" id="organisasi" role="tabpanel" aria-labelledby="masjid-tab">
                             <div class="how-it-works-tab-content">
-                                <div class="row">
-                                    <div class="table-responsive">
-                                        <table id="tableOrganization" class="table table-centered table-nowrap mb-0"
-                                            id="organization">
-                                            <thead>
-                                                <th>Nama</th>
-                                                <th>No Phone</th>
-                                                <th>Email</th>
-                                                <th></th>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
+                                <div class="table-responsive">
+                                    <div class="row d-flex justify-content-md-between justify-content-center">
+                                        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">
+                                            <div class="card">
+                                                <img class="card-img-top w-100" src="donation-poster/poster1.jpg" alt="Card image cap">
+                                                <div class="card-body">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a>
+                                                        <a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+    
+                                        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">
+                                            <div class="card">
+                                                <img class="card-img-top w-100" src="donation-poster/poster1.jpg" alt="Card image cap">
+                                                <div class="card-body">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a>
+                                                        <a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">
+                                            <div class="card">
+                                                <img class="card-img-top w-100" src="donation-poster/poster1.jpg" alt="Card image cap">
+                                                <div class="card-body">
+                                                    <div class="d-flex flex-column justify-content-center">
+                                                        <a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a>
+                                                        <a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

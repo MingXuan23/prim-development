@@ -35,8 +35,10 @@
         width: 100%;
         height: 100%;
         line-height: 20px;
-        padding-top: 5px;
-        padding-bottom: 5px;
+        /* padding-top: 5px;
+        padding-bottom: 5px; */
+        padding: 16px 12px;
+        margin-bottom: 8px;
     }
 
     .btn-donation2 {
@@ -44,9 +46,19 @@
         width: 100%;
         height: 100%;
         line-height: 20px;
-        margin-top: 5px;
-        padding-top: 5px;
-        padding-bottom: 5px;
+        /* margin-top: 5px; */
+        /* padding: 16px 24px;
+         */
+         padding: 16px 12px;
+        margin-bottom: 8px;
+        /* padding-top: 5px;
+        padding-bottom: 5px; */
         background-color: #852aff;
+    }
+
+    .nav-item {
+        width: 260px;
+        border: none !important;
+        margin: 0px 6.5px 10px !important;
     }
 </style>

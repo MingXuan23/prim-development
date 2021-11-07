@@ -32,41 +32,47 @@
             {{csrf_field()}}
             <div class="card-body">
 
-                <div class="form-group">
-                    <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="" selected>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
+                <div class="form-row">
+                    <div class="form-group col-md-6 required">
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            <option value="" selected>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div id="dkelas" class="form-group col-md-6">
+                        <label> Nama Kelas</label>
+                        <select name="classes" id="classes" class="form-control">
+                            <option value="" disabled selected>Pilih Kelas</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div id="dkelas" class="form-group">
-                    <label> Nama Kelas</label>
-                    <select name="classes" id="classes" class="form-control">
-                        <option value="" disabled selected>Pilih Kelas</option>
-
-                    </select>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Nama Penuh Murid</label>
+                        <input type="text" name="name" class="form-control" placeholder="Nama Penuh Murid">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Nombor Kad Pengenalan</label>
+                        <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Nama Penuh</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
-                </div>
-                <div class="form-group">
-                    <label>Nombor Kad Pengenalan</label>
-                    <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
-                </div>
-                <div class="form-group">
-                    <label>Email Pelajar&nbsp(optional)</label>
-                    <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
-                </div>
-                <div class="form-group">
-                    <label>Jantina</label>
-                    <div class="radio">
-                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="L"> Lelaki </label>
-                        <label class="radio-inline pl-2"><input type="radio" name="gender" value="P"> Perempuan </label>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Email Pelajar&nbsp(optional)</label>
+                        <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Jantina</label>
+                        <div class="radio">
+                            <label class="radio-inline pl-2"><input type="radio" name="gender" value="L"> Lelaki </label>
+                            <label class="radio-inline pl-2"><input type="radio" name="gender" value="P"> Perempuan </label>
+                        </div>
                     </div>
                 </div>
 
@@ -83,12 +89,9 @@
                 </div>
             </div>
             <!-- /.card-body -->
-
-
         </form>
     </div>
 </div>
-
 @endsection
 
 

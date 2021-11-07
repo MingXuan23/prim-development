@@ -391,7 +391,7 @@ class PayController extends AppBaseController
             {
                 $fpx_buyerEmail =  NULL;
                 $telno = NULL;
-                $fpx_buyerName = "Penderma Anonymous";
+                $fpx_buyerName = "Penderma Tanpa Nama";
             }
 
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
