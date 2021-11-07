@@ -69,7 +69,8 @@
 
     .carousel{
         margin: auto;
-        touch-action: none;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling:touch;
     }
 
     .carousel .card{
