@@ -61,4 +61,9 @@
         border: none !important;
         margin: 0px 6.5px 10px !important;
     }
+
+    .donation-poster{
+        height: 450px;
+    }
+
 </style>

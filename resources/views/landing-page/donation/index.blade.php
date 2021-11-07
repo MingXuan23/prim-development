@@ -45,25 +45,9 @@
             </div>
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
-                    <li class="current-menu-item">
-                        <a href="/derma">Utama</a>
-                    </li>
+                    <li class="current-menu-item"><a href="/derma">Utama</a></li>
                     <li><a href="#team">Info</a></li>
-
-                    <li>
-                        <a href="#organization">Organisasi</a>
-
-                    </li>
-                    {{-- <li><a href="/organization-list">Derma</a></li> --}}
-                    {{-- <li class="menu-item-has-children">
-                        <a href="#">Derma</a>
-                        <ul class="sub-menu">
-                            <li><a href="/organization-list">Derma Tahfiz UTeM</a></li>
-                            {{-- <li><a href="blog-details.html">Sekolah JAIM</a></li> --}}
-
-                    {{-- <li><a href="#pricing">Pricing</a></li> --}}
-                    {{-- <li><a href="#sekolah">Sekolah</a></li> --}}
-
+                    <li><a href="#organization">Organisasi</a></li>
                     <li><a href="#contact">Hubungi Kami</a></li>
                 </ul>
             </div>
@@ -317,7 +301,6 @@
                 <div class="col-lg-10">
                     <div class="section-title">
                         <!-- section title -->
-                        {{-- <span class="subtitle">Working Process</span> --}}
                         <h3 class="title">Organisasi</h3>
                         <p>Antara derma yang berdaftar dengan PRiM </p>
                     </div><!-- //. section title -->
@@ -358,62 +341,23 @@
                                     Masjid </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
-                                    NGO </a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-church"></i>
                                     Rumah Ibadat </a>
                             </li>
-                            {{-- <li class="nav-item">
-                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="anakyatim" aria-selected="false"><i
-                                        class="fas fa-home"></i> Rumah Anak Yatim </a>
-                            </li> --}}
+                            <li class="nav-item">
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
+                                    NGO </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content wow slideInUp">
                         <div class="tab-pane fade show" id="organisasi" role="tabpanel" aria-labelledby="masjid-tab">
                             <div class="how-it-works-tab-content">
                                 <div class="table-responsive">
-                                    <div class="row d-flex justify-content-md-between justify-content-center">
-                                        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">
-                                            <div class="card">
-                                                <img class="card-img-top w-100" src="donation-poster/poster1.jpg" alt="Card image cap">
-                                                <div class="card-body">
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a>
-                                                        <a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-    
-                                        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">
-                                            <div class="card">
-                                                <img class="card-img-top w-100" src="donation-poster/poster1.jpg" alt="Card image cap">
-                                                <div class="card-body">
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a>
-                                                        <a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">
-                                            <div class="card">
-                                                <img class="card-img-top w-100" src="donation-poster/poster1.jpg" alt="Card image cap">
-                                                <div class="card-body">
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a>
-                                                        <a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div id="donationPoster" class="row d-flex justify-content-md-center justify-content-center">
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -423,36 +367,6 @@
             </div>
         </div>
     </section>
-    {{-- modal start --}}
-    <div class="modal fade modal-derma" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title mt-0" id="myLargeModalLabel">Senarai Derma</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                </div>
-                <div class="modal-body">
-                    <div class="container">
-                        <div class="row">
-                            <div class="table-responsive">
-                                <table id="tableDerma" class="table table-centered table-nowrap mb-0">
-                                    <thead>
-                                        <th>Nama</th>
-                                        <th>Action</th>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal end -->
-    <!-- how it works area end -->
-
     <!--====== TESTIMONIAL PART ENDS ======-->
 
     <!-- team member area start -->
@@ -698,112 +612,34 @@
         $(document).on('click', '.btn-organization', function() {
             var type = $(this).attr("id");
             typedonation = type;
-            
-                var tableOrganization = $('#tableOrganization').DataTable({
-                    "ordering": true,
-                    "processing": true,
-                    "serverSide": true,
-                    "bDestroy": true,
-                    "searching": false,
-                    "lengthChange": false,
-                    "bInfo": false,
-                    "drawCallback": function(settings) {
-                        $("#tableOrganization thead").remove();
-                    },
-                    "language": {
-                        "emptyTable": "Tiada maklumat untuk dipaparkan",
-                        "paginate": {
-                            "next": "Seterusnya",
-                            "previous": "Sebelumnya"
-                        }
-                    },
-                    ajax: {
-                        url: "{{ route('landingpage.donation.custom') }}",
-                        type: 'GET',
-                        data: {
-                            type: type,
-                        },
-                    },
-                    order: [
-                        [1, 'asc']
-                    ],
-                    responsive: {
-                        details: {
-                            type: 'column'
-                        }
-                    },
-                    columns: [{
-                        data: "nama",
-                        name: "nama"
-                    }, {
-                        data: "telno",
-                        name: "telno"
-                    },{
-                        data: "email",
-                        name: "email",
-                        className: "desktop"
-                    },{
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
 
-                    }, ]
-                });
-
-        });
-
-        $(document).on('click', '.btn-donation', function() {
-            var id = $(this).attr("id");
-
-            var tableDerma = $('#tableDerma').DataTable({
-                "ordering": true,
-                "processing": true,
-                "serverSide": true,
-                "bDestroy": true,
-                "searching": false,
-                "lengthChange": false,
-                "bInfo": false,
-                "drawCallback": function(settings) {
-                    $("#tableDerma thead").remove();
+            $.ajax({
+                url: "{{ route('landingpage.donation.bytabbing') }}",
+                type: 'GET',
+                // dataType: 'json',
+                data: {
+                    type: type,
                 },
-                "language": {
-                    "emptyTable": "Tiada maklumat untuk dipaparkan",
-                    "paginate": {
-                        "next": "Seterusnya",
-                        "previous": "Sebelumnya"
-                    }
-                },
-                ajax: {
-                    url: "{{ route('landingpage.donation.donation') }}",
-                    type: 'GET',
-                    data: {
-                        id: id,
-                    },
-                },
-                order: [
-                    [1, 'asc']
-                ],
-                responsive: {
-                    details: {
-                        type: 'column'
-                    }
-                },
-                columns: [{
-                    data: "nama",
-                    name: "nama"
-                }, {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-
-                }, ]
+                success: function( result ){
+                    $('#donationPoster').html( result );
+                }
             });
-
         });
     });
+
+    
     </script>
 </body>
-
 </html>
+
+<!-- <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">
+    <div class="card">
+        <img class="card-img-top w-100" src="donation-poster/poster1.jpg" alt="Card image cap">
+        <div class="card-body">
+            <div class="d-flex flex-column justify-content-center">
+                <a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a>
+                <a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a>
+            </div>
+        </div>
+    </div>
+</div> -->
