@@ -69,7 +69,6 @@
 
     .carousel{
         margin: auto;
-        overflow-y: scroll;
         -webkit-overflow-scrolling:touch;
     }
 
