@@ -63,7 +63,16 @@
     }
 
     .donation-poster{
+        width: 320px;
         height: 450px;
     }
 
+    .carousel{
+        margin: auto;
+        touch-action: none;
+    }
+
+    .carousel .card{
+        margin: 0 10px 10px 0;
+    }
 </style>

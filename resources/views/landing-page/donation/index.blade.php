@@ -352,16 +352,8 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="tab-content wow slideInUp">
-                        <div class="tab-pane fade show" id="organisasi" role="tabpanel" aria-labelledby="masjid-tab">
-                            <div class="how-it-works-tab-content">
-                                <div class="table-responsive">
-                                    <div id="donationPoster" class="row d-flex justify-content-md-center justify-content-center">
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="donationPoster" class="row d-flex justify-content-center carousel">
+
                     </div>
                 </div>
             </div>
@@ -601,7 +593,6 @@
     }
 
     $(document).ready(function() {
-
         window.onload = function() {
             document.getElementById("8").click();
         };
@@ -612,34 +603,49 @@
         $(document).on('click', '.btn-organization', function() {
             var type = $(this).attr("id");
             typedonation = type;
-
+            owlCarousel();
             $.ajax({
                 url: "{{ route('landingpage.donation.bytabbing') }}",
                 type: 'GET',
-                // dataType: 'json',
                 data: {
                     type: type,
                 },
                 success: function( result ){
+
                     $('#donationPoster').html( result );
+                    $('#donationPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                    $('#donationPoster').find('.owl-stage-outer').children().unwrap();
+                    $('#donationPoster').owlCarousel({
+                        // loop:true,
+                        responsiveClass:true,
+                        responsive:{
+                            0:{
+                                items:1,
+                                nav:false
+                            },
+                            600:{
+                                items:2,
+                                nav:false
+                            },
+                            1000:{
+                                items:3,
+                                nav:false,
+                                loop:false
+                            }
+                        }, 
+                    });
+
+                    console.log(result);
                 }
             });
         });
-    });
 
-    
+        function owlCarousel()
+        {
+            
+        }
+
+    });
     </script>
 </body>
 </html>
-
-<!-- <div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">
-    <div class="card">
-        <img class="card-img-top w-100" src="donation-poster/poster1.jpg" alt="Card image cap">
-        <div class="card-body">
-            <div class="d-flex flex-column justify-content-center">
-                <a href="' . route('URLdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a>
-                <a href="' . route('ANONdonate', ['link' => $row->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a>
-            </div>
-        </div>
-    </div>
-</div> -->

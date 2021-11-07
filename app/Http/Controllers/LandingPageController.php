@@ -220,18 +220,16 @@ class LandingPageController extends AppBaseController
                         ->where('donations.status', 1)
                         ->get();
             foreach ($donations as $donation) {
-                $posters = $posters . '<div class="col-12 col-sm-6 col-lg-4" style="margin-bottom:20px">';
                 $posters = $posters . '<div class="card"> <img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap">';
                 $posters = $posters . '<div class="card-body"><div class="d-flex flex-column justify-content-center ">';
                 $posters = $posters . '<a href="' . route('URLdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a></div>';
-                $posters = $posters . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div></div></div></div>';
+                $posters = $posters . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div></div></div>';
             }
             
             if($posters === '')
             {
-                return '<div>Tiada Makulmat Dipaparkan</div>';
-            }
-            
+                return '<div class="d-flex justify-content-center">Tiada Makulmat Dipaparkan</div>';
+            }            
             return $posters;
         }
     }
