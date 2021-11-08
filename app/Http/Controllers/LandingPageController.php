@@ -228,9 +228,11 @@ class LandingPageController extends AppBaseController
             
             if($posters === '')
             {
-                return '<div class="d-flex justify-content-center">Tiada Makulmat Dipaparkan</div>';
-            }            
-            return $posters;
+                return '';
+                // return '<div class="d-flex justify-content-center">Tiada Makulmat Dipaparkan</div>';
+            }
+                     
+            return $posters . $posters;
         }
     }
 }

@@ -352,7 +352,7 @@
                             </li>
                         </ul>
                     </div>
-                    <div id="donationPoster" class="row d-flex justify-content-center carousel">
+                    <div id="donationPoster" class="row d-flex justify-content-center carousel owl-theme">
 
                     </div>
                 </div>
@@ -611,11 +611,19 @@
                 },
                 success: function( result ){
 
+                    var posterExist = true;
+                    if (result === '') {
+                        result = `<div class="d-flex justify-content-center">Tiada Makulmat Dipaparkan</div>`;
+                        posterExist = false;
+                    }
+
                     $('#donationPoster').html( result );
                     $('#donationPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
                     $('#donationPoster').find('.owl-stage-outer').children().unwrap();
                     $('#donationPoster').owlCarousel({
                         // loop:true,
+                        dots: posterExist,
+                        // paginationNumbers: false,
                         responsiveClass:true,
                         responsive:{
                             0:{

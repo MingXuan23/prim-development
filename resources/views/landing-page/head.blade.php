@@ -62,7 +62,7 @@
         margin: 0px 6.5px 10px !important;
     }
 
-    .donation-poster{
+    .donation-poster {
         width: 320px;
         height: 450px;
     }
@@ -72,7 +72,45 @@
         -webkit-overflow-scrolling:touch;
     }
 
-    .carousel .card{
+    .carousel .card {
         margin: 0 10px 10px 0;
     }
+
+    .carousel .owl-item.active:last-child .card {
+        margin-right: 0;
+    }
+
+    .owl-controls {
+        position: relative;
+        margin-top: 30px;
+        width: 100vw;
+        height: 20px;
+
+    }
+
+    .owl-controls .owl-dots {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .owl-controls .owl-dots .owl-dot {
+        margin: 0 5px;
+    }
+
+    .owl-controls .owl-dots .owl-dot span {
+        width: 20px;
+        height: 20px;
+        background-color: #eee;
+        color: darkgray;
+        border-radius: 50%;
+        display: block;
+    }
+
+    .owl-controls .owl-dots .owl-dot.active span {
+        background-color: #852aff;
+    }
+
+
 </style>
