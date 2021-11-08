@@ -232,7 +232,7 @@ class LandingPageController extends AppBaseController
                 // return '<div class="d-flex justify-content-center">Tiada Makulmat Dipaparkan</div>';
             }
                      
-            return $posters . $posters;
+            return $posters;
         }
     }
 }
