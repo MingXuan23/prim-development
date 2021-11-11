@@ -16,8 +16,8 @@
                     <select name="organization" id="organization_dropdown" class="form-control col-md-12">
                         <option value="" selected>Pilih Organisasi</option>
                         @isset($organizations)
-                            @foreach ($organizations as $organization)
-                                <option value="{{ $organization->id }}">{{ $organization->nama }}</option>
+                            @foreach ($organizations as $organizations)
+                                <option value="{{ $organizations->id }}">{{ $organizations->nama }}</option>
                             @endforeach
                         @endisset
                     </select>
@@ -35,9 +35,9 @@
                             <img src="assets/images/services-icon/donation.png" alt="">
                         </div>
                         <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Jumlah Penderma</h5>
-                        <h4 class="font-weight-medium font-size-24" id="total_donor">0</h4>
-                        <div class="mini-stat-label bg-success">
-                            <p id="p_donor_day" class="mb-0">Hari Ini</p>
+                        <div class="font-weight-medium font-size-24" id="total_donor">                        
+                        </div>
+                        <div id="p_donor_day" class="mini-stat-label bg-success mb-0">
                         </div>
                     </div>
                     <div class="pt-2 float-right">
@@ -48,6 +48,7 @@
                                 ini</button>
                             <button id="btn_donor_month" onclick="getTotalDonor(this.id)" class="btn btn-secondary">Bulan
                                 ini</button>
+                            <button id="btn_all" class="btn btn-secondary" onclick="getTotalDonationDonor(this.id)">Keseluruhan</button>
                         </div>
                     </div>
                 </div>
@@ -61,9 +62,9 @@
                             <img src="assets/images/services-icon/donate.png" style="max-width: 40px" alt="">
                         </div>
                         <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Derma Terkumpul</h5>
-                        <h4 class="font-weight-medium font-size-24" id="total_donation">RM 0.00</h4>
-                        <div class="mini-stat-label bg-success">
-                            <p id="p_donation_day" class="mb-0">Minggu Ini</p>
+                        <div class="font-weight-medium font-size-24" id="total_donation">                        
+                        </div>
+                        <div id="p_donation_day" class="mini-stat-label bg-success mb-0">
                         </div>
                     </div>
                     <div class="pt-2 float-right">
@@ -74,6 +75,7 @@
                                 ini</button>
                             <button id="btn_month" class="btn btn-secondary" onclick="getTotalDonation(this.id)">Bulan
                                 ini</button>
+                            <button id="btn_all" class="btn btn-secondary" onclick="getTotalDonationDonor(this.id)">Keseluruhan</button>
                         </div>
                     </div>
                 </div>

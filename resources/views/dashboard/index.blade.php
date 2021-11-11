@@ -1,9 +1,9 @@
 <script>
     // on change event for organization_dropdown
-    var organizationid
+    var donationid
 
     $('#organization_dropdown').change( () =>  {
-        organizationid = $("#organization_dropdown option:selected").val();
+        donationid = $("#organization_dropdown option:selected").val();
         
         $('#donorTable').DataTable({
                   processing:   true,
@@ -16,7 +16,7 @@
                   ajax: {
                       url: "{{ route('dashboard.latest_transaction') }}",
                       data: {
-                        id: organizationid,
+                        id: donationid,
                       },
                       type: 'GET',
 
@@ -55,7 +55,7 @@
             type: 'GET',
             url: '{{ route('dashboard.get_transaction') }}',
             data: {
-                id: organizationid,
+                id: donationid,
             },
             success: (data) => {
                 var date = new Array();
@@ -91,8 +91,34 @@
                 });
             }
         });
-
+        return getTotalDonationDonor();
     });
+
+    function getTotalDonationDonor() {
+        $.ajax({
+            type: 'GET',
+            url: '{{ route('dashboard.get_transaction') }}',
+            data: {
+                id: donationid,
+            },
+            success: (data) => {
+                var amount = new Array();
+                var totalDonor = 0;
+                var totalAmount = 0;
+
+                for (var i=0; i < data.data.length; i++) {
+                    amount[i] = data.data[i].amount;
+                    totalAmount += amount[i];  
+                    totalDonor++;               
+                }
+                    
+                document.getElementById("p_donation_day").innerHTML = "Keseluruhan";
+                document.getElementById("p_donor_day").innerHTML = "Keseluruhan";
+                document.getElementById("total_donation").innerHTML = "RM " + totalAmount;
+                document.getElementById("total_donor").innerHTML = totalDonor;
+            }
+        });
+    }
 
     let getTotalDonation = (id) => {
             var duration;
@@ -113,7 +139,7 @@
                 type: 'GET',
                 url: '{{ route('dashboard.totalDonation') }}',
                 data: {
-                    id: organizationid,
+                    id: donationid,
                     duration: duration
                 },
                 success: function(data) {
@@ -148,7 +174,7 @@
             type: 'GET',
             url: '{{ route('dashboard.totalDonor') }}',
             data: {
-                id: organizationid,
+                id: donationid,
                 duration: duration
             },
             success: function(data) {
