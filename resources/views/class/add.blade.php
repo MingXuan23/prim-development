@@ -63,6 +63,16 @@
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label>Guru Kelas</label>
+                        <select name="classTeacher" id="classTeacher" class="form-control">
+                            <option value="" selected disabled>Pilih Guru Kelas</option>
+                            @foreach($listTeacher as $row)
+                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
                     <div class="form-group mb-0">
                         <div>
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
