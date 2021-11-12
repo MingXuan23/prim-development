@@ -51,12 +51,7 @@ class ClassController extends Controller
         //
         $organization = $this->getOrganizationByUserId();
 
-        $listTeacher = DB::table('users as u')
-                ->leftJoin('organization_user as ou', 'ou.user_id', 'u.id')
-                ->select('ou.id as id', 'u.name')
-                ->where('ou.organization_id', $organization[0]->id)
-                ->where('ou.role_id', 5)
-                ->get();
+        $listTeacher = $this->getTeacherList($organization[0]->id);
         return view('class.add', compact('organization', 'listTeacher'));
     }
 
@@ -100,7 +95,9 @@ class ClassController extends Controller
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->where('classes.id', $id)->first();
 
-        return view('class.update', compact('class', 'organization'));
+        $listTeacher = $this->getTeacherList($organization[0]->id);
+
+        return view('class.update', compact('class', 'organization', 'listTeacher'));
     }
 
     public function update(Request $request, $id)
@@ -110,6 +107,7 @@ class ClassController extends Controller
             'name'          =>  'required',
             'level'         =>  'required',
             'organization'  =>  'required',
+            'classTeacher'  =>  'required'
         ]);
 
         DB::table('classes')
@@ -124,6 +122,7 @@ class ClassController extends Controller
         DB::table('class_organization')->where('class_id', $id)
             ->update([
                 'organization_id' => $request->get('organization'),
+                'organ_user_id'    =>  $request->get('classTeacher')
             ]);
 
         return redirect('/class')->with('success', 'The data has been updated!');
@@ -235,5 +234,17 @@ class ClassController extends Controller
                 });
             })->get();
         }
+    }
+
+    public function getTeacherList($organization_id)
+    {
+        $listTeacher = DB::table('users as u')
+        ->leftJoin('organization_user as ou', 'ou.user_id', 'u.id')
+        ->select('ou.id as id', 'u.name')
+        ->where('ou.organization_id', $organization_id)
+        ->where('ou.role_id', 5)
+        ->get();
+        
+        return $listTeacher;
     }
 }
