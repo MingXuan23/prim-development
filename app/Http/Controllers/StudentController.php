@@ -15,22 +15,41 @@ use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Arabic;
 
 class StudentController extends Controller
 {
     public function index()
     {
+        $userId = Auth::id();
         $organization = $this->getOrganizationByUserId();
 
-        $listclass = DB::table('classes')
-            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
-            ->select('classes.id as id', 'classes.nama', 'classes.levelid')
-            ->where([
-                ['class_organization.organization_id', $organization[0]->id],
-                ['classes.status', 1]
-            ])
-            ->orderBy('classes.nama')
-            ->get();
+        if(Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir'))
+        {
+            $listclass = DB::table('classes')
+                ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+                ->select('classes.id as id', 'classes.nama', 'classes.levelid')
+                ->where([
+                    ['class_organization.organization_id', $organization[0]->id],
+                    ['classes.status', 1]
+                ])
+                ->orderBy('classes.nama')
+                ->get();
+        }
+        else
+        {
+            $listclass = DB::table('class_organization')
+                ->leftJoin('classes', 'class_organization.class_id', '=', 'classes.id')
+                ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
+                ->select('classes.id as id', 'classes.nama', 'classes.levelid')
+                ->where([
+                    ['class_organization.organization_id', $organization[0]->id],
+                    ['classes.status', 1],
+                    ['organization_user.user_id', $userId]
+                ])
+                ->orderBy('classes.nama')
+                ->get();
+        }
 
         return view("student.index", compact('listclass', 'organization'));
     }
@@ -304,20 +323,35 @@ class StudentController extends Controller
 
     public function fetchClass(Request $request)
     {
-
-        // dd($request->get('schid'));
+        $userId = Auth::id();
         $oid = $request->get('oid');
 
-        $list = DB::table('organizations')
-            ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('organizations.nama as nschool', 'classes.id as cid', 'classes.nama as cname')
-            ->where('organizations.id', $oid)
-            ->where('classes.status', 1)
-            ->orderBy('classes.nama')
-            ->get();
-
-        // dd($list);
+        if(Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir'))
+        {
+            $list = DB::table('classes')
+                ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+                ->select('classes.id as cid', 'classes.nama as cname')
+                ->where([
+                    ['class_organization.organization_id', $oid],
+                    ['classes.status', 1]
+                ])
+                ->orderBy('classes.nama')
+                ->get();
+        }
+        else
+        {
+            $list = DB::table('class_organization')
+                ->leftJoin('classes', 'class_organization.class_id', '=', 'classes.id')
+                ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
+                ->select('classes.id as cid', 'classes.nama as cname')
+                ->where([
+                    ['class_organization.organization_id', $oid],
+                    ['classes.status', 1],
+                    ['organization_user.user_id', $userId]
+                ])
+                ->orderBy('classes.nama')
+                ->get();
+        }
         return response()->json(['success' => $list]);
     }
 

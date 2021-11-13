@@ -117,7 +117,7 @@
                         @endrole
 
 
-                        @role('Superadmin|Pentadbir|Guru')
+                        @role('Superadmin|Pentadbir')
                         <li>
                             <a href="{{ route('class.index') }}" class=" waves-effect">
                                 <i class="mdi mdi-google-classroom"></i>
