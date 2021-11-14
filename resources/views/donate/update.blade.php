@@ -48,8 +48,7 @@
                     </div>
                     <div class="form-group required col-md-6">
                         <label class="control-label">Jenis Derma</label>
-                        <select name="donation_type" id="donation_type" class="form-control"
-                        data-parsley-required-message="Sila masukkan jenis derma" required>
+                        <select name="donation_type" id="donation_type" class="form-control" data-parsley-required-message="Sila masukkan jenis derma" required>
                             <option value="$donation->donation_type">{{ $current_type->nama }}</option>
                             @foreach($donation_type as $row)
                                 @if ($row->id != $donation->donation_type)

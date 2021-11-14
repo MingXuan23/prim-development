@@ -79,6 +79,7 @@ Route::group(['prefix' => 'teacher'], function () {
 
 Route::group(['prefix' => 'class'], function () {
     Route::get('list', 'ClassController@getClassesDatatable')->name('class.getClassesDatatable');
+    Route::post('/fetchTeacher', 'ClassController@fetchTeacher')->name('class.fetchTeacher');
 });
 
 Route::group(['prefix' => 'student'], function () {

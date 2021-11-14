@@ -50,9 +50,7 @@ class ClassController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
-
-        $listTeacher = $this->getTeacherList($organization[0]->id);
-        return view('class.add', compact('organization', 'listTeacher'));
+        return view('class.add', compact('organization'));
     }
 
     public function store(Request $request)
@@ -95,9 +93,7 @@ class ClassController extends Controller
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->where('classes.id', $id)->first();
 
-        $listTeacher = $this->getTeacherList($organization[0]->id);
-
-        return view('class.update', compact('class', 'organization', 'listTeacher'));
+        return view('class.update', compact('class', 'organization'));
     }
 
     public function update(Request $request, $id)
@@ -236,15 +232,15 @@ class ClassController extends Controller
         }
     }
 
-    public function getTeacherList($organization_id)
+    public function fetchTeacher(Request $request)
     {
         $listTeacher = DB::table('users as u')
         ->leftJoin('organization_user as ou', 'ou.user_id', 'u.id')
         ->select('ou.id as id', 'u.name')
-        ->where('ou.organization_id', $organization_id)
+        ->where('ou.organization_id', $request->oid)
         ->where('ou.role_id', 5)
         ->get();
         
-        return $listTeacher;
+        return response()->json(['success' => $listTeacher]);
     }
 }

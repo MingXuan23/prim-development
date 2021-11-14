@@ -107,7 +107,6 @@
 <script>
     $(document).ready(function() {
         $('#icno').mask('000000-00-0000');
-
     });
 
     $(document).ready(function(){
