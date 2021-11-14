@@ -60,6 +60,7 @@ class ClassController extends Controller
             'name'          =>  'required',
             'level'         =>  'required',
             'organization'  =>  'required',
+            'classTeacher'  =>  'required'
         ]);
 
         $class = new ClassModel([
@@ -72,6 +73,7 @@ class ClassController extends Controller
         DB::table('class_organization')->insert([
             'organization_id' => $request->get('organization'),
             'class_id'        => $class->id,
+            'organ_user_id'  =>  $request->get('classTeacher'),
             'start_date'      => now(),
         ]);
 
@@ -101,6 +103,7 @@ class ClassController extends Controller
             'name'          =>  'required',
             'level'         =>  'required',
             'organization'  =>  'required',
+            'classTeacher'  =>  'required'
         ]);
 
         DB::table('classes')
@@ -115,6 +118,7 @@ class ClassController extends Controller
         DB::table('class_organization')->where('class_id', $id)
             ->update([
                 'organization_id' => $request->get('organization'),
+                'organ_user_id'    =>  $request->get('classTeacher')
             ]);
 
         return redirect('/class')->with('success', 'The data has been updated!');
@@ -153,7 +157,9 @@ class ClassController extends Controller
 
                 $data = DB::table('classes')
                     ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
-                    ->select('classes.id as cid', 'classes.nama as cnama', 'classes.levelid')
+                    ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
+                    ->leftJoin('users', 'organization_user.user_id', 'users.id')
+                    ->select('classes.id as cid', 'classes.nama as cnama', 'classes.levelid', 'users.name as guru')
                     ->where([
                         ['class_organization.organization_id', $oid],
                         ['classes.status', "1"]
@@ -163,6 +169,17 @@ class ClassController extends Controller
             }
             // dd($data->oid);
             $table = Datatables::of($data);
+
+            $table->addColumn('gkelas', function ($row) {
+                if ($row->guru === NULL) {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger">Tiada Guru Kelas</span></div>';
+
+                    return $btn;
+                } else {
+                    return $btn = '<div class="d-flex justify-content-center">' . $row->guru . '</div>';
+                }
+            });
 
             $table->addColumn('totalstudent', function ($row) {
 
@@ -193,7 +210,7 @@ class ClassController extends Controller
                 return $btn;
             });
 
-            $table->rawColumns(['totalstudent', 'action']);
+            $table->rawColumns(['totalstudent', 'action', 'gkelas']);
             return $table->make(true);
         }
     }
@@ -213,5 +230,17 @@ class ClassController extends Controller
                 });
             })->get();
         }
+    }
+
+    public function fetchTeacher(Request $request)
+    {
+        $listTeacher = DB::table('users as u')
+        ->leftJoin('organization_user as ou', 'ou.user_id', 'u.id')
+        ->select('ou.id as id', 'u.name')
+        ->where('ou.organization_id', $request->oid)
+        ->where('ou.role_id', 5)
+        ->get();
+        
+        return response()->json(['success' => $listTeacher]);
     }
 }

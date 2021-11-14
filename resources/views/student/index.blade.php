@@ -128,20 +128,20 @@
                             {{ csrf_field() }}
                             <div class="form-group">
                                 <label>Organisasi</label>
-                                <select name="kelas" id="kelas" class="form-control">
-                                    @foreach($organization as $row)
-                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
+                                <select name="organImport" id="organImport" class="form-control">
+                                @foreach($organization as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                @endforeach
                                 </select>
                             </div>
+
                             <div class="form-group">
                                 <label>Nama Kelas</label>
-                                <select name="kelas" id="kelas" class="form-control">
-                                    @foreach($listclass as $row)
-                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                    @endforeach
+                                <select name="classImport" id="classImport" class="form-control">
+
                                 </select>
                             </div>
+
                             <div class="form-group">
                                 <input type="file" name="file" required>
                             </div>
@@ -172,7 +172,7 @@
                             {{ csrf_field() }}
                             <div class="form-group">
                                 <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
+                                <select name="organExport" id="organExport" class="form-control">
                                     @foreach($organization as $row)
                                         <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
@@ -180,10 +180,8 @@
                             </div>
                             <div class="form-group">
                                 <label>Nama Kelas</label>
-                                <select name="kelas" id="kelas" class="form-control">
-                                    @foreach($listclass as $row)
-                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                    @endforeach
+                                <select name="classExport" id="classExport" class="form-control">
+
                                 </select>
                             </div>
                             <div class="modal-footer">
@@ -215,7 +213,17 @@
 
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetchClass($("#organization").val());
+            fetchClass($("#organization").val(), '#classes');
+        }
+
+        if($("#organImport").val() != ""){
+            $("#organImport").prop("selectedIndex", 0).trigger('change');
+            fetchClass($("#organImport").val(), '#classImport');
+        }
+
+        if($("#organExport").val() != ""){
+            $("#organExport").prop("selectedIndex", 0).trigger('change');
+            fetchClass($("#organExport").val(), '#classExport');
         }
 
         
@@ -224,69 +232,78 @@
 
             function fetch_data(cid = '') {
                 studentTable = $('#studentTable').DataTable({
-                        processing: true,
-                        serverSide: true,
-                        ajax: {
-                            url: "{{ route('student.getStudentDatatable') }}",
-                            data: {
-                                classid: cid,
-                                hasOrganization: true
-                            },
-                            type: 'GET',
-
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('student.getStudentDatatable') }}",
+                        data: {
+                            classid: cid,
+                            hasOrganization: true
                         },
-                        'columnDefs': [{
-                            "targets": [0], // your case first column
-                            "className": "text-center",
-                            "width": "2%"
-                        },{
-                            "targets": [2,3,4,5], // your case first column
-                            "className": "text-center",
-                        },],
-                        order: [
-                            [1, 'asc']
-                        ],
-                        columns: [{
-                            "data": null,
-                            searchable: false,
-                            "sortable": false,
-                            render: function (data, type, row, meta) {
-                                return meta.row + meta.settings._iDisplayStart + 1;
-                            }
-                        }, {
-                            data: "studentname",
-                            name: 'studentname'
-                        }, {
-                            data: "icno",
-                            name: 'icno'
-                        }, {
-                            data: "classname",
-                            name: 'classname'
-                        }, {
-                            data: 'status',
-                            name: 'status',
-                            orderable: false,
-                            searchable: false
-                        }, {
-                            data: 'action',
-                            name: 'action',
-                            orderable: false,
-                            searchable: false
-                        },]
+                        type: 'GET',
+
+                    },
+                    'columnDefs': [{
+                        "targets": [0], // your case first column
+                        "className": "text-center",
+                        "width": "2%"
+                    },{
+                        "targets": [2,3,4,5], // your case first column
+                        "className": "text-center",
+                    },],
+                    order: [
+                        [1, 'asc']
+                    ],
+                    columns: [{
+                        "data": null,
+                        searchable: false,
+                        "sortable": false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    }, {
+                        data: "studentname",
+                        name: 'studentname'
+                    }, {
+                        data: "icno",
+                        name: 'icno'
+                    }, {
+                        data: "classname",
+                        name: 'classname'
+                    }, {
+                        data: 'status',
+                        name: 'status',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },]
                 });
             }
 
             $('#organization').change(function() {
-               
                 var organizationid    = $("#organization").val();
                 var _token            = $('input[name="_token"]').val();
-
-                fetchClass(organizationid);
-                
+                fetchClass(organizationid, "#classes");
             });
 
-            function fetchClass(organizationid = ''){
+            $('#organImport').change(function() {
+                var organizationid    = $("#organImport").val();
                 var _token            = $('input[name="_token"]').val();
+                fetchClass(organizationid, '#classImport');
+            });
+
+            $('#organExport').change(function() {
+                var organizationid    = $("#organExport").val();
+                var _token            = $('input[name="_token"]').val();
+                fetchClass(organizationid, '#classExport');
+            });
+
+            function fetchClass(organizationid = '', classId = ''){
+                var _token = $('input[name="_token"]').val();
                 $.ajax({
                     url:"{{ route('student.fetchClass') }}",
                     method:"POST",
@@ -294,11 +311,11 @@
                             _token:_token },
                     success:function(result)
                     {
-                        $('#classes').empty();
-                        $("#classes").append("<option value='' disabled selected> Pilih Kelas</option>");
+                        $(classId).empty();
+                        $(classId).append("<option value='' disabled selected> Pilih Kelas</option>");
                         jQuery.each(result.success, function(key, value){
                             // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
-                            $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
+                            $(classId).append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
                         });
                     }
                 })

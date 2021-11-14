@@ -84,6 +84,7 @@
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th>Nama Kelas</th>
+                                <th>Guru Kelas</th>
                                 <th>Bilangan Pelajar</th>
                                 <th>Details</th>
                             </tr>
@@ -229,7 +230,7 @@
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [1,2,3], // your case first column
+                        "targets": [1,2,3,4], // your case first column
                         "className": "text-center",
                     },],
                     order: [
@@ -243,10 +244,13 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     }, {
-                        data: "cnama",
+                        data: 'cnama',
                         name: 'cnama'
+                    },{
+                        data: 'gkelas',
+                        name: 'gkelas',
                     }, {
-                        data: "totalstudent",
+                        data: 'totalstudent',
                         name: 'totalstudent',
                         orderable: false,
                         searchable: false,

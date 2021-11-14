@@ -37,14 +37,12 @@
                     <div class="form-group">
                         <label>Nama Organisasi</label>
                         <select name="organization" id="organization" class="form-control">
-                            <option value="" selected disabled>Pilih Organisasi</option>
                             @foreach($organization as $row)
-                            @if ($loop->first)
-                            <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                            @else
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-
-                            @endif
+                                @if ($loop->first)
+                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                @else
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                @endif
                             @endforeach
                         </select>
                     </div>
@@ -60,6 +58,13 @@
                         <select name="level" id="level" class="form-control">
                             <option value="1">Tahap 1</option>
                             <option value="2">Tahap 2</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Guru Kelas</label>
+                        <select name="classTeacher" id="classTeacher" class="form-control">
+                            <option value="" selected disabled>Pilih Guru Kelas</option>
                         </select>
                     </div>
 
@@ -87,4 +92,45 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
+<script>
+    $(document).ready(function() {
+
+        if($("#organization").val() != ""){
+            $("#organization").prop("selectedIndex", 0).trigger('change');
+            fectchTeacher($("#organization").val());
+        }
+
+        $('#organization').change(function() {
+            organizationid    = $("#organization").val();
+            _token            = $('input[name="_token"]').val();
+            fectchTeacher(organizationid);
+        });
+
+        function fectchTeacher(organizationid = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('class.fetchTeacher') }}",
+                method:"POST",
+                data:{ oid:organizationid,
+                        _token:_token },
+                success:function(result)
+                {
+                    $('#classTeacher').empty();
+                    $("#classTeacher").append("<option value='' disabled selected> Pilih Guru</option>");
+                    jQuery.each(result.success, function(key, value){
+                        $("#classTeacher").append("<option value='"+ value.id +"'>" + value.name + "</option>");
+                    });
+                }
+            })
+        }
+
+        // csrf token for ajax
+        $.ajaxSetup({
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    });
+</script>
 @endsection
