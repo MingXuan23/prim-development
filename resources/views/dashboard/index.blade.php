@@ -62,14 +62,23 @@
                 var username = new Array();
                 var amount = new Array();
                 var series = new Array();
+                var totalAmount = 0;
+                var totalDonor = 0;
 
                 for (var i=0; i < data.data.length; i++) {
                     var NowMoment = moment(data.data[i].datetime_created); 
                     date[i] = NowMoment.format('D-M hh:mm A');
                     username[i] = data.data[i].username;
                     amount[i] = data.data[i].amount;  
-                    series = [username,amount];                  
+                    series = [username,amount];
+                    totalAmount += amount[i]; 
+                    totalDonor++;                 
                 }
+
+                document.getElementById("p_donation_day").innerHTML = "Keseluruhan";
+                document.getElementById("total_donation").innerHTML = "RM " + totalAmount;
+                document.getElementById("p_donor_day").innerHTML = "Keseluruhan";
+                document.getElementById("total_donor").innerHTML = totalDonor;
 
                 var chart = new Chartist.Line('.ct-chart', {
                     labels: date,
@@ -91,34 +100,7 @@
                 });
             }
         });
-        return getTotalDonationDonor();
     });
-
-    function getTotalDonationDonor() {
-        $.ajax({
-            type: 'GET',
-            url: '{{ route('dashboard.get_transaction') }}',
-            data: {
-                id: donationid,
-            },
-            success: (data) => {
-                var amount = new Array();
-                var totalDonor = 0;
-                var totalAmount = 0;
-
-                for (var i=0; i < data.data.length; i++) {
-                    amount[i] = data.data[i].amount;
-                    totalAmount += amount[i];  
-                    totalDonor++;               
-                }
-                    
-                document.getElementById("p_donation_day").innerHTML = "Keseluruhan";
-                document.getElementById("p_donor_day").innerHTML = "Keseluruhan";
-                document.getElementById("total_donation").innerHTML = "RM " + totalAmount;
-                document.getElementById("total_donor").innerHTML = totalDonor;
-            }
-        });
-    }
 
     let getTotalDonation = (id) => {
             var duration;

@@ -76,7 +76,7 @@ class DashboardController extends AppBaseController
                 $response = Transaction::getTotalDonorByMonth($organizationID);
                 $response = json_decode($response, true);
                 $response['duration'] = 'month';
-                
+                               
                 return $this->sendResponse($response, "Success");
             } catch (\Throwable $th) {
                 return $this->sendError($th->getMessage(), 500);

@@ -21,13 +21,14 @@ class Transaction extends Model
     public static function getTransactionByOrganizationIdAndStatus($organizationId)
     {
         $transaction = Transaction::select('*')
-            ->join('donation_transaction', 'transactions.id', '=', 'donation_transaction.transaction_id')
-            ->join('donations', 'donation_transaction.donation_id', '=', 'donations.id')
-            ->join('donation_organization', 'donations.id', '=', 'donation_organization.donation_id')
-            ->join('organizations', 'donation_organization.organization_id', '=', 'organizations.id')
+            ->leftjoin('donation_transaction', 'transactions.id', '=', 'donation_transaction.transaction_id')
+            ->leftjoin('donations', 'donation_transaction.donation_id', '=', 'donations.id')
+            ->leftjoin('donation_organization', 'donations.id', '=', 'donation_organization.id')
+            ->leftjoin('organizations', 'donation_organization.organization_id', '=', 'organizations.id')
             ->where(([
-                ['organizations.id', '=', $organizationId],
-                ['transactions.status', '=', 'Success']
+                ['donations.id', '=', $organizationId],
+                ['transactions.status', '=', 'Success'],
+                ['donations.status', '=', 1]
             ]));
 
         return $transaction;
@@ -37,7 +38,7 @@ class Transaction extends Model
     {
         $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
             ->whereRaw('date(transactions.datetime_created) = curdate()')
-            ->select(DB::raw('count(transactions.id) as donor'))
+            ->select(DB::raw('count(donation_transaction.donation_id) as donor'))
             ->first();
 
         return $donors;
@@ -47,7 +48,7 @@ class Transaction extends Model
     {
         $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
             ->whereRaw('YEARWEEK(transactions.datetime_created, 1) = YEARWEEK(CURDATE(), 1)')
-            ->select(DB::raw('count(transactions.id) as donor'))
+            ->select(DB::raw('count(donation_transaction.donation_id) as donor'))
             ->first();
 
         return $donors;
@@ -58,7 +59,7 @@ class Transaction extends Model
         $donors = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
             ->whereRaw('year(transactions.datetime_created) = year(curdate())')
             ->whereRaw('month(transactions.datetime_created) = month(curdate())')
-            ->select(DB::raw('count(transactions.id) as donor'))
+            ->select(DB::raw('count(donation_transaction.donation_id) as donor'))
             ->first();
 
         return $donors;
@@ -99,6 +100,7 @@ class Transaction extends Model
     {
         $result = Transaction::getTransactionByOrganizationIdAndStatus($organizationId)
             ->select(['*', DB::raw('max(datetime_created) as latest')])
+            ->where('transactions.status', '=', 'Success')
             ->groupBy('transactions.id')
             ->orderBy('latest', 'desc')
             ->take(4)
