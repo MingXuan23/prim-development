@@ -7,6 +7,7 @@ use App\Imports\StudentImport;
 use App\Models\ClassModel;
 use App\Models\Organization;
 use App\Models\Student;
+use App\Models\Parents;
 use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +17,11 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Arabic;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
+use App\Models\OrganizationRole;
+use App\User;
 
 class StudentController extends Controller
 {
@@ -122,22 +128,76 @@ class StudentController extends Controller
 
     public function store(Request $request)
     {
-        //
         $classid = $request->get('classes');
 
         $co = DB::table('class_organization')
-            ->select('id')
+            ->select('id', 'organization_id as oid')
             ->where('class_id', $classid)
             ->first();
 
-        // dd($co->id);
-
         $this->validate($request, [
-            'name'          =>  'required',
-            'icno'          =>  'required',
-            'classes'       =>  'required',
+            'name'              =>  'required',
+            'icno'              =>  'required|unique:students,icno',
+            'classes'           =>  'required',
+            'parent_name'       =>  'required',
+            'parent_email'      =>  'required',
+            'parent_icno'       =>  'required',
+            'parent_phone'      =>  'required',
         ]);
 
+        $ifExits = DB::table('users as u')
+                    ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+                    ->where('u.email', '=', $request->get('parent_email'))
+                    ->where('u.icno', '=', $request->get('parent_icno'))
+                    ->where('u.telno', '=', $request->get('parent_phone'))
+                    ->whereIn('ou.role_id', [5, 6])
+                    ->get();
+        
+        // dd($request->get('parent_email'), $request->get('parent_icno'), $request->get('parent_phone'),  $ifExits);
+        
+        if(count($ifExits) == 0) { // if not teacher
+            $this->validate($request, [
+                'parent_icno'      =>  'required|unique:users,icno',
+                'parent_email'     =>  'required|email|unique:users,email',
+            ]);
+
+            $newparent = new Parents([
+                'name'           =>  strtoupper($request->get('parent_name')),
+                'icno'           =>  $request->get('parent_icno'),
+                'email'          =>  $request->get('parent_email'),
+                'password'       =>  Hash::make('abc123'),
+                'telno'          =>  $request->get('parent_phone'),
+                'remember_token' =>  Str::random(40),
+            ]);
+            $newparent->save();
+        }
+        else { // add parent role
+            $newparent = DB::table('users')
+                        ->where('email', '=', "{$request->get('parent_email')}")
+                        ->first();
+        }
+
+        DB::table('organization_user')->insert([
+            'organization_id'   => $co->oid,
+            'user_id'           => $newparent->id,
+            'role_id'           => 6,
+            'start_date'        => now(),
+            'status'            => 1,
+        ]);
+
+
+        $ou = DB::table('organization_user')
+                ->where('user_id', $newparent->id)
+                ->where('organization_id', $co->oid)
+                ->where('role_id', 6)
+                ->first();
+
+        $user = User::find($newparent->id);
+
+        // role parent
+        $rolename = OrganizationRole::find(6);
+        $user->assignRole($rolename->nama);
+        
         $student = new Student([
             'nama'          =>  $request->get('name'),
             'icno'          =>  $request->get('icno'),
@@ -153,6 +213,15 @@ class StudentController extends Controller
             'start_date'      => now(),
             'status'          => 1,
         ]);
+        DB::table('organization_user_student')->insert([
+            'organization_user_id'  => $ou->id,
+            'student_id'            => $student->id
+        ]);
+
+        // this have to change after all the featuer have done.
+        DB::table('students')
+            ->where('id', $student->id)
+            ->update(['parent_tel' => $newparent->telno]);
 
         return redirect('/student')->with('success', 'New student has been added successfully');
     }
