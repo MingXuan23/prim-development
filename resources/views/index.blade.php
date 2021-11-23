@@ -15,23 +15,9 @@
                 <div class="form-group card-title">
                     <select name="organization" id="organization_dropdown" class="form-control col-md-12">
                         <option value="" selected>Pilih Derma</option>
-                        <?php
-                            $conn = new MySqli("103.72.163.9", "primmy_main", "F5-UyHx;Z8iw", "primmy_main");
-                            
-                            $results = $conn->query("SELECT donation_organization.donation_id AS donateID, donations.nama AS donateName
-                                                    FROM donation_organization
-                                                    INNER JOIN donations ON donation_organization.id = donations.id
-                                                    WHERE donations.status = 1");
-                           
-                                while($row = $results->fetch_assoc()) {
-                                  echo "<option value=" . $row['donateID'] . ">" . $row["donateName"]. "</option>";
-                                }
-                        ?>
-                        <!-- @isset($organizations) 
-                            @foreach ($organizations as $organizations)
-                                <option value="{{ $organizations->id }}">{{ $organizations->nama }}</option>
+                            @foreach ($donations as $donations)
+                                <option value="{{ $donations->id }}">{{ $donations->nama }}</option>
                             @endforeach
-                        @endisset-->
                     </select>
                 </div>
             </div>

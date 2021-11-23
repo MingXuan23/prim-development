@@ -311,6 +311,11 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
+                                <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hamburger"></i>
+                                    FoodBank </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i>
                                     Derma Khas </a>
@@ -319,11 +324,6 @@
                                 <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-school"></i>
                                     Kebajikan Pelajar </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hamburger"></i>
-                                    FoodBank </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
@@ -594,7 +594,7 @@
 
     $(document).ready(function() {
         window.onload = function() {
-            document.getElementById("8").click();
+            document.getElementById("2").click();
         };
 
         $('.phone_no').mask('00000000000');

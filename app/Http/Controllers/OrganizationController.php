@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Http\Jajahan\Jajahan;
+use App\Models\Donation;
 use View;
 
 class OrganizationController extends Controller
@@ -128,10 +129,11 @@ class OrganizationController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-            return Organization::all();
+            return Donation::where('donations.status', 1)
+                            ->get();
         } else {
-            return Organization::whereHas('user', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
+            return Donation::whereHas('donation', function ($query) use ($userId) {
+                $query->where('donation_id', $userId);
             })->get();
         }
     }

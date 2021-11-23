@@ -218,6 +218,7 @@ class LandingPageController extends AppBaseController
             $donations = DB::table('donations')
                         ->where('donations.donation_type', $request->type)
                         ->where('donations.status', 1)
+                        ->orderBy('donations.date_created','desc')
                         ->get();
             foreach ($donations as $donation) {
                 $posters = $posters . '<div class="card"> <img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap">';
