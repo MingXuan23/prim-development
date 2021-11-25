@@ -31,9 +31,9 @@ class HomeController extends AppBaseController
      */
     public function index()
     {
-        $donations = OrganizationController::getOrganizationByUserId();
+        $organization = OrganizationController::getOrganizationByUserId();
         
-        return view("index", compact('donations'));
+        return view("index", compact('organization'));
     }
 
     /**

@@ -15,8 +15,8 @@
                 <div class="form-group card-title">
                     <select name="organization" id="organization_dropdown" class="form-control col-md-12">
                         <option value="" selected>Pilih Derma</option>
-                            @foreach ($donations as $donations)
-                                <option value="{{ $donations->id }}">{{ $donations->nama }}</option>
+                            @foreach($organization as $row)
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
                             @endforeach
                     </select>
                 </div>

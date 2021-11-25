@@ -129,12 +129,19 @@ class OrganizationController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-            return Donation::where('donations.status', 1)
-                            ->get();
+            return Organization::select('*')
+            ->join('donation_organization', 'organizations.id', '=', 'donation_organization.organization_id')
+            ->join('donations', 'donation_organization.donation_id', '=', 'donations.id')
+            ->where('donations.status', 1)
+            ->get();
         } else {
-            return Donation::whereHas('donation', function ($query) use ($userId) {
-                $query->where('donation_id', $userId);
-            })->get();
+            return Organization::select('*')
+            ->leftjoin('organization_user', 'organizations.id', '=', 'organization_user.organization_id')
+            ->leftjoin('users', 'organization_user.user_id', '=', 'users.id')
+            ->leftjoin('donation_organization', 'organizations.id', '=', 'donation_organization.organization_id')
+            ->leftjoin('donations', 'donation_organization.donation_id', '=', 'donations.id')
+            ->where('users.id', $userId)
+            ->get();
         }
     }
 
