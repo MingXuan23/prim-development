@@ -234,6 +234,26 @@ class DonationController extends Controller
         return $listorg;
     }
 
+    public static function getDonationByUserId()
+    {
+        $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
+            return Organization::select('*')
+            ->join('donation_organization', 'organizations.id', '=', 'donation_organization.organization_id')
+            ->join('donations', 'donation_organization.donation_id', '=', 'donations.id')
+            ->where('donations.status', 1)
+            ->get();
+        } else {
+            return Organization::select('*')
+            ->leftjoin('organization_user', 'organizations.id', '=', 'organization_user.organization_id')
+            ->leftjoin('users', 'organization_user.user_id', '=', 'users.id')
+            ->leftjoin('donation_organization', 'organizations.id', '=', 'donation_organization.organization_id')
+            ->leftjoin('donations', 'donation_organization.donation_id', '=', 'donations.id')
+            ->where('users.id', $userId)
+            ->get();
+        }
+    }
+    
     public function urlDonation($link)
     {
         $user = "";

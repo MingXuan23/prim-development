@@ -129,18 +129,13 @@ class OrganizationController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
-            return Organization::select('*')
-            ->join('donation_organization', 'organizations.id', '=', 'donation_organization.organization_id')
-            ->join('donations', 'donation_organization.donation_id', '=', 'donations.id')
-            ->where('donations.status', 1)
-            ->get();
+            return Organization::all();
         } else {
-            return Organization::select('*')
-            ->leftjoin('organization_user', 'organizations.id', '=', 'organization_user.organization_id')
-            ->leftjoin('users', 'organization_user.user_id', '=', 'users.id')
-            ->leftjoin('donation_organization', 'organizations.id', '=', 'donation_organization.organization_id')
-            ->leftjoin('donations', 'donation_organization.donation_id', '=', 'donations.id')
-            ->where('users.id', $userId)
+            return DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->select("o.*")
+            ->where('ou.user_id', $userId)
+            ->whereBetween('ou.role_id', [1, 3])
             ->get();
         }
     }
