@@ -74,12 +74,12 @@ class StudentController extends Controller
     public function studentimport(Request $request)
     {
         $this->validate($request, [
-            'kelas'          =>  'required',
+            'classImport'          =>  'required',
         ]);
 
-        // dd($request->kelas);
+        // dd($request->classImport);
 
-        $classID = $request->get('kelas');
+        $classID = $request->get('classImport');
 
         $file       = $request->file('file');
         $namaFile   = $file->getClientOriginalName();
@@ -218,10 +218,15 @@ class StudentController extends Controller
             'student_id'            => $student->id
         ]);
 
-        // this have to change after all the featuer have done.
+        /* 
+            - this has to change after all the features have done.
+            - delete parent tel column in table `students`
+        */
         DB::table('students')
             ->where('id', $student->id)
             ->update(['parent_tel' => $newparent->telno]);
+
+        // check fee for new in student
 
         return redirect('/student')->with('success', 'New student has been added successfully');
     }

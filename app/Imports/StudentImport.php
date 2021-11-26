@@ -48,11 +48,13 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             ->select('id', 'organization_id as oid')
             ->where('class_id', $this->class_id->class_id)
             ->first();
+
+        $gender = (int) substr($row["no_kp"], -1) % 2 == 0 ? "P" : "L";
         
         $student = new Student([
             'nama' => $row["nama"],
             'icno' => $row["no_kp"],
-            'gender' => $row["jantina"],
+            'gender' => $gender,
             'email' => $row["email"]
         ]);
 
