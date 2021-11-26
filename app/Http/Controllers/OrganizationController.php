@@ -135,7 +135,7 @@ class OrganizationController extends Controller
             ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
             ->select("o.*")
             ->where('ou.user_id', $userId)
-            ->whereBetween('ou.role_id', [1, 3])
+            ->whereIn('ou.role_id', [1, 4])
             ->get();
         }
     }
