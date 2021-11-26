@@ -994,7 +994,7 @@ class FeesController extends AppBaseController
         // dd($organization);
         // ************************* get list fees  *******************************
 
-        $getfees     = DB::table('students')
+        $getfees = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
@@ -1005,7 +1005,7 @@ class FeesController extends AppBaseController
             ->where('student_fees_new.status', 'Debt')
             ->get();
 
-        $getfees_bystudent     = DB::table('students')
+        $getfees_bystudent = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
