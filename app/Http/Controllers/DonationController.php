@@ -434,9 +434,4 @@ class DonationController extends Controller
 
         return $code;
     }
-
-    public function test()
-    {
-        echo "test";
-    }
 }

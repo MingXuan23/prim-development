@@ -53,6 +53,33 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
 
+        $phone = trim((string)$row['no_tel_bimbit_penjaga']);
+
+        if(!$this->startsWith($phone,"+60") && !$this->startsWith($phone,"60")){
+            if(strlen($phone) == 10) {
+                $phone = str_pad($phone, 12, "+60", STR_PAD_LEFT);
+            } 
+            elseif(strlen($phone) == 11)
+            {
+                $phone = str_pad($phone, 13, "+60", STR_PAD_LEFT);
+            }   
+        } else if($this->startsWith($phone,"60")){
+
+            if(strlen($phone) == 11) {
+                $phone = str_pad($phone, 12, "+60", STR_PAD_LEFT);
+            } 
+            elseif(strlen($phone) == 12)
+            {
+                $phone = str_pad($phone, 13, "+60", STR_PAD_LEFT);
+            } 
+        }
+        elseif($this->startsWith($phone,"+60")) {
+            // do nothing
+        }
+        else{
+            throw ValidationException::withMessages(["error" => "Invalid phone number"]);
+        }
+
         $co = DB::table('class_organization')
             ->select('id', 'organization_id as oid')
             ->where('class_id', $this->class_id->class_id)
@@ -88,7 +115,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                 // 'icno'           =>  $row['no_kp_penjaga'],
                 'email'          =>  isset($row['email_penjaga']) ? $row['email_penjaga'] : NULL,
                 'password'       =>  Hash::make('abc123'),
-                'telno'          =>  '+6' . $row['no_tel_bimbit_penjaga'],
+                'telno'          =>  $phone,
                 'remember_token' =>  Str::random(40),
             ]);
             $parent->save();
@@ -122,5 +149,10 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         DB::table('students')
             ->where('id', $student->id)
             ->update(['parent_tel' => $parent->telno]);
+    }
+
+    public function startsWith($string, $startString) {
+        $len = strlen($startString);
+        return (substr($string, 0, $len) === $startString);
     }
 }

@@ -63,12 +63,12 @@ class StudentController extends Controller
     public function studentexport(Request $request)
     {
         $this->validate($request, [
-            'organ'          =>  'required',
-            'kelas'          =>  'required',
+            'organExport'      =>  'required',
+            'classExport'      =>  'required',
         ]);
 
         // dd($request->kelas, $request->organ);
-        return Excel::download(new StudentExport($request->organ, $request->kelas), 'student.xlsx');
+        return Excel::download(new StudentExport($request->organExport, $request->classExport), 'student.xlsx');
     }
 
     public function studentimport(Request $request)

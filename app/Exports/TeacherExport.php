@@ -24,7 +24,7 @@ class TeacherExport implements FromCollection, ShouldAutoSize, WithHeadings
     {
 
         // dd($this->organId);
-        $listteacher = DB::table('users')
+        $listteachers = DB::table('users')
         ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
         ->select('users.name', 'users.icno', 'users.email', 'users.telno')
         ->where([
@@ -33,8 +33,12 @@ class TeacherExport implements FromCollection, ShouldAutoSize, WithHeadings
         ])
         ->orderBy('users.name')
         ->get();
+
+        foreach($listteachers as $listteacher){
+            $listteacher->telno = str_replace('+6', '', $listteacher->telno);
+        }
         
-        return $listteacher;
+        return $listteachers;
     }
 
     public function headings(): array

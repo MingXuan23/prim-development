@@ -59,6 +59,34 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
         if(!isset($row['nama']) || !isset($row['no_kp']) || !isset($row['email']) || !isset($row['no_tel_bimbit'])){
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
+
+        $phone = trim((string)$row['no_tel_bimbit']);
+
+        if(!$this->startsWith($phone,"+60") && !$this->startsWith($phone,"60")){
+            if(strlen($phone) == 10) {
+                $phone = str_pad($phone, 12, "+60", STR_PAD_LEFT);
+            } 
+            elseif(strlen($phone) == 11)
+            {
+                $phone = str_pad($phone, 13, "+60", STR_PAD_LEFT);
+            }   
+        } else if($this->startsWith($phone,"60")){
+
+            if(strlen($phone) == 11) {
+                $phone = str_pad($phone, 12, "+60", STR_PAD_LEFT);
+            } 
+            elseif(strlen($phone) == 12)
+            {
+                $phone = str_pad($phone, 13, "+60", STR_PAD_LEFT);
+            } 
+        }
+        elseif($this->startsWith($phone,"+60")) {
+            // do nothing
+        }
+        else{
+            throw ValidationException::withMessages(["error" => "Invalid phone number"]);
+        }
+
         // check if parent role exists
         $ifExits = DB::table('users as u')
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
@@ -110,5 +138,10 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
         // role parent
         $rolename = OrganizationRole::find(5);
         $user->assignRole($rolename->nama);
+    }
+
+    public function startsWith($string, $startString) {
+        $len = strlen($startString);
+        return (substr($string, 0, $len) === $startString);
     }
 }

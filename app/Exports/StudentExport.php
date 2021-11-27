@@ -25,14 +25,14 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
 
     public function collection()
     {
-        $liststudent = DB::table('organization_user_student as ous')
+        $liststudents = DB::table('organization_user_student as ous')
         ->join('students', 'students.id', '=', 'ous.student_id')
         ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
         ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
         ->join('classes as c', 'c.id', '=', 'co.class_id')
         ->join('organization_user as ou', 'ou.id', 'ous.organization_user_id')
         ->join('users', 'users.id', 'ou.user_id')
-        ->select('students.nama', 'students.icno', 'students.gender', 'students.email as student_email', 'users.name', 'users.email', 'users.telno')
+        ->select('students.nama', 'students.icno', 'students.email as student_email', 'users.name', 'users.telno')
         ->where([
             ['co.organization_id', $this->organId],
             ['c.id', $this->kelasId],
@@ -41,10 +41,15 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
         ])
         ->orderBy('students.nama')
         ->get();
+        
+        // dd($liststudents[0]->telno);
+        foreach($liststudents as $liststudent){
+            $liststudent->telno = str_replace('+6', '', $liststudent->telno);
+        }
 
-        // dd($liststudent);
+        // dd($liststudents);
 
-        return $liststudent;
+        return $liststudents;
     }
 
     public function headings(): array
@@ -52,10 +57,8 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
         return [
             'Nama',
             'No. Kp',
-            'Jantina',
             'email',
-            'Name Penjaga',
-            'Email Penjaga',
+            'Nama Penjaga',
             'No. Tel Bimbit Penjaga',
         ];
     }
