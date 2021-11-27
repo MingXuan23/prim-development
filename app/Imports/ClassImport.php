@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\ClassModel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -22,6 +23,9 @@ class ClassImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
+        if(!isset($row['nama_kelas']) || !isset($row['tahap_kelas'])){
+            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+        }
 
         // dd($this->organId);
         $newclass = new ClassModel([
