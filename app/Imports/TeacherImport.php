@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use App\User;
+use Illuminate\Validation\ValidationException;
 use App\Models\OrganizationRole;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
@@ -55,6 +56,9 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
 
     public function model(array $row)
     {
+        if(!isset($row['nama']) || !isset($row['no_kp']) || !isset($row['email']) || !isset($row['no_tel_bimbit'])){
+            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+        }
         // check if parent role exists
         $ifExits = DB::table('users as u')
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')

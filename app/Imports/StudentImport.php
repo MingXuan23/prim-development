@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use App\Models\OrganizationRole;
 use App\User;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -44,6 +45,14 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
 
     public function model(array $row)
     {
+        if(!isset($row['nama']) || !isset($row['no_kp']) || !isset($row['email'])){
+            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+        }
+
+        if(!isset($row['nama_penjaga']) || !isset($row['no_kp']) || !isset($row['no_tel_bimbit_penjaga'])){
+            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+        }
+
         $co = DB::table('class_organization')
             ->select('id', 'organization_id as oid')
             ->where('class_id', $this->class_id->class_id)
@@ -69,7 +78,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
 
         $parent = DB::table('users')
             ->select()
-            ->where('email', $row['email_penjaga'])
+            ->where('telno', $row['no_tel_bimbit_penjaga'])
             ->first();
         
         if(is_null($parent))
@@ -77,7 +86,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             $parent = new Parents([
                 'name'           =>  strtoupper($row['nama_penjaga']),
                 // 'icno'           =>  $row['no_kp_penjaga'],
-                'email'          =>  $row['email_penjaga'],
+                'email'          =>  isset($row['email_penjaga']) ? $row['email_penjaga'] : NULL,
                 'password'       =>  Hash::make('abc123'),
                 'telno'          =>  '+6' . $row['no_tel_bimbit_penjaga'],
                 'remember_token' =>  Str::random(40),

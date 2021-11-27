@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Illuminate\Support\Facades\Hash;
@@ -27,6 +28,10 @@ class ParentsImport implements ToModel, WithHeadingRow, WithValidation
 
     public function model(array $row)
     {
+        if(!isset($row['nama']) || !isset($row['no_kp']) || !isset($row['email']) || !isset($row['no_tel_bimbit'])){
+            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+        }
+
         $userid     = Auth::id();
         // check if teacher role exists
         $ifExits = DB::table('users as u')
