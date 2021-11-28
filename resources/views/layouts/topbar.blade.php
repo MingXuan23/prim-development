@@ -70,14 +70,16 @@
                                 </form>
                             </div>
                         </div>
+                        <!-- end of search -->
 
 
-
+                        <!-- full screen feature -->
                         <div class="dropdown d-none d-lg-inline-block">
                             <button type="button" class="btn header-item noti-icon waves-effect" data-toggle="fullscreen">
                                 <i class="mdi mdi-fullscreen"></i>
                             </button>
                         </div>
+                        <!-- end of full screen feature -->
 
                         <!-- <div class="dropdown d-inline-block">
                             <button type="button" class="btn header-item noti-icon waves-effect" id="page-header-notifications-dropdown"
@@ -182,17 +184,23 @@
                                 </div>
                             </div>
                         </div> -->
-
+                        
+                        <!-- user profile -->
                         <div class="dropdown d-inline-block">
+
                             <button type="button" class="btn header-item waves-effect" id="page-header-user-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <img class="rounded-circle header-profile-user" src="{{ URL::asset('assets/images/users/user-4.jpg')}}" alt="Header Avatar">
                             </button>
+
                             <div class="dropdown-menu dropdown-menu-right">
                                 <!-- item-->
-                                <a class="dropdown-item" href="#"><i class="mdi mdi-account-circle font-size-17 align-middle mr-1"></i> Profile</a>
+                                    <!-- item1 profile CHANGE THE ROUTE HERE-->
+                                <a class="dropdown-item" href="{{ route('profile_user') }}"><i class="mdi mdi-account-circle font-size-17 align-middle mr-1"></i> Profile</a>
                                 <!-- <a class="dropdown-item" href="#"><i class="mdi mdi-wallet font-size-17 align-middle mr-1"></i> My Wallet</a>
                                 <a class="dropdown-item d-block" href="#"><span class="badge badge-success float-right">11</span><i class="mdi mdi-settings font-size-17 align-middle mr-1"></i> Settings</a>
                                 <a class="dropdown-item" href="#"><i class="mdi mdi-lock-open-outline font-size-17 align-middle mr-1"></i> Lock screen</a> -->
+                               
+                                <!-- logout -->
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item text-danger" href="javascript:void();" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="bx bx-power-off font-size-17 align-middle mr-1 text-danger"></i>

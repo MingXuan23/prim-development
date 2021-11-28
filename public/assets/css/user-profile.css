@@ -1,0 +1,21 @@
+div.profile-box{
+    width: 300px;
+    border: 1px solid black;
+    margin: 10px;
+    font-size: 16px;
+    padding: 0.5vh;
+}
+.title-lable{
+    font-weight: 400;
+    font-size: 19px;
+}
+
+div.sticky{
+    float: right;
+}
+
+ /*icon to edit */
+img{
+    max-width:50px;
+    /* height: 200px; */
+}
