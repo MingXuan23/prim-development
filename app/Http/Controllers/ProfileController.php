@@ -16,8 +16,7 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        $newUser = new User(); // create object to call non static function 
-        $userData = $newUser->getUserById(); // get all data of a certain user with particular ID
+        $userData =  Auth::user(); // get all data of a certain user with particular ID
         return view('users.index', compact('userData'));
         
         // Get the currently authenticated user...
@@ -25,7 +24,6 @@ class ProfileController extends Controller
         // must include library: use Illuminate\Support\Facades\Auth;
     }
     
-
 
     /**
      * Show the form for editing the specified resource.
@@ -50,8 +48,9 @@ class ProfileController extends Controller
     {
         $request->validate([
             'name'      => 'required',
-            'telno'     => 'required|numeric',
-            'email'     => 'required|email|unique:users,email',
+            'telno'     => 'required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'email'     => 'required|email',
+            // 'required|email|unique:users, email,'.$this->email'|min:1',
         ]);
 
         $id = Auth::id();

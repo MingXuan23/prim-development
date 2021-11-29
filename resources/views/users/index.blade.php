@@ -1,8 +1,8 @@
-@extends('users.profile_layout');
-
+@extends('users.profile_layout')
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
-<link href="{{ URL::asset('assets/css/user-profile.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/css/profile.css') }}" rel="stylesheet" type="text/css" />
+
 @include('layouts.datatable')
 
 @endsection
@@ -22,37 +22,85 @@
      <p>{{ $message }}</p>
 </div>
 @endif
-<!-- button for edit -->
-<div class="sticky">
-    <a class="btn" href="{{ route('profile_edit') }}">
-        <img src="{{ URL::to('/assets/images/users/edit_icon.png') }}">
-    </a>
-</div>
+
 <!-- display data -->
-<div class="profile-box">
-    <label class="title-label">Name:  </label> {{ $userData->name }} 
-</div> 
-<div class="profile-box">
-    <label class="title-label">Email address: </label> {{ $userData->email }}
-</div> 
-<div class="profile-box">
-    <label class="title-label">Username: </label> {{ $userData->username }}
-</div>  
-<div class="profile-box">
-    <label class="title-label">Phone number: </label> {{ $userData->telno }}
-</div>
-<div class="profile-box">
-    <label class="title-label">Address: </label> {{ $userData->address }}
-</div>
-<div class="profile-box">
-    <label class="title-label">Postcode: </label>{{ $userData->postcode }}
-</div> 
-<div class="profile-box">
-    <label class="title-label">State: </label>{{ $userData->state }} 
-</div>
+<div class="col-lg-8">
+    <div class="card">
+        <div class="card-body">
+            <!-- name -->
+            <div class="col-sm-5">
+                <h5 class="mb-0">Name</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+                <input type="text" class="form-control" value="{{ $userData->name }} " readonly>
+            </div>
+            <!-- email -->
+            <div class="col-sm-5">
+                <h5 class="mb-0">Email address</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+                <input type="text" class="form-control" value="{{ $userData->email }}" readonly>
+            </div>
+            <!-- username -->
+            <div class="col-sm-5">
+                <h5 class="mb-0">Username</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+                <input type="text" class="form-control" value="{{ $userData->username }}" readonly>
+            </div>
+            <!-- phone number -->
+            <div class="col-sm-5">
+                <h5 class="mb-0 phone_no">Phone number</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+                <input type="text" class="form-control" value="{{ $userData->telno }}" readonly>
+            </div>
 
+            <!-- Address -->
+            <div class="col-sm-5">
+                <h5 class="mb-0">Address</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+                <input type="text" class="form-control" value="{{ $userData->address }}" readonly>
+            </div>
 
+            <!-- Postcode -->
+            <div class="col-sm-5">
+                <h5 class="mb-0">Postcode</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+                <input type="text" class="form-control" value="{{ $userData->postcode }}" readonly>
+            </div>
 
+            <!-- State -->
+            <div class="col-sm-5">
+                <h5 class="mb-0">State</h6>
+            </div>
+            <div class="col-sm-9 text-secondary">
+                <input type="text" class="form-control" value="{{ $userData->state }}" readonly>
+            </div>
+
+        </div> <!-- end of card-body -->
+
+        <!-- button for edit -->
+        <div class="sticky">
+            <a class="btn" href="{{ route('profile_edit') }}">
+                <img class="edit_icon" src="{{ URL::to('/assets/images/users/edit_icon.png') }}">
+            </a>
+        </div>
+    </div> <!-- end of card -->
+    
+</div> <!-- end of most outer -->
+@endsection
+@section('script')
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+
+<!-- <script>
+     $(document).ready(function () {
+            $('.phone_no').mask('+600000000000');
+    });
+</script> -->
+   
 @endsection
 
 
