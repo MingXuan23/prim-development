@@ -1,11 +1,16 @@
 <?php
 
 namespace App\Http\Controllers;
+// namespace App\Http\Requests; // can delete soon
+// use App\Http\Requests\Controller; // can delete soon
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule; // new added
+
 
 class ProfileController extends Controller
 {
@@ -16,8 +21,9 @@ class ProfileController extends Controller
      */
     public function index()
     {
+        $unseenProfile = false;
         $userData =  Auth::user(); // get all data of a certain user with particular ID
-        return view('users.index', compact('userData'));
+        return view('users.index', compact('userData', 'unseenProfile'));
         
         // Get the currently authenticated user...
         //$user = Auth::user();
@@ -33,7 +39,8 @@ class ProfileController extends Controller
      */
     public function edit()
     {
-       return view('users.edit'); 
+        $unseenProfile = false;
+        return view('users.edit', compact('unseenProfile')); 
         // return the data in edit mode.
     }
 
@@ -44,32 +51,30 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(Request $request, User $user)
     {
+        $id = Auth::id();
+
         $request->validate([
             'name'      => 'required',
             'telno'     => 'required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/',
-            'email'     => 'required|email',
-            // 'required|email|unique:users, email,'.$this->email'|min:1',
+            'email'     => "required|email|unique:users,email,$id",
         ]);
 
-        $id = Auth::id();
-
         $userUpdate = DB::table('users')
-        ->where('id', $id)
-        ->update(
-            [
-                'name'      => $request->post('name'),
-                'email'     => $request->post('email'),
-                'username'  => $request->post('username'),
-                'telno'     => $request->post('telno'),
-                'address'   => $request->post('address'),
-                'state'     => $request->post('state'),
-                'postcode'  => $request->post('postcode')
-            ]
-        );
-        
-        return redirect()->route('profile_user')->with('success','Profile updated successfully');
+            ->where('id', $id)
+            ->update(
+                [
+                    'name'      => $request->post('name'),
+                    'email'     => $request->post('email'),
+                    'username'  => $request->post('username'),
+                    'telno'     => $request->post('telno'),
+                    'address'   => $request->post('address'),
+                    'state'     => $request->post('state'),
+                    'postcode'  => $request->post('postcode')
+                ]
+            );
+        return redirect()->route('profile_user')->with('success','Profile updated successfully');   
     }
 
     // not using destroy

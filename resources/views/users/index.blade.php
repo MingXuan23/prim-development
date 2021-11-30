@@ -1,4 +1,4 @@
-@extends('users.profile_layout')
+@extends('layouts.master')
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{ URL::asset('assets/css/profile.css') }}" rel="stylesheet" type="text/css" />

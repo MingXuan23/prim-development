@@ -236,8 +236,6 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
 
-// huey
-
 // user profile
 
 Route::get('profile_user', 'ProfileController@index')->name('profile_user'); 

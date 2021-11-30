@@ -195,13 +195,18 @@
                             <div class="dropdown-menu dropdown-menu-right">
                                 <!-- item-->
                                     <!-- item1 profile CHANGE THE ROUTE HERE-->
-                                <a class="dropdown-item" href="{{ route('profile_user') }}"><i class="mdi mdi-account-circle font-size-17 align-middle mr-1"></i> Profile</a>
+                                    @if ($unseenProfile == 'true'){
+                                        <a class="dropdown-item" href="{{ route('profile') }}"><i class="mdi mdi-account-circle font-size-17 align-middle mr-1"></i> Profile</a>
+                                    }
+                                   
+                                
                                 <!-- <a class="dropdown-item" href="#"><i class="mdi mdi-wallet font-size-17 align-middle mr-1"></i> My Wallet</a>
                                 <a class="dropdown-item d-block" href="#"><span class="badge badge-success float-right">11</span><i class="mdi mdi-settings font-size-17 align-middle mr-1"></i> Settings</a>
                                 <a class="dropdown-item" href="#"><i class="mdi mdi-lock-open-outline font-size-17 align-middle mr-1"></i> Lock screen</a> -->
                                
                                 <!-- logout -->
                                 <div class="dropdown-divider"></div>
+                                @endif
                                 <a class="dropdown-item text-danger" href="javascript:void();" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="bx bx-power-off font-size-17 align-middle mr-1 text-danger"></i>
                                     {{ __('Logout') }}

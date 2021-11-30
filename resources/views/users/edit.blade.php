@@ -1,4 +1,4 @@
-@extends('users.profile_layout')
+@extends('layouts.master')
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
@@ -14,6 +14,13 @@
     </div>
 </div>
 <!-- end of title of the page -->
+
+@if($message = Session::get('success'))
+ <div class="alert alert-success"> <!-- update message -->
+     <p>{{ $message }}</p>
+</div>
+@endif
+
 
 <!-- error message -->
 <div class="card">
@@ -35,7 +42,9 @@
                 <!-- email -->
                 <label for="useremail">Email</label>
                 <input type="email" class="form-control @error('email') is-invalid @enderror"
-                value="{{ Auth::user()->email }}" name="email">
+                value=" @error('email'){{ old('email')}}  @enderror  @if (!(old('email'))) {{Auth::user()->email}} @endif" 
+                name="email">
+
                 @error('email')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
@@ -56,7 +65,7 @@
 
             <div class="form-group">
                 <!-- telno -->
-                <label for="telno">Tel No:</label>
+                <label for="telno">Phone No:</label>
                 <input type="text" name="telno"  
                 class="form-control phone_no @error('telno') is-invalid @enderror" value="{{ Auth::user()->telno }}" name="username">
                 @error('telno')
@@ -75,7 +84,7 @@
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
                     </span>
-                @enderror        
+            @enderror        
         </div> <!-- end of address --> 
                     
             <div class="form-group">
