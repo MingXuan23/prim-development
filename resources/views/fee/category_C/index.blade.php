@@ -70,6 +70,8 @@
                 </div>
                 @endif
 
+                <div class="flash-message"></div>
+
                 <div class="table-responsive">
                     <table id="categoryC" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -79,7 +81,7 @@
                                 <th>Nama Butiran</th>
                                 <th>Penerangan</th>
                                 <th>Jumlah Amaun (RM)</th>
-                                <th>Rujukan</th>
+                                <!-- <th>Rujukan</th> -->
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -188,14 +190,6 @@
                             }
                         }
                     }, {
-                        data: "target",
-                        name: 'target',
-                        orderable: false,
-                        searchable: false,
-                        render: function(data, type, full) {
-                            return data;
-                        }
-                    }, {
                         data: 'status',
                         name: 'status',
                         orderable: false,
@@ -211,6 +205,18 @@
                         alert(error.toString());
                     }
             });
+
+            /* 
+                {
+                    data: "target",
+                    name: 'target',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, full) {
+                        return data;
+                    }
+                }
+            */
         }
   
         $('#organization').change(function() {
@@ -227,35 +233,37 @@
             }
         });
   
-        var teacher_id;
+        var fee_id;
   
         $(document).on('click', '.btn-danger', function(){
-            teacher_id = $(this).attr('id');
+            fee_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
         });
   
         $('#delete').click(function() {
-              $.ajax({
-                  type: 'POST',
-                  dataType: 'html',
-                  data: {
-                      "_token": "{{ csrf_token() }}",
-                      _method: 'DELETE'
-                  },
-                  url: "/teacher/" + teacher_id,
-                  success: function(data) {
-                      setTimeout(function() {
-                          $('#confirmModal').modal('hide');
-                      }, 2000);
-  
-                      $('div.flash-message').html(data);
-  
-                      teacherTable.ajax.reload();
-                  },
-                  error: function (data) {
-                      $('div.flash-message').html(data);
-                  }
-              })
+
+            console.log(fee_id);
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    _method: 'DELETE'
+                },
+                url: "/fees/" + fee_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+
+                    $('div.flash-message').html(data);
+
+                    categoryC.ajax.reload();
+                },
+                error: function (data) {
+                    $('div.flash-message').html(data);
+                }
+            })
           });
           
           $('.alert').delay(3000).fadeOut();

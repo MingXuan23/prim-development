@@ -159,7 +159,21 @@ class FeesController extends AppBaseController
 
     public function destroy($id)
     {
-        //
+        // dd($id);
+        $result = DB::table('fees_new')
+                    ->where('id', '=', $id)
+                    ->update([
+                        'status' => 0
+                    ]);
+        
+
+        if ($result) {
+            Session::flash('success', 'Yuran Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Yuran Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+        }
     }
 
     public function getOrganizationByUserId()
@@ -528,6 +542,8 @@ class FeesController extends AppBaseController
                 ->where('role_id', 6)
                 ->where('status', 1)
                 ->get();
+            
+            // dd(count($parent_id));
 
             for ($i = 0; $i < count($parent_id); $i++) {
                 $array[] = array(
@@ -540,9 +556,10 @@ class FeesController extends AppBaseController
                 $fees_parent = DB::table('organization_user')
                     ->where('id', $parent_id[$i]->id)
                     ->update(['fees_status' => 'Not Complete']);
-            }
 
-            DB::table('fees_new_organization_user')->insert($array);
+                if($i = count($parent_id) - 1)
+                    DB::table('fees_new_organization_user')->insert($array);
+            }
 
             return redirect('/fees/A')->with('success', 'Yuran Kategori A telah berjaya dimasukkan');
         }
@@ -599,8 +616,8 @@ class FeesController extends AppBaseController
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });
 
@@ -797,8 +814,11 @@ class FeesController extends AppBaseController
             $fees_student = DB::table('class_student')
                 ->where('id', $list[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
+            
+            if($i = count($list) - 1)
+                DB::table('student_fees_new')->insert($array);
         }
-        DB::table('student_fees_new')->insert($array);
+
         if ($category == "Kategory B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
@@ -945,8 +965,11 @@ class FeesController extends AppBaseController
             $fees_student = DB::table('class_student')
                 ->where('id', $list_student[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
+            
+            if($i = count($list_student) - 1)
+                DB::table('student_fees_new')->insert($array);
         }
-        DB::table('student_fees_new')->insert($array);
+        
         if ($category == "Kategory B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
