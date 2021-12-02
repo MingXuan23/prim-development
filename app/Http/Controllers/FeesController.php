@@ -90,9 +90,6 @@ class FeesController extends AppBaseController
 
     public function update(Request $request, $id)
     {
-        //
-        // dd($request);
-        //class return array
         $class = $request->get('cb_class');
 
         $req = DB::table('organizations')
@@ -102,11 +99,6 @@ class FeesController extends AppBaseController
             ->where('organizations.id', $request->get('organization'))
             ->whereIn('classes.id', $class)
             ->get()->toArray();
-
-        // $getclassfees = DB::table('class_fees')->where('class_organization_id', $list->co_id->array())->get();
-        // $arr = $req->toArray();
-        // dd(count($req));
-        // dd($req[0]);
 
         //get all class that have been store with that fees
         $getclassfees = DB::table('fees')
@@ -159,12 +151,9 @@ class FeesController extends AppBaseController
 
     public function destroy($id)
     {
-        // dd($id);
         $result = DB::table('fees_new')
-                    ->where('id', '=', $id)
-                    ->update([
-                        'status' => 0
-                    ]);
+            ->where('id', '=', $id)
+            ->delete();
         
 
         if ($result) {
@@ -476,7 +465,6 @@ class FeesController extends AppBaseController
                 ->orderBy('students.nama')
                 ->get();
 
-
             // dd($first);
             $table = Datatables::of($data);
 
@@ -542,23 +530,17 @@ class FeesController extends AppBaseController
                 ->where('role_id', 6)
                 ->where('status', 1)
                 ->get();
-            
-            // dd(count($parent_id));
 
             for ($i = 0; $i < count($parent_id); $i++) {
-                $array[] = array(
-                    'status' => 'Debt',
-                    'fees_new_id' => $fee->id,
-                    'organization_user_id' => $parent_id[$i]->id,
-
-                );
-
                 $fees_parent = DB::table('organization_user')
                     ->where('id', $parent_id[$i]->id)
                     ->update(['fees_status' => 'Not Complete']);
 
-                if($i = count($parent_id) - 1)
-                    DB::table('fees_new_organization_user')->insert($array);
+                DB::table('fees_new_organization_user')->insert([
+                    'status' => 'Debt',
+                    'fees_new_id' => $fee->id,
+                    'organization_user_id' => $parent_id[$i]->id,
+                ]);
             }
 
             return redirect('/fees/A')->with('success', 'Yuran Kategori A telah berjaya dimasukkan');
@@ -595,9 +577,6 @@ class FeesController extends AppBaseController
                         ->where('status', "1")
                         ->get();
                 }
-
-
-                // dd($data);
             }
             $table = Datatables::of($data);
 
@@ -616,7 +595,7 @@ class FeesController extends AppBaseController
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });
@@ -646,11 +625,11 @@ class FeesController extends AppBaseController
         // dd($request->toArray());
         $dt = Carbon::now();
 
-        $gender      = "";
-        $class      = $request->get('cb_class');
-        $level      = $request->get('level');
-        $year       = $request->get('year');
-        $name       = $request->get('name');
+        $gender         = "";
+        $class          = $request->get('cb_class');
+        $level          = $request->get('level');
+        $year           = $request->get('year');
+        $name           = $request->get('name');
         $price          = $request->get('price');
         $quantity       = $request->get('quantity');
         $desc           = $request->get('description');
@@ -802,21 +781,17 @@ class FeesController extends AppBaseController
 
         ]);
 
-        // dd($oid);
         for ($i = 0; $i < count($list); $i++) {
-            $array[] = array(
-                'status' => 'Debt',
-                'fees_id' => $fees,
-                'class_student_id' => $list[$i]->class_student_id,
-
-            );
 
             $fees_student = DB::table('class_student')
                 ->where('id', $list[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
             
-            if($i = count($list) - 1)
-                DB::table('student_fees_new')->insert($array);
+            DB::table('student_fees_new')->insert([
+                'status' => 'Debt',
+                'fees_id' => $fees,
+                'class_student_id' => $list[$i]->class_student_id,
+            ]);
         }
 
         if ($category == "Kategory B") {
@@ -875,18 +850,18 @@ class FeesController extends AppBaseController
         ]);
 
         for ($i = 0; $i < count($list); $i++) {
-            $array[] = array(
-                'status' => 'Debt',
-                'fees_id' => $fees,
-                'class_student_id' => $list[$i]->class_student_id,
-
-            );
 
             $fees_student = DB::table('class_student')
                 ->where('id', $list[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
+
+            DB::table('student_fees_new')->insert([
+                'status' => 'Debt',
+                'fees_id' => $fees,
+                'class_student_id' => $list[$i]->class_student_id,
+            ]);
         }
-        DB::table('student_fees_new')->insert($array);
+
         if ($category == "Kategory B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
@@ -940,34 +915,29 @@ class FeesController extends AppBaseController
         $target = json_encode($data);
 
         $fees = DB::table('fees_new')->insertGetId([
-            'name'          => $name,
-            'desc'          => $desc,
-            'category'      => $category,
-            'quantity'      => $quantity,
-            'price'         => $price,
+            'name'              => $name,
+            'desc'              => $desc,
+            'category'          => $category,
+            'quantity'          => $quantity,
+            'price'             => $price,
             'totalAmount'       => $total,
             'start_date'        => $date_started,
             'end_date'          => $date_end,
             'status'            => "1",
             'target'            => $target,
             'organization_id'   => $oid,
-
         ]);
-
+        
         for ($i = 0; $i < count($list_student); $i++) {
-            $array[] = array(
-                'status' => 'Debt',
-                'fees_id' => $fees,
-                'class_student_id' => $list_student[$i]->class_student_id,
-
-            );
-
             $fees_student = DB::table('class_student')
                 ->where('id', $list_student[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
-            
-            if($i = count($list_student) - 1)
-                DB::table('student_fees_new')->insert($array);
+
+            DB::table('student_fees_new')->insert([
+                'status' => 'Debt',
+                'fees_id' => $fees,
+                'class_student_id' => $list_student[$i]->class_student_id,
+            ]);
         }
         
         if ($category == "Kategory B") {
