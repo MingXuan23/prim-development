@@ -236,4 +236,28 @@ class LandingPageController extends AppBaseController
             return $posters;
         }
     }
+
+    public function getHeaderPoster()
+    {  
+        $posters = '';
+
+        $donations = DB::table('donations')
+                    ->where('donations.status', 1)
+                    ->orderBy('donations.date_created','desc')
+                    ->inRandomOrder()
+                    ->limit(5)
+                    ->get();
+
+        foreach ($donations as $donation) {
+            $posters = $posters . '<div class="card"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">';
+            $posters = $posters . '<img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap"></a></div>';
+        }
+        
+        if($posters === '')
+        {
+            return '';
+        }
+
+        return $posters;
+    }
 }

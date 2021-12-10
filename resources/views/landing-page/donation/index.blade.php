@@ -63,26 +63,29 @@
 
     <!-- header area start  -->
     <header class="header-area header-bg-2 style-two" id="home">
-        <div class="header-right-image  wow zoomIn" style="text-align: right">
+        <!-- <div class="header-right-image  wow zoomIn" style="text-align: right">
             <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="padding-bottom: 482px;
             max-width: 70%;">
-        </div>
+        </div> -->
         <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
-                    <div class="header-inner">
-                        <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
-                            berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
-                        <div class="btn-wrapper wow fadeInUp">
-                            <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
-
-                            {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
-                        </div>
+                <div class="row d-flex align-items-center ">
+                    <div class="col-lg-7">
+                        <div class="header-inner">
+                            <h1 class="title wow fadeInDown">PRiM</h1>
+                            <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                                berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
+                                <div class="btn-wrapper wow fadeInUp">
+                                    <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
+                                    
+                                    {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
+                                        <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
+                                </div>
+                         </div>
+                    </div>
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
                     </div>
                 </div>
-            </div>
         </div>
     </header>
     <!-- header area end  -->
@@ -596,6 +599,37 @@
         window.onload = function() {
             document.getElementById("2").click();
         };
+
+        $.ajax({
+            url: "{{ route('landingpage.donation.header') }}",
+            type: 'GET',
+            success: function( result ){
+
+                $('#headerPoster').html( result );
+                $('#headerPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                $('#headerPoster').find('.owl-stage-outer').children().unwrap();
+                $('#headerPoster').owlCarousel({
+                    loop:true,
+                    autoplay:true,
+                    autoplayTimeout:5000,
+                    responsiveClass:true,
+                    responsive:{
+                        0:{
+                            items:1,
+                            nav:false
+                        },
+                        600:{
+                            items:1,
+                            nav:false
+                        },
+                        1000:{
+                            items:1,
+                            nav:false,
+                        }
+                    }, 
+                });
+            }
+        });
 
         $('.phone_no').mask('00000000000');
 
