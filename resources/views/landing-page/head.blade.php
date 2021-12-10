@@ -22,9 +22,9 @@
 <link rel="stylesheet" href="{{ URL::asset('assets/libs/slick/slick.css') }}">
 <!-- Default CSS -->
 <link rel="stylesheet" href="{{ URL::asset('assets/css/default.css') }}">
+
 <!-- Header CSS -->
 <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/scss/sections/_header.scss') }}">
-
 
 <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
 
@@ -118,6 +118,12 @@
     .header-poster{
         width: 230px;
         height: 625px;
+    }
+
+    .header-area {
+        padding: 140px 0 252px 0;
+        background-color: #fff;
+        position: relative;
     }
 
 </style>
