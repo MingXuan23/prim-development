@@ -250,7 +250,7 @@ class LandingPageController extends AppBaseController
 
         foreach ($donations as $donation) {
             $posters = $posters . '<div class="card"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">';
-            $posters = $posters . '<img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap"></a></div>';
+            $posters = $posters . '<img class="card-img-top header-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap"></a></div>';
         }
         
         if($posters === '')
