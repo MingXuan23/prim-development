@@ -207,7 +207,19 @@
                         </div>
                         <div class="content">
                             <span class="count-num">{{ $transactions }}</span>
-                            <h4 class="title">Jumlah transaksi</h4>
+                            <h4 class="title">Jumlah Transaksi</h4>
+                        </div>
+                    </div><!-- //. single counter item -->
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="single-counter-item">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-save-money"></i>
+                        </div>
+                        <div class="content">
+                            <span class="count-num">{{ $dailyGain }}</span>
+                            <h4 class="title">Jumlah Derma</h4>
                         </div>
                     </div><!-- //. single counter item -->
                 </div>
