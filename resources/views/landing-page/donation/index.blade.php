@@ -34,9 +34,10 @@
         <div class="container nav-container">
             <div class="responsive-mobile-menu">
                 <div class="logo-wrapper">
-                    <a href="index.html" class="logo">
+                    <!-- <a href="index.html" class="logo">
                         <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
-                    </a>
+                    </a> -->
+                    <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
                     aria-expanded="false" aria-label="Toggle navigation">
