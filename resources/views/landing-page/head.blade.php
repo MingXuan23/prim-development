@@ -118,9 +118,10 @@
     .header-poster{
         /* width: 230px;
         height: 625px; */
-        width: 294px;
-        height: 480px;
+        width: auto;
+        height: 520px;
         flex-grow: 1;
+        
         z-index: -1;
     }
 
