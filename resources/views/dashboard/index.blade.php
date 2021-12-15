@@ -76,7 +76,7 @@
                 }
 
                 document.getElementById("p_donation_day").innerHTML = "Keseluruhan";
-                document.getElementById("total_donation").innerHTML = "RM " + totalAmount;
+                document.getElementById("total_donation").innerHTML = "RM " + (Math.round(totalAmount * 100) / 100).toFixed(2);
                 document.getElementById("p_donor_day").innerHTML = "Keseluruhan";
                 document.getElementById("total_donor").innerHTML = totalDonor;
 
