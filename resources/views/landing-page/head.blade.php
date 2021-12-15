@@ -116,14 +116,15 @@
     }
 
     .header-poster{
-        width: 230px;
-        height: 625px;
+        /* width: 230px;
+        height: 625px; */
+        width: 320px;
+        height: 450px;
     }
 
     .header-area {
-        padding: 140px 0 252px 0;
+        padding: 140px 0 0 0;
         background-color: #fff;
         position: relative;
     }
-
 </style>

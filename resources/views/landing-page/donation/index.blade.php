@@ -62,30 +62,42 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="header-area header-bg-2 style-two" id="home">
-        <!-- <div class="header-right-image  wow zoomIn" style="text-align: right">
+    <header class="header-area header-bg-2 style-two" id="home" style="margin-bottom: 10px;">
+        <!-- <div class="header-right-image wow zoomIn" style="text-align: right">
             <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="padding-bottom: 482px;
             max-width: 70%;">
         </div> -->
+
         <div class="container">
-                <div class="row d-flex align-items-center ">
-                    <div class="col-lg-7">
-                        <div class="header-inner">
-                            <h1 class="title wow fadeInDown">PRiM</h1>
-                            <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
-                                berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
-                                <div class="btn-wrapper wow fadeInUp">
-                                    <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
-                                    
-                                    {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                                        <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
-                                </div>
-                         </div>
-                    </div>
-                    <div class="col-lg-5 d-none d-lg-block">
-                        <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
-                    </div>
+            <div class="row d-flex align-items-center">
+                <!-- <div class="col-lg-7">
+                    <div class="header-inner">
+                        <h1 class="title wow fadeInDown">PRiM</h1>
+                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                            berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
+                            <div class="btn-wrapper wow fadeInUp">
+                                <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
+                                
+                                {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
+                                    <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
+                            </div>
+                        </div>
+                </div> -->
+                <div class="col-lg-5">
+                    <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
                 </div>
+                <div class="col-lg-7 align-items-center d-none d-lg-block" style="text-align: right">
+                    <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="max-width: 100%;">
+                </div>
+            </div>
+            <div class="row justify-content-center" style="padding-top: 150px">
+                <h1 class="title wow fadeInDown">PRiM</h1>
+                <p class="text-center">Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
+                <div class="btn-wrapper wow fadeInUp">
+                    <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
+                </div>
+            </div>
         </div>
     </header>
     <!-- header area end  -->
