@@ -338,7 +338,7 @@
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-school"></i>
-                                    Kebajikan Pelajar </a>
+                                    PIBG Sekolah </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
