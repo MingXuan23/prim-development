@@ -118,14 +118,15 @@
     .header-poster{
         /* width: 230px;
         height: 625px; */
-        width: 320px;
-        height: 450px;
+        width: 294px;
+        height: 480px;
+        flex-grow: 1;
+        z-index: -1;
     }
 
     .header-area {
         padding: 140px 0 0 0;
         background-color: #fff;
         position: relative;
-        z-index: -1;
     }
 </style>
