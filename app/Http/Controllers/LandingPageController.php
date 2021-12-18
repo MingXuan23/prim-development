@@ -95,12 +95,12 @@ class LandingPageController extends AppBaseController
     {
         $organization = Organization::all()->count();
 
-        /* $transactions = Transaction::where('nama', 'LIKE', 'Donation%')
+        $transactions = Transaction::where('nama', 'LIKE', 'Donation%')
             ->where('status', 'Success')
-            ->get()->count(); */
+            ->get()->count();
 
         // retrieve daily transactions
-        $transactions = DB::table('transactions')
+        $dailyTransactions = DB::table('transactions')
             ->where('status', 'success')
             ->where('nama', 'LIKE', 'donation%')
             ->where('datetime_created', '>', date('Y-m-d'))
@@ -131,7 +131,7 @@ class LandingPageController extends AppBaseController
             ->count();
 
         // dd($donation);
-        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain'));
+        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions'));
     }
 
     public function organizationListDonation()
