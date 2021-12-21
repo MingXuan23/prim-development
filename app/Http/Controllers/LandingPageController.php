@@ -106,6 +106,12 @@ class LandingPageController extends AppBaseController
             ->where('datetime_created', '>', date('Y-m-d'))
             ->get()->count();
 
+        $totalAmount = DB::table('transactions')
+            ->where('status', 'success')
+            ->where('nama', 'LIKE', 'donation%')
+            ->select(DB::table('transactions')->raw('sum(amount) as total_amount'))
+            ->first();
+
         $dailyGain = DB::table('transactions')
             ->where('status', 'success')
             ->where('nama', 'LIKE', 'donation%')
@@ -115,7 +121,9 @@ class LandingPageController extends AppBaseController
 
         $dailyGain = $dailyGain->total_amount;
 
-        // dd($dailyGain);
+        $totalAmount = (int) $totalAmount->total_amount;
+
+        // dd($totalAmount);
 
         /* 
             SELECT SUM(amount) AS "Total Amount"
@@ -131,7 +139,7 @@ class LandingPageController extends AppBaseController
             ->count();
 
         // dd($donation);
-        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions'));
+        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount'));
     }
 
     public function organizationListDonation()

@@ -200,7 +200,7 @@
     <section class="counterup-area">
         <div class="container">
             <div class="row justify-content-center">
-                {{-- <div class="col-lg-3 col-md-6">
+                <div class="col-lg-4 col-md-4">
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
@@ -211,44 +211,7 @@
                             <h4 class="title">Jumlah Organisasi</h4>
                         </div>
                     </div><!-- //. single counter item -->
-                </div> --}}
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="flaticon-checked"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">{{ $transactions }}</span>
-                            <h4 class="title">Jumlah Transaksi</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="flaticon-transaction"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">{{ $dailyTransactions }}</span>
-                            <h4 class="title">Jumlah Transaksi Hari Ini</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="flaticon-save-money"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">{{ $dailyGain }}</span>
-                            <h4 class="title">Jumlah Derma Hari Ini</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
+                    <br>
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
@@ -257,6 +220,52 @@
                         <div class="content">
                             <span class="count-num">{{ $donation }}</span>
                             <h4 class="title">Derma berdaftar</h4>
+                        </div>
+                    </div><!-- //. single counter item -->
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="single-counter-item">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-checked"></i>
+                        </div>
+                        <div class="content">
+                            RM<span class="count-num">{{ $totalAmount }}</span>
+                            <h4 class="title">Jumlah Derma</h4>
+                        </div>
+                    </div><!-- //. single counter item -->
+                    <br>
+                    <div class="single-counter-item">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-save-money"></i>
+                        </div>
+                        <div class="content">
+                            RM<span class="count-num">{{ $dailyGain }}</span>
+                            <h4 class="title">Jumlah Derma Hari Ini</h4>
+                        </div>
+                    </div><!-- //. single counter item -->  
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <div class="single-counter-item">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-donation"></i>
+                        </div>
+                        <div class="content">
+                            <span class="count-num">{{ $transactions }}</span>
+                            <h4 class="title">Jumlah Transaksi</h4>
+                        </div>
+                    </div><!-- //. single counter item -->
+                    <br>
+                    <div class="single-counter-item">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-transaction"></i>
+                        </div>
+                        <div class="content">
+                            <span class="count-num">{{ $dailyTransactions }}</span>
+                            <h4 class="title">Jumlah Transaksi Hari Ini</h4>
                         </div>
                     </div><!-- //. single counter item -->
                 </div>
