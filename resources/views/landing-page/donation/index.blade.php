@@ -200,7 +200,7 @@
     <section class="counterup-area">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-4 col-md-4" style="padding-top: 25px;">
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
@@ -211,8 +211,7 @@
                             <h4 class="title">Jumlah Organisasi</h4>
                         </div>
                     </div><!-- //. single counter item -->
-                    <br>
-                    <div class="single-counter-item">
+                    <div class="single-counter-item" style="padding-top: 25px;">
                         <!-- single counter item -->
                         <div class="icon">
                             <i class="flaticon-donation-1"></i>
@@ -223,7 +222,7 @@
                         </div>
                     </div><!-- //. single counter item -->
                 </div>
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-4 col-md-4" style="margin-top: 25px;">
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
@@ -234,8 +233,7 @@
                             <h4 class="title">Jumlah Derma</h4>
                         </div>
                     </div><!-- //. single counter item -->
-                    <br>
-                    <div class="single-counter-item">
+                    <div class="single-counter-item" style="padding-top: 25px;">
                         <!-- single counter item -->
                         <div class="icon">
                             <i class="flaticon-save-money"></i>
@@ -246,7 +244,7 @@
                         </div>
                     </div><!-- //. single counter item -->  
                 </div>
-                <div class="col-lg-4 col-md-4">
+                <div class="col-lg-4 col-md-4" style="margin-top: 25px;">
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
@@ -257,8 +255,7 @@
                             <h4 class="title">Jumlah Transaksi</h4>
                         </div>
                     </div><!-- //. single counter item -->
-                    <br>
-                    <div class="single-counter-item">
+                    <div class="single-counter-item" style="padding-top: 25px;">
                         <!-- single counter item -->
                         <div class="icon">
                             <i class="flaticon-transaction"></i>
