@@ -127,6 +127,6 @@
         padding: 140px 0 0 0;
         background-color: #fff;
         position: relative;
-        z-index: -1;
+        z-index: 0;
     }
 </style>
