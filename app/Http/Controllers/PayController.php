@@ -396,7 +396,7 @@ class PayController extends AppBaseController
             }
 
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
-            $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
+            $fpx_sellerOrderNo  = "PRIM" . $request->o_id . "_" . date('YmdHis') . rand(10000, 99999);
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
