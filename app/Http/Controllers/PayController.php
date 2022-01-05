@@ -295,6 +295,7 @@ class PayController extends AppBaseController
         $list_parent_fees_id    = $request->parent_fees_id;
 
         $id = explode("_", $request->fpx_sellerOrderNo);
+        $id = str_replace("PRIM", "", $id[0]);
 
         if ($transaction->save()) {
 
@@ -327,7 +328,7 @@ class PayController extends AppBaseController
                     }
                 }
             } else {
-                $transaction->donation()->attach($id[1], ['payment_type_id' => 1]);
+                $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
         }
     }
