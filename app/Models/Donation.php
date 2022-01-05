@@ -80,11 +80,11 @@ class Donation extends Model
         //     $query->where("nama", $transaction_name);
         // })->first();
 
-        $donation = DB::table('donations d')
-                    ->leftJoin('donation_transaction', "d.id", "dt.donation_id")
-                    ->leftJoin("transactions t", "t.id", "=", "dt.transaction_id")
-                    ->where("t.nama", $transaction_name)
-                    ->select('d.*')
+        $donation = DB::table('donations')
+                    ->leftJoin('donation_transaction', "donations.id", "donation_transaction.donation_id")
+                    ->leftJoin("transactions", "transactions.id", "=", "donation_transaction.transaction_id")
+                    ->where("transactions.nama", $transaction_name)
+                    ->select('donations.*')
                     ->first();
 
         return $donation;
