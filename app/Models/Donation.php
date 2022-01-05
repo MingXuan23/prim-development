@@ -5,6 +5,7 @@ namespace App\Models;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 
 class Donation extends Model
@@ -75,9 +76,16 @@ class Donation extends Model
 
     public function getDonationByTransactionName($transaction_name)
     {
-        $donation = Donation::with(["transaction"])->whereHas('transaction', function ($query) use ($transaction_name) {
-            $query->where("nama", $transaction_name);
-        })->first();
+        // $donation = Donation::with(["transaction"])->whereHas('transaction', function ($query) use ($transaction_name) {
+        //     $query->where("nama", $transaction_name);
+        // })->first();
+
+        $donation = DB::table('donations d')
+                    ->leftJoin('donation_transaction', "d.id", "dt.donation_id")
+                    ->leftJoin("transactions t", "t.id", "=", "dt.transaction_id")
+                    ->where("t.nama", $transaction_name)
+                    ->select('d.*')
+                    ->first();
 
         return $donation;
     }
