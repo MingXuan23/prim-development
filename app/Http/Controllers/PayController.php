@@ -295,7 +295,7 @@ class PayController extends AppBaseController
         $list_parent_fees_id    = $request->parent_fees_id;
 
         $id = explode("_", $request->fpx_sellerOrderNo);
-        $id = str_replace("PRIM", "", $id[0]);
+        $id = (int) str_replace("PRIM", "", $id[0]);
 
         if ($transaction->save()) {
 
@@ -396,7 +396,7 @@ class PayController extends AppBaseController
             }
 
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
-            $fpx_sellerOrderNo  = "PRIM" . $request->o_id . "_" . date('YmdHis') . rand(10000, 99999);
+            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->o_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . rand(10000, 99999);
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
