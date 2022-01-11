@@ -698,7 +698,13 @@ class PayController extends AppBaseController
         // parent user id
 
         // dd($transaction_id);
-        $userid = Auth::id();
+        $userid = DB::table("transactions")
+                ->where('id', $transaction_id)
+                ->select('user_id')
+                ->get();
+
+        dd($userid);
+        
         $id = $transaction_id;
         // $userid = 4;
 

@@ -222,9 +222,7 @@
                                                                         data-parent="#accordionExample{{ $data->studentid }}-{{ $data->organization_id  }}"
                                                                         class="collapse show">
                                                                         <div class="card-body pl-0 pr-0">
-                                                                            @foreach($getfees_bystudent->where('studentid',
-                                                                            $data->studentid)->where('category',
-                                                                            $data->category) as $item)
+                                                                            @foreach($getfees_bystudent->where('studentid', $data->studentid)->where('category',$data->category) as $item)
                                                                             <div class="inputGroup">
                                                                                 <input
                                                                                     id="option-{{ $item->id }}-{{ $data->studentid }}"
@@ -233,15 +231,10 @@
                                                                                     onchange="checkD(this)"
                                                                                     type="checkbox" />
 
-                                                                                <label
-                                                                                    for="option-{{ $item->id }}-{{ $data->studentid }}">
-                                                                                    <span
-                                                                                        style="font-size: 18px">{{ $item->name }}</span>
+                                                                                <label for="option-{{ $item->id }}-{{ $data->studentid }}">
+                                                                                    <span style="font-size: 18px">{{ $item->name }}</span>
                                                                                     <br>
-                                                                                    <span
-                                                                                        style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->totalAmount, 2, '.', '') }}
-                                                                                        ({{ $item->quantity }}
-                                                                                        kuantiti)</span>
+                                                                                    <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->totalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span>
                                                                                 </label>
 
                                                                                 {{-- hidden input checkbox second --}}
@@ -410,8 +403,6 @@
         } 
         
     }
-
-     
     
 
     function checkD(element) {
@@ -509,10 +500,6 @@
             $('input[name="checkall"]').prop("checked", true);
     }
 
-
-    
-
-  
         // $('.getid').children().prop('disabled', true);
 
         // $('.getid').on("click",function(){
