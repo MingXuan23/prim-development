@@ -224,6 +224,8 @@
         }
     }
 
+    var arr = [];
+
     $.ajax({
         type: 'GET',
         dataType: 'json',
