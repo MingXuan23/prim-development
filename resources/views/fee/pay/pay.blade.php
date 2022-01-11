@@ -9,8 +9,8 @@ For B2B1, message.token = 02 */
 
 $fpx_msgToken="01";
 $fpx_msgType="BE";
-// $fpx_sellerExId=config('app.env') == 'production' ? "EX00011125" : "EX00012323";
-$fpx_sellerExId="EX00012323";
+$fpx_sellerExId=config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+// $fpx_sellerExId="EX00012323";
 $fpx_version="6.0";
 /* Generating signing String */
 $data=$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_version;
@@ -28,8 +28,8 @@ extract($_POST);
 $fields_string="";
 
 //set POST variables
-// $url = config('app.env') == 'production' ? config('app.PRODUCTION_BE_URL') : config('app.UAT_BE_URL');
-$url = config('app.UAT_BE_URL');
+$url = config('app.env') == 'production' ? config('app.PRODUCTION_BE_URL') : config('app.UAT_BE_URL');
+// $url = config('app.UAT_BE_URL');
 
 $fields = array(
             'fpx_msgToken' => urlencode($fpx_msgToken),
@@ -141,6 +141,8 @@ try {
         $bank_list['UOB0226']['nama']   = $bank_list['UOB0226']['value']  == "A" ? "UOB Bank" : "UOB Bank (OFFLINE)";
         // $bank_list['UOB0229']['nama']   = $bank_list['UOB0229']['value']  == "A" ? "UOB Bank - Test ID" : "UOB Bank - Test ID (OFFLINE)";
     }
+    
+    // dd($bank_list);
 
     // $bank_list['ABB0234']['nama']   = $bank_list['ABB0234']['value'] == "A" ? "Affin B2C - Test ID" : "Affin B2C - Test ID (OFFLINE)";
     // $bank_list['ABB0233']['nama']   = $bank_list['ABB0233']['value'] == "A" ? "Affin Bank" : "Affin Bank (OFFLINE)";
@@ -341,17 +343,17 @@ catch(Exception $e){
 
                 <div class="form-group">
                     <label for="sel1">Sila Pilih Bank:</label>
-                    <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
-                    {{-- <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
-                        <option value="">Pilih bank</option>
-                    </select> --}}
 
-                    <select name="bankid" id="bankid" class="form-control">
-                        <option value="">Pilih bank</option>
-                        @foreach ($bank_list as $key=>$value)
-                        <option value="{{ $value['key'] }}">{{ $value['nama'] }}</option>
-                        @endforeach
-                    </select>
+                    <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
+                        <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
+                            <option value="">Pilih bank</option>
+                        </select>
+                        {{-- <select name="bankid" id="bankid" class="form-control">
+                            <option value="">Pilih bank</option>
+                            @foreach ($bank_list as $key=>$value)
+                            <option value="{{ $value['key'] }}">{{ $value['nama'] }}</option>
+                            @endforeach
+                        </select> --}}
                 </div>
 
                 @if ($getfees_category_A)
@@ -425,22 +427,22 @@ catch(Exception $e){
         }
     }
 
-    // $.ajax({
-    //     type: 'GET',
-    //     dataType: 'json',
-    //     url: "/fpx/getBankList",
-    //     success: function(data) {
-    //         jQuery.each(data.data, function(key, value){
-    //             arr.push(key);
-    //         });
-    //         for(var i = 0; i < arr.length; i++){
-    //             arr.sort();
-    //             $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-    //         }
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: "/fpx/getBankList",
+        success: function(data) {
+            jQuery.each(data.data, function(key, value){
+                arr.push(key);
+            });
+            for(var i = 0; i < arr.length; i++){
+                arr.sort();
+                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
+            }
 
-    //     },
-    //     error: function (data) {
-    //         // console.log(data);
-    //     }
-    // });
+        },
+        error: function (data) {
+            // console.log(data);
+        }
+    });
 </script>
