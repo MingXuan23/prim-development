@@ -341,12 +341,12 @@ catch(Exception $e){
 
                 <div class="form-group">
                     <label for="sel1">Sila Pilih Bank:</label>
+                    <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
                     <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
                         <option value="">Pilih bank</option>
                     </select>
-                    {{-- <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
 
-                        <select name="bankid" id="bankid" class="form-control">
+                        {{-- <select name="bankid" id="bankid" class="form-control">
                             <option value="">Pilih bank</option>
                             @foreach ($bank_list as $key=>$value)
                             <option value="{{ $value['key'] }}">{{ $value['nama'] }}</option>
