@@ -167,7 +167,7 @@ Route::group(['middleware' => ['auth']], function () {
         'reminder'           => 'ReminderController',
         'activity'           => 'ActivityController',
         'session'            => 'SessionController',
-        'profile'            => 'ProfileController'
+        // 'profile'            => 'ProfileController'
     ]);
 });
 

@@ -195,7 +195,9 @@
                             <div class="dropdown-menu dropdown-menu-right">
                                 <!-- item-->
                                     <!-- item1 profile CHANGE THE ROUTE HERE-->
-                                    @if ($unseenProfile == 'true'){
+                                    @if ($unseenProfile == true){
+                                        
+                                        <!-- <a class="dropdown-item" href="{{ route('profile_user') }}"><i class="mdi mdi-account-circle font-size-17 align-middle mr-1"></i> Profile</a> -->
                                         <a class="dropdown-item" href="{{ route('profile') }}"><i class="mdi mdi-account-circle font-size-17 align-middle mr-1"></i> Profile</a>
                                     }
                                    
