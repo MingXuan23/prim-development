@@ -701,7 +701,7 @@ class PayController extends AppBaseController
         $userid = DB::table("transactions")
                 ->where('id', $transaction_id)
                 ->select('user_id as id')
-                ->get();
+                ->first();
         
         $userid = $userid->id;
 
