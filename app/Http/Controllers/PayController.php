@@ -704,11 +704,8 @@ class PayController extends AppBaseController
                 ->first();
         
         $userid = $userid->id;
-
-        // dd($userid);
         
         $id = $transaction_id;
-        // $userid = 4;
 
         // details parents
         $getparent = DB::table('users')
