@@ -242,6 +242,7 @@ class DonationController extends Controller
             ->join('donation_organization', 'organizations.id', '=', 'donation_organization.organization_id')
             ->join('donations', 'donation_organization.donation_id', '=', 'donations.id')
             ->where('donations.status', 1)
+            ->orderBy('donations.nama')
             ->get();
         } else {
             return Organization::select('*')

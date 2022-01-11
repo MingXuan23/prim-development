@@ -34,9 +34,10 @@
         <div class="container nav-container">
             <div class="responsive-mobile-menu">
                 <div class="logo-wrapper">
-                    <a href="index.html" class="logo">
+                    <!-- <a href="index.html" class="logo">
                         <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
-                    </a>
+                    </a> -->
+                    <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -62,25 +63,40 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="header-area header-bg-2 style-two" id="home">
-        <div class="header-right-image  wow zoomIn" style="text-align: right">
+    <header class="header-area header-bg-2 style-two" id="home" style="margin-bottom: 10px;">
+        <!-- <div class="header-right-image wow zoomIn" style="text-align: right">
             <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="padding-bottom: 482px;
             max-width: 70%;">
-        </div>
+        </div> -->
+
         <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
+            <div class="row d-flex align-items-center">
+                <!-- <div class="col-lg-7">
                     <div class="header-inner">
                         <h1 class="title wow fadeInDown">PRiM</h1>
                         <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
                             berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
-                        <div class="btn-wrapper wow fadeInUp">
-                            <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
-
-                            {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
+                            <div class="btn-wrapper wow fadeInUp">
+                                <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
+                                
+                                {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
+                                    <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
+                            </div>
                         </div>
-                    </div>
+                </div> -->
+                <div class="col-lg-5">
+                    <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
+                </div>
+                <div class="col-lg-7 align-items-center d-none d-lg-block" style="text-align: right">
+                    <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="max-width: 100%;">
+                </div>
+            </div>
+            <div class="row justify-content-center" style="padding-top: 150px">
+                <h1 class="title wow fadeInDown">PRiM</h1>
+                <p class="text-center">Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
+                <div class="btn-wrapper wow fadeInUp">
+                    <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                 </div>
             </div>
         </div>
@@ -184,7 +200,7 @@
     <section class="counterup-area">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-4 col-md-4" style="padding-top: 25px;">
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
@@ -195,21 +211,7 @@
                             <h4 class="title">Jumlah Organisasi</h4>
                         </div>
                     </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="flaticon-transaction"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">{{ $transactions }}</span>
-                            <h4 class="title">Jumlah transaksi</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
+                    <div class="single-counter-item" style="padding-top: 25px;">
                         <!-- single counter item -->
                         <div class="icon">
                             <i class="flaticon-donation-1"></i>
@@ -217,6 +219,50 @@
                         <div class="content">
                             <span class="count-num">{{ $donation }}</span>
                             <h4 class="title">Derma berdaftar</h4>
+                        </div>
+                    </div><!-- //. single counter item -->
+                </div>
+                <div class="col-lg-4 col-md-4" style="margin-top: 25px;">
+                    <div class="single-counter-item">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-checked"></i>
+                        </div>
+                        <div class="content">
+                            RM<span class="count-num">{{ $totalAmount }}</span>
+                            <h4 class="title">Jumlah Derma</h4>
+                        </div>
+                    </div><!-- //. single counter item -->
+                    <div class="single-counter-item" style="padding-top: 25px;">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-save-money"></i>
+                        </div>
+                        <div class="content">
+                            RM<span class="count-num">{{ $dailyGain }}</span>
+                            <h4 class="title">Jumlah Derma Hari Ini</h4>
+                        </div>
+                    </div><!-- //. single counter item -->  
+                </div>
+                <div class="col-lg-4 col-md-4" style="margin-top: 25px;">
+                    <div class="single-counter-item">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-donation"></i>
+                        </div>
+                        <div class="content">
+                            <span class="count-num">{{ $transactions }}</span>
+                            <h4 class="title">Jumlah Transaksi</h4>
+                        </div>
+                    </div><!-- //. single counter item -->
+                    <div class="single-counter-item" style="padding-top: 25px;">
+                        <!-- single counter item -->
+                        <div class="icon">
+                            <i class="flaticon-transaction"></i>
+                        </div>
+                        <div class="content">
+                            <span class="count-num">{{ $dailyTransactions }}</span>
+                            <h4 class="title">Jumlah Transaksi Hari Ini</h4>
                         </div>
                     </div><!-- //. single counter item -->
                 </div>
@@ -323,7 +369,7 @@
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-school"></i>
-                                    Kebajikan Pelajar </a>
+                                    PIBG Sekolah </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
@@ -596,6 +642,37 @@
         window.onload = function() {
             document.getElementById("2").click();
         };
+
+        $.ajax({
+            url: "{{ route('landingpage.donation.header') }}",
+            type: 'GET',
+            success: function( result ){
+
+                $('#headerPoster').html( result );
+                $('#headerPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                $('#headerPoster').find('.owl-stage-outer').children().unwrap();
+                $('#headerPoster').owlCarousel({
+                    loop:true,
+                    autoplay:true,
+                    autoplayTimeout:5000,
+                    responsiveClass:true,
+                    responsive:{
+                        0:{
+                            items:1,
+                            nav:false
+                        },
+                        600:{
+                            items:1,
+                            nav:false
+                        },
+                        1000:{
+                            items:1,
+                            nav:false,
+                        }
+                    }, 
+                });
+            }
+        });
 
         $('.phone_no').mask('00000000000');
 

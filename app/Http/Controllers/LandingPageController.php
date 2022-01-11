@@ -94,13 +94,52 @@ class LandingPageController extends AppBaseController
     public function indexDonation()
     {
         $organization = Organization::all()->count();
+
         $transactions = Transaction::where('nama', 'LIKE', 'Donation%')
             ->where('status', 'Success')
             ->get()->count();
-        $donation = Donation::all()->count();
 
-        // dd($transactions->count());
-        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation'));
+        // retrieve daily transactions
+        $dailyTransactions = DB::table('transactions')
+            ->where('status', 'success')
+            ->where('nama', 'LIKE', 'donation%')
+            ->where('datetime_created', '>', date('Y-m-d'))
+            ->get()->count();
+
+        $totalAmount = DB::table('transactions')
+            ->where('status', 'success')
+            ->where('nama', 'LIKE', 'donation%')
+            ->select(DB::table('transactions')->raw('sum(amount) as total_amount'))
+            ->first();
+
+        $dailyGain = DB::table('transactions')
+            ->where('status', 'success')
+            ->where('nama', 'LIKE', 'donation%')
+            ->where('datetime_created', '>', date('Y-m-d'))
+            ->select(DB::table('transactions')->raw('sum(amount) as total_amount'))
+            ->first();
+
+        $dailyGain = $dailyGain->total_amount;
+
+        $totalAmount = (int) $totalAmount->total_amount;
+
+        // dd($totalAmount);
+
+        /* 
+            SELECT SUM(amount) AS "Total Amount"
+            FROM transactions	
+            WHERE datetime_created > CURDATE()
+            AND `nama` LIKE "Donation%"
+            AND `status` = "success";
+        */
+
+        $donation = DB::table('donations')
+            ->where('status', 1)
+            ->get()
+            ->count();
+
+        // dd($donation);
+        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount'));
     }
 
     public function organizationListDonation()
@@ -151,13 +190,13 @@ class LandingPageController extends AppBaseController
     public function getOrganizationDatatable(Request $request)
     {
         $data = $this->getOrganizationByType($request->type);
-        
+
         $table = Datatables::of($data);
 
         $table->addColumn('action', function ($row) {
             $btn = '<div class="d-flex justify-content-center">';
             // $btn = $btn . '<a class="btn btn-outline-primary waves-effect waves-light btn-sm btn-donation" data-toggle="modal" data-target=".modal-derma" id="'. $row->id . '">Derma</a></div>';
-            $btn = $btn . '<a href="#" class="boxed-btn btn-rounded btn-donation" data-toggle="modal" data-target=".modal-derma" id="'. $row->id . '" style="color: white;">Derma</a></div>';
+            $btn = $btn . '<a href="#" class="boxed-btn btn-rounded btn-donation" data-toggle="modal" data-target=".modal-derma" id="' . $row->id . '" style="color: white;">Derma</a></div>';
 
             return $btn;
         });
@@ -174,7 +213,7 @@ class LandingPageController extends AppBaseController
         $table->addColumn('action', function ($row) {
             $btn = '<div class="d-flex justify-content-center">';
             //$btn = $btn . '<a href="sumbangan/' . $row->url . ' " class="boxed-btn btn-rounded btn-donation">Bayar</a></div>';
-            $btn = $btn . '<a href="#" class="boxed-btn btn-rounded btn-donation" data-toggle="modal" data-target=".modal-derma" id="'. $row->id . '" style="color: white;">Derma</a></div>';
+            $btn = $btn . '<a href="#" class="boxed-btn btn-rounded btn-donation" data-toggle="modal" data-target=".modal-derma" id="' . $row->id . '" style="color: white;">Derma</a></div>';
             return $btn;
         });
         $table->rawColumns(['action']);
@@ -185,15 +224,15 @@ class LandingPageController extends AppBaseController
     {
         // dd($request->type);
         $data = Donation::where('donations.donation_type', $request->type)
-                        ->where('donations.status', 1)
-                        ->get();
+            ->where('donations.status', 1)
+            ->get();
         $table = Datatables::of($data);
-        $table->addColumn('email', function($row){
+        $table->addColumn('email', function ($row) {
             $data1 = $this->getOrganizationByDonationId($row->id);
             $data2 = $data1->email;
             return $data2;
         });
-        $table->addColumn('telno', function($row){
+        $table->addColumn('telno', function ($row) {
             $data1 = $this->getOrganizationByDonationId($row->id);
             $data2 = $data1->telno;
             return $data2;
@@ -211,29 +250,49 @@ class LandingPageController extends AppBaseController
     }
 
     public function getDonationByTabbing(Request $request)
-    {  
-        if($request->ajax())
-        {
+    {
+        if ($request->ajax()) {
             $posters = '';
             $donations = DB::table('donations')
-                        ->where('donations.donation_type', $request->type)
-                        ->where('donations.status', 1)
-                        ->orderBy('donations.date_created','desc')
-                        ->get();
+                ->where('donations.donation_type', $request->type)
+                ->where('donations.status', 1)
+                ->orderBy('donations.date_created', 'desc')
+                ->get();
             foreach ($donations as $donation) {
                 $posters = $posters . '<div class="card"> <img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap">';
                 $posters = $posters . '<div class="card-body"><div class="d-flex flex-column justify-content-center ">';
                 $posters = $posters . '<a href="' . route('URLdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a></div>';
                 $posters = $posters . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div></div></div>';
             }
-            
-            if($posters === '')
-            {
+
+            if ($posters === '') {
                 return '';
                 // return '<div class="d-flex justify-content-center">Tiada Makulmat Dipaparkan</div>';
             }
-                     
+
             return $posters;
         }
+    }
+
+    public function getHeaderPoster()
+    {
+        $posters = '';
+
+        $donations = DB::table('donations')
+            ->where('donations.status', 1)
+            ->inRandomOrder()
+            ->limit(5)
+            ->get();
+
+        foreach ($donations as $donation) {
+            $posters = $posters . '<div class="card"><a href="' . route('ANONdonate', ['link' => $donation->url]) . '">';
+            $posters = $posters . '<img class="card-img-top header-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap"></a></div>';
+        }
+
+        if ($posters === '') {
+            return '';
+        }
+
+        return $posters;
     }
 }

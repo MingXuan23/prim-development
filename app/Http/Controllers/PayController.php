@@ -295,6 +295,7 @@ class PayController extends AppBaseController
         $list_parent_fees_id    = $request->parent_fees_id;
 
         $id = explode("_", $request->fpx_sellerOrderNo);
+        $id = (int) str_replace("PRIM", "", $id[0]);
 
         if ($transaction->save()) {
 
@@ -327,7 +328,7 @@ class PayController extends AppBaseController
                     }
                 }
             } else {
-                $transaction->donation()->attach($id[1], ['payment_type_id' => 1]);
+                $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
         }
     }
@@ -395,7 +396,7 @@ class PayController extends AppBaseController
             }
 
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
-            $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999)  . "_" . $request->o_id;
+            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->o_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . rand(10000, 99999);
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -697,9 +698,14 @@ class PayController extends AppBaseController
         // parent user id
 
         // dd($transaction_id);
-        $userid = Auth::id();
+        $userid = DB::table("transactions")
+                ->where('id', $transaction_id)
+                ->select('user_id as id')
+                ->first();
+        
+        $userid = $userid->id;
+        
         $id = $transaction_id;
-        // $userid = 4;
 
         // details parents
         $getparent = DB::table('users')

@@ -233,8 +233,6 @@
         $(".input-mask").inputmask();
         $('.phone_no').mask('01000000000');
         $('.form-validation').parsley();
-
-
     });
 
     function checkBank() {
