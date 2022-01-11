@@ -55,11 +55,11 @@
 <div class="card p-4">
     <div class="row">
         <div class="col-md-12 pb-3">
-            <h3> Senarai Nama Tanggungan</h3>
+            <h3> Senarai Sekolah Dibawah Tanggungan</h3>
         </div>
         <div class="col-md-12 pb-3">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Sila pilih item untuk dibayar</li>
+                <li class="breadcrumb-item active">Sila Pilih Sekolah</li>
             </ol>
         </div>
 
