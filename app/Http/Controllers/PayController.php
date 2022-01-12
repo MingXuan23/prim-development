@@ -403,14 +403,15 @@ class PayController extends AppBaseController
 
             // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
-            $fpx_buyerEmail      = "prim.utem@gmail.com";
+            $fpx_buyerEmail      = $user->email;
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999);
 
-            $fpx_sellerExId     = "EX00012323";
-            $fpx_sellerId       = "SE00013841";
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
             // if ($getstudentfees) {
             //     $getstudentfees     = $request->student_fees_id;
