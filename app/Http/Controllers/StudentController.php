@@ -175,15 +175,15 @@ class StudentController extends Controller
             $newparent = DB::table('users')
                         ->where('email', '=', "{$request->get('parent_email')}")
                         ->first();
+            
+            DB::table('organization_user')->insert([
+                'organization_id'   => $co->oid,
+                'user_id'           => $newparent->id,
+                'role_id'           => 6,
+                'start_date'        => now(),
+                'status'            => 1,
+            ]);
         }
-
-        DB::table('organization_user')->insert([
-            'organization_id'   => $co->oid,
-            'user_id'           => $newparent->id,
-            'role_id'           => 6,
-            'start_date'        => now(),
-            'status'            => 1,
-        ]);
 
 
         $ou = DB::table('organization_user')
