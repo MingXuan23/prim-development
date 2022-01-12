@@ -170,11 +170,6 @@ class StudentController extends Controller
                 'remember_token' =>  Str::random(40),
             ]);
             $newparent->save();
-        }
-        else { // add parent role
-            $newparent = DB::table('users')
-                        ->where('email', '=', "{$request->get('parent_email')}")
-                        ->first();
             
             DB::table('organization_user')->insert([
                 'organization_id'   => $co->oid,
@@ -183,6 +178,11 @@ class StudentController extends Controller
                 'start_date'        => now(),
                 'status'            => 1,
             ]);
+        }
+        else { // add parent role
+            $newparent = DB::table('users')
+                        ->where('email', '=', "{$request->get('parent_email')}")
+                        ->first();
         }
 
 
