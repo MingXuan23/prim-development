@@ -21,9 +21,10 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        $unseenProfile = false;
+        //$unseenProfile = false;
         $userData =  Auth::user(); // get all data of a certain user with particular ID
-        return view('users.index', compact('userData', 'unseenProfile'));
+        // return view('users.index', compact('userData', 'unseenProfile'));
+        return view('users.index', compact('userData'));
         
         // Get the currently authenticated user...
         //$user = Auth::user();
@@ -39,8 +40,9 @@ class ProfileController extends Controller
      */
     public function edit()
     {
-        $unseenProfile = false;
-        return view('users.edit', compact('unseenProfile')); 
+        // $unseenProfile = false;
+        // return view('users.edit', compact('unseenProfile')); 
+        return view('users.edit'); 
         // return the data in edit mode.
     }
 
