@@ -31,14 +31,14 @@
         <div class="card-body">
             <!-- name -->
             <div class="col-sm-5">
-                <h5 class="mb-0">Name</h6>
+                <h5 class="mb-0">Name</h5>
             </div>
             <div class="col-sm-9 text-secondary">
                 <input type="text" class="form-control" value="{{ $userData->name }} " readonly>
             </div>
             <!-- email -->
             <div class="col-sm-5">
-                <h5 class="mb-0">Email address</h6>
+                <h5 class="mb-0">Email address</h5>
             </div>
             <div class="col-sm-9 text-secondary">
                 <input type="text" class="form-control" value="{{ $userData->email }}" readonly>
@@ -86,8 +86,8 @@
 
         <!-- button for edit -->
         <div class="btn-group editBtnGrp" role="group" aria-label="">
-            
-            <button class="btn btn-light w-md waves-effect waves-light border border-dark">Reset password</button>
+        <!-- <a class="btn btn-light w-md waves-effect waves-light border border-dark" href="">Reset password</a> -->
+            <a class="btn btn-light w-md waves-effect waves-light border border-dark" href="{{ route('profile_change_password') }}">Reset password</a>
             <a class="btn btn-light w-md waves-effect waves-light border border-dark" href="{{ route('profile_edit') }}">
                 Edit Details
             </a>
@@ -102,7 +102,6 @@
 @endsection
 @section('script')
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
-
 <script>
     $(document).ready(function () {
         $('.phone_no').mask('+600000000000');

@@ -32,19 +32,3 @@ img.edit_icon{
 div.dataState{
     margin-bottom:3em;
 }
-
-/* task
-1. create reset password page
-2. content 3 row - create form{
-    - current pwd
-    - new pwd
-    - reconfirm pwd
-    }
-3. condition validation{
-    - check if new password is the same
-    - check if current user's pwd is same as received from input
-    if (all correct){
-        - update to database
-    }
-}
-*/

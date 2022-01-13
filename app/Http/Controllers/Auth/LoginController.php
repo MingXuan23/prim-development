@@ -76,6 +76,7 @@ class LoginController extends Controller
      */
     protected function credentials(Request $request)
     {
+        // $request->get  get email (name) from form
         $phone = $request->get('email');
         if(is_numeric($request->get('email'))){
             

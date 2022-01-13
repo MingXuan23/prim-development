@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule; // new added
-
+use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      *
@@ -123,6 +124,51 @@ class ProfileController extends Controller
         // button to save
         // havent test
         //return redirect()->route('users.index')->with('success', 'Profile updated!'); // just example; need to add status and message for user
+    }
+
+    public function showChangePwd(){
+       // $userData =  Auth::user(); // get all data of a certain user with particular ID
+        // return view('users.resetPwd', compact('userData'));
+        return view('users.resetPwd');
+    }
+
+    public function updatePwd(Request $request, User $user){
+        $hashedPassword = Auth::user()->password;
+        $id = Auth::id();
+        
+        $request->validate([
+            'old_password'              => ['required', 'min:8'],
+            'password'                  => ['required', 'confirmed', 'min:8','regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
+            'password_confirmation'     => ['required',' same:password']
+        ],
+        [
+            'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character (@!$#%^&*())',
+        ]);
+
+        // check if the password is match
+        if (Hash::check($request->old_password, $hashedPassword)){
+            // check if new password is same with old password
+            if (Hash::check($request->password , $hashedPassword)){
+
+            
+                return redirect()->back()->with('error', 'Old and new password cannot be the same');
+
+            } else{
+                $userUpdate = DB::table('users')
+                ->where('id', $id)
+                ->update(
+                    [
+                        // update into db
+                        'password'   => Hash::make($request->password)
+                    ]
+                );
+                return redirect()->route('profile_user')->with('success','Password Updated');   
+
+            }
+        } else{
+        //     // password not match between user entered and actual current password
+            return redirect()->back()->with('error', 'Old password does not match');
+        }
     }
    
 }
