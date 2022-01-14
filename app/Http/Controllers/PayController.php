@@ -535,8 +535,8 @@ class PayController extends AppBaseController
                     // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
                     // return Redirect::away('https://dev.prim.my/api/devtrans')->with($request->toArray());
 
-                    $userid = Auth::id();
                     $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    $userid = $transaction->user_id;;
                     $transaction->transac_no = $request->fpx_fpxTxnId;
                     $transaction->status = "Success";
 
