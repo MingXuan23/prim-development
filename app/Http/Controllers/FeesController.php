@@ -531,6 +531,7 @@ class FeesController extends AppBaseController
                 ->where('status', 1)
                 ->get();
 
+            // to make sure one parent would recieve one only katagory fee if he or she hv more than children in school
             for ($i = 0; $i < count($parent_id); $i++) {
                 $fees_parent = DB::table('organization_user')
                     ->where('id', $parent_id[$i]->id)

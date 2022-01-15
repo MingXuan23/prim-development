@@ -147,13 +147,12 @@
                     </div>
                 </div>
 
+                <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="sel1">Sila Pilih Bank:</label>
-
-                    <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
-                        <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
-                            <option value="">Pilih bank</option>
-                        </select>
+                    <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
+                        <option value="">Pilih bank</option>
+                    </select>
                 </div>
 
                 @if ($getfees_category_A)
@@ -193,9 +192,7 @@
                             the FPX Terms And Condition.</a></label>
                 </div>
                 <button id="bayarBtn" class="btn btn-primary float-right mt-3 w-100 p-2" style="font-size:18px"
-                    type="submit" onclick="return checkBank();" disabled>Teruskan
-                    Pembayaran</button>
-
+                    type="submit" onclick="return checkBank();" disabled>Teruskan Pembayaran</button>
                 </form>
             </div>
 

@@ -403,14 +403,20 @@ class PayController extends AppBaseController
 
             // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } else {
-            $fpx_buyerEmail      = "prim.utem@gmail.com";
+            $fpx_buyerEmail      = $user->email;
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999);
 
-            $fpx_sellerExId     = "EX00012323";
-            $fpx_sellerId       = "SE00013841";
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+
+            // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
+            /* 
+                for the current moment, we use smk pendang seller id for the testing..
+                need to change and find organization seller id after we need to launch
+            */
+            $fpx_sellerId       = config('app.env') == 'production' ? "SE00048858" : "SE00013841";
 
             // if ($getstudentfees) {
             //     $getstudentfees     = $request->student_fees_id;
@@ -522,123 +528,108 @@ class PayController extends AppBaseController
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
                 case 'School':
+                    // $response = Http::post('https://dev.prim.my/api/devtrans', [
+                    //     $this->sendResponse($request->toArray(), "Success")
+                    // ]);
 
-                    // dd($request);
-                    if ($request->fpx_buyerBankId == 'TEST0021') {
-                        // $response = Http::post('https://dev.prim.my/api/devtrans', [
-                        //     $this->sendResponse($request->toArray(), "Success")
-                        // ]);
+                    // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
+                    // return Redirect::away('https://dev.prim.my/api/devtrans')->with($request->toArray());
 
-                        // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
-                        // return Redirect::away('https://dev.prim.my/api/devtrans')->with($request->toArray());
+                    $userid = Auth::id();
+                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction->status = "Success";
 
-                        $userid = Auth::id();
-                        $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                        $transaction->transac_no = $request->fpx_fpxTxnId;
-                        $transaction->status = "Success";
+                    $res_student = DB::table('student_fees_new')
+                        ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+                        ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
+                        ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
+                        ->where('transactions.id', $transaction->id)
+                        ->get();
 
-                        $res_student = DB::table('student_fees_new')
-                            ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
-                            ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
-                            ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
-                            ->where('transactions.id', $transaction->id)
-                            ->get();
+                    $res_parent  = DB::table('fees_new')
+                        ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+                        ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+                        ->select('fees_new_organization_user.*')
+                        ->orderBy('fees_new.category')
+                        ->where('organization_user.user_id', $userid)
+                        ->where('organization_user.role_id', 6)
+                        ->where('organization_user.status', 1)
+                        ->where('fees_new_organization_user.transaction_id', $transaction->id)
+                        ->get();
 
-                        $res_parent  = DB::table('fees_new')
-                            ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
-                            ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
-                            ->select('fees_new_organization_user.*')
-                            ->orderBy('fees_new.category')
-                            ->where('organization_user.user_id', $userid)
-                            ->where('organization_user.role_id', 6)
-                            ->where('organization_user.status', 1)
-                            ->where('fees_new_organization_user.transaction_id', $transaction->id)
-                            ->get();
+                    $res_student ? $list_student_fees_id = $res_student : $list_student_fees_id = "";
+                    $res_parent ? $list_parent_fees_id = $res_parent : $list_student_fees_id = "";
 
-                        $res_student ? $list_student_fees_id = $res_student : $list_student_fees_id = "";
-                        $res_parent ? $list_parent_fees_id = $res_parent : $list_student_fees_id = "";
+                    if ($transaction->save()) {
 
-                        if ($transaction->save()) {
+                        if ($list_student_fees_id) {
+                            for ($i = 0; $i < count($list_student_fees_id); $i++) {
 
-                            if ($list_student_fees_id) {
-                                for ($i = 0; $i < count($list_student_fees_id); $i++) {
+                                // ************************* update student fees status fees by transactions *************************
+                                $res  = DB::table('student_fees_new')
+                                    ->where('id', $list_student_fees_id[$i]->student_fees_id)
+                                    ->update(['status' => 'Paid']);
 
-                                    // ************************* update student fees status fees by transactions *************************
-                                    $res  = DB::table('student_fees_new')
-                                        ->where('id', $list_student_fees_id[$i]->student_fees_id)
-                                        ->update(['status' => 'Paid']);
+                                // ************************* check the student if have still debt *************************
 
-                                    // ************************* check the student if have still debt *************************
-
-                                    $check_debt = DB::table('students')
-                                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                                        ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                                        ->select('students.*')
-                                        ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
-                                        ->where('student_fees_new.status', 'Debt')
-                                        ->get();
+                                $check_debt = DB::table('students')
+                                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                                    ->select('students.*')
+                                    ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
+                                    ->where('student_fees_new.status', 'Debt')
+                                    ->get();
 
 
-                                    // ************************* update status fees for student if all fees completed paid*************************
+                                // ************************* update status fees for student if all fees completed paid*************************
 
-                                    if (count($check_debt) == 0) {
-                                        DB::table('class_student')
-                                            ->where('id', $list_student_fees_id[$i]->class_student_id)
-                                            ->update(['fees_status' => 'Completed']);
-                                    }
+                                if (count($check_debt) == 0) {
+                                    DB::table('class_student')
+                                        ->where('id', $list_student_fees_id[$i]->class_student_id)
+                                        ->update(['fees_status' => 'Completed']);
                                 }
                             }
+                        }
 
-                            if ($list_parent_fees_id) {
-                                for ($i = 0; $i < count($list_parent_fees_id); $i++) {
+                        if ($list_parent_fees_id) {
+                            for ($i = 0; $i < count($list_parent_fees_id); $i++) {
 
-                                    // ************************* update status fees for parent *************************
-                                    $res = DB::table('fees_new_organization_user')
-                                        ->where('id', $list_parent_fees_id[$i]->id)
-                                        ->update([
-                                            'status' => 'Paid'
-                                        ]);
+                                // ************************* update status fees for parent *************************
+                                $res = DB::table('fees_new_organization_user')
+                                    ->where('id', $list_parent_fees_id[$i]->id)
+                                    ->update([
+                                        'status' => 'Paid'
+                                    ]);
 
-                                    // ************************* check the parent if have still debt *************************
+                                // ************************* check the parent if have still debt *************************
 
-                                    $check_debt = DB::table('organization_user')
-                                        ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
-                                        ->select('fees_new_organization_user.*')
-                                        ->where('organization_user.user_id', $userid)
-                                        ->where('organization_user.role_id', 6)
-                                        ->where('organization_user.status', 1)
-                                        ->where('fees_new_organization_user.status', 'Debt')
-                                        ->get();
+                                $check_debt = DB::table('organization_user')
+                                    ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
+                                    ->select('fees_new_organization_user.*')
+                                    ->where('organization_user.user_id', $userid)
+                                    ->where('organization_user.role_id', 6)
+                                    ->where('organization_user.status', 1)
+                                    ->where('fees_new_organization_user.status', 'Debt')
+                                    ->get();
 
+                                // ************************* update status fees for organization user (parent) if all fees completed paid *************************
 
-                                    // ************************* update status fees for organization user (parent) if all fees completed paid *************************
-
-                                    if (count($check_debt) == 0) {
-                                        DB::table('organization_user')
-                                            ->where('user_id', $userid)
-                                            ->where('role_id', 6)
-                                            ->where('status', 1)
-                                            ->update(['fees_status' => 'Completed']);
-                                    }
+                                if (count($check_debt) == 0) {
+                                    DB::table('organization_user')
+                                        ->where('user_id', $userid)
+                                        ->where('role_id', 6)
+                                        ->where('status', 1)
+                                        ->update(['fees_status' => 'Completed']);
                                 }
                             }
+                        }
 
-
-                            //call function
-                            // return view('parent.fee.receipt');
-                            // return view('fpx.tStatus', compact('request', 'user'));
-
-
-                            if ($res) {
-                                return $this->ReceiptFees($transaction->id);
-                            } else {
-                                return view('errors.500');
-                            }
+                        if ($res) {
+                            return $this->ReceiptFees($transaction->id);
                         } else {
                             return view('errors.500');
                         }
-
-                        // dd($request);
                     }
                     break;
 
