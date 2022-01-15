@@ -407,7 +407,7 @@ class PayController extends AppBaseController
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            $fpx_sellerOrderNo  = "PRIM" . date('YmdHis') . rand(10000, 99999);
+            $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
