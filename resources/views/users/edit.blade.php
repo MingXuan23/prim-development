@@ -23,14 +23,15 @@
 
 
 <!-- error message -->
-<div class="card">
-    <div class="card-body p-4" style="width: 40rem;">
-        <form action="profile_update" class=" form-horizontal" method="post">
+<div class="card ">
+    <div class="card-body p-4">
+        <form action="profile_update" class="form-horizontal" method="post">
             @csrf 
             <div class="form-group"><!-- name  -->
                 <label for="name">Nama penuh:</label>
                 <input type="text" name="name" id="name"  class="form-control @error('name') is-invalid @enderror" required
-                value="{{ Auth::user()->name }}">
+                    value="{{ Auth::user()->name }}">                   
+                
                 @error('name')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
@@ -140,7 +141,7 @@
         </div> <!-- end of state -->
             
             <div class="form-group row">
-                <div class="col-12 text-center">
+                <div class="col-12 text-right">
                 <button type="button" class="btn btn-light w-md waves-effect waves-light" onclick="window.location='{{ url("/profile_user") }}'">Back</button>
                     <button type="submit" class="btn btn-primary w-md waves-effect waves-light" name="submit_btn">Update</button>
                 </div>

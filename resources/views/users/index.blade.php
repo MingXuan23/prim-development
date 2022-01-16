@@ -1,9 +1,9 @@
 @extends('layouts.master')
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
-<link href="{{ URL::asset('assets/css/profile1.css') }}" rel="stylesheet" type="text/css" />
+<!-- <link href="{{ URL::asset('assets/css/profile1.css') }}" rel="stylesheet" type="text/css" /> -->
 
-<!-- <link href="{{ URL::asset('assets/css/profile.css') }}" rel="stylesheet" type="text/css" /> -->
+<link href="{{ URL::asset('assets/css/profile.css') }}" rel="stylesheet" type="text/css" />
 <!-- for input mask -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap.min.css"/>  
 
@@ -35,28 +35,28 @@
             <div class="col-sm-5">
                 <h5 class="mb-0">Nama Penuh</h5>
             </div>
-            <div class="col-sm-9 text-secondary">
+            <div class="col-sm-12 text-secondary">
                 <input type="text" class="form-control" value="{{ $userData->name }} " readonly>
             </div>
             <!-- email -->
             <div class="col-sm-5">
                 <h5 class="mb-0">Emel</h5>
             </div>
-            <div class="col-sm-9 text-secondary">
+            <div class="col-sm-12 text-secondary">
                 <input type="text" class="form-control" value="{{ $userData->email }}" readonly>
             </div>
             <!-- username -->
             <div class="col-sm-5">
                 <h5 class="mb-0">Nama pengguna</h6>
             </div>
-            <div class="col-sm-9 text-secondary">
+            <div class="col-sm-12 text-secondary">
                 <input type="text" class="form-control" value="{{ $userData->username }}" readonly>
             </div>
             <!-- phone number -->
             <div class="col-sm-5">
                 <h5 class="mb-0">No. Telefon</h6>
             </div>
-            <div class="col-sm-9 text-secondary">
+            <div class="col-sm-12 text-secondary">
                 <input type="text" class="form-control phone_no" value="{{ $userData->telno }}" readonly>
             </div>
 
@@ -64,7 +64,7 @@
             <div class="col-sm-5">
                 <h5 class="mb-0">Alamat</h6>
             </div>
-            <div class="col-sm-9 text-secondary">
+            <div class="col-sm-12 text-secondary">
                 <input type="text" class="form-control" value="{{ $userData->address }}" readonly>
             </div>
 
@@ -72,7 +72,7 @@
             <div class="col-sm-5">
                 <h5 class="mb-0">Poskod</h6>
             </div>
-            <div class="col-sm-9 text-secondary">
+            <div class="col-sm-12 text-secondary">
                 <input type="text" class="form-control" value="{{ $userData->postcode }}" readonly>
             </div>
 
@@ -80,21 +80,21 @@
             <div class="col-sm-5">
                 <h5 class="mb-0">Negeri</h6>
             </div>
-            <div class="col-sm-9 text-secondary dataState">
+            <div class="col-sm-12 text-secondary dataState">
                 <input type="text" class="form-control" value="{{ $userData->state }}" readonly>
             </div>
             <!-- button for edit -->
-           
-
-        </div> <!-- end of card-body -->
-       
-
-        <div class="btn-group editBtnGrp" role="group" aria-label="">
+            <div class="btn-group editBtnGrp" role="group" aria-label="">
                 <a class="btn btn-light w-md waves-effect waves-light" href="{{ route('profile_change_password') }}">Tukar Kata Laluan</a>
                 <a class="btn btn-primary w-md waves-effect waves-light" href="{{ route('profile_edit') }}">
                     Edit Profil
                 </a>
             </div>
+
+        </div> <!-- end of card-body -->
+       
+
+            
     </div> <!-- end of card -->
 </div> <!-- end of most outer -->
 @endsection
