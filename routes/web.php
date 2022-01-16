@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -167,8 +166,8 @@ Route::group(['middleware' => ['auth']], function () {
         'donation'           => 'DonationController',
         'reminder'           => 'ReminderController',
         'activity'           => 'ActivityController',
-        'session'            => 'SessionController'
-
+        'session'            => 'SessionController',
+        // 'profile'            => 'ProfileController'
     ]);
 });
 
@@ -237,3 +236,13 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
+
+// user profile
+
+Route::get('profile_user', 'ProfileController@index')->name('profile_user'); 
+// Route::get('this is the name to write in route', [ermm macam path link to the function to execute])->name('');
+// Route::get('profile_user_edit', 'ProfileController@edit')->name('profile_user_edit');
+Route::get('profile_edit', 'ProfileController@edit')->name('profile_edit');
+Route::get('profile_change_password','ProfileController@showChangePwd')->name('profile_change_password') ;
+Route::post('profile_update', 'ProfileController@update');
+Route::post('profile_reset_password','ProfileController@updatePwd');

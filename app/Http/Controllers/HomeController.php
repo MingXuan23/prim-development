@@ -34,6 +34,7 @@ class HomeController extends AppBaseController
         $organization = OrganizationController::getOrganizationByUserId();
         $donation = DonationController::getDonationByUserId();
         
+        
         return view("index", compact('organization', 'donation'));
     }
 

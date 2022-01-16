@@ -94,7 +94,7 @@ Register
                                         <input type="text" name="telno" id="telno"
                                             class="form-control phone_no @error('telno') is-invalid @enderror"
                                             placeholder="Nombor Telefon" max="11">
-                                        @error('telno')
+                                        @error('telno') 
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>
