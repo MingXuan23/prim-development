@@ -50,7 +50,7 @@
                 <!-- type again -->
                 
                 <div class="form-group">
-                    <label for="userpassword">Sahkan Kata Laluan</label>
+                    <label for="userpassword">Pengesahan Kata Laluan</label>
                     <input id="password-confirm" type="password" name="password_confirmation"
                                             class="form-control @error('password_confirmation') is-invalid @enderror"
                                             name="password_confirmation" required placeholder="Sahkan Kata Laluan">

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule; // new added
 use Illuminate\Support\Facades\Hash;
+use App\Http\Jajahan\Jajahan;
 
 class ProfileController extends Controller
 {
@@ -43,7 +44,8 @@ class ProfileController extends Controller
     {
         // $unseenProfile = false;
         // return view('users.edit', compact('unseenProfile')); 
-        return view('users.edit'); 
+        $states = Jajahan::negeri();
+        return view('users.edit',compact('states')); 
         // return the data in edit mode.
     }
 
@@ -56,13 +58,19 @@ class ProfileController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $id = Auth::id();
+        $id = Auth::id(); 
+        // to prepare the data before validation
+        $request->merge([
+            'telno' => str_replace( '+6', '', $request->post('telno')),
+        ]);
 
         $request->validate([
             'name'      => 'required',
-            'telno'     => 'required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'telno'     => "required|numeric|digits_between:10,11|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
             'email'     => "required|email|unique:users,email,$id",
         ]);
+
+        // unique: tableName, columName, $id to exclude
 
         $userUpdate = DB::table('users')
             ->where('id', $id)
@@ -77,7 +85,7 @@ class ProfileController extends Controller
                     'postcode'  => $request->post('postcode')
                 ]
             );
-        return redirect()->route('profile_user')->with('success','Profile updated successfully');   
+        return redirect()->route('profile_user')->with('success','Profil berjaya dikemaskini');   
     }
 
     // not using destroy
@@ -143,6 +151,7 @@ class ProfileController extends Controller
         ],
         [
             'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character (@!$#%^&*())',
+            'password.min' => 'Kata laluan mesti lebih daripada 8'
         ]);
 
         // check if the password is match
