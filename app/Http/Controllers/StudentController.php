@@ -23,6 +23,8 @@ use Illuminate\Support\Str;
 use App\Models\OrganizationRole;
 use App\User;
 
+use function PHPUnit\Framework\isNull;
+
 class StudentController extends Controller
 {
     public function index()
@@ -150,27 +152,41 @@ class StudentController extends Controller
                     ->where('u.email', '=', $request->get('parent_email'))
                     ->where('u.icno', '=', $request->get('parent_icno'))
                     ->where('u.telno', '=', $request->get('parent_phone'))
+                    ->where('ou.organization_id', $co->oid)
                     ->whereIn('ou.role_id', [5, 6])
                     ->get();
         
         // dd($request->get('parent_email'), $request->get('parent_icno'), $request->get('parent_phone'),  $ifExits);
         
         if(count($ifExits) == 0) { // if not teacher
-            $this->validate($request, [
-                'parent_icno'      =>  'required|unique:users,icno',
-                'parent_email'     =>  'required|email|unique:users,email',
-            ]);
 
-            $newparent = new Parents([
-                'name'           =>  strtoupper($request->get('parent_name')),
-                'icno'           =>  $request->get('parent_icno'),
-                'email'          =>  $request->get('parent_email'),
-                'password'       =>  Hash::make('abc123'),
-                'telno'          =>  $request->get('parent_phone'),
-                'remember_token' =>  Str::random(40),
-            ]);
-            $newparent->save();
+            $newparent = DB::table('users')
+                            ->where('email', '=', $request->get('parent_email'))
+                            ->where('icno', '=', $request->get('parent_icno'))
+                            ->where('telno', '=', $request->get('parent_phone'))
+                            ->first();
             
+            // dd($newparent);
+            
+            if(empty($newparent))
+            {
+                $this->validate($request, [
+                    'parent_icno'      =>  'required|unique:users,icno',
+                    'parent_email'     =>  'required|email|unique:users,email',
+                ]);
+    
+                $newparent = new Parents([
+                    'name'           =>  strtoupper($request->get('parent_name')),
+                    'icno'           =>  $request->get('parent_icno'),
+                    'email'          =>  $request->get('parent_email'),
+                    'password'       =>  Hash::make('abc123'),
+                    'telno'          =>  $request->get('parent_phone'),
+                    'remember_token' =>  Str::random(40),
+                ]);
+                $newparent->save();
+            }
+           
+            // add parent role
             DB::table('organization_user')->insert([
                 'organization_id'   => $co->oid,
                 'user_id'           => $newparent->id,
@@ -179,7 +195,7 @@ class StudentController extends Controller
                 'status'            => 1,
             ]);
         }
-        else { // add parent role
+        else { 
             $newparent = DB::table('users')
                         ->where('email', '=', "{$request->get('parent_email')}")
                         ->first();
@@ -217,6 +233,8 @@ class StudentController extends Controller
             'organization_user_id'  => $ou->id,
             'student_id'            => $student->id
         ]);
+
+        // dd($ou);
 
         /* 
             - this has to change after all the features have done.
@@ -386,11 +404,15 @@ class StudentController extends Controller
     {
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
+
             return Organization::all();
         } else {
-            // user role guru
+            // user role pentadbir n guru 
             return Organization::whereHas('user', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
+                $query->where('user_id', $userId)->Where(function ($query) {
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5);
+                });
             })->get();
         }
     }

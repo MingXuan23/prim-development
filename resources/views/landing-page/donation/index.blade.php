@@ -463,7 +463,7 @@
                         <!-- contact area wrapper -->
                         {{-- <span class="subtitle">Contact us</span> --}}
                         <h3 class="title">Hubungi Kami</h3>
-                        <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi form ini.</p>
+                        <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>
                         <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"
                             enctype="multipart/form-data">
 

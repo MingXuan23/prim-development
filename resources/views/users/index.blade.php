@@ -16,7 +16,7 @@
 <!-- begin title of the page -->
 <div class="col-sm-6">
     <div class="page-title-box">
-        <h4 class="font-size-18">Profil saya</h4>
+        <h4 class="font-size-18">Profil Saya</h4>
     </div>
 </div>
 <!-- end of title of the page -->

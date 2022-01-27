@@ -272,7 +272,7 @@
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('#teacherTable').DataTable().destroy();
-            console.log(organizationid);
+            // console.log(organizationid);
             fetch_data(organizationid);
         });
   

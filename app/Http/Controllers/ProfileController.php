@@ -60,13 +60,13 @@ class ProfileController extends Controller
     {
         $id = Auth::id(); 
         // to prepare the data before validation
-        $request->merge([
-            'telno' => str_replace( '+6', '', $request->post('telno')),
-        ]);
+        // $request->merge([
+        //     'telno' => str_replace( '+6', '', $request->post('telno')),
+        // ]);
 
         $request->validate([
             'name'      => 'required',
-            'telno'     => "required|numeric|digits_between:10,11|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
+            'telno'     => "required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
             'email'     => "required|email|unique:users,email,$id",
         ]);
 

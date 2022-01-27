@@ -131,11 +131,13 @@ class OrganizationController extends Controller
         if (Auth::user()->hasRole('Superadmin')) {
             return Organization::all();
         } else {
+        $userId = Auth::id();
             return DB::table('organizations as o')
             ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
             ->select("o.*")
+            ->distinct()
             ->where('ou.user_id', $userId)
-            ->whereIn('ou.role_id', [1, 4])
+            ->whereIn('ou.role_id', [2, 4])
             ->get();
         }
     }
