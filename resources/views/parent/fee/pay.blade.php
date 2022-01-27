@@ -113,7 +113,7 @@
                     </li>
                 </ul>
                 {{ csrf_field() }}
-                <input type="hidden" name="o_id" value="{{ $getorganization->id}}">
+                <input type="hidden" name="o_id" id="o_id" value="{{ $getorganization->id}}">
                 <input type="hidden" name="amount" id="amount" value={{ $i + $getorganization->fixed_charges }}>
                 {{-- <input type="hidden" name="o_id" id="o_id" value="{{ 1 }}"> --}}
                 <input type="hidden" name="desc" id="desc" value="School_Fees">
