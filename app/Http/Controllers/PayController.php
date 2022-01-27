@@ -377,7 +377,6 @@ class PayController extends AppBaseController
         $user       = User::find(Auth::id());
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
-        $getorganization = ($request->getorganization) ? $request->getorganization : "";
         $organization = $this->organization->getOrganizationByDonationId($request->o_id);
 
 
@@ -417,7 +416,7 @@ class PayController extends AppBaseController
                 for the current moment, we use smk pendang seller id for the testing..
                 need to change and find organization seller id after we need to launch
             */
-            $fpx_sellerId       = config('app.env') == 'production' ? $getorganization->seller_id : "SE00013841";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
             // if ($getstudentfees) {
             //     $getstudentfees     = $request->student_fees_id;
