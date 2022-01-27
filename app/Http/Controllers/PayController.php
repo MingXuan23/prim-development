@@ -259,7 +259,7 @@ class PayController extends AppBaseController
                 ->whereIn('fees_new.id', $res_fee_A)
                 ->get();
 
-            // dd($getfees_category_A);
+            // dd($getorganization->seller_id);
         }
         return view('fee.pay.pay', compact('getstudent', 'getorganization', 'getfees', 'getfees_bystudent', 'getstudentfees', 'getfees_category_A', 'getfees_category_A_byparent', 'get_fees_by_parent'))->render();
     }
@@ -377,6 +377,7 @@ class PayController extends AppBaseController
         $user       = User::find(Auth::id());
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
+        $getorganization = ($request->getorganization) ? $request->getorganization : "";
         $organization = $this->organization->getOrganizationByDonationId($request->o_id);
 
 
@@ -409,7 +410,7 @@ class PayController extends AppBaseController
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
 
-            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerExId     = config('app.env') == 'production' ? $getorganization->seller_id : "EX00012323";
 
             // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
             /* 
