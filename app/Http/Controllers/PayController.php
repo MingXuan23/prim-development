@@ -410,14 +410,14 @@ class PayController extends AppBaseController
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
 
-            $fpx_sellerExId     = config('app.env') == 'production' ? $getorganization->seller_id : "EX00012323";
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
             /* 
                 for the current moment, we use smk pendang seller id for the testing..
                 need to change and find organization seller id after we need to launch
             */
-            $fpx_sellerId       = config('app.env') == 'production' ? "SE00048858" : "SE00013841";
+            $fpx_sellerId       = config('app.env') == 'production' ? $getorganization->seller_id : "SE00013841";
 
             // if ($getstudentfees) {
             //     $getstudentfees     = $request->student_fees_id;
