@@ -435,4 +435,21 @@ class DonationController extends Controller
 
         return $code;
     }
+
+    public function getReportByDate(Request $request)
+    {
+        $start_date = $request->startDate;
+        $end_date = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
+
+        $result = DB::table('transactions')
+                ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
+                ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
+                ->select('transactions.username as nama_penderma', 'transactions.telno as tel_penderma', 'transactions.email as emel_penderma', 'transactions.datetime_created as time', 'transactions.amount', 'donations.nama as nama_poster')
+                ->where('transactions.status', 'success')
+                ->where('transactions.nama','LIKE','Donation%')
+                ->whereBetween('transactions.datetime_created', [$start_date, $end_date])
+                ->get();
+
+        return Datatables::of($result)->make(true);
+    }
 }
