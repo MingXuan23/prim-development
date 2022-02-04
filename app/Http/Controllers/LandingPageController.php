@@ -94,9 +94,11 @@ class LandingPageController extends AppBaseController
     public function indexDonation()
     {
         $organization = Organization::all()->count();
+        $curYear = date("Y") . "-01-01";
 
         $transactions = Transaction::where('nama', 'LIKE', 'Donation%')
             ->where('status', 'Success')
+            ->where('datetime_created', '>', $curYear)
             ->get()->count();
 
         // retrieve daily transactions
@@ -109,6 +111,7 @@ class LandingPageController extends AppBaseController
         $totalAmount = DB::table('transactions')
             ->where('status', 'success')
             ->where('nama', 'LIKE', 'donation%')
+            ->where('datetime_created', '>', $curYear)
             ->select(DB::table('transactions')->raw('sum(amount) as total_amount'))
             ->first();
 

@@ -230,7 +230,7 @@
                         </div>
                         <div class="content">
                             RM<span class="count-num">{{ $totalAmount }}</span>
-                            <h4 class="title">Jumlah Derma</h4>
+                            <h4 class="title">Jumlah Derma Tahun Ini</h4>
                         </div>
                     </div><!-- //. single counter item -->
                     <div class="single-counter-item" style="padding-top: 25px;">
@@ -252,7 +252,7 @@
                         </div>
                         <div class="content">
                             <span class="count-num">{{ $transactions }}</span>
-                            <h4 class="title">Jumlah Transaksi</h4>
+                            <h4 class="title">Jumlah Transaksi Tahun Ini</h4>
                         </div>
                     </div><!-- //. single counter item -->
                     <div class="single-counter-item" style="padding-top: 25px;">
