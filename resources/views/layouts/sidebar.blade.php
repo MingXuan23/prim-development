@@ -51,6 +51,15 @@
                             </a>
                         </li>
 
+                        @role('Superadmin')
+                        <li>
+                            <a href="{{ route('donate.donor_history') }}" class=" waves-effect">
+                                <i class="ti-clipboard"></i>
+                                <span>Sejarah Derma</span>
+                            </a>
+                        </li>
+                        @endrole
+
                         {{-- <li>
                             <a href="{{ route('donate.donor_history') }}" class=" waves-effect">
                                 <i class="far fa-clock"></i>

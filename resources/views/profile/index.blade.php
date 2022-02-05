@@ -85,8 +85,8 @@
             </div>
             <!-- button for edit -->
             <div class="btn-group editBtnGrp" role="group" aria-label="">
-                <a class="btn btn-light w-md waves-effect waves-light" href="{{ route('profile_change_password') }}">Tukar Kata Laluan</a>
-                <a class="btn btn-primary w-md waves-effect waves-light" href="{{ route('profile_edit') }}">
+                <a class="btn btn-light w-md waves-effect waves-light" href="{{ route('profile.resetPassword') }}">Tukar Kata Laluan</a>
+                <a class="btn btn-primary w-md waves-effect waves-light" href="{{ route("profile.edit", $userData->id) }}">
                     Edit Profil
                 </a>
             </div>

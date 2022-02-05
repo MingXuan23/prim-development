@@ -150,6 +150,11 @@ Route::group(['prefix' => 'reminder'], function () {
     Route::get('testing', 'ReminderController@testingEloquent');
 });
 
+Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
+    Route::get('/resetPwd', 'ProfileController@showChangePwd')->name('profile.resetPassword');
+    Route::post('/updatePwd/{id}', 'ProfileController@updatePwd')->name('profile.updatePwd');
+});
+
 Route::group(['middleware' => ['auth']], function () {
     Route::resources([
         'school'             => 'SchoolController',
@@ -167,7 +172,7 @@ Route::group(['middleware' => ['auth']], function () {
         'reminder'           => 'ReminderController',
         'activity'           => 'ActivityController',
         'session'            => 'SessionController',
-        // 'profile'            => 'ProfileController'
+        'profile'            => 'ProfileController'
     ]);
 });
 
@@ -237,12 +242,10 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
 
-// user profile
-
-Route::get('profile_user', 'ProfileController@index')->name('profile_user'); 
-// Route::get('this is the name to write in route', [ermm macam path link to the function to execute])->name('');
-// Route::get('profile_user_edit', 'ProfileController@edit')->name('profile_user_edit');
-Route::get('profile_edit', 'ProfileController@edit')->name('profile_edit');
-Route::get('profile_change_password','ProfileController@showChangePwd')->name('profile_change_password') ;
-Route::post('profile_update', 'ProfileController@update');
-Route::post('profile_reset_password','ProfileController@updatePwd');
+/* 
+    yung huey's code, need to modify after this, adding middleware, make it in resource route
+*/
+// Route::get('profile_user', 'ProfileController@index')->name('profile_user'); 
+// Route::get('profile_edit', 'ProfileController@edit')->name('profile_edit');
+// Route::get('profile_change_password','ProfileController@showChangePwd')->name('profile_change_password');
+// Route::post('profile_update', 'ProfileController@update');

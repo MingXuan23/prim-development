@@ -25,8 +25,9 @@
 <!-- error message -->
 <div class="card ">
     <div class="card-body p-4">
-        <form action="profile_update" class="form-horizontal" method="post">
-            @csrf 
+        <form action="{{ route("profile.update", Auth::id()) }}" class="form-horizontal" method="post">
+            @method('PATCH')
+            {{csrf_field()}}
             <div class="form-group"><!-- name  -->
                 <label for="name">Nama penuh:</label>
                 <input type="text" name="name" id="name"  class="form-control @error('name') is-invalid @enderror" required
@@ -71,7 +72,7 @@
                 <label for="telno">No. Telefon:</label>
                 <input type="text" name="telno"  
                 class="form-control  phone_no  @error('telno') is-invalid @enderror" 
-                value="@error('telno'){{ old('telno')}}  @enderror  @if (!(old('telno'))) {{ Auth::user()->telno }} @endif" 
+                value="@error('telno'){{ old('telno')}}  @enderror  @if (!(old('telno'))) {{ $usertel }} @endif" 
                 data-parsley-required-message="Sila masukkan no telefon"
                 min="10"  max="13" 
                 >
@@ -142,7 +143,7 @@
             
             <div class="form-group row">
                 <div class="col-12 text-right">
-                <button type="button" class="btn btn-light w-md waves-effect waves-light" onclick="window.location='{{ url("/profile_user") }}'">Back</button>
+                <button type="button" class="btn btn-light w-md waves-effect waves-light" onclick="window.location='{{ route("profile.index") }}'">Back</button>
                     <button type="submit" class="btn btn-primary w-md waves-effect waves-light" name="submit_btn">Update</button>
                 </div>
             </div>

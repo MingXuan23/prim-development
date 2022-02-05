@@ -23,14 +23,8 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        //$unseenProfile = false;
-        $userData =  Auth::user(); // get all data of a certain user with particular ID
-        // return view('users.index', compact('userData', 'unseenProfile'));
-        return view('users.index', compact('userData'));
-        
-        // Get the currently authenticated user...
-        //$user = Auth::user();
-        // must include library: use Illuminate\Support\Facades\Auth;
+        $userData =  Auth::user();
+        return view('profile.index', compact('userData'));
     }
     
 
@@ -42,11 +36,10 @@ class ProfileController extends Controller
      */
     public function edit()
     {
-        // $unseenProfile = false;
-        // return view('users.edit', compact('unseenProfile')); 
+        $userData =  Auth::user();
+        $usertel = str_replace('+6', '', $userData->telno);
         $states = Jajahan::negeri();
-        return view('users.edit',compact('states')); 
-        // return the data in edit mode.
+        return view('profile.edit',compact('states', 'usertel')); 
     }
 
     /**
@@ -58,8 +51,7 @@ class ProfileController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $id = Auth::id(); 
-        // to prepare the data before validation
+        $id = Auth::id();
         // $request->merge([
         //     'telno' => str_replace( '+6', '', $request->post('telno')),
         // ]);
@@ -85,7 +77,7 @@ class ProfileController extends Controller
                     'postcode'  => $request->post('postcode')
                 ]
             );
-        return redirect()->route('profile_user')->with('success','Profil berjaya dikemaskini');   
+        return redirect()->route('profile.index')->with('success','Profil berjaya dikemaskini');   
     }
 
     // not using destroy
@@ -95,20 +87,20 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    // public function destroy($id)
-    // {
-    //     //
-    // }
+    public function destroy($id)
+    {
+        //
+    }
 
      /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    // public function create()
-    // {
-    //     //
-    // }
+    public function create()
+    {
+        //
+    }
 
       /**
      * Display the specified resource.
@@ -129,27 +121,23 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-        // button to save
-        // havent test
         //return redirect()->route('users.index')->with('success', 'Profile updated!'); // just example; need to add status and message for user
     }
 
     public function showChangePwd(){
-       // $userData =  Auth::user(); // get all data of a certain user with particular ID
-        // return view('users.resetPwd', compact('userData'));
-        return view('users.resetPwd');
+        return view('profile.reset-password');
     }
 
-    public function updatePwd(Request $request, User $user){
+    public function updatePwd(Request $request, $id){
         $hashedPassword = Auth::user()->password;
-        $id = Auth::id();
+        // $id = Auth::id();
+        // return "I love yuki";
         
         $request->validate([
-            'old_password'              => ['required', 'min:8'],
+            'old_password'              => ['required'],
             'password'                  => ['required', 'confirmed', 'min:8','regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
             'password_confirmation'     => ['required',' same:password']
-        ],
-        [
+        ], [
             'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character (@!$#%^&*())',
             'password.min' => 'Kata laluan mesti lebih daripada 8'
         ]);
@@ -171,11 +159,11 @@ class ProfileController extends Controller
                         'password'   => Hash::make($request->password)
                     ]
                 );
-                return redirect()->route('profile_user')->with('success','Password Updated');   
+                return redirect()->route('profile.index')->with('success','Password Updated');   
 
             }
         } else{
-        //     // password not match between user entered and actual current password
+             // password not match between user entered and actual current password
             return redirect()->back()->with('error', 'Old password does not match');
         }
     }
