@@ -241,11 +241,3 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
-
-/* 
-    yung huey's code, need to modify after this, adding middleware, make it in resource route
-*/
-// Route::get('profile_user', 'ProfileController@index')->name('profile_user'); 
-// Route::get('profile_edit', 'ProfileController@edit')->name('profile_edit');
-// Route::get('profile_change_password','ProfileController@showChangePwd')->name('profile_change_password');
-// Route::post('profile_update', 'ProfileController@update');

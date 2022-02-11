@@ -690,7 +690,7 @@
 
                     var posterExist = true;
                     if (result === '') {
-                        result = `<div class="d-flex justify-content-center">Tiada Makulmat Dipaparkan</div>`;
+                        result = `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
                         posterExist = false;
                     }
 
