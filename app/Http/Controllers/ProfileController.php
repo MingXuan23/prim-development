@@ -1,8 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-// namespace App\Http\Requests; // can delete soon
-// use App\Http\Requests\Controller; // can delete soon
+
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use App\User;
@@ -155,7 +154,6 @@ class ProfileController extends Controller
                 ->where('id', $id)
                 ->update(
                     [
-                        // update into db
                         'password'   => Hash::make($request->password)
                     ]
                 );

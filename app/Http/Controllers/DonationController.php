@@ -16,6 +16,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 
+use function PHPUnit\Framework\isEmpty;
+use function PHPUnit\Framework\isNull;
+
 class DonationController extends Controller
 {
     private $user;
@@ -176,17 +179,43 @@ class DonationController extends Controller
         return view('donate.history');
     }
 
-    public function getHistoryDonorDT()
+    public function getHistoryDonorDT(Request $request)
     {
-        $userId = Auth::id();
+        if(!isset($request->startDate) && !isset($request->endDate))
+        {
+            $listhistory = DB::table('transactions')
+                ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
+                ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
+                ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
+                ->where('transactions.status', 'success')
+                ->where('transactions.nama','LIKE','Donation%')
+                ->orderBy('transactions.datetime_created', 'desc')
+                ->get();
+        }
+        else{
+            $start_date = date('Y-m-d', strtotime($request->startDate));
+            $end_date = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
+            // dd($request->startDate, $request->endDate);
 
-        $listhistory = DB::table('donations')
-            ->join('donation_transaction', 'donation_transaction.donation_id', '=', 'donations.id')
-            ->join('transactions', 'transactions.id', '=', 'donation_transaction.transaction_id')
-            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
-            ->where('transactions.user_id', $userId)
-            ->orderBy('donations.nama')
-            ->get();
+            $result = DB::table('transactions')
+                ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
+                ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
+                ->select('transactions.username as nama_penderma', 'transactions.telno as tel_penderma', 'transactions.email as emel_penderma', 'transactions.datetime_created as time', 'transactions.amount', 'donations.nama as nama_poster')
+                ->where('transactions.status', 'success')
+                ->where('transactions.nama','LIKE','Donation%')
+                ->whereBetween('transactions.datetime_created', [$start_date, $end_date])
+                ->get();
+
+            $listhistory = DB::table('transactions')
+                ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
+                ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
+                ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
+                ->where('transactions.status', 'success')
+                ->where('transactions.nama','LIKE','Donation%')
+                ->whereBetween('transactions.datetime_created', [$start_date, $end_date])
+                ->orderBy('transactions.datetime_created', 'desc')
+                ->get();
+        }
 
         if (request()->ajax()) {
             return datatables()->of($listhistory)
@@ -197,22 +226,22 @@ class DonationController extends Controller
                 ->editColumn('amount', function ($data) {
                     return number_format($data->amount, 2);
                 })
-                ->addColumn('status', function ($data) {
-                    if ($data->status == 'Success') {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success">Success</span></div>';
-                        return $btn;
-                    } elseif ($data->status == 'Pending') {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<button  class="btn btn-warning m-1"> Pending </button></div>';
-                        return $btn;
-                    } else {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<button  class="btn btn-danger m-1"> Failed </button></div>';
-                        return $btn;
-                    }
-                })
-                ->rawColumns(['status'])
+                // ->addColumn('status', function ($data) {
+                //     if ($data->status == 'Success') {
+                //         $btn = '<div class="d-flex justify-content-center">';
+                //         $btn = $btn . '<span class="badge badge-success">Success</span></div>';
+                //         return $btn;
+                //     } elseif ($data->status == 'Pending') {
+                //         $btn = '<div class="d-flex justify-content-center">';
+                //         $btn = $btn . '<button  class="btn btn-warning m-1"> Pending </button></div>';
+                //         return $btn;
+                //     } else {
+                //         $btn = '<div class="d-flex justify-content-center">';
+                //         $btn = $btn . '<button  class="btn btn-danger m-1"> Failed </button></div>';
+                //         return $btn;
+                //     }
+                // })
+                // ->rawColumns(['status'])
                 ->make(true);
         }
     }
@@ -434,22 +463,5 @@ class DonationController extends Controller
         }
 
         return $code;
-    }
-
-    public function getReportByDate(Request $request)
-    {
-        $start_date = $request->startDate;
-        $end_date = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
-
-        $result = DB::table('transactions')
-                ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
-                ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
-                ->select('transactions.username as nama_penderma', 'transactions.telno as tel_penderma', 'transactions.email as emel_penderma', 'transactions.datetime_created as time', 'transactions.amount', 'donations.nama as nama_poster')
-                ->where('transactions.status', 'success')
-                ->where('transactions.nama','LIKE','Donation%')
-                ->whereBetween('transactions.datetime_created', [$start_date, $end_date])
-                ->get();
-
-        return Datatables::of($result)->make(true);
     }
 }

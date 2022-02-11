@@ -19,5 +19,4 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
-Route::get('/getReportByDate', 'DonationController@getReportByDate');
 
