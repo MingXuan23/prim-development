@@ -415,12 +415,55 @@ class ParentController extends Controller
 
     public function getFeesReceiptDataTable(Request $request){
 
-        $listHisotry = DB::table('transactions')
-            ->where('user_id', Auth::id())
-            ->where('description', "like", 'YS%')
-            ->where('status', 'success')
-            ->select('nama as name', 'description as desc', 'amount as amount', 'datetime_created as date')
-            ->get();
+        if(Auth::user()->hasRole('Superadmin'))
+        {
+            if($request->oid === NULL)
+            {
+                $listHisotry = DB::table('transactions as t')
+                    ->where('t.description', "like", 'YS%')
+                    ->where('t.status', 'success')
+                    ->select('t.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->get();
+            }
+            else{
+                $listHisotry = DB::table('transactions as t')
+                    ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
+                    ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
+                    ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
+                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->where('t.description', "like", 'YS%')
+                    ->where('t.status', 'success')
+                    ->where('co.organization_id', $request->oid)
+                    ->select('t.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->distinct('name')
+                    ->get();
+            }
+        }
+        else{
+            if($request->oid === NULL)
+            {
+                $listHisotry = DB::table('transactions as t')
+                    ->where('t.user_id', Auth::id())
+                    ->where('t.description', "like", 'YS%')
+                    ->where('t.status', 'success')
+                    ->select('t.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->get();
+            }
+            else{
+                $listHisotry = DB::table('transactions as t')
+                    ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
+                    ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
+                    ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
+                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->where('t.user_id', Auth::id())
+                    ->where('t.description', "like", 'YS%')
+                    ->where('t.status', 'success')
+                    ->where('co.organization_id', $request->oid)
+                    ->select('t.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->distinct('name')
+                    ->get();
+            }
+        }
         
         if (request()->ajax()) {
             return datatables()->of($listHisotry)
