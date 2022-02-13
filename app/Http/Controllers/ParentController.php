@@ -405,4 +405,13 @@ class ParentController extends Controller
 
         return redirect('/parent')->with('success', 'Parents have been added successfully');
     }
+
+    public function indexParentFeesHistory(){
+        $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
+            
+        } else {
+           
+        }
+    }
 }

@@ -36,7 +36,7 @@ class DonationController extends Controller
 
     public function index()
     {
-        $organization = $this->getOrganizationByUserId();
+        $organization = $this->getOrganizationByUserIdWithRole();
         return view('donate.index', compact('organization'));
     }
 
@@ -260,6 +260,16 @@ class DonationController extends Controller
             $query->where('user_id', $userId);
         })->get();
 
+        return $listorg;
+    }
+
+    public function getOrganizationByUserIdWithRole()
+    {
+        $userId = Auth::id();
+
+        $listorg = Organization::whereHas('user', function ($query) use ($userId) {
+            $query->where('user_id', $userId)->whereIn('role_id', [1, 2, 4]);
+        })->get();
         return $listorg;
     }
 

@@ -67,7 +67,7 @@
                             </a>
                         </li> --}}
 
-                        <li>
+                        {{-- <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="far fa-calendar-check"></i>
                                 <span>Peringatan</span>
@@ -82,7 +82,7 @@
                                 <i class="mdi mdi-format-list-checks"></i>
                                 <span>Aktiviti</span>
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </li>
 
@@ -255,6 +255,13 @@
                     <a href="{{ route('dependent_fees') }}" class=" waves-effect">
                         <i class="far fa-credit-card"></i>
                         <span>Bayar</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
+                        <i class="ti-clipboard"></i>
+                        <span>Sejarah Bayaran</span>
                     </a>
                 </li>
                 @endrole

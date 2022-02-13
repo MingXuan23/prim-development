@@ -121,6 +121,8 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/search-report', 'FeesController@searchreport')->name('fees.searchreport');
     Route::get('/list-student', 'StudentController@getStudentDatatableFees')->name('fees.getStudentDatatableFees');
     Route::get('/download-PDF', 'StudentController@generatePDFByClass')->name('fees.generatePDFByClass');
+
+    Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
 });
 
 Route::group(['prefix' => 'parent'], function () {
