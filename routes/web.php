@@ -123,6 +123,7 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/download-PDF', 'StudentController@generatePDFByClass')->name('fees.generatePDFByClass');
 
     Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
+    Route::get('/list', 'ParentController@getFeesReceiptDataTable')->name('parent.fees.getFeesReceiptDataTable');
 });
 
 Route::group(['prefix' => 'parent'], function () {

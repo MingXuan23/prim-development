@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 
@@ -407,11 +408,38 @@ class ParentController extends Controller
     }
 
     public function indexParentFeesHistory(){
-        $userId = Auth::id();
-        if (Auth::user()->hasRole('Superadmin')) {
-            
-        } else {
-           
+        $organization = $this->getOrganizationByUserId();
+
+        return view('parent.fee.history', compact('organization'));
+    }
+
+    public function getFeesReceiptDataTable(Request $request){
+
+        $listHisotry = DB::table('transactions')
+            ->where('user_id', Auth::id())
+            ->where('description', "like", 'YS%')
+            ->where('status', 'success')
+            ->select('nama as name', 'description as desc', 'amount as amount', 'datetime_created as date')
+            ->get();
+        
+        if (request()->ajax()) {
+            return datatables()->of($listHisotry)
+                ->editColumn('amount', function ($data) {
+                    return number_format($data->amount, 2);
+                })
+                ->editColumn('date', function ($data) {
+                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->date)->format('d/m/Y');
+                    return $formatedDate;
+                })
+                ->addColumn('action', function ($data) {
+
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="" class="btn btn-primary m-1">Show</a></div>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
         }
     }
 }
