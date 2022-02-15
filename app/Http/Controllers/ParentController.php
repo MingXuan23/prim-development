@@ -422,7 +422,7 @@ class ParentController extends Controller
                 $listHisotry = DB::table('transactions as t')
                     ->where('t.description', "like", 'YS%')
                     ->where('t.status', 'success')
-                    ->select('t.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->get();
             }
             else{
@@ -434,7 +434,7 @@ class ParentController extends Controller
                     ->where('t.description', "like", 'YS%')
                     ->where('t.status', 'success')
                     ->where('co.organization_id', $request->oid)
-                    ->select('t.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
                     ->get();
             }
@@ -446,7 +446,7 @@ class ParentController extends Controller
                     ->where('t.user_id', Auth::id())
                     ->where('t.description', "like", 'YS%')
                     ->where('t.status', 'success')
-                    ->select('t.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->get();
             }
             else{
@@ -459,7 +459,7 @@ class ParentController extends Controller
                     ->where('t.description', "like", 'YS%')
                     ->where('t.status', 'success')
                     ->where('co.organization_id', $request->oid)
-                    ->select('t.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
                     ->get();
             }
@@ -478,7 +478,7 @@ class ParentController extends Controller
 
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="" class="btn btn-primary m-1">Show</a></div>';
+                    $btn = $btn . '<a href=" ' . route('receipttest', $data->id) . ' " class="btn btn-primary m-1">Show</a></div>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
