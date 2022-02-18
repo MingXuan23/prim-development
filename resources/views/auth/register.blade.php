@@ -54,7 +54,7 @@ Register
                             <div class="text-primary text-center p-4">
                                 <h5 class="text-white font-size-20">Daftar</h5>
                                 <p class="text-white-50">Ayuh mendaftar diri anda bersama PRIM</p>
-                                <a href="index" class="logo logo-admin">
+                                <a href="/derma" class="logo logo-admin">
                                     <img src="assets/images/logo/prim-logo2.svg" height="60" alt="logo">
                                 </a>
                             </div>

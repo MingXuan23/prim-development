@@ -151,8 +151,8 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     }, {
-                        data: "name",
-                        name: 'name',
+                        data: "desc",
+                        name: 'desc',
                         "width": "20%"
                     },{
                         data: "date",

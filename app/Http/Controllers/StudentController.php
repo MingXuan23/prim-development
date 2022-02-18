@@ -245,6 +245,14 @@ class StudentController extends Controller
             ->update(['parent_tel' => $newparent->telno]);
 
         // check fee for new in student
+        // check category A fee
+        // $ifExitsCateA = DB::table('fees_new')
+        //                 ->where('category', 'Kategory A')
+        //                 ->where('organization_id', $co->oid)
+        //                 ->where('status', 1)
+        //                 ->get();
+        
+        // dd($ifExitsCateA);
 
         return redirect('/student')->with('success', 'New student has been added successfully');
     }

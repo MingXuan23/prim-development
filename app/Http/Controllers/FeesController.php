@@ -189,8 +189,6 @@ class FeesController extends AppBaseController
 
     public function fetchYear(Request $request)
     {
-
-        // dd($request->get('schid'));
         $oid = $request->get('oid');
         $category = Category::where('organization_id', $oid)->get();
 

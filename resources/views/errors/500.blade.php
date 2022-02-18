@@ -35,7 +35,7 @@
                                         <div class="ex-page-content">
                                             <h1 class="text-dark display-1 mt-4">MAAF</h1>
                                             <h4 class="mb-4">Error/Ralat</h4>
-                                            <p class="mb-5">Kepada penderma yg menggunakan IPHONE atau IOS operating system. Kami mohon maaf kerana ada kalanya framework yg kami guna akan ada ralat. Transaksi derma tuan/puan TELAH BERJAYA. Kami sedang usaha utk buat mobile apps utk penderma IOS. Terima kasih</p>
+                                            <p class="mb-5">Kepada penderma yang menggunakan IPHONE atau IOS operating system. Kami mohon maaf kerana ada kalanya framework yang kami guna akan ada ralat. Transaksi derma tuan/puan TELAH BERJAYA. Kami sedang usaha untuk buat mobile apps untuk penderma IOS. Terima kasih</p>
                                             <a class="btn btn-primary mb-5 waves-effect waves-light" href="/derma"><i class="mdi mdi-home"></i> Back to Dashboard</a>
                                         </div>
                                     </div>

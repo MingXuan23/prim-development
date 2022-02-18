@@ -46,7 +46,7 @@
             </div>
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
-                    <li class="current-menu-item"><a href="/derma">Utama</a></li>
+                    <li class="current-menu-item"><a href="#">Utama</a></li>
                     <li><a href="#team">Info</a></li>
                     <li><a href="#organization">Organisasi</a></li>
                     <li><a href="#contact">Hubungi Kami</a></li>
@@ -526,7 +526,7 @@
                 <div class="row justify-content-md-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
-                            <a href="index.html" class="footer-logo"><img
+                            <a href="" style="pointer-events: none;" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
                             <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk
                                 menghubungkan ibu bapa serta penjaga dengan pihak sekolah.</p>
@@ -550,11 +550,11 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget" style="text-align: center">
-                            <a href="#" class="footer-logo"><img
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt=""
                                     style="max-width: 70%"></a>
 
-                            <a href="#" class="footer-logo"><img
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""
                                     style="max-width: 70%"></a>
 
