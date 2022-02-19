@@ -23,6 +23,7 @@ use Illuminate\Support\Str;
 use App\Models\OrganizationRole;
 use App\User;
 
+use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
 
 class StudentController extends Controller
@@ -222,13 +223,18 @@ class StudentController extends Controller
         ]);
 
         $student->save();
-
+// 
         DB::table('class_student')->insert([
             'organclass_id'   => $co->id,
             'student_id'      => $student->id,
             'start_date'      => now(),
             'status'          => 1,
         ]);
+
+        $classStu = DB::table('class_student')
+                ->where('student_id', $student->id)
+                ->first();
+
         DB::table('organization_user_student')->insert([
             'organization_user_id'  => $ou->id,
             'student_id'            => $student->id
@@ -246,13 +252,42 @@ class StudentController extends Controller
 
         // check fee for new in student
         // check category A fee
-        // $ifExitsCateA = DB::table('fees_new')
-        //                 ->where('category', 'Kategory A')
-        //                 ->where('organization_id', $co->oid)
-        //                 ->where('status', 1)
-        //                 ->get();
+        $ifExitsCateA = DB::table('fees_new')
+                        ->where('category', 'Kategory A')
+                        ->where('organization_id', $co->oid)
+                        ->where('status', 1)
+                        ->get();
         
-        // dd($ifExitsCateA);
+        $ifExitsCateBC = DB::table('fees_new')
+                        ->whereIn('category', ['Kategory B', 'Kategory C'])
+                        ->where('organization_id', $co->oid)
+                        ->where('status', 1)
+                        ->get();
+
+        if(!$ifExitsCateA->isEmpty())
+        {
+            foreach($ifExitsCateA as $kateA)
+            {
+                DB::table('fees_new_organization_user')->insert([
+                    'status'                    => 'Debt',
+                    'fees_new_id'               =>  $kateA->id,
+                    'organization_user_id'      =>  $ou->id,
+                    'transaction_id'            => NULL
+                ]);
+            }
+        }
+
+        if(!$ifExitsCateBC->isEmpty())
+        {
+            foreach($ifExitsCateBC as $kateBC)
+            {
+                DB::table('student_fees_new')->insert([
+                    'status'            => 'Debt',
+                    'fees_id'            =>  $kateBC->id,
+                    'class_student_id'  =>  $classStu->id
+                ]);
+            }
+        }
 
         return redirect('/student')->with('success', 'New student has been added successfully');
     }
