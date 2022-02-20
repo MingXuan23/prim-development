@@ -103,6 +103,10 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             'status'          => 1,
         ]);
 
+        $classStu = DB::table('class_student')
+                ->where('student_id', $student->id)
+                ->first();
+
         $parent = DB::table('users')
             ->select()
             ->where('telno', $row['no_tel_bimbit_penjaga'])
@@ -149,6 +153,43 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         DB::table('students')
             ->where('id', $student->id)
             ->update(['parent_tel' => $parent->telno]);
+        
+        $ifExitsCateA = DB::table('fees_new')
+                        ->where('category', 'Kategory A')
+                        ->where('organization_id', $co->oid)
+                        ->where('status', 1)
+                        ->get();
+        
+        $ifExitsCateBC = DB::table('fees_new')
+                        ->whereIn('category', ['Kategory B', 'Kategory C'])
+                        ->where('organization_id', $co->oid)
+                        ->where('status', 1)
+                        ->get();
+
+        if(!$ifExitsCateA->isEmpty())
+        {
+            foreach($ifExitsCateA as $kateA)
+            {
+                DB::table('fees_new_organization_user')->insert([
+                    'status'                    => 'Debt',
+                    'fees_new_id'               =>  $kateA->id,
+                    'organization_user_id'      =>  $ou->id,
+                    'transaction_id'            => NULL
+                ]);
+            }
+        }
+
+        if(!$ifExitsCateBC->isEmpty())
+        {
+            foreach($ifExitsCateBC as $kateBC)
+            {
+                DB::table('student_fees_new')->insert([
+                    'status'            => 'Debt',
+                    'fees_id'           =>  $kateBC->id,
+                    'class_student_id'  =>  $classStu->id
+                ]);
+            }
+        }
     }
 
     public function startsWith($string, $startString) {

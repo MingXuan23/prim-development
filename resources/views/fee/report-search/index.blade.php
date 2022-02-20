@@ -23,10 +23,10 @@
     <div class="col-md-12">
         <div class="card">
             {{-- <div class="card-header">List Of Applications</div> --}}
-            <div>
+            {{-- <div>
                 <a style="margin: 19px; float: right;" id="btn-download" class="btn btn-primary"> <i
                         class="fas fa-download"></i> Muat Turun PDF</a>
-            </div>
+            </div> --}}
 
             <div class="card-body">
                 {{csrf_field()}}

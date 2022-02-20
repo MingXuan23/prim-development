@@ -151,10 +151,15 @@ class FeesController extends AppBaseController
 
     public function destroy($id)
     {
+        /* $result = DB::table('fees_new')
+            ->where('id', '=', $id)
+            ->delete(); */
+        
         $result = DB::table('fees_new')
             ->where('id', '=', $id)
-            ->delete();
-        
+            ->update([
+                'status'        =>  '0'
+            ]);
 
         if ($result) {
             Session::flash('success', 'Yuran Berjaya Dipadam');

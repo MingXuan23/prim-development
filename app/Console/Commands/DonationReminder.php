@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Notifications\DonationReminderNotification;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class DonationReminder extends Command
 {

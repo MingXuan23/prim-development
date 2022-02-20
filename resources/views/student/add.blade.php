@@ -77,15 +77,15 @@
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-12">
                         <label for="">Nama Penjaga</label>
                         <input type="text" id="parent_name" name="parent_name" class="form-control" placeholder="Nama Penuh">
                     </div>
 
-                    <div class="form-group col-md-6">
+                    {{-- <div class="form-group col-md-6">
                         <label for="">Nombor Kad Pengenalan Penjaga</label>
                         <input type="text" id="parent_icno" name="parent_icno" class="form-control" placeholder="Nombor Kad Pengenalan">
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="form-row">
