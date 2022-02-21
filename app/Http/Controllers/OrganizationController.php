@@ -95,7 +95,8 @@ class OrganizationController extends Controller
         if(isset($request->seller_id))
         {
             Organization::where('id', $id)->update([
-                'seller_id' => $request->seller_id
+                'seller_id'         => $request->seller_id,
+                'fixed_charges'      =>  $request->fixed_charges,
             ]);
         }
 
