@@ -50,15 +50,30 @@
                         <input type="text" name="email" class="form-control" placeholder="Email"
                             value="{{ $org->email }}" data-parsley-required-message="Sila masukkan email" required>
                     </div>
+
+                    @if (Auth::user()->hasRole('Superadmin'))
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Cas Pembayaran (RM)</label>
+                                    <input id="input-currency" class="form-control input-mask text-left"
+                                        data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
+                                        im-insert="true" style="text-align: right;" name="fixed_charges"
+                                        value="{{ $org->fixed_charges }}"
+                                        data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran" required>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="form-group">
+                                    <label>Seller Id</label>
+                                    <input type="text" name="seller_id" class="form-control" placeholder="Seller Id Organisasi"
+                                    value="{{ $org->seller_id }}" data-parsley-required-message="Sila masukkan seller id organisasi" required>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                     
-                    <div class="form-group">
-                        <label>Cas Pembayaran (RM)</label>
-                        <input id="input-currency" class="form-control input-mask text-left"
-                            data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
-                            im-insert="true" style="text-align: right;" name="fixed_charges"
-                            value="{{ $org->fixed_charges }}"
-                            data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran" required>
-                    </div>
 
                     <div class="row">
                         <div class="col">

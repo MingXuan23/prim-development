@@ -75,15 +75,14 @@
 
                     </div>
 
-
-                    <div class="form-group">
+                    {{-- <div class="form-group">
                         <label class="control-label">Cas Pembayaran (RM) <span style="color:#d00"> *</span></label>
                         <input id="input-currency" class="form-control input-mask text-left"
                             data-inputmask="'alias': 'numeric', 'groupSeparator': ',', 'digits': 2, 'digitsOptional': false, 'placeholder': '0'"
                             im-insert="true" style="text-align: right;" name="fixed_charges"
                             data-parsley-required-message="Sila masukkan cas pembayaran, masukkan 0 jika tidak mengenakan sebarang cas pembayaran"
                             required>
-                    </div>
+                    </div> --}}
 
                     <div class="form-group">
                         <label>Logo Organisasi</label>

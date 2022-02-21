@@ -92,6 +92,13 @@ class OrganizationController extends Controller
     {
         Organization::where('id', $id)->update($request->validated());
 
+        if(isset($request->seller_id))
+        {
+            Organization::where('id', $id)->update([
+                'seller_id' => $request->seller_id
+            ]);
+        }
+
         return redirect('/organization')->with('success', 'Maklumat Organisasi Berjaya Dikemaskini');
     }
 
