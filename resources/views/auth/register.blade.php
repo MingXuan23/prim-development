@@ -42,9 +42,6 @@ Register
 
     @section('content')
 
-    <div class="home-btn d-none d-sm-block">
-        <a href="index" class="text-dark"><i class="fas fa-home h2"></i></a>
-    </div>
     <div class="account-pages my-5 pt-5">
         <div class="container">
             <div class="row justify-content-center">
@@ -133,7 +130,7 @@ Register
                                     <div class="form-group mt-2 mb-0 row">
                                         <div class="col-12 mt-4 text-center">
                                             <p class="mb-0">Dengan mengklik Daftar, anda bersetuju dengan <a href="#"
-                                                    class="text-primary">Terma</a> PRIM</p>
+                                                style="pointer-events: none;"  class="text-primary">Terma</a> PRIM</p>
                                         </div>
                                     </div>
 

@@ -115,10 +115,9 @@
 <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script>
 <script>
+
     $(document).ready(function() {
-
         fetch_data();
-
         $('#date').datepicker({
             toggleActive: true,
             format: 'dd-mm-yyyy',
@@ -129,8 +128,6 @@
             startDate = $('#startDate').val();
             endDate = $('#endDate').val();
 
-            console.log(startDate, endDate);
-
             if(startDate === "" || endDate === ""){
                 alert( "input date cant be empty." );
             }
@@ -138,7 +135,7 @@
             {
                 alert( "invalid date." );
             }
-            else if(endDate > (new Date()).toISOString().split('T')[0])
+            else if(endDate > getTodayDate())
             {
                 alert( "invalid date." );
             }
@@ -147,6 +144,24 @@
                 fetch_data(startDate, endDate);
             }
         });
+
+        function getTodayDate()
+        {
+            let date = new Date();
+            let year = date.getFullYear();
+            let month = date.getMonth()+1;
+            let dt = date.getDate();
+
+            if (dt < 10) {
+                dt = '0' + dt;
+            }
+            
+            if (month < 10) {
+                month = '0' + month;
+            }
+
+            return dt + '-' + month + '-' + year;
+        }
 
         function fetch_data(start_Date = "", end_Date = ""){
 
