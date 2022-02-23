@@ -213,7 +213,6 @@ class TeacherController extends Controller
                 ]
             );
 
-
         if ($result) {
             Session::flash('success', 'Guru Berjaya Dipadam');
             return View::make('layouts/flash-messages');

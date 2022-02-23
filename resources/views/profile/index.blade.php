@@ -1,9 +1,7 @@
 @extends('layouts.master')
 @section('css')
-<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
-<!-- <link href="{{ URL::asset('assets/css/profile1.css') }}" rel="stylesheet" type="text/css" /> -->
-
-<link href="{{ URL::asset('assets/css/profile.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css"/>
+<link href="{{ URL::asset('assets/css/profile.css') }}" rel="stylesheet" type="text/css"/>
 <!-- for input mask -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap.min.css"/>  
 
@@ -28,7 +26,7 @@
 @endif
 
 <!-- display data -->
-<div class="col-lg-8">
+<div class="col-lg-12">
     <div class="card">
         <div class="card-body">
             <!-- name -->
@@ -90,13 +88,11 @@
                     Edit Profil
                 </a>
             </div>
-
         </div> <!-- end of card-body -->
-       
-
             
     </div> <!-- end of card -->
 </div> <!-- end of most outer -->
+
 @endsection
 @section('script')
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
