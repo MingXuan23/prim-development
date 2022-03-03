@@ -358,8 +358,8 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hamburger"></i>
-                                    FoodBank </a>
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hammer"></i>
+                                    Tabung Bina Masjid/Surau Baru </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
@@ -384,7 +384,7 @@
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
-                                    Masjid </a>
+                                    Tabung Imarah Masjid </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
