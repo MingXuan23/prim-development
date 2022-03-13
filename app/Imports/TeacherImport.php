@@ -35,11 +35,11 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
         return [
             'no_tel_bimbit' => [
                 'required',
-                // Rule::unique('users', 'icno')
+                Rule::unique('users', 'telno')
             ],
             'email' => [
                 'required',
-                // Rule::unique('users', 'email')
+                Rule::unique('users', 'email')
             ],
         ];
     }
@@ -49,7 +49,7 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
         return [
             // 'no_kp.unique' => 'Terdapat maklumat guru yang telah wujud',
             'no_tel_bimbit.required' => 'Maklumat guru diperlukan',
-            // 'email.unique' => 'Terdapat maklumat guru yang telah wujud',
+            'email.unique' => 'Terdapat maklumat guru yang telah wujud',
             'email.required' => 'Maklumat guru diperlukan',
         ];
     }
