@@ -94,7 +94,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                     ->whereIn('ou.role_id', [5, 6])
                     ->get();
         
-        if(count($ifExits) == 0) { // if not teacher
+        if(count($ifExits) == 0) { // if not teacher or parent
 
             $newparent = DB::table('users')
                             ->where('telno', '=', $phone)
@@ -113,16 +113,26 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                     'remember_token' =>  Str::random(40),
                 ]);
                 $newparent->save();
+
             }
             
             // add parent role
-            DB::table('organization_user')->insert([
-                'organization_id'   => $co->oid,
-                'user_id'           => $newparent->id,
-                'role_id'           => 6,
-                'start_date'        => now(),
-                'status'            => 1,
-            ]);
+            $parentRole = DB::table('organization_user')
+                        ->where('user_id', $co->oid)
+                        ->where('organization_id', $newparent->id)
+                        ->where('role_id', 6)
+                        ->first();
+
+            if(empty($parentRole))
+            {
+                DB::table('organization_user')->insert([
+                    'organization_id'   => $co->oid,
+                    'user_id'           => $newparent->id,
+                    'role_id'           => 6,
+                    'start_date'        => now(),
+                    'status'            => 1,
+                ]);
+            }   
         }
         else { 
             $newparent = DB::table('users')
@@ -172,6 +182,9 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             ->where('id', $student->id)
             ->update(['parent_tel' => $newparent->telno]);
         
+
+        // check fee for new in student
+        // check category A fee
         $ifExitsCateA = DB::table('fees_new')
                         ->where('category', 'Kategory A')
                         ->where('organization_id', $co->oid)
@@ -184,7 +197,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                         ->where('status', 1)
                         ->get();
 
-        if(!$ifExitsCateA->isEmpty())
+        if(!$ifExitsCateA->isEmpty()  && count($ifExits) == 0)
         {
             foreach($ifExitsCateA as $kateA)
             {

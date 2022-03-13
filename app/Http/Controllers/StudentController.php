@@ -156,7 +156,7 @@ class StudentController extends Controller
         
         // dd($request->get('parent_email'), $request->get('parent_icno'), $request->get('parent_phone'),  $ifExits);
         
-        if(count($ifExits) == 0) { // if not teacher
+        if(count($ifExits) == 0) { // if not teacher or parent
 
             $newparent = DB::table('users')
                             ->where('email', '=', $request->get('parent_email'))
@@ -183,13 +183,22 @@ class StudentController extends Controller
             }
            
             // add parent role
-            DB::table('organization_user')->insert([
-                'organization_id'   => $co->oid,
-                'user_id'           => $newparent->id,
-                'role_id'           => 6,
-                'start_date'        => now(),
-                'status'            => 1,
-            ]);
+            $parentRole = DB::table('organization_user')
+                        ->where('user_id', $co->oid)
+                        ->where('organization_id', $newparent->id)
+                        ->where('role_id', 6)
+                        ->first();
+
+            if(empty($parentRole))
+            {
+                DB::table('organization_user')->insert([
+                    'organization_id'   => $co->oid,
+                    'user_id'           => $newparent->id,
+                    'role_id'           => 6,
+                    'start_date'        => now(),
+                    'status'            => 1,
+                ]);
+            }   
         }
         else { 
             $newparent = DB::table('users')
@@ -259,7 +268,7 @@ class StudentController extends Controller
                         ->where('status', 1)
                         ->get();
 
-        if(!$ifExitsCateA->isEmpty())
+        if(!$ifExitsCateA->isEmpty() && count($ifExits) == 0)
         {
             foreach($ifExitsCateA as $kateA)
             {
