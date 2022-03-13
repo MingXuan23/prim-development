@@ -38,11 +38,11 @@
                         value="{{$teacher->tcname}}">
                 </div>
 
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label>Nombor Kad Pengenalan</label>
                     <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan"
                         value="{{$teacher->icno}}">
-                </div>
+                </div> --}}
 
                 <div class="form-group">
                     <label>Nama Organisasi</label>
