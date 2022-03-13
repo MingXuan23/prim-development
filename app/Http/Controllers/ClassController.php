@@ -91,7 +91,8 @@ class ClassController extends Controller
         $organization = $this->getOrganizationByUserId();
         $class       = DB::table('classes')
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
-            ->where('classes.id', $id)->first();
+            ->where('classes.id', $id)
+            ->first();
 
         return view('class.update', compact('class', 'organization'));
     }
@@ -99,6 +100,7 @@ class ClassController extends Controller
     public function update(Request $request, $id)
     {
         //
+        // dd($id);
         $this->validate($request, [
             'name'          =>  'required',
             'level'         =>  'required',
