@@ -41,7 +41,7 @@
                             
                                     </div>
                                     <div class="col-lg-5 mx-auto">
-                                        <img src="assets/images/error.png" alt="" class="img-fluid mx-auto d-block">
+                                        <img src="{{ URL::asset('assets/images/error.png')}}" alt="" class="img-fluid mx-auto d-block">
                                     </div>
                                 </div>
                             </div><!-- end cardbody -->

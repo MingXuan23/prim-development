@@ -176,6 +176,10 @@ class DonationController extends Controller
 
     public function historyDonor()
     {
+        if (!Auth::user()->hasRole('Superadmin')) {
+            return view('errors.400');
+        }
+        
         return view('donate.history');
     }
 

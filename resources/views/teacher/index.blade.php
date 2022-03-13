@@ -84,7 +84,7 @@
                                 <th> No. </th>
                                 <th>Nama Penuh</th>
                                 <th>Nama Pengguna</th>
-                                <th>Nombor Kad pengenalan</th>
+                                {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Email</th>
                                 <th>Nombor Telefon</th>
                                 <th>Status</th>
@@ -227,7 +227,7 @@
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [3,4,5,6,7], // your case first column
+                        "targets": [3,4,5,6], // your case first column
                         "className": "text-center",
                     },],
                     order: [
@@ -246,9 +246,6 @@
                     }, {
                         data: "username",
                         name: 'username'
-                    }, {
-                        data: "icno",
-                        name: 'icno'
                     }, {
                         data: "email",
                         name: 'email'

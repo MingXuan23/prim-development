@@ -408,6 +408,64 @@
     <!--====== TESTIMONIAL PART ENDS ======-->
 
     <!-- team member area start -->
+    <section class="team-member-area">
+        <div class="container">
+            {{-- row d-flex justify-content-center carousel owl-theme team-carousel --}}
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="section-title"><!-- section title -->
+                        <h3 class="title">Meet The Team</h3>
+                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor  tempor incididunt ut labore dolore magna.</p>
+                    </div><!-- //. section title -->
+                </div>
+            </div>
+
+            <div id="feedback" class="carousel owl-theme ">
+                <div class="single-team-member"><!-- single team member -->
+                    <div class="feed-back">
+                        <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="team member image">
+                        <div class="centered">Centered</div>
+                    </div>
+                    <div class="content">
+                        <h4 class="title">Penderma Tanpa Nama</h4>
+                    </div>
+                </div>
+
+                <div class="single-team-member"><!-- single team member -->
+                    <div class="thumb">
+                        <img src="assets/img/team-member/05.jpg" alt="team member image">
+                        <div class="hover"></div>
+                    </div>
+                    <div class="content">
+                        <h4 class="title">Eiusmoy Smith</h4>
+                    </div>
+                </div>
+
+                <div class="single-team-member"><!-- single team member -->
+                    <div class="thumb">
+                        <img src="assets/img/team-member/05.jpg" alt="team member image">
+                        <div class="hover"></div>
+                    </div>
+                    <div class="content">
+                        <h4 class="title">Eiusmoy Smith</h4>
+                    </div>
+                </div>
+
+                <div class="single-team-member"><!-- single team member -->
+                    <div class="thumb">
+                        <img src="assets/img/team-member/05.jpg" alt="team member image">
+                        <div class="hover"></div>
+                    </div>
+                    <div class="content">
+                        <h4 class="title">Eiusmoy Smith</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- team member area end -->
+
+    <!-- team member area start -->
     <section class="team-member-area" id="team">
 
         <div class="bg-shape-3 fa-rotate-180" style="top: 0px !important;right:0px;">
@@ -671,6 +729,51 @@
                         }
                     }, 
                 });
+            }
+        });
+
+        $('#feedback').owlCarousel({
+            loop: true,
+            autoplay: true, //true if you want enable autoplay
+            autoPlayTimeout: 1000,
+            margin: 30,
+            dots: false,
+            nav: true,
+            smartSpeed:3000,
+            animateIn:'fadeIn',
+            animateOut:"fadeOut",
+            navText:['',''],
+            responsive: {
+                0: {
+                    items: 1,
+                    nav: false
+                },
+                414: {
+                    items: 1,
+                    nav: false
+                },
+                520: {
+                    items: 2,
+                    nav: false
+                },
+                767: {
+                    items: 2,
+                    nav: false
+                },
+                768: {
+                    items: 2,
+                    nav: false
+                },
+                960: {
+                    items: 3,
+                    nav:false
+                },
+                1200: {
+                    items: 4
+                },
+                1920: {
+                    items: 4
+                }
             }
         });
 

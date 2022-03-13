@@ -79,7 +79,19 @@ class OrganizationController extends Controller
         // $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
         // $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
         
-        
+        // check if organizations doesnt belong to the user
+        if (!Auth::user()->hasRole('Superadmin')) {
+            $user = Auth::user();
+            $exists = DB::table('organization_user')
+                        ->where('user_id', $user->id)
+                        ->where('organization_id', $id)
+                        ->where('role_id', 2)
+                        ->get();
+            
+            if($exists->isEmpty()){
+                return view('errors.404');
+            }
+        }
 
         $type_org = TypeOrganization::all();
 

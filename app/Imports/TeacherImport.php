@@ -33,7 +33,7 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'no_kp' => [
+            'no_tel_bimbit' => [
                 'required',
                 // Rule::unique('users', 'icno')
             ],
@@ -48,7 +48,7 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
     {
         return [
             // 'no_kp.unique' => 'Terdapat maklumat guru yang telah wujud',
-            'no_kp.required' => 'Maklumat guru diperlukan',
+            'no_tel_bimbit.required' => 'Maklumat guru diperlukan',
             // 'email.unique' => 'Terdapat maklumat guru yang telah wujud',
             'email.required' => 'Maklumat guru diperlukan',
         ];
@@ -56,7 +56,7 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
 
     public function model(array $row)
     {
-        if(!isset($row['nama']) || !isset($row['no_kp']) || !isset($row['email']) || !isset($row['no_tel_bimbit'])){
+        if(!isset($row['nama']) || !isset($row['email']) || !isset($row['no_tel_bimbit'])){
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
 
@@ -92,7 +92,7 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
                     ->where('ou.role_id', '=', '6')
                     ->where('u.email', '=', "{$row['email']}")
-                    ->where('u.icno', '=', "{$row['no_kp']}")
+                    // ->where('u.icno', '=', "{$row['no_kp']}")
                     ->where('u.telno', '=', "{$row['no_tel_bimbit']}")
                     ->get();
         
@@ -101,9 +101,9 @@ class TeacherImport implements ToModel, WithHeadingRow, WithValidation
             $newteacher = new Teacher([
                 //
                 'name'      => $row['nama'],
-                'icno'      => $row['no_kp'],
+                // 'icno'      => $row['no_kp'],
                 'email'     => $row['email'],
-                'telno'     => $row['no_tel_bimbit'],
+                'telno'     => $phone,
                 'password'  => Hash::make('abc123'),
     
             ]);

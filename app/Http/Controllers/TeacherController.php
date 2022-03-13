@@ -71,7 +71,7 @@ class TeacherController extends Controller
     {
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required',
+            // 'icno'          =>  'required',
             'email'         =>  'required',
             'telno'         =>  'required',
             'organization'  =>  'required',
@@ -82,7 +82,7 @@ class TeacherController extends Controller
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
                     ->where('ou.role_id', '=', '6')
                     ->where('u.email', '=', "{$request->get('email')}")
-                    ->where('u.icno', '=', "{$request->get('icno')}")
+                    // ->where('u.icno', '=', "{$request->get('icno')}")
                     ->where('u.telno', '=', "{$request->get('telno')}")
                     ->get();
         
@@ -91,13 +91,13 @@ class TeacherController extends Controller
         if (count($ifExits) == 0) // if not parent
         {
             $this->validate($request, [
-                'icno'          =>  'required|unique:users',
+                // 'icno'          =>  'required|unique:users',
                 'email'         =>  'required|email|unique:users',
             ]);
     
             $newteacher = new Teacher([
                 'name'           =>  $request->get('name'),
-                'icno'           =>  $request->get('icno'),
+                // 'icno'           =>  $request->get('icno'),
                 'email'          =>  $request->get('email'),
                 'password'       =>  Hash::make('abc123'),
                 'telno'          =>  $request->get('telno'),
@@ -172,7 +172,7 @@ class TeacherController extends Controller
 
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required|unique:users,icno,' . $uid->id,
+            // 'icno'          =>  'required|unique:users,icno,' . $uid->id,
             'email'         =>  'required|unique:users,email,' . $uid->id,
             'telno'         =>  'required',
         ]);
@@ -184,7 +184,7 @@ class TeacherController extends Controller
                     'name'      => $request->get('name'),
                     'email'     => $request->get('email'),
                     'telno'     => $request->get('telno'),
-                    'icno'      => $request->get('icno'),
+                    // 'icno'      => $request->get('icno'),
                 ]
             );
 
@@ -212,7 +212,6 @@ class TeacherController extends Controller
                     'organization_user.status' => 0,
                 ]
             );
-
 
         if ($result) {
             Session::flash('success', 'Guru Berjaya Dipadam');

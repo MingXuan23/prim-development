@@ -31,6 +31,7 @@ class HomeController extends AppBaseController
      */
     public function index()
     {
+        // return redirect(route('profile.resetPassword'));
         $organization = OrganizationController::getOrganizationByUserId();
         $donation = DonationController::getDonationByUserId();
         
