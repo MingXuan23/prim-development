@@ -241,7 +241,7 @@ class ClassController extends Controller
         ->select('ou.id as id', 'u.name')
         ->where('ou.organization_id', $request->oid)
         ->where('ou.role_id', 5)
-        ->orderBy('users.name')
+        ->orderBy('u.name')
         ->get();
         
         return response()->json(['success' => $listTeacher]);
