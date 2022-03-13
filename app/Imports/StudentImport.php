@@ -97,10 +97,8 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         if(count($ifExits) == 0) { // if not teacher
 
             $newparent = DB::table('users')
-                            ->where('telno', '=',$phone)
+                            ->where('telno', '=', $phone)
                             ->first();
-            
-            // dd($newparent);
             
             if(empty($newparent))
             {   
@@ -145,10 +143,10 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         $user->assignRole($rolename->nama);
         
         $student = new Student([
-            'nama' => $row["nama"],
-            'icno' => $row["no_kp"],
-            'gender' => $gender,
-            'email' => isset($row['email']) ? $row['email'] : NULL,
+            'nama'       => $row["nama"],
+            'icno'       => $row["no_kp"],
+            'gender'     => $gender,
+            'email'      => isset($row['email']) ? $row['email'] : NULL,
         ]);
 
         $student->save();
@@ -165,16 +163,10 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                 ->where('student_id', $student->id)
                 ->first();
 
-        $user = User::find($newparent->id);
-        // role parent
-        $rolename = OrganizationRole::find(6);
-        $user->assignRole($rolename->nama);
-
-        DB::table('organization_user_student')
-                ->insert([
-                    'organization_user_id'  => $ou->id,
-                    'student_id'            => $student->id
-                ]);
+        DB::table('organization_user_student')->insert([
+            'organization_user_id'  => $ou->id,
+            'student_id'            => $student->id
+        ]);
             
         DB::table('students')
             ->where('id', $student->id)

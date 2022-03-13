@@ -160,7 +160,6 @@ class StudentController extends Controller
 
             $newparent = DB::table('users')
                             ->where('email', '=', $request->get('parent_email'))
-                            // ->where('icno', '=', $request->get('parent_icno'))
                             ->where('telno', '=', $request->get('parent_phone'))
                             ->first();
             
@@ -169,14 +168,12 @@ class StudentController extends Controller
             if(empty($newparent))
             {
                 $this->validate($request, [
-                    // 'parent_icno'      =>  'required|unique:users,icno',
-                    'parent_phone'      =>  'required|unique:users,icno',
+                    'parent_phone'      =>  'required|unique:users,telno',
                     'parent_email'     =>  'required|email|unique:users,email',
                 ]);
     
                 $newparent = new Parents([
                     'name'           =>  strtoupper($request->get('parent_name')),
-                    // 'icno'           =>  $request->get('parent_icno'),
                     'email'          =>  $request->get('parent_email'),
                     'password'       =>  Hash::make('abc123'),
                     'telno'          =>  $request->get('parent_phone'),
