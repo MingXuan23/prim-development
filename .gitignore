@@ -5,4 +5,4 @@ yarn-error.log
 .env
 .gitattributes
 composer.lock
-/Providers/AppServiceProvider.php
+/app/Providers/AppServiceProvider.php
