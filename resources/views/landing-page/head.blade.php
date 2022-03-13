@@ -60,7 +60,7 @@
     }
 
     .nav-item {
-        width: 360px;
+        width: 260px;
         border: none !important;
         margin: 0px 6.5px 10px !important;
     }
