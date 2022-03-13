@@ -358,8 +358,8 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hamburger"></i>
-                                    FoodBank </a>
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hammer"></i>
+                                    Masjid/Surau Baru </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
@@ -384,7 +384,7 @@
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
-                                    Masjid </a>
+                                    Imarah Masjid </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
@@ -406,64 +406,6 @@
         </div>
     </section>
     <!--====== TESTIMONIAL PART ENDS ======-->
-
-    <!-- team member area start -->
-    <section class="team-member-area">
-        <div class="container">
-            {{-- row d-flex justify-content-center carousel owl-theme team-carousel --}}
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title"><!-- section title -->
-                        <h3 class="title">Meet The Team</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor  tempor incididunt ut labore dolore magna.</p>
-                    </div><!-- //. section title -->
-                </div>
-            </div>
-
-            <div id="feedback" class="carousel owl-theme ">
-                <div class="single-team-member"><!-- single team member -->
-                    <div class="feed-back">
-                        <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="team member image">
-                        <div class="centered">Centered</div>
-                    </div>
-                    <div class="content">
-                        <h4 class="title">Penderma Tanpa Nama</h4>
-                    </div>
-                </div>
-
-                <div class="single-team-member"><!-- single team member -->
-                    <div class="thumb">
-                        <img src="assets/img/team-member/05.jpg" alt="team member image">
-                        <div class="hover"></div>
-                    </div>
-                    <div class="content">
-                        <h4 class="title">Eiusmoy Smith</h4>
-                    </div>
-                </div>
-
-                <div class="single-team-member"><!-- single team member -->
-                    <div class="thumb">
-                        <img src="assets/img/team-member/05.jpg" alt="team member image">
-                        <div class="hover"></div>
-                    </div>
-                    <div class="content">
-                        <h4 class="title">Eiusmoy Smith</h4>
-                    </div>
-                </div>
-
-                <div class="single-team-member"><!-- single team member -->
-                    <div class="thumb">
-                        <img src="assets/img/team-member/05.jpg" alt="team member image">
-                        <div class="hover"></div>
-                    </div>
-                    <div class="content">
-                        <h4 class="title">Eiusmoy Smith</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- team member area end -->
 
     <!-- team member area start -->
     <section class="team-member-area" id="team">
