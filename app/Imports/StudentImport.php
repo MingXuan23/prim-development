@@ -89,7 +89,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
                     // ->where('u.email', '=', $request->get('parent_email'))
                     // ->where('u.icno', '=', $request->get('parent_icno'))
-                    ->where('u.telno', '=', $row['no_tel_bimbit_penjaga'])
+                    ->where('u.telno', '=', $phone)
                     ->where('ou.organization_id', $co->oid)
                     ->whereIn('ou.role_id', [5, 6])
                     ->get();
@@ -199,7 +199,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                         ->where('status', 1)
                         ->get();
 
-        if(!$ifExitsCateA->isEmpty()  && count($ifExits) == 0)
+        if(!$ifExitsCateA->isEmpty() && count($ifExits) == 0)
         {
             foreach($ifExitsCateA as $kateA)
             {
