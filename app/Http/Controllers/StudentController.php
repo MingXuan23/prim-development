@@ -184,8 +184,8 @@ class StudentController extends Controller
            
             // add parent role
             $parentRole = DB::table('organization_user')
-                        ->where('user_id', $co->oid)
-                        ->where('organization_id', $newparent->id)
+                        ->where('user_id', $newparent->id)
+                        ->where('organization_id', $co->oid)
                         ->where('role_id', 6)
                         ->first();
 
