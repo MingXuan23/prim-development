@@ -45,11 +45,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
 
     public function model(array $row)
     {
-        if(!isset($row['nama']) || !isset($row['no_kp']) || !isset($row['email'])){
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
-        }
-
-        if(!isset($row['nama_penjaga']) || !isset($row['no_kp']) || !isset($row['no_tel_bimbit_penjaga'])){
+        if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['no_kp']) || !isset($row['no_tel_bimbit_penjaga'])){
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
 
@@ -91,7 +87,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             'nama' => $row["nama"],
             'icno' => $row["no_kp"],
             'gender' => $gender,
-            'email' => $row["email"]
+            'email' => isset($row['email']) ? $row['email'] : NULL,
         ]);
 
         $student->save();
