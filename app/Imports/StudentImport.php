@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use App\Models\OrganizationRole;
 use App\User;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -76,12 +77,72 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             throw ValidationException::withMessages(["error" => "Invalid phone number"]);
         }
 
+        
         $co = DB::table('class_organization')
-            ->select('id', 'organization_id as oid')
-            ->where('class_id', $this->class_id->class_id)
-            ->first();
-
+        ->select('id', 'organization_id as oid')
+        ->where('class_id', $this->class_id->class_id)
+        ->first();
+        
         $gender = (int) substr($row["no_kp"], -1) % 2 == 0 ? "P" : "L";
+
+        $ifExits = DB::table('users as u')
+                    ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+                    // ->where('u.email', '=', $request->get('parent_email'))
+                    // ->where('u.icno', '=', $request->get('parent_icno'))
+                    ->where('u.telno', '=', $row['no_tel_bimbit_penjaga'])
+                    ->where('ou.organization_id', $co->oid)
+                    ->whereIn('ou.role_id', [5, 6])
+                    ->get();
+        
+        if(count($ifExits) == 0) { // if not teacher
+
+            $newparent = DB::table('users')
+                            ->where('telno', '=',$phone)
+                            ->first();
+            
+            // dd($newparent);
+            
+            if(empty($newparent))
+            {   
+                $validator = Validator::make($row, [
+                    $phone      =>  'required|unique:users,telno',
+                ]);
+    
+                $newparent = new Parents([
+                    'name'           =>  strtoupper($row['nama_penjaga']),
+                    'password'       =>  Hash::make('abc123'),
+                    'telno'          =>  $phone,
+                    'remember_token' =>  Str::random(40),
+                ]);
+                $newparent->save();
+            }
+            
+            // add parent role
+            DB::table('organization_user')->insert([
+                'organization_id'   => $co->oid,
+                'user_id'           => $newparent->id,
+                'role_id'           => 6,
+                'start_date'        => now(),
+                'status'            => 1,
+            ]);
+        }
+        else { 
+            $newparent = DB::table('users')
+                        ->where('telno', '=', "{$phone}")
+                        ->first();
+        }
+
+        $ou = DB::table('organization_user')
+                ->where('user_id', $newparent->id)
+                ->where('organization_id', $co->oid)
+                ->where('role_id', 6)
+                ->first();
+
+        $user = User::find($newparent->id);
+
+        // role parent
+        $rolename = OrganizationRole::find(6);
+        $user->assignRole($rolename->nama);
         
         $student = new Student([
             'nama' => $row["nama"],
@@ -91,7 +152,8 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         ]);
 
         $student->save();
-        // id kelas
+
+
         DB::table('class_student')->insert([
             'organclass_id'   => $co->id,
             'student_id'      => $student->id,
@@ -103,39 +165,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                 ->where('student_id', $student->id)
                 ->first();
 
-        $parent = DB::table('users')
-            ->select()
-            ->where('telno', $row['no_tel_bimbit_penjaga'])
-            ->first();
-        
-        if(is_null($parent))
-        {
-            $parent = new Parents([
-                'name'           =>  strtoupper($row['nama_penjaga']),
-                // 'icno'           =>  $row['no_kp_penjaga'],
-                'email'          =>  isset($row['email_penjaga']) ? $row['email_penjaga'] : NULL,
-                'password'       =>  Hash::make('abc123'),
-                'telno'          =>  $phone,
-                'remember_token' =>  Str::random(40),
-            ]);
-            $parent->save();
-        }
-
-        DB::table('organization_user')->insert([
-            'organization_id'   => $co->oid,
-            'user_id'           => $parent->id,
-            'role_id'           => 6,
-            'start_date'        => now(),
-            'status'            => 1,
-        ]);
-
-        $ou = DB::table('organization_user')
-                    ->where('user_id', $parent->id)
-                    ->where('organization_id', $co->oid)
-                    ->where('role_id', 6)
-                    ->first();
-
-        $user = User::find($parent->id);
+        $user = User::find($newparent->id);
         // role parent
         $rolename = OrganizationRole::find(6);
         $user->assignRole($rolename->nama);
@@ -148,7 +178,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             
         DB::table('students')
             ->where('id', $student->id)
-            ->update(['parent_tel' => $parent->telno]);
+            ->update(['parent_tel' => $newparent->telno]);
         
         $ifExitsCateA = DB::table('fees_new')
                         ->where('category', 'Kategory A')
