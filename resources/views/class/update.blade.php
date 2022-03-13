@@ -29,7 +29,7 @@
                 </ul>
             </div>
             @endif
-            <form method="post" action="{{ route('class.update', $class->id) }}" enctype="multipart/form-data">
+            <form method="post" action="{{ route('class.update', $id) }}" enctype="multipart/form-data">
                 @method('PATCH')
                 {{csrf_field()}}
                 <div class="card-body">

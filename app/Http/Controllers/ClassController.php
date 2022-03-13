@@ -94,7 +94,7 @@ class ClassController extends Controller
             ->where('classes.id', $id)
             ->first();
 
-        return view('class.update', compact('class', 'organization'));
+        return view('class.update', compact('class', 'organization', 'id'));
     }
 
     public function update(Request $request, $id)
