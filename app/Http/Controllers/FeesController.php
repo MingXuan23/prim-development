@@ -219,6 +219,7 @@ class FeesController extends AppBaseController
             ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname')
             ->where('organizations.id', $oid)
             ->where('classes.nama', 'LIKE', '%' . $year . '%')
+            ->where('classes.status', 1)
             ->orderBy('classes.nama')
             ->get();
 
@@ -507,11 +508,11 @@ class FeesController extends AppBaseController
         $date_end       = $dt->toDateString($request->get('date_end'));
         $total          = $price * $quantity;
 
-        $data = array(
-            'data' => 'All'
-        );
+        $target = ['data' => 'ALL'];
 
-        $target = json_encode($data);
+        // $target = json_encode($data);
+
+        // dd($target);
 
         $fee = new Fee_New([
             'name'              =>  $request->get('name'),
@@ -526,6 +527,8 @@ class FeesController extends AppBaseController
             'target'            =>  $target,
             'organization_id'   =>  $oid,
         ]);
+
+        // dd($fee);
 
         if ($fee->save()) {
             $parent_id = DB::table('organization_user')
@@ -710,6 +713,7 @@ class FeesController extends AppBaseController
                 ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                 ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
                 ->distinct()
+                ->where('classes.status', 1)
                 ->where('classes.levelid', $level)
                 ->where('class_organization.organization_id', $oid)
                 ->get();
@@ -727,6 +731,7 @@ class FeesController extends AppBaseController
                 ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                 ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
                 ->distinct()
+                ->where('classes.status', 1)
                 ->where('classes.levelid', $level)
                 ->where('class_organization.organization_id', $oid)
                 ->get();
@@ -884,7 +889,7 @@ class FeesController extends AppBaseController
 
         // dd(count($list));
         for ($i = 0; $i < count($list); $i++) {
-            $class_arr[] = $list[$i]->nama;
+            $class_arr[] = $list[$i]->id;
         }
 
         if ($gender) {

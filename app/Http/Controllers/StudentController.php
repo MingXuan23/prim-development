@@ -22,6 +22,7 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Str;
 use App\Models\OrganizationRole;
 use App\User;
+use Illuminate\Database\Eloquent\Model;
 
 class StudentController extends Controller
 {
@@ -129,6 +130,7 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         $classid = $request->get('classes');
+        $class = ClassModel::find($classid);
 
         $co = DB::table('class_organization')
             ->select('id', 'organization_id as oid')
@@ -285,11 +287,36 @@ class StudentController extends Controller
         {
             foreach($ifExitsCateBC as $kateBC)
             {
-                DB::table('student_fees_new')->insert([
-                    'status'            => 'Debt',
-                    'fees_id'           =>  $kateBC->id,
-                    'class_student_id'  =>  $classStu->id
-                ]);
+                $target = json_decode($kateBC->target);
+
+                if(isset($target->gender))
+                {
+                    if($target->gender != $request->get('gender'))
+                    {
+                        continue;
+                    }
+                }
+                
+                if($target->data == "All_Level" || $target->data == $class->levelid)
+                {
+                    DB::table('student_fees_new')->insert([
+                        'status'            => 'Debt',
+                        'fees_id'           =>  $kateBC->id,
+                        'class_student_id'  =>  $classStu->id
+                    ]);
+                }
+                else if(is_array($target->data))
+                {
+                    if(in_array($class->id, $target->data))
+                    {
+                        DB::table('student_fees_new')->insert([
+                            'status'            => 'Debt',
+                            'fees_id'           =>  $kateBC->id,
+                            'class_student_id'  =>  $classStu->id
+                        ]);
+                    }
+                }
+
             }
         }
 

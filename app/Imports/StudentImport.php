@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
 use App\Models\OrganizationRole;
 use App\User;
+use App\Models\ClassModel;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
@@ -82,6 +83,8 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         ->select('id', 'organization_id as oid')
         ->where('class_id', $this->class_id->class_id)
         ->first();
+
+        $class = ClassModel::find($this->class_id->class_id);
         
         $gender = (int) substr($row["no_kp"], -1) % 2 == 0 ? "P" : "L";
 
@@ -216,11 +219,36 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         {
             foreach($ifExitsCateBC as $kateBC)
             {
-                DB::table('student_fees_new')->insert([
-                    'status'            => 'Debt',
-                    'fees_id'           =>  $kateBC->id,
-                    'class_student_id'  =>  $classStu->id
-                ]);
+                $target = json_decode($kateBC->target);
+
+                if(isset($target->gender))
+                {
+                    if($target->gender != $gender)
+                    {
+                        continue;
+                    }
+                }
+                
+                if($target->data == "All_Level" || $target->data == $class->levelid)
+                {
+                    DB::table('student_fees_new')->insert([
+                        'status'            => 'Debt',
+                        'fees_id'           =>  $kateBC->id,
+                        'class_student_id'  =>  $classStu->id
+                    ]);
+                }
+                else if(is_array($target->data))
+                {
+                    if(in_array($class->id, $target->data))
+                    {
+                        DB::table('student_fees_new')->insert([
+                            'status'            => 'Debt',
+                            'fees_id'           =>  $kateBC->id,
+                            'class_student_id'  =>  $classStu->id
+                        ]);
+                    }
+                }
+
             }
         }
     }
