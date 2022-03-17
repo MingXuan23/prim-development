@@ -200,7 +200,7 @@
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right">
-                                            Cas yang dikenakan oleh organisasi (RM)
+                                            Caj yang dikenakan oleh organisasi (RM)
                                         </td>
                                         <td style="text-align:center;width:20%">
                                             {{  number_format((float)$get_organization->fixed_charges, 2, '.', '') }}
