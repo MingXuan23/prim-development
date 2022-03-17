@@ -571,20 +571,87 @@ class FeesController extends AppBaseController
                         ->where('category', "Kategory A")
                         ->where('status', "1")
                         ->get();
+                    
+                    foreach($data as $d)
+                    {
+                        $d->target = "Setiap Keluarga";
+                    }
+
                 } elseif ($category == "B") {
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategory B")
                         ->where('status', "1")
                         ->get();
-                } else {
+                    
+                    foreach($data as $d)
+                    {
+                        $level = json_decode($d->target);
+                        if($level->data == "All_Level")
+                        {
+                            $d->target = "Semua Tahap";
+                        }
+                        elseif($level->data  == 1)
+                        {
+                            $d->target = "Kelas : Tahap 1";
+                        }
+                        elseif($level->data  == 2)
+                        {
+                            $d->target = "Kelas : Tahap 2";
+                        }
+                        elseif(is_array($level->data))
+                        {
+                            $classes = DB::table('classes')
+                                        ->whereIN('id', $level->data)
+                                        ->get();
+                            
+                            $d->target = "Kelas : ";
+                            foreach($classes as $i=>$class)
+                            {
+                                $d->target = $d->target .  $class->nama  . (sizeof($classes) - 1 == $i ? "" : ", ");
+                            }
+                        }
+                    }
+
+                } elseif($category == "C") {
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategory C")
                         ->where('status', "1")
                         ->get();
+                    
+                    foreach($data as $d)
+                    {
+                        $level = json_decode($d->target);
+                        $d->target = "Jantina : " . ($level->gender == 'L' ? "Lelaki<br>" : "Perempuan<br>");
+                        if($level->data == "All_Level")
+                        {
+                            $d->target = $d->target . "Kelas : Semua Tahap";
+                        }
+                        elseif($level->data  == 1)
+                        {
+                            $d->target = $d->target . "Kelas : Tahap 1";
+                        }
+                        elseif($level->data  == 2)
+                        {
+                            $d->target = $d->target . "Kelas : Tahap 2";
+                        }
+                        elseif(is_array($level->data))
+                        {
+                            $classes = DB::table('classes')
+                                        ->whereIN('id', $level->data)
+                                        ->get();
+                            
+                            $d->target = $d->target . $d->target = "Kelas : ";
+                            foreach($classes as $i=>$class)
+                            {
+                                $d->target = $d->target .  $class->nama  . (sizeof($classes) - 1 == $i ? "" : ", ");
+                            }
+                        }
+                    }
                 }
             }
+
             $table = Datatables::of($data);
 
             $table->addColumn('status', function ($row) {
@@ -599,15 +666,16 @@ class FeesController extends AppBaseController
                 }
             });
 
-            $table->addColumn('action', function ($row) {
+            /* $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
                 // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
-            });
+            }); */
 
-            $table->rawColumns(['status', 'action']);
+            // $table->rawColumns(['status', 'action']);
+            $table->rawColumns(['target', 'status']);
             return $table->make(true);
         }
     }
