@@ -80,9 +80,9 @@
                                 <th>Nama Butiran</th>
                                 <th>Penerangan</th>
                                 <th>Jumlah Amaun (RM)</th>
-                                <!-- <th>Rujukan</th> -->
+                                <th>Rujukan</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <!-- <th>Action</th> -->
                             </tr>
                         </thead>
                     </table>
@@ -188,17 +188,21 @@
                                 return 0;
                             }
                         }
+                    }, 
+                    {
+                        data: "target",
+                        name: 'target',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, full) {
+                            return data;
+                        }
                     }, {
                         data: 'status',
                         name: 'status',
                         orderable: false,
                         searchable: false
-                    }, {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },],
+                    }, ],
                     error: function (error) {
                         alert('error');
                         alert(error.toString());
@@ -214,6 +218,12 @@
                         return data;
                     }
                 }, 
+                {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
             */
         }
   
