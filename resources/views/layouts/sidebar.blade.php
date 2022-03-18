@@ -182,7 +182,7 @@
                         <li>
                             <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-search"></i>
-                                <span>Carian Laporan</span>
+                                <span>Laporan Kelas</span>
                             </a>
                         </li>
                         

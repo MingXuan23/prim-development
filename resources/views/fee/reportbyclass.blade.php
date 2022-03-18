@@ -70,7 +70,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Butiran Yuran</h5>
+                        <h5 class="modal-title"></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -182,6 +182,8 @@
 
                     var html="";
                     $('.modal-body').empty();
+
+                    $('.modal-title').text("Butiran Yuran - " +  response[0].studentnama);
 
                     html += '<table class="table table-bordered" >';
                         html += '<tr style="text-align:center">';

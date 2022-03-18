@@ -1120,7 +1120,7 @@ class FeesController extends AppBaseController
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-            ->select('fees_new.*', 'students.id as studentid', 'student_fees_new.status')
+            ->select('fees_new.*','students.id as studentid', 'students.nama as studentnama', 'student_fees_new.status')
             ->where('students.id', $student_id)
             ->orderBy('fees_new.name')
             ->get();
