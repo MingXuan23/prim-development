@@ -478,7 +478,7 @@ class ParentController extends Controller
 
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href=" ' . route('receipttest', $data->id) . ' " class="btn btn-primary m-1">Show</a></div>';
+                    $btn = $btn . '<a href=" ' . route('receipttest', $data->id) . ' " class="btn btn-primary m-1">Papar Resit</a></div>';
                     return $btn;
                 })
                 ->rawColumns(['action'])

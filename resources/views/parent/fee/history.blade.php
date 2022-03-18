@@ -83,7 +83,7 @@
                 <th> No. </th>
                 <th> No Receipt </th>
                 <th> Tarikh Pembayaran </th>
-                <th> Jumlah Amoun </th>
+                <th> Jumlah </th>
                 <th> Action </th>
               </tr>
             </thead>
