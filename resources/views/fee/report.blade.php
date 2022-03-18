@@ -159,7 +159,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Senarai Nama Tanggungan</h5>
+                        <h5 class="modal-title"></h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -465,6 +465,8 @@
 
                     var html="";
                     $('.modal-body').empty();
+
+                    $('.modal-title').text('Senarai Nama Tanggungan - ' + response[0].username);
 
                     html += '<table class="table table-bordered" >';
                         html += '<tr style="text-align:center">';
