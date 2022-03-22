@@ -294,6 +294,8 @@ class DonationController extends Controller
             ->leftjoin('donation_organization', 'organizations.id', '=', 'donation_organization.organization_id')
             ->leftjoin('donations', 'donation_organization.donation_id', '=', 'donations.id')
             ->where('users.id', $userId)
+            ->where('organization_user.role_id', 2)
+            // ->distinct('donations.nama')
             ->get();
         }
     }
