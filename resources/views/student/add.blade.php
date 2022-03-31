@@ -52,14 +52,14 @@
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-12">
                         <label>Nama Penuh Murid</label>
                         <input type="text" name="name" class="form-control" placeholder="Nama Penuh Murid">
                     </div>
-                    <div class="form-group col-md-6">
+                    {{-- <div class="form-group col-md-6">
                         <label>Nombor Kad Pengenalan</label>
                         <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="form-row">

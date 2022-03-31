@@ -139,7 +139,7 @@ class StudentController extends Controller
 
         $this->validate($request, [
             'name'              =>  'required',
-            'icno'              =>  'required|unique:students,icno',
+            // 'icno'              =>  'required|unique:students,icno',
             'classes'           =>  'required',
             'parent_name'       =>  'required',
             'parent_email'      =>  'required',
@@ -223,7 +223,7 @@ class StudentController extends Controller
         
         $student = new Student([
             'nama'          =>  $request->get('name'),
-            'icno'          =>  $request->get('icno'),
+            // 'icno'          =>  $request->get('icno'),
             'gender'        =>  $request->get('gender'),
             'email'         =>  $request->get('email'),
         ]);

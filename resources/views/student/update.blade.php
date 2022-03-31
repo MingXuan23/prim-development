@@ -66,11 +66,11 @@
                     <input type="text" name="name" class="form-control" placeholder="Nama Penuh"
                         value="{{ $student->studentname }}">
                 </div>
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label>Nombor Kad Pengenalan</label>
                     <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan"
                         value="{{ $student->icno }}">
-                </div>
+                </div> --}}
                 <div class="form-group">
                     <label>Email Pelajar&nbsp(optional)</label>
                     <input type="text" name="email" class="form-control" placeholder="Email Pelajar" value="{{ $student->email }}">

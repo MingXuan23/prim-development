@@ -30,24 +30,24 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
     public function rules(): array
     {
         return [
-            'no_kp' => [
+            /* 'no_kp' => [
                 'required',
                  Rule::unique('students', 'icno')
-            ],
+            ], */
         ];
     }
 
     public function customValidationMessages()
     {
         return [
-            'no_kp.unique' => 'Terdapat maklumat murid yang telah wujud',
-            'no_kp.required' => 'Maklumat murid diperlukan',
+            /* 'no_kp.unique' => 'Terdapat maklumat murid yang telah wujud',
+            'no_kp.required' => 'Maklumat murid diperlukan', */
         ];
     }
 
     public function model(array $row)
     {
-        if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['no_kp']) || !isset($row['no_tel_bimbit_penjaga'])){
+        if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_tel_bimbit_penjaga'])){
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
 
@@ -86,7 +86,8 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
 
         $class = ClassModel::find($this->class_id->class_id);
         
-        $gender = (int) substr($row["no_kp"], -1) % 2 == 0 ? "P" : "L";
+        // $gender = (int) substr($row["no_kp"], -1) % 2 == 0 ? "P" : "L";
+        $gender = $row["jantina"];
 
         $ifExits = DB::table('users as u')
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
@@ -159,8 +160,8 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         
         $student = new Student([
             'nama'       => $row["nama"],
-            'icno'       => $row["no_kp"],
-            'gender'     => $gender,
+            // 'icno'       => $row["no_kp"],
+            'gender'     => $row["jantina"],
             'email'      => isset($row['email']) ? $row['email'] : NULL,
         ]);
 

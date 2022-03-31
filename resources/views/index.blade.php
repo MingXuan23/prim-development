@@ -13,7 +13,7 @@
         <div class="col-md-12 ">
             <div class=" align-items-center">
                 <div class="form-group card-title">
-                    <select name="organization" id="organization_dropdown" class="form-control col-md-12">
+                    <select name="donation" id="donation_dropdown" class="form-control col-md-12">
                         <option value="" selected>Pilih Derma</option>
                             @foreach($donation as $row)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>

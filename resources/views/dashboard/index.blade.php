@@ -2,8 +2,8 @@
     // on change event for organization_dropdown
     var donationid
 
-    $('#organization_dropdown').change( () =>  {
-        donationid = $("#organization_dropdown option:selected").val();
+    $('#donation_dropdown').change( () =>  {
+        donationid = $("#donation_dropdown option:selected").val();
         
         $('#donorTable').DataTable({
                   processing:   true,

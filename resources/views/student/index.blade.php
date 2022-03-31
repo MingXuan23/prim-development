@@ -79,7 +79,7 @@
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th>Nama Penuh</th>
-                                <th>Nombor Kad pengenalan</th>
+                                {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Kelas</th>
                                 <th>Status</th>
                                 <th>Details</th>
@@ -248,7 +248,7 @@
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [2,3,4,5], // your case first column
+                        "targets": [2,3,4], // your case first column
                         "className": "text-center",
                     },],
                     order: [
@@ -265,9 +265,6 @@
                         data: "studentname",
                         name: 'studentname'
                     }, {
-                        data: "icno",
-                        name: 'icno'
-                    }, {
                         data: "classname",
                         name: 'classname'
                     }, {
@@ -283,6 +280,13 @@
                     },]
                 });
             }
+
+            /* 
+                {
+                    data: "icno",
+                    name: 'icno'
+                }
+            */
 
             $('#organization').change(function() {
                 var organizationid    = $("#organization").val();
