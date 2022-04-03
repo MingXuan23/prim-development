@@ -449,6 +449,20 @@ class ParentController extends Controller
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->get();
             }
+            else if(Auth::user()->hasRole('Pentadbir'))
+            {
+                $listHisotry = DB::table('transactions as t')
+                    ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
+                    ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
+                    ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
+                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->where('t.description', "like", 'YS%')
+                    ->where('t.status', 'success')
+                    ->where('co.organization_id', $request->oid)
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->distinct('name')
+                    ->get();
+            }
             else{
                 $listHisotry = DB::table('transactions as t')
                     ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
