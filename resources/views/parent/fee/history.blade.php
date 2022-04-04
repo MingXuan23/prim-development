@@ -128,7 +128,7 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('parent.fees.getFeesReceiptDataTable') }}",
+                        url: "{{ route('fees.getFeesReceiptDataTable') }}",
                         data: {
                             oid: oid,
                         },
