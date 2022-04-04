@@ -130,19 +130,12 @@
                                 </table>
                                 @endif
 
-
-
-
-
-
-
-
                                 @if (count($get_student) != 0)
 
                                 {{-- ******** --}}
                                 @foreach ($get_student as $student)
                                 <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
-                                    {{ $student->nama }}
+                                    {{ $student->nama }} ({{ $student->classname }})
                                 </div>
                                 {{-- <center class="my-2">
                                     <span style="font-weight: bold;text-transform: uppercase;">

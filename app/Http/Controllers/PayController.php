@@ -710,10 +710,12 @@ class PayController extends AppBaseController
         // details students by transactions 
         $get_student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', 'class_organization.class_id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
             ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
-            ->select('students.*')
+            ->select('students.*', 'classes.nama as classname')
             ->distinct()
             ->orderBy('students.id')
             ->orderBy('fees_new.category')
