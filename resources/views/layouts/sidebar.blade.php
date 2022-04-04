@@ -170,22 +170,34 @@
                         <span>Yuran</span>
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
-                        @role('Superadmin|Pentadbir|Guru')
-
+                        @role('Superadmin|Pentadbir')
                         <li>
                             <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-list-ul"></i>
                                 <span>Laporan</span>
                             </a>
                         </li>
-
+                        @endrole
+                        
+                        @role('Superadmin|Pentadbir|Guru|Penjaga')
+                        <li>
+                            <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
+                                <i class="ti-clipboard"></i>
+                                <span>Sejarah Bayaran</span>
+                            </a>
+                        </li>
+                        @endrole
+                        
+                        @role('Superadmin|Pentadbir|Guru|Penjaga')
                         <li>
                             <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-search"></i>
                                 <span>Laporan Kelas</span>
                             </a>
                         </li>
+                        @endrole
                         
+                        @role('Superadmin|Pentadbir')
                         <li>
                             <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-user-cog"></i>
@@ -224,14 +236,6 @@
                 </li>
                 @endrole
                 
-                @role('Superadmin|Pentadbir|Penjaga')
-                <li>
-                    <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
-                        <span>Sejarah Bayaran</span>
-                    </a>
-                </li>
-                @endrole
             </ul>
             </li>
             @endrole
