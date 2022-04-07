@@ -7,19 +7,14 @@
 @endsection
 
 @section('content')
-<!-- {{-- <p>Welcome to this beautiful admin panel.</p> --}} -->
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
             <h4 class="font-size-18">Carian Laporan</h4>
-            <!-- <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-            </ol> -->
         </div>
     </div>
 </div>
 <div class="row">
-
     <div class="col-md-12">
         <div class="card">
             {{-- <div class="card-header">List Of Applications</div> --}}
@@ -72,7 +67,6 @@
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th>Nama Penuh</th>
-                                <th>Nombor Kad pengenalan</th>
                                 <th>Jantina</th>
                                 <th>Status Yuran</th>
                             </tr>
@@ -128,7 +122,7 @@
                             "className": "text-center",
                             "width": "2%"
                         },{
-                            "targets": [2,3,4], // your case first column
+                            "targets": [2,3], // your case first column
                             "className": "text-center",
                         },],
                         order: [
@@ -144,9 +138,6 @@
                         }, {
                             data: "nama",
                             name: 'nama'
-                        }, {
-                            data: "icno",
-                            name: 'icno'
                         }, {
                             data: "gender",
                             name: 'gender'

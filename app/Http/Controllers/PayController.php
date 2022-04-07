@@ -520,6 +520,7 @@ class PayController extends AppBaseController
         }
     }
 
+    // callback for FPX
     public function transactionReceipt(Request $request)
     {
 

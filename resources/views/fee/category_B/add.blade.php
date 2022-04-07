@@ -196,7 +196,6 @@
         // ************************** checkbox class ********************************
 
         $(document).on('change', '.checkSingle', function() {
-            console.log('asdf');
             // $('#cb_class').not(this).prop('checked', this.checked);
             if ($(this).is(":checked")) {
                 var isAllChecked = 0;
@@ -291,8 +290,6 @@
                 })
             }
         });
-
-        
         
     });
 </script>

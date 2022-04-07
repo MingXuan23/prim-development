@@ -154,7 +154,7 @@
                 duration: duration
             },
             success: function(data) {
-                console.log(data.data.duration);
+                // console.log(data.data.duration);
                 duration = data.data.duration;
                 if (duration == "day") {
                     document.getElementById("total_donor").innerHTML = (data.data.donor === null) ? 0 : data.data.donor;

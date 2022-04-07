@@ -449,9 +449,7 @@
             $("#" + id2).prop('checked', true).each(function() {
                 myCheckboxes_categoryA.push($(this).val());
             });
-
-            console.log(myCheckboxes_categoryA);
-
+            
         } else {
             if(amt != 0)
             {

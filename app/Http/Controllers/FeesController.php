@@ -17,6 +17,7 @@ use Psy\Command\WhereamiCommand;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Category;
 use App\Models\Fee_New;
+use App\Models\ClassModel;
 
 class FeesController extends AppBaseController
 {
@@ -212,6 +213,8 @@ class FeesController extends AppBaseController
         // dd($request->get('schid'));
         $oid    = $request->get('oid');
         $year   = $request->get('year');
+
+        // dd($year);
 
         $list = DB::table('organizations')
             ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
@@ -1271,5 +1274,84 @@ class FeesController extends AppBaseController
                 ->rawColumns(['action'])
                 ->make(true);
         }
+    }
+
+    public function cetegoryReportIndex(){
+
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.categoryReport.index', compact('organization'));
+    }
+
+    public function fetchClassForCateYuran(Request $request)
+    {
+
+        // dd($request->get('schid'));
+        $oid = $request->get('oid');
+
+        if(Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir'))
+        {
+            $list = DB::table('classes')
+                ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+                ->select('classes.id as cid', 'classes.nama as cname')
+                ->where([
+                    ['class_organization.organization_id', $oid],
+                    ['classes.status', 1]
+                ])
+                ->orderBy('classes.nama')
+                ->get();
+        }
+        else
+        {
+            $list = DB::table('class_organization')
+                ->leftJoin('classes', 'class_organization.class_id', '=', 'classes.id')
+                ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
+                ->select('classes.id as cid', 'classes.nama as cname')
+                ->where([
+                    ['class_organization.organization_id', $oid],
+                    ['classes.status', 1],
+                    ['organization_user.user_id', Auth::id()]
+                ])
+                ->orderBy('classes.nama')
+                ->get();
+        }
+
+
+        return response()->json(['success' => $list]);
+    }
+
+    public function fetchYuran(Request $request)
+    {
+        $class = ClassModel::find($request->classid);
+        $oid = $request->oid;
+
+        $lists = DB::table('fees_new')
+        ->select('fees_new.*', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
+        ->where('organization_id', $oid)
+        ->orderBy('category')
+        ->orderBy('name')
+        ->get();
+
+        foreach($lists as $key=>$list)
+        {
+            $target = json_decode($list->target);
+
+            if($target->data == "ALL_Level" || $target->data == "ALL" || $target->data == $class->levelid)
+            {
+                continue;
+            }
+
+            if(is_array($target->data))
+            {
+                if(in_array($class->id, $target->data))
+                {
+                    continue;
+                }
+            }
+
+            unset($lists[$key]);
+        }
+        
+        return response()->json(['success' => $lists]);
     }
 }

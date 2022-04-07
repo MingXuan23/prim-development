@@ -253,7 +253,6 @@
 
         $('#delete').click(function() {
 
-            console.log(fee_id);
             $.ajax({
                 type: 'POST',
                 dataType: 'html',

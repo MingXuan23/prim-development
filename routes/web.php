@@ -89,8 +89,9 @@ Route::group(['prefix' => 'student'], function () {
 
 Route::group(['prefix' => 'fees'], function () {
     Route::post('/year', 'FeesController@fetchYear')->name('fees.fetchYear');
-    Route::get('/classyear', 'FeesController@fetchClassYear')->name('fees.fetchClassYear');
     Route::post('/class', 'FeesController@fetchClass')->name('fees.fetchClass');
+    Route::get('/classyear', 'FeesController@fetchClassYear')->name('fees.fetchClassYear');
+    Route::post('/classCateYuran', 'FeesController@fetchClassForCateYuran')->name('fees.fetchClassForCateYuran');
 
     Route::get('/list', 'FeesController@getTypeDatatable')->name('fees.getTypeDatatable');
     Route::get('/listparent', 'FeesController@getParentDatatable')->name('fees.getParentDatatable');
@@ -124,6 +125,9 @@ Route::group(['prefix' => 'fees'], function () {
 
     Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
     Route::get('/list-receipt', 'FeesController@getFeesReceiptDataTable')->name('fees.getFeesReceiptDataTable');
+    
+    Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
+    Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 });
 
 Route::group(['prefix' => 'parent'], function () {

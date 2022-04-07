@@ -363,7 +363,6 @@
         var timesChange = 0;
         $('#organizationdd').change(function(e) {
             timesChange++;
-            console.log(timesChange);
             if (timesChange>1) {
                 organization_id = e.target.value;
                 getCategory2(organization_id);
@@ -443,7 +442,6 @@
                             });
 
                             for(let i=0; i < category_length; i++){
-                                console.log(is_clicked_add);
                                 $('select[name="outer-group[0][inner-group]['+ i +'][category]"] option:eq("1")');
                                     // $("input[name*='inner-group["+ i +"]']").options.selectedIndex = 2;
 

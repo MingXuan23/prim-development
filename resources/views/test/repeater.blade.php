@@ -130,7 +130,6 @@
                     $('[data-repeater-item]').slice(1).remove();
                     $('#button_add').click();
                     
-                    console.log('button click')
                     for(var i = 0; i < data.length; i++){
                         data.sort();
                         $('.district').empty();

@@ -179,20 +179,27 @@
                         </li>
                         @endrole
                         
-                        @role('Superadmin|Pentadbir|Guru|Penjaga')
+                        @role('Superadmin|Pentadbir|Guru')
                         <li>
-                            <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
+                            <a href="{{ route('fees.category.report') }}" class=" waves-effect">
                                 <i class="ti-clipboard"></i>
-                                <span>Sejarah Bayaran</span>
+                                <span>Laporan Yuran</span>
                             </a>
                         </li>
                         @endrole
-                        
+
                         @role('Superadmin|Pentadbir|Guru|Penjaga')
                         <li>
                             <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-search"></i>
                                 <span>Laporan Kelas</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
+                                <i class="ti-clipboard"></i>
+                                <span>Sejarah Bayaran</span>
                             </a>
                         </li>
                         @endrole
