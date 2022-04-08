@@ -312,8 +312,6 @@
         } 
         
     }
-
-     
     
 
     function checkD(element) {

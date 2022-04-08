@@ -55,13 +55,13 @@
 <div class="card p-4">
     <div class="row">
         <div class="col-md-12 pb-3">
-            <h3> Senarai Sekolah Dibawah Tanggungan</h3>
+            <h3>Sila Pilih Sekolah Berkaitan Untuk Bayaran Yuran</h3>
         </div>
-        <div class="col-md-12 pb-3">
+        {{-- <div class="col-md-12 pb-3">
             <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Sila Pilih Sekolah</li>
             </ol>
-        </div>
+        </div> --}}
 
         {{-- <div class="col-md-12">
             <div class="card card-primary">
@@ -78,8 +78,6 @@
                     @endforeach
                 </select>
             </div>
-
-
         </div>
     </div>
 </div> --}}
@@ -87,7 +85,6 @@
 <div class="col-md-12">
     <div class="row">
         <div class="container-wrapper-scroll p-2 mb-3">
-
 
             @foreach ($organization as $organizations)
             <div class="col-md-12">
@@ -105,7 +102,6 @@
 
                             <label for="option-{{ $organizations->id }}">
                                 <span style="font-size: 18px">{{ $organizations->nama }}</span>
-
                                 <br>
                             </label>
                         </div>

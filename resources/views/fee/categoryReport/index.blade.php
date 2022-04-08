@@ -204,7 +204,6 @@
             }
         });
 
-
         // csrf token for ajax
         $.ajaxSetup({
             headers: {
