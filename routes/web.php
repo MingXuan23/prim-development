@@ -90,8 +90,10 @@ Route::group(['prefix' => 'student'], function () {
 Route::group(['prefix' => 'fees'], function () {
     Route::post('/year', 'FeesController@fetchYear')->name('fees.fetchYear');
     Route::post('/class', 'FeesController@fetchClass')->name('fees.fetchClass');
+
     Route::get('/classyear', 'FeesController@fetchClassYear')->name('fees.fetchClassYear');
     Route::post('/classCateYuran', 'FeesController@fetchClassForCateYuran')->name('fees.fetchClassForCateYuran');
+    Route::get('/list-debtDatatable', 'FeesController@studentDebtDatatable')->name('fees.debtDatatable');
 
     Route::get('/list', 'FeesController@getTypeDatatable')->name('fees.getTypeDatatable');
     Route::get('/listparent', 'FeesController@getParentDatatable')->name('fees.getParentDatatable');

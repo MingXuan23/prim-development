@@ -203,7 +203,6 @@
       $('#organization').change(function() {
           var organizationid = $("#organization option:selected").val();
           $('#donationTable').DataTable().destroy();
-          console.log(organizationid);
           fetch_data(organizationid);
       });
 

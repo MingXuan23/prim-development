@@ -74,6 +74,7 @@
                     <tr style="text-align:center">
                         <th>No</th>
                         <th>Nama Murid</th>
+                        <th>Jantina</th>
                         <th>Status Pembayaran</th>
                     </tr>
                 </thead>
@@ -140,7 +141,7 @@
                         $("#fees").append("<option value='0'> Pilih Yuran</option>");
                         
                         jQuery.each(result.success, function(key, value){
-                            $("#fees").append("<option value='"+ value.sid +"'>" + value.name + "</option>");
+                            $("#fees").append("<option value='"+ value.id +"'>" + value.name + "</option>");
                         });
                     }
                 })
@@ -154,40 +155,55 @@
             }
         });
         
-        var dependentTable = $('#yuranTable').DataTable({
-            ordering: true,
-            processing: true,
-            serverSide: true,
-                ajax: {
-                    url: "{{ route('parent.getDependentDataTable') }}",
-                    type: 'GET',
-                },
-                'columnDefs': [{
-                      "targets": [0], // your case first column
-                      "className": "text-center",
-                      "width": "2%"
-                  }],
-                order: [
-                    [1, 'asc']
-                ],
-                columns: [{
-                    "data": null,
-                    searchable: false,
-                    "sortable": false,
-                    render: function (data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                }, {
-                    data: "nama",
-                    name: "nama",
-                    "width": "20%"
-                },
-                {
-                    data: "status",
-                    name: "sekolah",
-                    "width": "10%"
-                }]
-          });
+        $('#fees').change(function(){
+            if($(this).val() != 0){
+                $('#yuranTable').DataTable().destroy();
+
+                var yuranTable = $('#yuranTable').DataTable({
+                    ordering: true,
+                    processing: true,
+                    serverSide: true,
+                        ajax: {
+                            url: "{{ route('fees.debtDatatable') }}",
+                            type: 'GET',
+                            data: {
+                                feeid: $("#fees").val(),
+                                classid: $("#classes").val()
+                            }
+                        },
+                        'columnDefs': [{
+                              "targets": [0, 1, 2, 3], // your case first column
+                              "className": "text-center",
+                              "width": "2%"
+                          }],
+                        order: [
+                            [1, 'asc']
+                        ],
+                        columns: [{
+                            "data": null,
+                            searchable: false,
+                            "sortable": false,
+                            render: function (data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            }
+                        }, {
+                            data: "nama",
+                            name: "nama",
+                            "width": "20%"
+                        },
+                        {
+                            data: "gender",
+                            name: "gender",
+                            "width": "10%"
+                        },{
+                            data: "status",
+                            name: "status",
+                            "width": "10%"
+                        }]
+                  });
+            }
+        });
+
 
         // csrf token for ajax
         $.ajaxSetup({

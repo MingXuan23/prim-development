@@ -18,6 +18,7 @@ use App\Http\Controllers\AppBaseController;
 use App\Models\Category;
 use App\Models\Fee_New;
 use App\Models\ClassModel;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 class FeesController extends AppBaseController
 {
@@ -1353,5 +1354,60 @@ class FeesController extends AppBaseController
         }
         
         return response()->json(['success' => $lists]);
+    }
+
+    public function studentDebtDatatable(Request $request)
+    {
+        $fees = Fee_New::find($request->feeid);
+
+        if (request()->ajax()) {
+            if($fees->category == "Kategory A")
+            {
+                $data = DB::table('students as s')
+                    ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
+                    ->leftJoin('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
+                    ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+                    ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->leftJoin('fees_new_organization_user as fou', 'fou.organization_user_id', 'ou.id')
+                    ->where('fou.fees_new_id', $fees->id)
+                    ->where('co.class_id', $request->classid)
+                    ->select('s.*', 'fou.status')
+                    ->orderBy('s.nama')
+                    ->get();
+            }
+            else
+            {
+                $data = DB::table('students as s')
+                    ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+                    ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                    ->where('sfn.fees_id', $fees->id)
+                    ->where('co.class_id', $request->classid)
+                    ->select('s.*', 'sfn.status')
+                    ->orderBy('s.nama')
+                    ->get();
+            }
+
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == 'Debt') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
+
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success"> Telah Bayar </span></div>';
+
+                    return $btn;
+                }
+            });
+
+
+            $table->rawColumns(['status']);
+
+            return $table->make(true);
+        }
     }
 }
