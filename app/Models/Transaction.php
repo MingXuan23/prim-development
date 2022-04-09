@@ -27,8 +27,7 @@ class Transaction extends Model
             ->leftjoin('organizations', 'donation_organization.organization_id', '=', 'organizations.id')
             ->where(([
                 ['donations.id', '=', $organizationId],
-                ['transactions.status', '=', 'Success'],
-                ['donations.status', '=', 1]
+                ['transactions.status', '=', 'Success']
             ]));
 
         return $transaction;
