@@ -186,6 +186,7 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
+Route::get('donateFromMobile', 'PayController@donateFromMobile');
 Route::post('trn', 'PayController@transaction')->name('trn');
 Route::post('trn-dev', 'PayController@transactionDev')->name('trn-dev');
 Route::post('payment', 'PayController@paymentProcess')->name('payment');

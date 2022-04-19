@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\Donation;
 use Illuminate\Database\Eloquent\Model;
-use DB;
+use Illuminate\Support\Facades\DB;
 use App\Models\DonationTransaction;
 
 class Transaction extends Model

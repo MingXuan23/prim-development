@@ -76,6 +76,20 @@ class PayController extends AppBaseController
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
+    public function donateFromMobile(Request $request)
+    {
+        $user = "";
+
+        $donationId   = $request->donationId;
+        $donation  = $this->donation->getDonationById($donationId);
+        
+        if (isset($request->userId)) {
+            $user = DB::table("users")->where('id', $request->userId)->first();
+        }
+
+        return view('paydonate.pay', compact('donation', 'user'));
+    }
+
     // pay fees latest 15 july code
     public function pay(Request $request)
     {
