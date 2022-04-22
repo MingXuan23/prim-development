@@ -87,6 +87,8 @@ class PayController extends AppBaseController
             $user = DB::table("users")->where('id', $request->userId)->first();
         }
 
+        // dd(!is_null($user));
+
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
