@@ -309,6 +309,11 @@ class DonationController extends Controller
                         ->first();
         // dd($donation);
 
+        if($donation->status == 0)
+        {
+            return view('errors.404');
+        }
+
         if (Auth::id()) {
             $user = $this->user->getUserById();
         }
@@ -321,6 +326,12 @@ class DonationController extends Controller
         $donation = DB::table('donations')
                         ->where('url', '=' , $link)
                         ->first();
+        
+        if($donation->status == 0)
+        {
+            return view('errors.404');
+        }
+        
         return view('paydonate.anonymous.index', compact('donation'));
     }
 

@@ -20,3 +20,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
 
+
+Route::post('donateFromMobile', 'PayController@donateFromMobile');

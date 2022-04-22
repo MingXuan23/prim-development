@@ -159,20 +159,20 @@
                             <div class="form-group">
                                 <label>Nama</label>
                                 <input type="text" name="name" id="name" class="form-control text-left"
-                                    placeholder="Nama" value="{{ isset($user) ? $user->name : '' }}"
+                                    placeholder="Nama" value="{{ is_null($user) ? $user->name : '' }}"
                                     data-parsley-required-message="Sila masukkan nama penuh" required>
                             </div>
                             <div class="form-group">
                                 <label>Email</label>
                                 <input type="email" parsley-type="email" name="email" class="form-control text-left"
-                                    placeholder="Email" value="{{ isset($user) ? $user->email : '' }}"
+                                    placeholder="Email" value="{{ is_null($user) ? $user->email : '' }}"
                                     data-parsley-required-message="Sila masukkan email" required>
                             </div>
                             <div class="form-group">
                                 <label>No Telefon</label>
                                 <input type="text" name="telno" class="form-control phone_no text-left"
                                     placeholder="No Telefon"
-                                    value="{{ isset($user) ?  substr($user->telno , 2) : '' }}"
+                                    value="{{ is_null($user) ?  substr($user->telno , 2) : '' }}"
                                     data-parsley-required-message="Sila masukkan no telefon" required>
                             </div>
                             <div class="form-group">
