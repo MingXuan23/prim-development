@@ -21,4 +21,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
 
 
-Route::post('donateFromMobile', 'PayController@donateFromMobile');
+// mobile api
+Route::get('donateFromMobile', 'PayController@donateFromMobile');
+
+Route::get('mobile/getAllDonation', 'MobileApiController@getAllDonation');
+Route::get('mobile/getAllDonationType', 'MobileApiController@getAllDonationType');
+Route::get('mobile/getAllDonationQuantity', 'MobileApiController@getAllDonationQuantity');
+Route::get('mobile/getAllDonationTypeQuantity', 'MobileApiController@getAllDonationTypeQuantity');
+
+Route::post('mobile/login', 'MobileApiController@login');

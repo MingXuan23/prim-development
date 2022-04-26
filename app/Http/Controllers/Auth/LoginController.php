@@ -99,7 +99,6 @@ class LoginController extends Controller
                     $phone = str_pad($request->get('email'), 13, "+", STR_PAD_LEFT);
                 }   
             }
-            // dd($phone);
             return ['telno'=>$phone,'password'=>$request->get('password')];
         }
         // //elseif (filter_var($request->get('email'), FILTER_VALIDATE_EMAIL)) {
