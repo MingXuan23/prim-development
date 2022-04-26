@@ -105,7 +105,6 @@ class LoginController extends Controller
         //     return ['email' => $request->get('email'), 'password'=>$request->get('password')];
         // }
         return ['email' => $request->get('email'), 'password'=>$request->get('password')];
-
     }
 }
 

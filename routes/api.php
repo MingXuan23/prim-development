@@ -28,5 +28,6 @@ Route::get('mobile/getAllDonation', 'MobileApiController@getAllDonation');
 Route::get('mobile/getAllDonationType', 'MobileApiController@getAllDonationType');
 Route::get('mobile/getAllDonationQuantity', 'MobileApiController@getAllDonationQuantity');
 Route::get('mobile/getAllDonationTypeQuantity', 'MobileApiController@getAllDonationTypeQuantity');
+Route::get('mobile/getAllStatistic', 'MobileApiController@getAllStatistic');
 
 Route::post('mobile/login', 'MobileApiController@login');

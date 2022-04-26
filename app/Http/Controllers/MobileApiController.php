@@ -91,4 +91,40 @@ class MobileApiController extends Controller
             'message' => 'Unauthorized'
         ], 401);
     }
+
+    public function getAllStatistic()
+    {
+        $curYear = date("Y") . "-01-01";
+
+        $organ = DB::table('organizations as o')
+            ->count();
+        
+        $user = DB::table('users')
+            ->count();
+        
+        $totalAmount = DB::table('transactions')
+            ->where('status', 'success')
+            ->where('nama', 'LIKE', 'donation%')
+            ->where('datetime_created', '>', $curYear)
+            ->select(DB::table('transactions')->raw('sum(amount) as total_amount'))
+            ->first();
+        
+        $totalAmount = $totalAmount->total_amount;
+
+        $transactions = DB::table('transactions')
+            ->where('nama', 'LIKE', 'Donation%')
+            ->where('status', 'Success')
+            ->where('datetime_created', '>', $curYear)
+            ->get()->count();
+        
+
+        $statistic = array(
+            'organizationReport'  => $organ,
+            'userReport'          => $user,
+            'yearAmountReport'    => $totalAmount,
+            'yearTransactionReport' => $transactions
+        );
+
+        return $statistic;
+    }
 }
