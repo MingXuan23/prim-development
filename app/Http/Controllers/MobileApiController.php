@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Expr\FuncCall;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
+use IlluminateAgnostic\Arr\Support\Arr;
 
 class MobileApiController extends Controller
 {
@@ -126,5 +129,101 @@ class MobileApiController extends Controller
         );
 
         return $statistic;
+    }
+
+    public function getallmytransactionhistory(Request $request)
+    {
+        $data = DB::table('transactions as t')
+            ->leftJoin('donation_transaction as dt', 'dt.transaction_id', 't.id')
+            ->leftJoin('donations as d', 'dt.donation_id', 'd.id')
+            ->select('t.id', 't.datetime_created as row', 'd.nama', DB::raw('CONCAT("RM ", t.amount) as amount'))
+            ->where('user_id', $request->userid)
+            ->where('t.status', 'success')
+            ->orderByDesc('datetime_created')
+            ->get();
+
+        foreach($data as $d)
+        {
+            $d->row = Carbon::createFromFormat('Y-m-d H:i:s', $d->row)->format('d/m');
+        }
+        
+        return $data;
+    }
+
+    public function getlatesttransaction()
+    {
+        $data = DB::table('transactions as t')
+            ->leftJoin('donation_transaction as dt', 'dt.transaction_id', 't.id')
+            ->leftJoin('donations as d', 'dt.donation_id', 'd.id')
+            ->select('t.id', 't.datetime_created as row', 'd.nama', DB::raw('CONCAT("RM ", t.amount) as amount'))
+            ->where('t.status', 'success')
+            ->orderByDesc('datetime_created')
+            ->first();
+
+        $data->row = Carbon::createFromFormat('Y-m-d H:i:s', $data->row)->format('d/m');
+
+        return response()->json($data);
+    }
+
+    public function gettransactionbymonth()
+    {
+        $curYear = date("Y") . "-01-01";
+
+        $donationbymonth = DB::table('transactions')
+                        ->where('status', 'success')
+                        ->where('nama', 'LIKE', 'donation%')
+                        ->where('datetime_created', '>', $curYear)
+                        ->select(DB::table('transactions')->raw('sum(amount) as value'))
+                        ->groupBy(DB::table('transactions')->raw('DATE_FORMAT(datetime_created, "%m")'))
+                        ->get();
+
+        $month = [];
+
+        for($i = 0; $i < 12; $i++)
+        {
+            if($i < count($donationbymonth))
+            {
+                array_push($month, ['label' => $i+1, 'value' => number_format($donationbymonth[$i]->value, 2)]);
+            }
+            else
+            {
+                array_push($month, ['label' => $i+1, 'value' => "0.00"]);
+            }
+        }
+
+        return $month;
+    }
+
+    public function gettransactionbyyear()
+    {
+        return DB::table('transactions')
+                ->where('status', 'success')
+                ->where('nama', 'LIKE', 'donation%')
+                ->select(DB::table('transactions')->raw('DATE_FORMAT(datetime_created, "%Y") as label'), DB::table('transactions')->raw('format(sum(amount), 2) as value'))
+                ->groupBy('label')
+                ->get();
+    }
+
+    public function donationnumberbyorganization()
+    {
+        return DB::table('organizations as o')
+                ->leftJoin('donation_organization as do', 'do.organization_id', 'o.id')
+                ->leftJoin('donations as d', 'd.id', 'do.donation_id')
+                ->select('o.nama as label', DB::table('organizations')->raw('count("o.nama") as value'))
+                ->groupBy('label')
+                ->orderByDesc('value')
+                ->where('d.status', 1)
+                ->limit(10)
+                ->get();
+    }
+
+    public function getdonationbycategory()
+    {
+        return DB::table('donation_type as dt')
+                ->leftJoin('donations as d', 'd.donation_type', 'dt.id')
+                ->select('dt.nama as label', DB::table('organizations')->raw('count("d.id") as value'))
+                ->where('d.status', 1)
+                ->groupBy('label')
+                ->get();
     }
 }

@@ -29,5 +29,11 @@ Route::get('mobile/getAllDonationType', 'MobileApiController@getAllDonationType'
 Route::get('mobile/getAllDonationQuantity', 'MobileApiController@getAllDonationQuantity');
 Route::get('mobile/getAllDonationTypeQuantity', 'MobileApiController@getAllDonationTypeQuantity');
 Route::get('mobile/getAllStatistic', 'MobileApiController@getAllStatistic');
+Route::get('mobile/getallmytransactionhistory', 'MobileApiController@getallmytransactionhistory');
+Route::get('mobile/getlatesttransaction', 'MobileApiController@getlatesttransaction');
+Route::get('mobile/gettransactionbymonth', 'MobileApiController@gettransactionbymonth');
+Route::get('mobile/gettransactionbyyear', 'MobileApiController@gettransactionbyyear');
+Route::get('mobile/donationnumberbyorganization', 'MobileApiController@donationnumberbyorganization');
+Route::get('mobile/getdonationbycategory', 'MobileApiController@getdonationbycategory');
 
 Route::post('mobile/login', 'MobileApiController@login');
