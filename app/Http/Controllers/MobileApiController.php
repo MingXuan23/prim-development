@@ -9,6 +9,7 @@ use PhpParser\Node\Expr\FuncCall;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use IlluminateAgnostic\Arr\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 
 class MobileApiController extends Controller
 {
@@ -225,5 +226,37 @@ class MobileApiController extends Controller
                 ->where('d.status', 1)
                 ->groupBy('label')
                 ->get();
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $id = $request->id;
+
+        $validator = Validator::make($request->all(), [
+            'name'      => 'required',
+            'telno'     => "required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
+            'email'     => "required|email|unique:users,email,$id",
+        ]);
+
+        if($validator->fails())
+        {
+            return response(401);
+        }
+
+        $userUpdate = DB::table('users')
+            ->where('id', $id)
+            ->update(
+                [
+                    'name'      => $request->post('name'),
+                    'email'     => $request->post('email'),
+                    'username'  => $request->post('username'),
+                    'telno'     => $request->post('telno'),
+                    'address'   => $request->post('address'),
+                    'state'     => $request->post('state'),
+                    'postcode'  => $request->post('postcode')
+                ]
+            );
+        
+        return response(200); 
     }
 }

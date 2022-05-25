@@ -37,3 +37,4 @@ Route::get('mobile/donationnumberbyorganization', 'MobileApiController@donationn
 Route::get('mobile/getdonationbycategory', 'MobileApiController@getdonationbycategory');
 
 Route::post('mobile/login', 'MobileApiController@login');
+Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
