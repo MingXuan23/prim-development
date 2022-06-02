@@ -109,11 +109,12 @@
         let donateid = $('#don').val();
 
         let donor_table = $('#donorTable').DataTable({
-            processing: true,
-            serverSide: true,
+            // processing: true,
+            // serverSide: true,
             lengthChange: false,
             dom: 'Bfrtip',
-            buttons: ['excel', 'pdf'],
+            buttons:  [ { extend: 'excel', text: 'Excel', exportOptions: { modifier: {  page:   'all', }}},
+                        { extend: 'pdf', text: 'PDF', exportOptions: { modifier: { page:   'all', }}} ],
             ajax: {
                 url: "{{ route('donate.donor_datatable') }}",
                 data: {
@@ -122,9 +123,6 @@
                 type: 'GET',
 
             },
-            order: [
-                [1, 'asc']
-            ],
             'columnDefs': [{
                 "targets": [2, 3, 4, 5],
                 "className": "text-center",
