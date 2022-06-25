@@ -170,6 +170,22 @@
                         <span>Yuran</span>
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
+                        @role('Superadmin|Penjaga')
+                        <li>
+                            <a href="{{ route('dependent_fees') }}" class=" waves-effect">
+                                <i class="far fa-credit-card"></i>
+                                <span>Bayar</span>
+                            </a>
+                        </li>
+        
+                        <li>
+                            <a href="{{ route('parent.dependent') }}" class=" waves-effect">
+                            <i class="fas fa-child"></i>
+                            <span>Carian Tanggungan</span>
+                            </a>
+                        </li>
+                        @endrole
+                        
                         @role('Superadmin|Pentadbir')
                         <li>
                             <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
@@ -186,15 +202,16 @@
                                 <span>Laporan Yuran</span>
                             </a>
                         </li>
-                        @endrole
 
-                        @role('Superadmin|Pentadbir|Guru|Penjaga')
                         <li>
                             <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-search"></i>
                                 <span>Laporan Kelas</span>
                             </a>
                         </li>
+                        @endrole
+
+                        @role('Superadmin|Pentadbir|Guru|Penjaga')
 
                         <li>
                             <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
@@ -226,22 +243,6 @@
                             </a>
                         </li>
                         @endrole
-
-                @role('Superadmin|Penjaga')
-                <li>
-                    <a href="{{ route('parent.dependent') }}" class=" waves-effect">
-                    <i class="fas fa-child"></i>
-                    <span>Carian Tanggungan</span>
-                    </a>
-                </li>
-                
-                <li>
-                    <a href="{{ route('dependent_fees') }}" class=" waves-effect">
-                        <i class="far fa-credit-card"></i>
-                        <span>Bayar</span>
-                    </a>
-                </li>
-                @endrole
                 
             </ul>
             </li>
