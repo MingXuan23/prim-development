@@ -1,8 +1,7 @@
 @extends('layouts.master')
 
 <div class="container" style="margin-top: 5%;">
-    {{-- <form name="form1" id="form1" method="post" action="{{ $fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL')}}"> --}}
-    <form name="form1" id="form1" method="post" action="{{ route('trn') }}">
+    <form name="form1" id="form1" method="post" action="{{ $fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL')}}">
         @csrf
         <div class="card">
             <div class="card-body">
@@ -97,34 +96,14 @@
 <script>
     var values = $("#form1").serialize();
     
-    // function redirectFPX() {
-    //     $('#form1').submit();
-    //     pay();
-    // }
-    
-    // setTimeout("redirectFPX();",3000);
     var count = 5;
     setInterval(function(){
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
             $('#form1').submit();
-            // pay();
         }
     },1000);
-
-    function pay(){
-    $.ajax({
-            url: "{{ route('trn') }}",
-            type: "post",
-            data: values ,
-            success: function (response) {
-            // You will get response from your PHP page (what you echo or print)
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.log(textStatus, errorThrown);
-            }
-        });
-    }
+    
 </script>
 @endsection

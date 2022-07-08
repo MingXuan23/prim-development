@@ -290,7 +290,6 @@ class PayController extends AppBaseController
 
     public function transaction(Request $request)
     {
-        //  $fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL')
         $user       = User::find(Auth::id());
         $transaction = new Transaction();
         $transaction->nama          = $request->fpx_sellerExOrderNo;
@@ -348,32 +347,6 @@ class PayController extends AppBaseController
                 $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
         }
-
-        $url = $request->fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL');
-
-        return redirect()->route($url, [
-            'fpx_msgType'           => $request->fpx_msgType,
-            'fpx_msgToken'          => $request->fpx_msgToken,
-            'fpx_sellerExId'        => $request->fpx_sellerExId,
-            'fpx_sellerExOrderNo'   => $request->fpx_sellerExOrderNo,
-            'fpx_sellerTxnTime'     => $request->fpx_sellerTxnTime,
-            'fpx_sellerOrderNo'     => $request->fpx_sellerOrderNo,
-            'fpx_sellerId'          => $request->fpx_sellerId,
-            'fpx_sellerBankCode'    => $request->fpx_sellerBankCode,
-            'fpx_txnCurrency'       => $request->fpx_txnCurrency,
-            'fpx_txnAmount'         => $request->fpx_txnAmount,
-            'fpx_buyerEmail'        => $request->fpx_buyerEmail,
-            'fpx_checkSum'          => $request->fpx_checkSum,
-            'fpx_buyerName'         => $request->fpx_buyerName,
-            'fpx_buyerBankId'       => $request->fpx_buyerBankId,
-            'fpx_buyerBankBranch'   => $request->fpx_buyerBankBranch,
-            'fpx_buyerAccNo'        => $request->fpx_buyerAccNo,
-            'fpx_buyerId'           => $request->fpx_buyerId,
-            'fpx_makerName'         => $request->fpx_makerName,
-            'fpx_buyerIban'         => $request->fpx_buyerIban,
-            'fpx_productDesc'       => $request->fpx_productDesc,
-            'fpx_version'           => $request->fpx_version,
-        ]);
     }
 
     public function transactionDev(Request $request)
@@ -454,31 +427,13 @@ class PayController extends AppBaseController
             $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
-
-            // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
-            /* 
-                for the current moment, we use smk pendang seller id for the testing..
-                need to change and find organization seller id after we need to launch
-            */
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
-
-            // if ($getstudentfees) {
-            //     $getstudentfees     = $request->student_fees_id;
-            // }
-
-            // if ($getparentfees) {
-            //     $getparentfees     = $request->parent_fees_id;
-            // }
-            // dd($getstudentfees[0]);
-            // $fpx_buyerIban      = "";
         }
 
 
         $fpx_msgType        = "AR";
         $fpx_msgToken       = "01";
-        // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
         $fpx_sellerTxnTime  = date('YmdHis');
-        // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
         $fpx_buyerIban      = "";
@@ -502,6 +457,64 @@ class PayController extends AppBaseController
         $pkeyid = openssl_get_privatekey($priv_key, null);
         openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
         $fpx_checkSum = strtoupper(bin2hex($binary_signature));
+
+        $transaction = new Transaction();
+        $transaction->nama          = $fpx_sellerExOrderNo;
+        $transaction->description   = $fpx_sellerOrderNo;
+        $transaction->transac_no    = NULL;
+        $transaction->datetime_created = now();
+        $transaction->amount        = $fpx_txnAmount;
+        $transaction->status        = 'Pending';
+        $transaction->email         = $fpx_buyerEmail;
+        $transaction->telno         = $telno;
+        $transaction->username      = strtoupper($fpx_buyerName);
+        $transaction->fpx_checksum  = $fpx_checkSum;
+
+        if ($user) {
+            $transaction->user_id   = Auth::id();
+        }
+
+        $list_student_fees_id   = $getstudentfees;
+        $list_parent_fees_id    = $getparentfees;
+
+        $id = explode("_", $fpx_sellerOrderNo);
+        $id = (int) str_replace("PRIM", "", $id[0]);
+
+        if ($transaction->save()) {
+
+            // ******* save bridge transaction *********
+            // type = S for school fees and D for donation
+
+            if (substr($request->fpx_sellerExOrderNo, 0, 1) == 'S') {
+
+                // ********* student fee id
+
+                if ($list_student_fees_id) {
+                    for ($i = 0; $i < count($list_student_fees_id); $i++) {
+                        $array[] = array(
+                            'student_fees_id' => $list_student_fees_id[$i],
+                            'payment_type_id' => 1,
+                            'transactions_id' => $transaction->id,
+                        );
+                    }
+
+                    DB::table('fees_transactions_new')->insert($array);
+                }
+                if ($list_parent_fees_id) {
+
+                    for ($i = 0; $i < count($list_parent_fees_id); $i++) {
+                        $result = DB::table('fees_new_organization_user')
+                            ->where('id', $list_parent_fees_id[$i])
+                            ->update([
+                                'transaction_id' => $transaction->id
+                            ]);
+                    }
+                }
+            } else {
+                $transaction->donation()->attach($id, ['payment_type_id' => 1]);
+            }
+        }
+
         return view('fpx.index', compact(
             'fpx_msgType',
             'fpx_msgToken',
