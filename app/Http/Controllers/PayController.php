@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Fee_New;
 use Illuminate\Support\Facades\Redirect;
+use League\CommonMark\Inline\Parser\EscapableParser;
 use phpDocumentor\Reflection\Types\Null_;
 
 class PayController extends AppBaseController
@@ -417,7 +418,9 @@ class PayController extends AppBaseController
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
             // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
-        } else {
+        } 
+        else if (($request->desc == 'School_Fees'))
+        {
             $organization = Organization::find($request->o_id);
             
             $fpx_buyerEmail      = $user->email;
