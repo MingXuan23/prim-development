@@ -517,6 +517,10 @@ class PayController extends AppBaseController
                 $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
         }
+        else
+        {
+            return view('errors.500');
+        }
 
         return view('fpx.index', compact(
             'fpx_msgType',
