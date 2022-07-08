@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\AppBaseController;
 use App\Models\Fee_New;
 use Illuminate\Support\Facades\Redirect;
+use League\CommonMark\Inline\Parser\EscapableParser;
 use phpDocumentor\Reflection\Types\Null_;
 
 class PayController extends AppBaseController
@@ -417,7 +418,9 @@ class PayController extends AppBaseController
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
             // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
-        } else {
+        } 
+        else if (($request->desc == 'School_Fees'))
+        {
             $organization = Organization::find($request->o_id);
             
             $fpx_buyerEmail      = $user->email;
@@ -427,31 +430,13 @@ class PayController extends AppBaseController
             $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
-
-            // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
-            /* 
-                for the current moment, we use smk pendang seller id for the testing..
-                need to change and find organization seller id after we need to launch
-            */
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
-
-            // if ($getstudentfees) {
-            //     $getstudentfees     = $request->student_fees_id;
-            // }
-
-            // if ($getparentfees) {
-            //     $getparentfees     = $request->parent_fees_id;
-            // }
-            // dd($getstudentfees[0]);
-            // $fpx_buyerIban      = "";
         }
 
 
         $fpx_msgType        = "AR";
         $fpx_msgToken       = "01";
-        // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
         $fpx_sellerTxnTime  = date('YmdHis');
-        // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         $fpx_sellerBankCode = "01";
         $fpx_txnCurrency    = "MYR";
         $fpx_buyerIban      = "";
@@ -475,6 +460,68 @@ class PayController extends AppBaseController
         $pkeyid = openssl_get_privatekey($priv_key, null);
         openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
         $fpx_checkSum = strtoupper(bin2hex($binary_signature));
+
+        $transaction = new Transaction();
+        $transaction->nama          = $fpx_sellerExOrderNo;
+        $transaction->description   = $fpx_sellerOrderNo;
+        $transaction->transac_no    = NULL;
+        $transaction->datetime_created = now();
+        $transaction->amount        = $fpx_txnAmount;
+        $transaction->status        = 'Pending';
+        $transaction->email         = $fpx_buyerEmail;
+        $transaction->telno         = $telno;
+        $transaction->username      = strtoupper($fpx_buyerName);
+        $transaction->fpx_checksum  = $fpx_checkSum;
+
+        if ($user) {
+            $transaction->user_id   = Auth::id();
+        }
+
+        $list_student_fees_id   = $getstudentfees;
+        $list_parent_fees_id    = $getparentfees;
+
+        $id = explode("_", $fpx_sellerOrderNo);
+        $id = (int) str_replace("PRIM", "", $id[0]);
+
+        if ($transaction->save()) {
+
+            // ******* save bridge transaction *********
+            // type = S for school fees and D for donation
+
+            if (substr($request->fpx_sellerExOrderNo, 0, 1) == 'S') {
+
+                // ********* student fee id
+
+                if ($list_student_fees_id) {
+                    for ($i = 0; $i < count($list_student_fees_id); $i++) {
+                        $array[] = array(
+                            'student_fees_id' => $list_student_fees_id[$i],
+                            'payment_type_id' => 1,
+                            'transactions_id' => $transaction->id,
+                        );
+                    }
+
+                    DB::table('fees_transactions_new')->insert($array);
+                }
+                if ($list_parent_fees_id) {
+
+                    for ($i = 0; $i < count($list_parent_fees_id); $i++) {
+                        $result = DB::table('fees_new_organization_user')
+                            ->where('id', $list_parent_fees_id[$i])
+                            ->update([
+                                'transaction_id' => $transaction->id
+                            ]);
+                    }
+                }
+            } else {
+                $transaction->donation()->attach($id, ['payment_type_id' => 1]);
+            }
+        }
+        else
+        {
+            return view('errors.500');
+        }
+
         return view('fpx.index', compact(
             'fpx_msgType',
             'fpx_msgToken',
