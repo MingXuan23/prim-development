@@ -1,8 +1,8 @@
 @extends('layouts.master')
 
 <div class="container" style="margin-top: 5%;">
-    <form name="form1" id="form1" method="post"
-        action="{{ $fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL')}}">
+    {{-- <form name="form1" id="form1" method="post" action="{{ $fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL')}}"> --}}
+    <form name="form1" id="form1" method="post" action="{{ route('trn') }}">
         @csrf
         <div class="card">
             <div class="card-body">
@@ -109,7 +109,7 @@
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
             $('#form1').submit();
-            pay();
+            // pay();
         }
     },1000);
 

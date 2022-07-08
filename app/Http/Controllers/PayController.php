@@ -290,6 +290,7 @@ class PayController extends AppBaseController
 
     public function transaction(Request $request)
     {
+        //  $fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL')
         $user       = User::find(Auth::id());
         $transaction = new Transaction();
         $transaction->nama          = $request->fpx_sellerExOrderNo;
@@ -347,6 +348,32 @@ class PayController extends AppBaseController
                 $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
         }
+
+        $url = $request->fpx_buyerBankId == 'TEST0021' ? config('app.UAT_AR_AD_URL')  :  config('app.PRODUCTION_AR_AD_URL');
+
+        return redirect()->route($url, [
+            'fpx_msgType'           => $request->fpx_msgType,
+            'fpx_msgToken'          => $request->fpx_msgToken,
+            'fpx_sellerExId'        => $request->fpx_sellerExId,
+            'fpx_sellerExOrderNo'   => $request->fpx_sellerExOrderNo,
+            'fpx_sellerTxnTime'     => $request->fpx_sellerTxnTime,
+            'fpx_sellerOrderNo'     => $request->fpx_sellerOrderNo,
+            'fpx_sellerId'          => $request->fpx_sellerId,
+            'fpx_sellerBankCode'    => $request->fpx_sellerBankCode,
+            'fpx_txnCurrency'       => $request->fpx_txnCurrency,
+            'fpx_txnAmount'         => $request->fpx_txnAmount,
+            'fpx_buyerEmail'        => $request->fpx_buyerEmail,
+            'fpx_checkSum'          => $request->fpx_checkSum,
+            'fpx_buyerName'         => $request->fpx_buyerName,
+            'fpx_buyerBankId'       => $request->fpx_buyerBankId,
+            'fpx_buyerBankBranch'   => $request->fpx_buyerBankBranch,
+            'fpx_buyerAccNo'        => $request->fpx_buyerAccNo,
+            'fpx_buyerId'           => $request->fpx_buyerId,
+            'fpx_makerName'         => $request->fpx_makerName,
+            'fpx_buyerIban'         => $request->fpx_buyerIban,
+            'fpx_productDesc'       => $request->fpx_productDesc,
+            'fpx_version'           => $request->fpx_version,
+        ]);
     }
 
     public function transactionDev(Request $request)
