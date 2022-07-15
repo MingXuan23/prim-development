@@ -3,7 +3,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class TypeOrganizationsTableSeeder extends Seeder
+class DishTypeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -12,47 +12,63 @@ class TypeOrganizationsTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('type_organizations')->delete();
-        DB::table('type_organizations')->insert(array(
+        //
+        DB::table('dish_type')->delete();
+        DB::table('dish_type')->insert(array(
             0 =>
             array(
                 "id" => 1,
-                "nama" => "SK /SJK",
+                "name" => "Halal",
             ),
             1 =>
             array(
                 "id" => 2,
-                "nama" => "SRA /SRAI",
+                "name" => "Seafood",
             ),
             2 =>
             array(
                 "id" => 3,
-                "nama" => "SMK /SMJK",
+                "name" => "Fried Chicken",
             ),
             3 =>
             array(
                 "id" => 4,
-                "nama" => "Masjid",
+                "name" => "Western",
             ),
             4 =>
             array(
                 "id" => 5,
-                "nama" => "NGO",
+                "name" => "Fast Food",
             ),
             5 =>
             array(
                 "id" => 6,
-                "nama" => "Rumah Anak Yatim",
+                "name" => "Dessert",
             ),
             6 =>
             array(
                 "id" => 7,
-                "nama" => "Pusat Tahfiz",
+                "name" => "Local",
             ),
             7 =>
             array(
                 "id" => 8,
-                "nama" => "Kedai Makanan",
+                "name" => "Chicken",
+            ),
+            8 =>
+            array(
+                "id" => 9,
+                "name" => "Asian",
+            ),
+            9 =>
+            array(
+                "id" => 10,
+                "name" => "Snack",
+            ),
+            10 =>
+            array(
+                "id" => 11,
+                "name" => "Noodles",
             ),
         ));
     }
