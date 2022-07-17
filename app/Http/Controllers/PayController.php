@@ -488,7 +488,7 @@ class PayController extends AppBaseController
             // ******* save bridge transaction *********
             // type = S for school fees and D for donation
 
-            if (substr($request->fpx_sellerExOrderNo, 0, 1) == 'S') {
+            if (substr($fpx_sellerExOrderNo, 0, 1) == 'S') {
 
                 // ********* student fee id
 
