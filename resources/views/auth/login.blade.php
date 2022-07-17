@@ -81,7 +81,7 @@ Login
                 </div>
             </div>
 
-            <div class="container d-none d-lg-block">
+            <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-12">
                         <div class="section-title text-center">
