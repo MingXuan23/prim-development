@@ -80,7 +80,37 @@ Login
 
                 </div>
             </div>
+
+            <div class="container d-none d-lg-block">
+                <div class="row justify-content-center">
+                    <div class="col-lg-12">
+                        <div class="section-title text-center">
+                            <!-- section title -->
+                            {{-- <span class="subtitle">Screenshots</span> --}}
+                            <h3 class="title extra">Kerjasama</h3>
+                            <p>Laman web ini telah diakui dan disahkan selamat untuk digunakan.</p>
+                        </div><!-- //. section title -->
+                    </div>
+                </div>
+                
+                <div class="row text-center">
+                    <div class="col-lg-12">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt="" style="max-width:70%">
+                            </div>
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt="" style="max-width:70%">
+                            </div>
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt="" style="max-width:70%">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </div>
 @endsection
 
