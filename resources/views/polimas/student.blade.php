@@ -96,6 +96,26 @@
         </div>
     </div>
 </div>
+
+ <!-- Modal -->
+ <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+ aria-hidden="true">
+ <div class="modal-dialog" role="document">
+     <div class="modal-content">
+         <div class="modal-header">
+             <h5 class="modal-title"></h5>
+             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+             </button>
+         </div>
+
+         <div class="modal-body">
+
+         </div>
+
+     </div>
+ </div>
+</div>
 @endsection
 
 
@@ -230,6 +250,54 @@
 
         $('#buttonExport').click(function() {
             $('#modelId1').modal('hide');
+        });
+
+        var student_id;
+        $(document).on('click', '.student-id', function(){
+            student_id = $(this).attr('id');
+
+            $.ajax({
+                url: "{{ route('polimas.studentfees') }}",
+                type: 'get',
+                data: {
+                    student_id: student_id
+                },
+                success: function(response){ 
+
+                    var html="";
+                    $('.modal-body').empty();
+
+                    $('.modal-title').text("Butiran Yuran - " +  response[0].studentnama);
+
+                    html += '<table class="table table-bordered" >';
+                        html += '<tr style="text-align:center">';
+                        html += '<th> Nama Yuran </th>';
+                        html += '<th> Jumlah Amaun (RM)</th>';
+                        html += '<th> Status </th>';
+                        html += '</tr>';
+                    for(var i=0; i < response.length; i++){
+
+                        html += '<tr>';
+                        html += '<td><div style="text-align:center">'+response[i].name+'</div></td>';  
+                        html += '<td><div  style="text-align:center">'+response[i].totalAmount.toFixed(2)+'</div></td>';  
+                        if(response[i].status == 'Paid'){
+                            html += '<td><div  style="text-align:center"> <span class="badge badge-success"> Selesai </span></div> </td>';  
+                        }else{
+                            html += '<td><div  style="text-align:center"> <span class="badge badge-danger"> Belum Selesai </span></div> </td>';  
+                        }
+                        html += '</tr>';
+                    }
+                    html += '</table>';      
+                    
+                // Add response in Modal body
+                    $('.modal-body').append(html) 
+
+                // Display Modal
+                    $('#modelId').modal('show');
+
+                }
+            });
+
         });
     });
 </script>

@@ -260,5 +260,7 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
         Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
         Route::get('/student-list', 'PolimasController@getStudentDatatable')->name('polimas.student.getStudentDatatable');
+        Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
+
     });
 });

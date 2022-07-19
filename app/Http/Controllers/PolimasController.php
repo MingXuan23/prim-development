@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 
+use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
 
 class PolimasController extends Controller
@@ -122,13 +123,7 @@ class PolimasController extends Controller
                         ->select('fn.name')
                         ->first();
                     
-                    if (isNull($isPaid))
-                    {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
-                        return $btn;
-                    }
-                    else
+                    if ($isPaid)
                     {
                         if (strpos($isPaid->name, 'Tidak Hadir'))
                         {
@@ -143,13 +138,18 @@ class PolimasController extends Controller
                             return $btn;
                         }
                     }
+                    else
+                    {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
+                        return $btn;
+                    }
                 });
 
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = $btn . '<a class="btn btn-primary m-1 student-id" id="' . $row->id . '">Butiran</a></div>';
                     return $btn;
                 });
 
@@ -157,5 +157,33 @@ class PolimasController extends Controller
                 return $table->make(true);
             }
         }
+    }
+
+    public function student_fees(Request $request)
+    {
+        $student_id = $request->student_id;
+        $getfees_bystudent = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->select('fees_new.*','students.id as studentid', 'students.nama as studentnama', 'student_fees_new.status')
+            ->where('students.id', $student_id)
+            ->where('student_fees_new.status', 'Paid')
+            ->orderBy('fees_new.name')
+            ->get();
+        
+        if($getfees_bystudent->isEmpty())
+        {
+            $getfees_bystudent = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->select('fees_new.*','students.id as studentid', 'students.nama as studentnama', 'student_fees_new.status')
+            ->where('students.id', $student_id)
+            ->orderBy('fees_new.name')
+            ->get();
+        }
+
+        return response()->json($getfees_bystudent, 200);
     }
 }
