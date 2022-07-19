@@ -107,6 +107,33 @@
                 </li>
                 @endrole --}}
 
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="fas fa-school"></i>
+                        <span>Polimas</span>
+                    </a>
+
+                    <ul class="sub-menu mm-collapse" aria-expanded="false">
+                        @role('Superadmin|Pentadbir')
+                        <li>
+                            <a href="{{ route('polimas.batch') }}" class=" waves-effect">
+                                <i class="mdi mdi-google-classroom"></i>
+                                <span>Batch</span>
+                            </a>
+                        </li>
+                        @endrole
+
+                        @role('Superadmin|Pentadbir|Guru')
+                        <li>
+                            <a href="{{ route('polimas.student') }}" class=" waves-effect">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Pelajar</span>
+                            </a>
+                        </li>
+                        @endrole
+                    </ul>
+                </li>
+
                 @role('Superadmin|Pentadbir|Guru')
 
                 <li>

@@ -19,7 +19,9 @@ Polimas Login
                     <div class="card overflow-hidden">
                         <div class="bg-primary">
                             <div class="text-primary text-center p-4">
-                                <img src="{{ URL::asset('assets/images/logo/polimas-logo.png') }}" height="60" alt="logo">
+                                <a href="https://www.polimas.edu.my/web/">
+                                    <img src="{{ URL::asset('assets/images/logo/polimas-logo.png') }}" height="60" alt="logo">
+                                </a>
                                 <h5 class="text-white font-size-20">Selamat Datang!</h5>
                                 <p class="text-white-50">Log Masuk ke PRIM</p>
                             </div>
