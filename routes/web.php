@@ -13,8 +13,8 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Auth::routes();
-Auth::routes(['register' => false]);
+Auth::routes();
+// Auth::routes(['register' => false]);
 
 Route::get('/home', 'HomeController@index');
 Route::get('/form', 'HomeController@form');
@@ -251,4 +251,8 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/get', 'SessionController@accessSessionData')->name('getsession');
     Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');
     Route::get('session/remove', 'SessionController@deleteSessionData');
+});
+
+Route::group(['prefix' => 'polimas'], function () {
+    Route::get('/', 'PolimasController@indexLogin');
 });
