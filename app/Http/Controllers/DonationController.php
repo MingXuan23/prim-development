@@ -404,14 +404,15 @@ class DonationController extends Controller
         $end_date = Carbon::createFromFormat(config('app.date_format'), $request->date_end)->format('Y-m-d');
 
         $file_name = '';
+
+        // dd($request->donation_type);
         
         if (!is_null($request->donation_poster)) {
             
             // Delete existing image before update with new image;
             $donation = $this->donation->getDonationById($id);
-            $destination = public_path('donation-poster').  DIRECTORY_SEPARATOR  . $donation->donation_poster;
+            $destination = public_path('donation-poster') . '\\' . $donation->donation_poster;
             unlink($destination);
-
             $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
             $file_name = basename($storagePath);
         }
