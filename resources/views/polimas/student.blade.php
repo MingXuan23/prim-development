@@ -18,8 +18,78 @@
 
     <div class="col-md-12">
         <div class="card">
-            <div>
-                
+            <div class="row">
+                <div class="col-sm-6">
+                    <h4 class="card-title mb-4 text-center">Laporan Graf untuk Batch JUN 19, DIS 19, JUN 20</h4>
+
+                    <div class="row justify-content-center">
+                        {{-- <div class="col-sm-6">
+                            <div class="text-center">
+                                <h5 class="mb-0 font-size-20" id="student-complete">0 /
+                                    0</h5>
+                                <p class="text-muted">Orang Selesai Membayar</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="text-center">
+                                <h5 class="mb-0 font-size-20" id="student-not-complete">0 /
+                                    0</h5>
+                                <p class="text-muted">Orang Belum Selesai Membayar</p>
+                            </div>
+                        </div> --}}
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h5 class="mb-0 font-size-20">86541</h5>
+                            <p class="text-muted">Hadir</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h5 class="mb-0 font-size-20">2541</h5>
+                                <p class="text-muted">Tidak Hadir</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h5 class="mb-0 font-size-20">102030</h5>
+                            <p class="text-muted">Masih Berhutang</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pie-chart-yuran" style="width:500px;height:250px; margin: 0 auto;">
+                        <div id="pie-chart-container" class="flot-charts flot-charts-height">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <h4 class="card-title mb-4 text-center">Laporan Graf untuk Batch DIS 20, Sesi 1: 2020/2021</h4>
+                    <div class="row justify-content-center">
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h5 class="mb-0 font-size-20">86541</h5>
+                            <p class="text-muted">Hadir</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h5 class="mb-0 font-size-20">2541</h5>
+                                <p class="text-muted">Tidak Hadir</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <h5 class="mb-0 font-size-20">102030</h5>
+                            <p class="text-muted">Masih Berhutang</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="pie-chart-yuran-category-A" style="width:500px;height:250px; margin: 0 auto;">
+                        <div id="pie-chart-container" class="flot-charts flot-charts-height">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="card-body">
@@ -39,6 +109,7 @@
                         </select>
                     </div>
                 </div>
+                
                 <div style="margin: 0px 19px 19px 19px; float: right;">
                     <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Export All</a>
                     <a href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>

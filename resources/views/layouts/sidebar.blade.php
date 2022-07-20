@@ -85,20 +85,6 @@
                                 <span>Batch</span>
                             </a>
                         </li>
-
-                        <li>
-                            <a href="{{ route('fees.category.report') }}" class=" waves-effect">
-                                <i class="ti-clipboard"></i>
-                                <span>Laporan Yuran</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
-                                <i class="ti-clipboard"></i>
-                                <span>Sejarah Bayaran</span>
-                            </a>
-                        </li>
                     </ul>
                 </li>
                 @endrole
