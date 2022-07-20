@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 
@@ -411,8 +412,13 @@ class DonationController extends Controller
             
             // Delete existing image before update with new image;
             $donation = $this->donation->getDonationById($id);
-            $destination = public_path('donation-poster') . '\\' . $donation->donation_poster;
-            unlink($destination);
+
+            if (config('app.env') == 'staging' ||config('app.env') == 'production' )
+            {
+                $destination = public_path('donation-poster') . '/' . $donation->donation_poster;
+                unlink($destination);
+            }
+            
             $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
             $file_name = basename($storagePath);
         }
