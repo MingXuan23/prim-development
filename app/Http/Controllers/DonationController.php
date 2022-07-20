@@ -434,6 +434,7 @@ class DonationController extends Controller
         DB::table('donations')
             ->where('id', $id)
             ->update([
+                'nama'              => $request->nama,
                 'date_created'      => now(),
                 'date_started'      => $start_date,
                 'date_end'          => $end_date,
