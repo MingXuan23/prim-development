@@ -23,9 +23,9 @@ class CreateKoopOrderTable extends Migration
             $table->string('city')->nullable();
             $table->integer('postcode')->nullable();
             $table->string('state')->nullable();
-            $table->unsignedBigInteger('koop_id')->index();
+            $table->unsignedBigInteger('organization_id')->index();
 
-            $table->foreign('koop_id')->references('id')->on('koop')->onDelete('cascade');
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 
@@ -38,7 +38,7 @@ class CreateKoopOrderTable extends Migration
     {
         Schema::dropIfExists('koop_order', function(Blueprint $table)
         {
-            $table->drop('koop_id');
+            $table->drop('organization_id');
         });
     }
 }

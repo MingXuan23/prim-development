@@ -28,5 +28,6 @@ class DatabaseSeeder extends Seeder
         $this->call(OrganizationParentTableSeeder::class);
         $this->call(OrganizationNegeriTableSeeder::class);
         $this->call(OrganizationDaerahTableSeeder::class);
+        $this->call(ProductTypeTableSeeder::class);
     }
 }

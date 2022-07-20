@@ -22,8 +22,10 @@ class CreateProductItemTable extends Migration
             $table->string('image')->nullable();
             $table->integer('status');
             $table->unsignedBigInteger('product_type_id')->index();
+            $table->unsignedBigInteger('organization_id')->index();
 
             $table->foreign('product_type_id')->references('id')->on('product_type')->onDelete('cascade');
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 
@@ -37,6 +39,7 @@ class CreateProductItemTable extends Migration
         Schema::dropIfExists('product_item', function(Blueprint $table)
         {
             $table->drop('product_type_id');
+            $table->drop('organization_id');
         });
     }
 }

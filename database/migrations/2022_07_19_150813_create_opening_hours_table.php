@@ -19,9 +19,9 @@ class CreateOpeningHoursTable extends Migration
             $table->time('open_hour')->nullable();
             $table->time('close_hour')->nullable();
             $table->integer('status')->nullable();
-            $table->unsignedBigInteger('koop_id')->index();
+            $table->unsignedBigInteger('organization_id')->index();
 
-            $table->foreign('koop_id')->references('id')->on('koop')->onDelete('cascade');
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 
@@ -34,7 +34,7 @@ class CreateOpeningHoursTable extends Migration
     {
         Schema::dropIfExists('opening_hours', function(Blueprint $table)
         {
-            $table->drop('koop_id');
+            $table->drop('organization_id');
         });
     }
 }
