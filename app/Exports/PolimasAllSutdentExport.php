@@ -56,7 +56,7 @@ class PolimasAllSutdentExport implements FromCollection, ShouldAutoSize, WithHea
             }
             else
             {
-                $student->status = "Masih Berhutang";
+                $student->status = "Belum Bayar";
             }
 
             unset($student->csid);
