@@ -71,7 +71,7 @@ class PolimasAllSutdentExport implements FromCollection, ShouldAutoSize, WithHea
         return [
             'Nama',
             'Batch',
-            'No Kad Pengekalan',
+            'No Kad Pengenalan',
             'Telno',
             'Status',
         ];
