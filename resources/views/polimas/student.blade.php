@@ -39,9 +39,10 @@
                         </select>
                     </div>
                 </div>
-
-                <a style="margin: 0px 19px 19px 19px; float: right;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
-                    class="fas fa-plus"></i> Export</a>
+                <div style="margin: 0px 19px 19px 19px; float: right;">
+                    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Export All</a>
+                    <a href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
+                </div>
 
                 <div class="table-responsive">
                     <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
@@ -60,6 +61,35 @@
             </div>
         </div>
 
+        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Export Murid</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('polimas.allstudentexport') }}" method="post">
+                        <div class="modal-body">
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="organExport" id="organExport" class="form-control">
+                                    <option value="{{ $organization->id }}" selected>{{ $organization->nama }}</option>
+                                </select>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -70,8 +100,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    {{-- {{ route('exportstudent') }} --}}
-                    <form action="{{ route('exportstudent') }}" method="post">
+                    <form action="{{ route('polimas.studentexport') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
                             <div class="form-group">

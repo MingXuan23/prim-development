@@ -261,6 +261,7 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
         Route::get('/student-list', 'PolimasController@getStudentDatatable')->name('polimas.student.getStudentDatatable');
         Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
-
+        Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
+        Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
     });
 });

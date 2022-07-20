@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
-
+use App\Exports\PolimasSutdentExport;
+use App\Exports\PolimasAllSutdentExport;
 use Illuminate\Http\Request;
-
+use Maatwebsite\Excel\Facades\Excel;
 use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
 
@@ -185,5 +186,20 @@ class PolimasController extends Controller
         }
 
         return response()->json($getfees_bystudent, 200);
+    }
+
+    public function StudentExport(Request $request)
+    {
+        // dd($request);
+        $class = DB::table('classes')
+            ->where('id', $request->classExport)
+            ->first();
+
+        return Excel::download(new PolimasSutdentExport($this->oid, $request->classExport), $class->nama . '.xlsx');
+    }
+
+    public function AllStudentExport(Request $request)
+    {
+        return Excel::download(new PolimasAllSutdentExport(), 'Polimas.xlsx');
     }
 }
