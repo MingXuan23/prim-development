@@ -87,7 +87,72 @@ class PolimasController extends Controller
         $organization = DB::table('organizations')
             ->where('id', $this->oid)
             ->first();
-        return view('polimas.student', compact('organization'));
+
+        $batch1_totalStudent = DB::table('class_organization')
+            ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->where([
+                'classes.levelid' => 1,
+                'class_organization.organization_id' => $this->oid
+            ])
+            ->count();
+        
+        $batch1_hadir = DB::table('student_fees_new')
+            ->where([
+                'status' => 'Paid',
+            ])
+            ->whereIn('fees_id', [233, 244])
+            ->count();
+        
+        $batch1_tidakhadir = DB::table('student_fees_new')
+            ->where([
+                'status' => 'Paid',
+                'fees_id' => 246
+            ])
+            ->count();
+        
+        $batch1_hutang = $batch1_totalStudent - $batch1_hadir - $batch1_tidakhadir;
+
+        $batch1 = [
+            'hadir'         => $batch1_hadir,
+            'tidak_hadir'   => $batch1_tidakhadir,
+            'hutang'        => $batch1_hutang
+        ];
+        
+        $batch2_totalStudent = DB::table('class_organization')
+            ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->where([
+                'classes.levelid' => 2,
+                'class_organization.organization_id' => $this->oid
+            ])
+            ->count();
+        
+        $batch2_hadir = DB::table('student_fees_new')
+            ->where([
+                'status' => 'Paid',
+                'fees_id' => 247
+            ])
+            ->count();
+        
+        $batch2_tidakhadir = DB::table('student_fees_new')
+            ->where([
+                'status' => 'Paid',
+                'fees_id' => 248
+            ])
+            ->count();
+        
+        $batch2_hutang = $batch2_totalStudent - $batch2_hadir - $batch2_tidakhadir;
+
+        $batch2 = [
+            'hadir'         => $batch2_hadir,
+            'tidak_hadir'   => $batch2_tidakhadir,
+            'hutang'        => $batch2_hutang
+        ];
+
+        return view('polimas.student', compact('organization', 'batch1', 'batch2'));
     }
 
     public function getStudentDatatable(Request $request)
