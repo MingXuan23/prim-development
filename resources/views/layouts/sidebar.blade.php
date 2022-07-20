@@ -12,7 +12,6 @@
                 <li>
                     <a href="/home" class="waves-effect">
                         <i class="ti-home"></i>
-                        {{-- <span class="badge badge-pill badge-primary float-right">2</span> --}}
                         <span>Dashboard</span>
                     </a>
                 </li>
@@ -23,13 +22,6 @@
                         <span>Organisasi</span>
                     </a>
                 </li>
-
-                {{-- <li>
-                    <a href="{{ route('organization.index') }}" class=" waves-effect">
-                        <i class="mdi mdi-account-group"></i>
-                        <span>Chat</span>
-                    </a>
-                </li> --}}
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -59,30 +51,6 @@
                             </a>
                         </li>
                         @endrole
-
-                        {{-- <li>
-                            <a href="{{ route('donate.donor_history') }}" class=" waves-effect">
-                                <i class="far fa-clock"></i>
-                                <span>Sejarah</span>
-                            </a>
-                        </li> --}}
-
-                        {{-- <li>
-                            <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                <i class="far fa-calendar-check"></i>
-                                <span>Peringatan</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="true">
-                                <li><a href="{{ route('reminder.index') }}">Pengurusan Peringatan</a></li>
-                            </ul>
-                        </li>
-
-                        <li>
-                            <a href="{{ route('activity.index') }}" class="waves-effect">
-                                <i class="mdi mdi-format-list-checks"></i>
-                                <span>Aktiviti</span>
-                            </a>
-                        </li> --}}
                     </ul>
                 </li>
 
@@ -95,18 +63,8 @@
                     </a>
                 </li>
                 @endrole
-
-
-                {{-- 
-                @role('Superadmin')
-                <li>
-                    <a href="{{ route('organization.getAll') }}" class=" waves-effect">
-                <i class="mdi mdi-account-group"></i>
-                <span>Organisasi (All)</span>
-                </a>
-                </li>
-                @endrole --}}
-
+                
+                @role('Superadmin|Admin Polimas')
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fas fa-school"></i>
@@ -114,25 +72,36 @@
                     </a>
 
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
-                        @role('Superadmin|Pentadbir')
+                        <li>
+                            <a href="{{ route('polimas.student') }}" class=" waves-effect">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Laporan Pelajar</span>
+                            </a>
+                        </li>
+
                         <li>
                             <a href="{{ route('polimas.batch') }}" class=" waves-effect">
                                 <i class="mdi mdi-google-classroom"></i>
                                 <span>Batch</span>
                             </a>
                         </li>
-                        @endrole
 
-                        @role('Superadmin|Pentadbir|Guru')
                         <li>
-                            <a href="{{ route('polimas.student') }}" class=" waves-effect">
-                                <i class="fas fa-user-graduate"></i>
-                                <span>Pelajar</span>
+                            <a href="{{ route('fees.category.report') }}" class=" waves-effect">
+                                <i class="ti-clipboard"></i>
+                                <span>Laporan Yuran</span>
                             </a>
                         </li>
-                        @endrole
+
+                        <li>
+                            <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
+                                <i class="ti-clipboard"></i>
+                                <span>Sejarah Bayaran</span>
+                            </a>
+                        </li>
                     </ul>
                 </li>
+                @endrole
 
                 @role('Superadmin|Pentadbir|Guru')
 
@@ -274,36 +243,7 @@
             </ul>
             </li>
             @endrole
-
-            {{-- @role('Superadmin|Pentadbir|Guru')
-                <li>
-                    <a href="{{ route('chat-user') }}" class=" waves-effect">
-            <i class="mdi mdi-chat-outline"></i>
-            <span>Chat</span>
-            </a>
-            </li>
-            @endrole --}}
-
-            {{-- @role('Superadmin|Ibu|Bapa|Penjaga')
-                <li>
-                    <a href="{{ route('billIndex') }}" class=" waves-effect">
-            <i class="mdi"></i>
-            <span>Bill Design</span>
-            </a>
-            </li>
-            @endrole --}}
-
-
-            <!-- <li>
-                    <a href="" class=" waves-effect">
-                        <i class="ti-clipboard"></i>
-                        <span>Derma</span>
-                    </a>
-                </li> -->
-
             </ul>
         </div>
-        <!-- Sidebar -->
     </div>
 </div>
-<!-- Left Sidebar End -->

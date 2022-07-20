@@ -10,7 +10,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Pelajar</h4>
+            <h4 class="font-size-18">Laporan Pelajar</h4>
         </div>
     </div>
 </div>
