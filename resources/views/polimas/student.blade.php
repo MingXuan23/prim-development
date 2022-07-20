@@ -38,7 +38,7 @@
                         <div class="col-sm-4">
                             <div class="text-center">
                                 <h5 class="mb-0 font-size-20">{{ $batch1['hutang'] }}</h5>
-                            <p class="text-muted">Masih Berhutang</p>
+                            <p class="text-muted">Belum Bayar</p>
                             </div>
                         </div>
                     </div>
@@ -67,7 +67,7 @@
                         <div class="col-sm-4">
                             <div class="text-center">
                                 <h5 class="mb-0 font-size-20">{{ $batch2['hutang']  }}</h5>
-                            <p class="text-muted">Masih Berhutang</p>
+                            <p class="text-muted">Belum Bayar</p>
                             </div>
                         </div>
                     </div>
@@ -338,7 +338,7 @@
                 label: "Tidak Hadir",  
                 data: {{ $batch1['tidak_hadir']  }},
             }, {
-                label: "Masih berhutang",  
+                label: "Belum Bayar",  
                 data: {{ $batch1['hutang'] }},
             }];
 
@@ -349,7 +349,7 @@
                 label: "Tidak Hadir",  
                 data: {{ $batch2['tidak_hadir']  }},
             }, {
-                label: "Masih berhutang",  
+                label: "Belum Bayar",  
                 data: {{ $batch2['hutang'] }},
             }];
 

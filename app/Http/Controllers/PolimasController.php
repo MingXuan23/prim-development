@@ -207,7 +207,7 @@ class PolimasController extends Controller
                     else
                     {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
+                        $btn = $btn . '<span class="badge badge-danger">  Belum Bayar </span></div>';
                         return $btn;
                     }
                 });
