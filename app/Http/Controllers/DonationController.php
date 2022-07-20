@@ -398,6 +398,14 @@ class DonationController extends Controller
 
     public function update(DonationRequest $request, $id)
     {
+        $this->validate($request, [
+            'nama'              => 'required',
+            'donation_type'     => 'required',
+            'date_started'      => 'required',
+            'date_end'          => 'required',
+            'donation_poster'   => 'required'
+        ]);
+
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
 
@@ -425,9 +433,7 @@ class DonationController extends Controller
 
         DB::table('donations')
             ->where('id', $id)
-            ->update(
-                $request->validated() +
-            [
+            ->update([
                 'date_created'      => now(),
                 'date_started'      => $start_date,
                 'date_end'          => $end_date,
@@ -435,8 +441,7 @@ class DonationController extends Controller
                 'url'               => $str,
                 'donation_poster'   => $file_name,
                 'donation_type'     => $request->donation_type
-            ]
-            );
+            ]);
 
         return redirect('/donation')->with('success', 'Derma Telah Berjaya Dikemaskini');
     }
