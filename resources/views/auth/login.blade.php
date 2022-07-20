@@ -74,9 +74,9 @@ Login
 
                     </div>
 
-                    {{-- <div class="mt-5 text-center">
+                    <div class="mt-5 text-center">
                         <p>Masih belum daftar bersama kami? <a href="/register" class="font-weight-medium text-primary"> Daftar Sekarang </a> </p>
-                    </div> --}}
+                    </div>
 
                 </div>
             </div>
