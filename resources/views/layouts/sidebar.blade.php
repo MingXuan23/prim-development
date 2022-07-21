@@ -159,8 +159,7 @@
                 </li>
                 @endrole
 
-
-
+                
 
                 @role('Superadmin|Pentadbir|Guru|Penjaga')
 
@@ -245,6 +244,24 @@
                         @endrole
                 
             </ul>
+            </li>
+            @endrole
+
+            @role('Superadmin|Koop_Admin')
+            <li>
+                <a href="#" class=" waves-effect">
+                    <i class="mdi mdi-account-group"></i>
+                    <span>Kooperasi</span>
+                </a>
+            </li>
+            @endrole
+
+            @role('Superadmin|Penjaga')
+            <li>
+                <a href="#" class=" waves-effect">
+                    <i class="mdi mdi-book"></i>
+                    <span>Kooperasi</span>
+                </a>
             </li>
             @endrole
 

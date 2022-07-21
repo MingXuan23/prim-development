@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddParentOrganIdToOrganizationsTable extends Migration
+class AddParentOrgToOrganizationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,8 +14,8 @@ class AddParentOrganIdToOrganizationsTable extends Migration
     public function up()
     {
         Schema::table('organizations', function (Blueprint $table) {
-            $table->unsignedBigInteger('parent_organ_id')->nullable();
-            $table->foreign('parent_organ_id')->references('id')->on('organizations')->onDelete('cascade');
+            $table->unsignedBigInteger('parent_org')->nullable();
+            $table->foreign('parent_org')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 
@@ -27,7 +27,7 @@ class AddParentOrganIdToOrganizationsTable extends Migration
     public function down()
     {
         Schema::table('organizations', function (Blueprint $table) {
-            $table->dropColumn('parent_organ_id');
+            $table->dropColumn('parent_org');
         });
     }
 }

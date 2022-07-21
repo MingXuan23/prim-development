@@ -56,6 +56,21 @@
                         </div>
                     </div>
 
+                    <div class="row" id="parent_org_class" style="display: none;">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Sekolah</label>
+                                <select name="parent_org" id="parent_org" class="form-control"
+                                    data-parsley-required-message="Sila pilih jenis organisasi">
+                                    <option value="" selected>Pilih Sekolah</option>
+                                    @foreach($parent_org as $row)
+                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col">
                             <div class="form-group required">
@@ -194,6 +209,19 @@
                 }
             })
         });
+        
+        $('#type_org').on('change', function(){
+            var type_org = $(this).children(":selected").text();
+            
+            if(type_org == "Koperasi")
+            {
+                $('#parent_org_class').removeAttr('style');
+            }
+            else
+            {
+                $('#parent_org_class').attr('style', 'display: none;');
+            }
+        }); 
     });
 
 </script>

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Http\Jajahan\Jajahan;
 use App\Models\Donation;
+use App\Models\OrganizationRole;
 use View;
 
 class OrganizationController extends Controller
@@ -25,8 +26,10 @@ class OrganizationController extends Controller
         // after launch remove where
         $type_org = TypeOrganization::all();
 
+        $parent_org = Organization::whereIn('type_org', [1, 2, 3])->get();
+
         $states = Jajahan::negeri();
-        return view('organization.add', compact('type_org', 'states'));
+        return view('organization.add', compact('type_org', 'parent_org', 'states'));
     }
 
     public function getDistrict(Request $request)
@@ -40,12 +43,17 @@ class OrganizationController extends Controller
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
         // dd($request->organization_picture);
-        $extension = $request->organization_picture->extension();
+        
         $file_name = '';
 
         if (!is_null($request->organization_picture)) {
+            $extension = $request->organization_picture->extension();
             $storagePath  = $request->organization_picture->storeAs('/public/organization-picture', $str . '.' . $extension);
             $file_name = basename($storagePath);
+        }
+        else
+        {
+            $file_name = null;
         }
 
         $organization = Organization::create($request->validated() + [
@@ -65,6 +73,14 @@ class OrganizationController extends Controller
             $user->assignRole('Pentadbir');
         }
 
+        // Koperasi
+        if ($request->type_org == 1039) {
+            Organization::where('id', $organization->id)->update(['parent_org' => $request->parent_org]);
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
+            //$organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
+            $user->assignRole('Koop_Admin');
+        }
+        
         return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
     }
 
@@ -85,7 +101,7 @@ class OrganizationController extends Controller
             $exists = DB::table('organization_user')
                         ->where('user_id', $user->id)
                         ->where('organization_id', $id)
-                        ->where('role_id', 2)
+                        ->whereIn('role_id', [2, 1239])
                         ->get();
             
             if($exists->isEmpty()){
@@ -99,11 +115,22 @@ class OrganizationController extends Controller
 
         $states = Jajahan::negeri();
 
+        // Koperasi
+        if($org->type_org == 1039)
+        {
+            $parent_org = Organization::whereIn('type_org', [1, 2, 3])->get();
+
+            $org_parent_name = Organization::where('id', $org->parent_org)->first();
+
+            return view('organization.update', compact('org', 'type_org', 'parent_org', 'org_parent_name', 'states'));
+        }
+
         return view('organization.update', compact('org', 'type_org', 'states'));
     }
 
     public function update(OrganizationRequest $request, $id)
     {
+        dd($id);
         Organization::where('id', $id)->update($request->validated());
 
         if(isset($request->seller_id))
@@ -159,7 +186,7 @@ class OrganizationController extends Controller
             ->select("o.*")
             ->distinct()
             ->where('ou.user_id', $userId)
-            ->whereIn('ou.role_id', [2, 4])
+            ->whereIn('ou.role_id', [2, 4, 1239])
             ->get();
         }
     }
@@ -185,6 +212,8 @@ class OrganizationController extends Controller
             $code = 'RAY' . str_pad($id, 5, '0', STR_PAD_LEFT);
         } elseif ($typeOrg == 7) {
             $code = 'PT' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 1039) { // Koperasi
+            $code = 'KP' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
         return $code;

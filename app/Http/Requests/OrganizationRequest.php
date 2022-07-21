@@ -34,6 +34,7 @@ class OrganizationRequest extends FormRequest
             'state'        =>  'required',
             'type_org'     =>  'required',
             'city'         =>  'required',
+            'parent_org'   =>  'nullable',
         ];
     }
 
