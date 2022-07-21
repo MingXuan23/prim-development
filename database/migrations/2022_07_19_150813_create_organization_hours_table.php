@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateOpeningHoursTable extends Migration
+class CreateOrganizationHoursTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateOpeningHoursTable extends Migration
      */
     public function up()
     {
-        Schema::create('opening_hours', function (Blueprint $table) {
+        Schema::create('organization_hours', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('day')->nullable();
             $table->time('open_hour')->nullable();
@@ -32,7 +32,7 @@ class CreateOpeningHoursTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('opening_hours', function(Blueprint $table)
+        Schema::dropIfExists('organization_hours', function(Blueprint $table)
         {
             $table->drop('organization_id');
         });
