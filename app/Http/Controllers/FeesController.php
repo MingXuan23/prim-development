@@ -1333,11 +1333,14 @@ class FeesController extends AppBaseController
         ->orderBy('name')
         ->get();
 
+        // dd($lists);
+
         foreach($lists as $key=>$list)
         {
             $target = json_decode($list->target);
+            // dd($target->data);
 
-            if($target->data == "ALL_Level" || $target->data == "ALL" || $target->data == $class->levelid)
+            if($target->data == "All_Level" || $target->data == "ALL" || $target->data == $class->levelid)
             {
                 continue;
             }

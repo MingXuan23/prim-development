@@ -13,8 +13,8 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Auth::routes();
-Auth::routes(['register' => false]);
+Auth::routes();
+// Auth::routes(['register' => false]);
 
 Route::get('/home', 'HomeController@index');
 Route::get('/form', 'HomeController@form');
@@ -251,4 +251,17 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/get', 'SessionController@accessSessionData')->name('getsession');
     Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');
     Route::get('session/remove', 'SessionController@deleteSessionData');
+});
+
+Route::group(['prefix' => 'polimas'], function () {
+    Route::get('/', 'PolimasController@indexLogin');
+    Route::group(['middleware' => ['auth']], function () {
+        Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
+        Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
+        Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
+        Route::get('/student-list', 'PolimasController@getStudentDatatable')->name('polimas.student.getStudentDatatable');
+        Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
+        Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
+        Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
+    });
 });
