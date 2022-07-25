@@ -723,6 +723,11 @@ class PayController extends AppBaseController
                         Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
                     }
 
+                    if ($donation->lhdn_reference_code != null)
+                    {
+                        return view('indexlhdn.index', compact('request', 'donation', 'organization', 'transaction'));
+                    }
+
                     return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
 
                     break;
