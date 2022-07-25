@@ -725,7 +725,7 @@ class PayController extends AppBaseController
 
                     if ($donation->lhdn_reference_code != null)
                     {
-                        return view('indexlhdn.index', compact('request', 'donation', 'organization', 'transaction'));
+                        return view('receipt.indexlhdn', compact('request', 'donation', 'organization', 'transaction'));
                     }
 
                     return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
