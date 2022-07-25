@@ -414,7 +414,6 @@ class PayController extends AppBaseController
             }
 
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
-            $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
 
             $success_transaction = DB::table('donation_transaction as dt')
                 ->leftJoin('transactions as t', 't.id', 'dt.transaction_id')
@@ -422,7 +421,7 @@ class PayController extends AppBaseController
                 ->where('dt.donation_id', $request->d_id)
                 ->count();
 
-            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->o_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad($success_transaction, 6, '0', STR_PAD_LEFT);
+            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad($success_transaction, 6, '0', STR_PAD_LEFT);
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
