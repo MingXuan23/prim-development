@@ -75,7 +75,8 @@ class AsramaController extends Controller
         $asrama = Asrama::findOrFail($id);
         $asrama->update(array('status' => '1'));
 
-        return redirect('/asrama')->with('success', 'Application Data is successfully deleted');
+        return redirect('/asrama')->with('success', 'Application Data is successfully updated');
+        // return redirect('/asrama', compact('asrama'));
     }
 
     /**

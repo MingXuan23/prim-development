@@ -28,14 +28,15 @@
 
             {{csrf_field()}}
             <!-- 这里是放organization的 可以从activity的index拿-->
-            
+
         </div>
     </div>
 
     <div class="col-md-12">
         <div class="card">
             <div>
-                {{-- route('sekolah.create')  --}}
+                <!-- commented by micole becuz this should be result of cnp -->
+                <!-- {{-- route('sekolah.create')  --}} -->
                 <a style="margin: 19px; float: right;" href="{{ route('asrama.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Tambah Permintaan</a>
             </div>
@@ -58,8 +59,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="activityTable" class="table table-bordered table-striped dt-responsive nowrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="activityTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
@@ -84,10 +84,12 @@
                                 <td>{{$asrama->start_date}}</td>
                                 <td>{{$asrama->end_date}}</td>
                                 <td>Pending</td>
-                                <td><form action="{{route('asrama.edit', $asrama->id)}}" method="get">
+                                <td>
+                                    <form action="{{route('asrama.edit', $asrama->id)}}" method="get">
                                         @csrf
                                         <button type="submit">Approve</button>
-                                    </form></td>
+                                    </form>
+                                </td>
                                 <td>
                                     <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
                                         @csrf
