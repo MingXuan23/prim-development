@@ -252,3 +252,7 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
+
+
+Route::get('/asrama', 'AsramaController@create')->name('asrama.create');
+Route::resource('asrama', 'AsramaController');
