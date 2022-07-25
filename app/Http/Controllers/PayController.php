@@ -396,7 +396,7 @@ class PayController extends AppBaseController
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
         
         if ($request->desc == 'Donation') {
-            $organization = $this->organization->getOrganizationByDonationId($request->o_id);
+            $organization = $this->organization->getOrganizationByDonationId($request->d_id);
 
             if(isset($request->email))
             {
@@ -414,7 +414,15 @@ class PayController extends AppBaseController
             }
 
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
-            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->o_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . rand(10000, 99999);
+            $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+
+            $success_transaction = DB::table('donation_transaction as dt')
+                ->leftJoin('transactions as t', 't.id', 'dt.transaction_id')
+                ->where('t.status', 'success')
+                ->where('dt.donation_id', $request->d_id)
+                ->count();
+
+            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->o_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad($success_transaction, 6, '0', STR_PAD_LEFT);
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
