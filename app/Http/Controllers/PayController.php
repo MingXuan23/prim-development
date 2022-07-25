@@ -394,6 +394,8 @@ class PayController extends AppBaseController
         $user       = User::find(Auth::id());
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
+        $icno = isset($request->icno) ? $request->icno : NULL;
+        $address = isset($request->address) ? $request->address : NULL;
         
         if ($request->desc == 'Donation') {
             $organization = $this->organization->getOrganizationByDonationId($request->d_id);
@@ -403,8 +405,6 @@ class PayController extends AppBaseController
                 $fpx_buyerEmail = $request->email;
                 $telno = "+6" . $request->telno;
                 $fpx_buyerName = $request->name;
-                $icno = isset($request->icno) ? $request->icno : NULL;
-                $address = isset($request->address) ? $request->address : NULL;
             }
             else
             {
