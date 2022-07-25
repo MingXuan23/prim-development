@@ -266,7 +266,16 @@ class LandingPageController extends AppBaseController
             foreach ($donations as $donation) {
                 $posters = $posters . '<div class="card"> <img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap">';
                 $posters = $posters . '<div class="card-body"><div class="d-flex flex-column justify-content-center ">';
-                $posters = $posters . '<a href="' . route('URLdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a></div>';
+                
+                if ($donation->lhdn_status == 0)
+                {
+                    $posters = $posters . '<a href="' . route('URLdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a></div>';
+                }
+                else if ($donation->lhdn_status == 1)
+                {
+                    $posters = $posters . '<a href="' . route('LHDNdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Pengecualian Cukai</a></div>';
+                }
+
                 $posters = $posters . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div></div></div>';
             }
 

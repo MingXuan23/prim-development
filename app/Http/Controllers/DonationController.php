@@ -322,6 +322,28 @@ class DonationController extends Controller
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
+    public function lhdndonate($link)
+    {
+        $user = "";
+
+        //$donation = Donation::where('url', $link)->first();
+        $donation = DB::table('donations')
+                        ->where('url', '=' , $link)
+                        ->first();
+        // dd($donation);
+
+        if($donation->status == 0)
+        {
+            return view('errors.404');
+        }
+
+        if (Auth::id()) {
+            $user = $this->user->getUserById();
+        }
+
+        return view('paydonate.lhdn.index', compact('donation', 'user'));
+    }
+
     public function anonymouIndex($link)
     {
         $donation = DB::table('donations')
