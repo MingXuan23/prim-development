@@ -297,7 +297,7 @@
                                             <tbody>
                                                 <tr>
                                                 <td>
-                                                    <b>Nama :</b> {{ $transactionUsername }} ({{ $transactionIcno }})<br>
+                                                    <b>Nama :</b> {{ $transactionUsername }}<br>
                                                     <b>Email :</b> {{ $transactionEmail }}<br>
                                                     <b>Nombor Resit :</b> {{ $transactionName }}<br>
                                                     <b>Tarikh Derma :</b> {{ date('d-m-Y', strtotime($transactionDate)) }}
