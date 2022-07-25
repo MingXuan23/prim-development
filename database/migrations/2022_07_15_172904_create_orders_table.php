@@ -23,8 +23,6 @@ class CreateOrdersTable extends Migration
             $table->double('delivery_latitude')->nullable();
             $table->double('delivery_longitude')->nullable();
             $table->string('order_description')->nullable();
-            $table->integer('PhoneNumber')->nullable();
-            $table->string('username')->nullable();
             $table->timestamps();
             
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
