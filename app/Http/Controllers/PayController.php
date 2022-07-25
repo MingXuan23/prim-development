@@ -403,6 +403,8 @@ class PayController extends AppBaseController
                 $fpx_buyerEmail = $request->email;
                 $telno = "+6" . $request->telno;
                 $fpx_buyerName = $request->name;
+                $icno = isset($request->icno) ? $request->icno : NULL;
+                $address = isset($request->address) ? $request->address : NULL;
             }
             else
             {
@@ -472,6 +474,8 @@ class PayController extends AppBaseController
         $transaction->telno         = $telno;
         $transaction->username      = strtoupper($fpx_buyerName);
         $transaction->fpx_checksum  = $fpx_checkSum;
+        $transaction->icno  = $icno;
+        $transaction->address  = $address;
 
         if ($user) {
             $transaction->user_id   = Auth::id();

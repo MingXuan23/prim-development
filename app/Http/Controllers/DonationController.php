@@ -319,29 +319,12 @@ class DonationController extends Controller
             $user = $this->user->getUserById();
         }
 
-        return view('paydonate.pay', compact('donation', 'user'));
-    }
-
-    public function lhdndonate($link)
-    {
-        $user = "";
-
-        //$donation = Donation::where('url', $link)->first();
-        $donation = DB::table('donations')
-                        ->where('url', '=' , $link)
-                        ->first();
-        // dd($donation);
-
-        if($donation->status == 0)
+        if($donation->lhdn_reference_code != NULL)
         {
-            return view('errors.404');
+            return view('paydonate.lhdn.index', compact('donation', 'user'));
         }
 
-        if (Auth::id()) {
-            $user = $this->user->getUserById();
-        }
-
-        return view('paydonate.lhdn.index', compact('donation', 'user'));
+        return view('paydonate.pay', compact('donation', 'user'));
     }
 
     public function anonymouIndex($link)
@@ -456,14 +439,15 @@ class DonationController extends Controller
         DB::table('donations')
             ->where('id', $id)
             ->update([
-                'nama'              => $request->nama,
-                'date_created'      => now(),
-                'date_started'      => $start_date,
-                'date_end'          => $end_date,
-                'status'            => '1',
-                'url'               => $str,
-                'donation_poster'   => $file_name,
-                'donation_type'     => $request->donation_type
+                'nama'                => $request->nama,
+                'date_created'        => now(),
+                'date_started'        => $start_date,
+                'date_end'            => $end_date,
+                'status'              => '1',
+                'url'                 => $str,
+                'donation_poster'     => $file_name,
+                'donation_type'       => $request->donation_type,
+                'lhdn_reference_code' => $request->lhdn_reference_code
             ]);
 
         return redirect('/donation')->with('success', 'Derma Telah Berjaya Dikemaskini');

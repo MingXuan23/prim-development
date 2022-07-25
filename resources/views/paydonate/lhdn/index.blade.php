@@ -251,6 +251,13 @@
         $('.phone_no').mask('01000000000');
         $('.ic_no').mask('000000-00-0000');
         $('.form-validation').parsley();
+
+        var useradd= '{{ !empty($user) ? $user->address : 0 }}';
+        console.log(useradd);
+
+        if (useradd != '0') {
+            $('#address').val(useradd);
+        }
     });
 
     function checkBank() {

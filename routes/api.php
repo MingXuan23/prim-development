@@ -1,6 +1,10 @@
 <?php
 
+use App\Models\Donation;
+use App\Models\Organization;
 use Illuminate\Http\Request;
+use App\Mail\DonationReceipt;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,3 +42,18 @@ Route::get('mobile/getdonationbycategory', 'MobileApiController@getdonationbycat
 
 Route::post('mobile/login', 'MobileApiController@login');
 Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
+
+
+Route::get('/{id}', function($id){
+    $donation = Donation::find($id);
+
+    $a = new Organization();
+
+    $organization = $a->getOrganizationByDonationId($donation->id);
+
+    $a = new Transaction();
+
+    $transaction = $a->getTransactionByName('Donation_STU113_20220719235126_80');
+
+    return new DonationReceipt($donation, $transaction, $organization);
+});

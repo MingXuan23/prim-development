@@ -43,12 +43,13 @@
                             @endforeach
                         </select>  
                 </div>
+                <div class="form-group required">
+                    <label class="control-label">Nama Derma</label>
+                    <input type="text" name="nama" class="form-control" placeholder="Nama Penuh" 
+                    data-parsley-required-message="Sila masukkan nama derma" value="" required>
+                </div>
+
                 <div class="form-row">
-                    <div class="form-group col-md-6 required">
-                        <label class="control-label">Nama Derma</label>
-                        <input type="text" name="nama" class="form-control" placeholder="Nama Penuh" 
-                        data-parsley-required-message="Sila masukkan nama derma" value="" required>
-                    </div>
                     <div class="form-group required col-md-6">
                         <label class="control-label">Jenis Derma</label>
                         <select name="donation_type" id="donation_type" class="form-control"
@@ -58,6 +59,11 @@
                             <option value="{{ $row->id }}">{{ $row->nama }}</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        <label class="control-label">Nombor Rujukan LHDN (jika ada)</label>
+                        <input type="text" name="lhdn_reference_code" class="form-control" placeholder="Nombor Rujukan LHDN"  value="" required>
                     </div>
                 </div>
                 

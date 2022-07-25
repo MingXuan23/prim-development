@@ -239,6 +239,11 @@
             font-weight: 700;
         }
 
+        .center {
+            display: flex;
+            justify-content: center;
+        }
+
         /* -------------------------------------
             RESPONSIVE AND MOBILE FRIENDLY STYLES
         ------------------------------------- */
@@ -271,6 +276,8 @@
             .invoice {
                 width: 100% !important;
             }
+
+            
         }
     </style>
 </head>
@@ -284,21 +291,23 @@
                     <tbody><tr>
                         <td class="content-wrap aligncenter">
                             <table width="100%" cellpadding="0" cellspacing="0">
-                                <tbody><tr>
-                                    <td class="content-block">
+                                <tbody>
+                                <tr>
+                                    <td>
                                         <h2>{{ $organizationName }}</h2>
                                         <h3 style="margin: 20px 0 0 0; font-size: 14px !important">({{ $ogranizationAddress }})</h3>
                                         <h3 style="margin: 20px 0 0 0; font-size: 14px !important">{{ $organizationTelNo }} | {{ $organizationEmail }}</h3>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="content-block">
+                                    <td>
                                         <table class="invoice">
                                             <tbody>
                                                 <tr>
                                                 <td>
                                                     <b>Nama :</b> {{ $transactionUsername }} ({{ $transactionIcno }})<br>
                                                     <b>Email :</b> {{ $transactionEmail }}<br>
+                                                    <b>Alamat Menyurat :</b> {{ $transactionUserAdress }}<br>
                                                     <b>Nombor Resit :</b> {{ $transactionName }}<br>
                                                     <b>Tarikh Derma :</b> {{ date('d-m-Y', strtotime($transactionDate)) }}
                                                 </td>
@@ -307,13 +316,9 @@
                                                 <td>
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0">
                                                         <tbody><tr>
-                                                            <td>{{ $donationName }}</td>
+                                                            <td>{{ $donationName }} ({{ $doantionLHDNcode }} : {{ date('d-m-Y', strtotime($doantionStartDate)) }} - {{ date('d-m-Y', strtotime($doantionEndDate)) }})</td>
                                                             <td class="alignright">RM {{ number_format($transactionAmount , 2, '.', '') }}</td>
                                                         </tr>
-                                                        {{-- <tr>
-                                                            <td>Tax (Paid By JAIM)</td>
-                                                            <td class="alignright">RM 1.00</td>
-                                                        </tr> --}}
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
                                                             <td class="alignright">RM  {{ number_format($transactionAmount , 2, '.', '') }}</td>
@@ -336,5 +341,9 @@
     </tr>
 </tbody>
 </table>
+
+<div class="center">
+    <button class="btn btn-primary" style="font-size:18px" onclick="window.print();">Cetak Resit</button>
+</div>
 </body>
 </html>
