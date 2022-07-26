@@ -3,6 +3,7 @@
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
+
 @endsection
 
 @section('content')
@@ -35,7 +36,7 @@
     <div class="col-md-12">
         <div class="card">
             <div>
-                {{-- route('sekolah.create')  --}}
+                <!-- {{-- route('sekolah.create')  --}} -->
                 <a style="margin: 19px; float: right;" href="{{ route('asrama.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Tambah Permintaan</a>
             </div>

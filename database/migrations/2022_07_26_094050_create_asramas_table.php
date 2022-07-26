@@ -15,13 +15,15 @@ class CreateAsramasTable extends Migration
     {
         Schema::create('asramas', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('ic');
             $table->string('reason');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->boolean('status');
-            $table->timestamps();
+            // $table->integer('student_id')->unsigned();
+            // $table->integer('teacher_id')->unsigned(); 
+            // $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
+            // $table->foreign('teacher_id')->references('id')->on('organization_user')->onDelete('cascade');
+        
         });
     }
 

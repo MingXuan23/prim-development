@@ -8,11 +8,12 @@ class Asrama extends Model
 {
     //
     protected $fillable = [
-        'name', 
-        'ic',
         'reason',
         'start_date',
         'end_date',
         'status',
+        'student_id',
+        'teacher_id'
     ];
+
 }
