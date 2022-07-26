@@ -16,4 +16,6 @@ class Asrama extends Model
         'teacher_id'
     ];
 
+    public $timestamps = false;
+
 }

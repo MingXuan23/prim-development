@@ -37,12 +37,12 @@
 
                 <div class="form-group">
                     <label>Nama Pelajar</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Pelajar">
+                    <input type="text" name="name" class="form-control" placeholder="Nama Pelajar" value="{{$users->nama}}">
                 </div>
 
                 <div class="form-group">
                     <label>No IC Pelajar</label>
-                    <input type="text" name="ic" class="form-control" placeholder="No IC Pelajar">
+                    <input type="text" name="ic" class="form-control" placeholder="No IC Pelajar" value="{{$users->icno}}">
                 </div>
 
                 <div class="form-group">
@@ -67,7 +67,7 @@
 
                 <div class="form-group">
                     <label>Tarikh Masuk</label>
-                    <input onclick="this.showPicker()" class="form-control" id="end_date" name="end_date" type="date"
+                    <input onclick="this.showPicker()" onfocus="setMinDate();" class="form-control" id="end_date" name="end_date" type="date"
                             placeholder="Pilih Tarikh Keluar">
 
                     <!-- <div id="datepicker-end_date" class="input-group date" data-date-format="mm-dd-yyyy"
@@ -96,30 +96,33 @@
 
 @endsection
 
-<!-- @section('script')
+@section('script')
 <script>
-    $(document).ready(function(){
+    
+    start_date.min = new Date().toISOString().split("T")[0];
+    
+    function setMinDate(){
+        end_date.min = start_date.value;
+    }
+   
+    // $(document).ready(function(){
 
-        var today = new Date();
+    //     var today = new Date();
+        // var start = $("#datepicker-start_date").datepicker({
+        //     changeMonth: true,
+        //     changeYear: true,
+        //     startDate: today,
+        //     todayHighlight:true,
+        //     format: 'dd-mm-yyyy'
+        // });
 
-        var start = $("#datepicker-start_date").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            startDate: today,
-            todayHighlight:true,
-            format: 'dd-mm-yyyy'
-        });
-
-        $("#datepicker-end_date").datepicker({
-            changeMonth: true,
-            changeYear: true,
-            startDate: today,
-            todayHighlight:true,
-            format: 'dd-mm-yyyy'
-        });
-
-        // console.log($("#start_date").val());
-        
-    });
+        // $("#datepicker-end_date").datepicker({
+        //     changeMonth: true,
+        //     changeYear: true,
+        //     startDate: today,
+        //     todayHighlight:true,
+        //     format: 'dd-mm-yyyy'
+        // });  
+    // });
 </script>
-@endsection -->
+@endsection

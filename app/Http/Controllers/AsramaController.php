@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Asrama;
+use DB; 
 
 class AsramaController extends Controller
 {
@@ -15,8 +16,11 @@ class AsramaController extends Controller
     public function index()
     {
         //
-        $asrama = Asrama::all();
-
+        // $asrama = Asrama::all();
+        $asrama = DB::table('asramas')
+        ->join('students', 'students.id', '=', 'asramas.student_id')
+        ->select('asramas.*', 'students.*')
+        ->get();
         return view('asrama.index', compact('asrama'));
     }
 
@@ -28,7 +32,18 @@ class AsramaController extends Controller
     public function create()
     {
         //
-        return view('asrama.create');
+        $users = DB::table('students')
+        ->where('id', 1)
+        ->first();
+
+        if(is_null($users))
+        {
+            
+        }
+        else{
+            return view('asrama.create', compact('users'));
+        }
+        
     }
 
     /**
