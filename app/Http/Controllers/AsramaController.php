@@ -16,10 +16,16 @@ class AsramaController extends Controller
     public function index()
     {
         //
-        // $asrama = Asrama::all();
-        $asrama = DB::table('asramas')
-        ->join('students', 'students.id', '=', 'asramas.student_id')
-        ->select('asramas.*', 'students.*')
+        // $asrama1 = Asrama::all();
+
+        // $asrama = DB::table('asramas')
+        // ->join('students', 'students.id', '=', 'asramas.student_id')
+        // ->select('asramas.*', 'students.*')
+        // ->get();
+
+        $asrama = DB::table('students')
+        ->join('asramas', 'asramas.student_id', '=', 'students.id')
+        ->select('students.*', 'asramas.*')
         ->get();
         return view('asrama.index', compact('asrama'));
     }
@@ -90,6 +96,12 @@ class AsramaController extends Controller
         $asrama = Asrama::findOrFail($id);
         $asrama->update(array('status' => '1'));
 
+        // DB::table('asramas')
+        // ->where('student_id',$id)
+        // ->update([
+        //     'status' =>$request->get('status'),
+        // ]);
+        
         return redirect('/asrama')->with('success', 'Application Data is successfully updated');
     }
 
@@ -124,9 +136,12 @@ class AsramaController extends Controller
     public function destroy($id)
     {
         //
-        $asrama = Asrama::findOrFail($id);
-        $asrama->delete();
-
+        // $asrama = Asrama::findOrFail($id);
+        // $asrama->delete();
+        // dd($id);
+        DB::table('asramas')
+            ->where('id',$id)
+            ->delete();
         return redirect('/asrama')->with('success', 'Application Data is successfully deleted');
     }
 }

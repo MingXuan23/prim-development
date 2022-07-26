@@ -9,9 +9,8 @@
 @section('content')
 <!-- 我想做login 然后去分辨学生还是老师 但是目前没有思绪 所以先用这个代替着-->
 <!-- 目前是直接set student_id 和 teacher_id = 1-->
-<!-- 目前action用不到了 -->
 <?php
-    $role = "t";
+    $role = "s";
 ?>
 <div class="row align-items-center">
     <div class="col-sm-6">
@@ -70,7 +69,6 @@
                     <table id="activityTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <!-- 如果是学生 -->
-                        @foreach($asrama as $asrama)
                         @if($role == "s")
                         <thead>
                             <tr style="text-align:center">
@@ -86,7 +84,7 @@
                         </thead>
 
                         <tbody>
-                            @if($asrama->status == '0')
+                            @foreach($asrama as $asrama)
                             <tr>
                                 <td>{{$asrama->id}}</td>
                                 <td>{{$asrama->nama}}</td>
@@ -103,7 +101,7 @@
                                     </form>
                                 </td>
                             </tr>
-                            @endif
+                            @endforeach
                         </tbody>
                         <!-- 其他 -->
                         @else
@@ -120,8 +118,10 @@
                         </thead>
 
                         <tbody>
+                        @foreach($asrama as $asrama)
                             @if($asrama->status == '0')
                             <tr>
+
                                 <td>{{$asrama->id}}</td>
                                 <td>{{$asrama->nama}}</td>
                                 <td>{{$asrama->icno}}</td>
@@ -142,10 +142,9 @@
                                 </td>
                             </tr>
                             @endif
-                            
+                        @endforeach
                         </tbody>
                         @endif
-                        @endforeach
                     </table>
                 </div>
             </div>
