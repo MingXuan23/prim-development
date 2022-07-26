@@ -24,10 +24,11 @@ class DonationRequest extends FormRequest
     public function rules()
     {
         return [
-            'nama'              => 'required',
-            'description'       => 'nullable',
-            'tax_payer'         => 'nullable',
-            'total_tax'         => 'nullable',
+            'nama'                  => 'required',
+            'description'           => 'nullable',
+            'tax_payer'             => 'nullable',
+            'total_tax'             => 'nullable',
+            'lhdn_reference_code'   =>'nullable'
         ];
     }
 }
