@@ -35,7 +35,7 @@
 
             {{csrf_field()}}
             <!-- 这里是放organization的 可以从activity的index拿-->
-            
+
         </div>
     </div>
 
@@ -131,7 +131,8 @@
                                 <td><form action="{{route('asrama.edit', $asrama->id)}}" method="get">
                                         @csrf
                                         <button type="submit">Approve</button>
-                                    </form></td>
+                                    </form>
+                                </td>
                                 <td>
                                     <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
                                         @csrf

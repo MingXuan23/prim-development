@@ -91,6 +91,10 @@ class AsramaController extends Controller
         $asrama->update(array('status' => '1'));
 
         return redirect('/asrama')->with('success', 'Application Data is successfully updated');
+<<<<<<< HEAD
+=======
+        // return redirect('/asrama', compact('asrama'));
+>>>>>>> 79b715c21753a66e70766b8762ac8d241d8839c5
     }
 
     /**
