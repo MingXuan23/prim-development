@@ -63,7 +63,7 @@
 
                     <div class="form-group col-md-6">
                         <label class="control-label">Nombor Rujukan LHDN (jika ada)</label>
-                        <input type="text" name="lhdn_reference_code" class="form-control" placeholder="Nombor Rujukan LHDN"  value="" required>
+                        <input type="text" name="lhdn_reference_code" class="form-control" placeholder="Nombor Rujukan LHDN" value="">
                     </div>
                 </div>
                 
