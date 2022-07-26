@@ -15,7 +15,7 @@ class CreateDishAvailableTable extends Migration
     {
         Schema::create('dish_available', function (Blueprint $table) {
             $table->id();
-            $table->string('day')->nullable();
+            $table->date('date')->nullable();
             $table->time('time')->nullable();
             $table->text('delivery_address')->nullable();
 

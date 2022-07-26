@@ -15,6 +15,7 @@ class AddColumnsToOrganization extends Migration
     {
         Schema::table('organizations', function (Blueprint $table) {
             $table->string('district');
+            $table->string('description');
         });
     }
 
