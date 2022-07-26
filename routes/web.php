@@ -254,5 +254,8 @@ Route::group(['prefix' => 'session'], function () {
 });
 
 
-Route::get('/asrama', 'AsramaController@create')->name('asrama.create');
+// Route::get('asrama', 'AsramaController@index')->name('asrama.index');
 Route::resource('asrama', 'AsramaController');
+// Route::group(['prefix' => 'asrama'], function () {
+//     Route::get('/asrama', 'AsramaController@index')->name('asrama.index');
+// });
