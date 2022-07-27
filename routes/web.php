@@ -259,5 +259,6 @@ Route::resource('asrama', 'AsramaController');
 Route::group(['prefix' => 'asrama'], function () {
     Route::get('asrama/updateOutTime/{id}', 'AsramaController@updateOutTime')->name('asrama.updateOutTime');
     Route::get('asrama/updateInTime/{id}', 'AsramaController@updateInTime')->name('asrama.updateInTime');
-    Route::get('asrama/updateArriveTime/{id}', 'AsramaController@updateArriveTime')->name('asrama.updateArriveTime');
+    Route::get('asrama/updateOutArriveTime/{id}', 'AsramaController@updateOutArriveTime')->name('asrama.updateOutArriveTime');
+    Route::get('asrama/updateInArriveTime/{id}', 'AsramaController@updateInArriveTime')->name('asrama.updateInArriveTime');
 });

@@ -104,25 +104,6 @@
     function setMinDate(){
         end_date.min = start_date.value;
     }
-   
-    // $(document).ready(function(){
-
-    //     var today = new Date();
-        // var start = $("#datepicker-start_date").datepicker({
-        //     changeMonth: true,
-        //     changeYear: true,
-        //     startDate: today,
-        //     todayHighlight:true,
-        //     format: 'dd-mm-yyyy'
-        // });
-
-        // $("#datepicker-end_date").datepicker({
-        //     changeMonth: true,
-        //     changeYear: true,
-        //     startDate: today,
-        //     todayHighlight:true,
-        //     format: 'dd-mm-yyyy'
-        // });  
-    // });
+    
 </script>
 @endsection

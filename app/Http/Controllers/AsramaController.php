@@ -118,9 +118,15 @@ class AsramaController extends Controller
         return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
     
-    public function updateArriveTime($id){
+    public function updateOutArriveTime($id){
         $asrama = Asrama::findOrFail($id);
         $asrama->update(array('out_arrive_time' => new DateTime()));
+        return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+
+    public function updateInArriveTime($id){
+        $asrama = Asrama::findOrFail($id);
+        $asrama->update(array('in_arrive_time' => new DateTime()));
         return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 
