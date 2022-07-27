@@ -24,17 +24,16 @@
     <button class="btn btn-secondary" type="submit">Enter</button>
 </form> -->
 <form name="form" action="" method="get">
-  <input type="text" name="subject" id="subject"> 
-  <button type="submit">Enter</button>
+    <input type="text" name="subject" id="subject">
+    <button type="submit">Enter</button>
 </form>
 
-<?php 
-    if(isset($_GET['subject'])){
-        $role = $_GET['subject'];
-    }
-    else{
-        $role = NULL;
-    }
+<?php
+if (isset($_GET['subject'])) {
+    $role = $_GET['subject'];
+} else {
+    $role = NULL;
+}
 ?>
 @if($role != NULL)
 <div class="row">
@@ -52,7 +51,17 @@
 
             {{csrf_field()}}
             <!-- 这里是放organization的 可以从activity的index拿-->
-
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected>Semua Organisasi</option>
+                        @foreach($organization as $row)
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -84,8 +93,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="activityTable" class="table table-bordered table-striped dt-responsive nowrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="activityTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
@@ -146,7 +154,8 @@
                                             @endif
                                         </td>
                                     @endif
-                                </tr>
+                                </td>
+                            </tr>
                             <!-- guard -->
                                 @elseif(str_contains($role, 'guard'))
                                     @if($asrama->status == '1')
@@ -176,6 +185,9 @@
                                         </td>
                                     </tr>
                                     @endif
+                                </td>
+                            </tr>
+                            @endif
                             <!-- teacher -->
                                 @else
                                     <tr>
