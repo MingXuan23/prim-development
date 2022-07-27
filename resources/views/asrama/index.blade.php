@@ -51,17 +51,7 @@ if (isset($_GET['subject'])) {
 
             {{csrf_field()}}
             <!-- 这里是放organization的 可以从activity的index拿-->
-            <div class="card-body">
-                <div class="form-group">
-                    <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="" selected>Semua Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
+            
         </div>
     </div>
 
@@ -108,7 +98,6 @@ if (isset($_GET['subject'])) {
                                 <th> Tarikh Keluar </th>
                                 <th> Tarikh Sampai </th>
                                 <th> Tarikh Masuk </th>
-                                <th> Tarikh Sampai </th>
                                 <th> Action </th>
                             </tr>
                         </thead>
@@ -129,7 +118,6 @@ if (isset($_GET['subject'])) {
                                         <td>{{$asrama->outing_time}}</td>
                                         <td>{{$asrama->out_arrive_time}}</td>
                                         <td>{{$asrama->in_time}}</td>
-                                        <td>{{$asrama->in_arrive_time}}</td>
                                         <td>
                                             <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
                                                 @csrf
@@ -141,8 +129,7 @@ if (isset($_GET['subject'])) {
                                         <td>Approved</td>
                                         <td>{{$asrama->outing_time}}</td>
                                         <td>{{$asrama->out_arrive_time}}</td>
-                                        <td>{{$asrama->in_time}}</td>
-                                        <td>{{$asrama->in_arrive_time}}</td>    
+                                        <td>{{$asrama->in_time}}</td>  
                                         <td>
                                             @if($asrama->out_arrive_time == NULL && $asrama->outing_time != NULL)
                                             <form action="{{route('asrama.updateOutArriveTime', $asrama->id)}}" method="get">
@@ -169,7 +156,6 @@ if (isset($_GET['subject'])) {
                                         <td>{{$asrama->outing_time}}</td>
                                         <td>{{$asrama->out_arrive_time}}</td>
                                         <td>{{$asrama->in_time}}</td>
-                                        <td>{{$asrama->in_arrive_time}}</td>
                                         <td>
                                             @if($asrama->outing_time == NULL)
                                             <form action="{{route('asrama.updateOutTime', $asrama->id)}}" method="get">
@@ -187,7 +173,7 @@ if (isset($_GET['subject'])) {
                                     @endif
                                 </td>
                             </tr>
-                            @endif
+                            
                             <!-- teacher -->
                                 @else
                                     <tr>
@@ -200,7 +186,6 @@ if (isset($_GET['subject'])) {
                                         <td>{{$asrama->outing_time}}</td>
                                         <td>{{$asrama->out_arrive_time}}</td>
                                         <td>{{$asrama->in_time}}</td>
-                                        <td>{{$asrama->in_arrive_time}}</td>
                                         <td>
                                         @if($asrama->status == '0')
                                             <form action="{{route('asrama.edit', $asrama->id)}}" method="get">
@@ -212,11 +197,6 @@ if (isset($_GET['subject'])) {
                                                 @csrf
                                                 @method('DELETE')
                                                 <button class="btn btn-secondary" type="submit">Delete</button>
-                                            </form>
-                                        @elseif($asrama->status == '1' && $asrama->in_time != NULL && $asrama->outing_time != NULL && $asrama->out_arrive_time != NULL)
-                                            <form action="{{route('asrama.updateInArriveTime', $asrama->id)}}" method="post">
-                                                @csrf
-                                                <button class="btn btn-primary" type="submit">Arrive</button>
                                             </form>
                                         @endif
                                         </td>
