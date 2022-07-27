@@ -24,17 +24,16 @@
     <button class="btn btn-secondary" type="submit">Enter</button>
 </form> -->
 <form name="form" action="" method="get">
-  <input type="text" name="subject" id="subject"> 
-  <button type="submit">Enter</button>
+    <input type="text" name="subject" id="subject">
+    <button type="submit">Enter</button>
 </form>
 
-<?php 
-    if(isset($_GET['subject'])){
-        $role = $_GET['subject'];
-    }
-    else{
-        $role = NULL;
-    }
+<?php
+if (isset($_GET['subject'])) {
+    $role = $_GET['subject'];
+} else {
+    $role = NULL;
+}
 ?>
 @if($role != NULL)
 <div class="row">
@@ -52,7 +51,17 @@
 
             {{csrf_field()}}
             <!-- 这里是放organization的 可以从activity的index拿-->
-
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected>Semua Organisasi</option>
+                        @foreach($organization as $row)
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -84,8 +93,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="activityTable" class="table table-bordered table-striped dt-responsive nowrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="activityTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
@@ -107,97 +115,99 @@
 
                         <tbody>
                             @foreach($asrama as $asrama)
-                                <!-- 如果是学生 -->
-                                @if(str_contains($role, 'student'))
-                                <tr>
-                                    <td>{{$asrama->id}}</td>
-                                    <td>{{$asrama->nama}}</td>
-                                    <td>{{$asrama->icno}}</td>
-                                    <td>{{$asrama->reason}}</td>
-                                    <td>{{$asrama->start_date}}</td>
-                                    <td>{{$asrama->end_date}}</td>
-                                    @if($asrama->status == '0')
-                                        <td>Pending</td>
-                                        <td>{{$asrama->outing_time}}</td>
-                                        <td>{{$asrama->out_arrive_time}}</td>
-                                        <td>{{$asrama->in_time}}</td>
-                                        <td>{{$asrama->in_arrive_time}}</td>
-                                        <td>
-                                            <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-secondary" type="submit">Delete</button>
-                                            </form>
-                                        </td>
-                                    @elseif($asrama->status == '1')
-                                        <td>Approved</td>
-                                        <td>{{$asrama->outing_time}}</td>
-                                        <td>{{$asrama->out_arrive_time}}</td>
-                                        <td>{{$asrama->in_time}}</td>
-                                        <td>{{$asrama->in_arrive_time}}</td>    
-                                        <td>
-                                            @if($asrama->out_arrive_time == NULL)
-                                            <form action="{{route('asrama.updateArriveTime', $asrama->id)}}" method="get">
-                                                @csrf
-                                                <button id="arrive_home" onclick="Arrive()" class="btn btn-primary" type="submit">
-                                                    Arrive
-                                                </button>
-                                            </form>
-                                            @endif
-                                        </td>
+                            <!-- 如果是学生 -->
+                            @if(str_contains($role, 'student'))
+                            <tr>
+                                <td>{{$asrama->id}}</td>
+                                <td>{{$asrama->nama}}</td>
+                                <td>{{$asrama->icno}}</td>
+                                <td>{{$asrama->reason}}</td>
+                                <td>{{$asrama->start_date}}</td>
+                                <td>{{$asrama->end_date}}</td>
+                                @if($asrama->status == '0')
+                                <td>Pending</td>
+                                <td>{{$asrama->outing_time}}</td>
+                                <td>{{$asrama->out_arrive_time}}</td>
+                                <td>{{$asrama->in_time}}</td>
+                                <td>{{$asrama->in_arrive_time}}</td>
+                                <td>
+                                    <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-secondary" type="submit">Delete</button>
+                                    </form>
+                                </td>
+                                @elseif($asrama->status == '1')
+                                <td>Approved</td>
+                                <td>{{$asrama->outing_time}}</td>
+                                <td>{{$asrama->out_arrive_time}}</td>
+                                <td>{{$asrama->in_time}}</td>
+                                <td>{{$asrama->in_arrive_time}}</td>
+                                <td>
+                                    @if($asrama->out_arrive_time == NULL)
+                                    <form action="{{route('asrama.updateArriveTime', $asrama->id)}}" method="get">
+                                        @csrf
+                                        <button id="arrive_home" onclick="Arrive()" class="btn btn-primary" type="submit">
+                                            Arrive
+                                        </button>
+                                    </form>
                                     @endif
-                                </tr>
-                            <!-- guard -->
-                                @elseif(str_contains($role, 'guard'))
-                                    @if($asrama->status == '1')
-                                    <tr>
-                                        <td>{{$asrama->id}}</td>
-                                        <td>{{$asrama->nama}}</td>
-                                        <td>{{$asrama->icno}}</td>
-                                        <td>{{$asrama->reason}}</td>
-                                        <td>{{$asrama->start_date}}</td>
-                                        <td>{{$asrama->end_date}}</td>
-                                        <td>{{$asrama->outing_time}}</td>
-                                        <td>{{$asrama->out_arrive_time}}</td>
-                                        <td>{{$asrama->in_time}}</td>
-                                        <td>{{$asrama->in_arrive_time}}</td>
-                                        <td><form action="{{route('asrama.updateOutTime', $asrama->id)}}" method="get">
-                                                @csrf
-                                                <button class="btn btn-primary" type="submit">Leave</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    @endif
-                            <!-- teacher -->
-                                @else
-                                    @if($asrama->status == '0')
-                                        <tr>
-
-                                            <td>{{$asrama->id}}</td>
-                                            <td>{{$asrama->nama}}</td>
-                                            <td>{{$asrama->icno}}</td>
-                                            <td>{{$asrama->reason}}</td>
-                                            <td>{{$asrama->start_date}}</td>
-                                            <td>{{$asrama->end_date}}</td>
-                                            <td>{{$asrama->outing_time}}</td>
-                                            <td>{{$asrama->out_arrive_time}}</td>
-                                            <td>{{$asrama->in_time}}</td>
-                                            <td>{{$asrama->in_arrive_time}}</td>
-                                            <td><form action="{{route('asrama.edit', $asrama->id)}}" method="get">
-                                                    @csrf
-                                                    <button class="btn btn-primary" type="submit">Approve</button>
-                                                </form>
-                                            </td>
-                                            <td>
-                                                <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button class="btn btn-secondary" type="submit">Delete</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                     @endif
+                                </td>
                                 @endif
+                            </tr>
+                            <!-- guard -->
+                            @elseif(str_contains($role, 'guard'))
+                            @if($asrama->status == '1')
+                            <tr>
+                                <td>{{$asrama->id}}</td>
+                                <td>{{$asrama->nama}}</td>
+                                <td>{{$asrama->icno}}</td>
+                                <td>{{$asrama->reason}}</td>
+                                <td>{{$asrama->start_date}}</td>
+                                <td>{{$asrama->end_date}}</td>
+                                <td>{{$asrama->outing_time}}</td>
+                                <td>{{$asrama->out_arrive_time}}</td>
+                                <td>{{$asrama->in_time}}</td>
+                                <td>{{$asrama->in_arrive_time}}</td>
+                                <td>
+                                    <form action="{{route('asrama.updateOutTime', $asrama->id)}}" method="get">
+                                        @csrf
+                                        <button class="btn btn-primary" type="submit">Leave</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endif
+                            <!-- teacher -->
+                            @else
+                            @if($asrama->status == '0')
+                            <tr>
+
+                                <td>{{$asrama->id}}</td>
+                                <td>{{$asrama->nama}}</td>
+                                <td>{{$asrama->icno}}</td>
+                                <td>{{$asrama->reason}}</td>
+                                <td>{{$asrama->start_date}}</td>
+                                <td>{{$asrama->end_date}}</td>
+                                <td>{{$asrama->outing_time}}</td>
+                                <td>{{$asrama->out_arrive_time}}</td>
+                                <td>{{$asrama->in_time}}</td>
+                                <td>{{$asrama->in_arrive_time}}</td>
+                                <td>
+                                    <form action="{{route('asrama.edit', $asrama->id)}}" method="get">
+                                        @csrf
+                                        <button class="btn btn-primary" type="submit">Approve</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-secondary" type="submit">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endif
+                            @endif
                             @endforeach
                         </tbody>
                     </table>
@@ -210,8 +220,7 @@
 @endsection
 @section('script')
 <script>
-    
-    function Arrive(){
+    function Arrive() {
         var arrive = document.getElementById('arrive_home');
         arrive.innerHTML = "Arrived";
         arrive.disabled = true;
