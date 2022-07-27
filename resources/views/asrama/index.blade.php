@@ -92,16 +92,16 @@
                                 <th> Nama Pelajar </th>
                                 <th> No IC Pelajar </th>
                                 <th> Alasan </th>
-                                <th> Tarikh Keluar </th>
-                                <th> Tarikh Masuk </th>
+                                <th> Dibenarkan Keluar </th>
+                                <th> Dibenarkan Masuk </th>
                                 @if(str_contains($role, 'student'))
                                 <th> Status </th>
                                 @endif
-                                <th> Dibenarkan Keluar </th>
-                                <th> Dibenarkan Masuk </th>
                                 <th> Tarikh Keluar </th>
+                                <th> Tarikh Sampai </th>
                                 <th> Tarikh Masuk </th>
-                                <th colspan="2"> Action </th>
+                                <th> Tarikh Sampai </th>
+                                <th> Action </th>
                             </tr>
                         </thead>
 
@@ -161,10 +161,18 @@
                                         <td>{{$asrama->out_arrive_time}}</td>
                                         <td>{{$asrama->in_time}}</td>
                                         <td>{{$asrama->in_arrive_time}}</td>
-                                        <td><form action="{{route('asrama.updateOutTime', $asrama->id)}}" method="get">
+                                        <td>
+                                            @if($asrama->outing_time == NULL)
+                                            <form action="{{route('asrama.updateOutTime', $asrama->id)}}" method="get">
                                                 @csrf
                                                 <button class="btn btn-primary" type="submit">Leave</button>
                                             </form>
+                                            @elseif($asrama->in_time == NULL && $asrama->outing_time != NULL)
+                                            <form action="{{route('asrama.updateInTime', $asrama->id)}}" method="get">
+                                                @csrf
+                                                <button class="btn btn-primary" type="submit">In</button>
+                                            </form>
+                                            @endif
                                         </td>
                                     </tr>
                                     @endif
@@ -187,8 +195,7 @@
                                                     @csrf
                                                     <button class="btn btn-primary" type="submit">Approve</button>
                                                 </form>
-                                            </td>
-                                            <td>
+                                                <br />
                                                 <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
                                                     @csrf
                                                     @method('DELETE')
