@@ -256,6 +256,7 @@ Route::group(['prefix' => 'session'], function () {
 
 // Route::get('asrama', 'AsramaController@index')->name('asrama.index');
 Route::resource('asrama', 'AsramaController');
-// Route::group(['prefix' => 'asrama'], function () {
-//     Route::get('/asrama', 'AsramaController@index')->name('asrama.index');
-// });
+Route::group(['prefix' => 'asrama'], function () {
+    Route::get('asrama/updateOutTime', 'AsramaController@updateOutTime')->name('asrama.updateOutTime');
+    Route::get('asrama/updateArriveTime/{id}', 'AsramaController@updateArriveTime')->name('asrama.updateArriveTime');
+});

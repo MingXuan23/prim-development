@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Asrama;
 use DB; 
+use DateTime;
 
 class AsramaController extends Controller
 {
@@ -105,6 +106,18 @@ class AsramaController extends Controller
         return redirect('/asrama')->with('success', 'Application Data is successfully updated');
     }
 
+    public function updateOutTime($id){
+        $asrama = Asrama::findOrFail($id);
+        $asrama->update(array('out_time' => new DateTime()));
+        return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+    
+    public function updateArriveTime($id){
+        $asrama = Asrama::findOrFail($id);
+        $asrama->update(array('out_arrive_time' => new DateTime()));
+        return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -112,6 +125,7 @@ class AsramaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
     public function update(Request $request, $id)
     {
         //

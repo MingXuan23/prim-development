@@ -12,6 +12,10 @@ class Asrama extends Model
         'start_date',
         'end_date',
         'status',
+        'outing_time',
+        'out_arrive_time',
+        'in_time',
+        'in_arrive_time',
         'student_id',
         'teacher_id'
     ];
