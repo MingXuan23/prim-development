@@ -36,15 +36,39 @@ class DonationReceipt extends Mailable
      */
     public function build()
     {
+        if($this->donation->lhdn_reference_code != null)
+        {
+            return $this->view('mail.lhdn-receipt')
+                    ->subject("Resit Derma " . $this->donation->nama)
+                    ->with([
+                        'organizationName'    => $this->organization->nama,
+                        'organizationTelNo'   => $this->organization->telno,
+                        'organizationEmail'   => $this->organization->email,
+                        'ogranizationAddress' => $this->organization->address,
+                        'transactionUsername' => $this->transaction->username,
+                        'transactionIcno'    =>$this->transaction->icno,
+                        'transactionUserAdress' => $this->transaction->address,
+                        'transactionEmail'  => $this->transaction->email,
+                        'transactionName'   => $this->transaction->description,
+                        'transactionDate'   => $this->transaction->datetime_created,
+                        'transactionAmount' => $this->transaction->amount,
+                        'donationName'      => $this->donation->nama,
+                        'doantionLHDNcode' => $this->donation->lhdn_reference_code,
+                        'doantionStartDate' => $this->donation->date_started,
+                        'doantionEndDate' => $this->donation->date_end,
+                    ]);
+        }
+
         return $this->view('mail.receipt')
                     ->subject("Resit Derma " . $this->donation->nama)
                     ->with([
                         'organizationName'  => $this->organization->nama,
                         'organizationTelNo'   => $this->organization->telno,
                         'organizationEmail'   => $this->organization->email,
+                        'ogranizationAddress' => $this->organization->address,
                         'transactionUsername' => $this->transaction->username,
                         'transactionEmail'  => $this->transaction->email,
-                        'transactionName'   => $this->transaction->nama,
+                        'transactionName'   => $this->transaction->description,
                         'transactionDate'   => $this->transaction->datetime_created,
                         'transactionAmount' => $this->transaction->amount,
                         'donationName'      => $this->donation->nama

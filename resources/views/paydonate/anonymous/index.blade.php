@@ -175,7 +175,7 @@
                             </div>
 
                             <input type="hidden" name="desc" id="desc" value="Donation">
-                            <input type="hidden" name="o_id" id="o_id" value="{{ $donation->id }} ">
+                            <input type="hidden" name="d_id" id="d_id" value="{{ $donation->id }} ">
                             <input type="hidden" name="d_code" id="d_code" value="{{ $donation->code }} ">
                             <br>
 

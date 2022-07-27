@@ -239,6 +239,11 @@
             font-weight: 700;
         }
 
+        .center {
+            display: flex;
+            justify-content: center;
+        }
+
         /* -------------------------------------
             RESPONSIVE AND MOBILE FRIENDLY STYLES
         ------------------------------------- */
@@ -275,6 +280,7 @@
     </style>
 </head>
 <body>
+    <div>You are being redirected to our homepage in <span id="time">5</span> seconds</div>
     <table class="body-wrap">
     <tbody><tr>
         <td></td>
@@ -284,39 +290,37 @@
                     <tbody><tr>
                         <td class="content-wrap aligncenter">
                             <table width="100%" cellpadding="0" cellspacing="0">
-                                <tbody><tr>
-                                    <td class="content-block">
-                                        <h2>{{ $organizationName }}</h2>
-                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">({{ $ogranizationAddress }})</h3>
-                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">{{ $organizationTelNo }} | {{ $organizationEmail }}</h3>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        <h2>{{ $organization->nama }}</h2>
+                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">({{ $organization->address }})</h3>
+                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">{{ $organization->telno }} | {{ $organization->email }}</h3>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="content-block">
+                                    <td>
                                         <table class="invoice">
                                             <tbody>
                                                 <tr>
                                                 <td>
-                                                    <b>Nama :</b> {{ $transactionUsername }}<br>
-                                                    <b>Email :</b> {{ $transactionEmail }}<br>
-                                                    <b>Nombor Resit :</b> {{ $transactionName }}<br>
-                                                    <b>Tarikh Derma :</b> {{ date('d-m-Y', strtotime($transactionDate)) }}
+                                                    <b>Nama :</b> {{ $transaction->username }} ({{ $transaction->icno }})<br>
+                                                    <b>Email :</b> {{ $transaction->email }}<br>
+                                                    <b>Alamat Menyurat :</b> {{ $transaction->address}}<br>
+                                                    <b>Nombor Resit :</b> {{ $transaction->description }}<br>
+                                                    <b>Tarikh Derma :</b> {{ date('d-m-Y', strtotime($transaction->datetime_created)) }}
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <table class="invoice-items" cellpadding="0" cellspacing="0">
                                                         <tbody><tr>
-                                                            <td>{{ $donationName }}</td>
-                                                            <td class="alignright">RM {{ number_format($transactionAmount , 2, '.', '') }}</td>
+                                                            <td>{{ $donation->nama }}<br>({{ $donation->lhdn_reference_code }} : {{ date('d/m/Y', strtotime($donation->date_started)) }} - {{ date('d/m/Y', strtotime($donation->date_end)) }})</td>
+                                                            <td class="alignright">RM {{ number_format($transaction->amount , 2, '.', '') }}</td>
                                                         </tr>
-                                                        {{-- <tr>
-                                                            <td>Tax (Paid By JAIM)</td>
-                                                            <td class="alignright">RM 1.00</td>
-                                                        </tr> --}}
                                                         <tr class="total">
                                                             <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ number_format($transactionAmount , 2, '.', '') }}</td>
+                                                            <td class="alignright">RM  {{ number_format($transaction->amount, 2, '.', '') }}</td>
                                                         </tr>
                                                     </tbody></table>
                                                 </td>
@@ -336,5 +340,22 @@
     </tr>
 </tbody>
 </table>
+
+<div class="center">
+    <button class="btn btn-primary" style="font-size:18px" onclick="window.print();">Cetak Resit</button>
+</div>
+
+<script src="{{ URL::asset('assets/libs/jquery/jquery.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/jquery-ui/jquery-ui.min.js')}}"></script>
+<script>
+    var count = 5;
+    setInterval(function(){
+        count--;
+        document.getElementById('time').innerHTML = count;
+        if (count == 0) {
+            window.location = '/derma'; 
+        }
+    },1000);
+</script>
 </body>
 </html>
