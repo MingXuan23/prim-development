@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Http\Jajahan\Jajahan;
+use App\Models\OrganizationHours;
 use App\Models\Donation;
 use App\Models\OrganizationRole;
 use View;
@@ -26,7 +27,9 @@ class OrganizationController extends Controller
         // after launch remove where
         $type_org = TypeOrganization::all();
 
-        $parent_org = Organization::whereIn('type_org', [1, 2, 3])->get();
+        $parent_org = $this->getAvailableSchoolForKoop();
+
+        Organization::where('parent_org');
 
         $states = Jajahan::negeri();
         return view('organization.add', compact('type_org', 'parent_org', 'states'));
@@ -79,6 +82,8 @@ class OrganizationController extends Controller
             $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
             //$organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
             $user->assignRole('Koop_Admin');
+
+            $this->insertOrganizationHours($organization->id);
         }
         
         return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
@@ -118,7 +123,7 @@ class OrganizationController extends Controller
         // Koperasi
         if($org->type_org == 1039)
         {
-            $parent_org = Organization::whereIn('type_org', [1, 2, 3])->get();
+            $parent_org = $this->getAvailableSchoolForKoop();
 
             $org_parent_name = Organization::where('id', $org->parent_org)->first();
 
@@ -130,7 +135,6 @@ class OrganizationController extends Controller
 
     public function update(OrganizationRequest $request, $id)
     {
-        dd($id);
         Organization::where('id', $id)->update($request->validated());
 
         if(isset($request->seller_id))
@@ -186,9 +190,10 @@ class OrganizationController extends Controller
             ->select("o.*")
             ->distinct()
             ->where('ou.user_id', $userId)
-            ->whereIn('ou.role_id', [2, 4, 1239])
+            ->whereIn('ou.role_id', [2, 1239])
             ->get();
         }
+        
     }
 
     public function getAllOrganization()
@@ -223,5 +228,68 @@ class OrganizationController extends Controller
     {
         $states = Jajahan::negeri();
         return view('test.repeater', compact('states'));
+    }
+
+    public function insertOrganizationHours($id)
+    {
+        OrganizationHours::insert([
+            [
+                'day' => 1,
+                'status' => 0,
+                'organization_id' => $id,
+            ],
+            [
+                'day' => 2,
+                'status' => 0,
+                'organization_id' => $id,
+            ],
+            [
+                'day' => 3,
+                'status' => 0,
+                'organization_id' => $id,
+            ],
+            [
+                'day' => 4,
+                'status' => 0,
+                'organization_id' => $id,
+            ],
+            [
+                'day' => 5,
+                'status' => 0,
+                'organization_id' => $id,
+            ],
+            [
+                'day' => 6,
+                'status' => 0,
+                'organization_id' => $id,
+            ],
+            [
+                'day' => 0,
+                'status' => 0,
+                'organization_id' => $id,
+            ],
+        ]);
+    }
+
+    public function getAvailableSchoolForKoop()
+    {
+        $allSchool = Organization::whereIn('type_org', [1, 2, 3])->get();
+        $allKoop = Organization::where('type_org', 1039)->get();
+
+        $isNotParent = array();
+        foreach($allSchool as $school)
+        {
+            foreach($allKoop as $koop)
+            {
+                if($school->id != $koop->parent_org)
+                {
+                    $isNotParent[] += (int)$school->id;
+                }
+            }
+        }
+
+        $parent_org = Organization::whereIn('id', $isNotParent)->get();
+
+        return $parent_org;
     }
 }

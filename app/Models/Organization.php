@@ -41,6 +41,21 @@ class Organization extends Model
         return $this->belongsTo('TypeOrganization');
     }
 
+    public function organization_hours()
+    {
+        return $this->hasMany(OrganizationHours::class);
+    }
+
+    public function product_item()
+    {
+        return $this->hasMany(ProductItem::class);
+    }
+
+    public function koop_order()
+    {
+        return $this->hasMany(KoopOrder::class);
+    }
+
     public function getOrganizationByDonationId($donationId)
     {
         $organization = Organization::with(["donation"])->whereHas('donation', function ($query) use ($donationId) {

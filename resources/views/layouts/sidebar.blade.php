@@ -258,10 +258,30 @@
 
             @role('Superadmin|Penjaga')
             <li>
-                <a href="#" class=" waves-effect">
-                    <i class="mdi mdi-book"></i>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="mdi mdi-border-color"></i>
                     <span>Kooperasi</span>
                 </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    <li>
+                        <a href="{{ route('koperasi.index') }}" class=" waves-effect">
+                            <i class="mdi mdi-book"></i>
+                            <span>Koperasi Sekolah</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('koperasi.order') }}" class=" waves-effect">
+                            <i class="ti-email"></i>
+                            <span>Pesanan Koperasi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('koperasi.history') }}" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Sejarah Koperasi</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
             @endrole
 

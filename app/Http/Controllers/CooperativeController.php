@@ -3,6 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Carbon;
+use App\Models\KoopOrder;
+use App\Models\ProductItem;
+use App\Models\ProductOrder;
+use App\Models\OrganizationHours;
+use App\Models\Organization;
+
 
 class CooperativeController extends Controller
 {
@@ -13,9 +24,41 @@ class CooperativeController extends Controller
      */
     public function index()
     {
-        //
+        $userID = Auth::id();
+
+        $stdID = DB::table('organization_user as ou')
+                    ->join('organization_user_student as ous', 'ou.id', '=', 'ous.organization_user_id')
+                    ->where('ou.user_id', $userID)
+                    ->select('ous.student_id')
+                    ->get();
+
+        $sID = array();
+        foreach($stdID as $row)
+        {
+            $sID[] += $row->student_id;
+        }
+
+        $orgID = DB::table('class_student as cs')
+                    ->join('class_organization as co', 'cs.organclass_id', '=', 'co.id')
+                    ->join('organizations as o', 'co.organization_id', '=', 'o.id')
+                    ->whereIn('cs.student_id', $sID)
+                    ->select('o.id', 'o.nama')
+                    ->distinct()
+                    ->get();
+        
+        $koperasi = Organization::where('type_org', 1039)->select('id', 'nama', 'parent_org')->get();
+
+        return view('koperasi.index', compact('koperasi', 'orgID'));
     }
 
+    public function fetchKoop(Request $request)
+    {
+        $sID = $request->get('sID');
+
+        $koop = Organization::where('parent_org', $sID)->select('id', 'nama')->get();
+
+        return response()->json(['success' => $koop]);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -34,7 +77,124 @@ class CooperativeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $userID = Auth::id();
+
+        $item = ProductItem::where('id', $request->item_id)->first();
+
+        // Check if quantity request is less or equal to quantity available
+        if($request->item_quantity <= $item->quantity) // if true
+        {
+            $order = KoopOrder::where([
+                ['user_id', $userID],
+                ['status', 1],
+                ['organization_id', $request->org_id]
+            ])->first();
+            
+            // Check if order already exists
+            if($order) // order exists
+            {
+                $cartExist = ProductOrder::where([
+                    ['status', 1],
+                    ['product_item_id', $request->item_id],
+                    ['koop_order_id', $order->id],
+                ])->first();
+
+                // If same item exists in cart
+                if($cartExist) // if exists (update)
+                {
+                    if($request->item_quantity > $cartExist->quantity) // request quant more than existing quant
+                    {
+                        $newQuantity = intval($item->quantity - ($request->item_quantity - $cartExist->quantity)); // decrement stock
+                    }
+                    else if($request->item_quantity < $cartExist->quantity) // request quant less than existing quant
+                    {
+                        $newQuantity = intval($item->quantity + ($cartExist->quantity - $request->item_quantity)); // increment stock
+                    }
+                    else if($request->item_quantity == $cartExist->quantity) // request quant equal existing quant
+                    {
+                        $newQuantity = intval((int)$item->quantity - 0); // stock not change
+                    }
+
+                    ProductOrder::where('id', $cartExist->id)->update([
+                        'quantity' => $request->item_quantity
+                    ]);
+                }
+                else // if not exists (insert)
+                {
+                    ProductOrder::create([
+                        'quantity' => $request->item_quantity,
+                        'status' => 1,
+                        'product_item_id' => $request->item_id,
+                        'koop_order_id' => $order->id
+                    ]);
+
+                    $newQuantity = intval((int)$item->quantity - (int)$request->item_quantity);
+                }
+
+                $cartItem = DB::table('product_order as po')
+                                ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+                                ->where('po.koop_order_id', $order->id)
+                                ->where('po.status', 1)
+                                ->select('po.quantity', 'pi.price')
+                                ->get();
+
+                $newTotalPrice = 0;
+                
+                foreach($cartItem as $row)
+                {
+                    $newTotalPrice += doubleval($row->price * $row->quantity);
+                }
+
+                KoopOrder::where([
+                    ['user_id', $userID],
+                    ['status', 1],
+                    ['organization_id', $request->org_id]
+                ])
+                ->update([
+                    'total_price' => $newTotalPrice
+                ]);
+            }
+            else // order did not exists
+            {
+                $totalPrice = $item->price * (int)$request->item_quantity;
+
+                $newQuantity = intval((int)$item->quantity - (int)$request->item_quantity);
+
+                $newOrder = KoopOrder::create([
+                    'method_status' => 1,
+                    'total_price' => $totalPrice,
+                    'status' => 1,
+                    'user_id' => $userID,
+                    'organization_id' => $request->org_id
+                ]);
+
+                ProductOrder::create([
+                    'quantity' => $request->item_quantity,
+                    'status' => 1,
+                    'product_item_id' => $request->item_id,
+                    'koop_order_id' => $newOrder->id
+                ]);
+            }
+
+            // check if quantity is 0 after add to cart
+            if($newQuantity != 0) // if not 0
+            {
+                ProductItem::where('id', $request->item_id)->update(['quantity' => $newQuantity]);
+            }
+            else // if 0 (change item status)
+            {
+                ProductItem::where('id', $request->item_id)
+                ->update(['quantity' => $newQuantity, 'status' => 0]);
+            }
+
+            return back()->with('success', 'Item Berjaya Ditambah!');
+        }
+        else // if false
+        {
+            $message = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->quantity;
+            return back()->with('error', $message);
+        }
+        // dd($request->all());
     }
 
     /**
@@ -45,7 +205,35 @@ class CooperativeController extends Controller
      */
     public function show($id)
     {
-        //
+        $koperasi = DB::table('organizations as o')
+                    ->join('organization_hours as oh', 'o.id', '=', 'oh.organization_id')
+                    ->where('o.id', $id)
+                    ->where('o.type_org', 1039)
+                    ->select('o.id', 'o.nama', 'o.telno', 'o.address', 'o.city', 'o.postcode', 'o.state', 'o.parent_org',
+                            'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
+                    ->first();
+
+        $org = Organization::where('id', $koperasi->parent_org)->select('nama')->first();
+        
+        $product_item = DB::table('product_item as pi')
+                        ->join('product_type as pt', 'pi.product_type_id', '=', 'pt.id')
+                        ->where('pi.organization_id', $koperasi->id)
+                        ->select('pi.*', 'pt.name as type_name')
+                        ->orderBy('pi.name')
+                        ->get();
+        
+        $product_type = DB::table('product_type as pt')
+                            ->join('product_item as pi', 'pt.id', '=', 'pi.product_type_id')
+                            ->select('pt.id as type_id', 'pt.name as type_name')
+                            ->where('pi.organization_id', $koperasi->id)
+                            ->distinct() 
+                            ->get();
+
+        $k_open_hour = date('h:i A', strtotime($koperasi->open_hour));
+        
+        $k_close_hour = date('h:i A', strtotime($koperasi->close_hour));
+
+        return view('koperasi.menu', compact('koperasi', 'org', 'product_item', 'product_type', 'k_open_hour', 'k_close_hour'));
     }
 
     /**
@@ -56,7 +244,50 @@ class CooperativeController extends Controller
      */
     public function edit($id)
     {
-        //
+        $cart_item = array(); // empty if cart is empty
+        $user_id = Auth::id();
+
+        $cart = KoopOrder::where([
+            ['status', 1],
+            ['organization_id', $id],
+            ['user_id', $user_id],
+        ])->first();
+        
+        if($cart)
+        {
+            $cart_item = DB::table('product_order as po')
+                    ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+                    ->where('po.status', 1)
+                    ->where('po.koop_order_id', $cart->id)
+                    ->select('po.id', 'po.quantity', 'pi.name', 'pi.price', 'pi.image')
+                    ->get();
+
+            // $tomorrowDate = Carbon::tomorrow()->format('Y-m-d');
+
+            $allDay = OrganizationHours::where([
+                ['organization_id', $id],
+                ['status', 1],
+            ])->get();
+            
+            $isPast = array();
+            
+            foreach($allDay as $row)
+            {
+                $TodayDate = Carbon::now()->format('l');
+                // $MondayNextWeek = Carbon::now()->next(1);
+
+                $day = $this->getDayIntegerByDayName($TodayDate);
+
+                $key = strval($row->day);
+                
+                $isPast = $this->getDayStatus($day, $row->day, $isPast, $key);
+            }
+            return view('koperasi.cart', compact('cart', 'cart_item', 'allDay', 'isPast' ,'id'));
+        }
+        else
+        {
+            return view('koperasi.cart', compact('cart', 'cart_item' , 'id'));
+        }
     }
 
     /**
@@ -68,7 +299,98 @@ class CooperativeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $org = KoopOrder::where('id', $id)->select('organization_id as id')->first();
+
+        $daySelect = (int)$request->week_status;
+
+        $pickUp = Carbon::now()->next($daySelect)->toDateString();
+        
+        KoopOrder::where([
+            ['status', 1],
+            ['id', $id],
+        ])->update([
+            'pickup_date' => $pickUp,
+            'note' => $request->note,
+            'status' => 2,
+        ]);
+
+        ProductOrder::where([
+            ['status', 1],
+            ['koop_order_id', $id],
+        ])->update(['status' => 2]);
+
+        return redirect('/koperasi/'.$org->id)->with('success', 'Pesanan Anda Berjaya Direkod!');
+    }
+
+    public function destroyItemCart($org_id, $id)
+    {
+        $userID = Auth::id();
+
+        $cart_item = ProductOrder::where('id', $id);
+
+        $item = $cart_item->first();
+
+        $product_item = ProductItem::where('id', $item->product_item_id);
+
+        $product_item_quantity = $product_item->first();
+
+        $newQuantity = intval($product_item_quantity->quantity + $item->quantity); // increment quantity
+
+        /* If previous product item is being unavailable because of added item in cart,
+           after the item deleted, the quantity in product_item will increment back and
+           the item will be available */
+        if($product_item_quantity->quantity == 0)
+        {
+            $product_item->update([
+                'quantity' => $newQuantity,
+                'status' => 1,
+            ]);
+        }
+        else
+        {
+            $product_item->update([
+                'quantity' => $newQuantity,
+            ]);
+        }
+
+        $cart_item->forceDelete();
+
+        $allCartItem = DB::table('product_order as po')
+                        ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+                        ->where('po.koop_order_id', $item->koop_order_id)
+                        ->where('po.status', 1)
+                        ->select('po.quantity', 'pi.price')
+                        ->get();
+        
+        // If cart is not empty
+        if(count($allCartItem) != 0)
+        {
+
+            $newTotalPrice = 0;
+            
+            // Recalculate total
+            foreach($allCartItem as $row)
+            {
+                $newTotalPrice += doubleval($row->price * $row->quantity);
+            }
+
+            KoopOrder::where([
+                ['user_id', $userID],
+                ['status', 1],
+                ['organization_id', $org_id],
+            ])->update(['total_price' => $newTotalPrice]);
+        }
+        else // If cart is empty (delete order)
+        {
+            KoopOrder::where([
+                ['user_id', $userID],
+                ['status', 1],
+                ['organization_id', $org_id],
+            ])->forceDelete();
+        }
+        
+
+        return back()->with('success', 'Item Berjaya Dibuang');
     }
 
     /**
@@ -79,6 +401,234 @@ class CooperativeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        
     }
+
+    public function indexOrder()
+    {
+        $userID = Auth::id();
+
+        $query = DB::table('koop_order as ko')
+                ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                ->whereIn('status', [2,4])
+                ->where('user_id', $userID)
+                ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno')
+                ->orderBy('ko.status', 'desc')
+                ->orderBy('ko.pickup_date', 'asc')
+                ->orderBy('ko.updated_at', 'desc');
+
+        $all_order = $query->get();
+
+        $allPickUpDate = array();
+        $isPast = array();
+
+        foreach($all_order as $row)
+        {
+            $allPickUpDate[] += date(strtotime($row->pickup_date));
+
+            $key = date("Y-m-d", date(strtotime($row->pickup_date)));
+
+            $pickUpDate = Carbon::parse($row->pickup_date)->startofDay();
+            $todayDate = Carbon::now()->startOfDay();
+
+            // Check if today is the day of the pickup day or is still not yet arrived
+            if($todayDate->lte($pickUpDate))
+            {
+                $isPast[$key] = 0;
+            }
+            else
+            {
+                $isPast[$key] = 1;
+            }
+
+            if($row->pickup_date == $key && $isPast[$row->pickup_date] == 1)
+            {
+                // Status changed to overdue
+                KoopOrder::where('pickup_date', $row->pickup_date)->update(['status' => 4]);
+            }
+            else
+            {
+                // Status is still not picked
+                KoopOrder::where('pickup_date', $row->pickup_date)->update(['status' => 2]);
+            }
+        }
+
+        $order = $query->paginate(5);
+
+        return view('koperasi.order', compact('order'));
+    }
+
+    public function indexHistory()
+    {
+        $userID = Auth::id();
+
+        $query = DB::table('koop_order as ko')
+                ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                ->whereIn('status', [3, 100, 200])
+                ->where('user_id', $userID)
+                ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno')
+                ->orderBy('ko.status', 'desc')
+                ->orderBy('ko.pickup_date', 'asc')
+                ->orderBy('ko.updated_at', 'desc');
+
+        $order = $query->paginate(5);
+
+        return view('koperasi.history', compact('order'));
+    }
+
+    public function indexList($id)
+    {
+        $userID = Auth::id();
+
+        // Get Information about the order
+        $list_detail = DB::table('koop_order as ko')
+                        ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                        ->where('ko.id', $id)
+                        ->where('ko.status', '>' , 0)
+                        ->where('ko.user_id', $userID)
+                        ->select('ko.updated_at', 'ko.pickup_date', 'ko.total_price', 'ko.note', 'ko.status',
+                                'o.id','o.nama', 'o.parent_org', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state')
+                        ->first();
+
+        $date = Carbon::createFromDate($list_detail->pickup_date); // create date based on pickup date
+
+        $day = $this->getDayIntegerByDayName($date->format('l')); // get day in integer based on day name
+
+        // get open and close hour org
+        $allOpenDays = OrganizationHours::where([
+            ['organization_id', $list_detail->id],
+            ['day', $day],
+        ])->first();
+
+        // get parent name
+        $parent_org = Organization::where('id', $list_detail->parent_org)->select('nama')->first();
+
+        $sekolah_name = $parent_org->nama;
+
+        // get all product based on order
+        $item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+                ->where('po.koop_order_id', $id)
+                ->where('po.status', '>', 0)
+                ->select('pi.name', 'pi.price', 'po.quantity')
+                ->get();
+
+
+        $totalPrice = array();
+        
+        foreach($item as $row)
+        {
+            $key = strval($row->name); // key based on item name
+            $totalPrice[$key] = doubleval($row->price * $row->quantity); // calculate total for each item in cart
+        }
+
+        return view('koperasi.list', compact('list_detail', 'allOpenDays', 'sekolah_name', 'item', 'totalPrice'));
+    }
+
+    public function fetchAvailableDay(Request $request)
+    {   
+        $order_id = $request->get('oID');
+
+        $order = KoopOrder::where('id', $order_id)->first();
+
+        $allDay = OrganizationHours::where('organization_id', $order->organization_id)->where('status', 1)->get();
+        
+        $isPast = array();
+            
+        foreach($allDay as $row)
+        {
+            $TodayDate = Carbon::now()->format('l');
+
+            $day = $this->getDayIntegerByDayName($TodayDate);
+
+            $key = strval($row->day);
+
+            $isPast = $this->getDayStatus($day, $row->day, $isPast, $key);
+
+        }
+        return response()->json(['day' => $allDay, 'past' => $isPast ]);
+    }
+
+    public function updatePickUpDate(Request $request)
+    {
+        $order_id = $request->get('oID');
+        $daySelect = (int)$request->get('day');
+
+        $pickUp = Carbon::now()->next($daySelect)->toDateString();
+
+        $result = KoopOrder::where('id', $order_id)->update(['pickup_date' => $pickUp]);
+        
+        $this->indexOrder(); // Recall function to recheck status
+
+        if ($result) {
+            Session::flash('success', 'Hari Pengambilan Berjaya diubah');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Hari Pengambilan Tidak Berjaya diubah');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
+    public function destroyUserOrder($id)
+    {
+        $queryKO = KoopOrder::where('id', $id);
+        $queryKO->update(['status' => 200]);
+        $resultKO = $queryKO->delete();
+
+        $queryPO = ProductOrder::where('koop_order_id', $id);
+
+        $order = $queryPO->get();
+
+        // Increment product_item quantity after deleted
+        foreach($order as $row)
+        { 
+            ProductItem::where('id', $row->product_item_id)->increment('quantity', $row->quantity);
+        }
+
+        $queryPO->update(['status' => 200]);
+        $resultPO = $queryPO->delete();
+
+        $this->indexOrder(); // Recall function to recheck status
+        
+        if ($resultKO && $resultPO) {
+            Session::flash('success', 'Pesanan Berjaya Dibuang');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Pesanan Gagal Dibuang');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
+    private function getDayStatus($todayDay, $allDay, $arr, $key_index)
+    {
+        // If today is Sunday
+        if($todayDay == 0) 
+        { $arr[$key_index] = "Minggu Hadapan"; } // Pick up date always next week
+        else
+        {
+            // if array of day available is sunday
+            if($allDay == 0) { $arr[$key_index] = "Minggu Ini"; } // Pick up date for Sunday always this week
+            // if today day is passed or today
+            else if($todayDay >= $allDay) { $arr[$key_index] = "Minggu Hadapan"; } // Pick up date must next week
+            // if today day is not passed yet
+            else if($todayDay < $allDay) { $arr[$key_index] = "Minggu Ini"; } // Pick up date available this week
+        }
+
+        return $arr;
+    }
+
+    private function getDayIntegerByDayName($date)
+    {
+        if($date == "Monday") { $day = 1; }
+        else if($date == "Tuesday") { $day = 2; }
+        else if($date == "Wednesday") { $day = 3; }
+        else if($date == "Thursday") { $day = 4; }
+        else if($date == "Friday") { $day = 5; }
+        else if($date == "Saturday") { $day = 6; }
+        else if($date == "Sunday") { $day = 0; }
+        return $day;
+    }
+
+    
+
 }

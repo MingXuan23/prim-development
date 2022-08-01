@@ -21,6 +21,8 @@ class CreateProductItemTable extends Migration
             $table->double('price', 8, 2)->nullable();
             $table->string('image')->nullable();
             $table->integer('status');
+            $table->timestamps();
+            $table->softDeletes();
             $table->unsignedBigInteger('product_type_id')->index();
             $table->unsignedBigInteger('organization_id')->index();
 

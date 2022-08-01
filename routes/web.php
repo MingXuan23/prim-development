@@ -165,6 +165,17 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
     Route::post('/updatePwd/{id}', 'ProfileController@updatePwd')->name('profile.updatePwd');
 });
 
+Route::group(['prefix' => 'koperasi'], function() {
+    Route::delete('/{org_id}/edit/{id}', 'CooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
+    Route::post('/koperasi/fetchKoop', 'CooperativeController@fetchKoop')->name('koperasi.fetchKoop');
+    Route::get('/order', 'CooperativeController@indexOrder')->name('koperasi.order');
+    Route::get('/order/fetchDay', 'CooperativeController@fetchAvailableDay')->name('koperasi.fetchDay');
+    Route::post('/order/update-pick-up-date', 'CooperativeController@updatePickUpDate')->name('koperasi.updatePickUpDate');
+    Route::delete('/order/{id}', 'CooperativeController@destroyUserOrder')->name('koperasi.destroyUserOrder');
+    Route::get('/history', 'CooperativeController@indexHistory')->name('koperasi.history');
+    Route::get('/{id}/list', 'CooperativeController@indexList')->name('koperasi.list');
+});
+
 Route::group(['middleware' => ['auth']], function () {
     Route::resources([
         'school'             => 'SchoolController',
@@ -182,7 +193,8 @@ Route::group(['middleware' => ['auth']], function () {
         'reminder'           => 'ReminderController',
         'activity'           => 'ActivityController',
         'session'            => 'SessionController',
-        'profile'            => 'ProfileController'
+        'profile'            => 'ProfileController',
+        'koperasi'           => 'CooperativeController',
     ]);
 });
 

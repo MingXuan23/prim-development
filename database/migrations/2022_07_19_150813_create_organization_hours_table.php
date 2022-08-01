@@ -19,6 +19,7 @@ class CreateOrganizationHoursTable extends Migration
             $table->time('open_hour')->nullable();
             $table->time('close_hour')->nullable();
             $table->integer('status')->nullable();
+            $table->timestamps();
             $table->unsignedBigInteger('organization_id')->index();
 
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
