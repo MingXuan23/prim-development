@@ -25,7 +25,7 @@ class OrganizationController extends Controller
     {
         // after launch remove where
         $type_org = TypeOrganization::all();
-
+        
         $parent_org = Organization::whereIn('type_org', [1, 2, 3])->get();
 
         $states = Jajahan::negeri();
@@ -130,7 +130,7 @@ class OrganizationController extends Controller
 
     public function update(OrganizationRequest $request, $id)
     {
-        dd($id);
+        
         Organization::where('id', $id)->update($request->validated());
 
         if(isset($request->seller_id))

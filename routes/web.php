@@ -10,6 +10,7 @@
 |
 */
 
+use App\Http\Controllers\CooperativeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -165,6 +166,15 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
     Route::post('/updatePwd/{id}', 'ProfileController@updatePwd')->name('profile.updatePwd');
 });
 
+Route::group(['prefix' => 'koperasi'], function () {
+    Route::get('/admin', 'CooperativeController@indexAdmin')->name('koperasi.indexAdmin');
+    Route::get('/produk', 'CooperativeController@createProduct')->name('koperasi.createProduct');
+    Route::post('/produk', 'CooperativeController@storeProduct')->name('koperasi.storeProduct');
+    Route::get('/produk/update/{id}','CooperativeController@editProduct')->name('koperasi.editProduct');
+    Route::post('/produk/update/{id}','CooperativeController@updateProduct')->name('koperasi.updateProduct');
+    Route::get('/produk/delete/{id}', 'CooperativeController@deleteProduct')->name('koperasi.deleteProduct');
+});
+
 Route::group(['middleware' => ['auth']], function () {
     Route::resources([
         'school'             => 'SchoolController',
@@ -182,7 +192,8 @@ Route::group(['middleware' => ['auth']], function () {
         'reminder'           => 'ReminderController',
         'activity'           => 'ActivityController',
         'session'            => 'SessionController',
-        'profile'            => 'ProfileController'
+        'profile'            => 'ProfileController',
+        'koperasi'           => 'CooperativeController',
     ]);
 });
 

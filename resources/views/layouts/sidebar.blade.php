@@ -249,7 +249,7 @@
 
             @role('Superadmin|Koop_Admin')
             <li>
-                <a href="#" class=" waves-effect">
+                <a href="{{ route('koperasi.indexAdmin') }}" class=" waves-effect">
                     <i class="mdi mdi-account-group"></i>
                     <span>Kooperasi</span>
                 </a>
