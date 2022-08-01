@@ -42,3 +42,5 @@ Route::get('mobile/getdonationbycategory', 'MobileApiController@getdonationbycat
 
 Route::post('mobile/login', 'MobileApiController@login');
 Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
+
+Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
