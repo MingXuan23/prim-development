@@ -78,6 +78,7 @@ class LoginController extends Controller
     {
         // $request->get  get email (name) from form
         $phone = $request->get('email');
+        
         if(is_numeric($request->get('email'))){
             
             if(!$this->startsWith((string)$request->get('email'),"+60") && !$this->startsWith((string)$request->get('email'),"60")){
