@@ -17,6 +17,8 @@ class CreateProductOrderTable extends Migration
             $table->bigIncrements('id');
             $table->integer('quantity')->nullable();
             $table->integer('status')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
             $table->unsignedBigInteger('product_item_id')->index();
             $table->unsignedBigInteger('koop_order_id')->index();
 

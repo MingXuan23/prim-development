@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Models\Donation;
+use App\Models\KoopOrder;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +55,11 @@ class User extends Authenticatable
     public function donation()
     {
         return $this->belongsToMany(Donation::class, 'donation_user');
+    }
+
+    public function koop_order()
+    {
+        return $this->hasOne(KoopOrder::class);
     }
 
     public function getUserById()

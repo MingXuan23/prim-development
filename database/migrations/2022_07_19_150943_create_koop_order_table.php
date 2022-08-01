@@ -18,13 +18,18 @@ class CreateKoopOrderTable extends Migration
             $table->timestamps();
             $table->date('pickup_date')->nullable();
             $table->integer('method_status')->nullable();
+            $table->double('total_price', 8, 2)->nullable();
+            $table->mediumText('note')->nullable();
             $table->integer('status')->nullable();
+            $table->softDeletes();
             $table->string('address')->nullable();
             $table->string('city')->nullable();
             $table->integer('postcode')->nullable();
             $table->string('state')->nullable();
+            $table->unsignedBigInteger('user_id')->index();
             $table->unsignedBigInteger('organization_id')->index();
 
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
@@ -38,6 +43,7 @@ class CreateKoopOrderTable extends Migration
     {
         Schema::dropIfExists('koop_order', function(Blueprint $table)
         {
+            $table->drop('user_id');
             $table->drop('organization_id');
         });
     }
