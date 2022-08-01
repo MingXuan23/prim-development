@@ -68,7 +68,7 @@
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fas fa-school"></i>
-                        <span>Polimas</span>
+                        <span>Politeknik</span>
                     </a>
 
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
