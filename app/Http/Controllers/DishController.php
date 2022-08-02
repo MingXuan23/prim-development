@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dish;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DishController extends Controller
 {
@@ -81,5 +82,24 @@ class DishController extends Controller
     public function destroy(Dish $dish)
     {
         //
+    }
+
+
+
+    //to get all dishes of a certain organization
+    public function getDishByOrgId($id)
+    {
+        return DB::table('dishes')
+            ->where('organ_id', $id)
+            ->get();
+    }
+
+    //to get date available based on dish id
+    public function getDateByDishId($id)
+    {
+        return DB::table('dish_available')
+            ->where('dish_id', $id)
+            ->select('date')
+            ->get();
     }
 }

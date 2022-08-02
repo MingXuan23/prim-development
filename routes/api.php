@@ -57,3 +57,9 @@ Route::get('/{id}', function($id){
     // return new DonationReceipt($donation, $transaction, $organization);
     return view('receipt.indexlhdn', compact( 'donation', 'organization', 'transaction'));
 });
+
+
+//route for mobile order
+Route::get('mobile/getfoodorg', 'OrganizationController@getAllOrgTypeFood');
+Route::get('mobile/getdishbyorg/{id}', 'DishController@getDishByOrgId');
+Route::get('mobile/getdatebydish/{id}', 'DishController@getDateByDishId');
