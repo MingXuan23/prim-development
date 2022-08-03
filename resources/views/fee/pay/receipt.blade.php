@@ -30,20 +30,20 @@
                 <div class="card mb-1">
                     <div class="card-body py-5">
                         <div class="row">
-                            <div class="col-2 p-0">
+                            <div class="col-lg-2 col-sm-12 p-0">
                                 <center>
                                     <img src="{{ URL::asset('/organization-picture/'.$get_organization->organization_picture) }}" height="80"
                                         alt="" />
                                 </center>
                             </div>
-                            <div class="col-6 p-0">
+                            <div class="col-lg-6 col-sm-12 p-0">
                                 <h4>{{ $get_organization->nama }}</h4>
                                 <p>{{ $get_organization->address }},
                                     <br />
                                     {{ $get_organization->postcode }} {{ $get_organization->city }}, {{ $get_organization->state }}
                                 </p>
                             </div>
-                            <div class="col-4">
+                            <div class="col-lg-4 col-sm-12">
                                 <table style="width: 100%">
                                     <tr style="background-color:#e9ecef">
                                         <th colspan="6" class="text-center">Resit</th>
