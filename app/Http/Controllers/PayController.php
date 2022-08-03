@@ -737,7 +737,7 @@ class PayController extends AppBaseController
             }
             return view('errors.500');
         } else {
-            Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed' . $request->fpx_debitAuthCode]);
+            Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
             $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
             return view('fpx.transactionFailed', compact('request', 'user'));
         }
