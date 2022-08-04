@@ -78,13 +78,7 @@ class LoginController extends Controller
     {
         // $request->get  get email (name) from form
         $phone = $request->get('email');
-        $regex = '/[0-9]{4}-[0-9]{2}-[0-9]{4}/';
-
-        if(preg_match($regex, $phone))
-        {
-            return ['icno'=>$phone,'password'=>$request->get('password')];
-        }
-
+        
         if(is_numeric($request->get('email'))){
             
             if(!$this->startsWith((string)$request->get('email'),"+60") && !$this->startsWith((string)$request->get('email'),"60")){

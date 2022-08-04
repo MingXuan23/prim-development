@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDescColumnOrg extends Migration
+class AddDescriptionColumnToOrganizationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddDescColumnOrg extends Migration
     public function up()
     {
         Schema::table('organizations', function (Blueprint $table) {
-            $table->string('description');
+            //
+            $table->string('description')->nullable();
         });
     }
 
@@ -27,6 +28,7 @@ class AddDescColumnOrg extends Migration
     {
         Schema::table('organizations', function (Blueprint $table) {
             //
+            $table->dropIfExists('description');
         });
     }
 }
