@@ -128,7 +128,7 @@ Route::group(['prefix' => 'fees'], function () {
 
     Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
     Route::get('/list-receipt', 'FeesController@getFeesReceiptDataTable')->name('fees.getFeesReceiptDataTable');
-    
+
     Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 });
