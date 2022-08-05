@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDormsTable extends Migration
+class CreateOutingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateDormsTable extends Migration
      */
     public function up()
     {
-        Schema::create('dorms', function (Blueprint $table) {
+        Schema::create('outings', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->integer('accomodate_no');
-            $table->integer('student_inside_no');
+            $table->datetime('start_date_time');
+            $table->datetime('end_date_time');
         });
     }
 
@@ -28,6 +27,6 @@ class CreateDormsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('dorms');
+        Schema::dropIfExists('outings');
     }
 }
