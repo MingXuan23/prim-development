@@ -41,3 +41,11 @@ Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
 Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
 Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
 Route::get('mobile/order/orderTransaction1', 'OrderController@orderTransaction1');
+
+Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
+
+
+//route for mobile order
+Route::get('mobile/getfoodorg', 'OrganizationController@getAllOrgTypeFood');
+Route::get('mobile/getdishbyorg/{id}', 'DishController@getDishByOrgId');
+Route::get('mobile/getdatebydish/{id}', 'DishController@getDateByDishId');

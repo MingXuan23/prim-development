@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\Null_;
 
 class OrderController extends Controller
 {
@@ -1265,15 +1266,17 @@ class OrderController extends Controller
 
         try {
 
-            $this->validate($request, [
-                'name'          =>  'required',
+           /*  $this->validate($request, [
+                'delivery_status'          =>  'required',
                 'email'         =>  'required',
                 'telno'         =>  'required',
                 'organization'  =>  'required',
-            ]);
+            ]); */
 
             $order = new Order();
-            $order->name = $re
+            $order->delivery_status = $request['delivery_status'];
+            $order->transaction_id = Null;
+            $order->transaction
             
         } catch (\Throwable $th) {
 
