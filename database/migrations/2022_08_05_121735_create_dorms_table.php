@@ -16,7 +16,7 @@ class CreateDormsTable extends Migration
         Schema::create('dorms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('accomodate_no');
+            $table->integer('accommodate_no');
             $table->integer('student_inside_no');
         });
     }
