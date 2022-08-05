@@ -99,6 +99,7 @@ class DishController extends Controller
     {
         return DB::table('dish_available')
             ->where('dish_id', $id)
+            ->where('date', '>=', DB::raw('curdate()'))
             ->select('date')
             ->get();
     }
