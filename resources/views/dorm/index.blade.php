@@ -62,6 +62,9 @@ if (isset($_GET['subject'])) {
                 @if(str_contains($role, 's'))
                 <a style="margin: 19px; float: right;" href="{{ route('asrama.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Tambah Permintaan</a>
+                @elseif(str_contains($role, 't'))
+                <a style="margin: 19px; float: right;" href="" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Check in</a>
                 @endif
             </div>
 

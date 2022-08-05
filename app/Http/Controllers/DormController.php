@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Asrama;
+use App\Models\Dorm;
 use DB; 
 use DateTime;
 
-class AsramaController extends Controller
+class DormController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,13 +17,6 @@ class AsramaController extends Controller
     public function index()
     {
         //
-        // $asrama1 = Asrama::all();
-
-        // $asrama = DB::table('asramas')
-        // ->join('students', 'students.id', '=', 'asramas.student_id')
-        // ->select('asramas.*', 'students.*')
-        // ->get();
-
         $asrama = DB::table('students')
         ->join('asramas', 'asramas.student_id', '=', 'students.id')
         ->select('students.*', 'asramas.*')
@@ -50,7 +43,6 @@ class AsramaController extends Controller
         else{
             return view('asrama.create', compact('users'));
         }
-        
     }
 
     /**
@@ -81,17 +73,6 @@ class AsramaController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
     {
         //
         $asrama = Asrama::findOrFail($id);
@@ -131,13 +112,34 @@ class AsramaController extends Controller
     }
 
     /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+        $asrama = Asrama::findOrFail($id);
+        $asrama->update(array('status' => '1'));
+
+        // DB::table('asramas')
+        // ->where('student_id',$id)
+        // ->update([
+        //     'status' =>$request->get('status'),
+        // ]);
+        
+        return redirect('/asrama')->with('success', 'Application Data is successfully updated');
+        
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-
     public function update(Request $request, $id)
     {
         //
@@ -162,12 +164,10 @@ class AsramaController extends Controller
     public function destroy($id)
     {
         //
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->delete();
-        // dd($id);
         DB::table('asramas')
             ->where('id',$id)
             ->delete();
         return redirect('/asrama')->with('success', 'Application Data is successfully deleted');
     }
+
 }

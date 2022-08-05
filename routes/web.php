@@ -255,10 +255,10 @@ Route::group(['prefix' => 'session'], function () {
 
 
 // Route::get('asrama', 'AsramaController@index')->name('asrama.index');
-Route::resource('asrama', 'AsramaController');
-Route::group(['prefix' => 'asrama'], function () {
-    Route::get('asrama/updateOutTime/{id}', 'AsramaController@updateOutTime')->name('asrama.updateOutTime');
-    Route::get('asrama/updateInTime/{id}', 'AsramaController@updateInTime')->name('asrama.updateInTime');
-    Route::get('asrama/updateOutArriveTime/{id}', 'AsramaController@updateOutArriveTime')->name('asrama.updateOutArriveTime');
-    Route::get('asrama/updateInArriveTime/{id}', 'AsramaController@updateInArriveTime')->name('asrama.updateInArriveTime');
+Route::resource('dorm', 'DormController');
+Route::group(['prefix' => 'dorm'], function () {
+    Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
+    Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
+    Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
+    Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
 });
