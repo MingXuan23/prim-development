@@ -128,7 +128,7 @@ Route::group(['prefix' => 'fees'], function () {
 
     Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
     Route::get('/list-receipt', 'FeesController@getFeesReceiptDataTable')->name('fees.getFeesReceiptDataTable');
-    
+
     Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 });
@@ -255,10 +255,12 @@ Route::group(['prefix' => 'session'], function () {
 
 
 // Route::get('asrama', 'AsramaController@index')->name('asrama.index');
-Route::resource('asrama', 'AsramaController');
-Route::group(['prefix' => 'asrama'], function () {
-    Route::get('asrama/updateOutTime/{id}', 'AsramaController@updateOutTime')->name('asrama.updateOutTime');
-    Route::get('asrama/updateInTime/{id}', 'AsramaController@updateInTime')->name('asrama.updateInTime');
-    Route::get('asrama/updateOutArriveTime/{id}', 'AsramaController@updateOutArriveTime')->name('asrama.updateOutArriveTime');
-    Route::get('asrama/updateInArriveTime/{id}', 'AsramaController@updateInArriveTime')->name('asrama.updateInArriveTime');
-});
+// Route::resource('asrama', 'AsramaController');
+// Route::group(['prefix' => 'asrama'], function () {
+//     Route::get('asrama/updateOutTime/{id}', 'AsramaController@updateOutTime')->name('asrama.updateOutTime');
+//     Route::get('asrama/updateInTime/{id}', 'AsramaController@updateInTime')->name('asrama.updateInTime');
+//     Route::get('asrama/updateOutArriveTime/{id}', 'AsramaController@updateOutArriveTime')->name('asrama.updateOutArriveTime');
+//     Route::get('asrama/updateInArriveTime/{id}', 'AsramaController@updateInArriveTime')->name('asrama.updateInArriveTime');
+// });
+
+Route::resource('dorm', 'DormController');
