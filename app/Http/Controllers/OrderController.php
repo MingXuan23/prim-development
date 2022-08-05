@@ -82,4 +82,9 @@ class OrderController extends Controller
     {
         //
     }
+
+    public function orderTransaction(Request $request)
+    {
+        return $request;
+    }
 }

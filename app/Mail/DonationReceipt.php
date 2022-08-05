@@ -41,10 +41,14 @@ class DonationReceipt extends Mailable
             return $this->view('mail.lhdn-receipt')
                     ->subject("Resit Derma " . $this->donation->nama)
                     ->with([
+                        'organizationPic'    => $this->organization->organization_picture,
                         'organizationName'    => $this->organization->nama,
                         'organizationTelNo'   => $this->organization->telno,
                         'organizationEmail'   => $this->organization->email,
                         'ogranizationAddress' => $this->organization->address,
+                        'ogranizationPostCode' => $this->organization->postcode,
+                        'ogranizationCity' => $this->organization->city,
+                        'ogranizationState' => $this->organization->state,
                         'transactionUsername' => $this->transaction->username,
                         'transactionIcno'    =>$this->transaction->icno,
                         'transactionUserAdress' => $this->transaction->address,
