@@ -94,31 +94,13 @@
   </div>
 </div>
 
-{{-- confirmation delete modal --}}
-<div id="deleteConfirmationModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Padam Derma</h4>
-      </div>
-      <div class="modal-body">
-        Adakah anda pasti?
-      </div>
-      <div class="modal-footer">
-        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
-        <button type="button" data-dismiss="modal" class="btn">Batal</button>
-      </div>
-    </div>
-  </div>
-</div>
-{{-- end confirmation delete modal --}}
-
 @endsection
 
 
 @section('script')
 <script>
     $( document ).ready(function() {
+
         fetch_data();
 
         var receiptTable;

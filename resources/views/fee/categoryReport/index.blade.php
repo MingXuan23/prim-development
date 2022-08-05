@@ -97,7 +97,7 @@
 <script>
     $(document).ready(function(){
         
-        if($("#organization").val() != ""){
+        if($("#organization").val() == ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetch_data($("#organization").val());
         }

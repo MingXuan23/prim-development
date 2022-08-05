@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 
@@ -318,6 +319,11 @@ class DonationController extends Controller
             $user = $this->user->getUserById();
         }
 
+        if($donation->lhdn_reference_code != NULL)
+        {
+            return view('paydonate.lhdn.index', compact('donation', 'user'));
+        }
+
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
@@ -397,6 +403,14 @@ class DonationController extends Controller
 
     public function update(DonationRequest $request, $id)
     {
+        $this->validate($request, [
+            'nama'              => 'required',
+            'donation_type'     => 'required',
+            'date_started'      => 'required',
+            'date_end'          => 'required',
+            'donation_poster'   => 'required'
+        ]);
+
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
 
@@ -404,32 +418,37 @@ class DonationController extends Controller
         $end_date = Carbon::createFromFormat(config('app.date_format'), $request->date_end)->format('Y-m-d');
 
         $file_name = '';
+
+        // dd($request->donation_type);
         
         if (!is_null($request->donation_poster)) {
             
             // Delete existing image before update with new image;
             $donation = $this->donation->getDonationById($id);
-            $destination = public_path('donation-poster').  DIRECTORY_SEPARATOR  . $donation->donation_poster;
-            unlink($destination);
 
+            if (config('app.env') == 'staging' ||config('app.env') == 'production' )
+            {
+                $destination = public_path('donation-poster') . '/' . $donation->donation_poster;
+                unlink($destination);
+            }
+            
             $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
             $file_name = basename($storagePath);
         }
 
         DB::table('donations')
             ->where('id', $id)
-            ->update(
-                $request->validated() +
-            [
-                'date_created'      => now(),
-                'date_started'      => $start_date,
-                'date_end'          => $end_date,
-                'status'            => '1',
-                'url'               => $str,
-                'donation_poster'   => $file_name,
-                'donation_type'     => $request->donation_type
-            ]
-            );
+            ->update([
+                'nama'                => $request->nama,
+                'date_created'        => now(),
+                'date_started'        => $start_date,
+                'date_end'            => $end_date,
+                'status'              => '1',
+                'url'                 => $str,
+                'donation_poster'     => $file_name,
+                'donation_type'       => $request->donation_type,
+                'lhdn_reference_code' => $request->lhdn_reference_code
+            ]);
 
         return redirect('/donation')->with('success', 'Derma Telah Berjaya Dikemaskini');
     }

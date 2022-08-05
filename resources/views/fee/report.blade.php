@@ -319,12 +319,6 @@
                 }
             });
         }
-        
-
-        
-
-        
-
 
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');

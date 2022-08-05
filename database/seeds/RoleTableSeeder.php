@@ -50,6 +50,12 @@ class RoleTableSeeder extends Seeder
                 "name" => "Jaim",
                 "guard_name" => "web"
             ),
+            6 =>
+            array(
+                "id" => 7,
+                "name" => "Admin Polimas",
+                "guard_name" => "web"
+            ),
         ));
     }
 }
