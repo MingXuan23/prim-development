@@ -394,9 +394,11 @@ class PayController extends AppBaseController
         $user       = User::find(Auth::id());
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
+        $icno = isset($request->icno) ? $request->icno : NULL;
+        $address = isset($request->address) ? $request->address : NULL;
         
         if ($request->desc == 'Donation') {
-            $organization = $this->organization->getOrganizationByDonationId($request->o_id);
+            $organization = $this->organization->getOrganizationByDonationId($request->d_id);
 
             if(isset($request->email))
             {
@@ -412,7 +414,14 @@ class PayController extends AppBaseController
             }
 
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
-            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->o_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . rand(10000, 99999);
+
+            $success_transaction = DB::table('donation_transaction as dt')
+                ->leftJoin('transactions as t', 't.id', 'dt.transaction_id')
+                ->where('t.status', 'success')
+                ->where('dt.donation_id', $request->d_id)
+                ->count();
+
+            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad($success_transaction, 6, '0', STR_PAD_LEFT);
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -472,6 +481,8 @@ class PayController extends AppBaseController
         $transaction->telno         = $telno;
         $transaction->username      = strtoupper($fpx_buyerName);
         $transaction->fpx_checksum  = $fpx_checkSum;
+        $transaction->icno  = $icno;
+        $transaction->address  = $address;
 
         if ($user) {
             $transaction->user_id   = Auth::id();
@@ -710,6 +721,11 @@ class PayController extends AppBaseController
                     if($transaction->username != "Penderma Anonymous" && $transaction->email != NULL)
                     {
                         Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
+                    }
+
+                    if ($donation->lhdn_reference_code != null)
+                    {
+                        return view('receipt.indexlhdn', compact('request', 'donation', 'organization', 'transaction'));
                     }
 
                     return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));

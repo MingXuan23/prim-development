@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,4 +36,7 @@ Route::get('mobile/donationnumberbyorganization', 'MobileApiController@donationn
 Route::get('mobile/getdonationbycategory', 'MobileApiController@getdonationbycategory');
 
 Route::post('mobile/login', 'MobileApiController@login');
+Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
+
+Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
 Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');

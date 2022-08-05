@@ -13,8 +13,8 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Auth::routes();
-Auth::routes(['register' => false]);
+Auth::routes();
+// Auth::routes(['register' => false]);
 
 Route::get('/home', 'HomeController@index');
 Route::get('/form', 'HomeController@form');
@@ -65,6 +65,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
 });
 
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
+Route::get('sumbangan_lhdn/{link}', 'DonationController@lhdndonate')->name('LHDNdonate');
 Route::get('sumbangan_anonymous/{link}', 'DonationController@anonymouIndex')->name('ANONdonate');
 
 Route::group(['prefix' => 'organization'], function () {
@@ -253,12 +254,25 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
 
-
-// Route::get('asrama', 'AsramaController@index')->name('asrama.index');
-Route::resource('dorm', 'DormController');
-Route::group(['prefix' => 'dorm'], function () {
-    Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
-    Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
-    Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
-    Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
+// // Route::get('asrama', 'AsramaController@index')->name('asrama.index');
+// Route::resource('dorm', 'DormController');
+// Route::group(['prefix' => 'dorm'], function () {
+//     Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
+//     Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
+//     Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
+//     Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
+// });
+// =======
+Route::group(['prefix' => 'polimas'], function () {
+    Route::get('/', 'PolimasController@indexLogin');
+    Route::group(['middleware' => ['auth']], function () {
+        Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
+        Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
+        Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
+        Route::get('/student-list', 'PolimasController@getStudentDatatable')->name('polimas.student.getStudentDatatable');
+        Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
+        Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
+        Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
+    });
 });
+// >>>>>>> 6d335e602e3aa5114525f0585b2b5e4aee984f38

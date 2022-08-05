@@ -68,6 +68,12 @@
             </div> <!-- end of username -->
 
             <div class="form-group">
+                <label>Nombor Kad Pengenalan</label>
+                <input type="text" name="icno" class="form-control icno" placeholder="Nombor Kad Pengenalan"
+                    value="{{ Auth::user()->icno}}">
+            </div>
+
+            <div class="form-group">
                 <!-- telno -->
                 <label for="telno">No. Telefon:</label>
                 <input type="text" name="telno"  
@@ -164,6 +170,7 @@
         $('.form-validation').parsley();
         $('.phone_no').mask('+600000000000');
         $('.postcode').mask('99999');
+        $('.icno').mask('000000-00-0000');
 
         $.ajaxSetup({
             headers: {
