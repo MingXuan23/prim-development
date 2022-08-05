@@ -441,8 +441,9 @@ class StudentController extends Controller
                         ['classes.id', $classid],
                         ['class_student.status', 1],
                     ])
-                    ->orderBy('students.nama');
-
+                    ->orderBy('students.nama')
+                    ->get();
+                    
                 $table = Datatables::of($data);
 
                 $table->addColumn('status', function ($row) {
