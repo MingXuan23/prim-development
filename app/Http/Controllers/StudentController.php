@@ -424,6 +424,7 @@ class StudentController extends Controller
 
         if (request()->ajax()) {
             // $oid = $request->oid;
+
             $classid = $request->classid;
 
             $hasOrganizaton = $request->hasOrganization;
@@ -470,7 +471,6 @@ class StudentController extends Controller
                 return $table->make(true);
             }
 
-            // dd($data->oid);
         }
     }
 
@@ -578,6 +578,7 @@ class StudentController extends Controller
                         return $btn;
                     }
                 });
+
 
 
                 $table->rawColumns(['gender', 'status']);
