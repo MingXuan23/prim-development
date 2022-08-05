@@ -40,8 +40,6 @@ Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
 
 
 Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
-Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
-
 
 
 //route for mobile order
