@@ -254,15 +254,6 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
 
-// // Route::get('asrama', 'AsramaController@index')->name('asrama.index');
-// Route::resource('dorm', 'DormController');
-// Route::group(['prefix' => 'dorm'], function () {
-//     Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
-//     Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
-//     Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
-//     Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
-// });
-// =======
 Route::group(['prefix' => 'polimas'], function () {
     Route::get('/', 'PolimasController@indexLogin');
     Route::group(['middleware' => ['auth']], function () {
@@ -274,5 +265,13 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
         Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
     });
+
+    // Route::get('asrama', 'AsramaController@index')->name('asrama.index');
+    Route::resource('dorm', 'DormController');
+    Route::group(['prefix' => 'dorm'], function () {
+        Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
+        Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
+        Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
+        Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
+    });
 });
-// >>>>>>> 6d335e602e3aa5114525f0585b2b5e4aee984f38
