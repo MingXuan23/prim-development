@@ -492,15 +492,11 @@ class PayController extends AppBaseController
         $transaction->status        = 'Pending';
         $transaction->email         = $fpx_buyerEmail;
         $transaction->telno         = $telno;
-        $transaction->user_id       = $user->id;
+        $transaction->user_id       = $user ? $user->id : null;
         $transaction->username      = strtoupper($fpx_buyerName);
         $transaction->fpx_checksum  = $fpx_checkSum;
         $transaction->icno  = $icno;
         $transaction->address  = $address;
-
-        if ($user) {
-            $transaction->user_id   = Auth::id();
-        }
 
         $list_student_fees_id   = $getstudentfees;
         $list_parent_fees_id    = $getparentfees;
