@@ -87,6 +87,9 @@
                 <label for="sel1">Sila Pilih Bank:</label>
                 <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
                     <option value="">Pilih bank</option>
+                    @foreach ($bank_list as $key => $value)
+                        <option value="{{ $value['key'] }}">{{ $value['nama'] }}</option>
+                    @endforeach
                 </select>
             </div>
 
@@ -142,29 +145,5 @@
             return false;
         }
     }
-
-    $(document).ready(function () {
-
-        var arr = [];
-
-        $.ajax({
-            type: 'GET',
-            dataType: 'json',
-            url: "/fpx/getBankList",
-            success: function(data) {
-                jQuery.each(data.data, function(key, value){
-                    arr.push(key);
-                });
-                for(var i = 0; i < arr.length; i++){
-                    arr.sort();
-                    $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-                }
-
-            },
-            error: function (data) {
-                // console.log(data);
-            }
-        });
-    });
 </script>
 @endsection

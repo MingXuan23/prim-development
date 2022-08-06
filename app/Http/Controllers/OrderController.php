@@ -127,7 +127,9 @@ class OrderController extends Controller
 
             // dd($order_dishes, $organization);
 
-            return view('order.order-pay', compact('order_dishes', 'organization', 'order', 'user'));
+            $banklists = FPXController::getStaticBankList();
+
+            return view('order.order-pay', compact('order_dishes', 'organization', 'order', 'user', 'banklists'));
             
         } catch (\Throwable $th) {
             return response($th->getMessage())->setStatusCode(401);

@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\User;
+use App\Models\Order;
+use App\Models\Fee_New;
+use App\Models\Student;
+use App\Models\Donation;
+use App\Mail\OrderReceipt;
+use App\Models\Transaction;
+use App\Models\Organization;
+use Illuminate\Http\Request;
 use App\Mail\DonationReceipt;
 use App\Models\Dev\DevTransaction;
-use App\Models\Transaction;
-use App\User;
-use App\Models\Donation;
-use App\Models\Organization;
-use App\Models\Student;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\AppBaseController;
-use App\Mail\OrderReceipt;
-use App\Models\Fee_New;
-use App\Models\Order;
 use Illuminate\Support\Facades\Redirect;
-use League\CommonMark\Inline\Parser\EscapableParser;
 use phpDocumentor\Reflection\Types\Null_;
+use App\Http\Controllers\AppBaseController;
+use League\CommonMark\Inline\Parser\EscapableParser;
 
 class PayController extends AppBaseController
 {
@@ -770,7 +770,7 @@ class PayController extends AppBaseController
                         ->orderBy('d.name')
                         ->get();
                     
-                    // Mail::to($transaction->email)->send(new OrderReceipt($order, $organization, $transaction, $user));
+                    Mail::to($transaction->email)->send(new OrderReceipt($order, $organization, $transaction, $user));
 
                     return view('order.receipt', compact('order_dishes', 'organization', 'transaction', 'user'));
 
