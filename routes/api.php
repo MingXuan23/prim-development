@@ -1,5 +1,12 @@
 <?php
 
+use App\User;
+use App\Models\Order;
+use App\Mail\OrderReceipt;
+use App\Models\Transaction;
+use App\Models\Organization;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,9 +46,6 @@ Route::post('mobile/login', 'MobileApiController@login');
 Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
 
 Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
-Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
-Route::get('mobile/order/orderTransaction1', 'OrderController@orderTransaction1');
-
 Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
 
 
