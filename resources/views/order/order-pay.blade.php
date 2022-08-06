@@ -87,7 +87,7 @@
                 <label for="sel1">Sila Pilih Bank:</label>
                 <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
                     <option value="">Pilih bank</option>
-                    @foreach ($bank_list as $key => $value)
+                    @foreach ($banklists as $key => $value)
                         <option value="{{ $value['key'] }}">{{ $value['nama'] }}</option>
                     @endforeach
                 </select>
