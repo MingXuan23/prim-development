@@ -101,7 +101,7 @@
                         <p>Minimum Transaction is RM1 and Maximum Transaction is RM30,000.</p>
                     </li>
                 </ul>
-                {{ csrf_field() }}
+                <input type="hidden" name="_token" id="csrf-token" value="{{ $token }}" />
                 <input type="hidden" name="amount" id="amount" value={{ $i + $organization->fixed_charges }}>
                 <input type="hidden" name="o_id" id="o_id" value="{{ $organization->id }}">
                 <input type="hidden" name="desc" id="desc" value="Food_Order">
