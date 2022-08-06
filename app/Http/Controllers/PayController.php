@@ -494,6 +494,7 @@ class PayController extends AppBaseController
         $transaction->status        = 'Pending';
         $transaction->email         = $fpx_buyerEmail;
         $transaction->telno         = $telno;
+        $transaction->user_id       = $user->id;
         $transaction->username      = strtoupper($fpx_buyerName);
         $transaction->fpx_checksum  = $fpx_checkSum;
         $transaction->icno  = $icno;
@@ -539,17 +540,17 @@ class PayController extends AppBaseController
                             ]);
                     }
                 }
-            } else {
-                $transaction->donation()->attach($id, ['payment_type_id' => 1]);
-            }
-
-            if (substr($fpx_sellerExOrderNo, 0, 1) == 'F')
+            } 
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'F')
             {
                 $result = DB::table('orders')
                 ->where('id', $request->order_id)
                 ->update([
                     'transaction_id' => $transaction->id
                 ]);
+            }
+            else {
+                $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
         }
         else
@@ -756,7 +757,7 @@ class PayController extends AppBaseController
 
                     break;
                     
-                case 'Food_Order':
+                case 'Food':
                     $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
                     $userid = $transaction->user_id;
                     $transaction->transac_no = $request->fpx_fpxTxnId;
@@ -774,7 +775,7 @@ class PayController extends AppBaseController
                         ->orderBy('d.name')
                         ->get();
                     
-                    Mail::to($transaction->email)->send(new OrderReceipt($order, $organization, $transaction, $user));
+                    // Mail::to($transaction->email)->send(new OrderReceipt($order, $organization, $transaction, $user));
 
                     return view('order.receipt', compact('order_dishes', 'organization', 'transaction', 'user'));
 
