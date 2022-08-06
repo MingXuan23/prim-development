@@ -88,7 +88,7 @@
                 <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
                     <option value="">Pilih bank</option>
                     @foreach ($banklists as $key => $value)
-                        <option value="{{ $value['key'] }}">{{ $value['nama'] }}</option>
+                        <option value="{{ $value['code'] }}">{{ $value['nama'] }}</option>
                     @endforeach
                 </select>
             </div>
