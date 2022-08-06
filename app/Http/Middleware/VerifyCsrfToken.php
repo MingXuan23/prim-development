@@ -26,8 +26,6 @@ class VerifyCsrfToken extends Middleware
         'https://prim.my/paymentStatus',
         'https://dev.prim.my/devtrans',
         'https://prim.my/fpxIndex',
-        'https://dev.prim.my/fpxIndex',
-        'https://prim.my/mobile/*',
-        'https://dev.prim.my/mobile/*'
+        'https://dev.prim.my/fpxIndex'
     ];
 }
