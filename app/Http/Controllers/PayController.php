@@ -390,16 +390,13 @@ class PayController extends AppBaseController
 
     public function fpxIndex(Request $request)
     {
-        // dd($request);
-        // $user = Auth::id();
-        // dd($request->toArray());
-        $user       = ($request->user_id) ? User::find($request->user_id) : User::find(Auth::id());
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
         $icno = isset($request->icno) ? $request->icno : NULL;
         $address = isset($request->address) ? $request->address : NULL;
         
         if ($request->desc == 'Donation') {
+            $user = User::find(Auth::id());
             $organization = $this->organization->getOrganizationByDonationId($request->d_id);
 
             if(isset($request->email))
@@ -432,6 +429,7 @@ class PayController extends AppBaseController
         } 
         else if ($request->desc == 'School_Fees')
         {
+            $user = User::find(Auth::id());
             $organization = Organization::find($request->o_id);
             
             $fpx_buyerEmail      = $user->email;
@@ -445,8 +443,8 @@ class PayController extends AppBaseController
         }
         else if($request->desc == 'Food_Order')
         {
+            $user = User::find($request->user_id);
             $organization = Organization::find($request->o_id);
-            
             $fpx_buyerEmail      = $user->email;
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
@@ -759,10 +757,11 @@ class PayController extends AppBaseController
                     
                 case 'Food':
                     $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $userid = $transaction->user_id;
                     $transaction->transac_no = $request->fpx_fpxTxnId;
                     $transaction->status = "Success";
                     $transaction->save();
+
+                    $userid = $transaction->user_id;
 
                     $order = Order::where('transaction_id', '=', $transaction->id)->first();
                     $user = User::find($transaction->user_id);
