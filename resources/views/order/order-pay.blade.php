@@ -87,6 +87,9 @@
                     <label for="sel1">Sila Pilih Bank:</label>
                     <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
                         <option value="">Pilih bank</option>
+                        @foreach ($banklists as $key => $value)
+                        <option value="{{ $value['code'] }}">{{ $value['nama'] }}</option>
+                        @endforeach
                     </select>
                 </div>
 
@@ -119,13 +122,6 @@
         </div>
     </div>
 </body>
-<!-- JAVASCRIPT -->
-<script src="{{ URL::asset('assets/libs/jquery/jquery.min.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/jquery-ui/jquery-ui.min.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/bootstrap/bootstrap.min.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/metismenu/metismenu.min.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/simplebar/simplebar.min.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/node-waves/node-waves.min.js')}}"></script>
 <script>
     function checkBank() {
         var t = jQuery('#bankid').val();
@@ -143,23 +139,5 @@
             return false;
         }
     }
-    var arr = [];
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: "/fpx/getBankList",
-        success: function(data) {
-            jQuery.each(data.data, function(key, value){
-                arr.push(key);
-            });
-            for(var i = 0; i < arr.length; i++){
-                arr.sort();
-                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-            }
-        },
-        error: function (data) {
-            // console.log(data);
-        }
-    });
 </script> 
 </html>
