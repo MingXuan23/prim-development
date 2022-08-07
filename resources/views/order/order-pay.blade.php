@@ -82,7 +82,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('api.fpxIndex') }}" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="sel1">Sila Pilih Bank:</label>
                     <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
