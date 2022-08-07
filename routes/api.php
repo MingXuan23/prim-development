@@ -42,3 +42,5 @@ Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
 Route::get('mobile/getfoodorg', 'OrganizationController@getAllOrgTypeFood');
 Route::get('mobile/getdishbyorg/{id}', 'DishController@getDishByOrgId');
 Route::get('mobile/getdatebydish/{id}', 'DishController@getDateByDishId');
+
+Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
