@@ -36,10 +36,10 @@ class DormController extends Controller
             ->where('id', 1)
             ->first();
 
-        if (is_null($users)) {
-        } else {
-            return view('asrama.create', compact('users'));
-        }
+        // if (is_null($users)) {
+        // } else {
+        return view('dorm.create');
+        // }
     }
 
     /**
