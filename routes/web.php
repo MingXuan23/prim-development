@@ -273,10 +273,9 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
     Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
     Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
-    Route::get('dorm/updateWardenList', 'DormController@updateWardenList')->name('dorm.updateWardenList');
+    Route::get('/dorm/warden-outing/updateWardenList', 'DormController@updateWardenList')->name('dorm.updateWardenList');
 });
 
 //Route::view('/dorm/warden-outing', 'welcome');
 
 //Route::view('/dorm/warden-outing', 'welcome');
->>>>>>> 361f1f3570d04b3433edf12ef10873e2bcdbeea7

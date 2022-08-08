@@ -38,7 +38,7 @@ class DormController extends Controller
 
         // if (is_null($users)) {
         // } else {
-        //     return view('asrama.create', compact('users'));
+        return view('dorm.create');
         // }
     }
 
