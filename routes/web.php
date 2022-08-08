@@ -247,7 +247,6 @@ Route::get('/receipt', 'PayController@showReceipt');
 
 Route::get('list', 'LandingPageController@getDonationDatatable')->name('landing-page.getOrganizationDatatable');
 
-
 Route::group(['prefix' => 'session'], function () {
     Route::get('session/get', 'SessionController@accessSessionData')->name('getsession');
     Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');

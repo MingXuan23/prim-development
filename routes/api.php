@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+Route::post('fpxIndex', 'PayController@fpxIndex')->name('api.fpxIndex');
 
 Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
-
 
 // mobile api
 Route::get('donateFromMobile', 'PayController@donateFromMobile');
@@ -35,8 +35,12 @@ Route::get('mobile/gettransactionbyyear', 'MobileApiController@gettransactionbyy
 Route::get('mobile/donationnumberbyorganization', 'MobileApiController@donationnumberbyorganization');
 Route::get('mobile/getdonationbycategory', 'MobileApiController@getdonationbycategory');
 
+
 Route::post('mobile/login', 'MobileApiController@login');
 Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
+//route for mobile order
+Route::get('mobile/getfoodorg', 'OrganizationController@getAllOrgTypeFood');
+Route::get('mobile/getdishbyorg/{id}', 'DishController@getDishByOrgId');
+Route::get('mobile/getdatebydish/{id}', 'DishController@getDateByDishId');
 
 Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
-Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
