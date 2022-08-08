@@ -266,15 +266,17 @@ Route::group(['prefix' => 'polimas'], function () {
     });
 });
 
-// Route::get('dorm', 'DormController@index')->name('dorm.index');
+// Route::get('asrama', 'AsramaController@index')->name('asrama.index');
 Route::resource('dorm', 'DormController');
 Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
     Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
     Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
     Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
+    Route::get('dorm/updateWardenList', 'DormController@updateWardenList')->name('dorm.updateWardenList');
 });
 
+//Route::view('/dorm/warden-outing', 'welcome');
 
-
-
+//Route::view('/dorm/warden-outing', 'welcome');
+>>>>>>> 361f1f3570d04b3433edf12ef10873e2bcdbeea7

@@ -33,6 +33,8 @@ class AddColumnsToClassStudentTable extends Migration
     {
         Schema::table('class_student', function (Blueprint $table) {
             //
+            $table->dropForeign(['dorm_id']);
+
             $table->dropColumn(['outing_status', 'blacklist', 'start_date_time', 'end_date_time', 'dorm_id']);
         });
     }
