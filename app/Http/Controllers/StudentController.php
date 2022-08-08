@@ -443,7 +443,7 @@ class StudentController extends Controller
                     ])
                     ->orderBy('students.nama')
                     ->get();
-                    
+
                 $table = Datatables::of($data);
 
                 $table->addColumn('status', function ($row) {
