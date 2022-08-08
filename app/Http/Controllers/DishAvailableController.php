@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Dish;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class DishController extends Controller
+class DishAvailableController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -42,10 +41,10 @@ class DishController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Dish  $dish
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Dish $dish)
+    public function show($id)
     {
         //
     }
@@ -53,10 +52,10 @@ class DishController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Dish  $dish
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Dish $dish)
+    public function edit($id)
     {
         //
     }
@@ -65,10 +64,10 @@ class DishController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Dish  $dish
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Dish $dish)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -76,23 +75,31 @@ class DishController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Dish  $dish
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Dish $dish)
+    public function destroy($id)
     {
         //
     }
 
 
 
-    //to get all dishes of a certain organization
-    public function getDishByOrgId($id)
+    //to get date available based on dish id
+    public function getDateByDishId($id)
     {
-        return DB::table('dishes')
-            ->where('organ_id', $id)
+        return DB::table('dish_available')
+            ->where('dish_id', $id)
+            ->where('date', '>=', DB::raw('curdate()'))
+            ->select('date')
             ->get();
     }
 
-    
+    //to get all data in dish_available table
+    public function getAllDishAvailable()
+    {
+        return DB::table('dish_available')
+            ->select()
+            ->get();
+    }
 }
