@@ -17,9 +17,9 @@ class DormController extends Controller
     public function index()
     {
         //
-        // $asrama = DB::table('students')
-        //     ->join('class_stu', 'asramas.student_id', '=', 'students.id')
-        //     ->select('students.*', 'asramas.*')
+        // $dorm = DB::table('students')
+        //     ->join('class_student', 'class_student.student_id', '=', 'students.id')
+        //     ->select('students.*', 'class_student.*')
         //     ->get();
         return view('dorm.index');
     }
@@ -32,9 +32,9 @@ class DormController extends Controller
     public function create()
     {
         //
-        // $users = DB::table('students')
-        //     ->where('id', 1)
-        //     ->first();
+        $users = DB::table('students')
+            ->where('id', 1)
+            ->first();
 
         // if (is_null($users)) {
         // } else {
@@ -155,7 +155,7 @@ class DormController extends Controller
         // return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 
-    public function updateWardenList(Request $request, $id)
+    public function updateWardenList()
     {
         //
         // $validatedData = $request->validate([
