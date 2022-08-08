@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\User;
+use App\Models\Order;
+use App\Models\Fee_New;
+use App\Models\Student;
+use App\Models\Donation;
+use App\Mail\OrderReceipt;
+use App\Models\Transaction;
+use App\Models\Organization;
+use Illuminate\Http\Request;
 use App\Mail\DonationReceipt;
 use App\Models\Dev\DevTransaction;
-use App\Models\Transaction;
-use App\User;
-use App\Models\Donation;
-use App\Models\Organization;
-use App\Models\Student;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\AppBaseController;
-use App\Models\Fee_New;
 use Illuminate\Support\Facades\Redirect;
-use League\CommonMark\Inline\Parser\EscapableParser;
 use phpDocumentor\Reflection\Types\Null_;
+use App\Http\Controllers\AppBaseController;
+use League\CommonMark\Inline\Parser\EscapableParser;
 
 class PayController extends AppBaseController
 {
@@ -388,16 +390,13 @@ class PayController extends AppBaseController
 
     public function fpxIndex(Request $request)
     {
-        // dd($request);
-        // $user = Auth::id();
-        // dd($request->toArray());
-        $user       = User::find(Auth::id());
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
         $icno = isset($request->icno) ? $request->icno : NULL;
         $address = isset($request->address) ? $request->address : NULL;
         
         if ($request->desc == 'Donation') {
+            $user = User::find(Auth::id());
             $organization = $this->organization->getOrganizationByDonationId($request->d_id);
 
             if(isset($request->email))
@@ -428,8 +427,9 @@ class PayController extends AppBaseController
 
             // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } 
-        else if (($request->desc == 'School_Fees'))
+        else if ($request->desc == 'School_Fees')
         {
+            $user = User::find(Auth::id());
             $organization = Organization::find($request->o_id);
             
             $fpx_buyerEmail      = $user->email;
@@ -437,6 +437,19 @@ class PayController extends AppBaseController
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
+
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
+        }
+        else if($request->desc == 'Food_Order')
+        {
+            $user = User::find($request->user_id);
+            $organization = Organization::find($request->o_id);
+            $fpx_buyerEmail      = $user->email;
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "FOPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -479,14 +492,11 @@ class PayController extends AppBaseController
         $transaction->status        = 'Pending';
         $transaction->email         = $fpx_buyerEmail;
         $transaction->telno         = $telno;
+        $transaction->user_id       = $user ? $user->id : null;
         $transaction->username      = strtoupper($fpx_buyerName);
         $transaction->fpx_checksum  = $fpx_checkSum;
         $transaction->icno  = $icno;
         $transaction->address  = $address;
-
-        if ($user) {
-            $transaction->user_id   = Auth::id();
-        }
 
         $list_student_fees_id   = $getstudentfees;
         $list_parent_fees_id    = $getparentfees;
@@ -524,7 +534,16 @@ class PayController extends AppBaseController
                             ]);
                     }
                 }
-            } else {
+            } 
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'F')
+            {
+                $result = DB::table('orders')
+                ->where('id', $request->order_id)
+                ->update([
+                    'transaction_id' => $transaction->id
+                ]);
+            }
+            else {
                 $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
         }
@@ -612,7 +631,7 @@ class PayController extends AppBaseController
                     // return Redirect::away('https://dev.prim.my/api/devtrans')->with($request->toArray());
 
                     $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $userid = $transaction->user_id;;
+                    $userid = $transaction->user_id;
                     $transaction->transac_no = $request->fpx_fpxTxnId;
                     $transaction->status = "Success";
 
@@ -731,6 +750,32 @@ class PayController extends AppBaseController
                     return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
 
                     break;
+                    
+                case 'Food':
+                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction->status = "Success";
+                    $transaction->save();
+
+                    $userid = $transaction->user_id;
+
+                    $order = Order::where('transaction_id', '=', $transaction->id)->first();
+                    $user = User::find($transaction->user_id);
+                    $organization = Organization::find($order->organ_id);
+                    
+                    $order_dishes = DB::table('order_dish as od')
+                        ->leftJoin('dishes as d', 'd.id', 'od.dish_id')
+                        ->leftJoin('orders as o', 'o.id', 'od.order_id')
+                        ->where('od.order_id', $order->id)
+                        ->orderBy('d.name')
+                        ->get();
+                    
+                    Mail::to($transaction->email)->send(new OrderReceipt($order, $organization, $transaction, $user));
+
+                    return view('order.receipt', compact('order_dishes', 'organization', 'transaction', 'user'));
+
+                    break;
+                        
                 default:
                     return view('errors.500');
                     break;
