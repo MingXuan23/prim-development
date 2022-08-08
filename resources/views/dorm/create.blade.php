@@ -29,7 +29,7 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('asrama.store') }}">
+        <form method="post" action="{{ route('dorm.store') }}">
             {{csrf_field()}}
             <div class="card-body">
 
