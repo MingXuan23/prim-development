@@ -94,5 +94,21 @@ class DishController extends Controller
             ->get();
     }
 
-    
+    //to get date available based on dish id
+    public function getDateByDishId($id)
+    {
+        return DB::table('dish_available')
+            ->where('dish_id', $id)
+            ->where('date', '>=', DB::raw('curdate()'))
+            ->select('date')
+            ->get();
+    }
+
+    //to get all data in dish_available table
+    public function getAllDishAvailable()
+    {
+        return DB::table('dish_available')
+            ->select()
+            ->get();
+    }
 }
