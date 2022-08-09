@@ -91,46 +91,33 @@ class DormController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function destroy($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function addOutingTime()
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function updateOutingTime($id)
     {
-        //
-        // $validatedData = $request->validate([
-        //     'name' => 'required',
-        //     'ic' => 'required',
-        //     'reason' => 'required',
-        //     'start_date' => 'required',
-        //     'end_date' => 'required',
-        // ]);
-        // Asrama::whereId($id)->update($validatedData);
+        $outing = Outing::findOrFail($id);
+        $name = $request->input('stud_name');
+        DB::update('update student set name = ? where id = ?',[$name,$id]);
+        echo "Record updated successfully.<br/>";
+        echo '<a href = "/edit-records">Click Here</a> to go back.';
 
+<<<<<<< HEAD
+        $outing->update(array('start_date_time' => new DateTime()));
+        return redirect('/asrama')->with('success', 'Data is successfully updated');
+=======
         // return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 
@@ -147,6 +134,7 @@ class DormController extends Controller
         //     ->where('id', $id)
         //     ->delete();
         // return redirect('/asrama')->with('success', 'Application Data is successfully deleted');
+>>>>>>> dcd430e3153f1eff1e14d496929b2172b132e7e2
     }
 
     public function getOrganizationByUserId()

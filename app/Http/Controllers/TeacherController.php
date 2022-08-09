@@ -37,6 +37,13 @@ class TeacherController extends Controller
         return view('teacher.index', compact('organization'));
     }
 
+    //for warden 
+    public function wardenindex()
+    {
+        $organization = $this->getOrganizationByUserId();
+        return view('dorm.warden.index', compact('organization'));
+    }
+
     public function teacherexport(Request $request)
     {
         return Excel::download(new TeacherExport($request->organ), 'teacher.xlsx');
@@ -50,7 +57,7 @@ class TeacherController extends Controller
 
         $etx = $file->getClientOriginalExtension();
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
-        if (! in_array($etx, $formats)) {
+        if (!in_array($etx, $formats)) {
 
             return redirect('/teacher')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
@@ -67,6 +74,14 @@ class TeacherController extends Controller
         return view('teacher.add', compact('organization'));
     }
 
+    //for warden
+    public function wardencreate()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.warden.add', compact('organization'));
+    }
+
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -79,13 +94,13 @@ class TeacherController extends Controller
 
         //check if parent role exists
         $ifExits = DB::table('users as u')
-                    ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
-                    ->where('ou.role_id', '=', '6')
-                    ->where('u.email', '=', "{$request->get('email')}")
-                    // ->where('u.icno', '=', "{$request->get('icno')}")
-                    ->where('u.telno', '=', "{$request->get('telno')}")
-                    ->get();
-        
+            ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+            ->where('ou.role_id', '=', '6')
+            ->where('u.email', '=', "{$request->get('email')}")
+            // ->where('u.icno', '=', "{$request->get('icno')}")
+            ->where('u.telno', '=', "{$request->get('telno')}")
+            ->get();
+
         // dd($ifExits);
 
         if (count($ifExits) == 0) // if not parent
@@ -94,7 +109,7 @@ class TeacherController extends Controller
                 // 'icno'          =>  'required|unique:users',
                 'email'         =>  'required|email|unique:users',
             ]);
-    
+
             $newteacher = new Teacher([
                 'name'           =>  $request->get('name'),
                 // 'icno'           =>  $request->get('icno'),
@@ -105,12 +120,11 @@ class TeacherController extends Controller
                 // 'created_at'     =>  now(),
             ]);
             $newteacher->save();
-        }
-        else // if parent
+        } else // if parent
         {
             $newteacher = DB::table('users')
-                            ->where('email', '=', "{$request->get('email')}")
-                            ->first();
+                ->where('email', '=', "{$request->get('email')}")
+                ->first();
         }
 
         $username    = DB::table('users')
