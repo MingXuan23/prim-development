@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Dorm;
+use App\Models\Outing;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -32,11 +33,15 @@ class DormController extends Controller
     public function index()
     {
         //
-        // $dorm = DB::table('students')
-        //     ->join('class_student', 'class_student.student_id', '=', 'students.id')
-        //     ->select('students.*', 'class_student.*')
-        //     ->get();
-        return view('dorm.index');
+        
+    }
+
+    public function indexOuting()
+    {
+        // 
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.outing.index', compact('organization'));
     }
 
     /**
@@ -47,17 +52,13 @@ class DormController extends Controller
     public function create()
     {
         //
-        // $users = DB::table('students')
-        //     ->where('id', 1)
-        //     ->first();
+        
+    }
 
-        // // if (is_null($users)) {
-        // // } else {
-        // return view('dorm.create');
-        // }
-
+    public function createOuting()
+    {
+        //
         $organization = $this->getOrganizationByUserId();
-
         return view('dorm.outing.add', compact('organization'));
     }
 
@@ -70,25 +71,23 @@ class DormController extends Controller
     public function store(Request $request)
     {
         // 
+        
+    }
+
+    public function storeOuting(Request $request)
+    {
+        // 
         $this->validate($request, [
             'start_date'    =>  'required',
             'end_date'      =>  'required'
         ]);
 
-        $outing = new Outing([
-            'start_date_time'   =>  $request->get('start_date'),
-            'end_date_time'     =>  $request->get('end_date')
-        ]);
-        $outing->save();
-
         DB::table('outings')->insert([
-            'organization_id' => $request->get('organization'),
-            'class_id'        => $class->id,
-            'organ_user_id'  =>  $request->get('classTeacher'),
-            'start_date'      => now(),
+            'start_date_time' => $request->get('start_date'),
+            'end_date_time'   => $request->get('end_date')
         ]);
 
-        return redirect('/class')->with('success', 'New class has been added successfully');
+        return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
     }
 
     /**
@@ -100,44 +99,6 @@ class DormController extends Controller
     public function show($id)
     {
         //
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->update(array('status' => '1'));
-
-        // // DB::table('asramas')
-        // // ->where('student_id',$id)
-        // // ->update([
-        // //     'status' =>$request->get('status'),
-        // // ]);
-
-        // return redirect('/asrama')->with('success', 'Application Data is successfully updated');
-    }
-
-    public function updateOutTime($id)
-    {
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->update(array('outing_time' => new DateTime()));
-        // return redirect('/asrama')->with('success', 'Data is successfully updated');
-    }
-
-    public function updateInTime($id)
-    {
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->update(array('in_time' => new DateTime()));
-        // return redirect('/asrama')->with('success', 'Data is successfully updated');
-    }
-
-    public function updateOutArriveTime($id)
-    {
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->update(array('out_arrive_time' => new DateTime()));
-        // return redirect('/asrama')->with('success', 'Data is successfully updated');
-    }
-
-    public function updateInArriveTime($id)
-    {
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->update(array('in_arrive_time' => new DateTime()));
-        // return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 
     /**
@@ -149,40 +110,6 @@ class DormController extends Controller
     public function edit($id)
     {
         //
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->update(array('status' => '1'));
-
-        // // DB::table('asramas')
-        // // ->where('student_id',$id)
-        // // ->update([
-        // //     'status' =>$request->get('status'),
-        // // ]);
-
-        // return redirect('/asrama')->with('success', 'Application Data is successfully updated');
-    }
-
-    public function addOutingTime()
-    {
-        $users = DB::table('students')
-            ->where('id', 1)
-            ->first();
-
-        // if (is_null($users)) {
-        // } else {
-        return view('dorm.create');
-        // }
-    }
-
-    public function updateOutingTime($id)
-    {
-        $outing = Outing::findOrFail($id);
-        $name = $request->input('stud_name');
-        DB::update('update student set name = ? where id = ?',[$name,$id]);
-        echo "Record updated successfully.<br/>";
-        echo '<a href = "/edit-records">Click Here</a> to go back.';
-
-        $outing->update(array('start_date_time' => new DateTime()));
-        return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 
     /**
@@ -205,20 +132,6 @@ class DormController extends Controller
         // Asrama::whereId($id)->update($validatedData);
 
         // return redirect('/asrama')->with('success', 'Data is successfully updated');
-    }
-
-    public function updateWardenList()
-    {
-        //
-        // $validatedData = $request->validate([
-        //     'name' => 'required',
-        //     'ic' => 'required',
-        //     'reason' => 'required',
-        //     'start_date' => 'required',
-        //     'end_date' => 'required',
-        // ]);
-        // Asrama::whereId($id)->update($validatedData);
-        return view('dorm.warden-outing.index');
     }
 
     /**
@@ -251,5 +164,57 @@ class DormController extends Controller
                 });
             })->get();
         }
+    }
+
+    public function updateOutTime($id)
+    {
+        // $asrama = Asrama::findOrFail($id);
+        // $asrama->update(array('outing_time' => new DateTime()));
+        // return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+
+    public function updateInTime($id)
+    {
+        // $asrama = Asrama::findOrFail($id);
+        // $asrama->update(array('in_time' => new DateTime()));
+        // return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+
+    public function updateOutArriveTime($id)
+    {
+        // $asrama = Asrama::findOrFail($id);
+        // $asrama->update(array('out_arrive_time' => new DateTime()));
+        // return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+
+    public function updateInArriveTime($id)
+    {
+        // $asrama = Asrama::findOrFail($id);
+        // $asrama->update(array('in_arrive_time' => new DateTime()));
+        // return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+
+    public function addOutingTime()
+    {
+        $users = DB::table('students')
+            ->where('id', 1)
+            ->first();
+
+        // if (is_null($users)) {
+        // } else {
+        return view('dorm.create');
+        // }
+    }
+
+    public function updateOutingTime($id)
+    {
+        $outing = Outing::findOrFail($id);
+        $name = $request->input('stud_name');
+        DB::update('update student set name = ? where id = ?',[$name,$id]);
+        echo "Record updated successfully.<br/>";
+        echo '<a href = "/edit-records">Click Here</a> to go back.';
+
+        $outing->update(array('start_date_time' => new DateTime()));
+        return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 }

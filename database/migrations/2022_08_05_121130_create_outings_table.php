@@ -17,6 +17,8 @@ class CreateOutingsTable extends Migration
             $table->id();
             $table->dateTime('start_date_time');
             $table->dateTime('end_date_time');
+            $table->bigInteger('organization_id')->unsigned();
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 

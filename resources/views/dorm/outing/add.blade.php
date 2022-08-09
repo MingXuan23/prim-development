@@ -30,9 +30,21 @@
                 </ul>
             </div>
             @endif
-            <form method="post" action="{{ route('dorm.store') }}" enctype="multipart/form-data">
+            <form method="get" action="{{ route('dorm.storeOuting') }}" enctype="multipart/form-data">
                 {{csrf_field()}}
                 <div class="card-body">
+                    <div class="form-group">
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            @foreach($organization as $row)
+                                @if ($loop->first)
+                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                @else
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
 
                     <div class="form-group">
                         <label>Tarikh dan Masa Keluar</label>

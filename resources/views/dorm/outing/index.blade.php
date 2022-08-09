@@ -53,7 +53,7 @@
                 <!-- <a style="margin: 1px;" href="{{ route('exportclass') }}" class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a> -->
                 {{-- href="{{ route('kelas.create') }}" {{ route('exportkelas') }}--}}
-                <a style="margin: 19px; float: right;" href="{{ route('class.create') }}" class="btn btn-primary"> <i
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.createOuting') }}" class="btn btn-primary"> <i
                         class="fas fa-plus"></i> Tambah Outing</a>
             </div>
 
