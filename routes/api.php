@@ -23,7 +23,7 @@ Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
 // mobile api
 Route::get('donateFromMobile', 'PayController@donateFromMobile');
 
-Route::group(['prefix' => 'moblie'], function () {
+Route::group(['prefix' => 'mobile'], function () {
     Route::get('/getAllDonation', 'MobileApiController@getAllDonation');
     Route::get('/getAllDonationType', 'MobileApiController@getAllDonationType');
     Route::get('/getAllDonationQuantity', 'MobileApiController@getAllDonationQuantity');
