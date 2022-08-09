@@ -40,7 +40,7 @@ Route::post('mobile/login', 'MobileApiController@login');
 Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
 //route for mobile order
 Route::get('mobile/getfoodorg', 'OrganizationController@getAllOrgTypeFood');
-Route::get('mobile/getdishbyorg/{id}', 'DishController@getDishByOrgId');
-Route::get('mobile/getdatebydish/{id}', 'DishController@getDateByDishId');
+Route::get('mobile/getAllDishes', 'DishController@getAllDishes');
+Route::get('mobile/getAllAvailableDates', 'DishController@getAllAvailableDates');
 
 Route::post('mobile/order/orderTransaction', 'OrderController@orderTransaction');
