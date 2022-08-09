@@ -166,7 +166,7 @@ class DormController extends Controller
         //     'end_date' => 'required',
         // ]);
         // Asrama::whereId($id)->update($validatedData);
-        return view('dorm.warden-outing.index');
+        return view('dorm.warden-outing.updateWarden');
     }
 
     /**

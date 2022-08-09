@@ -77,6 +77,7 @@ Route::group(['prefix' => 'organization'], function () {
 
 Route::group(['prefix' => 'teacher'], function () {
     Route::get('list', 'TeacherController@getTeacherDatatable')->name('teacher.getTeacherDatatable');
+    Route::get('listwarden', 'TeacherController@wardenindex')->name('teacher.wardenindex');
 });
 
 Route::group(['prefix' => 'class'], function () {
