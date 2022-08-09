@@ -4,8 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Dorm;
-use DB;
-use DateTime;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TeacherExport;
+use App\Imports\TeacherImport;
+use App\Models\Organization;
+use App\Models\OrganizationRole;
+use App\User;
+use Illuminate\Validation\Rule;
+use App\Models\TypeOrganization;
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
+
+use function PHPUnit\Framework\isEmpty;
+use function PHPUnit\Framework\isNull;
 
 class DormController extends Controller
 {
@@ -32,14 +47,18 @@ class DormController extends Controller
     public function create()
     {
         //
-        $users = DB::table('students')
-            ->where('id', 1)
-            ->first();
+        // $users = DB::table('students')
+        //     ->where('id', 1)
+        //     ->first();
 
-        // if (is_null($users)) {
-        // } else {
-        return view('dorm.create');
+        // // if (is_null($users)) {
+        // // } else {
+        // return view('dorm.create');
         // }
+
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.outing.add', compact('organization'));
     }
 
     /**
@@ -50,17 +69,26 @@ class DormController extends Controller
      */
     public function store(Request $request)
     {
-        // //
-        // $validateData = $request->validate([
-        //     'name' => 'required',
-        //     'ic' => 'required',
-        //     'reason' => 'required',
-        //     'start_date' => 'required',
-        //     'end_date' => 'required',
-        // ]);
+        // 
+        $this->validate($request, [
+            'start_date'    =>  'required',
+            'end_date'      =>  'required'
+        ]);
 
-        // $show = Asrama::create($validateData);
-        // return redirect('/asrama')->with('success', 'Application saved');
+        $outing = new Outing([
+            'start_date_time'   =>  $request->get('start_date'),
+            'end_date_time'     =>  $request->get('end_date')
+        ]);
+        $outing->save();
+
+        DB::table('outings')->insert([
+            'organization_id' => $request->get('organization'),
+            'class_id'        => $class->id,
+            'organ_user_id'  =>  $request->get('classTeacher'),
+            'start_date'      => now(),
+        ]);
+
+        return redirect('/class')->with('success', 'New class has been added successfully');
     }
 
     /**
@@ -133,6 +161,30 @@ class DormController extends Controller
         // return redirect('/asrama')->with('success', 'Application Data is successfully updated');
     }
 
+    public function addOutingTime()
+    {
+        $users = DB::table('students')
+            ->where('id', 1)
+            ->first();
+
+        // if (is_null($users)) {
+        // } else {
+        return view('dorm.create');
+        // }
+    }
+
+    public function updateOutingTime($id)
+    {
+        $outing = Outing::findOrFail($id);
+        $name = $request->input('stud_name');
+        DB::update('update student set name = ? where id = ?',[$name,$id]);
+        echo "Record updated successfully.<br/>";
+        echo '<a href = "/edit-records">Click Here</a> to go back.';
+
+        $outing->update(array('start_date_time' => new DateTime()));
+        return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -182,5 +234,22 @@ class DormController extends Controller
         //     ->where('id', $id)
         //     ->delete();
         // return redirect('/asrama')->with('success', 'Application Data is successfully deleted');
+    }
+
+    public function getOrganizationByUserId()
+    {
+        $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
+
+            return Organization::all();
+        } else {
+            // user role pentadbir 
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId)->Where(function ($query) {
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5);
+                });
+            })->get();
+        }
     }
 }
