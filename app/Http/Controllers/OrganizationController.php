@@ -195,14 +195,4 @@ class OrganizationController extends Controller
         $states = Jajahan::negeri();
         return view('test.repeater', compact('states'));
     }
-
-    
-
-     // to get all organization with type_org = 8
-     public function getAllOrgTypeFood()
-     {
-         return DB::table('organizations')
-             ->where('type_org', 8)
-             ->get();
-     }
 }
