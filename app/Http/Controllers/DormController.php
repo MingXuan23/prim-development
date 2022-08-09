@@ -101,42 +101,12 @@ class DormController extends Controller
         //
     }
 
-    public function addOutingTime()
-    {
-        //
-    }
-
-    public function updateOutingTime($id)
-    {
-        $outing = Outing::findOrFail($id);
-        $name = $request->input('stud_name');
-        DB::update('update student set name = ? where id = ?',[$name,$id]);
-        echo "Record updated successfully.<br/>";
-        echo '<a href = "/edit-records">Click Here</a> to go back.';
-
-<<<<<<< HEAD
-        $outing->update(array('start_date_time' => new DateTime()));
-        return redirect('/asrama')->with('success', 'Data is successfully updated');
-=======
-        // return redirect('/asrama')->with('success', 'Data is successfully updated');
-    }
-
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        //
-        // DB::table('asramas')
-        //     ->where('id', $id)
-        //     ->delete();
-        // return redirect('/asrama')->with('success', 'Application Data is successfully deleted');
->>>>>>> dcd430e3153f1eff1e14d496929b2172b132e7e2
-    }
-
     public function getOrganizationByUserId()
     {
         $userId = Auth::id();
@@ -180,18 +150,6 @@ class DormController extends Controller
         // $asrama = Asrama::findOrFail($id);
         // $asrama->update(array('in_arrive_time' => new DateTime()));
         // return redirect('/asrama')->with('success', 'Data is successfully updated');
-    }
-
-    public function addOutingTime()
-    {
-        $users = DB::table('students')
-            ->where('id', 1)
-            ->first();
-
-        // if (is_null($users)) {
-        // } else {
-        return view('dorm.create');
-        // }
     }
 
     public function updateOutingTime($id)
