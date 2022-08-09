@@ -38,10 +38,17 @@ Route::group(['prefix' => 'moblie'], function () {
     
     Route::post('/login', 'MobileApiController@login');
     Route::post('/updateProfile', 'MobileApiController@updateProfile');
-    //route for mobile order
-    Route::get('/dish/getOrganizationWithDish', 'DishController@getOrganizationWithDish');
-    Route::get('/dish/getAllDishes', 'DishController@getAllDishes');
-    Route::get('/dish/getAllAvailableDates', 'DishController@getAllAvailableDates');
     
-    Route::post('/order/orderTransaction', 'OrderController@orderTransaction');
+    //route for mobile dish
+    Route::group(['prefix' => 'dish'], function (){
+        Route::get('/getOrganizationWithDish', 'DishController@getOrganizationWithDish');
+        Route::get('/getAllDishes', 'DishController@getAllDishes');
+        Route::get('/getAllAvailableDates', 'DishController@getAllAvailableDates');
+    });
+
+    //route for mobile order
+    Route::group(['prefix' => 'order'], function (){
+        Route::post('/orderTransaction', 'OrderController@orderTransaction');
+    });
+    
 });
