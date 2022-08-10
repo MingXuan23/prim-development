@@ -27,7 +27,7 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('teacher.wardenstore') }}" enctype="multipart/form-data">
+        <form method="get" action="{{ route('teacher.wardenstore') }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
 
@@ -66,11 +66,6 @@
                     <input type="text" id="telno" name="telno" class="form-control" placeholder="No Telefon" max="11">
                 </div>
 
-
-                {{-- <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                </div> --}}
                 <div class="form-group mb-0">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">

@@ -154,6 +154,56 @@ class TeacherController extends Controller
         return redirect('/teacher')->with('success', 'New teacher has been added successfully');
     }
 
+    //for warden
+    public function wardenstore(Request $request)
+    {
+        $this->validate($request, [
+            'name'          =>  'required',
+            // 'icno'          =>  'required',
+            'email'         =>  'required|email|unique:users',
+            'telno'         =>  'required',
+            'organization'  =>  'required',
+        ]);
+
+        $newteacher = new Teacher([
+            'name'           =>  $request->get('name'),
+            // 'icno'           =>  $request->get('icno'),
+            'email'          =>  $request->get('email'),
+            'password'       =>  Hash::make('abc123'),
+            'telno'          =>  $request->get('telno'),
+            'remember_token' =>  $request->get('_token'),
+            // 'created_at'     =>  now(),
+        ]);
+        $newteacher->save();
+
+        // dd($newteacher);
+
+        $username    = DB::table('users')
+            ->where('id', $newteacher->id)
+            ->update(
+                [
+                    'username' => 'GP' . str_pad($newteacher->id, 5, "0", STR_PAD_LEFT),
+                ]
+            );
+
+        // warden active when first time login then will change status
+        DB::table('organization_user')->insert([
+            'organization_id'   => $request->get('organization'),
+            'user_id'           => $newteacher->id,
+            'role_id'           => 8,
+            'start_date'        => now(),
+            'status'            => 0,
+        ]);
+
+        $user = User::find($newteacher->id);
+
+        // role guru
+        $rolename = OrganizationRole::find(7);
+        $user->assignRole($rolename->nama);
+
+
+        return redirect('/teacher/storewarden')->with('success', 'New warden has been added successfully');
+    }
     public function show($id)
     {
         //

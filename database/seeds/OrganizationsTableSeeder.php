@@ -61,6 +61,22 @@ class OrganizationsTableSeeder extends Seeder
                 "fixed_charges" => "2.00"
 
             ),
+            3 =>
+            array(
+                "id" => 4,
+                "code" => "SM00004",
+                "email" => "school@gmail.com",
+                "nama" => "SM Teknik Melaka",
+                "telno" => "01139893143",
+                "address" => "UTeM, Ayer Keroh",
+                "postcode" => "34400",
+                "state" => "Melaka",
+                "created_at" => "2020-06-07 10:48:33",
+                "updated_at" => "2020-06-07 10:52:01",
+                "type_org" => "2",
+                "fixed_charges" => "2.00"
+
+            ),
         ));
     }
 }
