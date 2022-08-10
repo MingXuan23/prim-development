@@ -18,8 +18,8 @@ class ClassStudentTableSeeder extends Seeder
             0 =>
             array(
                 "id" => 1,
-                "organclass_id" => 2,
-                "student_id" => 2,
+                "organclass_id" => 1,
+                "student_id" => 1,
                 "status" => 1,
             ),
         ));
