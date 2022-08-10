@@ -137,6 +137,16 @@
                         </li>
 
                         @endrole
+
+                        @role('Superadmin|Pentadbir|Guru')
+                        <li>
+                            <a href="{{ route('dorm.indexOuting') }}" class=" waves-effect">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Asrama</span>
+                            </a>
+                        </li>
+
+                        @endrole
                     </ul>
                 </li>
                 @endrole

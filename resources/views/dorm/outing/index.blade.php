@@ -1,5 +1,5 @@
 @extends('layouts.master')
-
+<!-- display不到data -->
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
@@ -34,14 +34,13 @@
             </div>
 
             {{-- <div class="">
-                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
-                        class="fa fa-search"></i>
-                    Tapis</button>
+                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary">
+                <i class="fa fa-search"></i>Tapis</button>
             </div> --}}
 
         </div>
     </div>
-
+    
     <div class="col-md-12">
         <div class="card">
             {{-- <div class="card-header">Senarai Tarikh Outing</div> --}}
@@ -50,9 +49,8 @@
                         class="fas fa-plus"></i> Import</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
                 class="fas fa-plus"></i> Export</a>
-                <!-- <a style="margin: 1px;" href="{{ route('exportclass') }}" class="btn btn-success"> <i
-                        class="fas fa-plus"></i> Export</a> -->
-                {{-- href="{{ route('kelas.create') }}" {{ route('exportkelas') }}--}}
+
+                {{-- href="{{ route('dorm.createOuting') }}" {{ route('exportkelas') }}--}}
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.createOuting') }}" class="btn btn-primary"> <i
                         class="fas fa-plus"></i> Tambah Outing</a>
             </div>
@@ -75,7 +73,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="classesTable" class="table table-bordered table-striped dt-responsive nowrap"
+                    <table id="outingTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
@@ -111,7 +109,7 @@
         {{-- end confirmation delete modal --}}
 
         <!-- Modal -->
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+        <!-- <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -182,7 +180,7 @@
                     </form>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>
 @endsection
@@ -201,19 +199,21 @@
 <script>
     $(document).ready(function() {
   
-      var classesTable;
-  
+      var outingTable;
+      
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetch_data($("#organization").val());
         }
-  
+        
         function fetch_data(oid = '') {
-            classesTable = $('#classesTable').DataTable({
+            
+            outingTable = $('#outingTable').DataTable({
                     processing: true,
                     serverSide: true,
+                    
                     ajax: {
-                        url: "{{ route('class.getClassesDatatable') }}",
+                        url: "{{ route('dorm.getOutingsDatatable') }}",
                         data: {
                             oid: oid,
                             hasOrganization: true
@@ -226,7 +226,7 @@
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [1,2,3,4], // your case first column
+                        "targets": [1,2,3], // your case first column
                         "className": "text-center",
                     },],
                     order: [
@@ -239,33 +239,29 @@
                         render: function (data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
-                    }, {
-                        data: 'cnama',
-                        name: 'cnama'
                     },{
-                        data: 'gkelas',
-                        name: 'gkelas',
-                    }, {
-                        data: 'totalstudent',
-                        name: 'totalstudent',
-                        orderable: false,
-                        searchable: false,
-                    }, {
+                        data: 'start_date_time',
+                        name: 'start_date_time'
+                    },{
+                        data: 'end_date_time',
+                        name: 'end_date_time'
+                    },{
                         data: 'action',
                         name: 'action',
                         orderable: false,
                         searchable: false
                     },]
+                    
             });
         }
-  
+        
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#classesTable').DataTable().destroy();
+            $('#outingTable').DataTable().destroy();
             console.log(organizationid);
             fetch_data(organizationid);
         });
-  
+        
         // csrf token for ajax
         $.ajaxSetup({
                 headers: {
@@ -273,13 +269,13 @@
             }
         });
   
-        var class_id;
-  
+        var outing_id;
+        
         $(document).on('click', '.btn-danger', function(){
-            class_id = $(this).attr('id');
+            outing_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
         });
-  
+        
         $('#delete').click(function() {
               $.ajax({
                   type: 'POST',
@@ -288,7 +284,7 @@
                       "_token": "{{ csrf_token() }}",
                       _method: 'DELETE'
                   },
-                  url: "/class/" + class_id,
+                  url: "/dorm/dorm/indexOuting" + outing_id,
                   success: function(data) {
                       setTimeout(function() {
                           $('#confirmModal').modal('hide');
@@ -296,7 +292,7 @@
   
                       $('div.flash-message').html(data);
   
-                      classesTable.ajax.reload();
+                      outingTable.ajax.reload();
                   },
                   error: function (data) {
                       $('div.flash-message').html(data);
