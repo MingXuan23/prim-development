@@ -280,4 +280,6 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/storeOuting', 'DormController@storeOuting')->name('dorm.storeOuting');
     Route::get('dorm/indexOuting', 'DormController@indexOuting')->name('dorm.indexOuting');
     Route::get('dorm/createOuting', 'DormController@createOuting')->name('dorm.createOuting');
+    Route::get('dorm/getOutingsDatatable', 'DormController@getOutingsDatatable')->name('dorm.getOutingsDatatable');
+
 });
