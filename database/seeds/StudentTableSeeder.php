@@ -21,6 +21,12 @@ class StudentTableSeeder extends Seeder
                 "nama" => "Haqeem Solehan",
                 "icno" => "100101-14-6137",
             ),
+            1 =>
+            array(
+                "id" => 2,
+                "nama" => "student 1",
+                "icno" => "026946-14-6137",
+            ),
         ));
     }
 }

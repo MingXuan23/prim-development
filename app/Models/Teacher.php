@@ -14,12 +14,11 @@ class Teacher extends Model
 
     public function getOrganizationByUserId($id)
     {
-        $oid = Organization::with(["user"])->whereHas('user', function ($query) use ($id){
+        $oid = Organization::with(["user"])->whereHas('user', function ($query) use ($id) {
             $query->where("users.id", $id);
         })->get();
 
-        // dd($oid);
+        dd($oid);
         return $oid;
     }
-
 }

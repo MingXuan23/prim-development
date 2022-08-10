@@ -21,6 +21,7 @@ class ClassOrganizationTableSeeder extends Seeder
                 "class_id" => 1,
                 "organization_id" => 2,
             ),
+
         ));
     }
 }

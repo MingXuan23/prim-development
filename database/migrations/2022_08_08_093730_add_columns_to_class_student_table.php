@@ -15,7 +15,7 @@ class AddColumnsToClassStudentTable extends Migration
     {
         Schema::table('class_student', function (Blueprint $table) {
             //
-            $table->integer('outing_status');
+            $table->integer('outing_status')->nullable();
             $table->integer('blacklist')->nullable();
             $table->datetime('start_date_time')->nullable();
             $table->datetime('end_date_time')->nullable();

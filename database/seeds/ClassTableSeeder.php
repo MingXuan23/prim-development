@@ -21,6 +21,12 @@ class ClassTableSeeder extends Seeder
                 "nama" => " 1 Bestari",
                 "levelid" => 1,
             ),
+            1 =>
+            array(
+                "id" => 2,
+                "nama" => " class 1",
+                "levelid" => 2,
+            ),
         ));
     }
 }
