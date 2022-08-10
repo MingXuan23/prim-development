@@ -4,8 +4,24 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Dorm;
-use DB;
-use DateTime;
+use App\Models\Outing;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TeacherExport;
+use App\Imports\TeacherImport;
+use App\Models\Organization;
+use App\Models\OrganizationRole;
+use App\User;
+use Illuminate\Validation\Rule;
+use App\Models\TypeOrganization;
+use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
+
+use function PHPUnit\Framework\isEmpty;
+use function PHPUnit\Framework\isNull;
 
 class DormController extends Controller
 {
@@ -17,11 +33,15 @@ class DormController extends Controller
     public function index()
     {
         //
-        // $dorm = DB::table('students')
-        //     ->join('class_student', 'class_student.student_id', '=', 'students.id')
-        //     ->select('students.*', 'class_student.*')
-        //     ->get();
-        return view('dorm.index');
+        
+    }
+
+    public function indexOuting()
+    {
+        // 
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.outing.index', compact('organization'));
     }
 
     /**
@@ -32,14 +52,14 @@ class DormController extends Controller
     public function create()
     {
         //
-        $users = DB::table('students')
-            ->where('id', 1)
-            ->first();
+        
+    }
 
-        // if (is_null($users)) {
-        // } else {
-        return view('dorm.create');
-        // }
+    public function createOuting()
+    {
+        //
+        $organization = $this->getOrganizationByUserId();
+        return view('dorm.outing.add', compact('organization'));
     }
 
     /**
@@ -50,38 +70,58 @@ class DormController extends Controller
      */
     public function store(Request $request)
     {
-        // //
-        // $validateData = $request->validate([
-        //     'name' => 'required',
-        //     'ic' => 'required',
-        //     'reason' => 'required',
-        //     'start_date' => 'required',
-        //     'end_date' => 'required',
-        // ]);
+        // 
+        
+    }
 
-        // $show = Asrama::create($validateData);
-        // return redirect('/asrama')->with('success', 'Application saved');
+    public function storeOuting(Request $request)
+    {
+        // 
+        $this->validate($request, [
+            'start_date'    =>  'required',
+            'end_date'      =>  'required'
+        ]);
+
+        DB::table('outings')->insert([
+            'start_date_time' => $request->get('start_date'),
+            'end_date_time'   => $request->get('end_date')
+        ]);
+
+        return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
     }
 
     /**
-     * Display the specified resource.
+     * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function destroy($id)
     {
         //
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->update(array('status' => '1'));
+    }
 
-        // // DB::table('asramas')
-        // // ->where('student_id',$id)
-        // // ->update([
-        // //     'status' =>$request->get('status'),
-        // // ]);
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getOrganizationByUserId()
+    {
+        $userId = Auth::id();
+        if (Auth::user()->hasRole('Superadmin')) {
 
-        // return redirect('/asrama')->with('success', 'Application Data is successfully updated');
+            return Organization::all();
+        } else {
+            // user role pentadbir 
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId)->Where(function ($query) {
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5);
+                });
+            })->get();
+        }
     }
 
     public function updateOutTime($id)
@@ -112,75 +152,15 @@ class DormController extends Controller
         // return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function updateOutingTime($id)
     {
-        //
-        // $asrama = Asrama::findOrFail($id);
-        // $asrama->update(array('status' => '1'));
+        $outing = Outing::findOrFail($id);
+        $name = $request->input('stud_name');
+        DB::update('update student set name = ? where id = ?',[$name,$id]);
+        echo "Record updated successfully.<br/>";
+        echo '<a href = "/edit-records">Click Here</a> to go back.';
 
-        // // DB::table('asramas')
-        // // ->where('student_id',$id)
-        // // ->update([
-        // //     'status' =>$request->get('status'),
-        // // ]);
-
-        // return redirect('/asrama')->with('success', 'Application Data is successfully updated');
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-        // $validatedData = $request->validate([
-        //     'name' => 'required',
-        //     'ic' => 'required',
-        //     'reason' => 'required',
-        //     'start_date' => 'required',
-        //     'end_date' => 'required',
-        // ]);
-        // Asrama::whereId($id)->update($validatedData);
-
-        // return redirect('/asrama')->with('success', 'Data is successfully updated');
-    }
-
-    public function updateWardenList()
-    {
-        //
-        // $validatedData = $request->validate([
-        //     'name' => 'required',
-        //     'ic' => 'required',
-        //     'reason' => 'required',
-        //     'start_date' => 'required',
-        //     'end_date' => 'required',
-        // ]);
-        // Asrama::whereId($id)->update($validatedData);
-        return view('dorm.warden-outing.updateWarden');
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-        // DB::table('asramas')
-        //     ->where('id', $id)
-        //     ->delete();
-        // return redirect('/asrama')->with('success', 'Application Data is successfully deleted');
+        $outing->update(array('start_date_time' => new DateTime()));
+        return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 }
