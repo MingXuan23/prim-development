@@ -236,7 +236,7 @@
         $('#delete').click(function() {
             console.log("hello" + outing_id);
               $.ajax({
-                  type: 'POST',
+                  type: 'DELETE',
                   dataType: 'html',
                   data: {
                       "_token": "{{ csrf_token() }}",
