@@ -222,6 +222,9 @@ Route::post('/importstudent', 'StudentController@studentimport')->name('importst
 
 Route::post('/importparent', 'ParentController@parentImport')->name('importparent');
 
+Route::post('/exportouting', 'DormController@outingexport')->name('exportouting');
+
+
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');

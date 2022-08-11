@@ -45,12 +45,10 @@
         <div class="card">
             {{-- <div class="card-header">Senarai Tarikh Outing</div> --}}
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
-                        class="fas fa-plus"></i> Import</a>
-                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
+                <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
                 class="fas fa-plus"></i> Export</a>
 
-                {{-- href="{{ route('dorm.createOuting') }}" {{ route('exportkelas') }}--}}
+                {{-- href="{{ route('dorm.createOuting') }}" {{ route('exportouting') }}--}}
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.createOuting') }}" class="btn btn-primary"> <i
                         class="fas fa-plus"></i> Tambah Outing</a>
             </div>
@@ -109,18 +107,18 @@
         {{-- end confirmation delete modal --}}
 
         <!-- Modal -->
-        <!-- <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Export Kelas</h5>
+                        <h5 class="modal-title">Export Outing</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    {{-- {{ route('exportclass') }} --}}
-                    <form action="{{ route('exportclass') }}" method="post">
+                    {{-- {{ route('exportouting') }} --}}
+                    <form action="{{ route('exportouting') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
                             <div class="form-group">
@@ -139,48 +137,6 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Import Kelas</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {{-- {{ route('importkelas')}} --}}
-                    <form action="{{ route('importclass') }}" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-
-                            {{ csrf_field() }}
-                            {{-- <div class="form-group">
-                                            <label>Nama Kelas</label>
-                                            <select name="tahap" id="tahap" class="form-control">
-                                                <option value="1">Tahap 1</option>
-                                            </select>
-                                        </div> --}}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    @foreach($organization as $row)
-                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <input type="file" name="file" required>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div> -->
     </div>
 </div>
 @endsection

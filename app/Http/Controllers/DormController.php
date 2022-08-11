@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OutingExport;
 use Illuminate\Http\Request;
 use App\Models\Dorm;
 use App\Models\Outing;
@@ -44,6 +45,11 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         return view('dorm.outing.index', compact('organization'));
+    }
+
+    public function outingexport()
+    {
+        return Excel::download(new OutingExport, 'outing.xlsx');
     }
 
     /**
