@@ -236,13 +236,13 @@
         $('#delete').click(function() {
             console.log("hello" + outing_id);
               $.ajax({
-                  type: 'DELETE',
+                  type: 'POST',
                   dataType: 'html',
                   data: {
                       "_token": "{{ csrf_token() }}",
-                      _method: 'DELETE'
+                    //   _method: 'DELETE'
                   },
-                  url: "/dorm/dorm/editOuting/" + outing_id,
+                  url: "/dorm/dorm/destroyOuting/" + outing_id,
                   success: function(data) {
                       setTimeout(function() {
                           $('#confirmModal').modal('hide');
