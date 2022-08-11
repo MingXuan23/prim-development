@@ -191,10 +191,9 @@ class DormController extends Controller
     public function destroyOuting($id)
     {
         //
-        // delete 有问题
-        $result = DB::table('outings')->where('outings.id',$id)->delete();
+        $result = DB::table('outings')->where('outings.id',$id);
 
-        if ($result) {
+        if ($result->delete()) {
             Session::flash('success', 'Outing Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         } else {
@@ -265,7 +264,7 @@ class DormController extends Controller
         // $outing->update(array('start_date_time' => new DateTime()));
         // return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
-// *************************注意 看看ClassController的*************************************
+
     public function getOutingsDatatable(Request $request)
     {
         // dd($request->oid);
