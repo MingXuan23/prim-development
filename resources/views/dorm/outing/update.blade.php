@@ -9,9 +9,9 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Is Update</h4>
+            <h4 class="font-size-18">Outing</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Kelas >> Edit Kelas</li>
+                <li class="breadcrumb-item active">Outing >> Edit Outing</li>
             </ol>
         </div>
     </div>
@@ -29,17 +29,20 @@
                 </ul>
             </div>
             @endif
-            <form method="post" action="{{ route('class.update', $id) }}" enctype="multipart/form-data">
-                @method('PATCH')
+            
+            <form method="post" action="{{ route('dorm.updateOuting', $id) }}" enctype="multipart/form-data">
+                
                 {{csrf_field()}}
                 <div class="card-body">
-
+                
                     <div class="form-group">
                         <label>Nama Organisasi</label>
                         <select name="organization" id="organization" class="form-control">
                             <option value="" selected disabled>Pilih Organisasi</option>
+                            
                             @foreach($organization as $row)
-                                @if($row->id == $class->organization_id)
+                                
+                                @if($row->id == $outing->organization_id)
                                 <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
                                 @else
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
@@ -49,26 +52,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Nama Kelas</label>
-                        <input type="text" name="name" class="form-control" placeholder="Nama Kelas"
-                            value="{{$class->nama}}">
+                        <label>Tarikh dan Masa Keluar</label>
+                        <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="datetime-local"
+                                placeholder="Pilih Tarikh Keluar" value="{{$outing->start_date_time}}">
                     </div>
 
                     <div class="form-group">
-                        <label>Tahap Kelas</label>
-                        <select name="level" id="tahap" class="form-control">
-                            <option value="1" {{$class->levelid == 1  ? 'selected' : ''}}>Tahap 1</option>
-                            <option value="2" {{$class->levelid == 2  ? 'selected' : ''}}>Tahap 2</option>
-                        </select>
+                        <label>Tarikh dan Masa Masuk</label>
+                        <input onclick="this.showPicker()" onfocus="setMinDate();" class="form-control" id="end_date" name="end_date" type="datetime-local"
+                                placeholder="Pilih Tarikh Masuk" value="{{$outing->end_date_time}}">
                     </div>
 
-                    <div class="form-group">
-                        <label>Guru Kelas</label>
-                        <select name="classTeacher" id="classTeacher" class="form-control">
-                            <option value="" selected disabled>Pilih Guru Kelas</option>
-                        </select>
-                    </div>
-                    
                     <div class="form-group mb-0">
                         <div>
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -96,42 +90,43 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    $(document).ready(function() {
+    
+    // $(document).ready(function() {
 
-        var organizationid    = $("#organization").val();
-        var _token            = $('input[name="_token"]').val();
-        fectchTeacher(organizationid);
+    //     var organizationid    = $("#organization").val();
+    //     var _token            = $('input[name="_token"]').val();
+    //     fectchTeacher(organizationid);
 
-        $('#organization').change(function() {
-            organizationid    = $("#organization").val();
-            _token            = $('input[name="_token"]').val();
-            fectchTeacher(organizationid);
-        });
+    //     $('#organization').change(function() {
+    //         organizationid    = $("#organization").val();
+    //         _token            = $('input[name="_token"]').val();
+    //         fectchTeacher(organizationid);
+    //     });
 
-        function fectchTeacher(organizationid = ''){
-            var _token = $('input[name="_token"]').val();
-            $.ajax({
-                url:"{{ route('class.fetchTeacher') }}",
-                method:"POST",
-                data:{ oid:organizationid,
-                        _token:_token },
-                success:function(result)
-                {
-                    $('#classTeacher').empty();
-                    $("#classTeacher").append("<option value='' disabled selected> Pilih Guru</option>");
-                    jQuery.each(result.success, function(key, value){
-                        $("#classTeacher").append("<option value='"+ value.id +"'>" + value.name + "</option>");
-                    });
-                }
-            })
-        }
+    //     function fectchTeacher(organizationid = ''){
+    //         var _token = $('input[name="_token"]').val();
+    //         $.ajax({
+    //             url:"{{ route('class.fetchTeacher') }}",
+    //             method:"POST",
+    //             data:{ oid:organizationid,
+    //                     _token:_token },
+    //             success:function(result)
+    //             {
+    //                 $('#classTeacher').empty();
+    //                 $("#classTeacher").append("<option value='' disabled selected> Pilih Guru</option>");
+    //                 jQuery.each(result.success, function(key, value){
+    //                     $("#classTeacher").append("<option value='"+ value.id +"'>" + value.name + "</option>");
+    //                 });
+    //             }
+    //         })
+    //     }
 
-        // csrf token for ajax
-        $.ajaxSetup({
-                headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-    });
+    //     // csrf token for ajax
+    //     $.ajaxSetup({
+    //             headers: {
+    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //         }
+    //     });
+    // });
 </script>
 @endsection

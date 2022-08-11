@@ -84,43 +84,6 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    // $(document).ready(function() {
 
-    //     if($("#organization").val() != ""){
-    //         $("#organization").prop("selectedIndex", 0).trigger('change');
-    //         fectchTeacher($("#organization").val());
-    //     }
-
-    //     $('#organization').change(function() {
-    //         organizationid    = $("#organization").val();
-    //         _token            = $('input[name="_token"]').val();
-    //         fectchTeacher(organizationid);
-    //     });
-
-    //     function fectchTeacher(organizationid = ''){
-    //         var _token = $('input[name="_token"]').val();
-    //         $.ajax({
-    //             url:"{{ route('class.fetchTeacher') }}",
-    //             method:"POST",
-    //             data:{ oid:organizationid,
-    //                     _token:_token },
-    //             success:function(result)
-    //             {
-    //                 $('#classTeacher').empty();
-    //                 $("#classTeacher").append("<option value='' disabled selected> Pilih Guru</option>");
-    //                 jQuery.each(result.success, function(key, value){
-    //                     $("#classTeacher").append("<option value='"+ value.id +"'>" + value.name + "</option>");
-    //                 });
-    //             }
-    //         })
-    //     }
-
-    //     // csrf token for ajax
-    //     $.ajaxSetup({
-    //             headers: {
-    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    //         }
-    //     });
-    // });
 </script>
 @endsection

@@ -232,7 +232,9 @@
             $('#deleteConfirmationModal').modal('show');
         });
         
+        
         $('#delete').click(function() {
+            console.log("hello" + outing_id);
               $.ajax({
                   type: 'POST',
                   dataType: 'html',
@@ -240,7 +242,7 @@
                       "_token": "{{ csrf_token() }}",
                       _method: 'DELETE'
                   },
-                  url: "/dorm/dorm/indexOuting" + outing_id,
+                  url: "/dorm/dorm/destroyOuting/" + outing_id,
                   success: function(data) {
                       setTimeout(function() {
                           $('#confirmModal').modal('hide');
