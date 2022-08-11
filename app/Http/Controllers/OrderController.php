@@ -135,4 +135,14 @@ class OrderController extends Controller
             return response($th->getMessage())->setStatusCode(401);
         }
     }
+
+    //to get all order of a certain user
+    //sorted by order id descending
+    public function getAllOrderById($id)
+    {
+        return DB::table('orders')
+            ->where('user_id', $id)
+            ->orderBy('id', 'desc')
+            ->get();
+    }
 }
