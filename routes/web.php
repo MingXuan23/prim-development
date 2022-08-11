@@ -212,6 +212,7 @@ Route::get('feesparentdev', 'FeesController@devpay')->name('feesparentdev');
 Route::post('receiptdev', 'FeesController@devreceipt')->name('receiptdev');
 
 Route::post('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
+Route::post('/exportwarden', 'TeacherController@wardenexport')->name('exportwarden');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
 
 Route::post('/exportclass', 'ClassController@classexport')->name('exportclass');
@@ -281,5 +282,4 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/indexOuting', 'DormController@indexOuting')->name('dorm.indexOuting');
     Route::get('dorm/createOuting', 'DormController@createOuting')->name('dorm.createOuting');
     Route::get('dorm/getOutingsDatatable', 'DormController@getOutingsDatatable')->name('dorm.getOutingsDatatable');
-
 });

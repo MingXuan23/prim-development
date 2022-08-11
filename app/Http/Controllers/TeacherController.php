@@ -50,6 +50,7 @@ class TeacherController extends Controller
         return Excel::download(new TeacherExport($request->organ), 'teacher.xlsx');
     }
 
+    //for warden
     public function wardenexport(Request $request)
     {
         return Excel::download(new WardenExport($request->organ), 'warden.xlsx');
