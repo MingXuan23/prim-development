@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OutingExport;
 use Illuminate\Http\Request;
 use App\Models\Dorm;
 use App\Models\Outing;
@@ -44,6 +45,11 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         return view('dorm.outing.index', compact('organization'));
+    }
+
+    public function outingexport()
+    {
+        return Excel::download(new OutingExport, 'outing.xlsx');
     }
 
     /**
@@ -94,6 +100,12 @@ class DormController extends Controller
         return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
     public function show($id)
     {
         //
@@ -102,6 +114,12 @@ class DormController extends Controller
     public function edit($id)
     {
         //
+        
+    }
+
+    public function editOuting($id)
+    {
+        //  
         $teacher = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
             ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
@@ -112,19 +130,47 @@ class DormController extends Controller
 
         $outing = DB::table('outings')
         ->where('outings.id', $id)
-        ->select('outings.id', 'outings.start_date_time', 'outings.end_date_time')
+        ->select('outings.id', 'outings.start_date_time', 'outings.end_date_time', 'outings.organization_id')
         ->first();
 
         $organization = $this->getOrganizationByUserId();
-
-        // dd($outing);
-        return view('dorm.outing.update', compact('outing', 'organization'));
+       
+        return view('dorm.outing.update', compact('outing', 'organization', 'id')); 
         
     }
 
     public function update(Request $request, $id)
     {
         //
+    
+    }
+
+    public function updateOuting(Request $request, $id)
+    {
+        //
+        // dd($id);
+        $this->validate($request, [
+            'start_date'        =>  'required',
+            'end_date'          =>  'required',
+            'organization'      =>  'required',
+        ]);
+
+        DB::table('outings')
+            ->where('id', $id)
+            ->update(
+                [
+                    'start_date_time' => $request->get('start_date'),
+                    'end_date_time'   => $request->get('end_date')
+                ]
+            );
+
+        // DB::table('class_organization')->where('class_id', $id)
+        //     ->update([
+        //         'organization_id' => $request->get('organization'),
+        //         'organ_user_id'    =>  $request->get('classTeacher')
+        //     ]);
+
+        return redirect('/dorm/dorm/indexOuting')->with('success', 'The data has been updated!');
     
     }
 
@@ -138,6 +184,23 @@ class DormController extends Controller
     public function destroy($id)
     {
         //
+        $organization = $this->getOrganizationByUserId();
+        return view('dorm.outing.add', compact('organization'));
+    }
+
+    public function destroyOuting($id)
+    {
+        //
+        // delete 有问题
+        $result = DB::table('outings')->where('outings.id',$id)->delete();
+
+        if ($result) {
+            Session::flash('success', 'Outing Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Outing Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+        }
     }
 
     /**
@@ -225,7 +288,7 @@ class DormController extends Controller
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<a href="' . route('dorm.editOuting', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });

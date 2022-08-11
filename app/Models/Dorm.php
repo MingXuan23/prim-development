@@ -9,6 +9,7 @@ class Dorm extends Model
 {
     //
     use HasFactory;
+    
     protected $fillable = ['name', 'accommodate_no', 'student_inside_no'];
 
     public $timestamps = false;

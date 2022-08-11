@@ -225,6 +225,9 @@ Route::post('/importstudent', 'StudentController@studentimport')->name('importst
 
 Route::post('/importparent', 'ParentController@parentImport')->name('importparent');
 
+Route::post('/exportouting', 'DormController@outingexport')->name('exportouting');
+
+
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
@@ -283,5 +286,8 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/storeOuting', 'DormController@storeOuting')->name('dorm.storeOuting');
     Route::get('dorm/indexOuting', 'DormController@indexOuting')->name('dorm.indexOuting');
     Route::get('dorm/createOuting', 'DormController@createOuting')->name('dorm.createOuting');
+    Route::get('dorm/editOuting/{id}', 'DormController@editOuting')->name('dorm.editOuting');
+    Route::post('dorm/updateOuting/{id}', 'DormController@updateOuting')->name('dorm.updateOuting');
+    Route::post('dorm/destroyOuting/{id}', 'DormController@destroyOuting')->name('dorm.destroyOuting');
     Route::get('dorm/getOutingsDatatable', 'DormController@getOutingsDatatable')->name('dorm.getOutingsDatatable');
 });
