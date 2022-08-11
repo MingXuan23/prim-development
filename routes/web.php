@@ -81,6 +81,8 @@ Route::group(['prefix' => 'teacher'], function () {
     Route::get('warden', 'TeacherController@wardenindex')->name('teacher.wardenindex');
     Route::get('storewarden', 'TeacherController@wardenstore')->name('teacher.wardenstore');
     Route::get('createwarden', 'TeacherController@wardencreate')->name('teacher.wardencreate');
+    Route::get('editwarden/{id}', 'TeacherController@wardenedit')->name('teacher.wardenedit');
+    Route::get('updatewarden', 'TeacherController@wardenupdate')->name('teacher.wardenupdate');
 });
 
 Route::group(['prefix' => 'class'], function () {

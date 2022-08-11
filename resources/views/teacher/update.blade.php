@@ -34,51 +34,48 @@
 
                 <div class="form-group">
                     <label>Nama Penuh</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh"
-                        value="{{$teacher->tcname}}">
+                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh" value="{{$teacher->tcname}}">
                 </div>
 
                 {{-- <div class="form-group">
                     <label>Nombor Kad Pengenalan</label>
                     <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan"
                         value="{{$teacher->icno}}">
-                </div> --}}
+            </div> --}}
 
-                <div class="form-group">
-                    <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="">Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                            @if($row->id == $teacher->organization_id)
-                            <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
-                            @else
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                </div>
+            <div class="form-group">
+                <label>Nama Organisasi</label>
+                <select name="organization" id="organization" class="form-control">
+                    <option value="">Pilih Organisasi</option>
+                    @foreach($organization as $row)
+                    @if($row->id == $teacher->organization_id)
+                    <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                    @else
+                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                    @endif
+                    @endforeach
+                </select>
+            </div>
 
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="text" name="email" class="form-control" placeholder="Email"
-                        value="{{ $teacher->email }}">
-                </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" name="email" class="form-control" placeholder="Email" value="{{ $teacher->email }}">
+            </div>
 
-                <div class="form-group">
-                    <label>No Telefon</label>
-                    <input type="text" id="telno" name="telno" class="form-control" placeholder="No Telefon" max="11"
-                        value="{{$teacher->telno}}">
-                </div>
-                <div class="form-group mb-0">
-                    <div>
-                        <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
-                            Simpan
-                        </button>
-                    </div>
+            <div class="form-group">
+                <label>No Telefon</label>
+                <input type="text" id="telno" name="telno" class="form-control" placeholder="No Telefon" max="11" value="{{$teacher->telno}}">
+            </div>
+            <div class="form-group mb-0">
+                <div>
+                    <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
+                        Simpan
+                    </button>
                 </div>
             </div>
-        </form>
     </div>
+    </form>
+</div>
 </div>
 
 @endsection

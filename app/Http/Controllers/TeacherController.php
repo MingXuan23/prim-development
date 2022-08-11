@@ -252,6 +252,26 @@ class TeacherController extends Controller
         return view('teacher.update', compact('teacher', 'organization'));
     }
 
+    //for warden use
+    public function wardenedit($id)
+    {
+        //
+        // $teacher = $this->teacher->getOrganizationByUserId($id);
+
+        $teacher = DB::table('users')
+            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+            ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
+            ->where('users.id', $id)
+            ->where('organization_user.role_id', 7)
+            ->select('organizations.id as organization_id', 'users.id as uid', 'users.name as tcname',  'users.email as email', 'users.telno as telno', 'organization_user.role_id as role_id')
+            ->first();
+
+        $organization = $this->getOrganizationByUserId();
+
+        // dd($teacher);
+        return view('dorm.warden.update', compact('teacher', 'organization', 'id'));
+    }
+
     public function update(Request $request, $id)
     {
         //
@@ -285,6 +305,41 @@ class TeacherController extends Controller
             );
 
         return redirect('/teacher')->with('success', 'The data has been updated!');
+    }
+
+    //for warden use
+    public function wardenupdate(Request $request, $id)
+    {
+        //
+        $uid = User::find($id);
+        dd($id);
+
+        $this->validate($request, [
+            'name'          =>  'required',
+            'email'         =>  'required|unique:users,email,' . $uid->id,
+            'telno'         =>  'required',
+        ]);
+
+        $teacherupdate    = DB::table('users')
+            ->where('id', $id)
+            ->update(
+                [
+                    'name'      => $request->get('name'),
+                    'email'     => $request->get('email'),
+                    'telno'     => $request->get('telno'),
+                    // 'icno'      => $request->get('icno'),
+                ]
+            );
+
+        DB::table('organization_user')
+            ->where('user_id', $id)
+            ->update(
+                [
+                    'organization_id'      => $request->get('organization'),
+                ]
+            );
+
+        return redirect('/teacher/warden')->with('success', 'The data has been updated!');
     }
 
     public function destroy($id)
@@ -399,7 +454,7 @@ class TeacherController extends Controller
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a href="' . route('teacher.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<a href="' . route('teacher.wardenedit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });
