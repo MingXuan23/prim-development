@@ -242,7 +242,7 @@
                       "_token": "{{ csrf_token() }}",
                       _method: 'DELETE'
                   },
-                  url: "/dorm/dorm/destroyOuting/" + outing_id,
+                  url: "/dorm/dorm/editOuting/" + outing_id,
                   success: function(data) {
                       setTimeout(function() {
                           $('#confirmModal').modal('hide');
