@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TeacherExport;
+use App\Exports\WardenExport;
 use App\Imports\TeacherImport;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
@@ -47,6 +48,11 @@ class TeacherController extends Controller
     public function teacherexport(Request $request)
     {
         return Excel::download(new TeacherExport($request->organ), 'teacher.xlsx');
+    }
+
+    public function wardenexport(Request $request)
+    {
+        return Excel::download(new WardenExport($request->organ), 'warden.xlsx');
     }
 
     public function teacherimport(Request $request)
