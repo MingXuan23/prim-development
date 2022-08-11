@@ -376,6 +376,69 @@ class TeacherController extends Controller
         }
     }
 
+    //for warden use
+    public function getWardenDatatable(Request $request)
+    {
+        // dd($request->oid);
+
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('organizations')
+                    ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+                    ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+                    ->join('users', 'users.id', '=', 'organization_user.user_id')
+                    ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
+                    ->where('organizations.id', $oid)
+                    ->where('organization_user.role_id', 7)
+                    ->orderBy('users.name');
+            }
+            // elseif ($hasOrganizaton == "true") {
+            //     $data = DB::table('organizations')
+            //         ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            //         ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+            //         ->join('users', 'users.id', '=', 'organization_user.user_id')
+            //         ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
+            //         ->where('organization_user.role_id', 5)
+            //         ->where('users.id', Auth::id())
+            //         ->orderBy('users.name');
+            // }
+            // dd($data);
+            // dd($data->oid);
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == '1') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<a href="' . route('teacher.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
+        }
+    }
+
     public function getOrganizationByUserId()
     {
         $userId = Auth::id();

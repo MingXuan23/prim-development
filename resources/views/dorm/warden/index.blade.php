@@ -31,11 +31,11 @@
                 </div>
             </div>
 
-            {{-- <div class="">
+            <!-- {{-- <div class="">
                 <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
                         class="fa fa-search"></i>
                     Tapis</button>
-            </div> --}}
+            </div> --}} -->
 
         </div>
     </div>
@@ -46,8 +46,6 @@
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
-                <!-- <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
-                        class="fas fa-plus"></i> Export</a> -->
                 <a style="margin: 19px; float: right;" href="{{ route('teacher.wardencreate') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Warden</a>
             </div>
 
@@ -103,6 +101,7 @@
         </div>
         {{-- end confirmation delete modal --}}
 
+        <!-- export warden modal-->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -132,7 +131,7 @@
             </div>
         </div>
 
-        <!-- Modal -->
+        <!-- import warden modal -->
         <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -186,7 +185,7 @@
 <script>
     $(document).ready(function() {
 
-        var teacherTable;
+        var wardenTable;
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
@@ -194,11 +193,11 @@
         }
 
         function fetch_data(oid = '') {
-            teacherTable = $('#teacherTable').DataTable({
+            wardenTable = $('#wardenTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('teacher.getTeacherDatatable') }}",
+                    url: "{{ route('teacher.getWardenDatatable') }}",
                     data: {
                         oid: oid,
                         hasOrganization: true
@@ -252,7 +251,7 @@
 
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#teacherTable').DataTable().destroy();
+            $('#wardenTable').DataTable().destroy();
             // console.log(organizationid);
             fetch_data(organizationid);
         });
@@ -287,7 +286,7 @@
 
                     $('div.flash-message').html(data);
 
-                    teacherTable.ajax.reload();
+                    wardenTable.ajax.reload();
                 },
                 error: function(data) {
                     $('div.flash-message').html(data);

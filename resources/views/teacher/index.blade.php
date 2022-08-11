@@ -191,7 +191,7 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
-
+-=
 <script>
     $(document).ready(function() {
 
