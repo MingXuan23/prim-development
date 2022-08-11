@@ -133,6 +133,23 @@ class UsersTableSeeder extends Seeder
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01"
             ),
+            7 =>
+            array(
+                "id" => 8,
+                "email" => app()->environment('local') ? 'warden1@gmail.com' : 'warden1@gmail.com',
+                "password" => app()->environment('local') ? \Hash::make("Prim123@") : \Hash::make("Prim123@"),
+                "name" => "warden 1",
+                "username" => "warden1",
+                "icno" => "963256-05-0654",
+                "state" => "Selangor",
+                "postcode" => "45600",
+                "telno" => "0106594357",
+                "address" => "Batu 8, Kampung Ijok",
+                "email_verified_at" => "2020-06-07 18:52:01",
+                "remember_token" => "",
+                "created_at" => "2020-06-07 10:48:33",
+                "updated_at" => "2020-06-07 10:52:01"
+            ),
         ));
     }
 }

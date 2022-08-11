@@ -22,6 +22,14 @@ class ClassStudentTableSeeder extends Seeder
                 "student_id" => 1,
                 "status" => 1,
             ),
+            //below is student 1 from class 1 from school 1
+            1 =>
+            array(
+                "id" => 2,
+                "organclass_id" => 2,
+                "student_id" => 2,
+                "status" => 1,
+            ),
         ));
     }
 }
