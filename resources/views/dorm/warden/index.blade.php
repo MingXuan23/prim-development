@@ -142,7 +142,7 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('importteacher') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('importwarden') }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
