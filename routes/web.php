@@ -199,7 +199,7 @@ Route::get('successpay', 'PayController@successPay')->name('successpay');
 Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
 Route::get('feespay', 'PayController@fees_pay')->name('feespay');
 Route::get('receiptfee', 'PayController@viewReceipt')->name('receiptfee');
-Route::get('receipttest/{transaction_id}', 'PayController@ReceiptFees')->name('receipttest');
+Route::get('viewfeereceipt/{transaction_id}', 'PayController@viewReceiptFees')->name('receipttest');
 
 Route::get('feesparent', 'FeesController@parentpay')->name('parentpay');
 
