@@ -186,7 +186,6 @@ class TeacherController extends Controller
     {
         $this->validate($request, [
             'name'          =>  'required',
-            // 'icno'          =>  'required',
             'email'         =>  'required|email|unique:users',
             'telno'         =>  'required',
             'organization'  =>  'required',
@@ -194,7 +193,6 @@ class TeacherController extends Controller
 
         $newteacher = new Teacher([
             'name'           =>  $request->get('name'),
-            // 'icno'           =>  $request->get('icno'),
             'email'          =>  $request->get('email'),
             'password'       =>  Hash::make('abc123'),
             'telno'          =>  $request->get('telno'),
@@ -217,7 +215,7 @@ class TeacherController extends Controller
         DB::table('organization_user')->insert([
             'organization_id'   => $request->get('organization'),
             'user_id'           => $newteacher->id,
-            'role_id'           => 8,
+            'role_id'           => 7,
             'start_date'        => now(),
             'status'            => 0,
         ]);
@@ -228,8 +226,7 @@ class TeacherController extends Controller
         $rolename = OrganizationRole::find(7);
         $user->assignRole($rolename->nama);
 
-
-        return redirect('/teacher/storewarden')->with('success', 'New warden has been added successfully');
+        return redirect('/teacher/warden')->with('success', 'New warden has been added successfully');
     }
     public function show($id)
     {

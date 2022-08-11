@@ -31,11 +31,11 @@
                 </div>
             </div>
 
-            <!-- {{-- <div class="">
+            {{-- <div class="">
                 <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
                         class="fa fa-search"></i>
                     Tapis</button>
-            </div> --}} -->
+            </div> --}}
 
         </div>
     </div>
