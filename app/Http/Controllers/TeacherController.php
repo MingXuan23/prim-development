@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TeacherExport;
+use App\Exports\WardenExport;
 use App\Imports\TeacherImport;
+use App\Imports\WardenImport;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
 use App\User;
@@ -49,6 +51,12 @@ class TeacherController extends Controller
         return Excel::download(new TeacherExport($request->organ), 'teacher.xlsx');
     }
 
+    //for warden
+    public function wardenexport(Request $request)
+    {
+        return Excel::download(new WardenExport($request->organ), 'warden.xlsx');
+    }
+
     public function teacherimport(Request $request)
     {
         $file       = $request->file('file');
@@ -65,6 +73,25 @@ class TeacherController extends Controller
         Excel::import(new TeacherImport($request->organ), public_path('/uploads/excel/' . $namaFile));
 
         return redirect('/teacher')->with('success', 'Techers have been added successfully');
+    }
+
+    //for warden use
+    public function wardenimport(Request $request)
+    {
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        if (!in_array($etx, $formats)) {
+
+            return redirect('/teacher')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+
+        Excel::import(new WardenImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+
+        return redirect('/teacher')->with('success', 'Wardens have been added successfully');
     }
 
     public function create()
