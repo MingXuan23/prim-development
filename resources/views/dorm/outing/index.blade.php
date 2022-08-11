@@ -1,5 +1,4 @@
 @extends('layouts.master')
-<!-- display不到data -->
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
@@ -235,9 +234,9 @@
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    _method: 'DELETE'
+                    //   _method: 'DELETE'
                 },
-                url: "/dorm/dorm/editOuting/" + outing_id,
+                url: "/dorm/dorm/destroyOuting/" + outing_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
