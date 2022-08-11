@@ -86,12 +86,12 @@ class TeacherController extends Controller
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
         if (!in_array($etx, $formats)) {
 
-            return redirect('/teacher')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+            return redirect('/teacher/warden')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
 
         Excel::import(new WardenImport($request->organ), public_path('/uploads/excel/' . $namaFile));
 
-        return redirect('/teacher')->with('success', 'Wardens have been added successfully');
+        return redirect('/teacher/warden')->with('success', 'Wardens have been added successfully');
     }
 
     public function create()
@@ -379,8 +379,6 @@ class TeacherController extends Controller
     //for warden use
     public function getWardenDatatable(Request $request)
     {
-        // dd($request->oid);
-
         if (request()->ajax()) {
             $oid = $request->oid;
             $hasOrganizaton = $request->hasOrganization;
@@ -398,33 +396,8 @@ class TeacherController extends Controller
                     ->where('organization_user.role_id', 7)
                     ->orderBy('users.name');
             }
-            // elseif ($hasOrganizaton == "true") {
-            //     $data = DB::table('organizations')
-            //         ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
-            //         ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
-            //         ->join('users', 'users.id', '=', 'organization_user.user_id')
-            //         ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
-            //         ->where('organization_user.role_id', 5)
-            //         ->where('users.id', Auth::id())
-            //         ->orderBy('users.name');
-            // }
-            // dd($data);
-            // dd($data->oid);
+
             $table = Datatables::of($data);
-
-            $table->addColumn('status', function ($row) {
-                if ($row->status == '1') {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
-
-                    return $btn;
-                } else {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
-
-                    return $btn;
-                }
-            });
 
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
@@ -434,7 +407,8 @@ class TeacherController extends Controller
                 return $btn;
             });
 
-            $table->rawColumns(['status', 'action']);
+            $table->rawColumns(['action']);
+
             return $table->make(true);
         }
     }

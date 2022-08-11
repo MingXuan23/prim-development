@@ -73,8 +73,9 @@
                                 <th> No. </th>
                                 <th>Nama Penuh</th>
                                 <th>Nama Pengguna</th>
-                                <th>Nombor Telefon</th>
                                 <th>Email</th>
+                                <th>Nombor Telefon</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                     </table>
@@ -210,7 +211,7 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [3, 4, 5, 6], // your case first column
+                    "targets": [1, 2, 3, 4, 5], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
@@ -236,23 +237,18 @@
                     data: "telno",
                     name: 'telno'
                 }, {
-                    data: 'status',
-                    name: 'status',
-                    orderable: false,
-                    searchable: false
-                }, {
                     data: 'action',
                     name: 'action',
                     orderable: false,
                     searchable: false
                 }, ]
             });
+
         }
 
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('#wardenTable').DataTable().destroy();
-            // console.log(organizationid);
             fetch_data(organizationid);
         });
 
@@ -278,7 +274,7 @@
                     "_token": "{{ csrf_token() }}",
                     _method: 'DELETE'
                 },
-                url: "/teacher/" + teacher_id,
+                url: "/teacher/warden" + teacher_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');

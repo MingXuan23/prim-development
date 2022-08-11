@@ -40,17 +40,15 @@
 
         </div>
     </div>
-    
+
     <div class="col-md-12">
         <div class="card">
             {{-- <div class="card-header">Senarai Tarikh Outing</div> --}}
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
-                class="fas fa-plus"></i> Export</a>
+                <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
 
                 {{-- href="{{ route('dorm.createOuting') }}" {{ route('exportouting') }}--}}
-                <a style="margin: 19px; float: right;" href="{{ route('dorm.createOuting') }}" class="btn btn-primary"> <i
-                        class="fas fa-plus"></i> Tambah Outing</a>
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.createOuting') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Outing</a>
             </div>
 
             <div class="card-body">
@@ -71,8 +69,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="outingTable" class="table table-bordered table-striped dt-responsive nowrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="outingTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
@@ -97,8 +94,7 @@
                         Adakah anda pasti?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
-                            name="delete">Padam</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
                         <button type="button" data-dismiss="modal" class="btn">Batal</button>
                     </div>
                 </div>
@@ -107,8 +103,7 @@
         {{-- end confirmation delete modal --}}
 
         <!-- Modal -->
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
+        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -125,7 +120,7 @@
                                 <label>Organisasi</label>
                                 <select name="organ" id="organ" class="form-control">
                                     @foreach($organization as $row)
-                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -154,112 +149,112 @@
 
 <script>
     $(document).ready(function() {
-  
-      var outingTable;
-      
-        if($("#organization").val() != ""){
+
+        var outingTable;
+
+        if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetch_data($("#organization").val());
         }
-        
+
         function fetch_data(oid = '') {
-            
+
             outingTable = $('#outingTable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    
-                    ajax: {
-                        url: "{{ route('dorm.getOutingsDatatable') }}",
-                        data: {
-                            oid: oid,
-                            hasOrganization: true
-                        },
-                        type: 'GET',
-  
+                processing: true,
+                serverSide: true,
+
+                ajax: {
+                    url: "{{ route('dorm.getOutingsDatatable') }}",
+                    data: {
+                        oid: oid,
+                        hasOrganization: true
                     },
-                    'columnDefs': [{
-                        "targets": [0], // your case first column
-                        "className": "text-center",
-                        "width": "2%"
-                    },{
-                        "targets": [1,2,3], // your case first column
-                        "className": "text-center",
-                    },],
-                    order: [
-                        [1, 'asc']
-                    ],
-                    columns: [{
-                        "data": null,
-                        searchable: false,
-                        "sortable": false,
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        }
-                    },{
-                        data: 'start_date_time',
-                        name: 'start_date_time'
-                    },{
-                        data: 'end_date_time',
-                        name: 'end_date_time'
-                    },{
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },]
-                    
+                    type: 'GET',
+
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [1, 2, 3], // your case first column
+                    "className": "text-center",
+                }, ],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: 'start_date_time',
+                    name: 'start_date_time'
+                }, {
+                    data: 'end_date_time',
+                    name: 'end_date_time'
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }, ]
+
             });
         }
-        
+
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('#outingTable').DataTable().destroy();
             console.log(organizationid);
             fetch_data(organizationid);
         });
-        
+
         // csrf token for ajax
         $.ajaxSetup({
-                headers: {
+            headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-  
+
         var outing_id;
-        
-        $(document).on('click', '.btn-danger', function(){
+
+        $(document).on('click', '.btn-danger', function() {
             outing_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
         });
-        
-        
+
+
         $('#delete').click(function() {
             console.log("hello" + outing_id);
-              $.ajax({
-                  type: 'POST',
-                  dataType: 'html',
-                  data: {
-                      "_token": "{{ csrf_token() }}",
-                      _method: 'DELETE'
-                  },
-                  url: "/dorm/dorm/editOuting/" + outing_id,
-                  success: function(data) {
-                      setTimeout(function() {
-                          $('#confirmModal').modal('hide');
-                      }, 2000);
-  
-                      $('div.flash-message').html(data);
-  
-                      outingTable.ajax.reload();
-                  },
-                  error: function (data) {
-                      $('div.flash-message').html(data);
-                  }
-              })
-          });
-          
-          $('.alert').delay(3000).fadeOut();
-  
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    _method: 'DELETE'
+                },
+                url: "/dorm/dorm/editOuting/" + outing_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+
+                    $('div.flash-message').html(data);
+
+                    outingTable.ajax.reload();
+                },
+                error: function(data) {
+                    $('div.flash-message').html(data);
+                }
+            })
+        });
+
+        $('.alert').delay(3000).fadeOut();
+
     });
 </script>
 
