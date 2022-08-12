@@ -47,6 +47,14 @@ class DormController extends Controller
         return view('dorm.outing.index', compact('organization'));
     }
 
+    public function indexResident()
+    {
+        // 
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.resident.index', compact('organization'));
+    }
+
     public function outingexport()
     {
         return Excel::download(new OutingExport, 'outing.xlsx');
@@ -68,6 +76,34 @@ class DormController extends Controller
         //
         $organization = $this->getOrganizationByUserId();
         return view('dorm.outing.add', compact('organization'));
+    }
+
+    public function createResident()
+    {
+        //
+        $userid     = Auth::id();
+
+        $school = DB::table('organizations')
+            ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
+            ->select('organizations.id as schoolid')
+            ->where('organization_user.user_id', $userid)
+            ->first();
+
+        // dd($userid);
+
+        $listclass = DB::table('classes')
+            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+            ->select('classes.id as id', 'classes.nama', 'classes.levelid')
+            ->where([
+                ['class_organization.organization_id', $school->schoolid]
+            ])
+            ->orderBy('classes.nama')
+            ->get();
+
+        $organization = $this->getOrganizationByUserId();
+
+
+        return view('dorm.resident.add', compact('listclass', 'organization'));
     }
 
     /**

@@ -140,10 +140,20 @@
 
                         @role('Superadmin|Pentadbir|Guru')
                         <li>
-                            <a href="{{ route('dorm.indexOuting') }}" class=" waves-effect">
-                                <i class="fas fa-user-graduate"></i>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="fas fa-hotel"></i>
                                 <span>Asrama</span>
                             </a>
+                            <ul class="sub-menu mm-collapse" aria-expanded="false">
+                                @role('Superadmin|Pentadbir|Guru|Warden')
+                                <li>
+                                    <a href="{{ route('dorm.indexOuting') }}" class=" waves-effect">
+                                        <i class="fas fa-bus"></i>
+                                        <span>Outing</span>
+                                    </a>
+                                </li>
+                                @endrole
+                            </ul>
                         </li>
 
                         @endrole
