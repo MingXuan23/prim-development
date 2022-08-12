@@ -140,9 +140,29 @@ class OrderController extends Controller
     //sorted by order id descending
     public function getAllOrderById($id)
     {
-        return DB::table('orders')
+        $orders =  DB::table('orders')
             ->where('user_id', $id)
+            ->whereNotNull('transaction_id')
             ->orderBy('id', 'desc')
             ->get();
+        
+        foreach ($orders as $key => $order) {
+            # code...
+            $order_dishes = DB::table('order_dish as od')
+                ->leftJoin('dishes as d', 'd.id', 'od.dish_id')
+                ->leftJoin('orders as o', 'o.id', 'od.order_id')
+                ->where('od.order_id', $order->id)
+                ->orderBy('d.name')
+                ->get();
+
+            $organization = DB::table('organizations')
+                ->where('id', $order->organ_id)
+                ->get();
+
+            $order->organization = $organization;
+            $order->order_dishes = $order_dishes;
+        }
+        
+        return $orders;
     }
 }
