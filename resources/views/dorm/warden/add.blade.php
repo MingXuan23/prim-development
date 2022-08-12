@@ -51,11 +51,6 @@
                     <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
                 </div>
 
-                {{-- <div class="form-group">
-                    <label>Nombor Kad Pengenalan</label>
-                    <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
-                </div> --}}
-
                 <div class="form-group">
                     <label>Email</label>
                     <input type="text" name="email" class="form-control" placeholder="Email">

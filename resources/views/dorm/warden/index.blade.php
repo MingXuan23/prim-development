@@ -31,18 +31,13 @@
                 </div>
             </div>
 
-            {{-- <div class="">
-                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
-                        class="fa fa-search"></i>
-                    Tapis</button>
-            </div> --}}
 
         </div>
     </div>
 
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">List Of Wardens</div>
+            <div class="card-header">Senarai Warden</div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>

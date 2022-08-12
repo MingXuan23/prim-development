@@ -36,7 +36,7 @@
 
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">List Of Asrama</div>
+            <div class="card-header">Senarai Asrama</div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
@@ -193,7 +193,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('dorm.getDormDatatable') }}",
+                    url: "{{ route('dorm.getDormDataTable') }}",
                     data: {
                         oid: oid,
                         hasOrganization: true
@@ -206,12 +206,13 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "targets": [1, 2, 3, 4], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
                     [1, 'asc']
                 ],
+                //'name', 'accommodate_no', 'student_inside_no'
                 columns: [{
                     "data": null,
                     searchable: false,
@@ -222,21 +223,14 @@
                 }, {
                     data: "name",
                     name: 'name',
-                    orderable: true,
-                    searchable: true
                 }, {
-                    data: "username",
-                    name: 'username',
+                    data: "accommodate_no",
+                    name: 'accommodate_no',
                     orderable: false,
                     searchable: false
                 }, {
-                    data: "email",
-                    name: 'email',
-                    orderable: false,
-                    searchable: false
-                }, {
-                    data: "telno",
-                    name: 'telno',
+                    data: "student_inside_no",
+                    name: 'student_inside_no',
                     orderable: false,
                     searchable: false
                 }, {
@@ -251,7 +245,7 @@
 
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#wardenTable').DataTable().destroy();
+            $('#dormTable').DataTable().destroy();
             fetch_data(organizationid);
         });
 
@@ -262,10 +256,10 @@
             }
         });
 
-        var teacher_id;
+        var dorm_id;
 
         $(document).on('click', '.btn-danger', function() {
-            teacher_id = $(this).attr('id');
+            dorm_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
         });
 
@@ -277,7 +271,7 @@
                     "_token": "{{ csrf_token() }}",
                     //_method: 'DELETE'
                 },
-                url: "/teacher/destroywarden/" + teacher_id,
+                url: "/dorm/dorm/destroyDorm/" + dorm_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
@@ -286,7 +280,7 @@
 
                     $('div.flash-message').html(data);
 
-                    wardenTable.ajax.reload();
+                    dormTable.ajax.reload();
                 },
                 error: function(data) {
                     $('div.flash-message').html(data);
