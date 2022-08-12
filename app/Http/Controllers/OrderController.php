@@ -158,11 +158,11 @@ class OrderController extends Controller
             
             $organization = DB::table('organizations')
                 ->where('id', $order->organ_id)
-                ->get();
+                ->first();
             
             $dish_available = DB::table('dish_available')
                 ->where('id', $order->dish_available_id)
-                ->get();
+                ->first();
 
 
             $order->organization = $organization;
