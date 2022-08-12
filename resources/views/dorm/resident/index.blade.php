@@ -29,13 +29,14 @@
                         @endforeach
                     </select>
                 </div>
+
                  <!-- choose hostel -->
                 <div class="form-group">
                     <label>Nama Asrama</label>
-                    <select name="organization" id="organization" class="form-control">
+                    <select name="dorm" id="dorm" class="form-control">
                         <option value="" selected disabled>Pilih Asrama</option>
                         @foreach($dorm as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        <option value="{{ $row->id }}">{{ $row->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -78,17 +79,19 @@
                 </div>
                 @endif
 
+                <div class="flash-message"></div>
+
                 <div class="table-responsive">
-                    <table id="outingTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="residentTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th> Nama Pelajar </th>
                                 <th> Nama Kelas </th>
-                                <th> Tarikh dan Masa Daftar Masuk </th>
-                                <th> Tarikh dan Masa Daftar Keluar </th>
+                                <th> Daftar Masuk </th>
+                                <th> Daftar Keluar </th>
                                 <th> Status </th>
-                                <th> Ditahan </th>
+                                <th> Blacklist </th>
                                 <th> Details </th>
                             </tr>
                         </thead>
@@ -160,27 +163,39 @@
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
-
+<!-- cannot display dorm student list ** search dorm -->
 <script>
     $(document).ready(function() {
 
-        var outingTable;
+        var residentTable;
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetch_data($("#organization").val());
+            // fetch_data($("#organization").val());
         }
 
-        function fetch_data(oid = '') {
+        if ($("#dorm").val() != "") {
+            // var dormid = $("#dorm option:selected").val();
+            $("#dorm").prop("selectedIndex", 1).trigger('change');
+            fetch_data($("#dorm").val());
+        }
+        else{
+            var dormid = $("#dorm option:selected").val();
+            console.log("hello is dorm");
+        }
+        
 
-            outingTable = $('#outingTable').DataTable({
+        function fetch_data(residentid = '') {
+
+            residentTable = $('#residentTable').DataTable({
                 processing: true,
                 serverSide: true,
 
                 ajax: {
-                    url: "{{ route('dorm.getOutingsDatatable') }}",
+                    url: "{{ route('dorm.getResidentsDatatable') }}",
                     data: {
-                        oid: oid,
+                        residentid: residentid,
+                        dormid: dormid,
                         hasOrganization: true
                     },
                     type: 'GET',
@@ -191,7 +206,7 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3], // your case first column
+                    "targets": [1, 2, 3, 4, 5, 6, 7], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
@@ -205,12 +220,28 @@
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
                 }, {
+                    data: 'studentname',
+                    name: 'studentname'
+                },{
+                    data: 'classname',
+                    name: 'classname'
+                },{
                     data: 'start_date_time',
                     name: 'start_date_time'
                 }, {
                     data: 'end_date_time',
                     name: 'end_date_time'
                 }, {
+                    data: 'outing_status',
+                    name: 'outing_status',
+                    orderable: false,
+                    searchable: false
+                },{
+                    data: 'blacklist',
+                    name: 'blacklist',
+                    orderable: false,
+                    searchable: false
+                },{
                     data: 'action',
                     name: 'action',
                     orderable: false,
@@ -222,9 +253,18 @@
 
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#outingTable').DataTable().destroy();
-            console.log(organizationid);
+            $('#residentTable').DataTable().destroy();
+            console.log("organization " + organizationid);
             fetch_data(organizationid);
+        });
+
+        $('#dorm').change(function() {
+            var dormid = $("#dorm option:selected").val();
+            if(dormid){
+                $('#residentTable').DataTable().destroy();
+                fetch_data( dormid);
+            }
+            console.log("ima " + dormid);
         });
 
         // csrf token for ajax
@@ -234,16 +274,16 @@
             }
         });
 
-        var outing_id;
+        var resident_id;
 
         $(document).on('click', '.btn-danger', function() {
-            outing_id = $(this).attr('id');
+            resident_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
         });
 
 
         $('#delete').click(function() {
-            console.log("hello" + outing_id);
+            
             $.ajax({
                 type: 'POST',
                 dataType: 'html',
@@ -251,7 +291,7 @@
                     "_token": "{{ csrf_token() }}",
                     //   _method: 'DELETE'
                 },
-                url: "/dorm/dorm/destroyOuting/" + outing_id,
+                url: "/dorm/dorm/destroyResident/" + resident_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
@@ -259,7 +299,7 @@
 
                     $('div.flash-message').html(data);
 
-                    outingTable.ajax.reload();
+                    residentTable.ajax.reload();
                 },
                 error: function(data) {
                     $('div.flash-message').html(data);
