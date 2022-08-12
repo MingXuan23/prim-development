@@ -73,6 +73,8 @@
                 </div>
                 @endif
 
+                <div class="flash-message"></div>
+
                 <div class="table-responsive">
                     <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>

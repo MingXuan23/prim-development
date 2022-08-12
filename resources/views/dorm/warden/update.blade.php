@@ -28,7 +28,6 @@
         </div>
         @endif
         <form method="post" action="{{ route('teacher.wardenupdate', $teacher->uid) }}" enctype="multipart/form-data">
-            @method('PATCH')
             {{csrf_field()}}
             <div class="card-body">
 
@@ -60,6 +59,7 @@
                     <label>No Telefon</label>
                     <input type="text" id="telno" name="telno" class="form-control" placeholder="No Telefon" max="11" value="{{$teacher->telno}}">
                 </div>
+
                 <div class="form-group mb-0">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -81,14 +81,13 @@
 
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
     $(document).ready(function() {
-        $('#icno').mask('000000-00-0000');
         $('#telno').mask('+600000000000');
-
     });
 </script>
 @endsection

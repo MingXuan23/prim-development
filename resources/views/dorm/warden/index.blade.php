@@ -66,6 +66,8 @@
                 </div>
                 @endif
 
+                <div class="flash-message"></div>
+
                 <div class="table-responsive">
                     <table id="wardenTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
@@ -226,16 +228,24 @@
                     }
                 }, {
                     data: "name",
-                    name: 'name'
+                    name: 'name',
+                    orderable: true,
+                    searchable: true
                 }, {
                     data: "username",
-                    name: 'username'
+                    name: 'username',
+                    orderable: false,
+                    searchable: false
                 }, {
                     data: "email",
-                    name: 'email'
+                    name: 'email',
+                    orderable: false,
+                    searchable: false
                 }, {
                     data: "telno",
-                    name: 'telno'
+                    name: 'telno',
+                    orderable: false,
+                    searchable: false
                 }, {
                     data: 'action',
                     name: 'action',
@@ -272,13 +282,14 @@
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    _method: 'DELETE'
+                    //_method: 'DELETE'
                 },
-                url: "/teacher/warden" + teacher_id,
+                url: "/teacher/destroywarden/" + teacher_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
                     }, 2000);
+                    // console.log("it Works");
 
                     $('div.flash-message').html(data);
 

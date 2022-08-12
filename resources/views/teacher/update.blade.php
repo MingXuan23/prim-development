@@ -87,14 +87,13 @@
 
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
     $(document).ready(function() {
         $('#icno').mask('000000-00-0000');
         $('#telno').mask('+600000000000');
-
     });
 </script>
 @endsection

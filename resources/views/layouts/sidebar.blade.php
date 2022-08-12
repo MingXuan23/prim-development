@@ -63,7 +63,7 @@
                     </a>
                 </li>
                 @endrole
-                
+
                 @role('Superadmin|Admin Polimas')
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -138,6 +138,7 @@
 
                         @endrole
 
+
                         @role('Superadmin|Pentadbir|Guru')
                         <li>
                             <a href="{{ route('dorm.indexOuting') }}" class=" waves-effect">
@@ -145,8 +146,20 @@
                                 <span>Asrama</span>
                             </a>
                         </li>
-
                         @endrole
+
+                        <ul>
+
+                            @role('Superadmin|Pentadbir|Guru|Warden')
+                            <li>
+                                <a href="{{ route('teacher.wardenindex') }}" class=" waves-effect">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <span>Warden</span>
+                                </a>
+                            </li>
+                            @endrole
+                        </ul>
+
                     </ul>
                 </li>
                 @endrole
@@ -169,15 +182,15 @@
                                 <span>Bayar</span>
                             </a>
                         </li>
-        
+
                         <li>
                             <a href="{{ route('parent.dependent') }}" class=" waves-effect">
-                            <i class="fas fa-child"></i>
-                            <span>Carian Tanggungan</span>
+                                <i class="fas fa-child"></i>
+                                <span>Carian Tanggungan</span>
                             </a>
                         </li>
                         @endrole
-                        
+
                         @role('Superadmin|Pentadbir')
                         <li>
                             <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
@@ -186,7 +199,7 @@
                             </a>
                         </li>
                         @endrole
-                        
+
                         @role('Superadmin|Pentadbir|Guru')
                         <li>
                             <a href="{{ route('fees.category.report') }}" class=" waves-effect">
@@ -212,7 +225,7 @@
                             </a>
                         </li>
                         @endrole
-                        
+
                         @role('Superadmin|Pentadbir')
                         <li>
                             <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
@@ -235,10 +248,10 @@
                             </a>
                         </li>
                         @endrole
-                
-            </ul>
-            </li>
-            @endrole
+
+                    </ul>
+                </li>
+                @endrole
             </ul>
         </div>
     </div>
