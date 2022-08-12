@@ -10,7 +10,7 @@
         <div class="page-title-box">
             <h4 class="font-size-18">Warden</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Guru >> Edit Warden</li>
+                <li class="breadcrumb-item active">Guru >> Tambah Warden</li>
             </ol>
         </div>
     </div>
@@ -27,37 +27,43 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('teacher.wardenupdate', $teacher->uid) }}" enctype="multipart/form-data">
+        <form method="get" action="{{ route('teacher.wardenstore') }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Penuh</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh" value="{{$teacher->tcname}}">
-                </div>
-
-                <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="">Pilih Organisasi</option>
+                        <option value="" selected>Pilih Organisasi</option>
                         @foreach($organization as $row)
-                        @if($row->id == $teacher->organization_id)
-                        <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                        @if ($loop->first)
+                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                         @else
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
+
                         @endif
                         @endforeach
                     </select>
                 </div>
 
                 <div class="form-group">
+                    <label>Nama Penuh</label>
+                    <input type="text" name="name" class="form-control" placeholder="Nama Penuh">
+                </div>
+
+                {{-- <div class="form-group">
+                    <label>Nombor Kad Pengenalan</label>
+                    <input type="text" id="icno" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan">
+                </div> --}}
+
+                <div class="form-group">
                     <label>Email</label>
-                    <input type="text" name="email" class="form-control" placeholder="Email" value="{{ $teacher->email }}">
+                    <input type="text" name="email" class="form-control" placeholder="Email">
                 </div>
 
                 <div class="form-group">
                     <label>No Telefon</label>
-                    <input type="text" id="telno" name="telno" class="form-control" placeholder="No Telefon" max="11" value="{{$teacher->telno}}">
+                    <input type="text" id="telno" name="telno" class="form-control" placeholder="No Telefon" max="11">
                 </div>
 
                 <div class="form-group mb-0">
@@ -68,6 +74,8 @@
                     </div>
                 </div>
             </div>
+            <!-- /.card-body -->
+
         </form>
     </div>
 </div>
@@ -82,12 +90,14 @@
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
-
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
     $(document).ready(function() {
+        $('#icno').mask('000000-00-0000');
         $('#telno').mask('+600000000000');
+
     });
 </script>
+
 @endsection

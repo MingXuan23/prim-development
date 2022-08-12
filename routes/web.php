@@ -82,7 +82,8 @@ Route::group(['prefix' => 'teacher'], function () {
     Route::get('storewarden', 'TeacherController@wardenstore')->name('teacher.wardenstore');
     Route::get('createwarden', 'TeacherController@wardencreate')->name('teacher.wardencreate');
     Route::get('editwarden/{id}', 'TeacherController@wardenedit')->name('teacher.wardenedit');
-    Route::get('updatewarden', 'TeacherController@wardenupdate')->name('teacher.wardenupdate');
+    Route::post('updatewarden/{id}', 'TeacherController@wardenupdate')->name('teacher.wardenupdate');
+    Route::post('destroywarden/{id}', 'TeacherController@wardendestroy')->name('teacher.wardendestroy');
 });
 
 Route::group(['prefix' => 'class'], function () {
@@ -229,6 +230,9 @@ Route::post('/importparent', 'ParentController@parentImport')->name('importparen
 
 Route::post('/exportouting', 'DormController@outingexport')->name('exportouting');
 
+//dorm management import and export
+Route::post('/exportdorm', 'DormController@outingexport')->name('exportdorm');
+Route::post('/importdorm', 'DormController@outingexport')->name('importdorm');
 
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
@@ -299,4 +303,8 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/indexResident', 'DormController@indexResident')->name('dorm.indexResident');
     Route::get('dorm/getResidentsDatatable', 'DormController@getResidentsDatatable')->name('dorm.getResidentsDatatable');
 
+    //dorm management
+    Route::get('dorm/createDorm', 'DormController@createDorm')->name('dorm.createDorm');
+    Route::get('dorm/indexDorm', 'DormController@indexDorm')->name('dorm.indexDorm');
+    Route::get('dorm/storeDorm', 'DormController@storeDorm')->name('dorm.storeDorm');
 });

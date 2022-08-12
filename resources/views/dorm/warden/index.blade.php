@@ -42,7 +42,7 @@
 
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">List Of Applications</div>
+            <div class="card-header">List Of Wardens</div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
@@ -65,6 +65,8 @@
                     <p>{{ \Session::get('success') }}</p>
                 </div>
                 @endif
+
+                <div class="flash-message"></div>
 
                 <div class="table-responsive">
                     <table id="wardenTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -226,16 +228,24 @@
                     }
                 }, {
                     data: "name",
-                    name: 'name'
+                    name: 'name',
+                    orderable: true,
+                    searchable: true
                 }, {
                     data: "username",
-                    name: 'username'
+                    name: 'username',
+                    orderable: false,
+                    searchable: false
                 }, {
                     data: "email",
-                    name: 'email'
+                    name: 'email',
+                    orderable: false,
+                    searchable: false
                 }, {
                     data: "telno",
-                    name: 'telno'
+                    name: 'telno',
+                    orderable: false,
+                    searchable: false
                 }, {
                     data: 'action',
                     name: 'action',
@@ -272,13 +282,14 @@
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    _method: 'DELETE'
+                    //_method: 'DELETE'
                 },
-                url: "/teacher/warden" + teacher_id,
+                url: "/teacher/destroywarden/" + teacher_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
                     }, 2000);
+                    // console.log("it Works");
 
                     $('div.flash-message').html(data);
 

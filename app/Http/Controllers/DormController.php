@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Exports\OutingExport;
+use App\Exports\DormExport;
+use App\Imports\DormImport;
 use Illuminate\Http\Request;
 use App\Models\Dorm;
 use App\Models\Outing;
@@ -31,6 +33,11 @@ class DormController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+
+    //
+    //
+    //index functions
     public function index()
     {
         //
@@ -69,9 +76,43 @@ class DormController extends Controller
         return view("dorm.resident.index", compact('dorm', 'organization'));
     }
 
+    public function indexDorm()
+    {
+        // 
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.management.index', compact('organization'));
+    }
+
+    //
+    //
+    //import and export functions
     public function outingexport()
     {
         return Excel::download(new OutingExport, 'outing.xlsx');
+    }
+
+    public function dormexport(Request $request)
+    {
+        return Excel::download(new DormExport($request->organ), 'dorm.xlsx');
+    }
+
+    public function dormimport(Request $request)
+    {
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        if (!in_array($etx, $formats)) {
+
+            return redirect('/dorm/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+
+        Excel::import(new DormImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+
+        return redirect('/dorm/dorm/indexDorm')->with('success', 'Dorms have been added successfully');
     }
 
     /**
@@ -79,10 +120,14 @@ class DormController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    //
+    //
+    //create or add files
     public function create()
     {
         //
-        
+
     }
 
     public function createOuting()
@@ -120,19 +165,49 @@ class DormController extends Controller
         return view('dorm.resident.add', compact('listclass', 'organization'));
     }
 
+    public function createDorm()
+    {
+        //
+        $organization = $this->getOrganizationByUserId();
+        return view('dorm.management.add', compact('organization'));
+    }
+
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    //
+    //
+    // store functions
     public function store(Request $request)
     {
         // 
-        
+
     }
 
     public function storeOuting(Request $request)
+    {
+        // 
+        $this->validate($request, [
+            'start_date'        =>  'required',
+            'end_date'          =>  'required',
+            'organization'      =>  'required',
+        ]);
+
+        DB::table('outings')->insert([
+            'start_date_time' => $request->get('start_date'),
+            'end_date_time'   => $request->get('end_date'),
+            'organization_id' => $request->get('organization'),
+        ]);
+
+        return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
+    }
+
+    //haven't modify yet
+    public function storeDorm(Request $request)
     {
         // 
         $this->validate($request, [
@@ -164,7 +239,7 @@ class DormController extends Controller
     public function edit($id)
     {
         //
-        
+
     }
 
     public function editOuting($id)
@@ -179,20 +254,19 @@ class DormController extends Controller
             ->first();
 
         $outing = DB::table('outings')
-        ->where('outings.id', $id)
-        ->select('outings.id', 'outings.start_date_time', 'outings.end_date_time', 'outings.organization_id')
-        ->first();
+            ->where('outings.id', $id)
+            ->select('outings.id', 'outings.start_date_time', 'outings.end_date_time', 'outings.organization_id')
+            ->first();
 
         $organization = $this->getOrganizationByUserId();
-       
-        return view('dorm.outing.update', compact('outing', 'organization', 'id')); 
-        
+
+        return view('dorm.outing.update', compact('outing', 'organization', 'id'));
     }
 
     public function update(Request $request, $id)
     {
         //
-    
+
     }
 
     public function updateOuting(Request $request, $id)
@@ -221,7 +295,6 @@ class DormController extends Controller
         //     ]);
 
         return redirect('/dorm/dorm/indexOuting')->with('success', 'The data has been updated!');
-    
     }
 
 
@@ -241,7 +314,7 @@ class DormController extends Controller
     public function destroyOuting($id)
     {
         //
-        $result = DB::table('outings')->where('outings.id',$id);
+        $result = DB::table('outings')->where('outings.id', $id);
 
         if ($result->delete()) {
             Session::flash('success', 'Outing Berjaya Dipadam');
@@ -325,7 +398,7 @@ class DormController extends Controller
             $userId = Auth::id();
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
-                
+
                 $data = DB::table('outings')
                     ->select('outings.id', 'outings.start_date_time', 'outings.end_date_time')
                     ->where('outings.organization_id', $oid)

@@ -312,7 +312,7 @@ class TeacherController extends Controller
     {
         //
         $uid = User::find($id);
-        dd($id);
+        //dd($id);
 
         $this->validate($request, [
             'name'          =>  'required',
@@ -365,6 +365,29 @@ class TeacherController extends Controller
         }
     }
 
+    //for warden use
+    public function wardendestroy($id)
+    {
+
+        $result = DB::table('users')
+            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+            ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
+            ->where('users.id', $id)
+            ->where('organization_user.role_id', 7)
+            ->update(
+                [
+                    'organization_user.status' => 0,
+                ]
+            );
+
+        if ($result) {
+            Session::flash('success', 'Warden Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Warden Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+        }
+    }
 
     public function getTeacherDatatable(Request $request)
     {
