@@ -42,7 +42,7 @@
 
     <div class="col-md-12">
         <div class="card">
-            {{-- <div class="card-header">Senarai Tarikh Outing</div> --}}
+            {{-- <div class="card-header">Outing</div> --}}
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
 
@@ -66,6 +66,8 @@
                     <p>{{ \Session::get('success') }}</p>
                 </div>
                 @endif
+
+                <div class="flash-message"></div>
 
                 <div class="table-responsive">
                     <table id="outingTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">

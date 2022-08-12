@@ -57,9 +57,23 @@ class DormController extends Controller
     public function indexResident()
     {
         // 
+        $userId = Auth::id();
         $organization = $this->getOrganizationByUserId();
+        // dd($organization[0]->id);
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
+            $dorm = DB::table('dorms')
+                ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->select()
+                ->where([
+                    ['class_organization.organization_id', $organization[0]->id],
+                    ['class_student.status', 1],
+                ])
+                ->orderBy('dorms.name')
+                ->get();
+        }
 
-        return view('dorm.resident.index', compact('organization'));
+        return view("dorm.resident.index", compact('dorm', 'organization'));
     }
 
     public function indexDorm()
@@ -436,6 +450,76 @@ class DormController extends Controller
 
             $table->rawColumns(['action']);
             return $table->make(true);
+        }
+    }
+
+    public function getResidentsDatatable(Request $request)
+    {
+        // dd($request->hasOrganization);
+        if (request()->ajax()) {
+            $residentid = $request->residentid;
+
+            $dormid = $request->dormid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($residentid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                    ->select('students.id as id', 'students.nama as studentname', 'classes.nama as classname', 'class_student.start_date_time', 'class_student.end_date_time', 'class_student.outing_status', 'class_student.blacklist')
+                    ->where([
+                        ['class_student.dorm_id', $dormid],
+                        ['class_student.status', 1],
+                    ])
+                    ->orderBy('students.nama')
+                    ->get();
+
+                $table = Datatables::of($data);
+
+                $table->addColumn('outing_status', function ($row) {
+                    if ($row->outing_status == '1') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success"> Aktif </span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Keluar </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('blacklist', function ($row) {
+                    if ($row->blacklist == '1') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success"> Ditahan </span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Free </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('dorm.editOuting', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                });
+
+                $table->rawColumns(['outing_status', 'blacklist', 'action']);
+                return $table->make(true);
+            }
         }
     }
 }

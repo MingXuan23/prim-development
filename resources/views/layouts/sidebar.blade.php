@@ -139,7 +139,7 @@
                         @endrole
 
 
-                        @role('Superadmin|Pentadbir|Guru')
+                        @role('Superadmin|Pentadbir|Guru|Warden')
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="fas fa-hotel"></i>
@@ -173,6 +173,15 @@
                                 </li>
                                 @endrole
                                 <!--fas fa-bed-->
+
+                                @role('Superadmin|Pentadbir|Guru|Warden')
+                                <li>
+                                    <a href="{{ route('dorm.indexResident') }}" class=" waves-effect">
+                                        <i class="fas fa-bus"></i>
+                                        <span>Resident</span>
+                                    </a>
+                                </li>
+                                @endrole
                             </ul>
                         </li>
                         @endrole
