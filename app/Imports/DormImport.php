@@ -33,6 +33,7 @@ class DormImport implements ToModel, WithHeadingRow
             'nama'      => $row['nama_asrama'],
             'accommodate_no'   => $row['kapasiti'],
             'student_inside_no'    => 0,
+            'organization_id' => $this->organId,
             //'name', 'accommodate_no', 'student_inside_no'
         ]);
 

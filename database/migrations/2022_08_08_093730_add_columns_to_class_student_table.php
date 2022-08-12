@@ -20,7 +20,7 @@ class AddColumnsToClassStudentTable extends Migration
             $table->datetime('start_date_time')->nullable();
             $table->datetime('end_date_time')->nullable();
             $table->bigInteger('dorm_id')->unsigned()->nullable()->after('end_date_time');
-            $table->foreign('dorm_id')->references('id')->on('dorms')->onDelete('cascade');
+            $table->foreign('dorm_id')->references('id')->on('dorms')->onDelete('set null');
         });
     }
 

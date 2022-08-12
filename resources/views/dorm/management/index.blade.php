@@ -40,7 +40,7 @@
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
-                <a style="margin: 19px; float: right;" href="{{ route('teacher.createDorm') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Asrama</a>
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.createDorm') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Asrama</a>
             </div>
 
             <div class="card-body">
@@ -63,7 +63,7 @@
                 <div class="flash-message"></div>
 
                 <div class="table-responsive">
-                    <table id="wardenTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="dormTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
@@ -181,7 +181,7 @@
 <script>
     $(document).ready(function() {
 
-        var wardenTable;
+        var dormTable;
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
@@ -189,11 +189,11 @@
         }
 
         function fetch_data(oid = '') {
-            wardenTable = $('#wardenTable').DataTable({
+            dormTable = $('#dormTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('teacher.getWardenDatatable') }}",
+                    url: "{{ route('dorm.getDormDatatable') }}",
                     data: {
                         oid: oid,
                         hasOrganization: true
