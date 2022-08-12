@@ -136,8 +136,6 @@ class OrderController extends Controller
         }
     }
 
-    //to get all order of a certain user
-    //sorted by order id descending
     public function getAllOrderById($id)
     {
         $orders =  DB::table('orders')
@@ -147,14 +145,16 @@ class OrderController extends Controller
             ->get();
         
         foreach ($orders as $key => $order) {
-            # code...
             $order_dishes = DB::table('order_dish as od')
-                ->leftJoin('dishes as d', 'd.id', 'od.dish_id')
                 ->leftJoin('orders as o', 'o.id', 'od.order_id')
                 ->where('od.order_id', $order->id)
-                ->orderBy('d.name')
                 ->get();
-
+            
+            foreach ($order_dishes as $key => $order_dish) {
+                $dish = Dish::find($order_dish->dish_id);
+                $order_dish->dish = $dish;
+            }
+            
             $organization = DB::table('organizations')
                 ->where('id', $order->organ_id)
                 ->get();
