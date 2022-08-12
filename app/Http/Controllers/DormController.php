@@ -61,7 +61,7 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
         // dd($organization[0]->id);
         if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
-                $dorm = DB::table('dorms')
+            $dorm = DB::table('dorms')
                 ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
                 ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                 ->select()
@@ -71,8 +71,8 @@ class DormController extends Controller
                 ])
                 ->orderBy('dorms.name')
                 ->get();
-        } 
-        
+        }
+
         return view("dorm.resident.index", compact('dorm', 'organization'));
     }
 
@@ -403,6 +403,39 @@ class DormController extends Controller
                     ->select('outings.id', 'outings.start_date_time', 'outings.end_date_time')
                     ->where('outings.organization_id', $oid)
                     ->orderBy('outings.start_date_time');
+            }
+
+            $table = Datatables::of($data);
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<a href="' . route('dorm.editOuting', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['action']);
+            return $table->make(true);
+        }
+    }
+
+    public function getDormDatatable(Request $request)
+    {
+        // dd($request->oid);
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('dorms')
+                    ->select('dorms.id', 'dorms.start_date_time', 'dorms.end_date_time')
+                    ->where('dorms.organization_id', $oid)
+                    ->orderBy('dorms.start_date_time');
+                //'name', 'accommodate_no', 'student_inside_no'
             }
 
             $table = Datatables::of($data);
