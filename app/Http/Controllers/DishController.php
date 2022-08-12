@@ -127,4 +127,12 @@ class DishController extends Controller
             
         return $AllAvailableDates;
     }
+
+    //to get all data in dish_available table
+    public function getAllDishAvailable()
+    {
+        return DB::table('dish_available')
+            ->select()
+            ->get();
+    }
 }
