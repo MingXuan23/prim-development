@@ -230,6 +230,9 @@ Route::post('/importparent', 'ParentController@parentImport')->name('importparen
 
 Route::post('/exportouting', 'DormController@outingexport')->name('exportouting');
 
+//dorm management import and export
+Route::post('/exportdorm', 'DormController@outingexport')->name('exportdorm');
+Route::post('/importdorm', 'DormController@outingexport')->name('importdorm');
 
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
@@ -298,4 +301,8 @@ Route::group(['prefix' => 'dorm'], function () {
     // student-dorm (resident)
     Route::get('dorm/createResident', 'DormController@createResident')->name('dorm.createResident');
     Route::get('dorm/indexResident', 'DormController@indexResident')->name('dorm.indexResident');
+    //dorm management
+    Route::get('dorm/createDorm', 'DormController@createDorm')->name('dorm.createDorm');
+    Route::get('dorm/indexDorm', 'DormController@indexDorm')->name('dorm.indexDorm');
+    Route::get('dorm/storeDorm', 'DormController@storeDorm')->name('dorm.storeDorm');
 });

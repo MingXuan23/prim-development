@@ -389,9 +389,6 @@ class TeacherController extends Controller
         }
     }
 
-
-
-
     public function getTeacherDatatable(Request $request)
     {
         // dd($request->oid);

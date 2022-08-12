@@ -154,22 +154,28 @@
                                     </a>
                                 </li>
                                 @endrole
+
+                                @role('Superadmin|Pentadbir|Guru|Warden')
+                                <li>
+                                    <a href="{{ route('teacher.wardenindex') }}" class=" waves-effect">
+                                        <i class="	far fa-address-card"></i>
+                                        <span>Warden</span>
+                                    </a>
+                                </li>
+                                @endrole
+
+                                @role('Superadmin|Pentadbir|Guru|Warden')
+                                <li>
+                                    <a href="{{ route('dorm.indexDorm') }}" class=" waves-effect">
+                                        <i class="fas fa-building"></i>
+                                        <span>Management</span>
+                                    </a>
+                                </li>
+                                @endrole
+                                <!--fas fa-bed-->
                             </ul>
                         </li>
                         @endrole
-
-                        <ul>
-
-                            @role('Superadmin|Pentadbir|Guru|Warden')
-                            <li>
-                                <a href="{{ route('teacher.wardenindex') }}" class=" waves-effect">
-                                    <i class="fas fa-user-graduate"></i>
-                                    <span>Warden</span>
-                                </a>
-                            </li>
-                            @endrole
-                        </ul>
-
                     </ul>
                 </li>
                 @endrole

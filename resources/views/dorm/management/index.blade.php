@@ -9,7 +9,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Warden</h4>
+            <h4 class="font-size-18">Pengurusan Asrama</h4>
         </div>
     </div>
 </div>
@@ -31,22 +31,16 @@
                 </div>
             </div>
 
-            {{-- <div class="">
-                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
-                        class="fa fa-search"></i>
-                    Tapis</button>
-            </div> --}}
-
         </div>
     </div>
 
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">List Of Wardens</div>
+            <div class="card-header">List Of Asrama</div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
-                <a style="margin: 19px; float: right;" href="{{ route('teacher.wardencreate') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Warden</a>
+                <a style="margin: 19px; float: right;" href="{{ route('teacher.createDorm') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Asrama</a>
             </div>
 
             <div class="card-body">
@@ -73,10 +67,9 @@
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
-                                <th>Nama Penuh</th>
-                                <th>Nama Pengguna</th>
-                                <th>Email</th>
-                                <th>Nombor Telefon</th>
+                                <th>Nama Asrama</th>
+                                <th>Kapasiti</th>
+                                <th>Bilangan pelajar dalam</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -90,7 +83,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Padam Warden</h4>
+                        <h4 class="modal-title">Padam Asrama</h4>
                     </div>
                     <div class="modal-body">
                         Adakah anda pasti?
@@ -104,17 +97,17 @@
         </div>
         {{-- end confirmation delete modal --}}
 
-        <!-- export warden modal-->
+        <!-- export dorm modal-->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Export Warden</h5>
+                        <h5 class="modal-title">Export Asrama</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('exportwarden') }}" method="post">
+                    <form action="{{ route('exportdorm') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
                             <div class="form-group">
@@ -134,17 +127,17 @@
             </div>
         </div>
 
-        <!-- import warden modal -->
+        <!-- import dorm modal -->
         <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Warden</h5>
+                        <h5 class="modal-title">Import Asrama</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('importwarden') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('importdorm') }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
