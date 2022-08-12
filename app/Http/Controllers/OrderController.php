@@ -158,9 +158,15 @@ class OrderController extends Controller
             $organization = DB::table('organizations')
                 ->where('id', $order->organ_id)
                 ->get();
+            
+            $dish_available = DB::table('dish_available')
+                ->where('id', $order->dish_available_id)
+                ->get();
+
 
             $order->organization = $organization;
             $order->order_dishes = $order_dishes;
+            $order->dish_available = $dish_available;
         }
         
         return $orders;
