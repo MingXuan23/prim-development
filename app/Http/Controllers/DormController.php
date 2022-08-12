@@ -424,15 +424,15 @@ class DormController extends Controller
     {
         // dd($request->hasOrganization);
         if (request()->ajax()) {
-            $residentid = $request->residentid;
+            $oid = $request->oid;
 
-            $dormid = $request->dormid;
+            // $dormid = $request->dormid;
 
             $hasOrganizaton = $request->hasOrganization;
 
             $userId = Auth::id();
 
-            if ($residentid != '' && !is_null($hasOrganizaton)) {
+            if ($oid != '' && !is_null($hasOrganizaton)) {
 
                 $data = DB::table('students')
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -440,7 +440,7 @@ class DormController extends Controller
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                     ->select('students.id as id', 'students.nama as studentname', 'classes.nama as classname', 'class_student.start_date_time', 'class_student.end_date_time', 'class_student.outing_status', 'class_student.blacklist')
                     ->where([
-                        ['class_student.dorm_id', $dormid],
+                        ['class_student.dorm_id', $oid],
                         ['class_student.status', 1],
                     ])
                     ->orderBy('students.nama')

@@ -171,21 +171,10 @@
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            // fetch_data($("#organization").val());
+            fetch_data($("#organization").val());
         }
 
-        if ($("#dorm").val() != "") {
-            // var dormid = $("#dorm option:selected").val();
-            $("#dorm").prop("selectedIndex", 1).trigger('change');
-            fetch_data($("#dorm").val());
-        }
-        else{
-            var dormid = $("#dorm option:selected").val();
-            console.log("hello is dorm");
-        }
-        
-
-        function fetch_data(residentid = '') {
+        function fetch_data(oid = '') {
 
             residentTable = $('#residentTable').DataTable({
                 processing: true,
@@ -194,8 +183,7 @@
                 ajax: {
                     url: "{{ route('dorm.getResidentsDatatable') }}",
                     data: {
-                        residentid: residentid,
-                        dormid: dormid,
+                        oid: oid,
                         hasOrganization: true
                     },
                     type: 'GET',
@@ -264,7 +252,7 @@
                 $('#residentTable').DataTable().destroy();
                 fetch_data( dormid);
             }
-            console.log("ima " + dormid);
+            console.log("This is dorm id " + dormid);
         });
 
         // csrf token for ajax
