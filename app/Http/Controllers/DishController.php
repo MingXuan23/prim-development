@@ -88,9 +88,22 @@ class DishController extends Controller
      // to get all organization with type_org = 8
      public function getOrganizationWithDish()
      {
-        return DB::table('organizations')
+        $organs =  DB::table('organizations')
             ->where('type_org', 8)
             ->get();
+        
+        foreach ($organs as $key => $organ) {
+            $organ_user = DB::table('organization_user')
+                ->where([
+                    ['organization_id', $organ->id],
+                    ['role_id', 7]
+                ])
+                ->get();
+            
+            $organ->organization_user = $organ_user;
+        }
+
+        return $organs;
      }
 
     //to get all dishes
