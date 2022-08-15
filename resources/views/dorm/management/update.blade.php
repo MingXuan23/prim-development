@@ -28,7 +28,7 @@
         </div>
         @endif
 
-        <form method="post" action="{{ route('dorm.updateDorm', $dorm->id) }}" enctype="multipart/form-data">
+        <form method="get" action="{{ route('dorm.updateDorm', $dorm->id) }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
 
@@ -63,7 +63,7 @@
 
                 <div class="form-group">
                     <label>Bilangan Pelajar Dalam</label>
-                    <input type="number" name="studentno" class="form-control" placeholder="Bilangan Pelajar Dalam" value="{{$dorm->student_inside_no}}">
+                    <input type="number" name="studentno" class="form-control" disabled value="{{$dorm_student_inside}}">
                 </div>
 
                 <div class="form-group mb-0">

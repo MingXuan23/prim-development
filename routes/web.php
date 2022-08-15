@@ -314,4 +314,5 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/editDorm/{id}', 'DormController@editDorm')->name('dorm.editDorm');
     Route::get('dorm/destroyDorm/{id}', 'DormController@destroyDorm')->name('dorm.destroyDorm');
     Route::get('dorm/getDormDataTable', 'DormController@getDormDataTable')->name('dorm.getDormDataTable');
+    Route::get('dorm/getID/{id}', 'DormController@getID')->name('dorm.getID');
 });
