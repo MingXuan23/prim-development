@@ -47,13 +47,10 @@
                     </div>
 
                     <div class="form-row">
-                        <div id="dorm" class="form-group col-md-12">
+                        <div class="form-group col-md-12">
                             <label> Nama Asrama</label>
                             <select name="dorm" id="dorm" class="form-control">
                                 <option value="" disabled selected>Pilih Asrama</option>
-                                @foreach($dormlist as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -67,8 +64,8 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label>No. IC Murid</label>
-                            <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan Murid">
+                            <label>No. Telefon Penjaga</label>
+                            <input type="text" id="parent_phone" name="parent_phone" class="form-control" placeholder="Nombor Telefon Penjaga">
                         </div>
                     </div>
                     
@@ -94,10 +91,63 @@
 
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
+    $(document).ready(function() {
+        $('#icno').mask('000000-00-0000');
+        $('#parent_phone').mask('+600000000000');
+    });
 
+    $(document).ready(function(){
+        
+        $("#organization").prop("selectedIndex", 1).trigger('change');
+        fetchDorm($("#organization").val());
+
+        $('#organization').change(function() {
+            
+            if($(this).val() != '')
+            {
+                var organizationid    = $("#organization option:selected").val();
+                var _token            = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('dorm.fetchDorm') }}",
+                    method:"POST",
+                    data:{ oid:organizationid,
+                            _token:_token },
+                    success:function(result)
+                    {  
+                        $('#dorm').empty();
+                        "<option value='' disabled selected>Pilih Asrama</option>"
+                        $("#dorm").append("<option value='' disabled selected> Pilih Asrama</option>");
+                        jQuery.each(result.success, function(key, value){
+                            console.log(value.id);
+                            $("#dorm").append("<option value='"+ value.id +"'>" + value.name + "</option>");
+                        });
+                    }
+
+                });
+            }
+        });
+
+        function fetchDorm(organizationid = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('dorm.fetchDorm') }}",
+                method:"POST",
+                data:{ oid:organizationid,
+                        _token:_token },
+                success:function(result)
+                {
+                    $('#dorm').empty();
+                    $("#dorm").append("<option value='' disabled selected> Pilih Asrama </option>");
+                    jQuery.each(result.success, function(key, value){
+                        $("#dorm").append("<option value='"+ value.id +"'>" + value.name + "</option>");
+                    });
+                }
+            })
+        }
+    });
 </script>
 @endsection

@@ -304,6 +304,8 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/createResident', 'DormController@createResident')->name('dorm.createResident');
     Route::get('dorm/indexResident', 'DormController@indexResident')->name('dorm.indexResident');
     Route::get('dorm/storeResident', 'DormController@storeResident')->name('dorm.storeResident');
+    Route::post('dorm/fetchDorm', 'DormController@fetchDorm')->name('dorm.fetchDorm');
+    Route::post('dorm/fetchClass', 'DormController@fetchClass')->name('dorm.fetchClass');
     Route::get('dorm/getResidentsDatatable', 'DormController@getResidentsDatatable')->name('dorm.getResidentsDatatable');
 
     //dorm management
