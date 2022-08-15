@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\User;
+use App\Models\Dish;
 use App\Models\Order;
 use App\Models\Organization;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use phpDocumentor\Reflection\Types\Null_;
@@ -136,13 +137,39 @@ class OrderController extends Controller
         }
     }
 
-    //to get all order of a certain user
-    //sorted by order id descending
     public function getAllOrderById($id)
     {
-        return DB::table('orders')
+        $orders =  DB::table('orders')
             ->where('user_id', $id)
+            ->whereNotNull('transaction_id')
             ->orderBy('id', 'desc')
             ->get();
+        
+        foreach ($orders as $key => $order) {
+            $order_dishes = DB::table('order_dish as od')
+                ->leftJoin('orders as o', 'o.id', 'od.order_id')
+                ->where('od.order_id', $order->id)
+                ->get();
+            
+            foreach ($order_dishes as $key => $order_dish) {
+                $dish = Dish::find($order_dish->dish_id);
+                $order_dish->dish = $dish;
+            }
+            
+            $organization = DB::table('organizations')
+                ->where('id', $order->organ_id)
+                ->first();
+            
+            $dish_available = DB::table('dish_available')
+                ->where('id', $order->dish_available_id)
+                ->first();
+
+
+            $order->organization = $organization;
+            $order->order_dishes = $order_dishes;
+            $order->dish_available = $dish_available;
+        }
+        
+        return $orders;
     }
 }
