@@ -1,4 +1,5 @@
 @extends('layouts.master')
+
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
@@ -6,8 +7,8 @@
 @endsection
 
 @section('content')
+<!-- {{-- <p>Welcome to this beautiful admin panel.</p> --}} -->
 <div class="row align-items-center">
-    <!-- use class_student -->
     <div class="col-sm-6">
         <div class="page-title-box">
             <h4 class="font-size-18">Asrama</h4>
@@ -15,55 +16,38 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-12">
-        <div class="card card-primary">
-            {{csrf_field()}}
-            <div class="card-body">
-                <!-- choose organization -->
-                <div class="form-group">
-                    <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                 <!-- choose hostel -->
-                <div class="form-group">
-                    <label>Nama Asrama</label>
-                    <select name="dorm" id="dorm" class="form-control">
-                        <option value="" selected disabled>Pilih Asrama</option>
-                        @foreach($dorm as $row)
-                        <option value="{{ $row->id }}">{{ $row->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-
-            </div>
-
-            {{-- <div class="">
-                <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary">
-                <i class="fa fa-search"></i>Tapis</button>
-            </div> --}}
-
-        </div>
-    </div>
 
     <div class="col-md-12">
         <div class="card">
-            {{-- <div class="card-header">Senarai Pelajar</div> --}}
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
-
-                {{-- href="{{ route('dorm.createOuting') }}" {{ route('exportouting') }}--}}
-                <a style="margin: 19px; float: right;" href="{{ route('dorm.createResident') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Outing</a>
+                <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
+                        class="fas fa-plus"></i> Export</a>
+                
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.createResident') }}" class="btn btn-primary"> <i
+                        class="fas fa-plus"></i> Tambah Pelajar</a>
             </div>
 
             <div class="card-body">
+                {{csrf_field()}}
+                <div class="card-body">
 
+                    <div class="form-group">
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            <option value="" selected disabled>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label> Asrama </label>
+                        <select name="dorm" id="dorm" class="form-control">
+                            <option value="" disabled selected>Pilih Asrama</option>
+                        </select>
+                    </div>
+                </div>
                 @if(count($errors) > 0)
                 <div class="alert alert-danger">
                     <ul>
@@ -79,10 +63,9 @@
                 </div>
                 @endif
 
-                <div class="flash-message"></div>
-
                 <div class="table-responsive">
-                    <table id="residentTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="residentTable" class="table table-bordered table-striped dt-responsive nowrap"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
@@ -105,13 +88,14 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Padam Tarikh Outing</h4>
+                        <h4 class="modal-title">Padam Pelajar</h4>
                     </div>
                     <div class="modal-body">
                         Adakah anda pasti?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
+                            name="delete">Padam</button>
                         <button type="button" data-dismiss="modal" class="btn">Batal</button>
                     </div>
                 </div>
@@ -120,25 +104,78 @@
         {{-- end confirmation delete modal --}}
 
         <!-- Modal -->
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+        <!-- import -->
+        <!-- <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+            aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Export Outing</h5>
+                        <h5 class="modal-title">Import Murid</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    {{-- {{ route('exportouting') }} --}}
-                    <form action="{{ route('exportouting') }}" method="post">
+                    {{-- {{ route('importmurid')}} --}}
+                    <form action="{{ route('importstudent')}}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="organImport" id="organImport" class="form-control">
+                                @foreach($organization as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                @endforeach
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nama Kelas</label>
+                                <select name="classImport" id="classImport" class="form-control">
+
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <input type="file" name="file" required>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Import</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div> -->
+        <!-- export -->
+        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Export Pelajar</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{-- {{ route('exportstudent') }} --}}
+                    <form action="{{ route('exportstudent') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
                             <div class="form-group">
                                 <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
+                                <select name="organExport" id="organExport" class="form-control">
                                     @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Kelas</label>
+                                <select name="dormExport" id="dormExport" class="form-control">
+
                                 </select>
                             </div>
                             <div class="modal-footer">
@@ -163,27 +200,33 @@
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
-<!-- cannot display dorm student list ** search dorm -->
 <script>
-    $(document).ready(function() {
-
+    $(document).ready(function(){
+        
         var residentTable;
 
-        if ($("#organization").val() != "") {
+        if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetch_data($("#organization").val());
+            fetchClass($("#organization").val(), '#dorm');
         }
 
-        function fetch_data(oid = '') {
-
+        if($("#organExport").val() != ""){
+            $("#organExport").prop("selectedIndex", 0).trigger('change');
+            fetchClass($("#organExport").val(), '#dormExport');
+        }
+ 
+        // fetch_data();
+        // alert($("#organization").val());
+        // ***********************************************look on this cid ad classid
+        function fetch_data(dormid = '') {
             residentTable = $('#residentTable').DataTable({
                 processing: true,
                 serverSide: true,
-
                 ajax: {
+                    // resident
                     url: "{{ route('dorm.getResidentsDatatable') }}",
                     data: {
-                        oid: oid,
+                        dormid: dormid,
                         hasOrganization: true
                     },
                     type: 'GET',
@@ -193,10 +236,10 @@
                     "targets": [0], // your case first column
                     "className": "text-center",
                     "width": "2%"
-                }, {
-                    "targets": [1, 2, 3, 4, 5, 6, 7], // your case first column
+                },{
+                    "targets": [1,2,3,4,5,6,7], // your case first column
                     "className": "text-center",
-                }, ],
+                },],
                 order: [
                     [1, 'asc']
                 ],
@@ -204,16 +247,16 @@
                     "data": null,
                     searchable: false,
                     "sortable": false,
-                    render: function(data, type, row, meta) {
+                    render: function (data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
                 }, {
-                    data: 'studentname',
+                    data: "studentname",
                     name: 'studentname'
-                },{
-                    data: 'classname',
+                }, {
+                    data: "classname",
                     name: 'classname'
-                },{
+                }, {
                     data: 'start_date_time',
                     name: 'start_date_time'
                 }, {
@@ -240,63 +283,89 @@
         }
 
         $('#organization').change(function() {
-            var organizationid = $("#organization option:selected").val();
-            $('#residentTable').DataTable().destroy();
-            console.log("organization " + organizationid);
-            fetch_data(organizationid);
+            var organizationid    = $("#organization").val();
+            var _token            = $('input[name="_token"]').val();
+            fetchClass(organizationid, "#dorm");
         });
 
+        $('#organExport').change(function() {
+            var organizationid    = $("#organExport").val();
+            var _token            = $('input[name="_token"]').val();
+            fetchClass(organizationid, '#dormExport');
+        });
+
+        function fetchClass(organizationid = '', dormId = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('dorm.fetchDorm') }}",
+                method:"POST",
+                data:{ oid:organizationid,
+                        _token:_token },
+                success:function(result)
+                {
+                    $(dormId).empty();
+                    $(dormId).append("<option value='' disabled selected> Pilih Asrama</option>");
+                    jQuery.each(result.success, function(key, value){
+                        $(dormId).append("<option value='"+ value.id +"'>" + value.name + "</option>");
+                    });
+                }
+            })
+        }
+
         $('#dorm').change(function() {
-            var dormid = $("#dorm option:selected").val();
+            var organizationid    = $("#organization option:selected").val();
+
+            var dormid    = $("#dorm option:selected").val();
             if(dormid){
                 $('#residentTable').DataTable().destroy();
                 fetch_data( dormid);
             }
-            console.log("This is dorm id " + dormid);
+            // console.log(organizationid);
         });
 
         // csrf token for ajax
         $.ajaxSetup({
-            headers: {
+                headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
 
         var resident_id;
 
-        $(document).on('click', '.btn-danger', function() {
+        $(document).on('click', '.btn-danger', function(){
             resident_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
         });
 
-
         $('#delete').click(function() {
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'html',
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                        _method: 'DELETE'
+                    },
+                    url: "/dorm/dorm/indexResident/" + resident_id,
+                    success: function(data) {
+                        setTimeout(function() {
+                            $('#confirmModal').modal('hide');
+                        }, 2000);
+
+                        $('div.flash-message').html(data);
+
+                        residentTable.ajax.reload();
+                    },
+                    error: function (data) {
+                        $('div.flash-message').html(data);
+                    }
+                })
+            });
             
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    //   _method: 'DELETE'
-                },
-                url: "/dorm/dorm/destroyResident/" + resident_id,
-                success: function(data) {
-                    setTimeout(function() {
-                        $('#confirmModal').modal('hide');
-                    }, 2000);
+            $('.alert').delay(3000).fadeOut();
 
-                    $('div.flash-message').html(data);
-
-                    residentTable.ajax.reload();
-                },
-                error: function(data) {
-                    $('div.flash-message').html(data);
-                }
-            })
-        });
-
-        $('.alert').delay(3000).fadeOut();
-
+            $('#buttonExport').click(function() {
+                $('#modelId1').modal('hide');
+            });
     });
 </script>
 

@@ -221,35 +221,85 @@ class DormController extends Controller
         ]);
 
         $organizationid = $request->get('organization');
+        $neworganizationid = (int)$organizationid;
+
         $stdname = $request->get('name');
         $parentphone = $request->get('parent_phone');
-        
+
         $dormid = $request->get('dorm');
         $newdormid = (int)$dormid;
 
         // find student id
         $student = DB::table('students')
-            ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
             ->where('students.nama', $stdname)
             ->where('students.parent_tel', $parentphone)
-            ->select('students.id', 'ou.organization_id as oid', 'ou.user_id as uid', 'ous.organization_user_id as ouid')
+            ->select('students.id')
             ->get();
 
-        // dd($student[0]->oid);
-        // get organization_class id
-        $orgclassid = DB::table('class_organization as co')
-            ->where('co.organization_id', $student[0]->oid)
-            ->select('co.id')
+        $dorm = DB::table('dorms')
+            ->where('dorms.id', $newdormid)
             ->get();
 
+        // dd($student[0]->id);
+        // 怎样validate这个学生是smk1的学生
+        //如果organization id 等于 class student， student id 对应的 organclassid 的 organization id
 
-        DB::table('class_student')
-            ->where('student_id', $student[0]->id)
-            ->where('organclass_id', $orgclassid[0]->id)
-            ->update(['dorm_id' => $newdormid]);
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
+        Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
+            try 
+            {
+                DB::table('class_student as cs')
+                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                ->where([
+                    ['cs.student_id', $student[0]->id],
+                    ['co.organization_id', $neworganizationid],
+                    ['cs.status', 1],
+                ])
+                ->update(['cs.dorm_id' => $newdormid]);
+                $queryStatus = 1;
 
-        return redirect('/dorm/dorm/indexResident')->with('success', 'New student has been added successfully');
+                if($dorm[0]->accommodate_no < $dorm[0]->student_inside_no && $queryStatus > 0){
+                    DB::table('dorms')
+                    ->where('dorms.id', $newdormid)
+                    ->update(['student_inside_no' => $totalresident[0]->student_inside_no + 1]);
+
+                    return redirect('/dorm/dorm/indexResident')->with('success', 'New student has been added successfully');
+                }
+            } 
+            catch(Exception $e) 
+            {
+                $queryStatus = 0;
+                return redirect('/dorm/dorm/indexResident')->with('error', 'Failed to add new student');
+            }
+        }
+        
+
+        // $all = DB::table('class_student')
+        //     ->join('students', 'students.id', '=', 'class_student.student_id')
+        //     ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+        //     ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+        //     ->join('organizations', 'organizations.id', '=','ou.organization_id')
+        //     ->join('class_organization as co', 'co.id', '=','class_student.organclass_id')
+        //     ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+        //     ->join('roles', 'roles.id', '=', 'ou.role_id')
+        //     ->where([
+        //         ['students.id',$student[0]->id],
+        //         ['organizations.id', $neworganizationid],
+        //         ['class_student.status', 1],
+        //     ])
+        //     ->select('students.id', 'students.nama', 
+        //     'dorms.id', 'dorms.name as dormname',
+        //     'class_student.id as csid', 'class_student.status', 
+        //     'organizations.id as oid', 'organizations.nama as orgname',
+        //     'ou.id as ouid', 'ous.id as ousid',
+        //     'co.id as coid', 'co.class_id as cid',
+        //     'roles.id', 'roles.name as rolename')
+        //     ->get();
+
+        
+
+
+        
     }
 
     //haven't modify yet
