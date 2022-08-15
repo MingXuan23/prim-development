@@ -88,9 +88,9 @@
                                 <th> No. </th>
                                 <th> Nama Derma </th>
                                 <th> Nama Penderma </th>
+                                <th> No Tel Penderma </th>
                                 <th> Tarikh Derma </th>
                                 <th> Amaun (RM) </th>
-                                <!-- <th> Status </th> -->
                             </tr>
                         </thead>
                     </table>
@@ -198,6 +198,10 @@
                     }, {
                         data: "username",
                         name: 'username'
+                    },
+                    {
+                        data: "telno",
+                        name: 'telno'
                     },{
                         data: "datetime_created",
                         name: 'datetime_created',

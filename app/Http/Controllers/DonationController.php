@@ -200,16 +200,6 @@ class DonationController extends Controller
         else{
             $start_date = date('Y-m-d', strtotime($request->startDate));
             $end_date = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
-            // dd($request->startDate, $request->endDate);
-
-            $result = DB::table('transactions')
-                ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
-                ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
-                ->select('transactions.username as nama_penderma', 'transactions.telno as tel_penderma', 'transactions.email as emel_penderma', 'transactions.datetime_created as time', 'transactions.amount', 'donations.nama as nama_poster')
-                ->where('transactions.status', 'success')
-                ->where('transactions.nama','LIKE','Donation%')
-                ->whereBetween('transactions.datetime_created', [$start_date, $end_date])
-                ->get();
 
             $listhistory = DB::table('transactions')
                 ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
@@ -230,24 +220,7 @@ class DonationController extends Controller
                 })
                 ->editColumn('amount', function ($data) {
                     return number_format($data->amount, 2);
-                })
-                // ->addColumn('status', function ($data) {
-                //     if ($data->status == 'Success') {
-                //         $btn = '<div class="d-flex justify-content-center">';
-                //         $btn = $btn . '<span class="badge badge-success">Success</span></div>';
-                //         return $btn;
-                //     } elseif ($data->status == 'Pending') {
-                //         $btn = '<div class="d-flex justify-content-center">';
-                //         $btn = $btn . '<button  class="btn btn-warning m-1"> Pending </button></div>';
-                //         return $btn;
-                //     } else {
-                //         $btn = '<div class="d-flex justify-content-center">';
-                //         $btn = $btn . '<button  class="btn btn-danger m-1"> Failed </button></div>';
-                //         return $btn;
-                //     }
-                // })
-                // ->rawColumns(['status'])
-                ->make(true);
+                })->make(true);
         }
     }
 
