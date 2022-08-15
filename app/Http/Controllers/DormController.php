@@ -399,12 +399,6 @@ class DormController extends Controller
         return redirect('/dorm/dorm/indexDorm')->with('success', 'The data has been updated!');
     }
 
-    //to get hyperlink dorm id
-    public function getID($id)
-    {
-        return view('dorm.editDorm', compact('id'));
-    }
-
 
     /**
      * Remove the specified resource from storage.
