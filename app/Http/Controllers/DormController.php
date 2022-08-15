@@ -313,13 +313,18 @@ class DormController extends Controller
         //  
         $dorm = DB::table('dorms')
             ->where('dorms.id', $id)
-            ->select('dorms.id', 'dorms.name', 'dorms.accommodate_no', 'dorms.student_inside_no')
-            //'name', 'accommodate_no', 'student_inside_no'
+            ->select('dorms.id', 'dorms.name', 'dorms.accommodate_no', 'dorms.student_inside_no', 'organization_id')
             ->first();
+
+        //calculate sum of resident inside this dorm
+        $dorm_student_inside = DB::table('class_student')
+            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+            ->where('class_student.dorm_id', $id)
+            ->count();
 
         $organization = $this->getOrganizationByUserId();
 
-        return view('dorm.management.update', compact('dorm', 'organization', 'id'));
+        return view('dorm.management.update', compact('dorm', 'organization', 'dorm_student_inside', 'id'));
     }
 
     public function update(Request $request, $id)
@@ -362,7 +367,7 @@ class DormController extends Controller
         // dd($id);
         $this->validate($request, [
             'name'        =>  'required',
-            'accommodate_no'    =>  'required',
+            'capacity'    =>  'required',
             'organization'      =>  'required',
             //'name', 'accommodate_no', 'student_inside_no'
 
@@ -374,15 +379,8 @@ class DormController extends Controller
                 [
                     'name' => $request->get('name'),
                     'accommodate_no'   => $request->get('capacity'),
-                    'student_inside_no'   => $request->get('studentno'),
                 ]
             );
-
-        // DB::table('class_organization')->where('class_id', $id)
-        //     ->update([
-        //         'organization_id' => $request->get('organization'),
-        //         'organ_user_id'    =>  $request->get('classTeacher')
-        //     ]);
 
         return redirect('/dorm/dorm/indexDorm')->with('success', 'The data has been updated!');
     }

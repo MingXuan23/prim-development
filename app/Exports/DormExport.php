@@ -23,8 +23,10 @@ class DormExport implements FromCollection, ShouldAutoSize, WithHeadings
     public function collection()
     {
 
+
         // dd($this->organId);
         $listDorms = DB::table('dorms')
+            //->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
             ->select('dorms.name', 'dorms.accommodate_no', 'dorms.student_inside_no')
             ->where([
                 //['organization.id', $this->organId],

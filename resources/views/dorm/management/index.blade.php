@@ -223,6 +223,11 @@
                 }, {
                     data: "name",
                     name: 'name',
+                    render: function(data, type, row, meta) {
+                        var dormId = row[0];
+                        //modify here, from updateDorm to ur residentindex
+                        return '<a href = "{{route("dorm.updateDorm",' + row.id + ')}}">' + data + '</a>';
+                    }
                 }, {
                     data: "accommodate_no",
                     name: 'accommodate_no',
