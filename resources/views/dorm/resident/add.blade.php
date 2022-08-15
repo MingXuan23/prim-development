@@ -35,20 +35,25 @@
                 {{csrf_field()}}
                 <div class="card-body">
                     <div class="form-row">
-                        <div class="form-group col-md-6 required">
+                        <div class="form-group col-md-12 required">
                             <label>Nama Organisasi</label>
                             <select name="organization" id="organization" class="form-control">
                                 <option value="" selected>Pilih Organisasi</option>
                                 @foreach($organization as $row)
-                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
                                 @endforeach
                             </select>
                         </div>
+                    </div>
 
-                        <div id="dkelas" class="form-group col-md-6">
-                            <label> Nama Kelas</label>
-                            <select name="classes" id="classes" class="form-control">
-                                <option value="" disabled selected>Pilih Kelas</option>
+                    <div class="form-row">
+                        <div id="dorm" class="form-group col-md-12">
+                            <label> Nama Asrama</label>
+                            <select name="dorm" id="dorm" class="form-control">
+                                <option value="" disabled selected>Pilih Asrama</option>
+                                @foreach($dormlist as $row)
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
@@ -57,6 +62,13 @@
                         <div class="form-group col-md-12">
                             <label>Nama Penuh Murid</label>
                             <input type="text" name="name" class="form-control" placeholder="Nama Penuh Murid">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <label>No. IC Murid</label>
+                            <input type="text" name="icno" class="form-control" placeholder="Nombor Kad Pengenalan Murid">
                         </div>
                     </div>
                     

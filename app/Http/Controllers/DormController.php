@@ -162,6 +162,7 @@ class DormController extends Controller
     {
         //
         $userid     = Auth::id();
+        $organization = $this->getOrganizationByUserId();
 
         $school = DB::table('organizations')
             ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
@@ -171,17 +172,15 @@ class DormController extends Controller
 
         // dd($userid);
 
-        $listclass = DB::table('classes')
-            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
-            ->select('classes.id as id', 'classes.nama', 'classes.levelid')
+        $listclass = DB::table('dorms')
+            ->select()
             ->where([
-                ['class_organization.organization_id', $school->schoolid]
+                ['dorms.organization_id', 6]
             ])
-            ->orderBy('classes.nama')
+            ->orderBy('dorms.name')
             ->get();
-
-        $organization = $this->getOrganizationByUserId();
-
+        
+        
 
         return view('dorm.resident.add', compact('listclass', 'organization'));
     }
@@ -223,6 +222,46 @@ class DormController extends Controller
             'end_date_time'   => $request->get('end_date'),
             'organization_id' => $request->get('organization'),
         ]);
+
+        return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
+    }
+
+    public function storeResident(Request $request)
+    {
+        // 
+        $this->validate($request, [
+            'name'              =>  'required',
+            'organization'      =>  'required',
+            'icno'              =>  'required',
+            // 'dorm'              =>  'required'
+        ]);
+
+        $organizationid = $request->get('organization');
+        $studentname = $request->get('name');
+        $studentic = $request->get('icno');
+
+        $student = DB::table('students')
+        ->where('students.nama', studentname)
+        ->where('students.icno', studentic)
+        ->select()
+        ->first();
+
+        $organclassid = DB::table('organization')
+        ->join('class_organization', 'class_organization.organization_id', '=', 'organization.id')
+        ->where('organization.id', $organizationid)
+        ->select()
+        ->get();
+
+        dd($student + " and " + $organclassid);
+
+        // DB::table('class_student')->insert([
+        //     'organclass_id'     => $request->get('organization'),
+        //     'student_id'        => $request->get('student'),
+        //     'status'            => 1,
+        //     'blacklist'         => 0,
+        //     'start_date_time'   => now(),
+        //     'dorm_id'           => $request->get('dorm')
+        // ]);
 
         return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
     }
@@ -547,15 +586,15 @@ class DormController extends Controller
     {
         // dd($request->hasOrganization);
         if (request()->ajax()) {
-            $residentid = $request->residentid;
+            $oid = $request->oid;
 
-            $dormid = $request->dormid;
+            // $dormid = $request->dormid;
 
             $hasOrganizaton = $request->hasOrganization;
 
             $userId = Auth::id();
 
-            if ($residentid != '' && !is_null($hasOrganizaton)) {
+            if ($oid != '' && !is_null($hasOrganizaton)) {
 
                 $data = DB::table('students')
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -563,7 +602,7 @@ class DormController extends Controller
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                     ->select('students.id as id', 'students.nama as studentname', 'classes.nama as classname', 'class_student.start_date_time', 'class_student.end_date_time', 'class_student.outing_status', 'class_student.blacklist')
                     ->where([
-                        ['class_student.dorm_id', $dormid],
+                        ['class_student.dorm_id', $oid],
                         ['class_student.status', 1],
                     ])
                     ->orderBy('students.nama')
