@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\OutingExport;
 use App\Exports\DormExport;
 use App\Imports\DormImport;
+use App\Imports\ResidentImport;
 use Illuminate\Http\Request;
 use App\Models\Dorm;
 use App\Models\Outing;
@@ -113,6 +114,26 @@ class DormController extends Controller
         Excel::import(new DormImport($request->organ), public_path('/uploads/excel/' . $namaFile));
 
         return redirect('/dorm/dorm/indexDorm')->with('success', 'Dorms have been added successfully');
+    }
+
+    //not yet modify
+    public function residentimport(Request $request, $id)
+    {
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        if (!in_array($etx, $formats)) {
+
+            return redirect('/dorm/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+
+        //please check need what id to pass into ResidentImport
+        Excel::import(new ResidentImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+
+        return redirect('/dorm/dorm/indexDorm')->with('success', 'Residents have been added successfully');
     }
 
     /**
@@ -250,18 +271,21 @@ class DormController extends Controller
     {
         // 
         $this->validate($request, [
-            'start_date'        =>  'required',
-            'end_date'          =>  'required',
+            'name'        =>  'required',
+            'capacity'    =>  'required',
             'organization'      =>  'required',
+            //'name', 'accommodate_no', 'student_inside_no'
         ]);
+        //echo ({{ $request->get('organization') }});
 
-        DB::table('outings')->insert([
-            'start_date_time' => $request->get('start_date'),
-            'end_date_time'   => $request->get('end_date'),
+        DB::table('dorms')->insert([
+            'name' => $request->get('name'),
+            'accommodate_no'   => $request->get('capacity'),
             'organization_id' => $request->get('organization'),
+            'student_inside_no' => 0
         ]);
 
-        return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
+        return redirect('/dorm/dorm/indexDorm')->with('success', 'New dorm has been added successfully');
     }
 
     /**
@@ -275,6 +299,9 @@ class DormController extends Controller
         //
     }
 
+    //
+    //
+    // edit and update functions
     public function edit($id)
     {
         //
@@ -284,13 +311,6 @@ class DormController extends Controller
     public function editOuting($id)
     {
         //  
-        $teacher = DB::table('users')
-            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
-            ->where('users.id', $id)
-            ->where('organization_user.role_id', 5)
-            ->select('organizations.id as organization_id', 'users.id as uid', 'users.name as tcname', 'users.icno as icno', 'users.email as email', 'users.telno as telno', 'organization_user.role_id as role_id')
-            ->first();
 
         $outing = DB::table('outings')
             ->where('outings.id', $id)
@@ -300,6 +320,20 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         return view('dorm.outing.update', compact('outing', 'organization', 'id'));
+    }
+
+    public function editDorm($id)
+    {
+        //  
+        $dorm = DB::table('dorms')
+            ->where('dorms.id', $id)
+            ->select('dorms.id', 'dorms.name', 'dorms.accommodate_no', 'dorms.student_inside_no')
+            //'name', 'accommodate_no', 'student_inside_no'
+            ->first();
+
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.management.update', compact('dorm', 'organization', 'id'));
     }
 
     public function update(Request $request, $id)
@@ -336,6 +370,37 @@ class DormController extends Controller
         return redirect('/dorm/dorm/indexOuting')->with('success', 'The data has been updated!');
     }
 
+    public function updateDorm(Request $request, $id)
+    {
+        //
+        // dd($id);
+        $this->validate($request, [
+            'name'        =>  'required',
+            'accommodate_no'    =>  'required',
+            'organization'      =>  'required',
+            //'name', 'accommodate_no', 'student_inside_no'
+
+        ]);
+
+        DB::table('dorms')
+            ->where('id', $id)
+            ->update(
+                [
+                    'name' => $request->get('name'),
+                    'accommodate_no'   => $request->get('capacity'),
+                    'student_inside_no'   => $request->get('studentno'),
+                ]
+            );
+
+        // DB::table('class_organization')->where('class_id', $id)
+        //     ->update([
+        //         'organization_id' => $request->get('organization'),
+        //         'organ_user_id'    =>  $request->get('classTeacher')
+        //     ]);
+
+        return redirect('/dorm/dorm/indexDorm')->with('success', 'The data has been updated!');
+    }
+
 
     /**
      * Remove the specified resource from storage.
@@ -343,6 +408,10 @@ class DormController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+    //
+    //
+    // destroy functions
     public function destroy($id)
     {
         //
@@ -360,6 +429,20 @@ class DormController extends Controller
             return View::make('layouts/flash-messages');
         } else {
             Session::flash('error', 'Outing Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
+    public function destroyDorm($id)
+    {
+        //
+        $result = DB::table('dorms')->where('dorms.id', $id);
+
+        if ($result->delete()) {
+            Session::flash('success', 'Dorm Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Dorm Gagal Dipadam');
             return View::make('layouts/flash-messages');
         }
     }
@@ -387,6 +470,9 @@ class DormController extends Controller
         }
     }
 
+    //
+    //
+    //application functions
     public function updateOutTime($id)
     {
         // $asrama = Asrama::findOrFail($id);
@@ -427,6 +513,9 @@ class DormController extends Controller
         // return redirect('/asrama')->with('success', 'Data is successfully updated');
     }
 
+    //
+    //
+    //get datatable functions
     public function getOutingsDatatable(Request $request)
     {
         // dd($request->oid);
@@ -471,9 +560,9 @@ class DormController extends Controller
             if ($oid != '' && !is_null($hasOrganizaton)) {
 
                 $data = DB::table('dorms')
-                    ->select('dorms.id', 'dorms.start_date_time', 'dorms.end_date_time')
+                    ->select('dorms.id', 'dorms.name', 'dorms.accommodate_no', 'dorms.student_inside_no', 'dorms.organization_id')
                     ->where('dorms.organization_id', $oid)
-                    ->orderBy('dorms.start_date_time');
+                    ->orderBy('dorms.name');
                 //'name', 'accommodate_no', 'student_inside_no'
             }
 
@@ -482,7 +571,8 @@ class DormController extends Controller
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a href="' . route('dorm.editOuting', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<a href="' . route('importresident', $row->id) . '" class="btn btn-primary m-1">Import</a>';
+                $btn = $btn . '<a href="' . route('dorm.editDorm', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });

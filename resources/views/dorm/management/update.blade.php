@@ -10,7 +10,7 @@
         <div class="page-title-box">
             <h4 class="font-size-18">Asrama</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Asrama >> Tambah Asrama</li>
+                <li class="breadcrumb-item active">Asrama >> Edit Asrama</li>
             </ol>
         </div>
     </div>
@@ -27,33 +27,43 @@
             </ul>
         </div>
         @endif
-        <form method="get" action="{{ route('dorm.storeDorm') }}" enctype="multipart/form-data">
+
+        <form method="post" action="{{ route('dorm.updateDorm', $dorm->id) }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
 
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        @if ($loop->first)
-                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+
+                        <option value="">Pilih Organisasi</option>
+                        @foreach($organization as $organizationRow)
+
+                        @if($organizationRow->id == $dorm->organization_id)
+                        <option value="{{ $organizationRow->id }}" selected> {{ $organizationRow->nama }} </option>
                         @else
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        <option value="{{ $organizationRow->id }}">{{ $organizationRow->nama }}</option>
 
                         @endif
+
                         @endforeach
+
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>Nama Asrama</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Asrama">
+                    <input type="text" name="name" class="form-control" placeholder="Nama Asrama" value="{{$dorm->name}}">
                 </div>
 
                 <div class="form-group">
                     <label>Kapasiti</label>
-                    <input type="number" name="capacity" class="form-control" placeholder="Kapasiti">
+                    <input type="number" name="capacity" class="form-control" placeholder="Kapasiti" value="{{ $dorm->accommodate_no }}">
+                </div>
+
+                <div class="form-group">
+                    <label>Bilangan Pelajar Dalam</label>
+                    <input type="number" name="studentno" class="form-control" placeholder="Bilangan Pelajar Dalam" value="{{$dorm->student_inside_no}}">
                 </div>
 
                 <div class="form-group mb-0">
@@ -64,8 +74,6 @@
                     </div>
                 </div>
             </div>
-            <!-- /.card-body -->
-
         </form>
     </div>
 </div>
@@ -79,6 +87,7 @@
 
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 

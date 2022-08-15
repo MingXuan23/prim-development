@@ -231,8 +231,10 @@ Route::post('/importparent', 'ParentController@parentImport')->name('importparen
 Route::post('/exportouting', 'DormController@outingexport')->name('exportouting');
 
 //dorm management import and export
-Route::post('/exportdorm', 'DormController@outingexport')->name('exportdorm');
-Route::post('/importdorm', 'DormController@outingexport')->name('importdorm');
+Route::post('/exportdorm', 'DormController@dormexport')->name('exportdorm');
+Route::post('/importdorm', 'DormController@dormimport')->name('importdorm');
+Route::post('/importresident/{id}', 'DormController@residentimport')->name('importresident');
+
 
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
@@ -308,4 +310,8 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/createDorm', 'DormController@createDorm')->name('dorm.createDorm');
     Route::get('dorm/indexDorm', 'DormController@indexDorm')->name('dorm.indexDorm');
     Route::get('dorm/storeDorm', 'DormController@storeDorm')->name('dorm.storeDorm');
+    Route::get('dorm/updateDorm/{id}', 'DormController@updateDorm')->name('dorm.updateDorm');
+    Route::get('dorm/editDorm/{id}', 'DormController@editDorm')->name('dorm.editDorm');
+    Route::get('dorm/destroyDorm/{id}', 'DormController@destroyDorm')->name('dorm.destroyDorm');
+    Route::get('dorm/getDormDataTable', 'DormController@getDormDataTable')->name('dorm.getDormDataTable');
 });
