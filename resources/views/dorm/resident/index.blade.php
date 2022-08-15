@@ -59,7 +59,7 @@
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
 
                 {{-- href="{{ route('dorm.createOuting') }}" {{ route('exportouting') }}--}}
-                <a style="margin: 19px; float: right;" href="{{ route('dorm.createOuting') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Outing</a>
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.createResident') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Outing</a>
             </div>
 
             <div class="card-body">

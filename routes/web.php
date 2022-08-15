@@ -301,6 +301,7 @@ Route::group(['prefix' => 'dorm'], function () {
     // student-dorm (resident)
     Route::get('dorm/createResident', 'DormController@createResident')->name('dorm.createResident');
     Route::get('dorm/indexResident', 'DormController@indexResident')->name('dorm.indexResident');
+    Route::get('dorm/storeResident', 'DormController@storeResident')->name('dorm.storeResident');
     Route::get('dorm/getResidentsDatatable', 'DormController@getResidentsDatatable')->name('dorm.getResidentsDatatable');
 
     //dorm management

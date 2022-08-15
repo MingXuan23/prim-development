@@ -141,6 +141,7 @@ class DormController extends Controller
     {
         //
         $userid     = Auth::id();
+        $organization = $this->getOrganizationByUserId();
 
         $school = DB::table('organizations')
             ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
@@ -150,17 +151,15 @@ class DormController extends Controller
 
         // dd($userid);
 
-        $listclass = DB::table('classes')
-            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
-            ->select('classes.id as id', 'classes.nama', 'classes.levelid')
+        $listclass = DB::table('dorms')
+            ->select()
             ->where([
-                ['class_organization.organization_id', $school->schoolid]
+                ['dorms.organization_id', 6]
             ])
-            ->orderBy('classes.nama')
+            ->orderBy('dorms.name')
             ->get();
-
-        $organization = $this->getOrganizationByUserId();
-
+        
+        
 
         return view('dorm.resident.add', compact('listclass', 'organization'));
     }
@@ -202,6 +201,46 @@ class DormController extends Controller
             'end_date_time'   => $request->get('end_date'),
             'organization_id' => $request->get('organization'),
         ]);
+
+        return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
+    }
+
+    public function storeResident(Request $request)
+    {
+        // 
+        $this->validate($request, [
+            'name'              =>  'required',
+            'organization'      =>  'required',
+            'icno'              =>  'required',
+            // 'dorm'              =>  'required'
+        ]);
+
+        $organizationid = $request->get('organization');
+        $studentname = $request->get('name');
+        $studentic = $request->get('icno');
+
+        $student = DB::table('students')
+        ->where('students.nama', studentname)
+        ->where('students.icno', studentic)
+        ->select()
+        ->first();
+
+        $organclassid = DB::table('organization')
+        ->join('class_organization', 'class_organization.organization_id', '=', 'organization.id')
+        ->where('organization.id', $organizationid)
+        ->select()
+        ->get();
+
+        dd($student + " and " + $organclassid);
+
+        // DB::table('class_student')->insert([
+        //     'organclass_id'     => $request->get('organization'),
+        //     'student_id'        => $request->get('student'),
+        //     'status'            => 1,
+        //     'blacklist'         => 0,
+        //     'start_date_time'   => now(),
+        //     'dorm_id'           => $request->get('dorm')
+        // ]);
 
         return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
     }
