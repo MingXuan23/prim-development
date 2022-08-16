@@ -244,35 +244,34 @@ class DormController extends Controller
         // 怎样validate这个学生是smk1的学生
         //如果organization id 等于 class student， student id 对应的 organclassid 的 organization id
 
-        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
-        Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
-            try 
-            {
+        if (
+            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
+            Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
+        ) {
+            try {
                 DB::table('class_student as cs')
-                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
-                ->where([
-                    ['cs.student_id', $student[0]->id],
-                    ['co.organization_id', $neworganizationid],
-                    ['cs.status', 1],
-                ])
-                ->update(['cs.dorm_id' => $newdormid]);
+                    ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                    ->where([
+                        ['cs.student_id', $student[0]->id],
+                        ['co.organization_id', $neworganizationid],
+                        ['cs.status', 1],
+                    ])
+                    ->update(['cs.dorm_id' => $newdormid]);
                 $queryStatus = 1;
 
-                if($dorm[0]->accommodate_no < $dorm[0]->student_inside_no && $queryStatus > 0){
+                if ($dorm[0]->accommodate_no < $dorm[0]->student_inside_no && $queryStatus > 0) {
                     DB::table('dorms')
-                    ->where('dorms.id', $newdormid)
-                    ->update(['student_inside_no' => $totalresident[0]->student_inside_no + 1]);
+                        ->where('dorms.id', $newdormid)
+                        ->update(['student_inside_no' => $totalresident[0]->student_inside_no + 1]);
 
                     return redirect('/dorm/dorm/indexResident')->with('success', 'New student has been added successfully');
                 }
-            } 
-            catch(Exception $e) 
-            {
+            } catch (Exception $e) {
                 $queryStatus = 0;
                 return redirect('/dorm/dorm/indexResident')->with('error', 'Failed to add new student');
             }
         }
-        
+
 
         // $all = DB::table('class_student')
         //     ->join('students', 'students.id', '=', 'class_student.student_id')
@@ -296,18 +295,18 @@ class DormController extends Controller
         //     'roles.id', 'roles.name as rolename')
         //     ->get();
 
-        
 
 
-        
+
+
     }
 
-    //haven't modify yet
+
     public function storeDorm(Request $request)
     {
         // 
         $this->validate($request, [
-            'name'        =>  'required',
+            'name'        =>  'required|unique:dorms',
             'capacity'    =>  'required',
             'organization'      =>  'required',
             //'name', 'accommodate_no', 'student_inside_no'
@@ -358,6 +357,10 @@ class DormController extends Controller
         return view('dorm.outing.update', compact('outing', 'organization', 'id'));
     }
 
+    public function getID($id)
+    {
+        return response()->json(["string" => $id]);
+    }
     public function editDorm($id)
     {
         //  
@@ -416,7 +419,7 @@ class DormController extends Controller
         //
         // dd($id);
         $this->validate($request, [
-            'name'        =>  'required',
+            'name'        =>  'required|unique:dorms',
             'capacity'    =>  'required',
             'organization'      =>  'required',
             //'name', 'accommodate_no', 'student_inside_no'
@@ -470,14 +473,17 @@ class DormController extends Controller
     public function destroyDorm($id)
     {
         //
-        $result = DB::table('dorms')->where('dorms.id', $id);
-
-        if ($result->delete()) {
+        $result = DB::table('dorms')->where('dorms.id', $id)->delete();
+        //return response()->json($result);
+        //$strirng = "asd";
+        if ($result) {
             Session::flash('success', 'Dorm Berjaya Dipadam');
             return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         } else {
             Session::flash('error', 'Dorm Gagal Dipadam');
             return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         }
     }
 
@@ -515,11 +521,11 @@ class DormController extends Controller
             return Dorm::all();
         } else {
             // user role pentadbir 
-        
+
             return DB::table('dorms')
-            ->where('dorms.organization_id' , $organization[0]->id)
-            ->select()
-            ->get();
+                ->where('dorms.organization_id', $organization[0]->id)
+                ->select()
+                ->get();
         }
     }
 

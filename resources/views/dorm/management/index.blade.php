@@ -224,19 +224,28 @@
                     data: "name",
                     name: 'name',
                     render: function(data, type, row, meta) {
-                        var dormId = row[0];
+                        //var dormId = row[0];
                         //modify here, from updateDorm to ur residentindex
-                        return '<a href = "{{route("dorm.updateDorm",' + row.id + ')}}">' + data + '</a>';
+                        // console.log("id" = row.id);
+
+                        // <
+                        // a href = "url('')" > < /a>
+                        console.log(data)
+                        //return '<a href = "{{url("dorm/dorm/editDorm/' + 2 + '")}}">' + row.id + '</a>';
+
+                        //return '<a href = "{{route("dorm.editDorm",["id"=>' + row.id + '])}}">' + row.id + '</a>';
+                        //return '<a href = "{{url("dorm/dorm/editDorm/' + row.id + '")}}">' + row.id + '</a>';
+                        console.log(row.id)
+                        return '<a href = "editDorm/' + row.id + '">' + data + '</a>';
+                        //,' + row.id + '
                     }
                 }, {
                     data: "accommodate_no",
                     name: 'accommodate_no',
-                    orderable: false,
                     searchable: false
                 }, {
                     data: "student_inside_no",
                     name: 'student_inside_no',
-                    orderable: false,
                     searchable: false
                 }, {
                     data: 'action',
@@ -274,14 +283,14 @@
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    //_method: 'DELETE'
+                    _method: 'GET'
                 },
                 url: "/dorm/dorm/destroyDorm/" + dorm_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
                     }, 2000);
-                    // console.log("it Works");
+                    //console.log('it works');
 
                     $('div.flash-message').html(data);
 
@@ -289,6 +298,8 @@
                 },
                 error: function(data) {
                     $('div.flash-message').html(data);
+                    console.log("it doesn't Works");
+
                 }
             })
         });

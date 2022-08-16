@@ -16,10 +16,13 @@ class DormImport implements ToModel, WithHeadingRow
      *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function __construct($organId)
+    public function __construct($organ)
     {
-        $this->organId = $organId;
+        $this->organ = $organ;
+        //trymethod();
+        //echo ($this->organ);
     }
+
 
     public function model(array $row)
     {
@@ -27,17 +30,13 @@ class DormImport implements ToModel, WithHeadingRow
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
 
-        // dd($this->organId);
-        $newdorm = new Dorm([
-            //
+        //dd($this->organ);
+
+        DB::table('dorms')->insert([
             'name'      => $row['nama_asrama'],
-            'organization_id' => $this->organId,
+            'organization_id' => $this->organ,
             'accommodate_no'   => $row['kapasiti'],
             'student_inside_no'    => 0,
-
-            //'name', 'accommodate_no', 'student_inside_no'
         ]);
-
-        $newdorm->save();
     }
 }
