@@ -49,6 +49,7 @@ Route::group(['prefix' => 'mobile'], function () {
     //route for mobile order
     Route::group(['prefix' => 'order'], function (){
         Route::get('/getAllOrderById/{id}', 'OrderController@getAllOrderById');
+        Route::get('/getAllOrderByOrganId/{id}', 'OrderController@getAllOrderByOrganId');
 
         Route::post('/orderTransaction', 'OrderController@orderTransaction');
     });
