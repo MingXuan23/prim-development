@@ -302,8 +302,9 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/getOutingsDatatable', 'DormController@getOutingsDatatable')->name('dorm.getOutingsDatatable');
     // student-dorm (resident)
     Route::get('dorm/createResident', 'DormController@createResident')->name('dorm.createResident');
-    Route::get('dorm/indexResident', 'DormController@indexResident')->name('dorm.indexResident');
+    Route::get('dorm/indexResident/{id}', 'DormController@indexResident')->name('dorm.indexResident');
     Route::get('dorm/storeResident', 'DormController@storeResident')->name('dorm.storeResident');
+    Route::post('dorm/destroyResident/{id}', 'DormController@destroyResident')->name('dorm.destroyResident');
     Route::post('dorm/fetchDorm', 'DormController@fetchDorm')->name('dorm.fetchDorm');
     Route::post('dorm/fetchClass', 'DormController@fetchClass')->name('dorm.fetchClass');
     Route::get('dorm/getResidentsDatatable', 'DormController@getResidentsDatatable')->name('dorm.getResidentsDatatable');

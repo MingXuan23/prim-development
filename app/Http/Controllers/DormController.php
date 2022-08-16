@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Exports\OutingExport;
 use App\Exports\DormExport;
 use App\Imports\DormImport;
@@ -55,13 +56,14 @@ class DormController extends Controller
         return view('dorm.outing.index', compact('organization'));
     }
 
-    public function indexResident()
+    public function indexResident($id)
     {
         // 
         $userId = Auth::id();
         $organization = $this->getOrganizationByUserId();
         // dd($organization[0]->id);
-        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || 
+        Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
             $dorm = DB::table('dorms')
                 ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
                 ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
@@ -69,6 +71,7 @@ class DormController extends Controller
                 ->where([
                     ['class_organization.organization_id', $organization[0]->id],
                     ['class_student.status', 1],
+                    ['dorms.id', $id],
                 ])
                 ->orderBy('dorms.name')
                 ->get();
@@ -245,6 +248,12 @@ class DormController extends Controller
             Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
         ) {
             if (isset($student[0]->id) && ($dorm[0]->student_inside_no < $dorm[0]->accommodate_no)) {
+                $updateDetails = [
+                    'cs.dorm_id' => $newdormid,
+                    'cs.start_date_time' => now()->toDateTimeString(),
+                    'cs.end_date_time' => NULL,
+                ];
+
                 $result = DB::table('class_student as cs')
                     ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
                     ->where([
@@ -252,8 +261,10 @@ class DormController extends Controller
                         ['co.organization_id', $neworganizationid],
                         ['cs.status', 1],
                     ])
-                    ->update(['cs.dorm_id' => $newdormid]);
-            } else {
+                    ->update($updateDetails);
+            } 
+            else 
+            {
                 $result = 0;
             }
 
@@ -262,11 +273,11 @@ class DormController extends Controller
                     ->where('dorms.id', $newdormid)
                     ->update(['student_inside_no' => $dorm[0]->student_inside_no + 1]);
 
-                return redirect('/dorm/dorm/indexResident')->with('success', 'New student has been added successfully');
+                return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->with('success', 'New student has been added successfully');
             }
         }
 
-        return redirect('/dorm/dorm/indexResident')->withErrors(['Failed to add student into dorm', 'Possible error: Dorm is full, Student not found']);
+        return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->withErrors(['Failed to add student into dorm', 'Possible error: Dorm is full, Student not found']);
     }
 
 
@@ -455,6 +466,35 @@ class DormController extends Controller
         }
     }
 
+    public function destroyResident($id)
+    {
+
+        // 有没有解决方法呢 不需要duplicate query
+        $dorm = DB::table('dorms')
+        ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
+        ->where('class_student.id', $id)
+        ->get();
+
+        $updateDetails1 = [
+            'class_student.end_date_time' => now()->toDateTimeString(),
+            'class_student.dorm_id' => NULL,
+            'dorms.student_inside_no' => $dorm[0]->student_inside_no - 1,
+        ];
+
+        $result = DB::table('dorms')
+        ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
+        ->where('class_student.id', $id)
+        ->update($updateDetails1);
+
+        if ($result) {
+            Session::flash('success', 'Pelajar Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Pelajar Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+        }  
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -613,15 +653,15 @@ class DormController extends Controller
     {
         // dd($request->hasOrganization);
         if (request()->ajax()) {
-            $oid = $request->oid;
+            // $oid = $request->oid;
 
-            // $dormid = $request->dormid;
+            $dormid = $request->dormid;
 
             $hasOrganizaton = $request->hasOrganization;
 
             $userId = Auth::id();
 
-            if ($oid != '' && !is_null($hasOrganizaton)) {
+            if ($dormid != '' && !is_null($hasOrganizaton)) {
 
                 $data = DB::table('students')
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -629,7 +669,7 @@ class DormController extends Controller
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                     ->select('students.id as id', 'students.nama as studentname', 'classes.nama as classname', 'class_student.start_date_time', 'class_student.end_date_time', 'class_student.outing_status', 'class_student.blacklist')
                     ->where([
-                        ['class_student.dorm_id', $oid],
+                        ['class_student.dorm_id', $dormid],
                         ['class_student.status', 1],
                     ])
                     ->orderBy('students.nama')

@@ -45,6 +45,7 @@
                         <label> Asrama </label>
                         <select name="dorm" id="dorm" class="form-control">
                             <option value="" disabled selected>Pilih Asrama</option>
+
                         </select>
                     </div>
                 </div>
@@ -106,51 +107,6 @@
         {{-- end confirmation delete modal --}}
 
         <!-- Modal -->
-        <!-- import -->
-        <!-- <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Import Murid</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {{-- {{ route('importmurid')}} --}}
-                    <form action="{{ route('importstudent')}}" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organImport" id="organImport" class="form-control">
-                                @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                @endforeach
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Nama Kelas</label>
-                                <select name="classImport" id="classImport" class="form-control">
-
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <input type="file" name="file" required>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div> -->
         <!-- export -->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
             aria-hidden="true">
@@ -175,7 +131,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Nama Kelas</label>
+                                <label>Nama Asrama</label>
                                 <select name="dormExport" id="dormExport" class="form-control">
 
                                 </select>
@@ -209,17 +165,14 @@
 
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetchClass($("#organization").val(), '#dorm');
+            fetchDorm($("#organization").val(), '#dorm');
         }
 
         if($("#organExport").val() != ""){
             $("#organExport").prop("selectedIndex", 0).trigger('change');
-            fetchClass($("#organExport").val(), '#dormExport');
+            fetchDorm($("#organExport").val(), '#dormExport');
         }
- 
-        // fetch_data();
-        // alert($("#organization").val());
-        // ***********************************************look on this cid ad classid
+
         function fetch_data(dormid = '') {
             residentTable = $('#residentTable').DataTable({
                 processing: true,
@@ -287,16 +240,16 @@
         $('#organization').change(function() {
             var organizationid    = $("#organization").val();
             var _token            = $('input[name="_token"]').val();
-            fetchClass(organizationid, "#dorm");
+            fetchDorm(organizationid, "#dorm");
         });
 
         $('#organExport').change(function() {
             var organizationid    = $("#organExport").val();
             var _token            = $('input[name="_token"]').val();
-            fetchClass(organizationid, '#dormExport');
+            fetchDorm(organizationid, '#dormExport');
         });
 
-        function fetchClass(organizationid = '', dormId = ''){
+        function fetchDorm(organizationid = '', dormId = ''){
             var _token = $('input[name="_token"]').val();
             $.ajax({
                 url:"{{ route('dorm.fetchDorm') }}",
@@ -313,11 +266,11 @@
                 }
             })
         }
-
+        var dormid;
         $('#dorm').change(function() {
             var organizationid    = $("#organization option:selected").val();
 
-            var dormid    = $("#dorm option:selected").val();
+            dormid = $("#dorm option:selected").val();
             if(dormid){
                 $('#residentTable').DataTable().destroy();
                 fetch_data( dormid);
@@ -340,14 +293,15 @@
         });
 
         $('#delete').click(function() {
+            console.log(dormid + "this is rid");
                 $.ajax({
                     type: 'POST',
                     dataType: 'html',
                     data: {
                         "_token": "{{ csrf_token() }}",
-                        _method: 'DELETE'
+                        // _method: 'DELETE'
                     },
-                    url: "/dorm/dorm/indexResident/" + resident_id,
+                    url: "/dorm/dorm/destroyResident/" + resident_id,
                     success: function(data) {
                         setTimeout(function() {
                             $('#confirmModal').modal('hide');

@@ -236,7 +236,7 @@
                         //return '<a href = "{{route("dorm.editDorm",["id"=>' + row.id + '])}}">' + row.id + '</a>';
                         //return '<a href = "{{url("dorm/dorm/editDorm/' + row.id + '")}}">' + row.id + '</a>';
                         console.log(row.id)
-                        return '<a href = "editDorm/' + row.id + '">' + data + '</a>';
+                        return '<a href = "indexResident/' + row.id + '">' + data + '</a>';
                         //,' + row.id + '
                     }
                 }, {
