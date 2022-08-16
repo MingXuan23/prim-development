@@ -7,6 +7,7 @@ use App\Models\Dish;
 use App\Models\Order;
 use App\Models\Organization;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use phpDocumentor\Reflection\Types\Null_;
 
@@ -191,7 +192,9 @@ class OrderController extends Controller
                 $dish = Dish::find($order_dish->dish_id);
                 $order_dish->dish = $dish;
             }
-            
+            $user = User::find($order->user_id);
+            $order->user = $user;
+
             $organization = DB::table('organizations')
                 ->where('id', $order->organ_id)
                 ->first();
