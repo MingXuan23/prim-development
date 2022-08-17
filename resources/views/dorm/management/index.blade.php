@@ -285,7 +285,7 @@
                     name: 'name',
                     render: function(data, type, row, meta) {
 
-                        return '<a href = "editDorm/' + row.id + '">' + data + '</a>';
+                        return '<a href = "indexResident/' + row.id + '">' + data + '</a>';
                     }
                 }, {
                     data: "accommodate_no",

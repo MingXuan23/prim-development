@@ -18,7 +18,41 @@
 <div class="row">
 
     <div class="col-md-12">
+        <div class="card card-primary">
+
+            {{csrf_field()}}
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected disabled>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                        @if($row->id == $dorm[0]->organization_id)
+                        <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                        @else
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                </div>
+
+                @foreach($dorm as $row)
+                <option id="isselecteddorm" value="{{ $row->id }}" hidden>{{$row->name}}</option>
+                @endforeach
+                <div class="form-group">
+                    <label>Nama Asrama </label>
+                    <select name="dorm" id="dorm" class="form-control">
+                        <option value="" disabled selected>Pilih Asrama</option>
+                        
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
         <div class="card">
+            <div class="card-header" id="title"></div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
                         class="fas fa-plus"></i> Export</a>
@@ -28,26 +62,7 @@
             </div>
 
             <div class="card-body">
-                {{csrf_field()}}
-                <div class="card-body">
-
-                    <div class="form-group">
-                        <label>Nama Organisasi</label>
-                        <select name="organization" id="organization" class="form-control">
-                            <option value="" selected disabled>Pilih Organisasi</option>
-                            @foreach($organization as $row)
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label> Asrama </label>
-                        <select name="dorm" id="dorm" class="form-control">
-                            <option value="" disabled selected>Pilih Asrama</option>
-                        </select>
-                    </div>
-                </div>
+                
                 @if(count($errors) > 0)
                 <div class="alert alert-danger">
                     <ul>
@@ -106,51 +121,6 @@
         {{-- end confirmation delete modal --}}
 
         <!-- Modal -->
-        <!-- import -->
-        <!-- <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Import Murid</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {{-- {{ route('importmurid')}} --}}
-                    <form action="{{ route('importstudent')}}" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organImport" id="organImport" class="form-control">
-                                @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                @endforeach
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Nama Kelas</label>
-                                <select name="classImport" id="classImport" class="form-control">
-
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <input type="file" name="file" required>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div> -->
         <!-- export -->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
             aria-hidden="true">
@@ -175,7 +145,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Nama Kelas</label>
+                                <label>Nama Asrama</label>
                                 <select name="dormExport" id="dormExport" class="form-control">
 
                                 </select>
@@ -204,22 +174,22 @@
 
 <script>
     $(document).ready(function(){
-        
+ 
         var residentTable;
+        var dormid;
 
+        // how to get the data pass using compact inside this function?
+        // can access from dorm1 but other than that one all cannot, do we want to change the concept?
         if($("#organization").val() != ""){
-            $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetchClass($("#organization").val(), '#dorm');
+            $("#organization").prop("selectedIndex", $("#organization")[0].selectedIndex).trigger('change');
+            fetchDorm($("#organization").val(), "#dorm");
         }
 
         if($("#organExport").val() != ""){
             $("#organExport").prop("selectedIndex", 0).trigger('change');
-            fetchClass($("#organExport").val(), '#dormExport');
+            fetchDorm($("#organExport").val(), '#dormExport');
         }
- 
-        // fetch_data();
-        // alert($("#organization").val());
-        // ***********************************************look on this cid ad classid
+
         function fetch_data(dormid = '') {
             residentTable = $('#residentTable').DataTable({
                 processing: true,
@@ -228,7 +198,7 @@
                     // resident
                     url: "{{ route('dorm.getResidentsDatatable') }}",
                     data: {
-                        dormid: dormid,
+                        dormid: dormid, //class_stduent.id
                         hasOrganization: true
                     },
                     type: 'GET',
@@ -287,16 +257,16 @@
         $('#organization').change(function() {
             var organizationid    = $("#organization").val();
             var _token            = $('input[name="_token"]').val();
-            fetchClass(organizationid, "#dorm");
+            fetchDorm(organizationid, "#dorm");
         });
 
         $('#organExport').change(function() {
             var organizationid    = $("#organExport").val();
             var _token            = $('input[name="_token"]').val();
-            fetchClass(organizationid, '#dormExport');
+            fetchDorm(organizationid, '#dormExport');
         });
 
-        function fetchClass(organizationid = '', dormId = ''){
+        function fetchDorm(organizationid = '', dormId = ''){
             var _token = $('input[name="_token"]').val();
             $.ajax({
                 url:"{{ route('dorm.fetchDorm') }}",
@@ -309,20 +279,22 @@
                     $(dormId).append("<option value='' disabled selected> Pilih Asrama</option>");
                     jQuery.each(result.success, function(key, value){
                         $(dormId).append("<option value='"+ value.id +"'>" + value.name + "</option>");
+                        if(value.id == $("#isselecteddorm").val()){
+                            $pick = key + 1;
+                        } 
                     });
+                    $("#dorm").prop("selectedIndex", $pick).trigger('change');
                 }
             })
         }
 
         $('#dorm').change(function() {
-            var organizationid    = $("#organization option:selected").val();
-
-            var dormid    = $("#dorm option:selected").val();
+            dormid = $("#dorm option:selected").val();
+            document.getElementById('title').innerHTML = "Senarai Pelajar dalam " + $("#dorm option:selected").text();
             if(dormid){
                 $('#residentTable').DataTable().destroy();
-                fetch_data( dormid);
+                fetch_data(dormid);
             }
-            // console.log(organizationid);
         });
 
         // csrf token for ajax
@@ -345,9 +317,9 @@
                     dataType: 'html',
                     data: {
                         "_token": "{{ csrf_token() }}",
-                        _method: 'DELETE'
+                        // _method: 'DELETE'
                     },
-                    url: "/dorm/dorm/indexResident/" + resident_id,
+                    url: "/dorm/dorm/destroyResident/" + resident_id,
                     success: function(data) {
                         setTimeout(function() {
                             $('#confirmModal').modal('hide');

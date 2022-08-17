@@ -172,25 +172,12 @@
                                     </a>
                                 </li>
                                 @endrole
-                                <!--fas fa-bed-->
-
-                                @role('Superadmin|Pentadbir|Guru|Warden')
-                                <li>
-                                    <a href="{{ route('dorm.indexResident') }}" class=" waves-effect">
-                                        <i class="fas fa-bus"></i>
-                                        <span>Resident</span>
-                                    </a>
-                                </li>
-                                @endrole
                             </ul>
                         </li>
                         @endrole
                     </ul>
                 </li>
                 @endrole
-
-
-
 
                 @role('Superadmin|Pentadbir|Guru|Penjaga')
 
