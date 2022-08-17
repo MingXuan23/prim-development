@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Carbon;
-use App\Models\KoopOrder;
+use App\Models\PickUpOrder;
 use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use App\Models\OrganizationHours;
@@ -84,7 +84,7 @@ class CooperativeController extends Controller
         // Check if quantity request is less or equal to quantity available
         if($request->item_quantity <= $item->quantity) // if true
         {
-            $order = KoopOrder::where([
+            $order = PickUpOrder::where([
                 ['user_id', $userID],
                 ['status', 1],
                 ['organization_id', $request->org_id]
@@ -96,7 +96,7 @@ class CooperativeController extends Controller
                 $cartExist = ProductOrder::where([
                     ['status', 1],
                     ['product_item_id', $request->item_id],
-                    ['koop_order_id', $order->id],
+                    ['pickup_order_id', $order->id],
                 ])->first();
 
                 // If same item exists in cart
@@ -125,7 +125,7 @@ class CooperativeController extends Controller
                         'quantity' => $request->item_quantity,
                         'status' => 1,
                         'product_item_id' => $request->item_id,
-                        'koop_order_id' => $order->id
+                        'pickup_order_id' => $order->id
                     ]);
 
                     $newQuantity = intval((int)$item->quantity - (int)$request->item_quantity);
@@ -133,7 +133,7 @@ class CooperativeController extends Controller
 
                 $cartItem = DB::table('product_order as po')
                                 ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                                ->where('po.koop_order_id', $order->id)
+                                ->where('po.pickup_order_id', $order->id)
                                 ->where('po.status', 1)
                                 ->select('po.quantity', 'pi.price')
                                 ->get();
@@ -145,7 +145,7 @@ class CooperativeController extends Controller
                     $newTotalPrice += doubleval($row->price * $row->quantity);
                 }
 
-                KoopOrder::where([
+                PickUpOrder::where([
                     ['user_id', $userID],
                     ['status', 1],
                     ['organization_id', $request->org_id]
@@ -160,8 +160,7 @@ class CooperativeController extends Controller
 
                 $newQuantity = intval((int)$item->quantity - (int)$request->item_quantity);
 
-                $newOrder = KoopOrder::create([
-                    'method_status' => 1,
+                $newOrder = PickUpOrder::create([
                     'total_price' => $totalPrice,
                     'status' => 1,
                     'user_id' => $userID,
@@ -172,7 +171,7 @@ class CooperativeController extends Controller
                     'quantity' => $request->item_quantity,
                     'status' => 1,
                     'product_item_id' => $request->item_id,
-                    'koop_order_id' => $newOrder->id
+                    'pickup_order_id' => $newOrder->id
                 ]);
             }
 
@@ -186,7 +185,7 @@ class CooperativeController extends Controller
                 ProductItem::where('id', $request->item_id)
                 ->update(['quantity' => $newQuantity, 'status' => 0]);
             }
-
+            
             return back()->with('success', 'Item Berjaya Ditambah!');
         }
         else // if false
@@ -205,10 +204,14 @@ class CooperativeController extends Controller
      */
     public function show($id)
     {
+        $todayDate = Carbon::now()->format('l');
+
+        $day = $this->getDayIntegerByDayName($todayDate);
+
         $koperasi = DB::table('organizations as o')
                     ->join('organization_hours as oh', 'o.id', '=', 'oh.organization_id')
                     ->where('o.id', $id)
-                    ->where('o.type_org', 1039)
+                    ->where('oh.day', $day)
                     ->select('o.id', 'o.nama', 'o.telno', 'o.address', 'o.city', 'o.postcode', 'o.state', 'o.parent_org',
                             'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
                     ->first();
@@ -217,7 +220,7 @@ class CooperativeController extends Controller
         
         $product_item = DB::table('product_item as pi')
                         ->join('product_type as pt', 'pi.product_type_id', '=', 'pt.id')
-                        ->where('pi.organization_id', $koperasi->id)
+                        ->where('pt.organization_id', $koperasi->id)
                         ->select('pi.*', 'pt.name as type_name')
                         ->orderBy('pi.name')
                         ->get();
@@ -225,7 +228,7 @@ class CooperativeController extends Controller
         $product_type = DB::table('product_type as pt')
                             ->join('product_item as pi', 'pt.id', '=', 'pi.product_type_id')
                             ->select('pt.id as type_id', 'pt.name as type_name')
-                            ->where('pi.organization_id', $koperasi->id)
+                            ->where('pt.organization_id', $koperasi->id)
                             ->distinct() 
                             ->get();
 
@@ -247,7 +250,7 @@ class CooperativeController extends Controller
         $cart_item = array(); // empty if cart is empty
         $user_id = Auth::id();
 
-        $cart = KoopOrder::where([
+        $cart = PickUpOrder::where([
             ['status', 1],
             ['organization_id', $id],
             ['user_id', $user_id],
@@ -258,7 +261,7 @@ class CooperativeController extends Controller
             $cart_item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
                     ->where('po.status', 1)
-                    ->where('po.koop_order_id', $cart->id)
+                    ->where('po.pickup_order_id', $cart->id)
                     ->select('po.id', 'po.quantity', 'pi.name', 'pi.price', 'pi.image')
                     ->get();
 
@@ -299,13 +302,13 @@ class CooperativeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $org = KoopOrder::where('id', $id)->select('organization_id as id')->first();
+        $org = PickUpOrder::where('id', $id)->select('organization_id as id')->first();
 
         $daySelect = (int)$request->week_status;
 
         $pickUp = Carbon::now()->next($daySelect)->toDateString();
         
-        KoopOrder::where([
+        PickUpOrder::where([
             ['status', 1],
             ['id', $id],
         ])->update([
@@ -316,7 +319,7 @@ class CooperativeController extends Controller
 
         ProductOrder::where([
             ['status', 1],
-            ['koop_order_id', $id],
+            ['pickup_order_id', $id],
         ])->update(['status' => 2]);
 
         return redirect('/koperasi/'.$org->id)->with('success', 'Pesanan Anda Berjaya Direkod!');
@@ -357,7 +360,7 @@ class CooperativeController extends Controller
 
         $allCartItem = DB::table('product_order as po')
                         ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                        ->where('po.koop_order_id', $item->koop_order_id)
+                        ->where('po.pickup_order_id', $item->pickup_order_id)
                         ->where('po.status', 1)
                         ->select('po.quantity', 'pi.price')
                         ->get();
@@ -374,7 +377,7 @@ class CooperativeController extends Controller
                 $newTotalPrice += doubleval($row->price * $row->quantity);
             }
 
-            KoopOrder::where([
+            PickUpOrder::where([
                 ['user_id', $userID],
                 ['status', 1],
                 ['organization_id', $org_id],
@@ -382,7 +385,7 @@ class CooperativeController extends Controller
         }
         else // If cart is empty (delete order)
         {
-            KoopOrder::where([
+            PickUpOrder::where([
                 ['user_id', $userID],
                 ['status', 1],
                 ['organization_id', $org_id],
@@ -408,7 +411,7 @@ class CooperativeController extends Controller
     {
         $userID = Auth::id();
 
-        $query = DB::table('koop_order as ko')
+        $query = DB::table('pickup_order as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                 ->whereIn('status', [2,4])
                 ->where('user_id', $userID)
@@ -444,12 +447,12 @@ class CooperativeController extends Controller
             if($row->pickup_date == $key && $isPast[$row->pickup_date] == 1)
             {
                 // Status changed to overdue
-                KoopOrder::where('pickup_date', $row->pickup_date)->update(['status' => 4]);
+                PickUpOrder::where('pickup_date', $row->pickup_date)->update(['status' => 4]);
             }
             else
             {
                 // Status is still not picked
-                KoopOrder::where('pickup_date', $row->pickup_date)->update(['status' => 2]);
+                PickUpOrder::where('pickup_date', $row->pickup_date)->update(['status' => 2]);
             }
         }
 
@@ -462,7 +465,7 @@ class CooperativeController extends Controller
     {
         $userID = Auth::id();
 
-        $query = DB::table('koop_order as ko')
+        $query = DB::table('pickup_order as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                 ->whereIn('status', [3, 100, 200])
                 ->where('user_id', $userID)
@@ -481,7 +484,7 @@ class CooperativeController extends Controller
         $userID = Auth::id();
 
         // Get Information about the order
-        $list_detail = DB::table('koop_order as ko')
+        $list_detail = DB::table('pickup_order as ko')
                         ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                         ->where('ko.id', $id)
                         ->where('ko.status', '>' , 0)
@@ -508,7 +511,7 @@ class CooperativeController extends Controller
         // get all product based on order
         $item = DB::table('product_order as po')
                 ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                ->where('po.koop_order_id', $id)
+                ->where('po.pickup_order_id', $id)
                 ->where('po.status', '>', 0)
                 ->select('pi.name', 'pi.price', 'po.quantity')
                 ->get();
@@ -529,7 +532,7 @@ class CooperativeController extends Controller
     {   
         $order_id = $request->get('oID');
 
-        $order = KoopOrder::where('id', $order_id)->first();
+        $order = PickUpOrder::where('id', $order_id)->first();
 
         $allDay = OrganizationHours::where('organization_id', $order->organization_id)->where('status', 1)->get();
         
@@ -556,7 +559,7 @@ class CooperativeController extends Controller
 
         $pickUp = Carbon::now()->next($daySelect)->toDateString();
 
-        $result = KoopOrder::where('id', $order_id)->update(['pickup_date' => $pickUp]);
+        $result = PickUpOrder::where('id', $order_id)->update(['pickup_date' => $pickUp]);
         
         $this->indexOrder(); // Recall function to recheck status
 
@@ -571,11 +574,11 @@ class CooperativeController extends Controller
 
     public function destroyUserOrder($id)
     {
-        $queryKO = KoopOrder::where('id', $id);
+        $queryKO = PickUpOrder::where('id', $id);
         $queryKO->update(['status' => 200]);
         $resultKO = $queryKO->delete();
 
-        $queryPO = ProductOrder::where('koop_order_id', $id);
+        $queryPO = ProductOrder::where('pickup_order_id', $id);
 
         $order = $queryPO->get();
 
@@ -599,7 +602,7 @@ class CooperativeController extends Controller
         }
     }
 
-    private function getDayStatus($todayDay, $allDay, $arr, $key_index)
+    public function getDayStatus($todayDay, $allDay, $arr, $key_index)
     {
         // If today is Sunday
         if($todayDay == 0) 
@@ -617,8 +620,9 @@ class CooperativeController extends Controller
         return $arr;
     }
 
-    private function getDayIntegerByDayName($date)
+    public function getDayIntegerByDayName($date)
     {
+        $day = null;
         if($date == "Monday") { $day = 1; }
         else if($date == "Tuesday") { $day = 2; }
         else if($date == "Wednesday") { $day = 3; }

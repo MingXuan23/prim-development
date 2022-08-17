@@ -50,10 +50,10 @@ class Organization extends Model
     {
         return $this->hasMany(ProductItem::class);
     }
-
-    public function koop_order()
+    
+    public function pickup_order()
     {
-        return $this->hasMany(KoopOrder::class);
+        return $this->hasMany(PickUpOrder::class);
     }
 
     public function getOrganizationByDonationId($donationId)

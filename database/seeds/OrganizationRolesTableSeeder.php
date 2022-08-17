@@ -51,6 +51,11 @@ class OrganizationRolesTableSeeder extends Seeder
                 "id" => 1239,
                 "name" => "Koop_Admin",
             ),
+            7 =>
+            array(
+                "id" => 2015,
+                "name" => "Merchant_Admin",
+            ),
         ));
     }
 }

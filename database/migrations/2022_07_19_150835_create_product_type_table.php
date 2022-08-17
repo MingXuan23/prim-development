@@ -16,6 +16,11 @@ class CreateProductTypeTable extends Migration
         Schema::create('product_type', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+            $table->unsignedBigInteger('organization_id')->index();
+
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 
@@ -26,6 +31,9 @@ class CreateProductTypeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_type');
+        Schema::dropIfExists('product_type', function(Blueprint $table)
+        {
+            $table->drop('organization_id');
+        });
     }
 }

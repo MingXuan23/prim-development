@@ -72,6 +72,7 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
     Route::get('testRepeater', 'OrganizationController@testRepeater');
+    Route::post('parent-koop', 'OrganizationController@fetchAvailableParentKoop')->name('organization.fetchAvailableParentKoop');
 });
 
 Route::group(['prefix' => 'teacher'], function () {
@@ -174,6 +175,14 @@ Route::group(['prefix' => 'koperasi'], function() {
     Route::delete('/order/{id}', 'CooperativeController@destroyUserOrder')->name('koperasi.destroyUserOrder');
     Route::get('/history', 'CooperativeController@indexHistory')->name('koperasi.history');
     Route::get('/{id}/list', 'CooperativeController@indexList')->name('koperasi.list');
+});
+
+Route::group(['prefix' => 'merchant'], function() {
+    Route::get('/', 'MerchantController@merchantList')->name('merchant.index');
+    Route::get('/{id}', 'MerchantController@showMerchant')->name('merchant.show');
+    Route::post('fetchItem', 'MerchantController@fetchItem')->name('merchant.fetchItem');
+    Route::post('store-item', 'MerchantController@storeItem')->name('merchant.storeItem');
+    Route::get('/{id}/merchant-cart', 'MerchantController@showMerchantCart')->name('merchant.cart');
 });
 
 Route::group(['middleware' => ['auth']], function () {

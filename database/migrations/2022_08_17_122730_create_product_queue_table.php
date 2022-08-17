@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProductOrderTable extends Migration
+class CreateProductQueueTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,16 @@ class CreateProductOrderTable extends Migration
      */
     public function up()
     {
-        Schema::create('product_order', function (Blueprint $table) {
+        Schema::create('product_queue', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('quantity')->nullable();
+            $table->unsignedBigInteger('product_item_id')->index();
+            $table->time('start_slot_time')->nullable();
+            $table->time('end_slot_time')->nullable();
+            $table->integer('quantity_available')->nullable();
             $table->integer('status')->nullable();
             $table->timestamps();
-            $table->softDeletes();
-            $table->unsignedBigInteger('product_item_id')->index();
-            $table->unsignedBigInteger('pickup_order_id')->index();
 
             $table->foreign('product_item_id')->references('id')->on('product_item')->onDelete('cascade');
-            $table->foreign('pickup_order_id')->references('id')->on('pickup_order')->onDelete('cascade');
         });
     }
 
@@ -34,9 +33,8 @@ class CreateProductOrderTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_order', function (Blueprint $table) {
+        Schema::dropIfExists('product_queue', function (Blueprint $table) {
             $table->dropColumn('product_item_id');
-            $table->dropColumn('pickup_order_id');
         });
     }
 }

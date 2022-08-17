@@ -3,6 +3,7 @@
 @section('css')
 
 <style>
+
 #has-bg-img{
   background-image: url("{{ URL('images/koperasi/Koperasi-default-background-2.jpg')}}");
   background-repeat: no-repeat;
@@ -21,6 +22,24 @@
   height: 200px;
   border-radius: 14px;
   object-fit: contain;
+}
+
+#test-size
+{
+  max-width: 100%;
+  height: auto;
+  width: 100px;
+  border-radius: 14px;
+  object-fit: contain;
+  background-color:rgb(61, 61, 61)
+}
+
+.nav-link{
+  color: black;
+}
+
+.nav-link:hover{
+  color:rgb(98, 97, 97);
 }
 </style>
 
@@ -50,8 +69,67 @@
           @endif
         </div>
       </div>
+
+      <div class="m-2">
+        <nav class="nav">
+          @foreach($product_type as $row)
+          <a class="nav-item nav-link" id="{{ $row->type_id }}" href="#{{ $row->type_name }}">
+            {{ $row->type_name }}
+          </a>
+          @endforeach
+        </nav>
+        <hr>
+      </div>
       
       <div class="card-body">
+        
+          @if(count($product_type) != 0 && count($product_item) != 0)
+          @foreach($product_type as $type)
+          
+            <div class="d-flex justify-content-start" id="{{ $type->type_name }}">
+              <h3 class="mb-4 ml-2">{{ $type->type_name }}</h3>
+            </div>
+    
+            <div class="row">
+              @foreach($product_item as $product)
+              @if($product->type_name == $type->type_name)
+              <div class="col">
+                <div class="card border p-2" id="shadow-bg" >
+                  <div class="d-flex">
+                    <div class="d-flex justify-content-center align-items-start">
+                      <div>
+                        <img class="img-fluid" id="test-size" src="{{ URL('images/koperasi/default-item.png')}}" alt="Card image cap">
+                      </div>
+                    </div>
+                    <div class="col">
+                      <div class="d-flex align-items-start flex-column h-100" >
+                        <div>
+                          <h4 class="mt-2">{{ $product->name }}</h4> 
+                        </div>
+                        <div>
+                          <p class="card-text"><i>{{ $product->desc }} Lorem ipsum dolor, sit amet consectetur adipisicing elit. Obcaecati quia ullam, nostrum eaque unde vel molestias necessitatibus officia corporis provident laborum nisi deleniti architecto, fugiat aliquam. Optio quas temporibus nobis.</i></p>
+                        </div>
+                        <div class="mt-auto d-flex justify-content-between align-items-center w-100">
+                          <div class="">
+                            <p class="card-text"><b>RM</b> {{ number_format((double)$product->price, 2, '.', '') }}</p>
+                          </div>
+                          <div class="ml-auto">
+                            <i class="btn btn-success mdi mdi-cart"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              @endif
+              @endforeach
+              </div>
+            </div>
+          
+          @endforeach
+          @endif
+        
+        
 
         @if(Session::has('success'))
           <div class="alert alert-success">
@@ -184,6 +262,35 @@
   $(document).ready(function(){
     $('.alert-success').delay(2000).fadeOut();
     $('.alert-danger').delay(4000).fadeOut();
+
+    var first_nav = $('.nav a:first');
+    first_nav.addClass('active');
+    // var nav_id = first_nav.attr('id');
+
+    // if($('.tab-pane').attr('id') == nav_id)
+    // {
+    //   $('.tab-pane').addClass('show active');
+    // }
+    
+
+    $('.nav-item').click(function(e){
+      // e.preventDefault();
+      var type_id = $(this).attr('id');
+
+      if($(this).hasClass('active'))
+      {
+        $(this).addClass('active');
+        $('.tab-pane').addClass('show active');
+      }
+      else
+      {
+        $('.nav-item:not(#type_id)').removeClass('active');
+        // $('.tab-pane:not(#type_id').removeClass('show active');
+        
+        $(this).addClass('active');
+        // $('.tab-pane').addClass('show active');
+      }
+    })
   });
 </script>
 

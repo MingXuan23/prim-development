@@ -247,6 +247,15 @@
             </li>
             @endrole
 
+            @role('Superadmin|Merchant_Admin')
+            <li>
+                <a href="#" class=" waves-effect">
+                    <i class="mdi mdi-account-group"></i>
+                    <span>Admin Peniaga</span>
+                </a>
+            </li>
+            @endrole
+
             @role('Superadmin|Koop_Admin')
             <li>
                 <a href="#" class=" waves-effect">
@@ -255,6 +264,33 @@
                 </a>
             </li>
             @endrole
+
+            <li>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="mdi mdi-store"></i>
+                    <span>Peniaga</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    <li>
+                        <a href="{{ route('merchant.index') }}" class=" waves-effect">
+                            <i class="ti-bookmark-alt"></i>
+                            <span>Semua Peniaga</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class=" waves-effect">
+                            <i class="ti-email"></i>
+                            <span>Pesanan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Sejarah</span>
+                        </a>
+                    </li>
+                </ul>  
+            </li>
 
             @role('Superadmin|Penjaga')
             <li>

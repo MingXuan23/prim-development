@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\User;
 
-class KoopOrder extends Model
+class PickUpOrder extends Model
 {
     use SoftDeletes;
 
-    protected $table = "koop_order";
+    protected $table = "pickup_order";
     
-    protected $fillable = ['receive_date', 'method_status', 'total_price', 'note', 'status', 'address', 'city', 'postcode', 'state', 'user_id', 'organization_id'];
+    protected $fillable = ['pickup_date', 'total_price', 'note', 'status', 'user_id', 'organization_id'];
     public $timestamps = true;
 
     public function user()

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateKoopOrderTable extends Migration
+class CreatePickupOrderTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,14 @@ class CreateKoopOrderTable extends Migration
      */
     public function up()
     {
-        Schema::create('koop_order', function (Blueprint $table) {
+        Schema::create('pickup_order', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->timestamps();
-            $table->date('pickup_date')->nullable();
-            $table->integer('method_status')->nullable();
+            $table->dateTime('pickup_date')->nullable();
             $table->double('total_price', 8, 2)->nullable();
             $table->mediumText('note')->nullable();
             $table->integer('status')->nullable();
             $table->softDeletes();
-            $table->string('address')->nullable();
-            $table->string('city')->nullable();
-            $table->integer('postcode')->nullable();
-            $table->string('state')->nullable();
             $table->unsignedBigInteger('user_id')->index();
             $table->unsignedBigInteger('organization_id')->index();
 
@@ -41,7 +36,7 @@ class CreateKoopOrderTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('koop_order', function(Blueprint $table)
+        Schema::dropIfExists('pickup_order', function(Blueprint $table)
         {
             $table->drop('user_id');
             $table->drop('organization_id');
