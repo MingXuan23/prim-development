@@ -233,7 +233,7 @@ Route::post('/exportouting', 'DormController@outingexport')->name('exportouting'
 //dorm management import and export
 Route::post('/exportdorm', 'DormController@dormexport')->name('exportdorm');
 Route::post('/importdorm', 'DormController@dormimport')->name('importdorm');
-Route::post('/importresident/{id}', 'DormController@residentimport')->name('importresident');
+Route::post('/importresident', 'DormController@residentimport')->name('importresident');
 
 
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
@@ -316,5 +316,5 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/editDorm/{id}', 'DormController@editDorm')->name('dorm.editDorm');
     Route::get('dorm/destroyDorm/{id}', 'DormController@destroyDorm')->name('dorm.destroyDorm');
     Route::get('dorm/getDormDataTable', 'DormController@getDormDataTable')->name('dorm.getDormDataTable');
-    Route::get('dorm/getID/{id}', 'DormController@getID')->name('dorm.getID');
+    Route::get('dorm/clearDorm/{id}', 'DormController@clearDorm')->name('dorm.clearDorm');
 });

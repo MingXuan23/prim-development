@@ -82,7 +82,12 @@ class DormController extends Controller
         // 
         $organization = $this->getOrganizationByUserId();
 
-        return view('dorm.management.index', compact('organization'));
+        $dormlist = DB::table('dorms')
+            ->select('id', 'name')
+            ->get();
+
+
+        return view('dorm.management.index', compact('organization', 'dormlist'));
     }
 
     //
@@ -117,7 +122,7 @@ class DormController extends Controller
     }
 
     //not yet modify
-    public function residentimport(Request $request, $id)
+    public function residentimport(Request $request)
     {
         $file       = $request->file('file');
         $namaFile   = $file->getClientOriginalName();
@@ -130,10 +135,28 @@ class DormController extends Controller
             return redirect('/dorm/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
 
-        //please check need what id to pass into ResidentImport
-        Excel::import(new ResidentImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+        //dorm id need to pass into ResidentImport
+        $import_file = new ResidentImport($request->dorm, 5);
+        $another_file = Excel::toArray($import_file,  public_path('/uploads/excel/' . $namaFile));
 
-        return redirect('/dorm/dorm/indexDorm')->with('success', 'Residents have been added successfully');
+        //get the accomodate number for the particular dorm
+        $accomodate_number = DB::table('dorms')
+            ->where('id', $request->dorm)
+            ->value('accommodate_no');
+
+        $student_inside = DB::table('dorms')
+            ->where('id', $request->dorm)
+            ->value('student_inside_no');
+
+        $total_student_add = $student_inside + sizeof($another_file[0]);
+
+        //only if the number of row count + student inside is less than accomodate number
+        if ($total_student_add <= $accomodate_number) {
+            Excel::import(new ResidentImport($request->dorm, $total_student_add), public_path('/uploads/excel/' . $namaFile));
+
+            return redirect('/dorm/dorm/indexDorm')->with('success', 'Residents have been added successfully');
+        } else
+            return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the student added is out of capacity limit');
     }
 
     /**
@@ -325,10 +348,10 @@ class DormController extends Controller
         return view('dorm.outing.update', compact('outing', 'organization', 'id'));
     }
 
-    public function getID($id)
-    {
-        return response()->json(["string" => $id]);
-    }
+    // public function getID($id)
+    // {
+    //     return response()->json(["string" => $id]);
+    // }
     public function editDorm($id)
     {
         //  
@@ -450,6 +473,24 @@ class DormController extends Controller
             //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         } else {
             Session::flash('error', 'Dorm Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
+        }
+    }
+
+    public function clearDorm($id)
+    {
+        //
+        $result = DB::table('class_student')->where('dorm_id', $id)->update(['dorm_id' => null]);
+
+        if ($result) {
+            DB::table('dorms')->where('id', $id)->update(['student_inside_no' => 0]);
+
+            Session::flash('success', 'Dorm Berjaya Dikosongkan');
+            return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
+        } else {
+            Session::flash('error', 'Dorm Gagal Dikosongkan');
             return View::make('layouts/flash-messages');
             //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         }
@@ -598,9 +639,14 @@ class DormController extends Controller
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a href="' . route('importresident', $row->id) . '" class="btn btn-primary m-1">Import</a>';
+                // $btn = $btn . '<a href="' . route('importresident', $row->id) . '" class="btn btn-primary m-1">Import</a>';
+
+                //try
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" data-toggle="modal" data-target="#modelId3" class="btn btn-primary m-1">Import</button>';
+
                 $btn = $btn . '<a href="' . route('dorm.editDorm', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 destroyDorm">Buang</button></div>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 clearDorm">Clear</button></div>';
                 return $btn;
             });
 

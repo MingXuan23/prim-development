@@ -21,34 +21,68 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class ResidentImport implements ToModel, WithValidation, WithHeadingRow
 {
-    public function __construct($class_id)
+    public function __construct($dorm_id, $number_student_inside)
     {
-        $id = DB::table('class_organization')->where('class_id', $class_id)->first();
-        $this->class_id = $id;
+        $selected_dorm = DB::table('dorms')->where('id', $dorm_id)->first();
+        $this->dorm_id = $selected_dorm->id;
+        $this->number_student_inside = $number_student_inside;
     }
 
     public function rules(): array
     {
         return [
-            /* 'no_kp' => [
-                'required',
-                 Rule::unique('students', 'icno')
-            ], */];
+            'name' => [
+                'required'
+                //Rule::unique('students', 'icno')
+            ],
+            'email' => [
+                'required'
+            ],
+            // 'nama_penjaga' => [
+            //     'required'
+            // ],
+            'no_tel_bimbit_penjaga' => [
+                'required'
+                //Rule::unique('users', 'telno')
+            ],
+            'class' => [
+                'required'
+            ],
+        ];
     }
 
     public function customValidationMessages()
     {
         return [
-            /* 'no_kp.unique' => 'Terdapat maklumat murid yang telah wujud',
-            'no_kp.required' => 'Maklumat murid diperlukan', */];
+            'name.required' => 'Maklumat nama murid diperlukan',
+            //'nama_penjaga.required' => 'Maklumat nama penjaga diperlukan',
+            'no_tel_bimbit_penjaga.required' => 'Maklumat nombor telefon bimbit penjaga diperlukan',
+            'class.required' => 'Maklumat kelas murid diperlukan'
+        ];
     }
 
     public function model(array $row)
     {
-        if (!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_tel_bimbit_penjaga'])) {
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
-        }
 
+
+        //validate column name
+        // if (!isset($row['name']) || !isset($row['nama_penjaga']) || !isset($row['no_tel_bimbit_penjaga']) || !isset($row['class'])) {
+        //     throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+        // }
+
+        if (!isset($row['name']))
+            throw ValidationException::withMessages(["error" => "missing name"]);
+        // else if (!isset($row['nama_penjaga']))
+        //     throw ValidationException::withMessages(["error" => "missing nama_penjaga"]);
+        else if (!isset($row['no_tel_bimbit_penjaga']))
+            throw ValidationException::withMessages(["error" => "missing no_tel_bimbit_penjaga"]);
+        else if (!isset($row['class']))
+            throw ValidationException::withMessages(["error" => "missing class"]);
+        // else
+        //     throw ValidationException::withMessages(["error" => "missing idunnoe"]);
+
+
+        //validate phone number
         $phone = trim((string)$row['no_tel_bimbit_penjaga']);
 
         if (!$this->startsWith($phone, "+60") && !$this->startsWith($phone, "60")) {
@@ -71,162 +105,71 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
         }
 
 
-        $co = DB::table('class_organization')
-            ->select('id', 'organization_id as oid')
-            ->where('class_id', $this->class_id->class_id)
-            ->first();
+        //Step 1: get organization id by dorm id
+        //Step 2: get class id from class name
+        //Step 3: then get class organization id where organizatioin id= organization id AND class id = class id
+        //Step 4: then get student id by matching name and parent_tel
+        //Step 5: check the student import is mmg not inside any dorm
 
-        $class = ClassModel::find($this->class_id->class_id);
+        //this is step 1
+        $get_organization_id = DB::table('dorms')
+            ->select('organization_id')
+            ->where('id', $this->dorm_id)
+            ->value('organization_id');
 
-        // $gender = (int) substr($row["no_kp"], -1) % 2 == 0 ? "P" : "L";
-        $gender = $row["jantina"];
-
-        $ifExits = DB::table('users as u')
-            ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
-            // ->where('u.email', '=', $request->get('parent_email'))
-            // ->where('u.icno', '=', $request->get('parent_icno'))
-            ->where('u.telno', '=', $phone)
-            ->where('ou.organization_id', $co->oid)
-            ->whereIn('ou.role_id', [5, 6])
+        //this is step 2
+        $class_exists = DB::table('classes')
+            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+            ->select('classes.id', 'classes.nama')
+            ->where('classes.nama', '=', $row['class'])
+            ->where('class_organization.organization_id', '=', $get_organization_id)
             ->get();
 
-        if (count($ifExits) == 0) { // if not teacher or parent
+        //this is step 3
+        //if the class is exist
+        if (isset($class_exists)) {
+            $that_class_id = DB::table('classes')
+                ->select('id', 'nama')
+                ->where('nama', '=', $row['class'])
+                ->value('id');
 
-            $newparent = DB::table('users')
-                ->where('telno', '=', $phone)
+            $co_id = DB::table('class_organization')
+                ->select('id')
+                ->where('organization_id', $get_organization_id)
+                ->where('class_id', $that_class_id)
                 ->first();
+        }
 
-            if (empty($newparent)) {
-                $validator = Validator::make($row, [
-                    $phone      =>  'required|unique:users,telno',
-                ]);
+        //this is step 4
+        $student_id = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->select('students.id')
+            ->where('students.nama', $row['name'])
+            ->where('students.email', $row['email'])
+            ->where('students.parent_tel', '=', "{$phone}")
+            ->whereNull('class_student.dorm_id')
+            ->value('students.id');
 
-                $newparent = new Parents([
-                    'name'           =>  strtoupper($row['nama_penjaga']),
-                    'password'       =>  Hash::make('abc123'),
-                    'telno'          =>  $phone,
-                    'remember_token' =>  Str::random(40),
-                ]);
-                $newparent->save();
-            }
-
-            // add parent role
-            $parentRole = DB::table('organization_user')
-                ->where('user_id', $newparent->id)
-                ->where('organization_id', $co->oid)
-                ->where('role_id', 6)
-                ->first();
-
-            // dd($parentRole);
-
-            if (empty($parentRole)) {
-                DB::table('organization_user')->insert([
-                    'organization_id'   => $co->oid,
-                    'user_id'           => $newparent->id,
-                    'role_id'           => 6,
-                    'start_date'        => now(),
-                    'status'            => 1,
-                ]);
-            }
+        //if the student is already inside the dorm
+        if (!isset($student_id)) {
+            return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the student added is already inside a dorm');
         } else {
-            $newparent = DB::table('users')
-                ->where('telno', '=', "{$phone}")
-                ->first();
-        }
+            $result = DB::table('class_student as cs')
+                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                ->where([
+                    ['cs.student_id', '=', $student_id],
+                    ['cs.organclass_id', '=', $co_id->id],
+                    ['cs.status', '=', 1],
+                ])
+                ->update(['cs.dorm_id' => $this->dorm_id]);
 
-        $ou = DB::table('organization_user')
-            ->where('user_id', $newparent->id)
-            ->where('organization_id', $co->oid)
-            ->where('role_id', 6)
-            ->first();
-
-        $user = User::find($newparent->id);
-
-        // role parent
-        $rolename = OrganizationRole::find(6);
-        $user->assignRole($rolename->nama);
-
-        $student = new Student([
-            'nama'       => $row["nama"],
-            // 'icno'       => $row["no_kp"],
-            'gender'     => $row["jantina"],
-            'email'      => isset($row['email']) ? $row['email'] : NULL,
-        ]);
-
-        $student->save();
-
-
-        DB::table('class_student')->insert([
-            'organclass_id'   => $co->id,
-            'student_id'      => $student->id,
-            'start_date'      => now(),
-            'status'          => 1,
-        ]);
-
-        $classStu = DB::table('class_student')
-            ->where('student_id', $student->id)
-            ->first();
-
-        DB::table('organization_user_student')->insert([
-            'organization_user_id'  => $ou->id,
-            'student_id'            => $student->id
-        ]);
-
-        DB::table('students')
-            ->where('id', $student->id)
-            ->update(['parent_tel' => $newparent->telno]);
-
-
-        // check fee for new in student
-        // check category A fee
-        $ifExitsCateA = DB::table('fees_new')
-            ->where('category', 'Kategory A')
-            ->where('organization_id', $co->oid)
-            ->where('status', 1)
-            ->get();
-
-        $ifExitsCateBC = DB::table('fees_new')
-            ->whereIn('category', ['Kategory B', 'Kategory C'])
-            ->where('organization_id', $co->oid)
-            ->where('status', 1)
-            ->get();
-
-        if (!$ifExitsCateA->isEmpty() && count($ifExits) == 0) {
-            foreach ($ifExitsCateA as $kateA) {
-                DB::table('fees_new_organization_user')->insert([
-                    'status'                    => 'Debt',
-                    'fees_new_id'               =>  $kateA->id,
-                    'organization_user_id'      =>  $ou->id,
-                    'transaction_id'            => NULL
-                ]);
-            }
-        }
-
-        if (!$ifExitsCateBC->isEmpty()) {
-            foreach ($ifExitsCateBC as $kateBC) {
-                $target = json_decode($kateBC->target);
-
-                if (isset($target->gender)) {
-                    if ($target->gender != $gender) {
-                        continue;
-                    }
-                }
-
-                if ($target->data == "All_Level" || $target->data == $class->levelid) {
-                    DB::table('student_fees_new')->insert([
-                        'status'            => 'Debt',
-                        'fees_id'           =>  $kateBC->id,
-                        'class_student_id'  =>  $classStu->id
-                    ]);
-                } else if (is_array($target->data)) {
-                    if (in_array($class->id, $target->data)) {
-                        DB::table('student_fees_new')->insert([
-                            'status'            => 'Debt',
-                            'fees_id'           =>  $kateBC->id,
-                            'class_student_id'  =>  $classStu->id
-                        ]);
-                    }
-                }
+            //if successfully update the dorm id to the class student
+            if ($result) {
+                DB::table('dorms')
+                    ->where('id', $this->dorm_id)
+                    ->update(['student_inside_no' => $this->number_student_inside]);
+            } else {
+                return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the student status is not active');
             }
         }
     }

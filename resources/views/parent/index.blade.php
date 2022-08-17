@@ -31,8 +31,7 @@
 
                 <div class="form-group">
                     <label>Nombor Telefon</label>
-                    <input type="text" id="telno" name="telno" class="form-control"
-                        placeholder="Masukkan Nombor Telefon">
+                    <input type="text" id="telno" name="telno" class="form-control" placeholder="Masukkan Nombor Telefon">
                     {{-- <p><i> *tiada "-" </i>  </p> --}}
                 </div>
             </div>
@@ -70,8 +69,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="parentTable" class="table table-bordered table-striped dt-responsive nowrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="parentTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
@@ -98,8 +96,7 @@
                         Adakah anda pasti?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
-                            name="delete">Padam</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
                         <button type="button" data-dismiss="modal" class="btn">Batal</button>
                     </div>
                 </div>
@@ -108,8 +105,7 @@
         {{-- end confirmation delete modal --}}
 
         <!-- Modal -->
-        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
+        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -126,7 +122,7 @@
                                 <label>Organisasi</label>
                                 <select name="organ" id="organ" class="form-control">
                                     @foreach($organization as $row)
-                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -166,92 +162,92 @@
         $('#telno').on('keyup', function() {
             var text = this.value;
             clearTimeout(timeout);
-            if(text.length == 12 || text.length == 13){
+            if (text.length == 12 || text.length == 13) {
                 // console.log('asdas');
                 timeout = setTimeout(function() {
-                // Do AJAX shit here      
-                $('#parentTable').DataTable().destroy();
+                    // Do AJAX shit here      
+                    $('#parentTable').DataTable().destroy();
                     fetch_data(text);
-                
-                // alert(text);
+
+                    // alert(text);
                 }, 100);
             }
-            
+
         });
         var parentTable;
 
         function fetch_data(telno = '') {
-            
+
             parentTable = $('#parentTable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('parent.getParentDatatable') }}",
-                        data: {
-                            telno: telno,
-                        },
-                        type: 'GET',
-  
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('parent.getParentDatatable') }}",
+                    data: {
+                        telno: telno,
                     },
-                    'columnDefs': [{
-                        "targets": [0], // your case first column
-                        "className": "text-center",
-                        "width": "2%"
-                    },{
-                        "targets": [3,4,5], // your case first column
-                        "className": "text-center",
-                    },{
-                        "targets": '_all',
-                        "defaultContent": ""
-                    }],
-                    order: [
-                        [1, 'asc']
-                    ],
-                    columns: [{
-                        "data": null,
-                        searchable: false,
-                        "sortable": false,
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        }
-                    }, {
-                        data: "name",
-                        name: 'name',
-                        orderable: false,
-                        searchable: false
-                    },{
-                        data: "icno",
-                        name: 'icno',
-                        orderable: false,
-                        searchable: false
-                    }, {
-                        data: "email",
-                        name: 'email',
-                        orderable: false,
-                        searchable: false
-                    }, {
-                        data: "telno",
-                        name: 'telno',
-                        orderable: false,
-                        searchable: false
-                    }, {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },]
+                    type: 'GET',
+
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [3, 4, 5], // your case first column
+                    "className": "text-center",
+                }, {
+                    "targets": '_all',
+                    "defaultContent": ""
+                }],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "name",
+                    name: 'name',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "icno",
+                    name: 'icno',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "email",
+                    name: 'email',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "telno",
+                    name: 'telno',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }, ]
             });
         }
-  
+
         // csrf token for ajax
         $.ajaxSetup({
-                headers: {
+            headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
 
 
-  
+
     });
 </script>
 @endsection
