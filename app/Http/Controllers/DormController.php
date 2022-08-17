@@ -65,8 +65,7 @@ class DormController extends Controller
         if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || 
         Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
             $dorm = DB::table('dorms')
-                ->join('organizations', 'organizations.id', '=', 'dorms.organization_id')
-                ->select('dorms.id', 'dorms.name', 'dorms.organization_id')
+                ->select( 'dorms.organization_id', 'dorms.id as id', 'dorms.name')
                 ->where([
                     // ['organizations.id', $organization[0]->id],
                     ['dorms.id', $id],
@@ -75,6 +74,7 @@ class DormController extends Controller
                 ->get();
         }
 
+        // dd($dorm);
         return view("dorm.resident.index", compact('dorm', 'organization'));
     }
 
@@ -256,6 +256,7 @@ class DormController extends Controller
                     ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
                     ->where([
                         ['cs.student_id', $student[0]->id],
+                        ['cs.dorm_id', NULL],
                         ['co.organization_id', $neworganizationid],
                         ['cs.status', 1],
                     ])
@@ -275,7 +276,7 @@ class DormController extends Controller
             }
         }
 
-        return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->withErrors(['Failed to add student into dorm', 'Possible error: Dorm is full, Student not found']);
+        return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student already has accommodation']);
     }
 
 
@@ -334,6 +335,35 @@ class DormController extends Controller
         return view('dorm.outing.update', compact('outing', 'organization', 'id'));
     }
 
+    public function editResident($id)
+    {
+        //  
+        // dd($id); class_student.id
+        $resident = DB::table('dorms')
+            ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->select('dorms.id as dorm_id', 'dorms.organization_id', 'dorms.name as dormname', 'class_student.student_id as id', 'students.nama as studentname', 'students.email', 'students.parent_tel')
+            ->where([
+                ['class_student.id', $id],
+                ['class_student.status', 1],
+            ])
+            ->orderBy('dorms.name')
+            ->get();
+
+        $dormlist = DB::table('dorms')
+        ->join('organizations', 'organizations.id', '=', 'dorms.organization_id')
+        ->select('dorms.id as id', 'dorms.name')
+        ->where([
+            ['dorms.organization_id', $resident[0]->organization_id]
+
+        ])
+        ->orderBy('dorms.name')
+        ->get();
+
+        $organization = $this->getOrganizationByUserId();
+        return view('dorm.resident.update', compact('resident', 'dormlist', 'organization'));
+    }
+
     public function getID($id)
     {
         return response()->json(["string" => $id]);
@@ -389,6 +419,92 @@ class DormController extends Controller
         //     ]);
 
         return redirect('/dorm/dorm/indexOuting')->with('success', 'The data has been updated!');
+    }
+
+    public function updateResident(Request $request, $id)
+    {
+        // dd($id);
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required',
+            'dorm' => 'required',
+            'organization' => 'required'
+        ]);
+
+        $organizationid = $request->get('organization');
+        $neworganizationid = (int)$organizationid;
+
+        $stdname = $request->get('name');
+        $stdemail = $request->get('email');
+
+        $dormid = $request->get('dorm');
+        $newdormid = (int)$dormid;
+
+        $dorm = DB::table('dorms')
+            ->where([
+                ['dorms.id', $newdormid],
+            ])
+            ->select('dorms.id as dormid', 'dorms.accommodate_no', 'dorms.student_inside_no')
+            ->get();
+
+
+        $resident = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->where([
+                ['class_student.id', $id],
+                ['students.nama', $stdname],
+                ['students.email', $stdemail]
+            ])
+            ->select('class_student.id as id', 'class_student.student_id', 'class_student.dorm_id')
+            ->get();
+
+
+        $olddormid = DB::table('dorms')
+            ->where([
+                ['dorms.id', $resident[0]->dorm_id],
+            ])
+            ->select('dorms.id as dormid', 'dorms.accommodate_no', 'dorms.student_inside_no')
+            ->get();
+
+        if (
+            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
+            Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
+        ) {
+            if (isset($resident[0]->id) && ($dorm[0]->student_inside_no < $dorm[0]->accommodate_no)) {
+                $updateDetails = [
+                    'cs.dorm_id' => $newdormid,
+                    'cs.start_date_time' => now()->toDateTimeString(),
+                    'cs.end_date_time' => NULL,
+                ];
+
+                $result = DB::table('class_student as cs')
+                    ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id') 
+                    ->where([
+                        ['cs.id', $id],
+                        ['co.organization_id', $neworganizationid],
+                        ['cs.student_id', $resident[0]->student_id],
+                        ['cs.status', 1],
+                    ])
+                    ->update($updateDetails);
+            } 
+            else 
+            {
+                $result = 0;
+            }
+
+            if ($result > 0) {
+                DB::table('dorms')
+                    ->where('dorms.id', $newdormid)
+                    ->update(['student_inside_no' => $dorm[0]->student_inside_no + 1]);
+
+                DB::table('dorms')
+                    ->where('dorms.id', $olddormid[0]->dormid)
+                    ->update(['student_inside_no' => $olddormid[0]->student_inside_no - 1]);
+
+                return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->with('success', 'New student has been added successfully');
+            }
+        }
+        return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found']);   
     }
 
     public function updateDorm(Request $request, $id)
@@ -706,7 +822,7 @@ class DormController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('dorm.editOuting', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<a href="' . route('dorm.editResident', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
                 });

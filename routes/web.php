@@ -292,6 +292,7 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
     Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
     Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
+    
     // outing
     Route::get('dorm/storeOuting', 'DormController@storeOuting')->name('dorm.storeOuting');
     Route::get('dorm/indexOuting', 'DormController@indexOuting')->name('dorm.indexOuting');
@@ -300,10 +301,13 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::post('dorm/updateOuting/{id}', 'DormController@updateOuting')->name('dorm.updateOuting');
     Route::post('dorm/destroyOuting/{id}', 'DormController@destroyOuting')->name('dorm.destroyOuting');
     Route::get('dorm/getOutingsDatatable', 'DormController@getOutingsDatatable')->name('dorm.getOutingsDatatable');
+    
     // student-dorm (resident)
     Route::get('dorm/createResident', 'DormController@createResident')->name('dorm.createResident');
     Route::get('dorm/indexResident/{id}', 'DormController@indexResident')->name('dorm.indexResident');
     Route::get('dorm/storeResident', 'DormController@storeResident')->name('dorm.storeResident');
+    Route::get('dorm/editResident/{id}', 'DormController@editResident')->name('dorm.editResident');
+    Route::get('dorm/updateResident/{id}', 'DormController@updateResident')->name('dorm.updateResident');
     Route::post('dorm/destroyResident/{id}', 'DormController@destroyResident')->name('dorm.destroyResident');
     Route::post('dorm/fetchDorm', 'DormController@fetchDorm')->name('dorm.fetchDorm');
     Route::post('dorm/fetchClass', 'DormController@fetchClass')->name('dorm.fetchClass');

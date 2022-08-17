@@ -27,13 +27,11 @@
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected disabled>Pilih Organisasi</option>
                         @foreach($organization as $row)
-                            @foreach($dorm as $row1)
-                                @if($row1->organization_id == $row->id)
-                                    <option value="{{ $row->id }}" selected="selected">{{ $row->nama }}</option>
-                                @else
-                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                @endif
-                            @endforeach
+                        @if($row->id == $dorm[0]->organization_id)
+                        <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                        @else
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endif
                         @endforeach
                     </select>
                 </div>
@@ -200,7 +198,7 @@
                     // resident
                     url: "{{ route('dorm.getResidentsDatatable') }}",
                     data: {
-                        dormid: dormid,
+                        dormid: dormid, //class_stduent.id
                         hasOrganization: true
                     },
                     type: 'GET',
