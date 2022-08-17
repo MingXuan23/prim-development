@@ -230,6 +230,8 @@ Route::post('/importparent', 'ParentController@parentImport')->name('importparen
 
 Route::post('/exportouting', 'DormController@outingexport')->name('exportouting');
 
+Route::post('/exportresident', 'DormController@residentexport')->name('exportresident');
+
 //dorm management import and export
 Route::post('/exportdorm', 'DormController@dormexport')->name('exportdorm');
 Route::post('/importdorm', 'DormController@dormimport')->name('importdorm');

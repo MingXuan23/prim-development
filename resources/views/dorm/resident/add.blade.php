@@ -64,8 +64,8 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label>No. Telefon Penjaga</label>
-                            <input type="text" id="parent_phone" name="parent_phone" class="form-control" placeholder="Nombor Telefon Penjaga">
+                            <label>Email Pelajar</label>
+                            <input type="text" id="email" name="email" class="form-control" placeholder="Email Pelajar">
                         </div>
                     </div>
                     
@@ -91,15 +91,10 @@
 
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
+
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#icno').mask('000000-00-0000');
-        $('#parent_phone').mask('+600000000000');
-    });
-
     $(document).ready(function(){
         
         $("#organization").prop("selectedIndex", 1).trigger('change');

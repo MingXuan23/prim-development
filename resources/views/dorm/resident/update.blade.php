@@ -67,12 +67,12 @@
                 <div class="form-group">
                     <label>Nama Penuh Pelajar</label>
                     <input type="text" name="name" class="form-control" placeholder="Nama Penuh"
-                        value="{{ $resident[0]->studentname }}">
+                        value="{{ $resident[0]->studentname }}" readonly>
                 </div>
 
                 <div class="form-group">
                     <label>Email Pelajar</label>
-                    <input type="text" name="email" class="form-control" placeholder="Email Pelajar" value="{{ $resident[0]->email }}">
+                    <input type="text" name="email" class="form-control" placeholder="Email Pelajar" value="{{ $resident[0]->email }}" readonly>
                 </div>
                 
                 <div class="form-group mb-0">

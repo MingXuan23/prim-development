@@ -113,7 +113,6 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    {{-- {{ route('exportouting') }} --}}
                     <form action="{{ route('exportouting') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
