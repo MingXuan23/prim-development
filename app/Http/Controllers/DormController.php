@@ -63,10 +63,12 @@ class DormController extends Controller
         $userId = Auth::id();
         $organization = $this->getOrganizationByUserId();
         // dd($organization[0]->id);
-        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || 
-        Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
+        if (
+            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
+            Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
+        ) {
             $dorm = DB::table('dorms')
-                ->select( 'dorms.organization_id', 'dorms.id as id', 'dorms.name')
+                ->select('dorms.organization_id', 'dorms.id as id', 'dorms.name')
                 ->where([
                     // ['organizations.id', $organization[0]->id],
                     ['dorms.id', $id],
@@ -84,7 +86,12 @@ class DormController extends Controller
         // 
         $organization = $this->getOrganizationByUserId();
 
-        return view('dorm.management.index', compact('organization'));
+        $dormlist = DB::table('dorms')
+            ->select('id', 'name')
+            ->get();
+
+
+        return view('dorm.management.index', compact('organization', 'dormlist'));
     }
 
     //
@@ -143,7 +150,7 @@ class DormController extends Controller
     }
 
     //not yet modify
-    public function residentimport(Request $request, $id)
+    public function residentimport(Request $request)
     {
         $file       = $request->file('file');
         $namaFile   = $file->getClientOriginalName();
@@ -156,10 +163,28 @@ class DormController extends Controller
             return redirect('/dorm/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
 
-        //please check need what id to pass into ResidentImport
-        Excel::import(new ResidentImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+        //dorm id need to pass into ResidentImport
+        $import_file = new ResidentImport($request->dorm, 5);
+        $another_file = Excel::toArray($import_file,  public_path('/uploads/excel/' . $namaFile));
 
-        return redirect('/dorm/dorm/indexDorm')->with('success', 'Residents have been added successfully');
+        //get the accomodate number for the particular dorm
+        $accomodate_number = DB::table('dorms')
+            ->where('id', $request->dorm)
+            ->value('accommodate_no');
+
+        $student_inside = DB::table('dorms')
+            ->where('id', $request->dorm)
+            ->value('student_inside_no');
+
+        $total_student_add = $student_inside + sizeof($another_file[0]);
+
+        //only if the number of row count + student inside is less than accomodate number
+        if ($total_student_add <= $accomodate_number) {
+            Excel::import(new ResidentImport($request->dorm, $total_student_add), public_path('/uploads/excel/' . $namaFile));
+
+            return redirect('/dorm/dorm/indexDorm')->with('success', 'Residents have been added successfully');
+        } else
+            return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the student added is out of capacity limit');
     }
 
     /**
@@ -286,9 +311,7 @@ class DormController extends Controller
                         ['cs.status', 1],
                     ])
                     ->update($updateDetails);
-            } 
-            else 
-            {
+            } else {
                 $result = 0;
             }
 
@@ -297,11 +320,11 @@ class DormController extends Controller
                     ->where('dorms.id', $newdormid)
                     ->update(['student_inside_no' => $dorm[0]->student_inside_no + 1]);
 
-                return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->with('success', 'New student has been added successfully');
+                return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
             }
         }
 
-        return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student already has accommodation']);
+        return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student already has accommodation']);
     }
 
 
@@ -376,14 +399,14 @@ class DormController extends Controller
             ->get();
 
         $dormlist = DB::table('dorms')
-        ->join('organizations', 'organizations.id', '=', 'dorms.organization_id')
-        ->select('dorms.id as id', 'dorms.name')
-        ->where([
-            ['dorms.organization_id', $resident[0]->organization_id]
+            ->join('organizations', 'organizations.id', '=', 'dorms.organization_id')
+            ->select('dorms.id as id', 'dorms.name')
+            ->where([
+                ['dorms.organization_id', $resident[0]->organization_id]
 
-        ])
-        ->orderBy('dorms.name')
-        ->get();
+            ])
+            ->orderBy('dorms.name')
+            ->get();
 
         $organization = $this->getOrganizationByUserId();
         return view('dorm.resident.update', compact('resident', 'dormlist', 'organization'));
@@ -503,7 +526,7 @@ class DormController extends Controller
                 ];
 
                 $result = DB::table('class_student as cs')
-                    ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id') 
+                    ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
                     ->where([
                         ['cs.id', $id],
                         ['co.organization_id', $neworganizationid],
@@ -511,9 +534,7 @@ class DormController extends Controller
                         ['cs.status', 1],
                     ])
                     ->update($updateDetails);
-            } 
-            else 
-            {
+            } else {
                 $result = 0;
             }
 
@@ -526,7 +547,7 @@ class DormController extends Controller
                     ->where('dorms.id', $olddormid[0]->dormid)
                     ->update(['student_inside_no' => $olddormid[0]->student_inside_no - 1]);
 
-                return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->with('success', 'New student has been added successfully');
+                return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
             }
         }
         return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found  |  Student is reside in the dorm']);   
@@ -605,14 +626,32 @@ class DormController extends Controller
         }
     }
 
+    public function clearDorm($id)
+    {
+        //
+        $result = DB::table('class_student')->where('dorm_id', $id)->update(['dorm_id' => null]);
+
+        if ($result) {
+            DB::table('dorms')->where('id', $id)->update(['student_inside_no' => 0]);
+
+            Session::flash('success', 'Dorm Berjaya Dikosongkan');
+            return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
+        } else {
+            Session::flash('error', 'Dorm Gagal Dikosongkan');
+            return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
+        }
+    }
+
     public function destroyResident($id)
     {
 
         // 有没有解决方法呢 不需要duplicate query
         $dorm = DB::table('dorms')
-        ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
-        ->where('class_student.id', $id)
-        ->get();
+            ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
+            ->where('class_student.id', $id)
+            ->get();
 
         $updateDetails1 = [
             'class_student.end_date_time' => now()->toDateTimeString(),
@@ -621,9 +660,9 @@ class DormController extends Controller
         ];
 
         $result = DB::table('dorms')
-        ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
-        ->where('class_student.id', $id)
-        ->update($updateDetails1);
+            ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
+            ->where('class_student.id', $id)
+            ->update($updateDetails1);
 
         if ($result) {
             Session::flash('success', 'Pelajar Berjaya Dipadam');
@@ -631,7 +670,7 @@ class DormController extends Controller
         } else {
             Session::flash('error', 'Pelajar Gagal Dipadam');
             return View::make('layouts/flash-messages');
-        }  
+        }
     }
 
     /**
@@ -777,9 +816,14 @@ class DormController extends Controller
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a href="' . route('importresident', $row->id) . '" class="btn btn-primary m-1">Import</a>';
+                // $btn = $btn . '<a href="' . route('importresident', $row->id) . '" class="btn btn-primary m-1">Import</a>';
+
+                //try
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" data-toggle="modal" data-target="#modelId3" class="btn btn-primary m-1">Import</button>';
+
                 $btn = $btn . '<a href="' . route('dorm.editDorm', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 destroyDorm">Buang</button></div>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 clearDorm">Clear</button></div>';
                 return $btn;
             });
 

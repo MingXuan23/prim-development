@@ -344,7 +344,7 @@ class StudentController extends Controller
 
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required',
+            //'icno'          =>  'required',
             'classes'       =>  'required',
         ]);
 
@@ -364,7 +364,7 @@ class StudentController extends Controller
             ->update(
                 [
                     'students.nama' => $request->get('name'),
-                    'students.icno' => $request->get('icno'),
+                    //'students.icno' => $request->get('icno'),
                     'students.gender' => $request->get('gender'),
                     'students.email' => $request->get('email'),
                     'class_student.organclass_id'    => $getOrganizationClass->id,

@@ -25,7 +25,7 @@ class ClassTableSeeder extends Seeder
             1 =>
             array(
                 "id" => 2,
-                "nama" => " class 1",
+                "nama" => "class 1",
                 "levelid" => 2,
                 "status"    => 1,
 

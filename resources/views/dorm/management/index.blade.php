@@ -59,6 +59,11 @@
                     <p>{{ \Session::get('success') }}</p>
                 </div>
                 @endif
+                @if(\Session::has('fail'))
+                <div class="alert alert-danger">
+                    <p>{{ \Session::get('fail') }}</p>
+                </div>
+                @endif
 
                 <div class="flash-message"></div>
 
@@ -96,6 +101,24 @@
             </div>
         </div>
         {{-- end confirmation delete modal --}}
+
+        <!-- Clear dorm confirmation delete modal -->
+        <div id="deleteConfirmationModal1" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Kosongkan Asrama</h4>
+                    </div>
+                    <div class="modal-body">
+                        Adakah anda pasti?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete1" name="delete1">Kosong</button>
+                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- export dorm modal-->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
@@ -146,6 +169,43 @@
                                 <select name="organ" id="organ" class="form-control">
                                     @foreach($organization as $row)
                                     <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="file" name="file" required>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Import</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- import dorm residents modal -->
+        <div class="modal fade" id="modelId3" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import Residents</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('importresident') }}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+
+                            {{ csrf_field() }}
+                            <div class="form-group">
+
+                                <label>Dorm</label>
+                                <select name="dorm" id="dorm" class="form-control">
+
+                                    @foreach($dormlist as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -224,20 +284,8 @@
                     data: "name",
                     name: 'name',
                     render: function(data, type, row, meta) {
-                        //var dormId = row[0];
-                        //modify here, from updateDorm to ur residentindex
-                        // console.log("id" = row.id);
 
-                        // <
-                        // a href = "url('')" > < /a>
-                        console.log(data)
-                        //return '<a href = "{{url("dorm/dorm/editDorm/' + 2 + '")}}">' + row.id + '</a>';
-
-                        //return '<a href = "{{route("dorm.editDorm",["id"=>' + row.id + '])}}">' + row.id + '</a>';
-                        //return '<a href = "{{url("dorm/dorm/editDorm/' + row.id + '")}}">' + row.id + '</a>';
-                        console.log(row.id)
                         return '<a href = "indexResident/' + row.id + '">' + data + '</a>';
-                        //,' + row.id + '
                     }
                 }, {
                     data: "accommodate_no",
@@ -272,9 +320,14 @@
 
         var dorm_id;
 
-        $(document).on('click', '.btn-danger', function() {
+        $(document).on('click', '.destroyDorm', function() {
             dorm_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
+        });
+
+        $(document).on('click', '.clearDorm', function() {
+            dorm_id = $(this).attr('id');
+            $('#deleteConfirmationModal1').modal('show');
         });
 
         $('#delete').click(function() {
@@ -291,6 +344,33 @@
                         $('#confirmModal').modal('hide');
                     }, 2000);
                     //console.log('it works');
+
+                    $('div.flash-message').html(data);
+
+                    dormTable.ajax.reload();
+                },
+                error: function(data) {
+                    $('div.flash-message').html(data);
+                    console.log("it doesn't Works");
+
+                }
+            })
+        });
+
+        $('#delete1').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    _method: 'GET'
+                },
+                url: "/dorm/dorm/clearDorm/" + dorm_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+                    console.log('it works');
 
                     $('div.flash-message').html(data);
 
