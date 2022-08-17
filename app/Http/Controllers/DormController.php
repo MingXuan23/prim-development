@@ -65,12 +65,10 @@ class DormController extends Controller
         if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || 
         Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) {
             $dorm = DB::table('dorms')
-                ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
-                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-                ->select()
+                ->join('organizations', 'organizations.id', '=', 'dorms.organization_id')
+                ->select('dorms.id', 'dorms.name', 'dorms.organization_id')
                 ->where([
-                    ['class_organization.organization_id', $organization[0]->id],
-                    ['class_student.status', 1],
+                    // ['organizations.id', $organization[0]->id],
                     ['dorms.id', $id],
                 ])
                 ->orderBy('dorms.name')

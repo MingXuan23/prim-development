@@ -18,7 +18,43 @@
 <div class="row">
 
     <div class="col-md-12">
+        <div class="card card-primary">
+
+            {{csrf_field()}}
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected disabled>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                            @foreach($dorm as $row1)
+                                @if($row1->organization_id == $row->id)
+                                    <option value="{{ $row->id }}" selected="selected">{{ $row->nama }}</option>
+                                @else
+                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                @endif
+                            @endforeach
+                        @endforeach
+                    </select>
+                </div>
+
+                @foreach($dorm as $row)
+                <option id="isselecteddorm" value="{{ $row->id }}" hidden>{{$row->name}}</option>
+                @endforeach
+                <div class="form-group">
+                    <label>Nama Asrama </label>
+                    <select name="dorm" id="dorm" class="form-control">
+                        <option value="" disabled selected>Pilih Asrama</option>
+                        
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
         <div class="card">
+            <div class="card-header" id="title"></div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
                         class="fas fa-plus"></i> Export</a>
@@ -28,27 +64,7 @@
             </div>
 
             <div class="card-body">
-                {{csrf_field()}}
-                <div class="card-body">
-
-                    <div class="form-group">
-                        <label>Nama Organisasi</label>
-                        <select name="organization" id="organization" class="form-control">
-                            <option value="" selected disabled>Pilih Organisasi</option>
-                            @foreach($organization as $row)
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label> Asrama </label>
-                        <select name="dorm" id="dorm" class="form-control">
-                            <option value="" disabled selected>Pilih Asrama</option>
-
-                        </select>
-                    </div>
-                </div>
+                
                 @if(count($errors) > 0)
                 <div class="alert alert-danger">
                     <ul>
@@ -160,12 +176,15 @@
 
 <script>
     $(document).ready(function(){
-        
+ 
         var residentTable;
+        var dormid;
 
+        // how to get the data pass using compact inside this function?
+        // can access from dorm1 but other than that one all cannot, do we want to change the concept?
         if($("#organization").val() != ""){
-            $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetchDorm($("#organization").val(), '#dorm');
+            $("#organization").prop("selectedIndex", $("#organization")[0].selectedIndex).trigger('change');
+            fetchDorm($("#organization").val(), "#dorm");
         }
 
         if($("#organExport").val() != ""){
@@ -262,20 +281,22 @@
                     $(dormId).append("<option value='' disabled selected> Pilih Asrama</option>");
                     jQuery.each(result.success, function(key, value){
                         $(dormId).append("<option value='"+ value.id +"'>" + value.name + "</option>");
+                        if(value.id == $("#isselecteddorm").val()){
+                            $pick = key + 1;
+                        } 
                     });
+                    $("#dorm").prop("selectedIndex", $pick).trigger('change');
                 }
             })
         }
-        var dormid;
-        $('#dorm').change(function() {
-            var organizationid    = $("#organization option:selected").val();
 
+        $('#dorm').change(function() {
             dormid = $("#dorm option:selected").val();
+            document.getElementById('title').innerHTML = "Senarai Pelajar dalam " + $("#dorm option:selected").text();
             if(dormid){
                 $('#residentTable').DataTable().destroy();
-                fetch_data( dormid);
+                fetch_data(dormid);
             }
-            // console.log(organizationid);
         });
 
         // csrf token for ajax
@@ -293,7 +314,6 @@
         });
 
         $('#delete').click(function() {
-            console.log(dormid + "this is rid");
                 $.ajax({
                     type: 'POST',
                     dataType: 'html',
