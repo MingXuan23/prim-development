@@ -102,7 +102,7 @@ class PolimasController extends Controller
             ->where([
                 'status' => 'Paid',
             ])
-            ->where('fees_id', [243, 244])
+            ->whereIn('fees_id', [243, 244])
             ->count();
         
         $batch1_tidakhadir = DB::table('student_fees_new')
