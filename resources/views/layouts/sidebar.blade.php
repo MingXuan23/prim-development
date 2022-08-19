@@ -146,6 +146,16 @@
                                 <span>Asrama</span>
                             </a>
                             <ul class="sub-menu mm-collapse" aria-expanded="false">
+                                @role('Superadmin|Pentadbir|Guru|Warden|Penjaga')
+                                <li>
+                                    <!-- need to change to index later -->
+                                    <a href="{{ route('dorm.create') }}" class=" waves-effect">
+                                        <i class="fas fa-book"></i>
+                                        <span>Permintaan</span>
+                                    </a>
+                                </li>
+                                @endrole
+
                                 @role('Superadmin|Pentadbir|Guru|Warden')
                                 <li>
                                     <a href="{{ route('dorm.indexOuting') }}" class=" waves-effect">

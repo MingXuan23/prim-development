@@ -198,8 +198,16 @@ class DormController extends Controller
     //create or add files
     public function create()
     {
-        //
+        //get user id
+        // $userid     = Auth::id();
+        $organization = $this->getOrganizationByUserId();
+        $category = DB::table('classifications')
+                    ->get();
 
+        if(Auth::user()->hasRole('Penjaga'))
+        {
+            return view('dorm.create', compact('organization', 'category'));
+        }
     }
 
     public function createOuting()
@@ -211,7 +219,7 @@ class DormController extends Controller
 
     public function createResident()
     {
-        $userid     = Auth::id();
+        // $userid     = Auth::id();
         $organization = $this->getOrganizationByUserId();
 
         $dormlist =  $this->getDormByOrganizationId();

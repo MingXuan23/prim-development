@@ -2,11 +2,10 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
-@include('layouts.datepicker')
-
 @endsection
 
 @section('content')
+{{-- <p>Welcome to this beautiful admin panel.</p> --}}
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
@@ -17,93 +16,103 @@
         </div>
     </div>
 </div>
+
 <div class="row">
-    <div class="card col-md-12">
+    <div class="col-md-12">
+        <div class="card card-primary">
 
-        @if(count($errors) > 0)
-        <div class="alert alert-danger">
-            <ul>
-                @foreach($errors->all() as $error)
-                <li>{{$error}}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-        <form method="post" action="{{ route('dorm.store') }}">
-            {{csrf_field()}}
-            <div class="card-body">
+            @if(count($errors) > 0)
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                    <li>{{$error}}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+            <form method="post" action="{{ route('dorm.store') }}" enctype="multipart/form-data">
+                {{csrf_field()}}
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Nama Organisasi</label>
+                        <select name="organization" id="organization" class="form-control">
+                            @foreach($organization as $row)
+                                @if ($loop->first)
+                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                @else
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
 
-                 <!-- 这里是放organization的 可以从activity的add拿-->
+                    <div class="form-group">
+                        <label>Nama Pelajar</label>
+                        <input type="text" name="name" class="form-control" placeholder="Nama Pelajar">
+                    </div>
 
-                <div class="form-group">
-                    <label>Nama Pelajar</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Pelajar" value="{{$users->nama}}">
-                </div>
+                    <div class="form-group">
+                        <label>Email Pelajar</label>
+                        <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
+                    </div>
 
-                <div class="form-group">
-                    <label>No IC Pelajar</label>
-                    <input type="text" name="ic" class="form-control" placeholder="No IC Pelajar" value="{{$users->icno}}">
-                </div>
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select name="category" id="category" class="form-control">
+                            @foreach($category as $row)
+                                @if ($loop->first)
+                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                @else
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>Alasan</label>
-                    <textarea name="reason" class="form-control" placeholder="Alasan Keluar" cols="30"
-                        rows="5"></textarea>
-                </div>
+                    <div class="form-group">
+                        <label>Alasan</label>
+                        <textarea name="reason" class="form-control" placeholder="Alasan Keluar" cols="30"
+                            rows="5"></textarea>
+                    </div>
 
-                <div class="form-group">
-                    <label>Tarikh Keluar</label>
-                    <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
-                            placeholder="Pilih Tarikh Keluar">
-                    <!-- <div id="datepicker-start_date" class="input-group date" data-date-format="mm-dd-yyyy"
-                        data-provide="datepicker">
-                        <input class="form-control" id="start_date" name="start_date" type="text"
-                            placeholder="Pilih Tarikh Keluar" autocomplete="off">
-                        <div class="input-group-addon">
-                            <i class="mdi mdi-calendar-today"></i>
+                    <div class="form-group">
+                        <label>Tarikh Keluar</label>
+                        <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
+                                placeholder="Pilih Tarikh Keluar">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tarikh Masuk</label>
+                        <input onclick="this.showPicker()" onfocus="setMinDate();" class="form-control" id="end_date" name="end_date" type="date"
+                                placeholder="Pilih Tarikh Keluar">
+                    </div>
+
+                    <div class="form-group mb-0">
+                        <div>
+                            <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
+                                Simpan
+                            </button>
                         </div>
-                    </div> -->
-                </div>
-
-                <div class="form-group">
-                    <label>Tarikh Masuk</label>
-                    <input onclick="this.showPicker()" onfocus="setMinDate();" class="form-control" id="end_date" name="end_date" type="date"
-                            placeholder="Pilih Tarikh Keluar">
-
-                    <!-- <div id="datepicker-end_date" class="input-group date" data-date-format="mm-dd-yyyy"
-                        data-provide="datepicker">
-                        <input class="form-control" id="end_date" name="end_date" type="text"
-                            placeholder="Pilih Tarikh Masuk" autocomplete="off">
-                        <div class="input-group-addon">
-                            <i class="mdi mdi-calendar-today"></i>
-                        </div>
-                    </div> -->
-                </div>
-
-
-                <div class="form-group mb-0">
-                    <div>
-                        <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
-                            Simpan
-                        </button>
                     </div>
                 </div>
-            </div>
-
-        </form>
+                <!-- /.card-body -->
+            </form>
+        </div>
     </div>
 </div>
-
 @endsection
 
+
 @section('script')
+<!-- Peity chart-->
+<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+
+<!-- Plugin Js-->
+<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+
+<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
 <script>
-    
-    start_date.min = new Date().toISOString().split("T")[0];
-    
-    function setMinDate(){
-        end_date.min = start_date.value;
-    }
-    
+
 </script>
 @endsection
