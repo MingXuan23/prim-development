@@ -132,8 +132,8 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    {{-- {{ route('exportstudent') }} --}}
-                    <form action="{{ route('exportstudent') }}" method="post">
+
+                    <form action="{{ route('exportresident') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
                             <div class="form-group">

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDormsTable extends Migration
+class AddColumnsToClassificationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,8 @@ class CreateDormsTable extends Migration
      */
     public function up()
     {
-        Schema::create('dorms', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->integer('accommodate_no')->unsigned();
-            $table->integer('student_inside_no')->unsigned();
-
+        Schema::table('classifications', function (Blueprint $table) {
+            //
             $table->bigInteger('organization_id')->unsigned();
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
@@ -31,6 +27,8 @@ class CreateDormsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('dorms');
+        Schema::table('classifications', function (Blueprint $table) {
+            //
+        });
     }
 }

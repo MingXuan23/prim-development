@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Exports\OutingExport;
+use App\Exports\ResidentExport;
 use App\Exports\DormExport;
 use App\Imports\DormImport;
 use App\Imports\ResidentImport;
@@ -44,6 +45,8 @@ class DormController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
+
+        
 
         return view('dorm.outing.index', compact('organization'));
     }
@@ -96,14 +99,38 @@ class DormController extends Controller
     //
     //
     //import and export functions
-    public function outingexport()
+    public function outingexport(Request $request)
     {
-        return Excel::download(new OutingExport, 'outing.xlsx');
+        $this->validate($request, [
+            'organ'      =>  'required',
+        ]);
+
+        $filename = DB::table('organizations')
+            ->where('organizations.id', $request->organ)
+            ->value('organizations.nama');
+
+        return Excel::download(new OutingExport($request->organ), $filename.' masa outing.xlsx');
     }
 
     public function dormexport(Request $request)
     {
         return Excel::download(new DormExport($request->organ), 'dorm.xlsx');
+    }
+
+    public function residentexport(Request $request)
+    {
+        $this->validate($request, [
+            'organExport'      =>  'required',
+            'dormExport'      =>  'required',
+        ]);
+
+        $filename = DB::table('dorms')
+            ->where('dorms.id', $request->dormExport)
+            ->value('dorms.name');
+
+            // dd($filename);
+
+        return Excel::download(new ResidentExport($request->organExport, $request->dormExport), $filename .' pelajar.xlsx');
     }
 
     public function dormimport(Request $request)
@@ -167,8 +194,17 @@ class DormController extends Controller
     //create or add files
     public function create()
     {
-        //
+        //get user id
+        // $userid     = Auth::id();
+        $organization = $this->getOrganizationByUserId();
 
+        $category = DB::table('classifications')
+                    ->get();
+
+        if(Auth::user()->hasRole('Penjaga'))
+        {
+            return view('dorm.create', compact('organization', 'category'));
+        }
     }
 
     public function createOuting()
@@ -180,9 +216,7 @@ class DormController extends Controller
 
     public function createResident()
     {
-        //need list of organization and dorm
-        //need logged in user id
-        $userid     = Auth::id();
+        // $userid     = Auth::id();
         $organization = $this->getOrganizationByUserId();
 
         $dormlist =  $this->getDormByOrganizationId();
@@ -236,7 +270,7 @@ class DormController extends Controller
         $this->validate($request, [
             'name'              =>  'required',
             'organization'      =>  'required',
-            'parent_phone'      =>  'required',
+            'email'             =>  'required',
             'dorm'              =>  'required'
         ]);
 
@@ -244,7 +278,7 @@ class DormController extends Controller
         $neworganizationid = (int)$organizationid;
 
         $stdname = $request->get('name');
-        $parentphone = $request->get('parent_phone');
+        $stdemail = $request->get('email');
 
         $dormid = $request->get('dorm');
         $newdormid = (int)$dormid;
@@ -252,7 +286,7 @@ class DormController extends Controller
         // find student id
         $student = DB::table('students')
             ->where('students.nama', $stdname)
-            ->where('students.parent_tel', $parentphone)
+            ->where('students.email', $stdemail)
             ->select('students.id')
             ->get();
 
@@ -269,6 +303,8 @@ class DormController extends Controller
                     'cs.dorm_id' => $newdormid,
                     'cs.start_date_time' => now()->toDateTimeString(),
                     'cs.end_date_time' => NULL,
+                    'cs.outing_status' => 0,
+                    'cs.blacklist' => 0,
                 ];
 
                 $result = DB::table('class_student as cs')
@@ -487,7 +523,7 @@ class DormController extends Controller
             Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
             Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
         ) {
-            if (isset($resident[0]->id) && ($dorm[0]->student_inside_no < $dorm[0]->accommodate_no)) {
+            if (isset($resident[0]->id) && ($dorm[0]->student_inside_no < $dorm[0]->accommodate_no) && ($olddormid[0]->dormid != $newdormid)) {
                 $updateDetails = [
                     'cs.dorm_id' => $newdormid,
                     'cs.start_date_time' => now()->toDateTimeString(),
@@ -519,7 +555,7 @@ class DormController extends Controller
                 return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
             }
         }
-        return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found']);
+        return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found  |  Student is reside in the dorm']);   
     }
 
     public function updateDorm(Request $request, $id)
@@ -658,9 +694,7 @@ class DormController extends Controller
             // user role pentadbir 
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->where('organization_user.role_id', '=', 4)
-                        ->Orwhere('organization_user.role_id', '=', 5)
-                        ->Orwhere('organization_user.role_id', '=', 8);
+                    $query->where('organization_user.role_id', '=', 4);
                 });
             })->get();
         }
@@ -830,9 +864,9 @@ class DormController extends Controller
                 $table = Datatables::of($data);
 
                 $table->addColumn('outing_status', function ($row) {
-                    if ($row->outing_status == '1') {
+                    if ($row->outing_status == '0') {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success"> Aktif </span></div>';
+                        $btn = $btn . '<span class="badge badge-success"> Dalam </span></div>';
 
                         return $btn;
                     } else {
@@ -846,12 +880,12 @@ class DormController extends Controller
                 $table->addColumn('blacklist', function ($row) {
                     if ($row->blacklist == '1') {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success"> Ditahan </span></div>';
+                        $btn = $btn . '<span class="badge badge-danger"> Ya </span></div>';
 
                         return $btn;
                     } else {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Free </span></div>';
+                        $btn = $btn . '<span class="badge badge-success"> Tidak </span></div>';
 
                         return $btn;
                     }
