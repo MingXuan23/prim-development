@@ -61,9 +61,9 @@
                         <select name="category" id="category" class="form-control">
                             @foreach($category as $row)
                                 @if ($loop->first)
-                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                <option value="{{ $row->id }}" selected>{{ $row->name }}</option>
                                 @else
-                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endif
                             @endforeach
                         </select>

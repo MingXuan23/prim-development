@@ -207,9 +207,14 @@ class DormController extends Controller
         $category = DB::table('classifications')
                     ->get();
 
-        if(Auth::user()->hasRole('Penjaga'))
+        if(Auth::user()->hasRole('Penjaga') || Auth::user()->hasRole('Warden') 
+        || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Superadmin') 
+        || Auth::user()->hasRole('Pentadbir'))
         {
             return view('dorm.create', compact('organization', 'category'));
+        }
+        else{
+            return view('/home');
         }
     }
 
@@ -249,6 +254,7 @@ class DormController extends Controller
     public function store(Request $request)
     {
         // 
+        
 
     }
 
@@ -700,7 +706,10 @@ class DormController extends Controller
             // user role pentadbir 
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->where('organization_user.role_id', '=', 4);
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5)
+                        ->Orwhere('organization_user.role_id', '=', 6)
+                        ->Orwhere('organization_user.role_id', '=', 8);
                 });
             })->get();
         }
