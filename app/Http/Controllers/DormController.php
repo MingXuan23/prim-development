@@ -46,6 +46,8 @@ class DormController extends Controller
         //
         $organization = $this->getOrganizationByUserId();
 
+        
+
         return view('dorm.outing.index', compact('organization'));
     }
 
@@ -201,6 +203,7 @@ class DormController extends Controller
         //get user id
         // $userid     = Auth::id();
         $organization = $this->getOrganizationByUserId();
+
         $category = DB::table('classifications')
                     ->get();
 
@@ -697,9 +700,7 @@ class DormController extends Controller
             // user role pentadbir 
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->where('organization_user.role_id', '=', 4)
-                        ->Orwhere('organization_user.role_id', '=', 5)
-                        ->Orwhere('organization_user.role_id', '=', 8);
+                    $query->where('organization_user.role_id', '=', 4);
                 });
             })->get();
         }
