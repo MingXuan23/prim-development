@@ -21,11 +21,12 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class ResidentImport implements ToModel, WithValidation, WithHeadingRow
 {
-    public function __construct($dorm_id, $number_student_inside)
+    private $status = 0;
+
+    public function __construct($dorm_id)
     {
         $selected_dorm = DB::table('dorms')->where('id', $dorm_id)->first();
         $this->dorm_id = $selected_dorm->id;
-        $this->number_student_inside = $number_student_inside;
     }
 
     public function rules(): array
@@ -64,23 +65,12 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
     public function model(array $row)
     {
 
-
-        //validate column name
-        // if (!isset($row['name']) || !isset($row['nama_penjaga']) || !isset($row['no_tel_bimbit_penjaga']) || !isset($row['class'])) {
-        //     throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
-        // }
-
         if (!isset($row['name']))
             throw ValidationException::withMessages(["error" => "missing name"]);
-        // else if (!isset($row['nama_penjaga']))
-        //     throw ValidationException::withMessages(["error" => "missing nama_penjaga"]);
         else if (!isset($row['no_tel_bimbit_penjaga']))
             throw ValidationException::withMessages(["error" => "missing no_tel_bimbit_penjaga"]);
         else if (!isset($row['class']))
             throw ValidationException::withMessages(["error" => "missing class"]);
-        // else
-        //     throw ValidationException::withMessages(["error" => "missing idunnoe"]);
-
 
         //validate phone number
         $phone = trim((string)$row['no_tel_bimbit_penjaga']);
@@ -140,6 +130,7 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
                 ->first();
         }
 
+        // dd("123");
         //this is step 4
         $student_id = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -149,27 +140,45 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
             ->where('students.parent_tel', '=', "{$phone}")
             ->whereNull('class_student.dorm_id')
             ->value('students.id');
-
-        //if the student is already inside the dorm
+        //if the student is already inside a dorm
         if (!isset($student_id)) {
             return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the student added is already inside a dorm');
         } else {
-            $result = DB::table('class_student as cs')
-                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
-                ->where([
-                    ['cs.student_id', '=', $student_id],
-                    ['cs.organclass_id', '=', $co_id->id],
-                    ['cs.status', '=', 1],
-                ])
-                ->update(['cs.dorm_id' => $this->dorm_id]);
+            $checkNoStudentInsideDorm = DB::table('class_student as cs')
+                ->where('cs.dorm_id', '=', $this->dorm_id)
+                ->count();
 
-            //if successfully update the dorm id to the class student
-            if ($result) {
-                DB::table('dorms')
-                    ->where('id', $this->dorm_id)
-                    ->update(['student_inside_no' => $this->number_student_inside]);
-            } else {
-                return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the student status is not active');
+            $checkCapacity = DB::table('dorms')
+                ->where('id', '=', $this->dorm_id)
+                ->value('accommodate_no');
+
+            //if number of student inside the dorm is less than capacity
+            if ($checkNoStudentInsideDorm <= $checkCapacity) {
+                //let this student come in the dorm
+                $result = DB::table('class_student as cs')
+                    ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                    ->where([
+                        ['cs.student_id', '=', $student_id],
+                        ['cs.organclass_id', '=', $co_id->id],
+                        ['cs.status', '=', 1],
+                    ])
+                    ->update(
+                        [
+                            'cs.dorm_id' => $this->dorm_id,
+                            'cs.start_date_time' => now()->toDateTimeString(),
+                            'cs.end_date_time' => null
+                        ]
+                    );
+                //if successfully update the dorm id and start date time to the class student
+                if ($result) {
+                    //update dorm number
+                    $this->status++;
+                    DB::table('dorms')
+                        ->where('id', $this->dorm_id)
+                        ->update(['student_inside_no' => $this->status]);
+                } else {
+                    return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the student status is not active');
+                }
             }
         }
     }
