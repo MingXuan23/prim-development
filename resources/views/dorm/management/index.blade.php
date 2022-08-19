@@ -194,6 +194,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
+
                     </div>
                     <form action="{{ route('importresident') }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
@@ -202,19 +203,23 @@
                             <div class="form-group">
 
                                 <label>Dorm</label>
-                                <select name="dorm" id="dorm" class="form-control">
+                                <input id="dorm" name="dorm" value="" hidden></input>
+                                <!-- <select name="dorm" id="dorm" value="" class="form-control"></select> -->
 
-                                    @foreach($dormlist as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
+                                <!-- <select name="dorm" id="dorm" class="form-control">
+                                    <option value="" selected disabled>Pilih Asrama</option> 
+
+                                    <option id="optionID" value="{{ $row->id }}" hidden selected></option>
+                                    <option></option>
+
+                                </select> -->
                             </div>
                             <div class="form-group">
-                                <input type="file" name="file" required>
+                                <input type="file" name="file1" required>
                             </div>
 
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
+                                <button id="fileID" type="submit" class="btn btn-primary fileIDclass">Import</button>
                             </div>
                         </div>
 
@@ -243,6 +248,8 @@
 
         var dormTable;
 
+
+
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetch_data($("#organization").val());
@@ -266,7 +273,11 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3, 4], // your case first column
+                    "targets": [4], // your case first column
+                    "className": "text-center",
+                    "width": "15%"
+                }, {
+                    "targets": [1, 3, 2], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
@@ -323,6 +334,12 @@
         $(document).on('click', '.destroyDorm', function() {
             dorm_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
+        });
+
+        $(document).on('click', '.importBtn', function() {
+            dorm_id = $(this).attr('id');
+            $('#dorm').val(dorm_id);
+            // dd($('#dorm').val(dorm_id));
         });
 
         $(document).on('click', '.clearDorm', function() {

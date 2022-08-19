@@ -124,23 +124,21 @@ class DormController extends Controller
         return redirect('/dorm/dorm/indexDorm')->with('success', 'Dorms have been added successfully');
     }
 
-    //not yet modify
     public function residentimport(Request $request)
     {
-        $file       = $request->file('file');
+        // dd($request->dorm);
+        $file       = $request->file('file1');
         $namaFile   = $file->getClientOriginalName();
-        $file->move('uploads/excel/', $namaFile);
+        $check = 0;
+        if ($check == 0) {
+            $file->move('uploads/excel/', $namaFile);
+        }
 
         $etx = $file->getClientOriginalExtension();
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
         if (!in_array($etx, $formats)) {
-
             return redirect('/dorm/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
-
-        //dorm id need to pass into ResidentImport
-        $import_file = new ResidentImport($request->dorm, 5);
-        $another_file = Excel::toArray($import_file,  public_path('/uploads/excel/' . $namaFile));
 
         //get the accomodate number for the particular dorm
         $accomodate_number = DB::table('dorms')
@@ -151,15 +149,11 @@ class DormController extends Controller
             ->where('id', $request->dorm)
             ->value('student_inside_no');
 
-        $total_student_add = $student_inside + sizeof($another_file[0]);
-
-        //only if the number of row count + student inside is less than accomodate number
-        if ($total_student_add <= $accomodate_number) {
-            Excel::import(new ResidentImport($request->dorm, $total_student_add), public_path('/uploads/excel/' . $namaFile));
-
+        if ($student_inside <= $accomodate_number) {
+            Excel::import(new ResidentImport($request->dorm), public_path('/uploads/excel/' . $namaFile));
             return redirect('/dorm/dorm/indexDorm')->with('success', 'Residents have been added successfully');
         } else
-            return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the student added is out of capacity limit');
+            return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the dorm is full');
     }
 
     /**
@@ -604,7 +598,7 @@ class DormController extends Controller
     public function clearDorm($id)
     {
         //
-        $result = DB::table('class_student')->where('dorm_id', $id)->update(['dorm_id' => null]);
+        $result = DB::table('class_student')->where('dorm_id', $id)->update(['dorm_id' => null, 'end_date_time' => now()->toDateTimeString()]);
 
         if ($result) {
             DB::table('dorms')->where('id', $id)->update(['student_inside_no' => 0]);
@@ -794,10 +788,10 @@ class DormController extends Controller
                 // $btn = $btn . '<a href="' . route('importresident', $row->id) . '" class="btn btn-primary m-1">Import</a>';
 
                 //try
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" data-toggle="modal" data-target="#modelId3" class="btn btn-primary m-1">Import</button>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" data-toggle="modal" data-target="#modelId3" class="btn btn-primary m-1 importBtn">Import</button>';
 
                 $btn = $btn . '<a href="' . route('dorm.editDorm', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 destroyDorm">Buang</button></div>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 destroyDorm">Buang</button>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 clearDorm">Clear</button></div>';
                 return $btn;
             });

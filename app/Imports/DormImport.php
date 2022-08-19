@@ -26,9 +26,19 @@ class DormImport implements ToModel, WithHeadingRow
 
     public function model(array $row)
     {
-        if (!isset($row['nama_asrama']) || !isset($row['kapasiti']) || !isset($row['bilangan_pelajar_dalam'])) {
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
-        }
+        // if (!isset($row['nama_asrama']) || !isset($row['kapasiti']) || !isset($row['bilangan_pelajar_dalam'])) {
+        //     throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+        // }
+
+        if (!isset($row['nama_asrama']))
+            throw ValidationException::withMessages(["error" => "Invalid headers or missing nama asrama"]);
+        else if (!isset($row['kapasiti']))
+            throw ValidationException::withMessages(["error" => "Invalid headers or missing kapasiti"]);
+        else if (!isset($row['bilangan_pelajar_dalam']))
+            throw ValidationException::withMessages(["error" => "Invalid headers or missing bilangan_pelajar_dalam"]);
+
+
+
 
         //dd($this->organ);
 
