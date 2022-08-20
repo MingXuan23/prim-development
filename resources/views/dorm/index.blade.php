@@ -40,8 +40,8 @@
             <div class="card-header">Senarai Permintaan Keluar</div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
-                @if($roles == true)
-                <a style="margin: 19px; float: right;" href="{{ route('teacher.wardencreate') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
+                @if($roles == "Penjaga")
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
             </div>
 
@@ -65,11 +65,11 @@
                 <div class="flash-message"></div>
 
                 <div class="table-responsive">
-                    <table id="wardenTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="requestTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
-                                <th>Nama Penuh Pelajar</th>
+                                <th>Nama Pelajar</th>
                                 <th>Nombor Telefon Penjaga</th>
                                 <th>Tarikh Membuat Permintaan</th>
                                 <th>Tarikh dan Masa Keluar</th>
@@ -82,90 +82,8 @@
             </div>
         </div>
 
-        {{-- confirmation delete modal --}}
-        <div id="deleteConfirmationModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Padam Warden</h4>
-                    </div>
-                    <div class="modal-body">
-                        Adakah anda pasti?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- end confirmation delete modal --}}
-
-        <!-- export warden modal-->
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Export Warden</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form action="{{ route('exportwarden') }}" method="post">
-                        <div class="modal-body">
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- import warden modal -->
-        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Import Warden</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form action="{{ route('importwarden') }}" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <input type="file" name="file" required>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
+        <!-- 注意这个之后要改 -->
+        
     </div>
 </div>
 
@@ -185,7 +103,7 @@
 <script>
     $(document).ready(function() {
 
-        var wardenTable;
+        var requestTable;
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
@@ -193,11 +111,11 @@
         }
 
         function fetch_data(oid = '') {
-            wardenTable = $('#wardenTable').DataTable({
+            requestTable = $('#requestTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('teacher.getWardenDatatable') }}",
+                    url: "{{ route('dorm.getStudentOutingDatatable') }}",
                     data: {
                         oid: oid,
                         hasOrganization: true
@@ -210,7 +128,7 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "targets": [1, 2, 3, 4, 5, 6], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
@@ -229,21 +147,27 @@
                     orderable: true,
                     searchable: true
                 }, {
-                    data: "username",
-                    name: 'username',
-                    orderable: false,
-                    searchable: false
-                }, {
-                    data: "email",
-                    name: 'email',
-                    orderable: false,
-                    searchable: false
-                }, {
                     data: "telno",
                     name: 'telno',
                     orderable: false,
                     searchable: false
                 }, {
+                    data: "applydate",
+                    name: 'applydate',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "outdate",
+                    name: 'outdate',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: 'indate',
+                    name: 'indate',
+                    orderable: false,
+                    searchable: false
+                },
+                {
                     data: 'action',
                     name: 'action',
                     orderable: false,
@@ -251,11 +175,13 @@
                 }, ]
             });
 
+            
+            console.log("is requesttable " + requestTable);
         }
 
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#wardenTable').DataTable().destroy();
+            $('#requestTable').DataTable().destroy();
             fetch_data(organizationid);
         });
 
@@ -266,6 +192,7 @@
             }
         });
 
+        // delete
         var teacher_id;
 
         $(document).on('click', '.btn-danger', function() {
@@ -290,7 +217,7 @@
 
                     $('div.flash-message').html(data);
 
-                    wardenTable.ajax.reload();
+                    requestTable.ajax.reload();
                 },
                 error: function(data) {
                     $('div.flash-message').html(data);

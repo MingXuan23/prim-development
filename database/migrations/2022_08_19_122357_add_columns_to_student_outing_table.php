@@ -15,7 +15,7 @@ class AddColumnsToStudentOutingTable extends Migration
     {
         Schema::table('student_outing', function (Blueprint $table) {
             //
-            $table->datetime('apply_date_time');
+            $table->date('apply_date_time');
             $table->datetime('arrive_date_time')->nullable();
             $table->integer('status');
             $table->bigInteger('classification_id')->unsigned();

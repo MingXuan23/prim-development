@@ -51,9 +51,9 @@ class DormController extends Controller
             ['ou.user_id', Auth::user()->id],
             ['ou.organization_id', $organization[0]->id],
         ])
-        ->select('roles.name')
-        ->get();
-        dd($roles);
+        ->value('organization_roles.nama');
+
+        // dd($roles);
         return view('dorm.index', compact('roles', 'organization'));
     }
 
@@ -957,5 +957,52 @@ class DormController extends Controller
             ->get();
 
         return response()->json(['success' => $list]);
+    }
+
+    public function getStudentOutingDatatable(Request $request)
+    {
+        // dd($request->oid);
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('student_outing')
+                    ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+                    ->join('students', 'students.id', '=', 'class_student.student_id')
+                    ->join('outings', 'outings.id', '=', 'student_outing.outing_id')
+                    ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+                    ->select('students.nama', 'students.parent_tel', 'student_outing.apply_date_time', 
+                    'student_outing.out_date_time', 'student_outing.in_date_time', 'student_outing.arrive_date_time')
+                    ->where([
+                        ['outings.organization_id', $oid],
+                        
+                    ]);
+                //'name', 'accommodate_no', 'student_inside_no'
+            }
+
+            if(isset($data))
+            {
+                $table = Datatables::of($data);
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('dorm.create', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 destroyDorm">Buang</button>';
+
+                    return $btn;
+                });
+
+                $table->rawColumns(['action']);
+                return $table->make(true);
+            }
+            else{
+                return "is null";
+            }
+        }
     }
 }
