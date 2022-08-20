@@ -3,12 +3,9 @@
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
-
 @endsection
 
 @section('content')
-<!-- 我想做login 然后去分辨学生还是老师 但是目前没有思绪 所以先用这个代替着-->
-<!-- 目前是直接set student_id 和 teacher_id = 1-->
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
@@ -16,55 +13,35 @@
         </div>
     </div>
 </div>
-
-<!-- input -->
-<!-- <form action="" method="get">
-    @csrf
-    <input type="text" name="role" id="role">
-    <button class="btn btn-secondary" type="submit">Enter</button>
-</form> -->
-<form name="form" action="" method="get">
-    <input type="text" name="subject" id="subject">
-    <button type="submit">Enter</button>
-</form>
-
-<?php
-if (isset($_GET['subject'])) {
-    $role = $_GET['subject'];
-} else {
-    $role = NULL;
-}
-?>
-@if($role != NULL)
 <div class="row">
     <div class="col-md-12">
         <div class="card card-primary">
-            @if(count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach($errors->all() as $error)
-                    <li>{{$error}}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
 
             {{csrf_field()}}
-            <!-- 这里是放organization的 可以从activity的index拿-->
+            <div class="card-body">
+
+                <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected disabled>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
 
         </div>
     </div>
 
     <div class="col-md-12">
         <div class="card">
+            <div class="card-header">Senarai Permintaan Keluar</div>
             <div>
-                <!-- {{-- route('sekolah.create')  --}} -->
-                @if(str_contains($role, 's'))
-                <a style="margin: 19px; float: right;" href="{{ route('asrama.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Tambah Permintaan</a>
-                @elseif(str_contains($role, 't'))
-                <a style="margin: 19px; float: right;" href="" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Check in</a>
+                <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
+                @if($roles == true)
+                <a style="margin: 19px; float: right;" href="{{ route('teacher.wardencreate') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
             </div>
 
@@ -85,139 +62,244 @@ if (isset($_GET['subject'])) {
                 </div>
                 @endif
 
+                <div class="flash-message"></div>
+
                 <div class="table-responsive">
-                    <table id="activityTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="wardenTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
-                                <th> Nama Pelajar </th>
-                                <th> No IC Pelajar </th>
-                                <th> Alasan </th>
-                                <th> Dibenarkan Keluar </th>
-                                <th> Dibenarkan Masuk </th>
-                                @if(str_contains($role, 'student'))
-                                <th> Status </th>
-                                @endif
-                                <th> Tarikh Keluar </th>
-                                <th> Tarikh Sampai </th>
-                                <th> Tarikh Masuk </th>
-                                <th> Action </th>
+                                <th>Nama Penuh Pelajar</th>
+                                <th>Nombor Telefon Penjaga</th>
+                                <th>Tarikh Membuat Permintaan</th>
+                                <th>Tarikh dan Masa Keluar</th>
+                                <th>Tarikh dan Masa Masuk</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-
-                        <tbody>
-                            @foreach($asrama as $asrama)
-                            <!-- 如果是学生 -->
-                            @if(str_contains($role, 'student'))
-                            <tr>
-                                <td>{{$asrama->id}}</td>
-                                <td>{{$asrama->nama}}</td>
-                                <td>{{$asrama->icno}}</td>
-                                <td>{{$asrama->reason}}</td>
-                                <td>{{$asrama->start_date}}</td>
-                                <td>{{$asrama->end_date}}</td>
-                                @if($asrama->status == '0')
-                                <td>Pending</td>
-                                <td>{{$asrama->outing_time}}</td>
-                                <td>{{$asrama->out_arrive_time}}</td>
-                                <td>{{$asrama->in_time}}</td>
-                                <td>
-                                    <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-secondary" type="submit">Delete</button>
-                                    </form>
-                                </td>
-                                @elseif($asrama->status == '1')
-                                <td>Approved</td>
-                                <td>{{$asrama->outing_time}}</td>
-                                <td>{{$asrama->out_arrive_time}}</td>
-                                <td>{{$asrama->in_time}}</td>
-                                <td>
-                                    @if($asrama->out_arrive_time == NULL && $asrama->outing_time != NULL)
-                                    <form action="{{route('asrama.updateOutArriveTime', $asrama->id)}}" method="get">
-                                        @csrf
-                                        <button id="arrive_home" class="btn btn-primary" type="submit">
-                                            Arrive
-                                        </button>
-                                    </form>
-                                    @endif
-                                </td>
-                                @endif
-                                </td>
-                            </tr>
-                            <!-- guard -->
-                            @elseif(str_contains($role, 'guard'))
-                            @if($asrama->status == '1')
-                            <tr>
-                                <td>{{$asrama->id}}</td>
-                                <td>{{$asrama->nama}}</td>
-                                <td>{{$asrama->icno}}</td>
-                                <td>{{$asrama->reason}}</td>
-                                <td>{{$asrama->start_date}}</td>
-                                <td>{{$asrama->end_date}}</td>
-                                <td>{{$asrama->outing_time}}</td>
-                                <td>{{$asrama->out_arrive_time}}</td>
-                                <td>{{$asrama->in_time}}</td>
-                                <td>
-                                    @if($asrama->outing_time == NULL)
-                                    <form action="{{route('asrama.updateOutTime', $asrama->id)}}" method="get">
-                                        @csrf
-                                        <button class="btn btn-primary" type="submit">Leave</button>
-                                    </form>
-                                    @elseif($asrama->in_time == NULL && $asrama->outing_time != NULL && $asrama->out_arrive_time != NULL)
-                                    <form action="{{route('asrama.updateInTime', $asrama->id)}}" method="get">
-                                        @csrf
-                                        <button class="btn btn-primary" type="submit">In</button>
-                                    </form>
-                                    @endif
-                                </td>
-                            </tr>
-                            @endif
-                            </td>
-                            </tr>
-
-                            <!-- teacher -->
-                            @else
-                            <tr>
-                                <td>{{$asrama->id}}</td>
-                                <td>{{$asrama->nama}}</td>
-                                <td>{{$asrama->icno}}</td>
-                                <td>{{$asrama->reason}}</td>
-                                <td>{{$asrama->start_date}}</td>
-                                <td>{{$asrama->end_date}}</td>
-                                <td>{{$asrama->outing_time}}</td>
-                                <td>{{$asrama->out_arrive_time}}</td>
-                                <td>{{$asrama->in_time}}</td>
-                                <td>
-                                    @if($asrama->status == '0')
-                                    <form action="{{route('asrama.edit', $asrama->id)}}" method="get">
-                                        @csrf
-                                        <button class="btn btn-primary" type="submit">Approve</button>
-                                    </form>
-                                    <br />
-                                    <form action="{{route('asrama.destroy', $asrama->id)}}" method="post">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-secondary" type="submit">Delete</button>
-                                    </form>
-                                    @endif
-                                </td>
-                            </tr>
-                            @endif
-                            @endforeach
-                        </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        {{-- confirmation delete modal --}}
+        <div id="deleteConfirmationModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Padam Warden</h4>
+                    </div>
+                    <div class="modal-body">
+                        Adakah anda pasti?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
+                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- end confirmation delete modal --}}
+
+        <!-- export warden modal-->
+        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Export Warden</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('exportwarden') }}" method="post">
+                        <div class="modal-body">
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="organ" id="organ" class="form-control">
+                                    @foreach($organization as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- import warden modal -->
+        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import Warden</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('importwarden') }}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="organ" id="organ" class="form-control">
+                                    @foreach($organization as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="file" name="file" required>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Import</button>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endif
+
+
 @endsection
+
+
 @section('script')
+<!-- Peity chart-->
+<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+
+<!-- Plugin Js-->
+<script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
+
+<script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+
 <script>
+    $(document).ready(function() {
 
+        var wardenTable;
 
+        if ($("#organization").val() != "") {
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+            fetch_data($("#organization").val());
+        }
+
+        function fetch_data(oid = '') {
+            wardenTable = $('#wardenTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('teacher.getWardenDatatable') }}",
+                    data: {
+                        oid: oid,
+                        hasOrganization: true
+                    },
+                    type: 'GET',
+
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "className": "text-center",
+                }, ],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "name",
+                    name: 'name',
+                    orderable: true,
+                    searchable: true
+                }, {
+                    data: "username",
+                    name: 'username',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "email",
+                    name: 'email',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "telno",
+                    name: 'telno',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }, ]
+            });
+
+        }
+
+        $('#organization').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#wardenTable').DataTable().destroy();
+            fetch_data(organizationid);
+        });
+
+        // csrf token for ajax
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        var teacher_id;
+
+        $(document).on('click', '.btn-danger', function() {
+            teacher_id = $(this).attr('id');
+            $('#deleteConfirmationModal').modal('show');
+        });
+
+        $('#delete').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    //_method: 'DELETE'
+                },
+                url: "/teacher/destroywarden/" + teacher_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+                    // console.log("it Works");
+
+                    $('div.flash-message').html(data);
+
+                    wardenTable.ajax.reload();
+                },
+                error: function(data) {
+                    $('div.flash-message').html(data);
+                }
+            })
+        });
+
+        $('.alert').delay(3000).fadeOut();
+
+    });
 </script>
 @endsection

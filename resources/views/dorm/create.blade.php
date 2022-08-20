@@ -81,12 +81,6 @@
                                 placeholder="Pilih Tarikh Keluar">
                     </div>
 
-                    <div class="form-group">
-                        <label>Tarikh Masuk</label>
-                        <input onclick="this.showPicker()" onfocus="setMinDate();" class="form-control" id="end_date" name="end_date" type="date"
-                                placeholder="Pilih Tarikh Keluar">
-                    </div>
-
                     <div class="form-group mb-0">
                         <div>
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -114,5 +108,7 @@
 
 <script>
 
+    start_date.min = new Date().toISOString().split("T")[0];
+    
 </script>
 @endsection

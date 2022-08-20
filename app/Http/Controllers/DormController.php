@@ -45,10 +45,16 @@ class DormController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
-
-        
-
-        return view('dorm.outing.index', compact('organization'));
+        $roles = DB::table('organization_roles')
+        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+        ->where([
+            ['ou.user_id', Auth::user()->id],
+            ['ou.organization_id', $organization[0]->id],
+        ])
+        ->select('roles.name')
+        ->get();
+        dd($roles);
+        return view('dorm.index', compact('roles', 'organization'));
     }
 
     public function indexOuting()
@@ -201,14 +207,9 @@ class DormController extends Controller
         $category = DB::table('classifications')
                     ->get();
 
-        if(Auth::user()->hasRole('Penjaga') || Auth::user()->hasRole('Warden') 
-        || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Superadmin') 
-        || Auth::user()->hasRole('Pentadbir'))
+        if(Auth::user()->hasRole('Penjaga'))
         {
             return view('dorm.create', compact('organization', 'category'));
-        }
-        else{
-            return view('/home');
         }
     }
 
@@ -248,8 +249,39 @@ class DormController extends Controller
     public function store(Request $request)
     {
         // 
-        
+        $this->validate($request, [
+            'name'         =>  'required',
+            'email'        =>  'required',
+            'category'     =>  'required',
+            'reason'       =>  'required',
+            'start_date'   =>  'required',
+            'organization' =>  'required',
+        ]);
 
+        $studentid = DB::table("students")
+                    ->join('class_student', 'class_student.id', '=', 'students.id')
+                    ->where([
+                        ['students.name', $request->get('name')],
+                        ['students.email', $request->get('email')],
+                        ['class_student.outing_status', 0],
+                        ['class_student.blacklist', 0],
+                    ])
+                    ->value('students.id');
+
+        dd($studentid);
+        if(isset($studentid)){
+            DB::table('student_outing')
+            ->insert([
+                'start_date_time' => $request->get('start_date'),
+                'end_date_time'   => $request->get('end_date'),
+                'organization_id' => $request->get('organization'),
+            ]);
+    
+            return redirect('/dorm/index')->with('success', 'New outing date and time has been added successfully');
+        }
+        else{
+            return redirect('/dorm/index')->withErrors('Failed to submit form');
+        }
     }
 
     public function storeOuting(Request $request)

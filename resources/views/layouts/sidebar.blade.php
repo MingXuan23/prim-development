@@ -149,7 +149,7 @@
                                 @role('Superadmin|Pentadbir|Guru|Warden|Penjaga')
                                 <li>
                                     <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.create') }}" class=" waves-effect">
+                                    <a href="{{ route('dorm.index') }}" class=" waves-effect">
                                         <i class="fas fa-book"></i>
                                         <span>Permintaan</span>
                                     </a>
