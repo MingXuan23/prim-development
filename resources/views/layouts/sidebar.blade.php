@@ -182,6 +182,15 @@
                                     </a>
                                 </li>
                                 @endrole
+
+                                @role('Superadmin|Pentadbir|Guru|Warden')
+                                <li>
+                                    <a href="{{ route('dorm.indexStudentlist') }}" class=" waves-effect">
+                                        <i class="fas fa-building"></i>
+                                        <span>Student List</span>
+                                    </a>
+                                </li>
+                                @endrole
                             </ul>
                         </li>
                         @endrole

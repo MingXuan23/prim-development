@@ -237,6 +237,11 @@ Route::post('/exportdorm', 'DormController@dormexport')->name('exportdorm');
 Route::post('/importdorm', 'DormController@dormimport')->name('importdorm');
 Route::post('/importresident', 'DormController@residentimport')->name('importresident');
 
+//studentlist export
+Route::post('/exportallstudentlist', 'DormController@allstudentlistexport')->name('exportallstudentlist');
+Route::post('/exportdormstudentlist', 'DormController@dormstudentlistexport')->name('exportdormstudentlist');
+
+
 
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
@@ -324,4 +329,10 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/destroyDorm/{id}', 'DormController@destroyDorm')->name('dorm.destroyDorm');
     Route::get('dorm/getDormDataTable', 'DormController@getDormDataTable')->name('dorm.getDormDataTable');
     Route::get('dorm/clearDorm/{id}', 'DormController@clearDorm')->name('dorm.clearDorm');
+
+    //studentlist
+    Route::get('dorm/indexStudentlist', 'DormController@indexStudentlist')->name('dorm.indexStudentlist');
+    Route::get('dorm/getAllStudentlistDatatable', 'DormController@getAllStudentlistDatatable')->name('dorm.getAllStudentlistDatatable');
+    Route::get('dorm/getBlacklistStudentlistDatatable', 'DormController@getBlacklistStudentlistDatatable')->name('dorm.getBlacklistStudentlistDatatable');
+    Route::get('dorm/blockStudent/{id}/{blockStatus}', 'DormController@blockStudent')->name('dorm.blockStudent');
 });

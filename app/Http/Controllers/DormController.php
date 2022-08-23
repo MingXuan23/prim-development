@@ -8,6 +8,8 @@ use App\Exports\ResidentExport;
 use App\Exports\DormExport;
 use App\Imports\DormImport;
 use App\Imports\ResidentImport;
+use App\Exports\AllStudentlistExport;
+use App\Exports\DormStudentlistExport;
 use Illuminate\Http\Request;
 use App\Models\Dorm;
 use App\Models\Outing;
@@ -46,7 +48,7 @@ class DormController extends Controller
         //
         $organization = $this->getOrganizationByUserId();
 
-        
+
 
         return view('dorm.outing.index', compact('organization'));
     }
@@ -96,6 +98,24 @@ class DormController extends Controller
         return view('dorm.management.index', compact('organization', 'dormlist'));
     }
 
+    public function indexStudentlist()
+    {
+        // 
+        $organization = $this->getOrganizationByUserId();
+
+        $studentlist = DB::table('class_student')
+            ->whereNotNull('dorm_id')
+            ->get();
+
+        $dormlist = DB::table('dorms')
+            ->select('id', 'name')
+            ->get();
+
+        // return redirect('/dorm/dorm/getAllStudentlistDatatable')->with('success', 'Dorms have been added successfully');
+
+        return view('dorm.studentlist.index', compact('organization', 'studentlist', 'dormlist'));
+    }
+
     //
     //
     //import and export functions
@@ -109,12 +129,22 @@ class DormController extends Controller
             ->where('organizations.id', $request->organ)
             ->value('organizations.nama');
 
-        return Excel::download(new OutingExport($request->organ), $filename.' masa outing.xlsx');
+        return Excel::download(new OutingExport($request->organ), $filename . ' masa outing.xlsx');
     }
 
     public function dormexport(Request $request)
     {
         return Excel::download(new DormExport($request->organ), 'dorm.xlsx');
+    }
+
+    public function allstudentlistexport(Request $request)
+    {
+        return Excel::download(new AllStudentlistExport($request->organ), 'studentlist.xlsx');
+    }
+
+    public function dormstudentlistexport(Request $request)
+    {
+        return Excel::download(new DormStudentlistExport($request->organ, $request->dorm), 'studentlist.xlsx');
     }
 
     public function residentexport(Request $request)
@@ -128,9 +158,9 @@ class DormController extends Controller
             ->where('dorms.id', $request->dormExport)
             ->value('dorms.name');
 
-            // dd($filename);
+        // dd($filename);
 
-        return Excel::download(new ResidentExport($request->organExport, $request->dormExport), $filename .' pelajar.xlsx');
+        return Excel::download(new ResidentExport($request->organExport, $request->dormExport), $filename . ' pelajar.xlsx');
     }
 
     public function dormimport(Request $request)
@@ -199,10 +229,9 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         $category = DB::table('classifications')
-                    ->get();
+            ->get();
 
-        if(Auth::user()->hasRole('Penjaga'))
-        {
+        if (Auth::user()->hasRole('Penjaga')) {
             return view('dorm.create', compact('organization', 'category'));
         }
     }
@@ -555,7 +584,7 @@ class DormController extends Controller
                 return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
             }
         }
-        return redirect()->to('/dorm/dorm/indexResident/'.$newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found  |  Student is reside in the dorm']);   
+        return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found  |  Student is reside in the dorm']);
     }
 
     public function updateDorm(Request $request, $id)
@@ -644,6 +673,32 @@ class DormController extends Controller
             //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         } else {
             Session::flash('error', 'Dorm Gagal Dikosongkan');
+            return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
+        }
+    }
+
+    public function blockStudent($id, $blockStatus)
+    {
+        //if the student is blocked
+        if ($blockStatus == 1) {
+            $result = DB::table('class_student')
+                ->where('id', $id)
+                ->update(['blacklist' => null]);
+        } else if ($blockStatus == 2) {
+            $result = DB::table('class_student')
+                ->where('id', $id)
+                ->update(['blacklist' => 1]);
+        }
+        if ($result && $blockStatus == 1) {
+            Session::flash('success', 'Pelajar Berjaya Unblock');
+            return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
+        } else if ($result && $blockStatus == 2) {
+            Session::flash('success', 'Pelajar Berjaya Block');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Pelajar Gagal Diproseskan');
             return View::make('layouts/flash-messages');
             //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         }
@@ -900,6 +955,123 @@ class DormController extends Controller
                 });
 
                 $table->rawColumns(['outing_status', 'blacklist', 'action']);
+                return $table->make(true);
+            }
+        }
+    }
+
+    public function getAllStudentlistDatatable(Request $request)
+    {
+
+        if (request()->ajax()) {
+            $oid = $request->oid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'co.class_id')
+                    ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+                    ->where('co.organization_id', '=', $oid)
+                    ->whereNotNull('class_student.dorm_id')
+                    ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as status')
+                    ->orderBy('students.nama')
+                    ->get();
+                dd($data);
+            }
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == null) {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success"> Unblock </span></div>';
+
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Blocked </span></div>';
+
+                    return $btn;
+                }
+            });
+
+            // how to know what is the $row->id??
+            // i need to make sure that the id is actually class_student id
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
+                //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                dd($row->id);
+                return $btn;
+            });
+
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
+        }
+    }
+
+    public function getBlacklistStudentlistDatatable(Request $request)
+    {
+        dd("inside blacklist controller");
+        // dd($request->hasOrganization);
+        if (request()->ajax()) {
+            $oid = $request->oid;
+
+            // $dormid = $request->dormid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'co.class_id')
+                    ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+                    ->where('co.organization_id', $oid)
+                    ->whereNotNull('class_student.dorm_id')
+                    ->whereNotNull('class_student.blacklist')
+                    ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as status')
+                    ->orderBy('students.nama')
+                    ->get();
+
+                $table = Datatables::of($data);
+
+                $table->addColumn('status', function ($row) {
+                    if ($row->status == null) {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success"> Unblock </span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Blocked </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+                // how to know what is the $row->id??
+                // i need to make sure that the id is actually class_student id
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
+                    //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                    dd($row->id);
+                    return $btn;
+                });
+
+                $table->rawColumns(['status', 'action']);
                 return $table->make(true);
             }
         }
