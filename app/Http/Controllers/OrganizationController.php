@@ -26,15 +26,12 @@ class OrganizationController extends Controller
     {
         // after launch remove where
         $type_org = TypeOrganization::all();
-<<<<<<< HEAD
         
         $parent_org = Organization::whereIn('type_org', [1, 2, 3])->get();
-=======
 
         $parent_org = $this->getAvailableSchoolForKoop();
 
         Organization::where('parent_org');
->>>>>>> main
 
         $states = Jajahan::negeri();
         return view('organization.add', compact('type_org', 'parent_org', 'states'));
@@ -140,10 +137,6 @@ class OrganizationController extends Controller
 
     public function update(OrganizationRequest $request, $id)
     {
-<<<<<<< HEAD
-        
-=======
->>>>>>> main
         Organization::where('id', $id)->update($request->validated());
 
         if(isset($request->seller_id))
