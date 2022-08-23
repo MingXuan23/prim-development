@@ -183,6 +183,12 @@ Route::group(['prefix' => 'merchant'], function() {
     Route::post('fetchItem', 'MerchantController@fetchItem')->name('merchant.fetchItem');
     Route::post('store-item', 'MerchantController@storeItem')->name('merchant.storeItem');
     Route::get('/{id}/merchant-cart', 'MerchantController@showMerchantCart')->name('merchant.cart');
+    Route::post('fetchDay', 'MerchantController@fetchDay')->name('merchant.fetchDay');
+    Route::post('fetchTime', 'MerchantController@fetchTime')->name('merchant.fetchTime');
+    Route::post('storeOrderDate', 'MerchantController@storeOrderDate')->name('merchant.storeOrderDate');
+    
+    Route::post('testType', 'MerchantController@testType')->name('merchant.testType');
+    Route::post('testItem', 'MerchantController@testItem')->name('merchant.testItem');
 });
 
 Route::group(['middleware' => ['auth']], function () {

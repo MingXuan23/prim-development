@@ -54,7 +54,7 @@ class CooperativeController extends Controller
     public function fetchKoop(Request $request)
     {
         $sID = $request->get('sID');
-
+        
         $koop = Organization::where('parent_org', $sID)->select('id', 'nama')->get();
 
         return response()->json(['success' => $koop]);
@@ -219,14 +219,14 @@ class CooperativeController extends Controller
         $org = Organization::where('id', $koperasi->parent_org)->select('nama')->first();
         
         $product_item = DB::table('product_item as pi')
-                        ->join('product_type as pt', 'pi.product_type_id', '=', 'pt.id')
+                        ->join('product_group as pt', 'pi.product_group_id', '=', 'pt.id')
                         ->where('pt.organization_id', $koperasi->id)
                         ->select('pi.*', 'pt.name as type_name')
                         ->orderBy('pi.name')
                         ->get();
         
-        $product_type = DB::table('product_type as pt')
-                            ->join('product_item as pi', 'pt.id', '=', 'pi.product_type_id')
+        $product_type = DB::table('product_group as pt')
+                            ->join('product_item as pi', 'pt.id', '=', 'pi.product_group_id')
                             ->select('pt.id as type_id', 'pt.name as type_name')
                             ->where('pt.organization_id', $koperasi->id)
                             ->distinct() 
@@ -305,7 +305,7 @@ class CooperativeController extends Controller
         $org = PickUpOrder::where('id', $id)->select('organization_id as id')->first();
 
         $daySelect = (int)$request->week_status;
-
+        
         $pickUp = Carbon::now()->next($daySelect)->toDateString();
         
         PickUpOrder::where([
@@ -632,7 +632,4 @@ class CooperativeController extends Controller
         else if($date == "Sunday") { $day = 0; }
         return $day;
     }
-
-    
-
 }

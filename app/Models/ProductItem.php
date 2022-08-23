@@ -11,7 +11,7 @@ class ProductItem extends Model
     use SoftDeletes;
 
     protected $table = "product_item";
-    protected $fillable = ['name', 'desc', 'quantity', 'price', 'image', 'status', 'product_type_id'];
+    protected $fillable = ['name', 'desc', 'quantity', 'price', 'image', 'status', 'product_group_id'];
     public $timestamps = true;
 
     public function product_order()
@@ -19,9 +19,9 @@ class ProductItem extends Model
         return $this->hasMany(ProductOrder::class, 'product_item');
     }
 
-    public function product_type()
+    public function product_group()
     {
-        return $this->belongsTo(ProductType::class);
+        return $this->belongsTo(ProductGroup::class);
     }
 
     public function pickup_order()
@@ -32,8 +32,8 @@ class ProductItem extends Model
         ->withTimestamps();
     }
 
-    public function product_queue()
+    public function queue()
     {
-        return $this->hasMany(ProductQueue::class);
+        return $this->belongsToMany(Queue::class);
     }
 }

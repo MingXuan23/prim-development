@@ -47,17 +47,23 @@
         <div class="list-group">
             @foreach($merchant as $row)
               @if($oh_status[$row->id] == 1)
-              <a href="{{ route('merchant.show', $row->id) }}" class="list-group-item list-group-item-action flex-column">
+              {{-- <a href="{{ route('merchant.show', $row->id) }}" class="list-group-item list-group-item-action flex-column"> --}}
+              <a id="order_modal" data-org-id="{{ $row->id }}" class="list-group-item list-group-item-action flex-column">
+              @csrf
               @else
               <a id="closed_modal" class="list-group-item list-group-item-action flex-column" style="opacity: 50%">
               @endif
-                <div class="d-flex" style="height: 100px">
+                <div class="d-flex" >
                     <img class="rounded img-fluid bg-dark" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
                     <div class="flex-column ml-2">
                         <h4 class="merchant_name" id="{{$oh_status[$row->id]}}">{{ $row->nama }}</h4>
-                        <p class="m-0"><i class="fas fa-map-marker-alt mr-2"></i>
-                             {{ $row->address }} , {{$row->city}} , {{$row->state}}
-                        </p>
+                        <div class="d-flex">
+                          <div class="justify-content-center align-items-center mr-2">
+                            <i class="fas fa-map-marker-alt"></i>
+                          </div>
+                          <p class="m-0">{{ $row->address }} , {{$row->city}} , {{$row->state}}</p>
+                        </div>
+                        
                         {{-- <p class="m-0"><i class="mdi mdi-bike-fast mr-2"></i>RM </p> --}}
                         {{-- <p class="m-0"><i class="mdi mdi-food mr-2"></i> </p>--}}
                     </div>
@@ -82,6 +88,23 @@
   </div>
 </div>
 
+<h4>Type</h4>
+<form action="{{ route('merchant.testType') }}" method="POST">
+  @csrf
+  <input type="text" placeholder="Categori" name="type_name">
+  <input type="text" placeholder="Restock setiap berapa minit" name="duration">
+  <input type="submit">
+</form>
+
+<h4>Item</h4>
+<form action="{{ route('merchant.testItem') }}" method="POST">
+  @csrf
+  <input type="text" placeholder="Nama makanan" name="item_name">
+  <input type="text" placeholder="Kuantiti" name="item_quantity">
+  <input type="text" placeholder="Harga" name="item_price">
+  <input type="submit">
+</form>
+
 {{-- Merchant Closed Modal --}}
 <div id="merchantClosedModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -101,6 +124,53 @@
 </div>
   {{-- end Merchant Closed Modal --}}
 
+{{-- Order Time Modal --}}
+<div id="orderTimeModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">Pilih Hari dan Masa Pengambilan</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+
+          <div class="alert" id="popup" style="display: none"></div>
+
+          <div class="row">
+
+            <div class="col">
+              <div class="form-group required">
+                <label class="col">Hari</label>
+                <div class="col" >
+                  <select class="form-control" data-parsley-required-message="Sila pilih hari" id="pickup_day" required>
+                    <option value="" selected>Pilih Hari</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="col">
+              <div class="form-group required">
+                <label class="col">Masa</label>
+                <div class="col" id="pickup_time_div">
+                  <input class="form-control" type="time" id="pickup_time" disabled required>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light mr-2" data-dismiss="modal">Tutup</button>
+          <button type="button" class="btn btn-primary" id="order_submit">Teruskan</button>
+        </div>
+
+      </div>
+  </div>
+</div>
+{{-- end Order Time Modal --}}
+
 
 @endsection
 
@@ -108,7 +178,6 @@
 
 <script>
     $(document).ready(function() {
-      
       if($('.merchant_name').attr('id') == 0){
         $('.merchant_name').append(' <label class="text-danger">Closed</label>')
       }
@@ -116,6 +185,125 @@
       $('#closed_modal').click(function(){
           $('#merchantClosedModal').modal('show')
       })
+
+      $.ajaxSetup({
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+      });
+
+      var org_id;
+
+      $('#order_modal').click(function(e) {
+        e.preventDefault();
+        org_id = $(this).attr('data-org-id')
+
+        $.ajax({
+          url: "{{ route('merchant.fetchDay') }}",
+          method: "POST",
+          data: {o_id:org_id},
+          success:function(result)
+          {
+            var pickup_day = $("#pickup_day")
+            var pickup_time = $('#pickup_time_div')
+
+            if(result.day_body != "")
+            {
+              pickup_time.html('<input class="form-control" type="time" id="pickup_time" disabled required>')
+              pickup_day.empty()
+              pickup_day.append("<option value='' disabled selected>Pilih Hari</option>")
+              pickup_day.append(result.day_body)
+
+              $('#orderTimeModal').modal('show')
+            }
+            else
+            {
+              window.location.href = result.path;
+            }
+            console.log(result)
+          },
+          error:function(result)
+          {
+            console.log(result.responseText)
+          }
+        })
+      })
+
+      var day;
+
+      $('#pickup_day').change(function() {
+        
+        if(this.value != null)
+        {
+          day = this.value
+          $.ajax({
+            url: "{{ route('merchant.fetchTime') }}",
+            method: "POST",
+            data: { day:day, o_id:org_id },
+            success:function(result){
+              var pickup_time = $('#pickup_time_div')
+
+              if(result.alert == "")
+              {
+                pickup_time.html(result.time_body)
+              }
+              else
+              {
+                pickup_time.html(result.alert)
+              }
+            },
+            error:function(result){
+              console.log(result)
+            }
+          })
+        }
+      })
+
+      $('#order_submit').click(function() {
+        if($('#pickup_time').val() == "" || $('#pickup_day').val() == null)
+        {
+          callAlert("Sila kemaskini ruangan yang tidak kosong")
+        }
+        else
+        {
+          var time = $('#pickup_time').val()
+          var min = $('#pickup_time').attr('min')
+          var max = $('#pickup_time').attr('max')
+
+          $.ajax({
+            url: "{{ route('merchant.storeOrderDate') }}",
+            method: "POST",
+            data: { day: day, time: time, min:min, max:max, org_id:org_id},
+            success:function(result)
+            {
+              if(!result.alert)
+              {
+                window.location.href = result.path;
+                $('#orderTimeModal').modal('hide')
+              }
+              else
+              {
+                callAlert(result.alert)
+              }
+            },
+            error:function(result)
+            {
+              console.log(result)
+            }
+          })
+        }
+      })
+
+      function callAlert(message)
+      {
+        const popup = $('#popup')
+        popup.empty()
+        popup.addClass('alert-danger')
+        popup.css('display', '')
+        popup.append('<p>'+message+'</p>')
+        popup.delay(3000).fadeOut()
+      }
+
     })
 </script>
 

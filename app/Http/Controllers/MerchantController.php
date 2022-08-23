@@ -6,8 +6,9 @@ use App\Models\Organization;
 use App\Models\OrganizationHours;
 use App\Models\PickUpOrder;
 use App\Models\ProductItem;
-use App\Models\ProductType;
+use App\Models\ProductGroup;
 use App\Models\ProductOrder;
+use App\Models\Queue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -39,6 +40,152 @@ class MerchantController extends Controller
         return view('merchant.index', compact('merchant', 'oh_status'));
     }
 
+    public function fetchDay(Request $request)
+    {
+        $Today = Carbon::now();
+        $dayNameMY = array("Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu");
+        $dayNameEN = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+
+        $user_id = Auth::id();
+        $org_id = $request->get('o_id');
+        $day_body = "";
+
+        $exist = PickUpOrder::where([['user_id', $user_id], ['organization_id', $org_id], ['status', 1]])->exists();
+        
+        if(!$exist)
+        {
+            $allDay = OrganizationHours::where('organization_id', $org_id)->where('status', 1)->get();
+        
+            $isPast = array();
+            
+            foreach($allDay as $row)
+            {
+                $TodayDay = $Today->format('l'); // Get Day Name
+
+                $day = app(CooperativeController::class)->getDayIntegerByDayName($TodayDay); // Return integer based on name
+
+                $key = strval($row->day);
+
+                $isPast = app(CooperativeController::class)->getDayStatus($day, $row->day, $isPast, $key); // Check and return day is past or this week
+            }
+
+            foreach($allDay as $row)
+            {
+                if($TodayDay == $dayNameEN[$row->day]) // If day array is Today
+                {
+                    $day_body .= "<option value='".$row->day."'>Hari ini</option>";
+                }
+                else
+                {
+                    $day_body .= "<option value='".$row->day."'>". $dayNameMY[$row->day]." ".$isPast[$row->day]."</option>";
+                }
+            }
+
+            return response()->json(['day_body' => $day_body]);
+        }
+        else
+        {
+            return response()->json(['path' => '/merchant/'.$org_id, 'day_body' => $day_body]);
+        }
+    }
+
+    public function fetchTime(Request $request)
+    {
+        $org_id = $request->get('o_id');
+        $daySelected = $request->get('day');
+
+        $Today = Carbon::now();
+        
+        $TodayDay = $Today->format('l');
+
+        $TodayDayInt = app(CooperativeController::class)->getDayIntegerByDayName($TodayDay);
+
+        $op_hour = OrganizationHours::where('organization_id', $org_id)
+                    ->where('day', $daySelected)
+                    ->select('open_hour', 'close_hour')
+                    ->first();
+
+        $min = Carbon::parse($op_hour->open_hour)->format("H:i");
+        $max = Carbon::parse($op_hour->close_hour)->format("H:i");
+
+        $alert = "";
+        $btn = "";
+
+        if($daySelected == $TodayDayInt) // If day selected in select option is today
+        {
+            $min_required_time = $Today->addHour(2)->toTimeString(); // Add 2 hour to current time
+
+            // check if current time(after add) is between open and close hour
+            if($min <= $min_required_time && $max >= $min_required_time)
+            {
+                $min = Carbon::parse($min_required_time)->hour; // Format the time and get hour
+                $min .= ":00"; // Ex. = if above $min = 11, this return 11:00 (formatted for HTML)
+            }
+            else
+            {
+                $alert = "<input class='form-control' type='time' id='pickup_time' disabled>";
+                $alert .= "<div class='alert alert-warning mt-2'><strong>Tutup:</strong> Sila pilih hari lain</div>";
+            }
+        }
+
+        // Formatted for display
+        $min_f = Carbon::parse($min)->format("g:i A");
+        $max_f = Carbon::parse($max)->format("g:i A");
+
+        $time_body = "<input class='form-control' type='time' min='".$min."' max='".$max."' id='pickup_time' required>";
+        $time_body .= "<p>".$min_f." - ".$max_f."</p>";
+
+        return response()->json(['time_body' => $time_body, 'alert' => $alert, 'btn' => $btn]);
+    }
+
+    public function storeOrderDate(Request $request)
+    {
+        $user_id = Auth::id();
+
+        $day = $request->get('day');
+        $min = $request->get('min');
+        $max = $request->get('max');
+        $time = $request->get('time');
+        $o_id = $request->get('org_id');
+
+        if($min <= $time && $max >= $time)
+        {
+            $date = $this->getPickUpDate((int)$day, $time);
+
+            PickUpOrder::create([
+                'pickup_date' => $date,
+                'status' => 1,
+                'user_id' => $user_id,
+                'organization_id' => $o_id,
+            ]);
+
+            return response()->json(['path' => '/merchant/'.$o_id]);
+        }
+        else
+        {
+            return response()->json(['alert' => 'Sila tetapkan masa pesanan dalam jarak masa yang ditetapkan']);
+        }
+        
+    }
+
+    private function getPickUpDate($daySelect, $timeSelect)
+    {
+        $todayDate = Carbon::now()->format('l');
+
+        $dayInt = app(CooperativeController::class)->getDayIntegerByDayName($todayDate);
+
+        $date = Carbon::now()->toDateString();
+        
+        if($daySelect != $dayInt)
+        {
+            $date = Carbon::now()->next($daySelect)->toDateString();
+        }
+
+        $pickUp = $date.' '.$timeSelect.':00';
+
+        return $pickUp;
+    }
+
     public function showMerchant($id)
     {
         $todayDate = Carbon::now()->format('l');
@@ -57,13 +204,13 @@ class MerchantController extends Controller
         
         $close_hour = date('h:i A', strtotime($oh->close_hour));
 
-        $product_item = ProductItem::with(['product_type' => function($q) use ($id){
-            $q->where('product_type.organization_id', $id);
+        $product_item = ProductItem::with(['product_group' => function($q) use ($id){
+            $q->where('product_group.organization_id', $id);
         }])
         ->orderBy('name')
         ->get();
 
-        $product_type = ProductType::where('organization_id', $id)
+        $product_type = ProductGroup::where('organization_id', $id)
         ->get();
 
         $jenis = array();
@@ -71,7 +218,7 @@ class MerchantController extends Controller
         {
             foreach($product_type as $type)
             {
-                if($item->product_type_id == $type->id)
+                if($item->product_group_id == $type->id)
                 {
                     $temp[] = [
                         'type_id' => strval($type->id),
@@ -277,4 +424,89 @@ class MerchantController extends Controller
         }
         return view('merchant.cart');
     }
+
+    # Testing function for insert product group data and queue data
+    public function testType(Request $request)
+    {
+        # Insert Product Group Data
+        $pg = ProductGroup::create([
+            'name' => $request->type_name,
+            'duration' => $request->duration,
+            'organization_id' => 4,
+        ]);
+
+        # Get Maximum and Minimum value of when the organization close(max) and open(min)
+        $max = OrganizationHours::where('organization_id', 4)->max('close_hour');
+        $min = OrganizationHours::where('organization_id', 4)->min('open_hour');
+
+        # Formatting Value
+        $max_f = Carbon::parse($max);
+        $min_f = Carbon::parse($min);
+
+        # Get Difference of Min and Max
+        $diffTime = $max_f->diff($min_f)->format('%H:%I:%S');
+
+        # Convert Time Difference into Minutes
+        $time = Carbon::parse($diffTime); // Formatting
+        $start_of_day = Carbon::parse($diffTime)->startOfDay(); // Get 00:00:00
+        $total_minutes = $time->diffInMinutes($start_of_day); // Get minutes by differenciate time in minutes
+
+        # Initialize variable
+        $duration = $pg->duration;
+        $temp = $min_f;
+        $data = array(0 => ["slot_time" => $min, "status" => 1, "product_group_id" => $pg->id, "created_at" => Carbon::now(),
+        "updated_at" => Carbon::now()]); // Initialize first row of queue (opening hour/ Min)
+
+        # Loop until the total duration more or equal to total minutes
+        for($newDuration = $duration; $newDuration <= $total_minutes; $newDuration += $duration)
+        {
+            $temp_f = $temp->addMinutes($duration)->format('H:i:s');  // Add minutes to current time var
+            $data[] = [
+                "slot_time" => $temp_f,
+                "status" => 1,
+                "product_group_id" => $pg->id,
+                "created_at" => Carbon::now(),
+                "updated_at" => Carbon::now(),
+            ];
+            $temp = Carbon::parse($temp_f); // Reformat time so it can perform addMinutes method
+        }
+
+        # Insert in Queue Table
+        Queue::insert($data);
+
+        return back();
+    }
+
+    # Testing function insert Item for Slot
+    public function testItem(Request $request)
+    {
+        # Get What Group ID the User Chose
+        $group_id = 8; // <- Value for Testing only
+
+        # Store Item Data
+        $item = ProductItem::create([
+            'name' => $request->item_name,
+            'quantity' => $request->item_quantity,
+            'price' => $request->item_price,
+            'status' => 1,
+            'product_group_id' => $group_id
+        ]);
+
+        # Get All Slot Time by Group ID
+        $queue = Queue::where('product_group_id', $group_id)->get();
+
+        # Store All Queue ID and Requested Item ID in an array
+        foreach($queue as $row)
+        {
+            $queue_id[] = [
+                "product_item_id" => $item->id,
+                "queue_id" => $row->id,
+            ];
+        }
+
+        # insert bridge data
+        DB::table('product_queue')->insert($queue_id);
+
+        return back();
+    }   
 }

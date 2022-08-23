@@ -112,7 +112,7 @@
           </div>
 
           @foreach($product_item as $product)
-          @if($product->product_type_id == $type['type_id'])
+          @if($product->product_group_id == $type['type_id'])
           <div class="row">
             <div class="col">
               <div class="card border p-2" id="shadow-bg" >
