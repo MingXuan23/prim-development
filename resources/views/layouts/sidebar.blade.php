@@ -249,10 +249,33 @@
 
             @role('Superadmin|Koop_Admin')
             <li>
-                <a href="{{ route('koperasi.indexAdmin') }}" class=" waves-effect">
-                    <i class="mdi mdi-account-group"></i>
-                    <span>Kooperasi</span>
-                </a>
+            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        <span>Koop Admin</span>
+                    </a>
+
+            <ul class="sub-menu mm-collapse" aria-expanded="false">
+                <li>
+                    <a href="{{ route('koperasi.indexAdmin') }}" class=" waves-effect">
+                    <i class="typcn typcn-pencil"></i>
+                    <span>Produk</span>
+                    </a>
+                </li>
+           
+                <li>
+                    <a href="{{route('koperasi.indexOpening')}}" class=" waves-effect">
+                    <i class="fas fa-archway"></i>
+                    <span>Hari Dibuka</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{route('koperasi.indexConfirm')}}" class=" waves-effect">
+                    <i class="fas fa-check-square"></i>
+                    <span>Pengesahan</span>
+                    </a>
+                </li>
+            </ul>
             </li>
             @endrole
 

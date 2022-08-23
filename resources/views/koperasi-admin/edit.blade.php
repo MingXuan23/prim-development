@@ -19,7 +19,7 @@
         </div>
         @endif
 
-      <form action="{{ route('koperasi.updateProduct', $edit->id),$test->id }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('koperasi.updateProduct', $edit->id , $test->id) }}" method="POST" enctype="multipart/form-data">
         {!! csrf_field() !!}
         <label>* wajib diisi</label></br>
         <label>* Nama</label></br>
@@ -29,7 +29,7 @@
         <label>* Harga</label></br>
         <input type="number" name="price" id="price" class="form-control"placeholder="Masukkan Harga Produk" step ="any" min="0" value="{{$edit->price}}" required></br>
         <label>* Kuantiti</label></br>
-        <input type="number" name="quantity" id="quantity" class="form-control" placeholder="Masukkan bilangan kuantiti Produk"  value="{{$edit->quantity}}" required></br>
+        <input type="number" name="quantity" id="quantity" class="form-control" min = "0" placeholder="Masukkan bilangan kuantiti Produk"  value="{{$edit->quantity}}" required></br>
         <label>* Jenis Produk</label></br>    
                               <div class="form-group required">
                                 <select name="type" id="type" class="form-control"

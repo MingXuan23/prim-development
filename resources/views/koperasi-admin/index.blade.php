@@ -65,7 +65,7 @@
                                         <td>{{ $item->name }}</td>
                                         <td>{{ $item->desc }}</td>
                                         <td>
-                                          <img src="{{asset('photo/'.$item->image)}}">
+                                          <img src="{{ URL('koperasi-item/'.$item->image)  }}" width="80px">
                                         </td>
                                         <td>{{ $item->quantity }}</td>
                                         <td>{{ number_format($item->price,2)}}</td>

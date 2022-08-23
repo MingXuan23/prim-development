@@ -166,15 +166,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
     Route::post('/updatePwd/{id}', 'ProfileController@updatePwd')->name('profile.updatePwd');
 });
 
-<<<<<<< HEAD
-Route::group(['prefix' => 'koperasi'], function () {
-    Route::get('/admin', 'CooperativeController@indexAdmin')->name('koperasi.indexAdmin');
-    Route::get('/produk', 'CooperativeController@createProduct')->name('koperasi.createProduct');
-    Route::post('/produk', 'CooperativeController@storeProduct')->name('koperasi.storeProduct');
-    Route::get('/produk/update/{id}','CooperativeController@editProduct')->name('koperasi.editProduct');
-    Route::post('/produk/update/{id}','CooperativeController@updateProduct')->name('koperasi.updateProduct');
-    Route::get('/produk/delete/{id}', 'CooperativeController@deleteProduct')->name('koperasi.deleteProduct');
-=======
 Route::group(['prefix' => 'koperasi'], function() {
     Route::delete('/{org_id}/edit/{id}', 'CooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
     Route::post('/koperasi/fetchKoop', 'CooperativeController@fetchKoop')->name('koperasi.fetchKoop');
@@ -184,7 +175,20 @@ Route::group(['prefix' => 'koperasi'], function() {
     Route::delete('/order/{id}', 'CooperativeController@destroyUserOrder')->name('koperasi.destroyUserOrder');
     Route::get('/history', 'CooperativeController@indexHistory')->name('koperasi.history');
     Route::get('/{id}/list', 'CooperativeController@indexList')->name('koperasi.list');
->>>>>>> main
+});
+
+Route::group(['prefix' => 'koperasi'], function () {
+    Route::get('/admin','CooperativeController@indexAdmin')->name('koperasi.indexAdmin');
+    Route::get('/produk','CooperativeController@createProduct')->name('koperasi.createProduct');
+    Route::post('/produk','CooperativeController@storeProduct')->name('koperasi.storeProduct');
+    Route::get('/produk/update/{id}','CooperativeController@editProduct')->name('koperasi.editProduct');
+    Route::post('/produk/update/{id}','CooperativeController@updateProduct')->name('koperasi.updateProduct');
+    Route::get('/produk/delete/{id}','CooperativeController@deleteProduct')->name('koperasi.deleteProduct');
+    Route::get('/openingHours','CooperativeController@indexOpening')->name('koperasi.indexOpening');
+    Route::post('/openingHours','CooperativeController@storeOpening')->name('koperasi.storeOpening');
+    Route::get('/Confirm','CooperativeController@indexConfirm')->name('koperasi.indexConfirm');
+    Route::get('/Confirm/update/{id}','CooperativeController@storeConfirm')->name('koperasi.storeConfirm');
+    Route::get('/Confirm/delete/{id}','CooperativeController@notConfirm')->name('koperasi.notConfirm');
 });
 
 Route::group(['middleware' => ['auth']], function () {
