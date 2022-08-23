@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Dish;
 use Illuminate\Http\Request;
+use PhpParser\Node\Expr\FuncCall;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class DishController extends Controller
 {
@@ -147,5 +149,36 @@ class DishController extends Controller
         return DB::table('dish_available')
             ->select()
             ->get();
+    }
+
+    public function storeDishAvailable(Request $request)
+    {
+        try {
+
+            $validator = Validator::make($request->all(), [
+                'date'              => "required",
+                'time'              => "required",
+                'latitude'          => "required",
+                'longitude'         => "required",
+                'delivery_address'  => "required",
+                'dish_id'           => "required",
+            ]);
+
+            foreach ($request->all() as $key => $dish_available) {
+                DB::table('dish_available')->insert([
+                    'date'              => $dish_available["date"],
+                    'time'              => $dish_available["time"],
+                    'latitude'          => $dish_available["latitude"],
+                    'longitude'         => $dish_available["longitude"],
+                    'delivery_address'  => $dish_available["delivery_address"],
+                    'dish_id'           => $dish_available["dish_id"],
+                ]);
+            }
+
+            return response(200);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage());
+        }
     }
 }

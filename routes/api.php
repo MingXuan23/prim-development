@@ -44,6 +44,7 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::get('/getOrganizationWithDish', 'DishController@getOrganizationWithDish');
         Route::get('/getAllDishes', 'DishController@getAllDishes');
         Route::get('/getAllAvailableDates', 'DishController@getAllAvailableDates');
+        Route::post('/storeDishAvailable', 'DishController@storeDishAvailable');
     });
 
     //route for mobile order
