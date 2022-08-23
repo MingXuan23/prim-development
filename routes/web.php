@@ -73,6 +73,7 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
     Route::get('testRepeater', 'OrganizationController@testRepeater');
+    Route::post('parent-koop', 'OrganizationController@fetchAvailableParentKoop')->name('organization.fetchAvailableParentKoop');
 });
 
 Route::group(['prefix' => 'teacher'], function () {
@@ -189,6 +190,20 @@ Route::group(['prefix' => 'koperasi'], function () {
     Route::get('/Confirm','CooperativeController@indexConfirm')->name('koperasi.indexConfirm');
     Route::get('/Confirm/update/{id}','CooperativeController@storeConfirm')->name('koperasi.storeConfirm');
     Route::get('/Confirm/delete/{id}','CooperativeController@notConfirm')->name('koperasi.notConfirm');
+});
+
+Route::group(['prefix' => 'merchant'], function() {
+    Route::get('/', 'MerchantController@merchantList')->name('merchant.index');
+    Route::get('/{id}', 'MerchantController@showMerchant')->name('merchant.show');
+    Route::post('fetchItem', 'MerchantController@fetchItem')->name('merchant.fetchItem');
+    Route::post('store-item', 'MerchantController@storeItem')->name('merchant.storeItem');
+    Route::get('/{id}/merchant-cart', 'MerchantController@showMerchantCart')->name('merchant.cart');
+    Route::post('fetchDay', 'MerchantController@fetchDay')->name('merchant.fetchDay');
+    Route::post('fetchTime', 'MerchantController@fetchTime')->name('merchant.fetchTime');
+    Route::post('storeOrderDate', 'MerchantController@storeOrderDate')->name('merchant.storeOrderDate');
+    
+    Route::post('testType', 'MerchantController@testType')->name('merchant.testType');
+    Route::post('testItem', 'MerchantController@testItem')->name('merchant.testItem');
 });
 
 Route::group(['middleware' => ['auth']], function () {

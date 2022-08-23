@@ -20,10 +20,10 @@ class CreateProductOrderTable extends Migration
             $table->timestamps();
             $table->softDeletes();
             $table->unsignedBigInteger('product_item_id')->index();
-            $table->unsignedBigInteger('koop_order_id')->index();
+            $table->unsignedBigInteger('pickup_order_id')->index();
 
             $table->foreign('product_item_id')->references('id')->on('product_item')->onDelete('cascade');
-            $table->foreign('koop_order_id')->references('id')->on('koop_order')->onDelete('cascade');
+            $table->foreign('pickup_order_id')->references('id')->on('pickup_order')->onDelete('cascade');
         });
     }
 
@@ -34,6 +34,9 @@ class CreateProductOrderTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_order');
+        Schema::dropIfExists('product_order', function (Blueprint $table) {
+            $table->dropColumn('product_item_id');
+            $table->dropColumn('pickup_order_id');
+        });
     }
 }
