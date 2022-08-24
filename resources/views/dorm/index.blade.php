@@ -70,10 +70,11 @@
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th>Nama Pelajar</th>
-                                <th>Nombor Telefon Penjaga</th>
-                                <th>Tarikh Membuat Permintaan</th>
-                                <th>Tarikh dan Masa Keluar</th>
-                                <th>Tarikh dan Masa Masuk</th>
+                                <th>No Tel Penjaga</th>
+                                <th>Tarikh Permintaan</th>
+                                <th>Tarikh dan <br>Masa Keluar</th>
+                                <th>Tarikh dan <br>Masa Sampai</th>
+                                <th>Tarikh dan <br>Masa Masuk</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -82,7 +83,7 @@
             </div>
         </div>
 
-        <!-- 注意这个之后要改 -->
+        <!-- 注意这个之后要改 import, delete, export-->
         
     </div>
 </div>
@@ -142,41 +143,42 @@
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
                 }, {
-                    data: "name",
-                    name: 'name',
+                    data: "nama",
+                    name: 'nama',
                     orderable: true,
                     searchable: true
                 }, {
-                    data: "telno",
-                    name: 'telno',
+                    data: "parent_tel",
+                    name: 'parent_tel',
                     orderable: false,
                     searchable: false
                 }, {
-                    data: "applydate",
-                    name: 'applydate',
+                    data: "apply_date_time",
+                    name: 'apply_date_time',
                     orderable: false,
                     searchable: false
                 }, {
-                    data: "outdate",
-                    name: 'outdate',
+                    data: "out_date_time",
+                    name: 'out_date_time',
                     orderable: false,
                     searchable: false
                 }, {
-                    data: 'indate',
-                    name: 'indate',
+                    data: 'arrive_date_time',
+                    name: 'arrive_date_time',
                     orderable: false,
                     searchable: false
-                },
-                {
+                },{
+                    data: 'in_date_time',
+                    name: 'in_date_time',
+                    orderable: false,
+                    searchable: false
+                },{
                     data: 'action',
                     name: 'action',
                     orderable: false,
                     searchable: false
                 }, ]
             });
-
-            
-            console.log("is requesttable " + requestTable);
         }
 
         $('#organization').change(function() {
@@ -192,38 +194,7 @@
             }
         });
 
-        // delete
-        var teacher_id;
-
-        $(document).on('click', '.btn-danger', function() {
-            teacher_id = $(this).attr('id');
-            $('#deleteConfirmationModal').modal('show');
-        });
-
-        $('#delete').click(function() {
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    //_method: 'DELETE'
-                },
-                url: "/teacher/destroywarden/" + teacher_id,
-                success: function(data) {
-                    setTimeout(function() {
-                        $('#confirmModal').modal('hide');
-                    }, 2000);
-                    // console.log("it Works");
-
-                    $('div.flash-message').html(data);
-
-                    requestTable.ajax.reload();
-                },
-                error: function(data) {
-                    $('div.flash-message').html(data);
-                }
-            })
-        });
+       
 
         $('.alert').delay(3000).fadeOut();
 

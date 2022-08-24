@@ -44,11 +44,13 @@ class DormController extends Controller
     public function index()
     {
         //
+        // 有error display 不到
         $organization = $this->getOrganizationByUserId();
+
         $roles = DB::table('organization_roles')
         ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
         ->where([
-            ['ou.user_id', Auth::user()->id],
+            ['ou.user_id', Auth::id()],
             ['ou.organization_id', $organization[0]->id],
         ])
         ->value('organization_roles.nama');
@@ -205,11 +207,19 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         $category = DB::table('classifications')
+                    ->where('classifications.organization_id', $organization[0]->id)
                     ->get();
+
+        $outingdate = date('Y-m-d', strtotime(DB::table('outings')
+                    ->where([
+                        ['outings.organization_id', $organization[0]->id],
+                        ['outings.start_date_time', '>=', now()->toDateString()],
+                    ])
+                    ->value("outings.start_date_time as start_date_time")));
 
         if(Auth::user()->hasRole('Penjaga'))
         {
-            return view('dorm.create', compact('organization', 'category'));
+            return view('dorm.create', compact('organization', 'category', 'outingdate'));
         }
     }
 
@@ -258,29 +268,50 @@ class DormController extends Controller
             'organization' =>  'required',
         ]);
 
-        $studentid = DB::table("students")
-                    ->join('class_student', 'class_student.id', '=', 'students.id')
-                    ->where([
-                        ['students.name', $request->get('name')],
-                        ['students.email', $request->get('email')],
-                        ['class_student.outing_status', 0],
-                        ['class_student.blacklist', 0],
-                    ])
-                    ->value('students.id');
+        $classstudentid = DB::table('students')
+                ->join('class_student', 'class_student.id', '=', 'students.id')
+                ->join('users', 'users.telno', '=', 'students.parent_tel')
+                ->where([
+                    ['students.nama', $request->get('name')],
+                    ['students.email', $request->get('email')],
+                    ['class_student.outing_status', 0],
+                    ['class_student.blacklist', 0],
+                    ['users.id', Auth::id()],
+                ])
+                ->value("class_student.id");
 
-        dd($studentid);
-        if(isset($studentid)){
-            DB::table('student_outing')
-            ->insert([
-                'start_date_time' => $request->get('start_date'),
-                'end_date_time'   => $request->get('end_date'),
-                'organization_id' => $request->get('organization'),
-            ]);
-    
-            return redirect('/dorm/index')->with('success', 'New outing date and time has been added successfully');
+        $outingtype = DB::table('classifications')
+        ->where([
+            ['classifications.id', $request->get('category')],
+        ])
+        ->value('classifications.name');
+
+        if($outingtype == "Outings")
+        {
+            $outingid = DB::table('outings')
+            ->where('outings.organization_id', $request->get('organization'))
+            ->where('outings.start_date_time', '<=', $request->get('start_date'))
+            ->where('outings.end_date_time', '>=', $request->get('start_date'))
+            ->value('outings.id');
         }
         else{
-            return redirect('/dorm/index')->withErrors('Failed to submit form');
+            $outingid = NULL; 
+        }
+
+        if(isset($classstudentid)){
+            DB::table('student_outing')
+            ->insert([
+                'apply_date_time'   => $request->get('start_date'),
+                'status'            => 0,
+                'classification_id' => $request->get('category'),
+                'class_student_id'  => $classstudentid,
+                'outing_id'         => $outingid,
+            ]);
+    
+            return redirect('/dorm')->with('success', 'New application has been added successfully');
+        }
+        else{
+            return redirect('/dorm')->withErrors('Information not matched');
         }
     }
 
@@ -481,6 +512,8 @@ class DormController extends Controller
     public function update(Request $request, $id)
     {
         //
+
+        
 
     }
 
@@ -961,48 +994,79 @@ class DormController extends Controller
 
     public function getStudentOutingDatatable(Request $request)
     {
-        // dd($request->oid);
         if (request()->ajax()) {
             $oid = $request->oid;
             $hasOrganizaton = $request->hasOrganization;
 
-            $userId = Auth::id();
+            $roles = DB::table('organization_roles')
+                    ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                    ->where([
+                        ['ou.user_id', Auth::user()->id],
+                        ['ou.organization_id', $oid],
+                    ])
+                    ->value('organization_roles.nama');
+
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
-
-                $data = DB::table('student_outing')
-                    ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
-                    ->join('students', 'students.id', '=', 'class_student.student_id')
-                    ->join('outings', 'outings.id', '=', 'student_outing.outing_id')
-                    ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
-                    ->select('students.nama', 'students.parent_tel', 'student_outing.apply_date_time', 
-                    'student_outing.out_date_time', 'student_outing.in_date_time', 'student_outing.arrive_date_time')
+                if(Auth::user()->hasRole('Penjaga'))
+                {
+                    $data = DB::table('students')
+                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
                     ->where([
-                        ['outings.organization_id', $oid],
-                        
-                    ]);
-                //'name', 'accommodate_no', 'student_inside_no'
+                        ['ou.organization_id', $oid],
+                        ['ou.user_id', Auth::user()->id],
+                    ])
+                    ->select('students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
+                    'so.arrive_date_time', 'so.in_date_time', 'or.nama as rolename')
+                    ->get();
+                }
+                else{
+                    $data = DB::table('students')
+                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                    ->where([
+                        ['ou.organization_id', $oid],
+                    ])
+                    ->select('students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
+                    'so.arrive_date_time', 'so.in_date_time', 'or.nama as rolename')
+                    ->get();
+                }
             }
-
+            
             if(isset($data))
             {
                 $table = Datatables::of($data);
 
                 $table->addColumn('action', function ($row) {
+                   
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('dorm.create', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 destroyDorm">Buang</button>';
-
+                    if($row->rolename == "Penjaga")
+                    {
+                        $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Edit</a>';
+                    }
+                    elseif($row->rolename == "Guard")
+                    {
+                        $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Keluar</a>';
+                    }
+                    else
+                    {
+                        $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Approve</a>';
+                    }
                     return $btn;
+                    
                 });
 
                 $table->rawColumns(['action']);
                 return $table->make(true);
-            }
-            else{
-                return "is null";
-            }
+            }   
         }
     }
 }

@@ -15,12 +15,13 @@ class CreateStudentOutingTable extends Migration
     {
         Schema::create('student_outing', function (Blueprint $table) {
             $table->id();
+            $table->string('reason');
             $table->datetime('out_date_time')->nullable();
             $table->datetime('in_date_time')->nullable();
             $table->timestamps();
             $table->bigInteger('outing_id')->unsigned();
             $table->bigInteger('class_student_id')->unsigned();
-            $table->foreign('outing_id')->references('id')->on('outings')->onDelete('cascade');
+            $table->foreign('outing_id')->references('id')->on('outings')->onDelete('cascade')->nullable();
             $table->foreign('class_student_id')->references('id')->on('class_student')->onDelete('cascade');
         });
     }
