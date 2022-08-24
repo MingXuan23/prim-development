@@ -243,8 +243,9 @@ class DormController extends Controller
         $outingdate = date('Y-m-d', strtotime(DB::table('outings')
                     ->where([
                         ['outings.organization_id', $organization[0]->id],
-                        ['outings.start_date_time', '>=', now()->toDateString()],
+                        ['outings.end_date_time', '>', now()],
                     ])
+                    ->orderBy("outings.start_date_time")
                     ->value("outings.start_date_time as start_date_time")));
 
         if(Auth::user()->hasRole('Penjaga'))
@@ -309,19 +310,19 @@ class DormController extends Controller
                     ['users.id', Auth::id()],
                 ])
                 ->value("class_student.id");
-
+                    
         $outingtype = DB::table('classifications')
         ->where([
             ['classifications.id', $request->get('category')],
         ])
         ->value('classifications.name');
 
-        if($outingtype == "Outings")
+        if(strtoupper($outingtype) == "OUTINGS")
         {
             $outingid = DB::table('outings')
             ->where('outings.organization_id', $request->get('organization'))
-            ->where('outings.start_date_time', '<=', $request->get('start_date'))
-            ->where('outings.end_date_time', '>=', $request->get('start_date'))
+            ->where('outings.start_date_time', '>=', $request->get('start_date'))
+            ->where('outings.end_date_time', '>', $request->get('start_date'))
             ->value('outings.id');
         }
         else{
@@ -329,6 +330,7 @@ class DormController extends Controller
         }
 
         if(isset($classstudentid)){
+            dd($outingid);
             DB::table('student_outing')
             ->insert([
                 'apply_date_time'   => $request->get('start_date'),
