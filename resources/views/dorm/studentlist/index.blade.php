@@ -9,7 +9,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Pengurusan Asrama</h4>
+            <h4 class="font-size-18">Pelajar</h4>
         </div>
     </div>
 </div>
@@ -31,16 +31,18 @@
                 </div>
             </div>
 
+
         </div>
     </div>
 
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">Senarai Asrama</div>
+            <div class="card-header">Senarai Pelajar</div>
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
-                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
-                <a style="margin: 19px; float: right;" href="{{ route('dorm.createDorm') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Asrama</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary allBtn"> <i class="far fa-id-badge"></i> All</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary blacklistBtn"> <i class="far fa-id-badge"></i> Blacklist</a>
+                <a style="margin: 19px; float: right;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export Dorm</a>
+                <a style="margin: 19px; float: right;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Export All</a>
             </div>
 
             <div class="card-body">
@@ -59,22 +61,18 @@
                     <p>{{ \Session::get('success') }}</p>
                 </div>
                 @endif
-                @if(\Session::has('fail'))
-                <div class="alert alert-danger">
-                    <p>{{ \Session::get('fail') }}</p>
-                </div>
-                @endif
 
                 <div class="flash-message"></div>
 
                 <div class="table-responsive">
-                    <table id="dormTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
-                                <th>Nama Asrama</th>
-                                <th>Kapasiti</th>
-                                <th>Bilangan pelajar dalam</th>
+                                <th>Nama Pelajar</th>
+                                <th>Kelas</th>
+                                <th>Dorm</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -83,18 +81,18 @@
             </div>
         </div>
 
-        {{-- confirmation delete modal --}}
-        <div id="deleteConfirmationModal" class="modal fade" role="dialog">
+        {{-- confirmation Block modal --}}
+        <div id="blockConfirmationModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Padam Asrama</h4>
+                        <h4 class="modal-title">Block Pelajar</h4>
                     </div>
                     <div class="modal-body">
                         Adakah anda pasti?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="block" name="block">Block</button>
                         <button type="button" data-dismiss="modal" class="btn">Batal</button>
                     </div>
                 </div>
@@ -102,35 +100,37 @@
         </div>
         {{-- end confirmation delete modal --}}
 
-        <!-- Clear dorm confirmation delete modal -->
-        <div id="deleteConfirmationModal1" class="modal fade" role="dialog">
+        {{-- confirmation UnBlock modal --}}
+        <div id="unblockConfirmationModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Kosongkan Asrama</h4>
+                        <h4 class="modal-title">Unblock Pelajar</h4>
                     </div>
                     <div class="modal-body">
                         Adakah anda pasti?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete1" name="delete1">Kosong</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="unblock" name="unblock">Unblock</button>
                         <button type="button" data-dismiss="modal" class="btn">Batal</button>
                     </div>
                 </div>
             </div>
         </div>
+        {{-- end confirmation delete modal --}}
 
-        <!-- export dorm modal-->
+        <!-- export particular dorm student modal-->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Export Asrama</h5>
+                        <h5 class="modal-title">Export Pelajar</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('exportdorm') }}" method="post">
+                    <!-- export pelajar -->
+                    <form action="{{ route('exportdormstudentlist') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
                             <div class="form-group">
@@ -141,88 +141,51 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="modal-footer">
-                                <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- import dorm modal -->
-        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Import Asrama</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form action="{{ route('importdorm') }}" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-
-                            {{ csrf_field() }}
                             <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <input type="file" name="file" required>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-            </div>
-        </div>
-        <!-- import dorm residents modal -->
-        <div class="modal fade" id="modelId3" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Import Residents</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-
-                    </div>
-                    <form action="{{ route('importresident') }}" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-
-                            {{ csrf_field() }}
-                            <div class="form-group">
-
+                                <!-- dormlist -->
                                 <label>Dorm</label>
-                                <input id="dorm" name="dorm" value="" hidden></input>
-                                <!-- <select name="dorm" id="dorm" value="" class="form-control"></select> -->
-
-                                <!-- <select name="dorm" id="dorm" class="form-control">
-                                    <option value="" selected disabled>Pilih Asrama</option> 
-
-                                    <option id="optionID" value="{{ $row->id }}" hidden selected></option>
-                                    <option></option>
-
-                                </select> -->
+                                <select name="dorm" id="dorm" class="form-control">
+                                    @foreach($dormlist as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
+                            <div class="modal-footer">
+                                <button id="buttonExportDorm" type="submit" class="btn btn-primary">Export Dorm</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- export all student modal-->
+        <div class="modal fade" id="modelId2" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Export Pelajar</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <!-- export pelajar -->
+                    <form action="{{ route('exportallstudentlist') }}" method="post">
+                        <div class="modal-body">
+                            {{ csrf_field() }}
                             <div class="form-group">
-                                <input type="file" name="file1" required>
+                                <label>Organisasi</label>
+                                <select name="organ" id="organ" class="form-control">
+                                    @foreach($organization as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div class="modal-footer">
-                                <button id="fileID" type="submit" class="btn btn-primary fileIDclass">Import</button>
+                                <button id="buttonExportAll" type="submit" class="btn btn-primary">Export Semua</button>
                             </div>
                         </div>
-
                     </form>
                 </div>
             </div>
@@ -246,24 +209,29 @@
 <script>
     $(document).ready(function() {
 
-        var dormTable;
+        var studentTable;
+
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetch_data($("#organization").val());
+            console.log("123");
+            console.log($("#organization").val());
         }
 
         function fetch_data(oid = '') {
-            dormTable = $('#dormTable').DataTable({
+            studentTable = $('#studentTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('dorm.getDormDataTable') }}",
+                    url: "{{ route('dorm.getAllStudentlistDatatable') }}",
+                    // url: "{{ route('dorm.getResidentsDatatable') }}",
+
                     data: {
                         oid: oid,
                         hasOrganization: true
                     },
-                    type: 'GET',
+                    type: 'GET'
 
                 },
                 'columnDefs': [{
@@ -271,17 +239,12 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [4], // your case first column
-                    "className": "text-center",
-                    "width": "15%"
-                }, {
-                    "targets": [1, 3, 2], // your case first column
+                    "targets": [1, 2, 3, 4, 5], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
                     [1, 'asc']
                 ],
-                //'name', 'accommodate_no', 'student_inside_no'
                 columns: [{
                     "data": null,
                     searchable: false,
@@ -290,19 +253,18 @@
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
                 }, {
-                    data: "name",
-                    name: 'name',
-                    render: function(data, type, row, meta) {
-
-                        return '<a href = "indexResident/' + row.id + '">' + data + '</a>';
-                    }
+                    data: "studentName",
+                    name: 'studentName',
                 }, {
-                    data: "accommodate_no",
-                    name: 'accommodate_no',
-                    searchable: false
+                    data: "className",
+                    name: 'className',
                 }, {
-                    data: "student_inside_no",
-                    name: 'student_inside_no',
+                    data: "dormName",
+                    name: 'dormName',
+                }, {
+                    data: "status",
+                    name: 'status',
+                    orderable: false,
                     searchable: false
                 }, {
                     data: 'action',
@@ -314,10 +276,88 @@
 
         }
 
+        function fetch_blacklist_data(oid = '') {
+
+            studentTable = $('#studentTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('dorm.getBlacklistStudentlistDatatable') }}",
+                    data: {
+                        oid: oid,
+                        hasOrganization: true,
+
+                    },
+                    type: 'GET',
+                    success: function(data) {
+                        console.log("success");
+                    },
+                    error: function(data) {
+                        console.log("fail inside blacklist");
+                    }
+
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "className": "text-center",
+                }, ],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "studentName",
+                    name: 'studentName',
+                }, {
+                    data: "className",
+                    name: 'className',
+                }, {
+                    data: "dormName",
+                    name: 'dormName',
+                }, {
+                    data: "status",
+                    name: 'status',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }, ]
+            });
+
+        }
+
+
+
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#dormTable').DataTable().destroy();
+            $('#studentTable').DataTable().destroy();
             fetch_data(organizationid);
+        });
+
+        $(document).on('click', '.allBtn', function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#studentTable').DataTable().destroy();
+            fetch_data(organizationid);
+        });
+
+        $(document).on('click', '.blacklistBtn', function() {
+            viewStatus = 2;
+            var organizationid = $("#organization option:selected").val();
+            $('#studentTable').DataTable().destroy();
+            fetch_blacklist_data(organizationid);
         });
 
         // csrf token for ajax
@@ -327,74 +367,67 @@
             }
         });
 
-        var dorm_id;
+        var student_id;
+        var block_status = 0;
 
-        $(document).on('click', '.destroyDorm', function() {
-            dorm_id = $(this).attr('id');
-            $('#deleteConfirmationModal').modal('show');
+        $(document).on('click', '.blockBtn', function() {
+            student_id = $(this).attr('id');
+            $('#blockConfirmationModal').modal('show');
         });
 
-        $(document).on('click', '.importBtn', function() {
-            dorm_id = $(this).attr('id');
-            $('#dorm').val(dorm_id);
-            // dd($('#dorm').val(dorm_id));
+        $(document).on('click', '.unblockBtn', function() {
+            student_id = $(this).attr('id');
+            $('#unblockConfirmationModal').modal('show');
         });
 
-        $(document).on('click', '.clearDorm', function() {
-            dorm_id = $(this).attr('id');
-            $('#deleteConfirmationModal1').modal('show');
-        });
-
-        $('#delete').click(function() {
+        $('#block').click(function() {
+            block_status = 1;
             $.ajax({
                 type: 'POST',
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    _method: 'GET'
+                    //_method: 'DELETE'
                 },
-                url: "/dorm/dorm/destroyDorm/" + dorm_id,
+                url: "/dorm/blockStudent/" + student_id + "/" + block_status,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
                     }, 2000);
-                    //console.log('it works');
+                    console.log("it Works");
 
                     $('div.flash-message').html(data);
 
-                    dormTable.ajax.reload();
+                    studentTable.ajax.reload();
                 },
                 error: function(data) {
                     $('div.flash-message').html(data);
-                    console.log("it doesn't Works");
-
                 }
             })
         });
 
-        $('#delete1').click(function() {
+        $('#unblock').click(function() {
+            block_status = 0;
             $.ajax({
                 type: 'POST',
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    _method: 'GET'
+                    //_method: 'DELETE'
                 },
-                url: "/dorm/dorm/clearDorm/" + dorm_id,
+                url: "/dorm/blockStudent/" + student_id + "/" + block_status,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
                     }, 2000);
-                    console.log('it works');
+                    console.log("it Works");
 
                     $('div.flash-message').html(data);
 
-                    dormTable.ajax.reload();
+                    studentTable.ajax.reload();
                 },
                 error: function(data) {
                     $('div.flash-message').html(data);
-                    console.log("it doesn't Works");
-
                 }
             })
         });
