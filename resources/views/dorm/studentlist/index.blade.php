@@ -255,11 +255,13 @@
             var organizationid = $("#organization option:selected").val();
 
             var dormid = $("#asrama option:selected").val();
-            if (dormid) {
-                $('#studentTable').DataTable().destroy();
+            $('#studentTable').DataTable().destroy();
+
+            if (dormid == 0) {
+                fetch_data(organizationid);
+            } else {
                 fetch_dorm_data(dormid);
             }
-            console.log(dormid);
         });
 
         //for particular dorm
