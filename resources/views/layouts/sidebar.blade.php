@@ -89,7 +89,8 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru')
+                <!-- yuqin add penjaga and warden -->
+                @role('Superadmin|Pentadbir|Guru|Penjaga|Warden')
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -139,7 +140,7 @@
                         @endrole
 
 
-                        @role('Superadmin|Pentadbir|Guru|Warden')
+                        @role('Superadmin|Pentadbir|Guru|Warden|Penjaga')
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="fas fa-hotel"></i>
@@ -149,7 +150,7 @@
                                 @role('Superadmin|Pentadbir|Guru|Warden|Penjaga')
                                 <li>
                                     <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.create') }}" class=" waves-effect">
+                                    <a href="{{ route('dorm.index') }}" class=" waves-effect">
                                         <i class="fas fa-book"></i>
                                         <span>Permintaan</span>
                                     </a>

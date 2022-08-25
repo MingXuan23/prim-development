@@ -56,15 +56,13 @@
                         <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
                     </div>
 
+                    <input id="outingdate" value="{{$outingdate}}" hidden>
                     <div class="form-group">
                         <label>Kategori</label>
                         <select name="category" id="category" class="form-control">
-                            @foreach($category as $row)
-                                @if ($loop->first)
-                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                @else
-                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                @endif
+                            <option value="" disabled selected>Pilih Kategori Keluar</option>
+                            @foreach($category as $row)  
+                                    <option value="{{ $row->id }}" >{{ $row->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -78,12 +76,6 @@
                     <div class="form-group">
                         <label>Tarikh Keluar</label>
                         <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
-                                placeholder="Pilih Tarikh Keluar">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Tarikh Masuk</label>
-                        <input onclick="this.showPicker()" onfocus="setMinDate();" class="form-control" id="end_date" name="end_date" type="date"
                                 placeholder="Pilih Tarikh Keluar">
                     </div>
 
@@ -113,6 +105,34 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
+
+    $(document).ready(function() {
+
+    });
+
+    
+    $("#category").change(function() {
+        if ($("#organization option:selected").text().toUpperCase() != "SM TEKNIKAL MELAKA") {
+            if($("#category option:selected").text().toUpperCase() == "OUTINGS")
+            {
+                start_date.max = start_date.min = start_date.value = $("#outingdate").val();
+            }
+            else if($("#category option:selected").text().toUpperCase() == "BALIK KHAS")
+            {
+                var today = new Date();
+                var day = today.getDate() + 3;
+                var month = today.getMonth();
+                var year = today.getFullYear();
+
+                var d = new Date (year, month, day);
+                start_date.min = d.toISOString().split('T')[0];
+            }
+            else
+            {
+                start_date.min = new Date().toISOString().split("T")[0];
+            }
+        }
+    });
 
 </script>
 @endsection

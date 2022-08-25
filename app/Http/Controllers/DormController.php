@@ -46,11 +46,19 @@ class DormController extends Controller
     public function index()
     {
         //
+        // 有error display 不到
         $organization = $this->getOrganizationByUserId();
 
+        $roles = DB::table('organization_roles')
+        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+        ->where([
+            ['ou.user_id', Auth::id()],
+            ['ou.organization_id', $organization[0]->id],
+        ])
+        ->value('organization_roles.nama');
 
-
-        return view('dorm.outing.index', compact('organization'));
+        // dd($roles);
+        return view('dorm.index', compact('roles', 'organization'));
     }
 
     public function indexOuting()
@@ -229,10 +237,20 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         $category = DB::table('classifications')
-            ->get();
+                    ->where('classifications.organization_id', $organization[0]->id)
+                    ->get();
 
-        if (Auth::user()->hasRole('Penjaga')) {
-            return view('dorm.create', compact('organization', 'category'));
+        $outingdate = date('Y-m-d', strtotime(DB::table('outings')
+                    ->where([
+                        ['outings.organization_id', $organization[0]->id],
+                        ['outings.end_date_time', '>', now()],
+                    ])
+                    ->orderBy("outings.start_date_time")
+                    ->value("outings.start_date_time as start_date_time")));
+
+        if(Auth::user()->hasRole('Penjaga'))
+        {
+            return view('dorm.create', compact('organization', 'category', 'outingdate'));
         }
     }
 
@@ -272,7 +290,61 @@ class DormController extends Controller
     public function store(Request $request)
     {
         // 
+        $this->validate($request, [
+            'name'         =>  'required',
+            'email'        =>  'required',
+            'category'     =>  'required',
+            'reason'       =>  'required',
+            'start_date'   =>  'required',
+            'organization' =>  'required',
+        ]);
 
+        $classstudentid = DB::table('students')
+                ->join('class_student', 'class_student.id', '=', 'students.id')
+                ->join('users', 'users.telno', '=', 'students.parent_tel')
+                ->where([
+                    ['students.nama', $request->get('name')],
+                    ['students.email', $request->get('email')],
+                    ['class_student.outing_status', 0],
+                    ['class_student.blacklist', 0],
+                    ['users.id', Auth::id()],
+                ])
+                ->value("class_student.id");
+                    
+        $outingtype = DB::table('classifications')
+        ->where([
+            ['classifications.id', $request->get('category')],
+        ])
+        ->value('classifications.name');
+
+        if(strtoupper($outingtype) == "OUTINGS")
+        {
+            $outingid = DB::table('outings')
+            ->where('outings.organization_id', $request->get('organization'))
+            ->where('outings.start_date_time', '>=', $request->get('start_date'))
+            ->where('outings.end_date_time', '>', $request->get('start_date'))
+            ->value('outings.id');
+        }
+        else{
+            $outingid = NULL; 
+        }
+
+        if(isset($classstudentid)){
+            dd($outingid);
+            DB::table('student_outing')
+            ->insert([
+                'apply_date_time'   => $request->get('start_date'),
+                'status'            => 0,
+                'classification_id' => $request->get('category'),
+                'class_student_id'  => $classstudentid,
+                'outing_id'         => $outingid,
+            ]);
+    
+            return redirect('/dorm')->with('success', 'New application has been added successfully');
+        }
+        else{
+            return redirect('/dorm')->withErrors('Information not matched');
+        }
     }
 
     public function storeOuting(Request $request)
@@ -472,6 +544,8 @@ class DormController extends Controller
     public function update(Request $request, $id)
     {
         //
+
+        
 
     }
 
@@ -750,7 +824,10 @@ class DormController extends Controller
             // user role pentadbir 
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->where('organization_user.role_id', '=', 4);
+                    $query->where('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5)
+                        ->Orwhere('organization_user.role_id', '=', 6)
+                        ->Orwhere('organization_user.role_id', '=', 8);
                 });
             })->get();
         }
@@ -1201,5 +1278,83 @@ class DormController extends Controller
             ->get();
 
         return response()->json(['success' => $list]);
+    }
+
+    public function getStudentOutingDatatable(Request $request)
+    {
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $hasOrganizaton = $request->hasOrganization;
+
+            $roles = DB::table('organization_roles')
+                    ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                    ->where([
+                        ['ou.user_id', Auth::user()->id],
+                        ['ou.organization_id', $oid],
+                    ])
+                    ->value('organization_roles.nama');
+
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+                if(Auth::user()->hasRole('Penjaga'))
+                {
+                    $data = DB::table('students')
+                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                    ->where([
+                        ['ou.organization_id', $oid],
+                        ['ou.user_id', Auth::user()->id],
+                    ])
+                    ->select('students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
+                    'so.arrive_date_time', 'so.in_date_time', 'or.nama as rolename')
+                    ->get();
+                }
+                else{
+                    $data = DB::table('students')
+                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                    ->where([
+                        ['ou.organization_id', $oid],
+                    ])
+                    ->select('students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
+                    'so.arrive_date_time', 'so.in_date_time', 'or.nama as rolename')
+                    ->get();
+                }
+            }
+            
+            if(isset($data))
+            {
+                $table = Datatables::of($data);
+
+                $table->addColumn('action', function ($row) {
+                   
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    if($row->rolename == "Penjaga")
+                    {
+                        $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Edit</a>';
+                    }
+                    elseif($row->rolename == "Guard")
+                    {
+                        $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Keluar</a>';
+                    }
+                    else
+                    {
+                        $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Approve</a>';
+                    }
+                    return $btn;
+                    
+                });
+
+                $table->rawColumns(['action']);
+                return $table->make(true);
+            }   
+        }
     }
 }

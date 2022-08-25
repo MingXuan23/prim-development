@@ -23,9 +23,10 @@ class ClassController extends Controller
         return view('class.index', compact('organization'));
     }
 
-    public function classexport()
+    public function classexport(Request $request)
     {
-        return Excel::download(new ClassExport, 'class.xlsx');
+        // yuqin add this ($request->organ)
+        return Excel::download(new ClassExport($request->organ), 'class.xlsx');
     }
 
     public function classimport(Request $request)
