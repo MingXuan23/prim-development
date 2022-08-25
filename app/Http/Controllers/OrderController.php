@@ -211,4 +211,55 @@ class OrderController extends Controller
         
         return $orders;
     }
+
+
+    public function updateStatusToDelivering(Request $request)
+    {
+        try{
+
+            $this->validate($request, [
+
+                'order_id' => 'required'
+
+            ]);
+
+            $rows = DB::table('orders')
+                        ->where('id', $request->order_id)
+                        ->update(['delivery_status' => 'Delivering']);
+
+            if($rows == 0)
+                return response()->json(['code' => 401, 'msg' => 'Fail']);
+            else
+                return response()->json(['code' => 200, 'msg' => 'Success']);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage())->setStatusCode(401);
+        }
+
+    }
+
+    public function updateStatusToDelivered(Request $request)
+    {
+        try{
+
+            $this->validate($request, [
+
+                'order_id' => 'required'
+
+            ]);
+
+            $rows = DB::table('orders')
+                        ->where('id', $request->order_id)
+                        ->update(['delivery_status' => 'Delivered']);
+
+            if($rows == 0)
+                return response()->json(['code' => 401, 'msg' => 'Fail']);
+            else
+                return response()->json(['code' => 200, 'msg' => 'Success']);
+
+        } catch (\Throwable $th) {
+            return response($th->getMessage())->setStatusCode(401);
+        }
+
+    }
 }
