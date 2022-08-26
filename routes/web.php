@@ -77,13 +77,13 @@ Route::group(['prefix' => 'organization'], function () {
 
 Route::group(['prefix' => 'teacher'], function () {
     Route::get('list', 'TeacherController@getTeacherDatatable')->name('teacher.getTeacherDatatable');
-    Route::get('listwarden', 'TeacherController@getWardenDatatable')->name('teacher.getWardenDatatable');
-    Route::get('warden', 'TeacherController@wardenindex')->name('teacher.wardenindex');
-    Route::get('storewarden', 'TeacherController@wardenstore')->name('teacher.wardenstore');
-    Route::get('createwarden', 'TeacherController@wardencreate')->name('teacher.wardencreate');
-    Route::get('editwarden/{id}', 'TeacherController@wardenedit')->name('teacher.wardenedit');
-    Route::post('updatewarden/{id}', 'TeacherController@wardenupdate')->name('teacher.wardenupdate');
-    Route::post('destroywarden/{id}', 'TeacherController@wardendestroy')->name('teacher.wardendestroy');
+    Route::get('listperanan', 'TeacherController@getPerananDatatable')->name('teacher.getPerananDatatable');
+    Route::get('peranan', 'TeacherController@perananindex')->name('teacher.perananindex');
+    Route::get('storeperanan', 'TeacherController@perananstore')->name('teacher.perananstore');
+    Route::get('createperanan', 'TeacherController@peranancreate')->name('teacher.peranancreate');
+    Route::get('editperanan/{id}', 'TeacherController@perananedit')->name('teacher.perananedit');
+    Route::post('updateperanan/{id}', 'TeacherController@perananupdate')->name('teacher.perananupdate');
+    Route::post('destroyperanan/{id}', 'TeacherController@peranandestroy')->name('teacher.peranandestroy');
 });
 
 Route::group(['prefix' => 'class'], function () {
@@ -216,9 +216,11 @@ Route::get('feesparentdev', 'FeesController@devpay')->name('feesparentdev');
 Route::post('receiptdev', 'FeesController@devreceipt')->name('receiptdev');
 
 Route::post('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
-Route::post('/exportwarden', 'TeacherController@wardenexport')->name('exportwarden');
+Route::post('/exportperanan', 'TeacherController@perananexport')->name('exportperanan');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
 Route::post('/importwarden', 'TeacherController@wardenimport')->name('importwarden');
+Route::post('/importguard', 'TeacherController@guardimport')->name('importguard');
+
 
 Route::post('/exportclass', 'ClassController@classexport')->name('exportclass');
 Route::post('/importclass', 'ClassController@classimport')->name('importclass');

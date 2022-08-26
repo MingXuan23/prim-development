@@ -8,9 +8,9 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Warden</h4>
+            <h4 class="font-size-18">Warden dan Guard</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Guru >> Tambah Warden</li>
+                <li class="breadcrumb-item active">Guru >> Tambah Warden dan Guard</li>
             </ol>
         </div>
     </div>
@@ -27,7 +27,7 @@
             </ul>
         </div>
         @endif
-        <form method="get" action="{{ route('teacher.wardenstore') }}" enctype="multipart/form-data">
+        <form method="get" action="{{ route('teacher.perananstore') }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
 
@@ -61,6 +61,14 @@
                     <input type="text" id="telno" name="telno" class="form-control" placeholder="No Telefon" max="11">
                 </div>
 
+                <div class="form-group">
+                    <label>Peranan</label>
+                    <select id="peranan" name="peranan" class="form-control">
+                        <option value="1">Warden</option>
+                        <option value="2">Guard</option>
+                    </select>
+                </div>
+
                 <div class="form-group mb-0">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -89,7 +97,7 @@
 
 <script>
     $(document).ready(function() {
-        $('#icno').mask('000000-00-0000');
+        // $('#icno').mask('000000-00-0000');
         $('#telno').mask('+600000000000');
 
     });

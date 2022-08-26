@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class WardenExport implements FromCollection, ShouldAutoSize, WithHeadings
+class PerananExport implements FromCollection, ShouldAutoSize, WithHeadings
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -23,15 +23,15 @@ class WardenExport implements FromCollection, ShouldAutoSize, WithHeadings
     public function collection()
     {
 
+        $perananArray = [7, 8];
         // dd($this->organId);
         $listteachers = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            ->select('users.name', 'users.email', 'users.telno')
-            ->where([
-                ['organization_user.organization_id', $this->organId],
-                ['organization_user.role_id', 7]
-            ])
-            ->orderBy('users.name')
+            ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
+            ->select('users.name', 'users.email', 'users.telno', 'organization_roles.nama')
+            ->where('organization_user.organization_id', $this->organId)
+            ->whereIn('organization_user.role_id', $perananArray)
+            ->orderBy('organization_roles.nama')
             ->get();
 
         foreach ($listteachers as $listteacher) {
@@ -46,7 +46,8 @@ class WardenExport implements FromCollection, ShouldAutoSize, WithHeadings
         return [
             'Nama',
             'email',
-            'No. Tel Bimbit'
+            'No. Tel Bimbit',
+            'Peranan'
         ];
     }
 }
