@@ -69,7 +69,7 @@
 
                     <div class="form-group">
                         <label>Alasan</label>
-                        <textarea name="reason" class="form-control" placeholder="Alasan Keluar" cols="30"
+                        <textarea name="reason" class="form-control" placeholder="Alasan Keluar" max-length="50" cols="30"
                             rows="5"></textarea>
                     </div>
 

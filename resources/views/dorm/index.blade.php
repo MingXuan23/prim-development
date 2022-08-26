@@ -3,6 +3,7 @@
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 @include('layouts.datatable')
+
 @endsection
 
 @section('content')
@@ -65,16 +66,17 @@
                 <div class="flash-message"></div>
 
                 <div class="table-responsive">
-                    <table id="requestTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th>Nama Pelajar</th>
                                 <th>No Tel Penjaga</th>
-                                <th>Tarikh Permintaan</th>
-                                <th>Tarikh dan <br>Masa Keluar</th>
-                                <th>Tarikh dan <br>Masa Sampai</th>
-                                <th>Tarikh dan <br>Masa Masuk</th>
+                                <th>Tarikh keluar dimohon</th>
+                                <th>Alasan</th>
+                                <th>Tarikh dan Masa Keluar</th>
+                                <th>Tarikh dan Masa Sampai</th>
+                                <th>Tarikh dan Masa Masuk</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -83,7 +85,43 @@
             </div>
         </div>
 
-        <!-- 注意这个之后要改 import, delete, export-->
+        {{-- confirmation delete modal --}}
+        <div id="deleteConfirmationModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Padam Permintaan</h4>
+                    </div>
+                    <div class="modal-body">
+                        Adakah anda pasti?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
+                            name="delete">Padam</button>
+                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- end confirmation delete modal --}}
+
+        <!-- Modal -->
+        <!-- export -->
+        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Export Permintaan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    
+                </div>
+            </div>
+        </div>
         
     </div>
 </div>
@@ -129,13 +167,15 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3, 4, 5, 6], // your case first column
+                    "targets": [1, 2, 3, 4, 5, 6, 7], // your case first column
                     "className": "text-center",
-                }, ],
+                },],
+                
                 order: [
                     [1, 'asc']
                 ],
                 columns: [{
+                    
                     "data": null,
                     searchable: false,
                     "sortable": false,
@@ -146,7 +186,7 @@
                     data: "nama",
                     name: 'nama',
                     orderable: true,
-                    searchable: true
+                    searchable: true,
                 }, {
                     data: "parent_tel",
                     name: 'parent_tel',
@@ -158,6 +198,11 @@
                     orderable: false,
                     searchable: false
                 }, {
+                    data: "reason",
+                    name: 'reason',
+                    orderable: false,
+                    searchable: false
+                },{
                     data: "out_date_time",
                     name: 'out_date_time',
                     orderable: false,
@@ -178,6 +223,7 @@
                     orderable: false,
                     searchable: false
                 }, ]
+                
             });
         }
 
@@ -194,9 +240,42 @@
             }
         });
 
-       
+        var student_outing_id;
+
+        $(document).on('click', '.btn-danger', function(){
+            student_outing_id = $(this).attr('id');
+            $('#deleteConfirmationModal').modal('show');
+        });
+
+        $('#delete').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    _method: 'DELETE'
+                },
+                url: "/dorm/" + student_outing_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+
+                    $('div.flash-message').html(data);
+
+                    requestTable.ajax.reload();
+                },
+                error: function (data) {
+                    $('div.flash-message').html(data);
+                }
+            })
+        });
 
         $('.alert').delay(3000).fadeOut();
+
+        $('#buttonExport').click(function() {
+            $('#modelId1').modal('hide');
+        });
 
     });
 </script>

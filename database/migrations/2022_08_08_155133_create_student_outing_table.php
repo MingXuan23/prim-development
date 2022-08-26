@@ -19,9 +19,9 @@ class CreateStudentOutingTable extends Migration
             $table->datetime('out_date_time')->nullable();
             $table->datetime('in_date_time')->nullable();
             $table->timestamps();
-            $table->bigInteger('outing_id')->unsigned();
+            $table->bigInteger('outing_id')->unsigned()->nullable();
             $table->bigInteger('class_student_id')->unsigned();
-            $table->foreign('outing_id')->references('id')->on('outings')->onDelete('cascade')->nullable();
+            $table->foreign('outing_id')->references('id')->on('outings')->onDelete('cascade');
             $table->foreign('class_student_id')->references('id')->on('class_student')->onDelete('cascade');
         });
     }

@@ -298,8 +298,9 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/getStudentOutingDatatable', 'DormController@getStudentOutingDatatable')->name('dorm.getStudentOutingDatatable');
     Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
     Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
-    Route::get('dorm/updateOutArriveTime/{id}', 'DormController@updateOutArriveTime')->name('dorm.updateOutArriveTime');
-    Route::get('dorm/updateInArriveTime/{id}', 'DormController@updateInArriveTime')->name('dorm.updateInArriveTime');
+    Route::get('dorm/updateArriveTime/{id}', 'DormController@updateArriveTime')->name('dorm.updateArriveTime');
+    Route::get('dorm/updateApprove/{id}', 'DormController@updateApprove')->name('dorm.updateApprove');
+    Route::get('dorm/updateTolak/{id}', 'DormController@updateTolak')->name('dorm.updateTolak');
 
     // outing
     Route::get('dorm/storeOuting', 'DormController@storeOuting')->name('dorm.storeOuting');
