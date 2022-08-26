@@ -194,14 +194,6 @@
                                 @endrole
 
                                 <!-- will delete soon -->
-                                @role('Superadmin|Pentadbir|Guru|Warden')
-                                <li>
-                                    <a href="{{ route('dorm.reportPerStudent') }}" class=" waves-effect">
-                                        <i class="fas fa-building"></i>
-                                        <span>Laporan Pelajar</span>
-                                    </a>
-                                </li>
-                                @endrole
                             </ul>
                         </li>
                         @endrole
