@@ -166,11 +166,11 @@
                                 </li>
                                 @endrole
 
-                                @role('Superadmin|Pentadbir|Guru|Warden')
+                                @role('Superadmin|Pentadbir|Guru|Warden|Guard')
                                 <li>
-                                    <a href="{{ route('teacher.wardenindex') }}" class=" waves-effect">
+                                    <a href="{{ route('teacher.perananindex') }}" class=" waves-effect">
                                         <i class="	far fa-address-card"></i>
-                                        <span>Warden</span>
+                                        <span>Peranan</span>
                                     </a>
                                 </li>
                                 @endrole
@@ -193,7 +193,7 @@
                                 </li>
                                 @endrole
 
-                                <!-- will delete soon -->
+
                             </ul>
                         </li>
                         @endrole

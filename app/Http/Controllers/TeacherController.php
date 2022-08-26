@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TeacherExport;
-use App\Exports\WardenExport;
+use App\Exports\PerananExport;
 use App\Imports\TeacherImport;
 use App\Imports\WardenImport;
+use App\Imports\GuardImport;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
 use App\User;
@@ -39,8 +40,8 @@ class TeacherController extends Controller
         return view('teacher.index', compact('organization'));
     }
 
-    //for warden 
-    public function wardenindex()
+    //for warden and guard 
+    public function perananindex()
     {
         $organization = $this->getOrganizationByUserId();
         return view('dorm.warden.index', compact('organization'));
@@ -52,9 +53,9 @@ class TeacherController extends Controller
     }
 
     //for warden
-    public function wardenexport(Request $request)
+    public function perananexport(Request $request)
     {
-        return Excel::download(new WardenExport($request->organ), 'warden.xlsx');
+        return Excel::download(new PerananExport($request->organ), 'peranan.xlsx');
     }
 
     public function teacherimport(Request $request)
@@ -86,12 +87,31 @@ class TeacherController extends Controller
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
         if (!in_array($etx, $formats)) {
 
-            return redirect('/teacher/warden')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+            return redirect('/teacher/peranan')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
 
         Excel::import(new WardenImport($request->organ), public_path('/uploads/excel/' . $namaFile));
 
-        return redirect('/teacher/warden')->with('success', 'Wardens have been added successfully');
+        return redirect('/teacher/peranan')->with('success', 'Wardens have been added successfully');
+    }
+
+    //for guard use
+    public function guardimport(Request $request)
+    {
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        if (!in_array($etx, $formats)) {
+
+            return redirect('/teacher/peranan')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+
+        Excel::import(new GuardImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+
+        return redirect('/teacher/peranan')->with('success', 'Guards have been added successfully');
     }
 
     public function create()
@@ -101,10 +121,11 @@ class TeacherController extends Controller
         return view('teacher.add', compact('organization'));
     }
 
-    //for warden
-    public function wardencreate()
+    //for warden and guard
+    public function peranancreate()
     {
         $organization = $this->getOrganizationByUserId();
+
 
         return view('dorm.warden.add', compact('organization'));
     }
@@ -181,14 +202,15 @@ class TeacherController extends Controller
         return redirect('/teacher')->with('success', 'New teacher has been added successfully');
     }
 
-    //for warden
-    public function wardenstore(Request $request)
+    //for warden and guard
+    public function perananstore(Request $request)
     {
         $this->validate($request, [
             'name'          =>  'required',
             'email'         =>  'required|email|unique:users',
             'telno'         =>  'required',
             'organization'  =>  'required',
+            'peranan'       =>  'required'
         ]);
 
         $newteacher = new Teacher([
@@ -203,30 +225,64 @@ class TeacherController extends Controller
 
         // dd($newteacher);
 
-        $username    = DB::table('users')
-            ->where('id', $newteacher->id)
-            ->update(
-                [
-                    'username' => 'GP' . str_pad($newteacher->id, 5, "0", STR_PAD_LEFT),
-                ]
-            );
+        //if the user create warden
+        if ($request->get('peranan') == 1) {
+            $username    = DB::table('users')
+                ->where('id', $newteacher->id)
+                ->update(
+                    [
+                        'username' => 'GP' . str_pad($newteacher->id, 5, "0", STR_PAD_LEFT),
+                    ]
+                );
 
-        // warden active when first time login then will change status
-        DB::table('organization_user')->insert([
-            'organization_id'   => $request->get('organization'),
-            'user_id'           => $newteacher->id,
-            'role_id'           => 7,
-            'start_date'        => now(),
-            'status'            => 0,
-        ]);
+            // warden active when first time login then will change status
+            DB::table('organization_user')->insert([
+                'organization_id'   => $request->get('organization'),
+                'user_id'           => $newteacher->id,
+                'role_id'           => 7,
+                'start_date'        => now(),
+                'status'            => 0,
+            ]);
 
-        $user = User::find($newteacher->id);
+            $user = User::find($newteacher->id);
 
-        // role guru
-        $rolename = OrganizationRole::find(7);
-        $user->assignRole($rolename->nama);
+            // role guru
+            $rolename = OrganizationRole::find(7);
+            $user->assignRole($rolename->nama);
 
-        return redirect('/teacher/warden')->with('success', 'New warden has been added successfully');
+            return redirect('/teacher/peranan')->with('success', 'New warden has been added successfully');
+        }
+        //else the user create guard
+        else if ($request->get('peranan') == 2) {
+            $username    = DB::table('users')
+                ->where('id', $newteacher->id)
+                ->update(
+                    [
+                        'username' => 'GS' . str_pad($newteacher->id, 5, "0", STR_PAD_LEFT),
+                    ]
+                );
+
+            // warden active when first time login then will change status
+            DB::table('organization_user')->insert([
+                'organization_id'   => $request->get('organization'),
+                'user_id'           => $newteacher->id,
+                'role_id'           => 8,
+                'start_date'        => now(),
+                'status'            => 0,
+            ]);
+
+            $user = User::find($newteacher->id);
+
+            // role guru
+            $rolename = OrganizationRole::find(8);
+            // dd($rolename);
+
+            $user->assignRole($rolename->nama);
+
+            return redirect('/teacher/peranan')->with('success', 'New guard has been added successfully');
+        } else {
+            dd("no peranan selected");
+        }
     }
     public function show($id)
     {
@@ -365,15 +421,16 @@ class TeacherController extends Controller
         }
     }
 
-    //for warden use
-    public function wardendestroy($id)
+    //for warden and guard use
+    public function peranandestroy($id)
     {
 
+        $arrayPeranan = [7, 8];
         $result = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
             ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
             ->where('users.id', $id)
-            ->where('organization_user.role_id', 7)
+            ->whereIn('organization_user.role_id', $arrayPeranan)
             ->update(
                 [
                     'organization_user.status' => 0,
@@ -381,10 +438,10 @@ class TeacherController extends Controller
             );
 
         if ($result) {
-            Session::flash('success', 'Warden Berjaya Dipadam');
+            Session::flash('success', 'Peranan Berjaya Dipadam');
             return View::make('layouts/flash-messages');
         } else {
-            Session::flash('error', 'Warden Gagal Dipadam');
+            Session::flash('error', 'Peranan Gagal Dipadam');
             return View::make('layouts/flash-messages');
         }
     }
@@ -451,8 +508,8 @@ class TeacherController extends Controller
         }
     }
 
-    //for warden use
-    public function getWardenDatatable(Request $request)
+    //for warden and guard use
+    public function getPerananDatatable(Request $request)
     {
         if (request()->ajax()) {
             $oid = $request->oid;
@@ -462,14 +519,15 @@ class TeacherController extends Controller
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
 
+                $arrayPeranan = [7, 8];
                 $data = DB::table('organizations')
                     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
                     ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
                     ->join('users', 'users.id', '=', 'organization_user.user_id')
-                    ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
+                    ->select('organizations.id as oid', 'organization_user.status as status', 'organization_roles.nama as roleName', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
                     ->where('organizations.id', $oid)
-                    ->where('organization_user.role_id', 7)
-                    ->orderBy('users.name');
+                    ->whereIn('organization_user.role_id', $arrayPeranan)
+                    ->orderBy('roleName');
             }
 
             $table = Datatables::of($data);
@@ -477,7 +535,7 @@ class TeacherController extends Controller
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a href="' . route('teacher.wardenedit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<a href="' . route('teacher.perananedit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });

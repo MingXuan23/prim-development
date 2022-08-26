@@ -9,7 +9,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Warden</h4>
+            <h4 class="font-size-18">Peranan</h4>
         </div>
     </div>
 </div>
@@ -37,11 +37,12 @@
 
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header">Senarai Warden</div>
+            <div class="card-header">Senarai Warden dan Guard</div>
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import Warden</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Import Guard</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
-                <a style="margin: 19px; float: right;" href="{{ route('teacher.wardencreate') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Warden</a>
+                <a style="margin: 19px; float: right;" href="{{ route('teacher.peranancreate') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Peranan</a>
             </div>
 
             <div class="card-body">
@@ -70,6 +71,7 @@
                                 <th> No. </th>
                                 <th>Nama Penuh</th>
                                 <th>Nama Pengguna</th>
+                                <th>Peranan</th>
                                 <th>Email</th>
                                 <th>Nombor Telefon</th>
                                 <th>Action</th>
@@ -85,7 +87,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Padam Warden</h4>
+                        <h4 class="modal-title">Padam Peranan</h4>
                     </div>
                     <div class="modal-body">
                         Adakah anda pasti?
@@ -99,17 +101,17 @@
         </div>
         {{-- end confirmation delete modal --}}
 
-        <!-- export warden modal-->
+        <!-- export all modal-->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Export Warden</h5>
+                        <h5 class="modal-title">Export</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('exportwarden') }}" method="post">
+                    <form action="{{ route('exportperanan') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
                             <div class="form-group">
@@ -140,6 +142,42 @@
                         </button>
                     </div>
                     <form action="{{ route('importwarden') }}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="organ" id="organ" class="form-control">
+                                    @foreach($organization as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="file" name="file" required>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Import</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- import guard modal -->
+        <div class="modal fade" id="modelId2" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import Guard</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('importguard') }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
@@ -195,7 +233,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('teacher.getWardenDatatable') }}",
+                    url: "{{ route('teacher.getPerananDatatable') }}",
                     data: {
                         oid: oid,
                         hasOrganization: true
@@ -231,6 +269,11 @@
                     name: 'username',
                     orderable: false,
                     searchable: false
+                }, {
+                    data: "roleName",
+                    name: 'roleName',
+                    orderable: true,
+                    searchable: true
                 }, {
                     data: "email",
                     name: 'email',
@@ -279,7 +322,7 @@
                     "_token": "{{ csrf_token() }}",
                     //_method: 'DELETE'
                 },
-                url: "/teacher/destroywarden/" + teacher_id,
+                url: "/teacher/destroyperanan/" + teacher_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
