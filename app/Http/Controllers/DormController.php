@@ -847,21 +847,22 @@ class DormController extends Controller
 
     public function blockStudent($id, $blockStatus)
     {
+        // dd("123");
         //if the student is blocked
-        if ($blockStatus == 1) {
+        if ($blockStatus == 0) {
             $result = DB::table('class_student')
-                ->where('id', $id)
-                ->update(['blacklist' => null]);
-        } else if ($blockStatus == 2) {
+                ->where('class_student.id', '=', $id)
+                ->update(['class_student.blacklist' => 0]);
+        } else if ($blockStatus == 1) {
             $result = DB::table('class_student')
-                ->where('id', $id)
-                ->update(['blacklist' => 1]);
+                ->where('class_student.id', '=', $id)
+                ->update(['class_student.blacklist' => 1]);
         }
-        if ($result && $blockStatus == 1) {
+        if ($result && $blockStatus == 0) {
             Session::flash('success', 'Pelajar Berjaya Unblock');
             return View::make('layouts/flash-messages');
             //return response()->json(['resultdata' => $result, 'string' => $strirng]);
-        } else if ($result && $blockStatus == 2) {
+        } else if ($result && $blockStatus == 1) {
             Session::flash('success', 'Pelajar Berjaya Block');
             return View::make('layouts/flash-messages');
         } else {
@@ -1087,9 +1088,11 @@ class DormController extends Controller
         }
     }
 
+    //for all student 
     public function getAllStudentlistDatatable(Request $request)
     {
 
+        // dd("ser");
         if (request()->ajax()) {
             $oid = $request->oid;
 
@@ -1101,52 +1104,162 @@ class DormController extends Controller
 
                 $data = DB::table('students')
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                    ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
-                    ->join('classes', 'classes.id', '=', 'co.class_id')
+                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                     ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
-                    ->where('co.organization_id', '=', $oid)
+                    ->where('dorms.organization_id',  $oid)
                     ->whereNotNull('class_student.dorm_id')
-                    ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as status')
+                    ->select('class_student.id', 'students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as status')
                     ->orderBy('students.nama')
                     ->get();
-                dd($data);
+
+                $table = Datatables::of($data);
+
+                $table->addColumn('status', function ($row) {
+                    if ($row->status == 1) {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Blocked </span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success"> Unblock </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
+                    //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                    return $btn;
+                });
+
+                $table->rawColumns(['status', 'action']);
+                return $table->make(true);
             }
-            $table = Datatables::of($data);
-
-            $table->addColumn('status', function ($row) {
-                if ($row->status == null) {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-success"> Unblock </span></div>';
-
-                    return $btn;
-                } else {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-danger"> Blocked </span></div>';
-
-                    return $btn;
-                }
-            });
-
-            // how to know what is the $row->id??
-            // i need to make sure that the id is actually class_student id
-            $table->addColumn('action', function ($row) {
-                $token = csrf_token();
-                $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
-                //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
-                dd($row->id);
-                return $btn;
-            });
-
-            $table->rawColumns(['status', 'action']);
-            return $table->make(true);
         }
     }
 
+    //for selected dorm student
+    public function getDormStudentlistDatatable(Request $request)
+    {
+
+        // dd("ser");
+        if (request()->ajax()) {
+            $dormid = $request->dormid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($dormid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                    ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+                    ->where('class_student.dorm_id',  $dormid)
+                    // ->whereNotNull('class_student.dorm_id')
+                    ->select('class_student.id', 'students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as status')
+                    ->orderBy('students.nama')
+                    ->get();
+
+                $table = Datatables::of($data);
+
+                $table->addColumn('status', function ($row) {
+                    if ($row->status == 1) {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Blocked </span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success"> Unblock </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
+                    //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                    return $btn;
+                });
+
+                $table->rawColumns(['status', 'action']);
+                return $table->make(true);
+            }
+        }
+    }
+
+    //for selected dorm but blacklist student
+    public function getDormBlacklistStudentlistDatatable(Request $request)
+    {
+
+        // dd("ser");
+        if (request()->ajax()) {
+            $dormid = $request->dormid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($dormid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                    ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+                    ->where('class_student.dorm_id',  $dormid)
+                    ->where('class_student.blacklist', '=', 1)
+                    ->select('class_student.id', 'students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as status')
+                    ->orderBy('students.nama')
+                    ->get();
+
+                $table = Datatables::of($data);
+
+                $table->addColumn('status', function ($row) {
+                    if ($row->status == 1) {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Blocked </span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success"> Unblock </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
+                    //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                    return $btn;
+                });
+
+                $table->rawColumns(['status', 'action']);
+                return $table->make(true);
+            }
+        }
+    }
+
+    //for all blacklist student
     public function getBlacklistStudentlistDatatable(Request $request)
     {
-        dd("inside blacklist controller");
+        // dd("inside blacklist controller");
         // dd($request->hasOrganization);
         if (request()->ajax()) {
             $oid = $request->oid;
@@ -1164,24 +1277,25 @@ class DormController extends Controller
                     ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'co.class_id')
                     ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
-                    ->where('co.organization_id', $oid)
+                    ->where('dorms.organization_id', $oid)
+                    ->where('class_student.blacklist', '=', 1)
                     ->whereNotNull('class_student.dorm_id')
-                    ->whereNotNull('class_student.blacklist')
-                    ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as status')
+                    ->select('class_student.id', 'students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as status')
                     ->orderBy('students.nama')
                     ->get();
+
 
                 $table = Datatables::of($data);
 
                 $table->addColumn('status', function ($row) {
-                    if ($row->status == null) {
+                    if ($row->status == 1) {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success"> Unblock </span></div>';
+                        $btn = $btn . '<span class="badge badge-danger"> Blocked </span></div>';
 
                         return $btn;
                     } else {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Blocked </span></div>';
+                        $btn = $btn . '<span class="badge badge-success"> Unblock </span></div>';
 
                         return $btn;
                     }
@@ -1194,7 +1308,6 @@ class DormController extends Controller
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
                     //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
-                    dd($row->id);
                     return $btn;
                 });
 

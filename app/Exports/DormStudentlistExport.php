@@ -30,14 +30,16 @@ class DormStudentlistExport implements FromCollection, ShouldAutoSize, WithHeadi
             ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
             ->join('students', 'students.id', '=', 'class_student.student_id')
             ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', 'co.class_id')
-            ->select('students.nama', 'classes.nama', 'dorms.name', 'class_student.blacklist')
+            ->join('classes', 'classes.id', '=', 'co.class_id')
+            ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as blacklist')
             ->where([
                 ['class_student.dorm_id', $this->dorm],
-                ['co.organization_id', $this->organId],
+                ['dorms.organization_id', $this->organId],
             ])
             ->orderBy('students.nama')
             ->get();
+
+
 
         return $studentlist;
     }

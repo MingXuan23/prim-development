@@ -29,6 +29,16 @@
                         @endforeach
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label> Kelas</label>
+                    <select name="asrama" id="asrama" class="form-control">
+                        <option value="0" selected>All</option>
+                        @foreach($dormlist as $row)
+                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
 
@@ -98,7 +108,7 @@
                 </div>
             </div>
         </div>
-        {{-- end confirmation delete modal --}}
+        {{-- end confirmation Block modal --}}
 
         {{-- confirmation UnBlock modal --}}
         <div id="unblockConfirmationModal" class="modal fade" role="dialog">
@@ -117,7 +127,7 @@
                 </div>
             </div>
         </div>
-        {{-- end confirmation delete modal --}}
+        {{-- end confirmation UnBlock modal --}}
 
         <!-- export particular dorm student modal-->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
@@ -136,8 +146,9 @@
                             <div class="form-group">
                                 <label>Organisasi</label>
                                 <select name="organ" id="organ" class="form-control">
+                                    <option value="" selected disabled>Pilih Organisasi</option>
                                     @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -145,8 +156,9 @@
                                 <!-- dormlist -->
                                 <label>Dorm</label>
                                 <select name="dorm" id="dorm" class="form-control">
+                                    <option value="" selected disabled>Pilih Dorm</option>
                                     @foreach($dormlist as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->name }}</option>
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -176,8 +188,9 @@
                             <div class="form-group">
                                 <label>Organisasi</label>
                                 <select name="organ" id="organ" class="form-control">
+                                    <option value="" selected disabled>Pilih Organisasi</option>
                                     @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -214,19 +227,174 @@
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
+            fetchDorm($("#organization").val(), '#asrama');
             fetch_data($("#organization").val());
-            console.log("123");
-            console.log($("#organization").val());
         }
 
+        function fetchDorm(organizationid = '', dormId = '') {
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url: "{{ route('dorm.fetchDorm') }}",
+                method: "POST",
+                data: {
+                    oid: organizationid,
+                    _token: _token
+                },
+                success: function(result) {
+                    $(dormId).empty();
+                    $(dormId).append("<option value='0'  selected> All</option>");
+                    jQuery.each(result.success, function(key, value) {
+                        // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
+                        $(dormId).append("<option value='" + value.id + "'>" + value.name + "</option>");
+                    });
+                }
+            })
+        }
+
+        $('#asrama').change(function() {
+            var organizationid = $("#organization option:selected").val();
+
+            var dormid = $("#asrama option:selected").val();
+            $('#studentTable').DataTable().destroy();
+
+            if (dormid == 0) {
+                fetch_data(organizationid);
+            } else {
+                fetch_dorm_data(dormid);
+            }
+        });
+
+        //for particular dorm
+        function fetch_dorm_data(dormid = '') {
+            studentTable = $('#studentTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('dorm.getDormStudentlistDatatable') }}",
+                    data: {
+                        dormid: dormid,
+                        hasOrganization: true
+                    },
+                    type: 'GET'
+
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "className": "text-center",
+                }, ],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: 'studentName',
+                    name: 'studentName',
+                    orderable: true,
+                    searchable: true,
+                }, {
+                    data: 'className',
+                    name: 'className',
+                    orderable: true,
+                    searchable: true,
+                }, {
+                    data: 'dormName',
+                    name: 'dormName',
+                    orderable: true,
+                    searchable: true,
+                }, {
+                    data: 'status',
+                    name: 'status',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }, ]
+            });
+
+        }
+
+        //for particular dorm blacklist
+        function fetch_dorm_blacklist_data(dormid = '') {
+            studentTable = $('#studentTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('dorm.getDormBlacklistStudentlistDatatable') }}",
+                    data: {
+                        dormid: dormid,
+                        hasOrganization: true
+                    },
+                    type: 'GET'
+
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "className": "text-center",
+                }, ],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: 'studentName',
+                    name: 'studentName',
+                    orderable: true,
+                    searchable: true,
+                }, {
+                    data: 'className',
+                    name: 'className',
+                    orderable: true,
+                    searchable: true,
+                }, {
+                    data: 'dormName',
+                    name: 'dormName',
+                    orderable: true,
+                    searchable: true,
+                }, {
+                    data: 'status',
+                    name: 'status',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }, ]
+            });
+
+        }
+
+        //for all dorms
         function fetch_data(oid = '') {
             studentTable = $('#studentTable').DataTable({
                 processing: true,
                 serverSide: true,
                 ajax: {
                     url: "{{ route('dorm.getAllStudentlistDatatable') }}",
-                    // url: "{{ route('dorm.getResidentsDatatable') }}",
-
                     data: {
                         oid: oid,
                         hasOrganization: true
@@ -253,16 +421,22 @@
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
                 }, {
-                    data: "studentName",
+                    data: 'studentName',
                     name: 'studentName',
+                    orderable: true,
+                    searchable: true,
                 }, {
-                    data: "className",
+                    data: 'className',
                     name: 'className',
+                    orderable: true,
+                    searchable: true,
                 }, {
-                    data: "dormName",
+                    data: 'dormName',
                     name: 'dormName',
+                    orderable: true,
+                    searchable: true,
                 }, {
-                    data: "status",
+                    data: 'status',
                     name: 'status',
                     orderable: false,
                     searchable: false
@@ -276,6 +450,7 @@
 
         }
 
+        //for blacklist from all dorm
         function fetch_blacklist_data(oid = '') {
 
             studentTable = $('#studentTable').DataTable({
@@ -285,17 +460,9 @@
                     url: "{{ route('dorm.getBlacklistStudentlistDatatable') }}",
                     data: {
                         oid: oid,
-                        hasOrganization: true,
-
+                        hasOrganization: true
                     },
-                    type: 'GET',
-                    success: function(data) {
-                        console.log("success");
-                    },
-                    error: function(data) {
-                        console.log("fail inside blacklist");
-                    }
-
+                    type: 'GET'
                 },
                 'columnDefs': [{
                     "targets": [0], // your case first column
@@ -318,12 +485,18 @@
                 }, {
                     data: "studentName",
                     name: 'studentName',
+                    orderable: true,
+                    searchable: true,
                 }, {
                     data: "className",
                     name: 'className',
+                    orderable: true,
+                    searchable: true,
                 }, {
                     data: "dormName",
                     name: 'dormName',
+                    orderable: true,
+                    searchable: true,
                 }, {
                     data: "status",
                     name: 'status',
@@ -344,20 +517,31 @@
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('#studentTable').DataTable().destroy();
+            fetchDorm(organizationid, '#asrama');
             fetch_data(organizationid);
         });
 
         $(document).on('click', '.allBtn', function() {
             var organizationid = $("#organization option:selected").val();
             $('#studentTable').DataTable().destroy();
-            fetch_data(organizationid);
+            var dormid = $("#asrama option:selected").val();
+            if (dormid == 0) {
+                fetch_data(organizationid);
+            } else {
+                fetch_dorm_data(dormid);
+            }
         });
 
         $(document).on('click', '.blacklistBtn', function() {
-            viewStatus = 2;
             var organizationid = $("#organization option:selected").val();
             $('#studentTable').DataTable().destroy();
-            fetch_blacklist_data(organizationid);
+            var dormid = $("#asrama option:selected").val();
+            if (dormid == 0) {
+                fetch_blacklist_data(organizationid);
+            } else {
+                fetch_dorm_blacklist_data(dormid);
+            }
+
         });
 
         // csrf token for ajax
@@ -389,7 +573,7 @@
                     "_token": "{{ csrf_token() }}",
                     //_method: 'DELETE'
                 },
-                url: "/dorm/blockStudent/" + student_id + "/" + block_status,
+                url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
@@ -401,6 +585,8 @@
                     studentTable.ajax.reload();
                 },
                 error: function(data) {
+                    console.log("it doesn't Works");
+
                     $('div.flash-message').html(data);
                 }
             })
@@ -415,7 +601,7 @@
                     "_token": "{{ csrf_token() }}",
                     //_method: 'DELETE'
                 },
-                url: "/dorm/blockStudent/" + student_id + "/" + block_status,
+                url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');

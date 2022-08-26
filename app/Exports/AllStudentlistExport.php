@@ -29,15 +29,17 @@ class AllStudentlistExport implements FromCollection, ShouldAutoSize, WithHeadin
             ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
             ->join('students', 'students.id', '=', 'class_student.student_id')
             ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', 'co.class_id')
-            ->select('students.nama', 'classes.nama', 'dorms.name', 'class_student.blacklist')
+            ->join('classes', 'classes.id', '=', 'co.class_id')
+            ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as blacklist')
             ->where([
                 //['organization.id', $this->organId],
-                ['co.organization_id', $this->organId],
+                ['dorms.organization_id', $this->organId],
             ])
             ->whereNotNull('class_student.dorm_id')
             ->orderBy('students.nama')
             ->get();
+
+        // dd($studentlist);
 
         return $studentlist;
     }
