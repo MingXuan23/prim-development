@@ -1390,6 +1390,7 @@ class DormController extends Controller
 
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
+                //can view all application
                 if (Auth::user()->hasRole('Penjaga')) {
                     $data = DB::table('students')
                         ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -1397,6 +1398,7 @@ class DormController extends Controller
                         ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
                         ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
                         ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                        ->join('classifications', 'classifications.id', '=', 'so.classification_id')
                         ->where([
                             ['ou.organization_id', $oid],
                             ['ou.user_id', Auth::user()->id],
@@ -1410,12 +1412,15 @@ class DormController extends Controller
                             'so.arrive_date_time',
                             'so.in_date_time',
                             'so.status as status',
-                            'so.reason'
+                            'so.reason',
+                            'classifications.name as catname'
                         )
                         ->orderBy('so.status')
                         ->orderBy('students.nama')
                         ->get();
-                } else {
+                }
+                //approved or kecemasan && havent expired
+                else if (Auth::user()->hasRole('Guard')) {
                     $data = DB::table('students')
                         ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
                         ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
@@ -1425,6 +1430,38 @@ class DormController extends Controller
                         ->join('classifications', 'classifications.id', '=', 'so.classification_id')
                         ->where([
                             ['ou.organization_id', $oid],
+                            ['so.apply_date_time', '>=', now()->toDateString()],
+                            ['so.in_date_time', NULL],
+                        ])
+                        ->select(
+                            'so.id as id',
+                            'students.nama',
+                            'students.parent_tel',
+                            'so.apply_date_time',
+                            'so.out_date_time',
+                            'so.arrive_date_time',
+                            'so.in_date_time',
+                            'so.status as status',
+                            'so.reason',
+                            'classifications.name as catname'
+                        )
+                        ->orderBy('so.status')
+                        ->orderBy('students.nama')
+                        ->get();
+                }
+                // pending && havent expired
+                else {
+                    $data = DB::table('students')
+                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                        ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+                        ->where([
+                            ['ou.organization_id', $oid],
+                            ['so.status', 0],
+                            ['so.apply_date_time', '>=', now()->toDateString()],
                         ])
                         ->select(
                             'so.id as id',
@@ -1453,15 +1490,18 @@ class DormController extends Controller
                     $btn = '<div class="d-flex justify-content-center">';
                     if ($row->status == 0) {  //havent approved
                         if (Auth::user()->hasRole('Penjaga')) {
-                            if ($row->apply_date_time > now()) {
+                            if ($row->apply_date_time >= now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                             }
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
-                        } elseif (Auth::user()->hasRole('Guru') && strtoupper($row->catname) == ("BALIK KECEMASAN")) {
+                        } elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == ("BALIK KECEMASAN")) {
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
-                        } elseif (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru')) {
+                        } elseif (
+                            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')
+                            || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
+                        ) {
                             $btn = $btn . '<a href="' . route('dorm.updateApprove', $row->id) . '" class="btn btn-primary m-1">Approve</a>';
                             $btn = $btn . '<a href="' . route('dorm.updateTolak', $row->id) . '" class="btn btn-danger m-1">Tolak</a>';
                         }
@@ -1470,7 +1510,7 @@ class DormController extends Controller
                             if ($row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->out_date_time != NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateArriveTime', $row->id) . '" class="btn btn-primary m-1">Sampai</a>';
                             }
-                        } elseif (Auth::user()->hasRole('Guru')) {
+                        } elseif (Auth::user()->hasRole('Guard')) {
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
@@ -1579,6 +1619,16 @@ class DormController extends Controller
                 'student_outing.in_date_time' => now()->toDateTimeString(),
                 'cs.outing_status' => 0,
             ]);
+
+        $intime = DB::table('student_outing')
+            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->where([
+                ['student_outing.id', $id],
+            ])
+            ->value("student_outing.in_date_time");
+
+        dd($intime);
+
 
         return redirect('/dorm')->with('success', 'Tarikh dan masa masuk telah dicatatkan');
     }

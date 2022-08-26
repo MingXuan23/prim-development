@@ -40,9 +40,12 @@
         <div class="card">
             <div class="card-header">Senarai Permintaan Keluar</div>
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
                 @if($roles == "Penjaga")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
+                @endif
+                <!-- hai xu geng gai -->
+                @if($roles == "Warden")
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
                 @endif
             </div>
 
@@ -64,7 +67,7 @@
                 @endif
 
                 <div class="flash-message"></div>
-
+                <input id="roles" value= "{{$roles}}" hidden>
                 <div class="table-responsive">
                     <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
@@ -74,9 +77,11 @@
                                 <th>No Tel Penjaga</th>
                                 <th>Tarikh keluar dimohon</th>
                                 <th>Alasan</th>
-                                <th>Tarikh dan Masa Keluar</th>
-                                <th>Tarikh dan Masa Sampai</th>
-                                <th>Tarikh dan Masa Masuk</th>
+                                @if($roles == "Penjaga" || $roles == "Guard")
+                                    <th>Tarikh dan Masa Keluar</th>
+                                    <th>Tarikh dan Masa Sampai</th>
+                                    <th>Tarikh dan Masa Masuk</th>
+                                @endif
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -104,24 +109,6 @@
             </div>
         </div>
         {{-- end confirmation delete modal --}}
-
-        <!-- Modal -->
-        <!-- export -->
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Export Permintaan</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-
-                    
-                </div>
-            </div>
-        </div>
         
     </div>
 </div>
@@ -150,81 +137,146 @@
         }
 
         function fetch_data(oid = '') {
-            requestTable = $('#requestTable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "{{ route('dorm.getStudentOutingDatatable') }}",
-                    data: {
-                        oid: oid,
-                        hasOrganization: true
-                    },
-                    type: 'GET',
+            if($("#roles").val() == "Penjaga" || $("#roles").val() == "Guard"){
+                requestTable = $('#requestTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('dorm.getStudentOutingDatatable') }}",
+                        data: {
+                            oid: oid,
+                            hasOrganization: true
+                        },
+                        type: 'GET',
 
-                },
-                'columnDefs': [{
-                    "targets": [0], // your case first column
-                    "className": "text-center",
-                    "width": "2%"
-                }, {
-                    "targets": [1, 2, 3, 4, 5, 6, 7], // your case first column
-                    "className": "text-center",
-                },],
-                
-                order: [
-                    [1, 'asc']
-                ],
-                columns: [{
+                    },
+                    'columnDefs': [{
+                        "targets": [0], // your case first column
+                        "className": "text-center",
+                        "width": "2%"
+                    }, {
+                        "targets": [1, 2, 3, 4, 5, 6, 7], // your case first column
+                        "className": "text-center",
+                    },],
                     
-                    "data": null,
-                    searchable: false,
-                    "sortable": false,
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                }, {
-                    data: "nama",
-                    name: 'nama',
-                    orderable: true,
-                    searchable: true,
-                }, {
-                    data: "parent_tel",
-                    name: 'parent_tel',
-                    orderable: false,
-                    searchable: false
-                }, {
-                    data: "apply_date_time",
-                    name: 'apply_date_time',
-                    orderable: false,
-                    searchable: false
-                }, {
-                    data: "reason",
-                    name: 'reason',
-                    orderable: false,
-                    searchable: false
-                },{
-                    data: "out_date_time",
-                    name: 'out_date_time',
-                    orderable: false,
-                    searchable: false
-                }, {
-                    data: 'arrive_date_time',
-                    name: 'arrive_date_time',
-                    orderable: false,
-                    searchable: false
-                },{
-                    data: 'in_date_time',
-                    name: 'in_date_time',
-                    orderable: false,
-                    searchable: false
-                },{
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                }, ]
+                    order: [
+                        [1, 'asc']
+                    ],
+                    columns: [{
+                        
+                        "data": null,
+                        searchable: false,
+                        "sortable": false,
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    }, {
+                        data: "nama",
+                        name: 'nama',
+                        orderable: true,
+                        searchable: true,
+                    }, {
+                        data: "parent_tel",
+                        name: 'parent_tel',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: "apply_date_time",
+                        name: 'apply_date_time',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: "catname",
+                        name: 'catname',
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: "out_date_time",
+                        name: 'out_date_time',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: 'arrive_date_time',
+                        name: 'arrive_date_time',
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: 'in_date_time',
+                        name: 'in_date_time',
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }, ]
+                    
+                });
+            }
+            else{
                 
-            });
+                requestTable = $('#requestTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('dorm.getStudentOutingDatatable') }}",
+                        data: {
+                            oid: oid,
+                            hasOrganization: true
+                        },
+                        type: 'GET',
+
+                    },
+                    'columnDefs': [{
+                        "targets": [0], // your case first column
+                        "className": "text-center",
+                        "width": "2%"
+                    }, {
+                        "targets": [1, 2, 3, 4, 5, 6, 7], // your case first column
+                        "className": "text-center",
+                    },],
+                    
+                    order: [
+                        [1, 'asc']
+                    ],
+                    columns: [{
+                        
+                        "data": null,
+                        searchable: false,
+                        "sortable": false,
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    }, {
+                        data: "nama",
+                        name: 'nama',
+                        orderable: true,
+                        searchable: true,
+                    }, {
+                        data: "parent_tel",
+                        name: 'parent_tel',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: "apply_date_time",
+                        name: 'apply_date_time',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: "catname",
+                        name: 'catname',
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    }, ]
+                    
+                });
+            }
         }
 
         $('#organization').change(function() {
@@ -272,10 +324,6 @@
         });
 
         $('.alert').delay(3000).fadeOut();
-
-        $('#buttonExport').click(function() {
-            $('#modelId1').modal('hide');
-        });
 
     });
 </script>
