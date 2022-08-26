@@ -69,11 +69,10 @@
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
-                                <th>Tarikh Keluar</th>
-                                <th></th>
-                                <th>Dorm</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <th>Tarikh Masa Keluar</th>
+                                <th>Warden Bertanggungjawab</th>
+                                <th>Tarikh Masa Masuk</th>
+                                <th>Guard Bertanggungjawab</th>
                             </tr>
                         </thead>
                     </table>
@@ -81,79 +80,32 @@
             </div>
         </div>
 
-        {{-- confirmation Block modal --}}
-        <div id="blockConfirmationModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Block Pelajar</h4>
-                    </div>
-                    <div class="modal-body">
-                        Adakah anda pasti?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="block" name="block">Block</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- end confirmation Block modal --}}
-
-        {{-- confirmation UnBlock modal --}}
-        <div id="unblockConfirmationModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Unblock Pelajar</h4>
-                    </div>
-                    <div class="modal-body">
-                        Adakah anda pasti?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="unblock" name="unblock">Unblock</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- end confirmation UnBlock modal --}}
-
-        <!-- export particular dorm student modal-->
+        <!-- export particular reason modal-->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Export Pelajar</h5>
+                        <h5 class="modal-title">Export Category</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <!-- export pelajar -->
-                    <form action="{{ route('exportdormstudentlist') }}" method="post">
+                    <!-- export category -->
+                    <form action="{{ route('exportcategoryreason') }}" method="post">
                         <div class="modal-body">
                             {{ csrf_field() }}
                             <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    <option value="" selected disabled>Pilih Organisasi</option>
-                                    <!-- @foreach($organization as $row)
-                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                    @endforeach -->
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <!-- dormlist -->
-                                <label>Dorm</label>
+                                <!-- category list -->
+                                <label>Kategori</label>
                                 <select name="dorm" id="dorm" class="form-control">
-                                    <option value="" selected disabled>Pilih Dorm</option>
-                                    <!-- @foreach($dormlist as $row)
+                                    <option value="" selected disabled>Pilih Kategori</option>
+                                    @foreach($applicationCat as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach -->
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="modal-footer">
-                                <button id="buttonExportDorm" type="submit" class="btn btn-primary">Export Dorm</button>
+                                <button id="buttonExportCategory" type="submit" class="btn btn-primary">Export Kategori</button>
                             </div>
                         </div>
                     </form>
@@ -161,7 +113,7 @@
             </div>
         </div>
 
-        <!-- export all student modal-->
+        <!-- export all reason modal-->
         <div class="modal fade" id="modelId2" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
