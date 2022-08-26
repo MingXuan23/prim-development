@@ -15,6 +15,7 @@ class AddColumnToOrganizationUser extends Migration
     {
         Schema::table('organization_user', function (Blueprint $table) {
             $table->string('fees_status')->nullable();
+            $table->integer('check_in_status')->nullable();
         });
     }
 

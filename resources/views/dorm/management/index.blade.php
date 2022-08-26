@@ -204,15 +204,7 @@
 
                                 <label>Dorm</label>
                                 <input id="dorm" name="dorm" value="" hidden></input>
-                                <!-- <select name="dorm" id="dorm" value="" class="form-control"></select> -->
 
-                                <!-- <select name="dorm" id="dorm" class="form-control">
-                                    <option value="" selected disabled>Pilih Asrama</option> 
-
-                                    <option id="optionID" value="{{ $row->id }}" hidden selected></option>
-                                    <option></option>
-
-                                </select> -->
                             </div>
                             <div class="form-group">
                                 <input type="file" name="file1" required>

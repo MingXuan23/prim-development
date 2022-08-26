@@ -100,6 +100,7 @@ class DormController extends Controller
         // 
         $organization = $this->getOrganizationByUserId();
 
+
         $dormlist = DB::table('dorms')
             ->select('id', 'name')
             ->get();
@@ -120,6 +121,7 @@ class DormController extends Controller
         $dormlist = DB::table('dorms')
             ->select('id', 'name')
             ->get();
+
 
         // return redirect('/dorm/dorm/getAllStudentlistDatatable')->with('success', 'Dorms have been added successfully');
 
@@ -962,6 +964,7 @@ class DormController extends Controller
                     $query->where('organization_user.role_id', '=', 4)
                         ->Orwhere('organization_user.role_id', '=', 5)
                         ->Orwhere('organization_user.role_id', '=', 6)
+                        ->Orwhere('organization_user.role_id', '=', 7)
                         ->Orwhere('organization_user.role_id', '=', 8);
                 });
             })->get();
