@@ -243,6 +243,10 @@ Route::post('/importresident', 'DormController@residentimport')->name('importres
 Route::post('/exportallstudentlist', 'DormController@allstudentlistexport')->name('exportallstudentlist');
 Route::post('/exportdormstudentlist', 'DormController@dormstudentlistexport')->name('exportdormstudentlist');
 
+//report export
+Route::post('/exportallcategory', 'DormController@allcategoryexport')->name('exportallcategory');
+Route::post('/exportcategory', 'DormController@categoryexport')->name('exportcategory');
+
 
 
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');

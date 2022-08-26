@@ -10,6 +10,8 @@ use App\Imports\DormImport;
 use App\Imports\ResidentImport;
 use App\Exports\AllStudentlistExport;
 use App\Exports\DormStudentlistExport;
+use App\Exports\AllCategoryExport;
+use App\Exports\CategoryExport;
 use Illuminate\Http\Request;
 use App\Models\Dorm;
 use App\Models\Outing;
@@ -230,6 +232,16 @@ class DormController extends Controller
             return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the dorm is full');
     }
 
+    public function allcategoryexport(Request $request)
+    {
+        return Excel::download(new AllCategoryExport($request->organ), 'AllCategory.xlsx');
+    }
+
+    public function categoryexport(Request $request)
+    {
+        return Excel::download(new CategoryExport($request->organ, $request->dorm), 'Category.xlsx');
+    }
+
     //report function
     public function reportPerStudent($id)
     {
@@ -367,18 +379,18 @@ class DormController extends Controller
             $outingid = NULL;
         }
 
-        if(isset($classstudentid)){
+        if (isset($classstudentid)) {
             DB::table('student_outing')
-            ->insert([
-                'reason'            => $request->get('reason'),
-                'apply_date_time'   => $request->get('start_date'),
-                'status'            => 0,
-                'classification_id' => $request->get('category'),
-                'class_student_id'  => $classstudentid,
-                'outing_id'         => $outingid,
-                'created_at'        => now(),
-            ]);
-    
+                ->insert([
+                    'reason'            => $request->get('reason'),
+                    'apply_date_time'   => $request->get('start_date'),
+                    'status'            => 0,
+                    'classification_id' => $request->get('category'),
+                    'class_student_id'  => $classstudentid,
+                    'outing_id'         => $outingid,
+                    'created_at'        => now(),
+                ]);
+
             return redirect('/dorm')->with('success', 'New application has been added successfully');
         } else {
             return redirect('/dorm')->withErrors('Information not matched');
@@ -511,24 +523,30 @@ class DormController extends Controller
     {
         //
         $studentouting = DB::table('student_outing')
-        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-        ->join('students', 'students.id', '=', 'cs.student_id')
-        ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
-        ->where([
-            ['student_outing.id', $id],
-            ['student_outing.status', 0],
-        ])
-        ->select('student_outing.id', 'student_outing.apply_date_time', 'students.nama', 'students.email', 
-        'student_outing.reason', 'classifications.name as categoryname', 'classifications.organization_id as oid')
-        ->first();
+            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->join('students', 'students.id', '=', 'cs.student_id')
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->where([
+                ['student_outing.id', $id],
+                ['student_outing.status', 0],
+            ])
+            ->select(
+                'student_outing.id',
+                'student_outing.apply_date_time',
+                'students.nama',
+                'students.email',
+                'student_outing.reason',
+                'classifications.name as categoryname',
+                'classifications.organization_id as oid'
+            )
+            ->first();
 
-        if(isset($studentouting))
-        {
+        if (isset($studentouting)) {
             $organization = $this->getOrganizationByUserId();
 
             $category = DB::table('classifications')
-                        ->where('classifications.organization_id', $organization[0]->id)
-                        ->get();
+                ->where('classifications.organization_id', $organization[0]->id)
+                ->get();
 
 
             return view('dorm.update', compact('studentouting', 'category', 'organization'));
@@ -622,51 +640,48 @@ class DormController extends Controller
         ]);
 
         $classstudentid = DB::table('students')
-                ->join('class_student', 'class_student.id', '=', 'students.id')
-                ->join('users', 'users.telno', '=', 'students.parent_tel')
-                ->where([
-                    ['students.nama', $request->get('name')],
-                    ['students.email', $request->get('email')],
-                    ['class_student.outing_status', 0],
-                    ['class_student.blacklist', 0],
-                    ['users.id', Auth::id()],
-                ])
-                ->value("class_student.id");
-        
+            ->join('class_student', 'class_student.id', '=', 'students.id')
+            ->join('users', 'users.telno', '=', 'students.parent_tel')
+            ->where([
+                ['students.nama', $request->get('name')],
+                ['students.email', $request->get('email')],
+                ['class_student.outing_status', 0],
+                ['class_student.blacklist', 0],
+                ['users.id', Auth::id()],
+            ])
+            ->value("class_student.id");
+
         $outingtype = DB::table('classifications')
-        ->where([
-            ['classifications.id', $request->get('category')],
-        ])
-        ->value('classifications.name');
+            ->where([
+                ['classifications.id', $request->get('category')],
+            ])
+            ->value('classifications.name');
 
-        if(strtoupper($outingtype) == "OUTINGS")
-        {
+        if (strtoupper($outingtype) == "OUTINGS") {
             $outingid = DB::table('outings')
-            ->where('outings.organization_id', $request->get('organization'))
-            ->where('outings.start_date_time', '>=', $request->get('start_date'))
-            ->where('outings.end_date_time', '>', $request->get('start_date'))
-            ->value('outings.id');
-        }
-        else{
-            $outingid = NULL; 
+                ->where('outings.organization_id', $request->get('organization'))
+                ->where('outings.start_date_time', '>=', $request->get('start_date'))
+                ->where('outings.end_date_time', '>', $request->get('start_date'))
+                ->value('outings.id');
+        } else {
+            $outingid = NULL;
         }
 
-        if(isset($classstudentid)){
+        if (isset($classstudentid)) {
             DB::table('student_outing')
-            ->where('id', $id)
-            ->update([
-                'reason'            => $request->get('reason'),
-                'apply_date_time'   => $request->get('start_date'),
-                'status'            => 0,
-                'classification_id' => $request->get('category'),
-                'class_student_id'  => $classstudentid,
-                'outing_id'         => $outingid,
-                'updated_at'        => now(),
-            ]);
-    
+                ->where('id', $id)
+                ->update([
+                    'reason'            => $request->get('reason'),
+                    'apply_date_time'   => $request->get('start_date'),
+                    'status'            => 0,
+                    'classification_id' => $request->get('category'),
+                    'class_student_id'  => $classstudentid,
+                    'outing_id'         => $outingid,
+                    'updated_at'        => now(),
+                ]);
+
             return redirect('/dorm')->with('success', 'The application has been updated');
-        }
-        else{
+        } else {
             return redirect('/dorm')->withErrors('Information not matched');
         }
     }
@@ -830,7 +845,6 @@ class DormController extends Controller
             Session::flash('error', 'Permintaan Gagal Dipadam');
             return View::make('layouts/flash-messages');
         }
-        
     }
 
     public function destroyOuting($id)
@@ -1365,7 +1379,7 @@ class DormController extends Controller
     // 拿created at当天的application而已吗
     // 需不需要让user选display approve和pending的呢？
     // for button：
-        // 如果是kecemasan， status=0 也要display给guard
+    // 如果是kecemasan， status=0 也要display给guard
     public function getStudentOutingDatatable(Request $request)
     {
         if (request()->ajax()) {
@@ -1385,111 +1399,129 @@ class DormController extends Controller
                 //can view all application
                 if (Auth::user()->hasRole('Penjaga')) {
                     $data = DB::table('students')
-                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-                    ->join('classifications', 'classifications.id', '=', 'so.classification_id')
-                    ->where([
-                        ['ou.organization_id', $oid],
-                        ['ou.user_id', Auth::user()->id],
-                    ])
-                    ->select('so.id as id', 'students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
-                    'so.arrive_date_time', 'so.in_date_time', 'so.status as status', 'so.reason', 'classifications.name as catname')
-                    ->orderBy('so.status')
-                    ->orderBy('students.nama')
-                    ->get();
+                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                        ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+                        ->where([
+                            ['ou.organization_id', $oid],
+                            ['ou.user_id', Auth::user()->id],
+                        ])
+                        ->select(
+                            'so.id as id',
+                            'students.nama',
+                            'students.parent_tel',
+                            'so.apply_date_time',
+                            'so.out_date_time',
+                            'so.arrive_date_time',
+                            'so.in_date_time',
+                            'so.status as status',
+                            'so.reason',
+                            'classifications.name as catname'
+                        )
+                        ->orderBy('so.status')
+                        ->orderBy('students.nama')
+                        ->get();
                 }
                 //approved or kecemasan && havent expired
                 else if (Auth::user()->hasRole('Guard')) {
                     $data = DB::table('students')
-                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-                    ->join('classifications', 'classifications.id', '=', 'so.classification_id')
-                    ->where([
-                        ['ou.organization_id', $oid],
-                        ['so.apply_date_time', '>=', now()->toDateString()],
-                        ['so.in_date_time', NULL],
-                    ])
-                    ->select('so.id as id', 'students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
-                    'so.arrive_date_time', 'so.in_date_time', 'so.status as status', 'so.reason', 'classifications.name as catname')
-                    ->orderBy('so.status')
-                    ->orderBy('students.nama')
-                    ->get();
+                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                        ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+                        ->where([
+                            ['ou.organization_id', $oid],
+                            ['so.apply_date_time', '>=', now()->toDateString()],
+                            ['so.in_date_time', NULL],
+                        ])
+                        ->select(
+                            'so.id as id',
+                            'students.nama',
+                            'students.parent_tel',
+                            'so.apply_date_time',
+                            'so.out_date_time',
+                            'so.arrive_date_time',
+                            'so.in_date_time',
+                            'so.status as status',
+                            'so.reason',
+                            'classifications.name as catname'
+                        )
+                        ->orderBy('so.status')
+                        ->orderBy('students.nama')
+                        ->get();
                 }
                 // pending && havent expired
-                else{
+                else {
                     $data = DB::table('students')
-                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-                    ->join('classifications', 'classifications.id', '=', 'so.classification_id')
-                    ->where([
-                        ['ou.organization_id', $oid],
-                        ['so.status', 0],
-                        ['so.apply_date_time', '>=', now()->toDateString()],
-                    ])
-                    ->select('so.id as id', 'students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
-                    'so.arrive_date_time', 'so.in_date_time', 'so.status as status', 'so.reason', 'classifications.name as catname')
-                    ->orderBy('so.status')
-                    ->orderBy('students.nama')
-                    ->get();
+                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                        ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+                        ->where([
+                            ['ou.organization_id', $oid],
+                            ['so.status', 0],
+                            ['so.apply_date_time', '>=', now()->toDateString()],
+                        ])
+                        ->select(
+                            'so.id as id',
+                            'students.nama',
+                            'students.parent_tel',
+                            'so.apply_date_time',
+                            'so.out_date_time',
+                            'so.arrive_date_time',
+                            'so.in_date_time',
+                            'so.status as status',
+                            'so.reason',
+                            'classifications.name as catname'
+                        )
+                        ->orderBy('so.status')
+                        ->orderBy('students.nama')
+                        ->get();
                 }
             }
 
-            if(isset($data))
-            {
+            if (isset($data)) {
                 $table = Datatables::of($data);
 
                 $table->addColumn('action', function ($row) {
 
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    if($row->status == 0){  //havent approved
-                        if(Auth::user()->hasRole('Penjaga'))
-                        {
-                            if($row->apply_date_time >= now()->toDateString()){
+                    if ($row->status == 0) {  //havent approved
+                        if (Auth::user()->hasRole('Penjaga')) {
+                            if ($row->apply_date_time >= now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                             }
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
-                        }
-                        elseif(Auth::user()->hasRole('Guard') && strtoupper($row->catname) == ("BALIK KECEMASAN"))
-                        {
-                            if($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL)
-                            {
+                        } elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == ("BALIK KECEMASAN")) {
+                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
-                        }
-                        elseif(Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') 
-                        || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden'))
-                        {
+                        } elseif (
+                            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')
+                            || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
+                        ) {
                             $btn = $btn . '<a href="' . route('dorm.updateApprove', $row->id) . '" class="btn btn-primary m-1">Approve</a>';
                             $btn = $btn . '<a href="' . route('dorm.updateTolak', $row->id) . '" class="btn btn-danger m-1">Tolak</a>';
                         }
-                    }
-                    elseif($row->status == 1){ //approved
-                        if(Auth::user()->hasRole('Penjaga'))
-                        {
-                            if($row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->out_date_time != NULL)
-                            {
+                    } elseif ($row->status == 1) { //approved
+                        if (Auth::user()->hasRole('Penjaga')) {
+                            if ($row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->out_date_time != NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateArriveTime', $row->id) . '" class="btn btn-primary m-1">Sampai</a>';
                             }
-                        }
-                        elseif(Auth::user()->hasRole('Guard'))
-                        {
-                            if($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL)
-                            {
+                        } elseif (Auth::user()->hasRole('Guard')) {
+                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
 
-                            if($row->in_date_time == NULL && $row->arrive_date_time != NULL && $row->out_date_time != NULL)
-                            {
+                            if ($row->in_date_time == NULL && $row->arrive_date_time != NULL && $row->out_date_time != NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateInTime', $row->id) . '" class="btn btn-primary m-1">Masuk</a>';
                             }
                         }
@@ -1507,10 +1539,10 @@ class DormController extends Controller
     public function updateApprove($id)
     {
         $studentouting = DB::table('student_outing')
-        ->where('student_outing.id', $id)
-        ->update([
-            'student_outing.status' => 1,
-        ]);
+            ->where('student_outing.id', $id)
+            ->update([
+                'student_outing.status' => 1,
+            ]);
 
         return redirect('/dorm')->with('success', 'Permintaan pelajar telah disahkan');
     }
@@ -1518,10 +1550,10 @@ class DormController extends Controller
     public function updateTolak($id)
     {
         $studentouting = DB::table('student_outing')
-        ->where('student_outing.id', $id)
-        ->update([
-            'student_outing.status' => 2,
-        ]);
+            ->where('student_outing.id', $id)
+            ->update([
+                'student_outing.status' => 2,
+            ]);
 
         return redirect('/dorm')->with('success', 'Permintaan pelajar ditolak');
     }
@@ -1529,58 +1561,53 @@ class DormController extends Controller
     public function updateOutTime($id)
     {
         $catname = DB::table('student_outing')
-        ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
-        ->where([
-            ['student_outing.id', $id],
-        ])
-        ->value('classifications.name');
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->where([
+                ['student_outing.id', $id],
+            ])
+            ->value('classifications.name');
 
         $outinglimit = (int)DB::table('student_outing')
-        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-        ->where([
-            ['student_outing.id', $id],
-        ])
-        ->value('cs.outing_limit');
+            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->where([
+                ['student_outing.id', $id],
+            ])
+            ->value('cs.outing_limit');
 
-        if(strtoupper($catname) == "BALIK KECEMASAN")
-        {
+        if (strtoupper($catname) == "BALIK KECEMASAN") {
             DB::table('student_outing')
-            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-            ->where([
-                ['student_outing.id', $id],
-            ])
-            ->update([
-                'student_outing.status' => 1,
-                'student_outing.out_date_time' => now()->toDateTimeString(),
-                'cs.outing_status' => 1,
-            ]);
-        }
-        else if(strtoupper($catname) == "BALIK KHAS")
-        {
+                ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+                ->where([
+                    ['student_outing.id', $id],
+                ])
+                ->update([
+                    'student_outing.status' => 1,
+                    'student_outing.out_date_time' => now()->toDateTimeString(),
+                    'cs.outing_status' => 1,
+                ]);
+        } else if (strtoupper($catname) == "BALIK KHAS") {
             DB::table('student_outing')
-            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-            ->where([
-                ['student_outing.id', $id],
-                ['student_outing.status', 1],
-            ])
-            ->update([
-                'student_outing.out_date_time' => now()->toDateTimeString(),
-                'cs.outing_status' => 1,
-                'cs.outing_limit' => $outinglimit + 1,
-            ]);
-        }
-        else
-        {
+                ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+                ->where([
+                    ['student_outing.id', $id],
+                    ['student_outing.status', 1],
+                ])
+                ->update([
+                    'student_outing.out_date_time' => now()->toDateTimeString(),
+                    'cs.outing_status' => 1,
+                    'cs.outing_limit' => $outinglimit + 1,
+                ]);
+        } else {
             DB::table('student_outing')
-            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-            ->where([
-                ['student_outing.id', $id],
-                ['student_outing.status', 1],
-            ])
-            ->update([
-                'student_outing.out_date_time' => now()->toDateTimeString(),
-                'cs.outing_status' => 1,
-            ]);
+                ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+                ->where([
+                    ['student_outing.id', $id],
+                    ['student_outing.status', 1],
+                ])
+                ->update([
+                    'student_outing.out_date_time' => now()->toDateTimeString(),
+                    'cs.outing_status' => 1,
+                ]);
         }
         return redirect('/dorm')->with('success', 'Tarikh dan masa keluar telah dicatatkan');
     }
@@ -1615,13 +1642,13 @@ class DormController extends Controller
     public function updateArriveTime($id)
     {
         DB::table('student_outing')
-        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-        ->where([
-            ['student_outing.id', $id],
-            ['student_outing.status', 1],
-            ['cs.outing_status', 1],
-        ])
-        ->update(['student_outing.arrive_date_time' => now()->toDateTimeString()]);
+            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->where([
+                ['student_outing.id', $id],
+                ['student_outing.status', 1],
+                ['cs.outing_status', 1],
+            ])
+            ->update(['student_outing.arrive_date_time' => now()->toDateTimeString()]);
 
         return redirect('/dorm')->with('success', 'Tarikh dan masa sampai destinasi telah dicatatkan');
     }
