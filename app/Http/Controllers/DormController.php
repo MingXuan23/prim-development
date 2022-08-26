@@ -1407,6 +1407,7 @@ class DormController extends Controller
                     ->where([
                         ['ou.organization_id', $oid],
                         ['so.apply_date_time', '>=', now()->toDateString()],
+                        ['so.in_date_time', NULL],
                     ])
                     ->select('so.id as id', 'students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
                     'so.arrive_date_time', 'so.in_date_time', 'so.status as status', 'so.reason', 'classifications.name as catname')
@@ -1591,6 +1592,16 @@ class DormController extends Controller
             'student_outing.in_date_time' => now()->toDateTimeString(),
             'cs.outing_status' => 0,
         ]);
+
+        $intime = DB::table('student_outing')
+        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+        ->where([
+            ['student_outing.id', $id],
+        ])
+        ->value("student_outing.in_date_time");
+        
+        dd($intime);
+        
 
         return redirect('/dorm')->with('success', 'Tarikh dan masa masuk telah dicatatkan');
     }

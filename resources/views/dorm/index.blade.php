@@ -40,7 +40,6 @@
         <div class="card">
             <div class="card-header">Senarai Permintaan Keluar</div>
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
                 @if($roles == "Penjaga")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
@@ -79,11 +78,9 @@
                                 <th>Tarikh keluar dimohon</th>
                                 <th>Alasan</th>
                                 @if($roles == "Penjaga" || $roles == "Guard")
-                                {
                                     <th>Tarikh dan Masa Keluar</th>
                                     <th>Tarikh dan Masa Sampai</th>
                                     <th>Tarikh dan Masa Masuk</th>
-                                }
                                 @endif
                                 <th>Action</th>
                             </tr>
@@ -279,7 +276,6 @@
                     }, ]
                     
                 });
-                console.log("123");
             }
         }
 
