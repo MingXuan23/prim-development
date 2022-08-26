@@ -50,12 +50,12 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         $roles = DB::table('organization_roles')
-        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-        ->where([
-            ['ou.user_id', Auth::id()],
-            ['ou.organization_id', $organization[0]->id],
-        ])
-        ->value('organization_roles.nama');
+            ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+            ->where([
+                ['ou.user_id', Auth::id()],
+                ['ou.organization_id', $organization[0]->id],
+            ])
+            ->value('organization_roles.nama');
 
         // dd($roles);
         return view('dorm.index', compact('roles', 'organization'));
@@ -221,6 +221,38 @@ class DormController extends Controller
             return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the dorm is full');
     }
 
+    //report function
+    public function reportPerStudent($id)
+    {
+        $studentName = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->where('class_student.id', $id)
+            ->select('students.nama as studentName')
+            ->first();
+
+        $applicationCat = DB::table('classifications')
+            ->get();
+
+        $postId = DB::table('student_outing')
+            ->join('organization_user as ou', 'ou.id', '=', 'student_outing.warden_id')
+            // ->join('organization_user as ou', 'ou.id', '=', 'student_outing.guard_id')
+            ->join('users', 'users.id', '=', 'ou.user_id')
+            ->where('student_outing.class_student_id', '=', $id)
+            // ->select('student_outing.warden_id as wardenId', 'student_outing.guard_id as guardId')
+            ->first();
+
+        dd($studentName, $postId);
+        $warden = DB::table('users')
+            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+            ->where('organization_user.id', $postId->wardenId)
+            ->select('users.name')
+            ->first();
+
+
+
+        return view('dorm.report.reportPerStudent', compact('studentName', 'applicationCat'));
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -237,19 +269,18 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         $category = DB::table('classifications')
-                    ->where('classifications.organization_id', $organization[0]->id)
-                    ->get();
+            ->where('classifications.organization_id', $organization[0]->id)
+            ->get();
 
         $outingdate = date('Y-m-d', strtotime(DB::table('outings')
-                    ->where([
-                        ['outings.organization_id', $organization[0]->id],
-                        ['outings.end_date_time', '>', now()],
-                    ])
-                    ->orderBy("outings.start_date_time")
-                    ->value("outings.start_date_time as start_date_time")));
+            ->where([
+                ['outings.organization_id', $organization[0]->id],
+                ['outings.end_date_time', '>', now()],
+            ])
+            ->orderBy("outings.start_date_time")
+            ->value("outings.start_date_time as start_date_time")));
 
-        if(Auth::user()->hasRole('Penjaga'))
-        {
+        if (Auth::user()->hasRole('Penjaga')) {
             return view('dorm.create', compact('organization', 'category', 'outingdate'));
         }
     }
@@ -300,49 +331,46 @@ class DormController extends Controller
         ]);
 
         $classstudentid = DB::table('students')
-                ->join('class_student', 'class_student.id', '=', 'students.id')
-                ->join('users', 'users.telno', '=', 'students.parent_tel')
-                ->where([
-                    ['students.nama', $request->get('name')],
-                    ['students.email', $request->get('email')],
-                    ['class_student.outing_status', 0],
-                    ['class_student.blacklist', 0],
-                    ['users.id', Auth::id()],
-                ])
-                ->value("class_student.id");
-                    
+            ->join('class_student', 'class_student.id', '=', 'students.id')
+            ->join('users', 'users.telno', '=', 'students.parent_tel')
+            ->where([
+                ['students.nama', $request->get('name')],
+                ['students.email', $request->get('email')],
+                ['class_student.outing_status', 0],
+                ['class_student.blacklist', 0],
+                ['users.id', Auth::id()],
+            ])
+            ->value("class_student.id");
+
         $outingtype = DB::table('classifications')
-        ->where([
-            ['classifications.id', $request->get('category')],
-        ])
-        ->value('classifications.name');
+            ->where([
+                ['classifications.id', $request->get('category')],
+            ])
+            ->value('classifications.name');
 
-        if(strtoupper($outingtype) == "OUTINGS")
-        {
+        if (strtoupper($outingtype) == "OUTINGS") {
             $outingid = DB::table('outings')
-            ->where('outings.organization_id', $request->get('organization'))
-            ->where('outings.start_date_time', '>=', $request->get('start_date'))
-            ->where('outings.end_date_time', '>', $request->get('start_date'))
-            ->value('outings.id');
-        }
-        else{
-            $outingid = NULL; 
+                ->where('outings.organization_id', $request->get('organization'))
+                ->where('outings.start_date_time', '>=', $request->get('start_date'))
+                ->where('outings.end_date_time', '>', $request->get('start_date'))
+                ->value('outings.id');
+        } else {
+            $outingid = NULL;
         }
 
-        if(isset($classstudentid)){
+        if (isset($classstudentid)) {
             dd($outingid);
             DB::table('student_outing')
-            ->insert([
-                'apply_date_time'   => $request->get('start_date'),
-                'status'            => 0,
-                'classification_id' => $request->get('category'),
-                'class_student_id'  => $classstudentid,
-                'outing_id'         => $outingid,
-            ]);
-    
+                ->insert([
+                    'apply_date_time'   => $request->get('start_date'),
+                    'status'            => 0,
+                    'classification_id' => $request->get('category'),
+                    'class_student_id'  => $classstudentid,
+                    'outing_id'         => $outingid,
+                ]);
+
             return redirect('/dorm')->with('success', 'New application has been added successfully');
-        }
-        else{
+        } else {
             return redirect('/dorm')->withErrors('Information not matched');
         }
     }
@@ -545,7 +573,7 @@ class DormController extends Controller
     {
         //
 
-        
+
 
     }
 
@@ -1084,7 +1112,7 @@ class DormController extends Controller
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
-                    //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                    $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
                     return $btn;
                 });
 
@@ -1140,7 +1168,7 @@ class DormController extends Controller
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
-                    //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                    $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
                     return $btn;
                 });
 
@@ -1196,7 +1224,7 @@ class DormController extends Controller
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
-                    //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                    $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
                     return $btn;
                 });
 
@@ -1251,13 +1279,11 @@ class DormController extends Controller
                     }
                 });
 
-                // how to know what is the $row->id??
-                // i need to make sure that the id is actually class_student id
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
-                    //$btn = $btn . '<a href="' . route('dorm.reportStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
+                    $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary m-1">Report</a>';
                     return $btn;
                 });
 
@@ -1287,74 +1313,79 @@ class DormController extends Controller
             $hasOrganizaton = $request->hasOrganization;
 
             $roles = DB::table('organization_roles')
-                    ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-                    ->where([
-                        ['ou.user_id', Auth::user()->id],
-                        ['ou.organization_id', $oid],
-                    ])
-                    ->value('organization_roles.nama');
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                    ['ou.organization_id', $oid],
+                ])
+                ->value('organization_roles.nama');
 
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
-                if(Auth::user()->hasRole('Penjaga'))
-                {
+                if (Auth::user()->hasRole('Penjaga')) {
                     $data = DB::table('students')
-                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-                    ->where([
-                        ['ou.organization_id', $oid],
-                        ['ou.user_id', Auth::user()->id],
-                    ])
-                    ->select('students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
-                    'so.arrive_date_time', 'so.in_date_time', 'or.nama as rolename')
-                    ->get();
-                }
-                else{
+                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                        ->where([
+                            ['ou.organization_id', $oid],
+                            ['ou.user_id', Auth::user()->id],
+                        ])
+                        ->select(
+                            'students.nama',
+                            'students.parent_tel',
+                            'so.apply_date_time',
+                            'so.out_date_time',
+                            'so.arrive_date_time',
+                            'so.in_date_time',
+                            'or.nama as rolename'
+                        )
+                        ->get();
+                } else {
                     $data = DB::table('students')
-                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-                    ->where([
-                        ['ou.organization_id', $oid],
-                    ])
-                    ->select('students.nama', 'students.parent_tel', 'so.apply_date_time', 'so.out_date_time', 
-                    'so.arrive_date_time', 'so.in_date_time', 'or.nama as rolename')
-                    ->get();
+                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                        ->where([
+                            ['ou.organization_id', $oid],
+                        ])
+                        ->select(
+                            'students.nama',
+                            'students.parent_tel',
+                            'so.apply_date_time',
+                            'so.out_date_time',
+                            'so.arrive_date_time',
+                            'so.in_date_time',
+                            'or.nama as rolename'
+                        )
+                        ->get();
                 }
             }
-            
-            if(isset($data))
-            {
+
+            if (isset($data)) {
                 $table = Datatables::of($data);
 
                 $table->addColumn('action', function ($row) {
-                   
+
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    if($row->rolename == "Penjaga")
-                    {
+                    if ($row->rolename == "Penjaga") {
                         $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Edit</a>';
-                    }
-                    elseif($row->rolename == "Guard")
-                    {
+                    } elseif ($row->rolename == "Guard") {
                         $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Keluar</a>';
-                    }
-                    else
-                    {
+                    } else {
                         $btn = $btn . '<a href="' . route('dorm.create') . '" class="btn btn-primary m-1">Approve</a>';
                     }
                     return $btn;
-                    
                 });
 
                 $table->rawColumns(['action']);
                 return $table->make(true);
-            }   
+            }
         }
     }
 }

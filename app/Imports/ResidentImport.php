@@ -57,6 +57,7 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
         return [
             'name.required' => 'Maklumat nama murid diperlukan',
             //'nama_penjaga.required' => 'Maklumat nama penjaga diperlukan',
+            'email.required' => 'Maklumat emel pelajar diperlukan',
             'no_tel_bimbit_penjaga.required' => 'Maklumat nombor telefon bimbit penjaga diperlukan',
             'class.required' => 'Maklumat kelas murid diperlukan'
         ];

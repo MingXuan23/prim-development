@@ -49,7 +49,7 @@ class ClassExport implements FromCollection, WithHeadings, ShouldAutoSize
             ->orderBy('classes.nama')
             ->get();
 
-            // dd($listclass)
+        // dd($listclass)
         return $listclass;
     }
 
