@@ -20,6 +20,10 @@ class AddColumnsToStudentOutingTable extends Migration
             $table->integer('status');
             $table->bigInteger('classification_id')->unsigned();
             $table->foreign('classification_id')->references('id')->on('classifications')->onDelete('cascade');
+            $table->bigInteger('warden_id')->unsigned()->nullable();
+            $table->foreign('warden_id')->references('id')->on('organization_user')->onDelete('cascade');
+            $table->bigInteger('guard_id')->unsigned()->nullable();
+            $table->foreign('guard_id')->references('id')->on('organization_user')->onDelete('cascade');
         });
     }
 

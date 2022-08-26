@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label> Kelas</label>
+                    <label> Dorm</label>
                     <select name="asrama" id="asrama" class="form-control">
                         <option value="0" selected>All</option>
                         @foreach($dormlist as $row)
