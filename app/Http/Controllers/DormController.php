@@ -46,19 +46,28 @@ class DormController extends Controller
     public function index()
     {
         //
-        // 有error display 不到
         $organization = $this->getOrganizationByUserId();
 
         $roles = DB::table('organization_roles')
             ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
             ->where([
-                ['ou.user_id', Auth::id()],
+                ['ou.user_id', Auth::user()->id],
                 ['ou.organization_id', $organization[0]->id],
             ])
             ->value('organization_roles.nama');
 
+        $isblacklisted = DB::table('students')
+            ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+            ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+            ->where([
+                ['ou.organization_id', $organization[0]->id],
+                ['ou.user_id', Auth::user()->id],
+            ])
+            ->value('cs.blacklist');
+
         // dd($roles);
-        return view('dorm.index', compact('roles', 'organization'));
+        return view('dorm.index', compact('roles', 'organization', 'isblacklisted'));
     }
 
     public function indexOuting()
@@ -945,10 +954,7 @@ class DormController extends Controller
             // user role pentadbir 
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->where('organization_user.role_id', '=', 4)
-                        ->Orwhere('organization_user.role_id', '=', 5)
-                        ->Orwhere('organization_user.role_id', '=', 6)
-                        ->Orwhere('organization_user.role_id', '=', 8);
+                    $query->whereIn('organization_user.role_id', [4,5,6,7,8]);
                 });
             })->get();
         }
@@ -1581,6 +1587,15 @@ class DormController extends Controller
 
     public function updateInTime($id)
     {
+        $intime = now();
+        
+        if(strtotime($intime) > strtotime("18:00:00")){
+            $blacklist = 1;
+        }
+        else{
+            $blacklist = 0;
+        }
+
         DB::table('student_outing')
         ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
         ->where([
@@ -1589,19 +1604,10 @@ class DormController extends Controller
             ['cs.outing_status', 1],
         ])
         ->update([
-            'student_outing.in_date_time' => now()->toDateTimeString(),
+            'student_outing.in_date_time' => $intime,
             'cs.outing_status' => 0,
+            'cs.blacklist' => $blacklist,
         ]);
-
-        $intime = DB::table('student_outing')
-        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-        ->where([
-            ['student_outing.id', $id],
-        ])
-        ->value("student_outing.in_date_time");
-        
-        dd($intime);
-        
 
         return redirect('/dorm')->with('success', 'Tarikh dan masa masuk telah dicatatkan');
     }
@@ -1630,5 +1636,20 @@ class DormController extends Controller
 
         // $outing->update(array('start_date_time' => new DateTime()));
         // return redirect('/asrama')->with('success', 'Data is successfully updated');
+    }
+
+    public function updateCheckIn()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        DB::table('organization_user as ou')
+        ->where([
+            ['ou.organization_id', $organization[0]->id],
+            ['ou.user_id', Auth::user()->id],
+        ])
+        ->update([
+            'ou.check_in_status' => 1,
+        ]);
+        return redirect('/dorm')->with('success', 'Data is successfully updated');
     }
 }

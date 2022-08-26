@@ -39,13 +39,19 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">Senarai Permintaan Keluar</div>
+            
             <div>
-                @if($roles == "Penjaga")
+                @if($isblacklisted == 1)    
+                    <div class="alert-danger" style="margin: 19px; padding: 10px;">
+                        Pelajar dalam blacklist
+                    </div>
+                @endif
+                @if($roles == "Penjaga" && $isblacklisted == 0)
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
                 <!-- hai xu geng gai -->
                 @if($roles == "Warden")
-                <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
                 @endif
             </div>
 
@@ -155,7 +161,7 @@
                         "className": "text-center",
                         "width": "2%"
                     }, {
-                        "targets": [1, 2, 3, 4, 5, 6, 7], // your case first column
+                        "targets": [1, 2, 3, 4, 5, 6, 7, 8], // your case first column
                         "className": "text-center",
                     },],
                     
@@ -233,7 +239,7 @@
                         "className": "text-center",
                         "width": "2%"
                     }, {
-                        "targets": [1, 2, 3, 4, 5, 6, 7], // your case first column
+                        "targets": [1, 2, 3, 4, 5], // your case first column
                         "className": "text-center",
                     },],
                     
