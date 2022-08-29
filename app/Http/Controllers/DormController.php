@@ -1479,7 +1479,7 @@ class DormController extends Controller
                         ->join('classifications', 'classifications.id', '=', 'so.classification_id')
                         ->where([
                             ['ou.organization_id', $oid],
-                            ['so.apply_date_time', now()->toDateString()],
+                            // ['so.apply_date_time', now()->toDateString()],
                             
                         ])
                         ->select(
@@ -1685,6 +1685,7 @@ class DormController extends Controller
                     'student_outing.status' => 1,
                     'student_outing.out_date_time' => now()->toDateTimeString(),
                     'cs.outing_status' => 1,
+                    'student_outing.guard_id' => Auth::user()->id,
                 ]);
         } else if (strtoupper($catname) == $balikKhas) {
             DB::table('student_outing')
@@ -1697,6 +1698,7 @@ class DormController extends Controller
                     'student_outing.out_date_time' => now()->toDateTimeString(),
                     'cs.outing_status' => 1,
                     'cs.outing_limit' => $outinglimit + 1,
+                    'student_outing.guard_id' => Auth::user()->id,
                 ]);
         } else {
             DB::table('student_outing')
@@ -1708,6 +1710,7 @@ class DormController extends Controller
                 ->update([
                     'student_outing.out_date_time' => now()->toDateTimeString(),
                     'cs.outing_status' => 1,
+                    'student_outing.guard_id' => Auth::user()->id,
                 ]);
         }
         return redirect('/dorm')->with('success', 'Tarikh dan masa keluar telah dicatatkan');

@@ -1,6 +1,4 @@
 <!-- 要怎么做auto check out -->
-<!-- for block 超过6点那个 应该是for outings和住dorm的学生 而已 所以要改那个validation -->
-
 
 @extends('layouts.master')
 
@@ -53,7 +51,7 @@
                 @if($roles == "Penjaga")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
-                <!-- hai xu geng gai  CHECKIN 是不是应该记录时间？-->
+
                 @if($roles == "Warden")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
                 @endif
