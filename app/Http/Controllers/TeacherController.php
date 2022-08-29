@@ -548,14 +548,16 @@ class TeacherController extends Controller
 
     public function getOrganizationByUserId()
     {
+
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
 
             return Organization::all();
         } else {
             // user role pentadbir 
+            //micole try
             return Organization::whereHas('user', function ($query) use ($userId) {
-                $query->where('user_id', $userId)->where('role_id', 4);
+                $query->where('user_id', $userId)->whereIn('role_id', [4, 5, 7, 8]);
             })->get();
         }
     }

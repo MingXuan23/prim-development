@@ -112,6 +112,7 @@ class DormController extends Controller
         // 
         $organization = $this->getOrganizationByUserId();
 
+
         $dormlist = DB::table('dorms')
             ->select('id', 'name')
             ->get();
@@ -132,6 +133,7 @@ class DormController extends Controller
         $dormlist = DB::table('dorms')
             ->select('id', 'name')
             ->get();
+
 
         // return redirect('/dorm/dorm/getAllStudentlistDatatable')->with('success', 'Dorms have been added successfully');
 
@@ -1008,7 +1010,7 @@ class DormController extends Controller
             // user role pentadbir 
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->whereIn('organization_user.role_id', [4,5,6,7,8]);
+                    $query->whereIn('organization_user.role_id', [4, 5, 6, 7, 8]);
                 });
             })->get();
         }
@@ -1596,6 +1598,11 @@ class DormController extends Controller
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
                     }
+                    elseif ($row->status == 2) {  //
+                        if (Auth::user()->hasRole('Penjaga')) {
+                            $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
+                        }
+                    }
                     return $btn;
                 });
 
@@ -1724,23 +1731,22 @@ class DormController extends Controller
 
         if(strtotime($intime) > strtotime("18:00:00") && isset($dormid)){
             $blacklist = 1;
-        }
-        else{
+        } else {
             $blacklist = 0;
         }
 
         DB::table('student_outing')
-        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-        ->where([
-            ['student_outing.id', $id],
-            ['student_outing.status', 1],
-            ['cs.outing_status', 1],
-        ])
-        ->update([
-            'student_outing.in_date_time' => $intime,
-            'cs.outing_status' => 0,
-            'cs.blacklist' => $blacklist,
-        ]);
+            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->where([
+                ['student_outing.id', $id],
+                ['student_outing.status', 1],
+                ['cs.outing_status', 1],
+            ])
+            ->update([
+                'student_outing.in_date_time' => $intime,
+                'cs.outing_status' => 0,
+                'cs.blacklist' => $blacklist,
+            ]);
 
         return redirect('/dorm')->with('success', 'Tarikh dan masa masuk telah dicatatkan');
     }
@@ -1776,13 +1782,13 @@ class DormController extends Controller
         $organization = $this->getOrganizationByUserId();
 
         DB::table('organization_user as ou')
-        ->where([
-            ['ou.organization_id', $organization[0]->id],
-            ['ou.user_id', Auth::user()->id],
-        ])
-        ->update([
-            'ou.check_in_status' => 1,
-        ]);
+            ->where([
+                ['ou.organization_id', $organization[0]->id],
+                ['ou.user_id', Auth::user()->id],
+            ])
+            ->update([
+                'ou.check_in_status' => 1,
+            ]);
         return redirect('/dorm')->with('success', 'Data is successfully updated');
     }
 }
