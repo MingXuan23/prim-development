@@ -65,7 +65,9 @@
                             @if($outinglimit->dorm_id != NULL)
                                 @foreach($category as $row)
                                     @if(strtoupper($row->name) == $outing && $outingdate < date("Y-m-d"))
-                                    
+                                    <!-- dont display option outings -->
+                                    @elseif(strtoupper($row->name) == $balikKhas && $outinglimit->outing_limit == 2)
+                                    <!-- dont display option balik khas -->
                                     @else
                                     <option value="{{ $row->id }}" >{{ $row->name }}</option>
                                     @endif

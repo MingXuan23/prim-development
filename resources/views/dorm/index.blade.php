@@ -1,6 +1,4 @@
 <!-- 要怎么做auto check out -->
-<!-- for block 超过6点那个 应该是for outings和住dorm的学生 而已 所以要改那个validation -->
-
 
 @extends('layouts.master')
 
@@ -53,7 +51,7 @@
                 @if($roles == "Penjaga")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
-                <!-- hai xu geng gai  CHECKIN 是不是应该记录时间？-->
+
                 @if($roles == "Warden")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
                 @endif
@@ -135,7 +133,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" data-dismiss="modal" class="btn btn-primary" id="unblock"
-                            name="delete">Unblock</button>
+                            name="unblock">Unblock</button>
                         <button type="button" data-dismiss="modal" class="btn">Batal</button>
                     </div>
                 </div>
@@ -348,24 +346,26 @@
         });
 
         $('#unblock').click(function() {
+            console.log(student_outing_id);
             $.ajax({
-                type: 'POST',
+                type: 'GET',
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
                     // _method: 'DELETE'
                 },
-                url: "/dorm/updateBlacklist/" + student_outing_id,
+                url: "/dorm/dorm/updateBlacklist/" + student_outing_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
                     }, 2000);
-
+                    
                     $('div.flash-message').html(data);
 
                     requestTable.ajax.reload();
                 },
                 error: function (data) {
+                    console.log("hellllll");
                     $('div.flash-message').html(data);
                 }
             })
