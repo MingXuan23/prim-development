@@ -239,12 +239,27 @@ class DormController extends Controller
 
     public function allcategoryexport(Request $request)
     {
-        return Excel::download(new AllCategoryExport($request->organ), 'AllCategory.xlsx');
+        $studentName = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->where('class_student.id', '=', $request->studentid)
+            ->value('students.nama');
+        // ->first();
+
+        // dd($studentName);
+
+        return Excel::download(new AllCategoryExport($request->studentid), $studentName . ' report.xlsx');
     }
 
     public function categoryexport(Request $request)
     {
-        return Excel::download(new CategoryExport($request->organ, $request->dorm), 'Category.xlsx');
+
+        $studentName = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->where('class_student.id', '=', $request->studentid)
+            ->value('students.nama');
+        // ->first();
+
+        return Excel::download(new CategoryExport($request->studentid, $request->category), $studentName . ' report.xlsx');
     }
 
     //report function
@@ -290,7 +305,9 @@ class DormController extends Controller
             // ->first();
             ->first();
 
-        return view('dorm.report.reportPerStudent', compact('studentName', 'applicationCat', 'warden', 'guard'));
+
+
+        return view('dorm.report.reportPerStudent', compact('studentName', 'applicationCat', 'warden', 'guard', 'id'));
     }
 
     /**
@@ -1200,8 +1217,11 @@ class DormController extends Controller
 
             $userId = Auth::id();
 
-            if ($catId != '' && !is_null($hasOrganizaton)) {
+            // if ($id != 6) {
+            //     dd("123");
+            // }
 
+            if ($catId != '' && !is_null($hasOrganizaton)) {
                 if ($catId == 0) {
                     $data = DB::table('student_outing')
                         ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
@@ -1229,10 +1249,7 @@ class DormController extends Controller
                         ->get();
                 }
 
-
-
                 $table = Datatables::of($data);
-
 
                 return $table->make(true);
             }

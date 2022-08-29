@@ -15,42 +15,50 @@ class CategoryExport implements FromCollection, ShouldAutoSize, WithHeadings
      * @return \Illuminate\Support\Collection
      */
 
-    public function __construct($organId, $dorm)
+    public function __construct($studentid, $category)
     {
-        $this->organId = $organId;
-        $this->dorm = $dorm;
+        $this->studentid = $studentid;
+        $this->category = $category;
     }
 
     public function collection()
     {
 
 
-        // dd($this->organId);
-        $studentlist = DB::table('class_student')
-            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
-            ->join('students', 'students.id', '=', 'class_student.student_id')
-            ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'co.class_id')
-            ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as blacklist')
-            ->where([
-                ['class_student.dorm_id', $this->dorm],
-                ['dorms.organization_id', $this->organId],
-            ])
-            ->orderBy('students.nama')
+        // dd($this->studentid);
+        $data = DB::table('student_outing')
+            ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+            ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
+            ->join('users as wardenUser', 'wardenUser.id', '=', 'warden.user_id')
+            ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
+            ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->where('class_student.id', $this->studentid)
+            ->where('student_outing.classification_id', '=', $this->category)
+            ->select(
+                'classifications.name as classificationName',
+                'student_outing.out_date_time as outTime',
+                'student_outing.reason',
+                'wardenUser.name as wardenName',
+                'student_outing.in_date_time as inTime',
+                'guardUser.name as guardName'
+            )->orderBy('student_outing.apply_date_time')
             ->get();
 
 
 
-        return $studentlist;
+        return $data;
     }
 
     public function headings(): array
     {
         return [
-            'Nama',
-            'Kelas',
-            'Dorm',
-            'Blacklist Status'
+            'Kategori Balik',
+            'Tarikh Masa Keluar',
+            'Sebab',
+            'Warden Bertanggungjawab',
+            'Tarikh Masa Masuk',
+            'Guard Bertanggungjawab'
         ];
     }
 }
