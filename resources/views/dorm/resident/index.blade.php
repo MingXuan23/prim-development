@@ -178,8 +178,6 @@
         var residentTable;
         var dormid;
 
-        // how to get the data pass using compact inside this function?
-        // can access from dorm1 but other than that one all cannot, do we want to change the concept?
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", $("#organization")[0].selectedIndex).trigger('change');
             fetchDorm($("#organization").val(), "#dorm");

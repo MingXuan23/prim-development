@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Exports\OutingExport;
 use App\Exports\ResidentExport;
+use App\Exports\AllRequestExport;
 use App\Exports\DormExport;
 use App\Imports\DormImport;
 use App\Imports\ResidentImport;
@@ -73,6 +74,12 @@ class DormController extends Controller
 
         // dd($roles);
         return view('dorm.index', compact('roles', 'organization', 'isblacklisted'));
+    }
+
+    public function indexReportAll()
+    {
+        $organization = $this->getOrganizationByUserId();
+        return view('dorm.report.allStudent', compact('organization'));
     }
 
     public function indexOuting()
@@ -154,6 +161,15 @@ class DormController extends Controller
             ->value('organizations.nama');
 
         return Excel::download(new OutingExport($request->organ), $filename . ' masa outing.xlsx');
+    }
+
+    public function allrequestexport(Request $request)
+    {
+        $this->validate($request, [
+            'organExport'      =>  'required',
+        ]);
+
+        return Excel::download(new AllRequestExport($request->organExport), 'Laporan Permintaan Keluar(Kategori).xlsx');
     }
 
     public function dormexport(Request $request)
@@ -1118,6 +1134,45 @@ class DormController extends Controller
         }
     }
 
+    public function getStudentOutingByCategory(Request $request)
+    {
+        if (request()->ajax()) {
+            $oid = $request->oid;
+
+            $hasOrganizaton = $request->hasOrganization;
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('students')
+                    ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                    ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                    ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                    ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+                    ->where([
+                        ['ou.organization_id', $oid],
+                    ])
+                    ->select('classifications.name as catname', DB::raw('count("so.id") as total'))
+                    ->groupBy('classifications.name')
+                    ->get();
+
+                $table = Datatables::of($data);
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="" class="btn btn-primary m-1">Edit</a>';
+                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                });
+
+                $table->rawColumns(['action']);
+                return $table->make(true);
+            }
+        }
+    }
+
     public function getResidentsDatatable(Request $request)
     {
         // dd($request->hasOrganization);
@@ -1496,17 +1551,19 @@ class DormController extends Controller
                 ])
                 ->value('organization_roles.nama');
 
+            $data = DB::table('students')
+            ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+            ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+            ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+            ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+            ->join('classifications', 'classifications.id', '=', 'so.classification_id');
+
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
                 //can view all application
                 if (Auth::user()->hasRole('Penjaga')) {
-                    $data = DB::table('students')
-                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-                        ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+                    $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
                             ['ou.user_id', Auth::user()->id],
@@ -1531,16 +1588,10 @@ class DormController extends Controller
                 }
                 //approved or kecemasan && havent expired
                 else if (Auth::user()->hasRole('Guard')) {
-                    $data = DB::table('students')
-                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-                        ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+                    $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
-                            // ['so.apply_date_time', now()->toDateString()],
+                            ['so.apply_date_time', now()->toDateString()],
 
                         ])
                         ->select(
@@ -1563,13 +1614,7 @@ class DormController extends Controller
                 }
                 // pending && havent expired
                 else {
-                    $data = DB::table('students')
-                        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-                        ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                        ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-                        ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+                    $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
                             ['so.status', 0],
@@ -1848,3 +1893,22 @@ class DormController extends Controller
         return redirect('/dorm')->with('success', 'Data is successfully updated');
     }
 }
+
+
+
+// DB::table('students')
+//                         ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+//                         ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+//                         ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+//                         ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+//                         ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+//                         ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+
+
+// DB::table('students')
+//                         ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+//                         ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+//                         ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+//                         ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+//                         ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+//                         ->join('classifications', 'classifications.id', '=', 'so.classification_id')

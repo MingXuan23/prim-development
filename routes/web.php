@@ -246,6 +246,7 @@ Route::post('/exportdormstudentlist', 'DormController@dormstudentlistexport')->n
 //report export
 Route::post('/exportallcategory', 'DormController@allcategoryexport')->name('exportallcategory');
 Route::post('/exportcategory', 'DormController@categoryexport')->name('exportcategory');
+Route::post('/exportallrequest', 'DormController@allrequestexport')->name('exportallrequest');
 
 
 
@@ -353,4 +354,7 @@ Route::group(['prefix' => 'dorm'], function () {
     //report
     Route::get('dorm/reportPerStudent/{id}', 'DormController@reportPerStudent')->name('dorm.reportPerStudent');
     Route::get('dorm/getReportDatatable/{id}', 'DormController@getReportDatatable')->name('dorm.getReportDatatable');
+    Route::get('dorm/getStudentOutingByCategory', 'DormController@getStudentOutingByCategory')->name('dorm.getStudentOutingByCategory');
+    Route::get('dorm/indexReportAll', 'DormController@indexReportAll')->name('dorm.indexReportAll');
+    
 });
