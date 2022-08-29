@@ -104,8 +104,6 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    $(document).ready(function() {
-        $('#telno').mask('+600000000000');
-    });
+
 </script>
 @endsection

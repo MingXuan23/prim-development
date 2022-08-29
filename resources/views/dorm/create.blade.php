@@ -5,6 +5,7 @@
 @endsection
 
 @section('content')
+
 {{-- <p>Welcome to this beautiful admin panel.</p> --}}
 <div class="row align-items-center">
     <div class="col-sm-6">
@@ -61,9 +62,21 @@
                         <label>Kategori</label>
                         <select name="category" id="category" class="form-control">
                             <option value="" disabled selected>Pilih Kategori Keluar</option>
-                            @foreach($category as $row)  
+                            @if($outinglimit->dorm_id != NULL)
+                                @foreach($category as $row)
+                                    @if(strtoupper($row->name) == $outing && $outingdate < date("Y-m-d"))
+                                    
+                                    @else
                                     <option value="{{ $row->id }}" >{{ $row->name }}</option>
-                            @endforeach
+                                    @endif
+                                @endforeach
+                            @else
+                                @foreach($category as $row)  
+                                    @if(strtoupper($row->name) == $balikKecemasan)
+                                        <option value="{{ $row->id }}" >{{ $row->name }}</option>
+                                    @endif
+                                @endforeach
+                            @endif
                         </select>
                     </div>
 
@@ -115,10 +128,13 @@
         if ($("#organization option:selected").text().toUpperCase() != "SM TEKNIKAL MELAKA") {
             if($("#category option:selected").text().toUpperCase() == "OUTINGS")
             {
-                start_date.max = start_date.min = start_date.value = $("#outingdate").val();
+                start_date.value = start_date.max = null;
+                start_date.value = start_date.min = start_date.max = $("#outingdate").val();
             }
             else if($("#category option:selected").text().toUpperCase() == "BALIK KHAS")
             {
+                start_date.value = start_date.max = null;
+
                 var today = new Date();
                 var day = today.getDate() + 3;
                 var month = today.getMonth();
@@ -129,6 +145,7 @@
             }
             else
             {
+                start_date.value = start_date.max = null;
                 start_date.min = new Date().toISOString().split("T")[0];
             }
         }

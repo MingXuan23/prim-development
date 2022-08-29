@@ -54,7 +54,7 @@
 
                     <div class="form-group">
                         <label>Tarikh dan Masa Masuk</label>
-                        <input onclick="this.showPicker()" onfocus="setMinDate();" class="form-control" id="end_date" name="end_date" type="datetime-local"
+                        <input onclick="this.showPicker()" class="form-control" id="end_date" name="end_date" type="datetime-local"
                                 placeholder="Pilih Tarikh Masuk">
                     </div>
 
@@ -84,6 +84,21 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
+
+    $(document).ready(function() {
+
+        var today = new Date();
+        today.setSeconds(0, 0);
+        var now = today.toISOString().replace(/:00.000Z/, "");
+
+        start_date.min = now;
+    });
+
+    $('#start_date').change(function() {
+        if (start_date.value != "") {
+            end_date.min = start_date.value;
+        }
+    });
 
 </script>
 @endsection

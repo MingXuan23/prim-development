@@ -1,3 +1,7 @@
+<!-- 要怎么做auto check out -->
+<!-- for block 超过6点那个 应该是for outings和住dorm的学生 而已 所以要改那个validation -->
+
+
 @extends('layouts.master')
 
 @section('css')
@@ -46,10 +50,10 @@
                         Pelajar dalam blacklist
                     </div>
                 @endif
-                @if($roles == "Penjaga" && $isblacklisted == 0)
+                @if($roles == "Penjaga")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
-                <!-- hai xu geng gai -->
+                <!-- hai xu geng gai  CHECKIN 是不是应该记录时间？-->
                 @if($roles == "Warden")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
                 @endif
@@ -82,11 +86,14 @@
                                 <th>Nama Pelajar</th>
                                 <th>No Tel Penjaga</th>
                                 <th>Tarikh keluar dimohon</th>
-                                <th>Alasan</th>
+                                <th>Kategori</th>
                                 @if($roles == "Penjaga" || $roles == "Guard")
+                                    <th>Status</th>
                                     <th>Tarikh dan Masa Keluar</th>
                                     <th>Tarikh dan Masa Sampai</th>
                                     <th>Tarikh dan Masa Masuk</th>
+                                @else
+                                    <th>Alasan</th>
                                 @endif
                                 <th>Action</th>
                             </tr>
@@ -115,6 +122,26 @@
             </div>
         </div>
         {{-- end confirmation delete modal --}}
+
+        {{-- confirmation unblock modal --}}
+        <div id="unblockConfirmationModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Unblock Pelajar</h4>
+                    </div>
+                    <div class="modal-body">
+                        Adakah anda pasti?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="unblock"
+                            name="delete">Unblock</button>
+                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- end confirmation unblock modal --}}
         
     </div>
 </div>
@@ -197,6 +224,11 @@
                         orderable: false,
                         searchable: false
                     },{
+                        data: "result",
+                        name: 'result',
+                        orderable: false,
+                        searchable: false
+                    },{
                         data: "out_date_time",
                         name: 'out_date_time',
                         orderable: false,
@@ -275,6 +307,11 @@
                         orderable: false,
                         searchable: false
                     },{
+                        data: "reason",
+                        name: 'reason',
+                        orderable: false,
+                        searchable: false
+                    },{
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -300,9 +337,38 @@
 
         var student_outing_id;
 
-        $(document).on('click', '.btn-danger', function(){
+        $(document).on('click', '.deleteBtn', function(){
             student_outing_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
+        });
+
+        $(document).on('click', '.unblockBtn', function(){
+            student_outing_id = $(this).attr('id');
+            $('#unblockConfirmationModal').modal('show');
+        });
+
+        $('#unblock').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    // _method: 'DELETE'
+                },
+                url: "/dorm/updateBlacklist/" + student_outing_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+
+                    $('div.flash-message').html(data);
+
+                    requestTable.ajax.reload();
+                },
+                error: function (data) {
+                    $('div.flash-message').html(data);
+                }
+            })
         });
 
         $('#delete').click(function() {
@@ -328,6 +394,8 @@
                 }
             })
         });
+
+        
 
         $('.alert').delay(3000).fadeOut();
 

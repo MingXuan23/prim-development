@@ -308,7 +308,8 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/updateApprove/{id}', 'DormController@updateApprove')->name('dorm.updateApprove');
     Route::get('dorm/updateTolak/{id}', 'DormController@updateTolak')->name('dorm.updateTolak');
     Route::get('dorm/updateCheckIn', 'DormController@updateCheckIn')->name('dorm.updateCheckIn');
-
+    Route::get('dorm/updateBlacklist/{id}', 'DormController@updateBlacklist')->name('dorm.updateBlacklist');
+    
     // outing
     Route::get('dorm/storeOuting', 'DormController@storeOuting')->name('dorm.storeOuting');
     Route::get('dorm/indexOuting', 'DormController@indexOuting')->name('dorm.indexOuting');
