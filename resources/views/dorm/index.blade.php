@@ -135,7 +135,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" data-dismiss="modal" class="btn btn-primary" id="unblock"
-                            name="delete">Unblock</button>
+                            name="unblock">Unblock</button>
                         <button type="button" data-dismiss="modal" class="btn">Batal</button>
                     </div>
                 </div>
@@ -348,24 +348,26 @@
         });
 
         $('#unblock').click(function() {
+            console.log(student_outing_id);
             $.ajax({
-                type: 'POST',
+                type: 'GET',
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
                     // _method: 'DELETE'
                 },
-                url: "/dorm/updateBlacklist/" + student_outing_id,
+                url: "/dorm/dorm/updateBlacklist/" + student_outing_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
                     }, 2000);
-
+                    
                     $('div.flash-message').html(data);
 
                     requestTable.ajax.reload();
                 },
                 error: function (data) {
+                    console.log("hellllll");
                     $('div.flash-message').html(data);
                 }
             })
