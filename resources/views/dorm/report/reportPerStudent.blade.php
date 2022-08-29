@@ -69,7 +69,9 @@
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
+                                <th>Kategori</th>
                                 <th>Tarikh Masa Keluar</th>
+                                <th>Sebab Balik</th>
                                 <th>Warden Bertanggungjawab</th>
                                 <th>Tarikh Masa Masuk</th>
                                 <th>Guard Bertanggungjawab</th>
@@ -162,406 +164,275 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    // $(document).ready(function() {
+    $(document).ready(function() {
 
-    var studentTable;
+        var studentTable;
+        var student_id;
 
+        if ($("#applicationCategory").val() != "") {
+            $("#applicationCategory").prop("selectedIndex", 0).trigger('change');
+            fetch_data($("#applicationCategory").val());
+        }
 
-    //     if ($("#organization").val() != "") {
-    //         $("#organization").prop("selectedIndex", 1).trigger('change');
-    //         fetchDorm($("#organization").val(), '#asrama');
-    //         fetch_data($("#organization").val());
-    //     }
+        $(document).on('click', '.reportBtn', function() {
+            student_id = $(this).attr('id');
+        });
 
-    //     function fetchDorm(organizationid = '', dormId = '') {
-    //         var _token = $('input[name="_token"]').val();
-    //         $.ajax({
-    //             url: "{{ route('dorm.fetchDorm') }}",
-    //             method: "POST",
-    //             data: {
-    //                 oid: organizationid,
-    //                 _token: _token
-    //             },
-    //             success: function(result) {
-    //                 $(dormId).empty();
-    //                 $(dormId).append("<option value='0'  selected> All</option>");
-    //                 jQuery.each(result.success, function(key, value) {
-    //                     // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
-    //                     $(dormId).append("<option value='" + value.id + "'>" + value.name + "</option>");
-    //                 });
-    //             }
-    //         })
-    //     }
+        $('#applicationCategory').change(function() {
+            var catId = $("#applicationCategory option:selected").val();
+            $('#reasonTable').DataTable().destroy();
 
-    //     $('#asrama').change(function() {
-    //         var organizationid = $("#organization option:selected").val();
+            // if (catId == 0) {
+            fetch_data(catId);
+            // } else {
+            //     fetch_reason_data(catId);
+            // }
+        });
 
-    //         var dormid = $("#asrama option:selected").val();
-    //         $('#studentTable').DataTable().destroy();
+        //for particular reason
+        // function fetch_reason_data(catId = '') {
+        //     reasonTable = $('#reasonTable').DataTable({
+        //         processing: true,
+        //         serverSide: true,
+        //         ajax: {
+        //             url: "{{ route('dorm.getDormStudentlistDatatable') }}",
+        //             data: {
+        //                 catId: catId,
+        //                 hasOrganization: true
+        //             },
+        //             type: 'GET'
 
-    //         if (dormid == 0) {
-    //             fetch_data(organizationid);
-    //         } else {
-    //             fetch_dorm_data(dormid);
-    //         }
-    //     });
+        //         },
+        //         'columnDefs': [{
+        //             "targets": [0], // your case first column
+        //             "className": "text-center",
+        //             "width": "2%"
+        //         }, {
+        //             "targets": [1, 2, 3, 4, 5], // your case first column
+        //             "className": "text-center",
+        //         }, ],
+        //         order: [
+        //             [1, 'asc']
+        //         ],
+        //         columns: [{
+        //             "data": null,
+        //             searchable: false,
+        //             "sortable": false,
+        //             render: function(data, type, row, meta) {
+        //                 return meta.row + meta.settings._iDisplayStart + 1;
+        //             }
+        //         }, {
+        //             data: 'studentName',
+        //             name: 'studentName',
+        //             orderable: true,
+        //             searchable: true,
+        //         }, {
+        //             data: 'className',
+        //             name: 'className',
+        //             orderable: true,
+        //             searchable: true,
+        //         }, {
+        //             data: 'dormName',
+        //             name: 'dormName',
+        //             orderable: true,
+        //             searchable: true,
+        //         }, {
+        //             data: 'status',
+        //             name: 'status',
+        //             orderable: false,
+        //             searchable: false
+        //         }, {
+        //             data: 'action',
+        //             name: 'action',
+        //             orderable: false,
+        //             searchable: false
+        //         }, ]
+        //     });
 
-    //     //for particular dorm
-    //     function fetch_dorm_data(dormid = '') {
-    //         studentTable = $('#studentTable').DataTable({
-    //             processing: true,
-    //             serverSide: true,
-    //             ajax: {
-    //                 url: "{{ route('dorm.getDormStudentlistDatatable') }}",
-    //                 data: {
-    //                     dormid: dormid,
-    //                     hasOrganization: true
-    //                 },
-    //                 type: 'GET'
-
-    //             },
-    //             'columnDefs': [{
-    //                 "targets": [0], // your case first column
-    //                 "className": "text-center",
-    //                 "width": "2%"
-    //             }, {
-    //                 "targets": [1, 2, 3, 4, 5], // your case first column
-    //                 "className": "text-center",
-    //             }, ],
-    //             order: [
-    //                 [1, 'asc']
-    //             ],
-    //             columns: [{
-    //                 "data": null,
-    //                 searchable: false,
-    //                 "sortable": false,
-    //                 render: function(data, type, row, meta) {
-    //                     return meta.row + meta.settings._iDisplayStart + 1;
-    //                 }
-    //             }, {
-    //                 data: 'studentName',
-    //                 name: 'studentName',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'className',
-    //                 name: 'className',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'dormName',
-    //                 name: 'dormName',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'status',
-    //                 name: 'status',
-    //                 orderable: false,
-    //                 searchable: false
-    //             }, {
-    //                 data: 'action',
-    //                 name: 'action',
-    //                 orderable: false,
-    //                 searchable: false
-    //             }, ]
-    //         });
-
-    //     }
-
-    //     //for particular dorm blacklist
-    //     function fetch_dorm_blacklist_data(dormid = '') {
-    //         studentTable = $('#studentTable').DataTable({
-    //             processing: true,
-    //             serverSide: true,
-    //             ajax: {
-    //                 url: "{{ route('dorm.getDormBlacklistStudentlistDatatable') }}",
-    //                 data: {
-    //                     dormid: dormid,
-    //                     hasOrganization: true
-    //                 },
-    //                 type: 'GET'
-
-    //             },
-    //             'columnDefs': [{
-    //                 "targets": [0], // your case first column
-    //                 "className": "text-center",
-    //                 "width": "2%"
-    //             }, {
-    //                 "targets": [1, 2, 3, 4, 5], // your case first column
-    //                 "className": "text-center",
-    //             }, ],
-    //             order: [
-    //                 [1, 'asc']
-    //             ],
-    //             columns: [{
-    //                 "data": null,
-    //                 searchable: false,
-    //                 "sortable": false,
-    //                 render: function(data, type, row, meta) {
-    //                     return meta.row + meta.settings._iDisplayStart + 1;
-    //                 }
-    //             }, {
-    //                 data: 'studentName',
-    //                 name: 'studentName',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'className',
-    //                 name: 'className',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'dormName',
-    //                 name: 'dormName',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'status',
-    //                 name: 'status',
-    //                 orderable: false,
-    //                 searchable: false
-    //             }, {
-    //                 data: 'action',
-    //                 name: 'action',
-    //                 orderable: false,
-    //                 searchable: false
-    //             }, ]
-    //         });
-
-    //     }
-
-    //     //for all dorms
-    //     function fetch_data(oid = '') {
-    //         studentTable = $('#studentTable').DataTable({
-    //             processing: true,
-    //             serverSide: true,
-    //             ajax: {
-    //                 url: "{{ route('dorm.getAllStudentlistDatatable') }}",
-    //                 data: {
-    //                     oid: oid,
-    //                     hasOrganization: true
-    //                 },
-    //                 type: 'GET'
-
-    //             },
-    //             'columnDefs': [{
-    //                 "targets": [0], // your case first column
-    //                 "className": "text-center",
-    //                 "width": "2%"
-    //             }, {
-    //                 "targets": [1, 2, 3, 4, 5], // your case first column
-    //                 "className": "text-center",
-    //             }, ],
-    //             order: [
-    //                 [1, 'asc']
-    //             ],
-    //             columns: [{
-    //                 "data": null,
-    //                 searchable: false,
-    //                 "sortable": false,
-    //                 render: function(data, type, row, meta) {
-    //                     return meta.row + meta.settings._iDisplayStart + 1;
-    //                 }
-    //             }, {
-    //                 data: 'studentName',
-    //                 name: 'studentName',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'className',
-    //                 name: 'className',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'dormName',
-    //                 name: 'dormName',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: 'status',
-    //                 name: 'status',
-    //                 orderable: false,
-    //                 searchable: false
-    //             }, {
-    //                 data: 'action',
-    //                 name: 'action',
-    //                 orderable: false,
-    //                 searchable: false
-    //             }, ]
-    //         });
-
-    //     }
-
-    //     //for blacklist from all dorm
-    //     function fetch_blacklist_data(oid = '') {
-
-    //         studentTable = $('#studentTable').DataTable({
-    //             processing: true,
-    //             serverSide: true,
-    //             ajax: {
-    //                 url: "{{ route('dorm.getBlacklistStudentlistDatatable') }}",
-    //                 data: {
-    //                     oid: oid,
-    //                     hasOrganization: true
-    //                 },
-    //                 type: 'GET'
-    //             },
-    //             'columnDefs': [{
-    //                 "targets": [0], // your case first column
-    //                 "className": "text-center",
-    //                 "width": "2%"
-    //             }, {
-    //                 "targets": [1, 2, 3, 4, 5], // your case first column
-    //                 "className": "text-center",
-    //             }, ],
-    //             order: [
-    //                 [1, 'asc']
-    //             ],
-    //             columns: [{
-    //                 "data": null,
-    //                 searchable: false,
-    //                 "sortable": false,
-    //                 render: function(data, type, row, meta) {
-    //                     return meta.row + meta.settings._iDisplayStart + 1;
-    //                 }
-    //             }, {
-    //                 data: "studentName",
-    //                 name: 'studentName',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: "className",
-    //                 name: 'className',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: "dormName",
-    //                 name: 'dormName',
-    //                 orderable: true,
-    //                 searchable: true,
-    //             }, {
-    //                 data: "status",
-    //                 name: 'status',
-    //                 orderable: false,
-    //                 searchable: false
-    //             }, {
-    //                 data: 'action',
-    //                 name: 'action',
-    //                 orderable: false,
-    //                 searchable: false
-    //             }, ]
-    //         });
-
-    //     }
+        // }
 
 
 
-    //     $('#organization').change(function() {
-    //         var organizationid = $("#organization option:selected").val();
-    //         $('#studentTable').DataTable().destroy();
-    //         fetchDorm(organizationid, '#asrama');
-    //         fetch_data(organizationid);
-    //     });
+        //for all reasons
+        function fetch_data(catId = '') {
+            reasonTable = $('#reasonTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "/dorm/dorm/getReportDatatable/" + student_id,
+                    data: {
+                        catId: catId,
+                        hasOrganization: true
+                    },
+                    type: 'GET'
 
-    //     $(document).on('click', '.allBtn', function() {
-    //         var organizationid = $("#organization option:selected").val();
-    //         $('#studentTable').DataTable().destroy();
-    //         var dormid = $("#asrama option:selected").val();
-    //         if (dormid == 0) {
-    //             fetch_data(organizationid);
-    //         } else {
-    //             fetch_dorm_data(dormid);
-    //         }
-    //     });
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "className": "text-center",
+                }, ],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                        "data": null,
+                        searchable: false,
+                        "sortable": false,
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    //                  <th>Kategori</th>
+                    //                 <th>Tarikh Masa Keluar</th>
+                    //                 <th>Sebab Balik</th>
+                    //                 <th>Warden Bertanggungjawab</th>
+                    //                 <th>Tarikh Masa Masuk</th>
+                    //                 <th>Guard Bertanggungjawab</th>
 
-    //     $(document).on('click', '.blacklistBtn', function() {
-    //         var organizationid = $("#organization option:selected").val();
-    //         $('#studentTable').DataTable().destroy();
-    //         var dormid = $("#asrama option:selected").val();
-    //         if (dormid == 0) {
-    //             fetch_blacklist_data(organizationid);
-    //         } else {
-    //             fetch_dorm_blacklist_data(dormid);
-    //         }
+                    //('student_outing.out_date_time as outTime', 'student_outing.in_date_time as inTime', 
+                    //'wardenUser.name as wardenName', 'guardUser.name as guardName', 
+                    //'classifications.name as classificationName', 'student_outing.reason')
 
-    //     });
+                    {
+                        data: 'classificationName',
+                        name: 'classificationName',
+                        orderable: false,
+                        searchable: true,
+                    }, {
+                        data: 'outTime',
+                        name: 'outTime',
+                        orderable: false,
+                        searchable: false,
+                    }, {
+                        data: 'reason',
+                        name: 'reason',
+                        orderable: false,
+                        searchable: false,
+                    }, {
+                        data: 'wardenName',
+                        name: 'wardenName',
+                        orderable: false,
+                        searchable: true,
+                    }, {
+                        data: 'inTime',
+                        name: 'inTime',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: 'guardName',
+                        name: 'guardName',
+                        orderable: false,
+                        searchable: false
+                    },
+                ]
+            });
 
-    //     // csrf token for ajax
-    //     $.ajaxSetup({
-    //         headers: {
-    //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    //         }
-    //     });
+        }
 
-    //     var student_id;
-    //     var block_status = 0;
+        $('#organization').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#studentTable').DataTable().destroy();
+            fetchDorm(organizationid, '#asrama');
+            fetch_data(organizationid);
+        });
 
-    //     $(document).on('click', '.blockBtn', function() {
-    //         student_id = $(this).attr('id');
-    //         $('#blockConfirmationModal').modal('show');
-    //     });
+        $(document).on('click', '.allBtn', function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#studentTable').DataTable().destroy();
+            var dormid = $("#asrama option:selected").val();
+            if (dormid == 0) {
+                fetch_data(organizationid);
+            } else {
+                fetch_dorm_data(dormid);
+            }
+        });
 
-    //     $(document).on('click', '.unblockBtn', function() {
-    //         student_id = $(this).attr('id');
-    //         $('#unblockConfirmationModal').modal('show');
-    //     });
+        $(document).on('click', '.blacklistBtn', function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#studentTable').DataTable().destroy();
+            var dormid = $("#asrama option:selected").val();
+            if (dormid == 0) {
+                fetch_blacklist_data(organizationid);
+            } else {
+                fetch_dorm_blacklist_data(dormid);
+            }
 
-    //     $('#block').click(function() {
-    //         block_status = 1;
-    //         $.ajax({
-    //             type: 'POST',
-    //             dataType: 'html',
-    //             data: {
-    //                 "_token": "{{ csrf_token() }}",
-    //                 //_method: 'DELETE'
-    //             },
-    //             url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
-    //             success: function(data) {
-    //                 setTimeout(function() {
-    //                     $('#confirmModal').modal('hide');
-    //                 }, 2000);
-    //                 console.log("it Works");
+        });
 
-    //                 $('div.flash-message').html(data);
+        // csrf token for ajax
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
 
-    //                 studentTable.ajax.reload();
-    //             },
-    //             error: function(data) {
-    //                 console.log("it doesn't Works");
 
-    //                 $('div.flash-message').html(data);
-    //             }
-    //         })
-    //     });
 
-    //     $('#unblock').click(function() {
-    //         block_status = 0;
-    //         $.ajax({
-    //             type: 'POST',
-    //             dataType: 'html',
-    //             data: {
-    //                 "_token": "{{ csrf_token() }}",
-    //                 //_method: 'DELETE'
-    //             },
-    //             url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
-    //             success: function(data) {
-    //                 setTimeout(function() {
-    //                     $('#confirmModal').modal('hide');
-    //                 }, 2000);
-    //                 console.log("it Works");
+        // $(document).on('click', '.unblockBtn', function() {
+        //     student_id = $(this).attr('id');
+        //     $('#unblockConfirmationModal').modal('show');
+        // });
 
-    //                 $('div.flash-message').html(data);
+        // $('#block').click(function() {
+        //     block_status = 1;
+        //     $.ajax({
+        //         type: 'POST',
+        //         dataType: 'html',
+        //         data: {
+        //             "_token": "{{ csrf_token() }}",
+        //             //_method: 'DELETE'
+        //         },
+        //         url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
+        //         success: function(data) {
+        //             setTimeout(function() {
+        //                 $('#confirmModal').modal('hide');
+        //             }, 2000);
+        //             console.log("it Works");
 
-    //                 studentTable.ajax.reload();
-    //             },
-    //             error: function(data) {
-    //                 $('div.flash-message').html(data);
-    //             }
-    //         })
-    //     });
+        //             $('div.flash-message').html(data);
 
-    //     $('.alert').delay(3000).fadeOut();
+        //             studentTable.ajax.reload();
+        //         },
+        //         error: function(data) {
+        //             console.log("it doesn't Works");
 
-    // });
+        //             $('div.flash-message').html(data);
+        //         }
+        //     })
+        // });
+
+        // $('#unblock').click(function() {
+        //     block_status = 0;
+        //     $.ajax({
+        //         type: 'POST',
+        //         dataType: 'html',
+        //         data: {
+        //             "_token": "{{ csrf_token() }}",
+        //             //_method: 'DELETE'
+        //         },
+        //         url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
+        //         success: function(data) {
+        //             setTimeout(function() {
+        //                 $('#confirmModal').modal('hide');
+        //             }, 2000);
+        //             console.log("it Works");
+
+        //             $('div.flash-message').html(data);
+
+        //             studentTable.ajax.reload();
+        //         },
+        //         error: function(data) {
+        //             $('div.flash-message').html(data);
+        //         }
+        //     })
+        // });
+
+        // $('.alert').delay(3000).fadeOut();
+
+    });
 </script>
 @endsection
