@@ -127,7 +127,8 @@
 
     
     $("#category").change(function() {
-        if ($("#organization option:selected").text().toUpperCase() != "SM TEKNIKAL MELAKA") {
+        if ($("#organization option:selected").text().toUpperCase() == "SEKOLAH MENENGAH TEKNIK MELAKA" ||
+        $("#organization option:selected").text().toUpperCase() == "SEKOLAH MENENGAH TEKNIK BUKIT PIATU") {
             if($("#category option:selected").text().toUpperCase() == "OUTINGS")
             {
                 start_date.value = start_date.max = null;
@@ -150,6 +151,10 @@
                 start_date.value = start_date.max = null;
                 start_date.min = new Date().toISOString().split("T")[0];
             }
+        }
+        else{
+            start_date.value = start_date.max = null;
+            start_date.min = new Date().toISOString().split("T")[0];
         }
     });
 

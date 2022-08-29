@@ -29,6 +29,18 @@
                         @endforeach
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label>Tarikh Mula</label>
+                    <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
+                            placeholder="Pilih Tarikh Mula">
+                </div>
+
+                <div class="form-group">
+                    <label>Tarikh Tamat</label>
+                    <input onclick="this.showPicker()" class="form-control" id="end_date" name="end_date" type="date"
+                            placeholder="Pilih Tarikh Tamat">
+                </div>
             </div>
 
         </div>
@@ -129,7 +141,8 @@
 
 <script>
     $(document).ready(function(){
- 
+        end_date.min = start_date.min = end_date.value = start_date.value = new Date().toISOString().split("T")[0];
+        
         var requestTable;
 
         if ($("#organization").val() != "") {
@@ -147,6 +160,8 @@
                     url: "{{ route('dorm.getStudentOutingByCategory') }}",
                     data: {
                         oid: oid,
+                        start_date: $("#start_date").val(),
+                        end_date: $("#end_date").val(),
                         hasOrganization: true
                     },
                     type: 'GET',
@@ -187,6 +202,18 @@
         }
 
         $('#organization').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#requestTable').DataTable().destroy();
+            fetch_data(organizationid);
+        });
+
+        $('#end_date').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#requestTable').DataTable().destroy();
+            fetch_data(organizationid);
+        });
+
+        $('#start_date').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('#requestTable').DataTable().destroy();
             fetch_data(organizationid);

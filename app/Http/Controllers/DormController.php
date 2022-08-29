@@ -1156,9 +1156,12 @@ class DormController extends Controller
         if (request()->ajax()) {
             $oid = $request->oid;
 
+            $start_date = $request->get('start_date');
+            $end_date = $request->get('end_date');
+
             $hasOrganizaton = $request->hasOrganization;
 
-            if ($oid != '' && !is_null($hasOrganizaton)) {
+            if ($oid != '' && !is_null($hasOrganizaton) && $start_date != '' && $end_date != '') {
 
                 $data = DB::table('students')
                     ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -1170,6 +1173,7 @@ class DormController extends Controller
                     ->where([
                         ['ou.organization_id', $oid],
                     ])
+                    ->whereBetween('so.apply_date_time', [$start_date, $end_date])
                     ->select('classifications.name as catname', DB::raw('count("so.id") as total'))
                     ->groupBy('classifications.name')
                     ->get();
