@@ -356,5 +356,6 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/getReportDatatable/{id}', 'DormController@getReportDatatable')->name('dorm.getReportDatatable');
     Route::get('dorm/getStudentOutingByCategory', 'DormController@getStudentOutingByCategory')->name('dorm.getStudentOutingByCategory');
     Route::get('dorm/indexReportAll', 'DormController@indexReportAll')->name('dorm.indexReportAll');
+    Route::get('dorm/resetOutingLimit', 'DormController@resetOutingLimit')->name('dorm.resetOutingLimit');
     
 });

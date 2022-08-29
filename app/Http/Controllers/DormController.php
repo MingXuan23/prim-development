@@ -1909,23 +1909,31 @@ class DormController extends Controller
             ]);
         return redirect('/dorm')->with('success', 'Data is successfully updated');
     }
+
+    public function resetOutingLimit(){
+        $organization = $this->getOrganizationByUserId();
+        if(Auth::user()->hasRole('Superadmin')){
+            $result = DB::table('class_student')
+            ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
+            ->where([
+                ['class_student.status', 1],
+            ])
+            ->update(['class_student.outing_limit' => NULL]);
+        }
+        else{
+            $result = DB::table('class_student')
+            ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
+            ->where([
+                ['class_student.status', 1],
+                ['co.organization_id', $organization[0]->id],
+            ])
+            ->update(['class_student.outing_limit' => NULL]);
+        }
+
+        if($result){
+            return redirect('/dorm/dorm/indexReportAll')->with('success', 'Data is successfully updated');
+        }else{
+            return redirect('/dorm/dorm/indexReportAll')->withErrors('Failed to update data');
+        }
+    }
 }
-
-
-
-// DB::table('students')
-//                         ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-//                         ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-//                         ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-//                         ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-//                         ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-//                         ->join('classifications', 'classifications.id', '=', 'so.classification_id')
-
-
-// DB::table('students')
-//                         ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-//                         ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-//                         ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-//                         ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-//                         ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-//                         ->join('classifications', 'classifications.id', '=', 'so.classification_id')

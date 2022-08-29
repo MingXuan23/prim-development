@@ -147,7 +147,6 @@
                                 <span>Asrama</span>
                             </a>
                             <ul class="sub-menu mm-collapse" aria-expanded="false">
-
                                 @role('Superadmin|Pentadbir|Guru|Warden|Penjaga|Guard')
                                 <li>
                                     <!-- need to change to index later -->
@@ -193,9 +192,15 @@
                                     </a>
                                 </li>
                                 @endrole
-
-
                             </ul>
+                        </li>
+                        @endrole
+                        @role('Superadmin|Pentadbir|Guru|Warden')
+                        <li>
+                            <a href="{{ route('dorm.indexReportAll') }}" class=" waves-effect">
+                                <i class="fas fa-list-ul"></i>
+                                <span>Laporan</span>
+                            </a>
                         </li>
                         @endrole
                     </ul>

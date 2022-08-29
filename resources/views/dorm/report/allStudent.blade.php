@@ -39,6 +39,7 @@
             <div class="card-header">Senarai</div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
+                <a style="margin: 19px; float: right;" href="{{ route('dorm.resetOutingLimit') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Set Outing Limit To Empty</a>
             </div>
 
             <div class="card-body">
