@@ -21,7 +21,7 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label> Dorm</label>
+                    <label> Sebab Kategori</label>
                     <select name="applicationCategory" id="applicationCategory" class="form-control">
                         <option value="0" selected>All</option>
                         @foreach($applicationCat as $row)
@@ -39,10 +39,11 @@
         <div class="card">
             <div class="card-header">Laporan {{$studentName->studentName}}</div>
             <div>
+                <span hidden id="getId">{{$id}}</span>
                 <!-- <a style="margin: 19px;" href="#" class="btn btn-primary allBtn"> <i class="far fa-id-badge"></i> All</a>
                 <a style="margin: 19px;" href="#" class="btn btn-primary blacklistBtn"> <i class="far fa-id-badge"></i> Blacklist</a>-->
-                <a style="margin: 19px; float: right;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export Category</a>
-                <a style="margin: 19px; float: right;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Export All</a>
+                <a style="margin: 19px; float: right;" href="#" class="btn btn-success exportCat" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export Category</a>
+                <a style="margin: 19px; float: right;" href="#" class="btn btn-success exportAll" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Export All</a>
             </div>
 
             <div class="card-body">
@@ -79,74 +80,68 @@
                         </thead>
                     </table>
                 </div>
-            </div>
-        </div>
 
-        <!-- export particular reason modal-->
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Export Category</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <!-- export category -->
-                    <form action="{{ route('exportcategoryreason') }}" method="post">
-                        <div class="modal-body">
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <!-- category list -->
-                                <label>Kategori</label>
-                                <select name="dorm" id="dorm" class="form-control">
-                                    <option value="" selected disabled>Pilih Kategori</option>
-                                    @foreach($applicationCat as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                    @endforeach
-                                </select>
+                <!-- export particular reason modal-->
+                <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Export Category</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
                             </div>
-                            <div class="modal-footer">
-                                <button id="buttonExportCategory" type="submit" class="btn btn-primary">Export Kategori</button>
-                            </div>
+                            <!-- export category -->
+                            <form action="{{ route('exportcategory') }}" method="post">
+                                <div class="modal-body">
+                                    {{ csrf_field() }}
+                                    <div class="form-group">
+                                        <!-- category list -->
+                                        <label>Kategori</label>
+                                        <select name="category" id="category" class="form-control">
+                                            <option value="" selected disabled>Pilih Kategori</option>
+                                            @foreach($applicationCat as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <input name="studentid" value="{{$id}}" hidden></input>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Export Kategori</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
+                </div>
+
+                <!-- export all reason modal-->
+                <div class="modal fade" id="modelId2" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Export All</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <!-- export pelajar -->
+                            <form action="{{ route('exportallcategory') }}" method="post">
+                                <div class="modal-footer">
+                                    {{ csrf_field() }}
+                                    <input name="studentid" value="{{$id}}" hidden></input>
+
+                                    <button type="submit" class="btn btn-primary">Export Semua</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- export all reason modal-->
-        <div class="modal fade" id="modelId2" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Export Pelajar</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <!-- export pelajar -->
-                    <form action="{{ route('exportallstudentlist') }}" method="post">
-                        <div class="modal-body">
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    <option value="" selected disabled>Pilih Organisasi</option>
-                                    <!-- @foreach($organization as $row)
-                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                    @endforeach -->
-                                </select>
-                            </div>
 
-                            <div class="modal-footer">
-                                <button id="buttonExportAll" type="submit" class="btn btn-primary">Export Semua</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -167,93 +162,22 @@
     $(document).ready(function() {
 
         var studentTable;
-        var student_id;
+        var student_id = $("#getId").html();
+
+
 
         if ($("#applicationCategory").val() != "") {
             $("#applicationCategory").prop("selectedIndex", 0).trigger('change');
             fetch_data($("#applicationCategory").val());
         }
 
-        $(document).on('click', '.reportBtn', function() {
-            student_id = $(this).attr('id');
-        });
-
         $('#applicationCategory').change(function() {
             var catId = $("#applicationCategory option:selected").val();
             $('#reasonTable').DataTable().destroy();
 
-            // if (catId == 0) {
             fetch_data(catId);
-            // } else {
-            //     fetch_reason_data(catId);
-            // }
         });
 
-        //for particular reason
-        // function fetch_reason_data(catId = '') {
-        //     reasonTable = $('#reasonTable').DataTable({
-        //         processing: true,
-        //         serverSide: true,
-        //         ajax: {
-        //             url: "{{ route('dorm.getDormStudentlistDatatable') }}",
-        //             data: {
-        //                 catId: catId,
-        //                 hasOrganization: true
-        //             },
-        //             type: 'GET'
-
-        //         },
-        //         'columnDefs': [{
-        //             "targets": [0], // your case first column
-        //             "className": "text-center",
-        //             "width": "2%"
-        //         }, {
-        //             "targets": [1, 2, 3, 4, 5], // your case first column
-        //             "className": "text-center",
-        //         }, ],
-        //         order: [
-        //             [1, 'asc']
-        //         ],
-        //         columns: [{
-        //             "data": null,
-        //             searchable: false,
-        //             "sortable": false,
-        //             render: function(data, type, row, meta) {
-        //                 return meta.row + meta.settings._iDisplayStart + 1;
-        //             }
-        //         }, {
-        //             data: 'studentName',
-        //             name: 'studentName',
-        //             orderable: true,
-        //             searchable: true,
-        //         }, {
-        //             data: 'className',
-        //             name: 'className',
-        //             orderable: true,
-        //             searchable: true,
-        //         }, {
-        //             data: 'dormName',
-        //             name: 'dormName',
-        //             orderable: true,
-        //             searchable: true,
-        //         }, {
-        //             data: 'status',
-        //             name: 'status',
-        //             orderable: false,
-        //             searchable: false
-        //         }, {
-        //             data: 'action',
-        //             name: 'action',
-        //             orderable: false,
-        //             searchable: false
-        //         }, ]
-        //     });
-
-        // }
-
-
-
-        //for all reasons
         function fetch_data(catId = '') {
             reasonTable = $('#reasonTable').DataTable({
                 processing: true,
@@ -264,7 +188,7 @@
                         catId: catId,
                         hasOrganization: true
                     },
-                    type: 'GET'
+                    type: 'GET',
 
                 },
                 'columnDefs': [{
@@ -272,7 +196,7 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "targets": [1, 2, 3, 4, 5, 6], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
@@ -286,23 +210,13 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     },
-                    //                  <th>Kategori</th>
-                    //                 <th>Tarikh Masa Keluar</th>
-                    //                 <th>Sebab Balik</th>
-                    //                 <th>Warden Bertanggungjawab</th>
-                    //                 <th>Tarikh Masa Masuk</th>
-                    //                 <th>Guard Bertanggungjawab</th>
-
-                    //('student_outing.out_date_time as outTime', 'student_outing.in_date_time as inTime', 
-                    //'wardenUser.name as wardenName', 'guardUser.name as guardName', 
-                    //'classifications.name as classificationName', 'student_outing.reason')
-
                     {
                         data: 'classificationName',
                         name: 'classificationName',
                         orderable: false,
                         searchable: true,
-                    }, {
+                    },
+                    {
                         data: 'outTime',
                         name: 'outTime',
                         orderable: false,
@@ -333,36 +247,6 @@
 
         }
 
-        $('#organization').change(function() {
-            var organizationid = $("#organization option:selected").val();
-            $('#studentTable').DataTable().destroy();
-            fetchDorm(organizationid, '#asrama');
-            fetch_data(organizationid);
-        });
-
-        $(document).on('click', '.allBtn', function() {
-            var organizationid = $("#organization option:selected").val();
-            $('#studentTable').DataTable().destroy();
-            var dormid = $("#asrama option:selected").val();
-            if (dormid == 0) {
-                fetch_data(organizationid);
-            } else {
-                fetch_dorm_data(dormid);
-            }
-        });
-
-        $(document).on('click', '.blacklistBtn', function() {
-            var organizationid = $("#organization option:selected").val();
-            $('#studentTable').DataTable().destroy();
-            var dormid = $("#asrama option:selected").val();
-            if (dormid == 0) {
-                fetch_blacklist_data(organizationid);
-            } else {
-                fetch_dorm_blacklist_data(dormid);
-            }
-
-        });
-
         // csrf token for ajax
         $.ajaxSetup({
             headers: {
@@ -370,10 +254,13 @@
             }
         });
 
+        // $(document).on('click', '.exportAll', function() {
+        //     //student_id = $(this).attr('id');
+        //     $('#unblockConfirmationModal').modal('show');
+        // });
 
-
-        // $(document).on('click', '.unblockBtn', function() {
-        //     student_id = $(this).attr('id');
+        // $(document).on('click', '.exportCat', function() {
+        //     //student_id = $(this).attr('id');
         //     $('#unblockConfirmationModal').modal('show');
         // });
 
