@@ -44,7 +44,16 @@ class TeacherController extends Controller
     public function perananindex()
     {
         $organization = $this->getOrganizationByUserId();
-        return view('dorm.warden.index', compact('organization'));
+
+        $roles = DB::table('organization_roles')
+            ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+            ->where([
+                ['ou.user_id', Auth::user()->id],
+                ['ou.organization_id', $organization[0]->id],
+            ])
+            ->value('organization_roles.nama');
+
+        return view('dorm.warden.index', compact('organization', 'roles'));
     }
 
     public function teacherexport(Request $request)

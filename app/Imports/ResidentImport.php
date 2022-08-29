@@ -167,7 +167,9 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
                         [
                             'cs.dorm_id' => $this->dorm_id,
                             'cs.start_date_time' => now()->toDateTimeString(),
-                            'cs.end_date_time' => null
+                            'cs.end_date_time' => null,
+                            // 'cs.outing_status' => 0,
+                            // 'cs.blacklist' => 0
                         ]
                     );
                 //if successfully update the dorm id and start date time to the class student
