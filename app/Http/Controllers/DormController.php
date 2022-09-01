@@ -263,7 +263,7 @@ class DormController extends Controller
 
         // dd($studentName);
 
-        return Excel::download(new AllCategoryExport($request->studentid), $studentName . ' report.xlsx');
+        return Excel::download(new AllCategoryExport($request->studentid, $request->fromTime, $request->untilTime), $studentName . ' report.xlsx');
     }
 
     public function categoryexport(Request $request)
@@ -275,7 +275,7 @@ class DormController extends Controller
             ->value('students.nama');
         // ->first();
 
-        return Excel::download(new CategoryExport($request->studentid, $request->category), $studentName . ' report.xlsx');
+        return Excel::download(new CategoryExport($request->studentid, $request->category, $request->fromTime, $request->untilTime), $studentName . ' report.xlsx');
     }
 
     //report function
@@ -290,40 +290,22 @@ class DormController extends Controller
         $applicationCat = DB::table('classifications')
             ->get();
 
-        $WpostId = DB::table('student_outing')
-            ->join('organization_user as ou', 'ou.id', '=', 'student_outing.warden_id')
-            // ->join('organization_user as ou', 'ou.id', '=', 'student_outing.guard_id')
-            ->join('users', 'users.id', '=', 'ou.user_id')
+
+
+        $minDate = date('Y-m-d', strtotime(DB::table('student_outing')
+            ->where('student_outing.class_student_id',  '=', $id)
+            ->orderBy('student_outing.apply_date_time')
+            ->value('student_outing.apply_date_time')));
+
+        $maxDate = date('Y-m-d', strtotime(DB::table('student_outing')
             ->where('student_outing.class_student_id', '=', $id)
-            // ->select('student_outing.warden_id')
-            ->value('student_outing.warden_id');
+            ->orderBy('student_outing.apply_date_time', 'desc')
+            ->value('student_outing.apply_date_time')));
 
-        $GpostId = DB::table('student_outing')
-            // ->join('organization_user as ou', 'ou.id', '=', 'student_outing.warden_id')
-            ->join('organization_user as ou', 'ou.id', '=', 'student_outing.guard_id')
-            ->join('users', 'users.id', '=', 'ou.user_id')
-            ->where('student_outing.class_student_id', '=', $id)
-            ->value('student_outing.guard_id as guardId');
-        // ->first();
-
-        $warden = DB::table('users')
-            // ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            ->where('users.id', '=', $WpostId)
-            // ->where('users.id', '=', 24)
-            ->select('users.name')
-            ->first();
-        // ->select();
-
-        $guard = DB::table('users')
-            // ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            ->where('users.id', $GpostId)
-            ->select('users.name')
-            // ->first();
-            ->first();
+        // dd($minDate, $maxDate);
 
 
-
-        return view('dorm.report.reportPerStudent', compact('studentName', 'applicationCat', 'warden', 'guard', 'id'));
+        return view('dorm.report.reportPerStudent', compact('studentName', 'applicationCat', 'id', 'minDate', 'maxDate'));
     }
 
     /**
@@ -1267,44 +1249,47 @@ class DormController extends Controller
     //for all reasons for particular student
     public function getReportDatatable(Request $request, $id)
     {
-        // dd("inside blacklist controller");
-        // dd($request->hasOrganization);
         if (request()->ajax()) {
             $catId = $request->catId;
 
             $hasOrganizaton = $request->hasOrganization;
 
             $userId = Auth::id();
+            $from = $request->fromTime;
+            $until = $request->untilTime;
 
-            // if ($id != 6) {
-            //     dd("123");
-            // }
+            $data = DB::table('student_outing')
+                ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+                ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
+                ->join('users as wardenUser', 'wardenUser.id', '=', 'warden.user_id')
+                ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
+                ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
+                ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+                ->select('student_outing.out_date_time as outTime', 'student_outing.in_date_time as inTime', 'wardenUser.name as wardenName', 'guardUser.name as guardName', 'classifications.name as classificationName', 'student_outing.reason')
+                ->orderBy('student_outing.apply_date_time');
 
             if ($catId != '' && !is_null($hasOrganizaton)) {
-                if ($catId == 0) {
-                    $data = DB::table('student_outing')
-                        ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
-                        ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
-                        ->join('users as wardenUser', 'wardenUser.id', '=', 'warden.user_id')
-                        ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
-                        ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
-                        ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+                if ($catId == 0 && $from != null && $until != null) {
+                    $data = $data
                         ->where('class_student.id', $id)
-                        ->select('student_outing.out_date_time as outTime', 'student_outing.in_date_time as inTime', 'wardenUser.name as wardenName', 'guardUser.name as guardName', 'classifications.name as classificationName', 'student_outing.reason')
-                        ->orderBy('student_outing.apply_date_time')
+                        ->where('student_outing.apply_date_time', '>=', $from)
+                        ->where('student_outing.apply_date_time', '<=', $until)
                         ->get();
-                } else {
-                    $data = DB::table('student_outing')
-                        ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
-                        ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
-                        ->join('users as wardenUser', 'wardenUser.id', '=', 'warden.user_id')
-                        ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
-                        ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
-                        ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+                } else if ($catId != 0 && $from != null && $until != null) {
+                    $data = $data
+                        ->where('class_student.id', $id)
+                        ->where('student_outing.apply_date_time', '>=', $from)
+                        ->where('student_outing.apply_date_time', '<=', $until)
+                        ->where('student_outing.classification_id', '=', $catId)
+                        ->get();
+                } else if ($catId == 0) {
+                    $data = $data
+                        ->where('class_student.id', $id)
+                        ->get();
+                } else if ($catId != 0) {
+                    $data = $data
                         ->where('class_student.id', $id)
                         ->where('student_outing.classification_id', '=', $catId)
-                        ->select('student_outing.out_date_time as outTime', 'student_outing.in_date_time as inTime', 'wardenUser.name as wardenName', 'guardUser.name as guardName', 'classifications.name as classificationName', 'student_outing.reason')
-                        ->orderBy('student_outing.apply_date_time')
                         ->get();
                 }
 
@@ -1573,12 +1558,12 @@ class DormController extends Controller
                 ->value('organization_roles.nama');
 
             $data = DB::table('students')
-            ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-            ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
-            ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-            ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
-            ->join('classifications', 'classifications.id', '=', 'so.classification_id');
+                ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+                ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+                ->join('classifications', 'classifications.id', '=', 'so.classification_id');
 
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
@@ -1914,29 +1899,29 @@ class DormController extends Controller
         return redirect('/dorm')->with('success', 'Data is successfully updated');
     }
 
-    public function resetOutingLimit(){
+    public function resetOutingLimit()
+    {
         $organization = $this->getOrganizationByUserId();
-        if(Auth::user()->hasRole('Superadmin')){
+        if (Auth::user()->hasRole('Superadmin')) {
             $result = DB::table('class_student')
-            ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
-            ->where([
-                ['class_student.status', 1],
-            ])
-            ->update(['class_student.outing_limit' => NULL]);
-        }
-        else{
+                ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
+                ->where([
+                    ['class_student.status', 1],
+                ])
+                ->update(['class_student.outing_limit' => NULL]);
+        } else {
             $result = DB::table('class_student')
-            ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
-            ->where([
-                ['class_student.status', 1],
-                ['co.organization_id', $organization[0]->id],
-            ])
-            ->update(['class_student.outing_limit' => NULL]);
+                ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
+                ->where([
+                    ['class_student.status', 1],
+                    ['co.organization_id', $organization[0]->id],
+                ])
+                ->update(['class_student.outing_limit' => NULL]);
         }
 
-        if($result){
+        if ($result) {
             return redirect('/dorm/dorm/indexReportAll')->with('success', 'Data is successfully updated');
-        }else{
+        } else {
             return redirect('/dorm/dorm/indexReportAll')->withErrors('Failed to update data');
         }
     }

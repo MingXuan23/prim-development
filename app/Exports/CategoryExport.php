@@ -15,17 +15,17 @@ class CategoryExport implements FromCollection, ShouldAutoSize, WithHeadings
      * @return \Illuminate\Support\Collection
      */
 
-    public function __construct($studentid, $category)
+    public function __construct($studentid, $category, $from, $until)
     {
         $this->studentid = $studentid;
         $this->category = $category;
+        $this->from = $from;
+        $this->until = $until;
     }
 
     public function collection()
     {
 
-
-        // dd($this->studentid);
         $data = DB::table('student_outing')
             ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
             ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
@@ -33,8 +33,6 @@ class CategoryExport implements FromCollection, ShouldAutoSize, WithHeadings
             ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
             ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
             ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
-            ->where('class_student.id', $this->studentid)
-            ->where('student_outing.classification_id', '=', $this->category)
             ->select(
                 'classifications.name as classificationName',
                 'student_outing.out_date_time as outTime',
@@ -42,11 +40,22 @@ class CategoryExport implements FromCollection, ShouldAutoSize, WithHeadings
                 'wardenUser.name as wardenName',
                 'student_outing.in_date_time as inTime',
                 'guardUser.name as guardName'
-            )->orderBy('student_outing.apply_date_time')
-            ->get();
+            )->orderBy('student_outing.apply_date_time');
 
+        if ($this->from == null || $this->until == null) {
+            $data = $data
+                ->where('class_student.id', $this->studentid)
+                ->where('student_outing.classification_id', '=', $this->category)
+                ->get();
+        } else {
 
-
+            $data = $data
+                ->where('class_student.id', $this->studentid)
+                ->where('student_outing.apply_date_time', '>=', $this->from)
+                ->where('student_outing.apply_date_time', '<=', $this->until)
+                ->where('student_outing.classification_id', '=', $this->category)
+                ->get();
+        }
         return $data;
     }
 
