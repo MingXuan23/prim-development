@@ -167,9 +167,10 @@ class DormController extends Controller
     {
         $this->validate($request, [
             'organExport'      =>  'required',
+            'from'             =>  'required',
+            'to'               =>  'required',
         ]);
-
-        return Excel::download(new AllRequestExport($request->organExport), 'Laporan Permintaan Keluar(Kategori).xlsx');
+        return Excel::download(new AllRequestExport($request->organExport, $request->from, $request->to), 'Laporan Permintaan Keluar(Kategori).xlsx');
     }
 
     public function dormexport(Request $request)
@@ -1183,7 +1184,7 @@ class DormController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="" class="btn btn-primary m-1">Edit</a>';
+                    // $btn = $btn . '<a href="" class="btn btn-primary m-1">Edit</a>';
                     // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
                 });
