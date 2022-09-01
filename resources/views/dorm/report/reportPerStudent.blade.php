@@ -29,6 +29,14 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="form-group">
+                    <label> Tarikh bermula</label>
+                    <input type="date" id="fromTime" name="fromTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label> Tarikh berakhir</label>
+                    <input type="date" id="untilTime" name="untilTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                </div>
             </div>
 
 
@@ -107,6 +115,14 @@
                                         <input name="studentid" value="{{$id}}" hidden></input>
 
                                     </div>
+                                    <div class="form-group">
+                                        <label> Tarikh bermula</label>
+                                        <input type="date" id="fromTime" name="fromTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label> Tarikh berakhir</label>
+                                        <input type="date" id="untilTime" name="untilTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                                    </div>
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-primary">Export Kategori</button>
                                     </div>
@@ -128,6 +144,16 @@
                             </div>
                             <!-- export pelajar -->
                             <form action="{{ route('exportallcategory') }}" method="post">
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label> Tarikh bermula</label>
+                                        <input type="date" id="fromTime" name="fromTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label> Tarikh berakhir</label>
+                                        <input type="date" id="untilTime" name="untilTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                                    </div>
+                                </div>
                                 <div class="modal-footer">
                                     {{ csrf_field() }}
                                     <input name="studentid" value="{{$id}}" hidden></input>
@@ -178,6 +204,22 @@
             fetch_data(catId);
         });
 
+        $('#fromTime').change(function() {
+            var catId = $("#applicationCategory option:selected").val();
+            $('#reasonTable').DataTable().destroy();
+
+            console.log($("#fromTime ").val());
+            fetch_data(catId);
+        });
+
+        $('#untilTime').change(function() {
+            var catId = $("#applicationCategory option:selected").val();
+            $('#reasonTable').DataTable().destroy();
+            console.log($("#untilTime").val());
+
+            fetch_data(catId);
+        });
+
         function fetch_data(catId = '') {
             reasonTable = $('#reasonTable').DataTable({
                 processing: true,
@@ -186,7 +228,9 @@
                     url: "/dorm/dorm/getReportDatatable/" + student_id,
                     data: {
                         catId: catId,
-                        hasOrganization: true
+                        hasOrganization: true,
+                        fromTime: $("#fromTime").val(),
+                        untilTime: $("#untilTime").val()
                     },
                     type: 'GET',
 
@@ -253,72 +297,6 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-
-        // $(document).on('click', '.exportAll', function() {
-        //     //student_id = $(this).attr('id');
-        //     $('#unblockConfirmationModal').modal('show');
-        // });
-
-        // $(document).on('click', '.exportCat', function() {
-        //     //student_id = $(this).attr('id');
-        //     $('#unblockConfirmationModal').modal('show');
-        // });
-
-        // $('#block').click(function() {
-        //     block_status = 1;
-        //     $.ajax({
-        //         type: 'POST',
-        //         dataType: 'html',
-        //         data: {
-        //             "_token": "{{ csrf_token() }}",
-        //             //_method: 'DELETE'
-        //         },
-        //         url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
-        //         success: function(data) {
-        //             setTimeout(function() {
-        //                 $('#confirmModal').modal('hide');
-        //             }, 2000);
-        //             console.log("it Works");
-
-        //             $('div.flash-message').html(data);
-
-        //             studentTable.ajax.reload();
-        //         },
-        //         error: function(data) {
-        //             console.log("it doesn't Works");
-
-        //             $('div.flash-message').html(data);
-        //         }
-        //     })
-        // });
-
-        // $('#unblock').click(function() {
-        //     block_status = 0;
-        //     $.ajax({
-        //         type: 'POST',
-        //         dataType: 'html',
-        //         data: {
-        //             "_token": "{{ csrf_token() }}",
-        //             //_method: 'DELETE'
-        //         },
-        //         url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
-        //         success: function(data) {
-        //             setTimeout(function() {
-        //                 $('#confirmModal').modal('hide');
-        //             }, 2000);
-        //             console.log("it Works");
-
-        //             $('div.flash-message').html(data);
-
-        //             studentTable.ajax.reload();
-        //         },
-        //         error: function(data) {
-        //             $('div.flash-message').html(data);
-        //         }
-        //     })
-        // });
-
-        // $('.alert').delay(3000).fadeOut();
 
     });
 </script>
