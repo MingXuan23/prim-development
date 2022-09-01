@@ -53,14 +53,14 @@ class DormController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
-
-        $roles = DB::table('organization_roles')
-            ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-            ->where([
-                ['ou.user_id', Auth::user()->id],
-                ['ou.organization_id', $organization[0]->id],
-            ])
-            ->value('organization_roles.nama');
+        $query = DB::table('organization_roles')
+        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+        ->where([
+            ['ou.user_id', Auth::user()->id],
+            ['ou.organization_id', $organization[0]->id],
+        ]);
+        $roles = $query->value('organization_roles.nama');
+        $checkin = $query->value('ou.check_in_status');
 
         $isblacklisted = DB::table('students')
             ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -73,7 +73,7 @@ class DormController extends Controller
             ->value('cs.blacklist');
 
         // dd($roles);
-        return view('dorm.index', compact('roles', 'organization', 'isblacklisted'));
+        return view('dorm.index', compact('roles', 'checkin', 'organization', 'isblacklisted'));
     }
 
     public function indexReportAll()
@@ -1900,11 +1900,22 @@ class DormController extends Controller
         return redirect('/dorm/index')->with('success', 'Data is successfully updated');
     }
 
-    public function updateCheckIn()
+    public function updateCheckIn($id)
     {
         $organization = $this->getOrganizationByUserId();
 
-        DB::table('organization_user as ou')
+        if($id == 1){
+            DB::table('organization_user as ou')
+            ->where([
+                ['ou.organization_id', $organization[0]->id],
+                ['ou.user_id', Auth::user()->id],
+            ])
+            ->update([
+                'ou.check_in_status' => 0,
+            ]);
+        }
+        else{
+            DB::table('organization_user as ou')
             ->where([
                 ['ou.organization_id', $organization[0]->id],
                 ['ou.user_id', Auth::user()->id],
@@ -1912,6 +1923,7 @@ class DormController extends Controller
             ->update([
                 'ou.check_in_status' => 1,
             ]);
+        }
         return redirect('/dorm')->with('success', 'Data is successfully updated');
     }
 
