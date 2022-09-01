@@ -141,7 +141,7 @@
 
 <script>
     $(document).ready(function(){
-        end_date.min = start_date.min = end_date.value = start_date.value = new Date().toISOString().split("T")[0];
+        end_date.max = start_date.max = end_date.value = start_date.value = new Date().toISOString().split("T")[0];
         
         var requestTable;
 
@@ -208,12 +208,17 @@
         });
 
         $('#end_date').change(function() {
+            if(end_date.value < start_date.value)
+            {
+                end_date.value = start_date.value;
+            }
             var organizationid = $("#organization option:selected").val();
             $('#requestTable').DataTable().destroy();
             fetch_data(organizationid);
         });
 
         $('#start_date').change(function() {
+            end_date.min = start_date.value;
             var organizationid = $("#organization option:selected").val();
             $('#requestTable').DataTable().destroy();
             fetch_data(organizationid);
