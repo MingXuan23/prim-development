@@ -1627,8 +1627,8 @@ class DormController extends Controller
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
-                            // ['so.apply_date_time', now()->toDateString()],
-
+                            ['so.in_date_time', NULL],
+                            ['so.status', '<>', 2],
                         ])
                         ->select(
                             'so.id as id',
@@ -1645,7 +1645,6 @@ class DormController extends Controller
                             'classifications.name as catname'
                         )
                         ->orderBy('so.apply_date_time', 'desc')
-                        // ->orderBy('students.nama')
                         ->get();
                 }
                 // pending && havent expired
@@ -1670,7 +1669,7 @@ class DormController extends Controller
                             'cs.outing_limit',
                             'classifications.name as catname'
                         )
-                        ->orderBy('so.created_at')
+                        ->orderBy('so.apply_date_time')
                         ->get();
                 }
             }
@@ -1694,6 +1693,7 @@ class DormController extends Controller
 
                     $balikKecemasan = $this->balikKecemasan;
                     $balikKhas = $this->balikKhas;
+                    $outing = $this->outing;
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     if ($row->status == 0) {  //havent approved
@@ -1702,7 +1702,7 @@ class DormController extends Controller
                                 $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                             }
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
-                        } elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == $balikKecemasan && $row->blacklist != 1) {
+                        } elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == $balikKecemasan) {
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
@@ -1710,12 +1710,13 @@ class DormController extends Controller
                             Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')
                             || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
                         ) {
-                            if ($row->blacklist == 0 || $row->blacklist == NULL) {
-                                $btn = $btn . '<a href="' . route('dorm.updateApprove', $row->id) . '" class="btn btn-primary m-1">Approve</a>';
-                                $btn = $btn . '<a href="' . route('dorm.updateTolak', $row->id) . '" class="btn btn-danger m-1">Tolak</a>';
-                            } else {
+                            if(strtoupper($row->catname) == $outing && $row->blacklist == 1) {
                                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
                             }
+                            else{
+                                $btn = $btn . '<a href="' . route('dorm.updateApprove', $row->id) . '" class="btn btn-primary m-1">Approve</a>';
+                                $btn = $btn . '<a href="' . route('dorm.updateTolak', $row->id) . '" class="btn btn-danger m-1">Tolak</a>';
+                            } 
                         }
                     } elseif ($row->status == 1) { //approved
                         if (Auth::user()->hasRole('Penjaga')) {

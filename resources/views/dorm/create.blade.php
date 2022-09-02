@@ -127,6 +127,7 @@
 
     
     $("#category").change(function() {
+    
         if ($("#organization option:selected").text().toUpperCase() == "SEKOLAH MENENGAH TEKNIK MELAKA" ||
         $("#organization option:selected").text().toUpperCase() == "SEKOLAH MENENGAH TEKNIK BUKIT PIATU") {
             if($("#category option:selected").text().toUpperCase() == "OUTINGS")
