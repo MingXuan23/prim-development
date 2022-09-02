@@ -30,6 +30,8 @@ use App\Models\TypeOrganization;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifyMail;
 
 use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
@@ -54,11 +56,11 @@ class DormController extends Controller
         //
         $organization = $this->getOrganizationByUserId();
         $query = DB::table('organization_roles')
-        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-        ->where([
-            ['ou.user_id', Auth::user()->id],
-            ['ou.organization_id', $organization[0]->id],
-        ]);
+            ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+            ->where([
+                ['ou.user_id', Auth::user()->id],
+                ['ou.organization_id', $organization[0]->id],
+            ]);
         $roles = $query->value('organization_roles.nama');
         $checkin = $query->value('ou.check_in_status');
 
@@ -446,6 +448,33 @@ class DormController extends Controller
                     'outing_id'         => $outingid,
                     'created_at'        => now(),
                 ]);
+
+            $arrayRecipientEmail = DB::table('users')
+                ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                ->where('organization_user.check_in_status', '=', 1)
+                ->orWhere('organization_user.role_id', '=', 4)
+                ->select('users.email')
+                ->get();
+            // dd($arrayRecipientEmail);
+
+            if (isset($arrayRecipientEmail)) {
+                foreach ($arrayRecipientEmail as $email) {
+                    // dd("here inside foreach");
+                    // Mail::to($email)->send(new NotifyMail());
+                    Mail::to($email)->send(new NotifyMail());
+
+
+                    if (Mail::failures()) {
+                        // dd("fail");
+                        return response()->Fail('Sorry! Please try again latter');
+                    } else {
+                        // return response()->success('Great! Successfully send in your mail');
+                        // dd("successs", $email);
+                    }
+                }
+            } else {
+                // do nothing 1st
+            }
 
             return redirect('/dorm')->with('success', 'New application has been added successfully');
         } else {
@@ -1598,7 +1627,7 @@ class DormController extends Controller
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
-                            ['so.apply_date_time', now()->toDateString()],
+                            // ['so.apply_date_time', now()->toDateString()],
 
                         ])
                         ->select(
@@ -1615,8 +1644,8 @@ class DormController extends Controller
                             'cs.outing_limit',
                             'classifications.name as catname'
                         )
-                        ->orderBy('so.status')
-                        ->orderBy('students.nama')
+                        ->orderBy('so.apply_date_time', 'desc')
+                        // ->orderBy('students.nama')
                         ->get();
                 }
                 // pending && havent expired
@@ -1889,25 +1918,24 @@ class DormController extends Controller
     {
         $organization = $this->getOrganizationByUserId();
 
-        if($id == 1){
+        if ($id == 1) {
             DB::table('organization_user as ou')
-            ->where([
-                ['ou.organization_id', $organization[0]->id],
-                ['ou.user_id', Auth::user()->id],
-            ])
-            ->update([
-                'ou.check_in_status' => 0,
-            ]);
-        }
-        else{
+                ->where([
+                    ['ou.organization_id', $organization[0]->id],
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->update([
+                    'ou.check_in_status' => 0,
+                ]);
+        } else {
             DB::table('organization_user as ou')
-            ->where([
-                ['ou.organization_id', $organization[0]->id],
-                ['ou.user_id', Auth::user()->id],
-            ])
-            ->update([
-                'ou.check_in_status' => 1,
-            ]);
+                ->where([
+                    ['ou.organization_id', $organization[0]->id],
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->update([
+                    'ou.check_in_status' => 1,
+                ]);
         }
         return redirect('/dorm')->with('success', 'Data is successfully updated');
     }
