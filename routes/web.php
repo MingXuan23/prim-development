@@ -13,6 +13,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+
 Auth::routes();
 // Auth::routes(['register' => false]);
 
@@ -357,5 +358,9 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/getStudentOutingByCategory', 'DormController@getStudentOutingByCategory')->name('dorm.getStudentOutingByCategory');
     Route::get('dorm/indexReportAll', 'DormController@indexReportAll')->name('dorm.indexReportAll');
     Route::get('dorm/resetOutingLimit', 'DormController@resetOutingLimit')->name('dorm.resetOutingLimit');
-    
 });
+
+//test mail here
+// Route::get('send-email', [SendEmailController::class, 'index']);
+Route::resource('/send-email', 'SendEmailController');
+// Route::get('/send-email', [SendEmailController::class, 'index']);
