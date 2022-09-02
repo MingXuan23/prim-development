@@ -1619,7 +1619,7 @@ class DormController extends Controller
                             'classifications.name as catname'
                         )
                         ->orderBy('so.status')
-                        ->orderBy('so.apply_date_time')
+                        ->orderBy('so.apply_date_time', 'desc')
                         ->get();
                 }
                 //approved or kecemasan && havent expired
@@ -1670,7 +1670,6 @@ class DormController extends Controller
                             'cs.outing_limit',
                             'classifications.name as catname'
                         )
-                        ->orderBy('so.status')
                         ->orderBy('so.created_at')
                         ->get();
                 }
@@ -1858,14 +1857,20 @@ class DormController extends Controller
     public function updateInTime($id)
     {
         $intime = now();
+        $outing = $this->outing;
 
-        $dormid = DB::table('student_outing')
+        $outingcat = DB::table('student_outing')
             ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
             ->where('student_outing.id', $id)
-            ->value('cs.dorm_id');
+            ->select('cs.dorm_id', 'classifications.name as catname', 'student_outing.apply_date_time')
+            ->get();
 
-        if (strtotime($intime) > strtotime("18:00:00") && isset($dormid)) {
-            $blacklist = 1;
+        if (strtoupper($outingcat[0]->catname) == $outing && isset($outingcat[0]->dorm_id)) {
+            if(strtotime($intime) > strtotime("18:00:00") || $intime->toDateString() > $outingcat[0]->apply_date_time)
+            {
+                $blacklist = 1;
+            }
         } else if (!isset($dormid)) {
             $blacklist = NULL;
         } else {
