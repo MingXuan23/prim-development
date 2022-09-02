@@ -1,4 +1,4 @@
-<!-- 要怎么做auto check out -->
+
 
 @extends('layouts.master')
 
@@ -53,7 +53,11 @@
                 @endif
 
                 @if($roles == "Warden")
-                <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
+                    @if($checkin == 1)
+                    <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', $checkin)}}" class="btn btn-primary"> <i class="fas fa-minus"></i> Check Out</a>
+                    @else
+                    <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', 0)}}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
+                    @endif
                 @endif
             </div>
 

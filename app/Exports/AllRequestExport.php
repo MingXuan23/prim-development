@@ -15,9 +15,11 @@ class AllRequestExport implements FromCollection, ShouldAutoSize, WithHeadings
      * @return \Illuminate\Support\Collection
      */
 
-    public function __construct($organId)
+    public function __construct($organId, $from, $to)
     {
         $this->organId = $organId;
+        $this->from = $from;
+        $this->to = $to;
     }
 
     public function collection()
@@ -33,20 +35,22 @@ class AllRequestExport implements FromCollection, ShouldAutoSize, WithHeadings
         ->where([
             ['ou.organization_id',  $this->organId],
         ])
+        ->whereBetween('so.apply_date_time', [$this->from, $this->to])
         ->select('classifications.name as catname', DB::raw('count("so.id") as total'))
         ->groupBy('classifications.name')
         ->get();
 
         // dd($studentlist);
-
         return $data;
     }
 
     public function headings(): array
     {
-        return [
-            'Kategori',
-            'Bilangan Permintaan',
+        return 
+        [
+            ['Laporan Permintaan Pelajar pada ' . $this->from .' hingga '. $this->to],
+            ['Kategori',
+            'Bilangan Permintaan',],
         ];
     }
 }

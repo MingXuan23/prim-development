@@ -85,7 +85,7 @@
                                 <th> No. </th>
                                 <th>Kategori</th>
                                 <th>Bilangan Permintaan</th>
-                                <th>Action</th>
+                                <th>Details</th>
                             </tr>
                         </thead>
                     </table>
@@ -116,6 +116,17 @@
                                         <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tarikh Mula</label>
+                                <input onclick="this.showPicker()" class="form-control" id="from" name="from" type="date"
+                                        placeholder="Pilih Tarikh Mula">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Tarikh Tamat</label>
+                                <input onclick="this.showPicker()" class="form-control" id="to" name="to" type="date"
+                                        placeholder="Pilih Tarikh Tamat">
                             </div>
                             <div class="modal-footer">
                                 <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
@@ -148,6 +159,11 @@
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetch_data($("#organization").val());
+        }
+
+        if ($("#organExport").val() != "") {
+            $("#organExport").prop("selectedIndex", 1).trigger('change');
+            // fetch_data($("#organExport").val());
         }
 
         function fetch_data(oid = '') {
@@ -207,19 +223,44 @@
             fetch_data(organizationid);
         });
 
+        $('#organExport').change(function() {
+            var organizationid    = $("#organExport").val();
+            $('#requestTable').DataTable().destroy();
+            // var _token            = $('input[name="_token"]').val();
+            fetch_data(organizationid);
+        });
+
         $('#end_date').change(function() {
             if(end_date.value < start_date.value)
             {
                 end_date.value = start_date.value;
             }
+            to.value = end_date.value;
             var organizationid = $("#organization option:selected").val();
             $('#requestTable').DataTable().destroy();
             fetch_data(organizationid);
         });
 
         $('#start_date').change(function() {
-            end_date.min = start_date.value;
+            from.value = end_date.min = start_date.value;
             var organizationid = $("#organization option:selected").val();
+            $('#requestTable').DataTable().destroy();
+            fetch_data(organizationid);
+        });
+
+        $('#to').change(function() {
+            if(to.value < from.value)
+            {
+                to.value = from.value;
+            }
+            var organizationid = $("#organExport").val();
+            $('#requestTable').DataTable().destroy();
+            fetch_data(organizationid);
+        });
+
+        $('#from').change(function() {
+            to.min = from.value;
+            var organizationid = $("#organExport").val();
             $('#requestTable').DataTable().destroy();
             fetch_data(organizationid);
         });
