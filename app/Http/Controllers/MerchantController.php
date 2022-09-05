@@ -13,8 +13,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\View;
 
 class MerchantController extends Controller
 {
@@ -35,58 +33,67 @@ class MerchantController extends Controller
             $oh_status[$row->id] = $row->organization_hours->first()->status;
         }
 
-        // dd($oh_status);
-
         return view('merchant.index', compact('merchant', 'oh_status'));
     }
 
     public function fetchDay(Request $request)
     {
-        $Today = Carbon::now();
-        $dayNameMY = array("Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu");
-        $dayNameEN = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
-
         $user_id = Auth::id();
         $org_id = $request->get('o_id');
         $day_body = "";
 
-        $exist = PickUpOrder::where([['user_id', $user_id], ['organization_id', $org_id], ['status', 1]])->exists();
+        $query = PickUpOrder::where([['user_id', $user_id], ['organization_id', $org_id], ['status', 1]]);
+        $exist = $query->exists();
         
+        # If Order already exists for this organization
         if(!$exist)
         {
-            $allDay = OrganizationHours::where('organization_id', $org_id)->where('status', 1)->get();
-        
-            $isPast = array();
-            
-            foreach($allDay as $row)
-            {
-                $TodayDay = $Today->format('l'); // Get Day Name
+            $allDay = OrganizationHours::where('organization_id', $org_id)->where('status', 1)->get(); // Get all open day organization
 
-                $day = app(CooperativeController::class)->getDayIntegerByDayName($TodayDay); // Return integer based on name
-
-                $key = strval($row->day);
-
-                $isPast = app(CooperativeController::class)->getDayStatus($day, $row->day, $isPast, $key); // Check and return day is past or this week
-            }
-
-            foreach($allDay as $row)
-            {
-                if($TodayDay == $dayNameEN[$row->day]) // If day array is Today
-                {
-                    $day_body .= "<option value='".$row->day."'>Hari ini</option>";
-                }
-                else
-                {
-                    $day_body .= "<option value='".$row->day."'>". $dayNameMY[$row->day]." ".$isPast[$row->day]."</option>";
-                }
-            }
+            $day_body = $this->getDayBody($allDay);
 
             return response()->json(['day_body' => $day_body]);
         }
         else
         {
-            return response()->json(['path' => '/merchant/'.$org_id, 'day_body' => $day_body]);
+            $order = $query->first();
+            return response()->json(['order_id' => $order->id, 'path' => '/merchant/'.$org_id, 'day_body' => $day_body]);
         }
+    }
+
+    private function getDayBody($all_open_days)
+    {
+        $dayNameMY = array("Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu");
+        $dayNameEN = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+
+        $body = "";
+
+        $isPast = array();
+        
+        foreach($all_open_days as $row)
+        {
+            $TodayDay = Carbon::now()->format('l'); // Get Day Name
+
+            $day = app(CooperativeController::class)->getDayIntegerByDayName($TodayDay); // Return integer based on name
+
+            $key = strval($row->day);
+
+            $isPast = app(CooperativeController::class)->getDayStatus($day, $row->day, $isPast, $key); // Check and return day is past or this week
+        }
+
+        foreach($all_open_days as $row)
+        {
+            if($TodayDay == $dayNameEN[$row->day]) // If day array is Today
+            {
+                $body .= "<option value='".$row->day."'>Hari ini</option>";
+            }
+            else
+            {
+                $body .= "<option value='".$row->day."'>". $dayNameMY[$row->day]." ".$isPast[$row->day]."</option>";
+            }
+        }
+
+        return $body;
     }
 
     public function fetchTime(Request $request)
@@ -110,7 +117,7 @@ class MerchantController extends Controller
 
         $alert = "";
         $btn = "";
-
+        
         if($daySelected == $TodayDayInt) // If day selected in select option is today
         {
             $min_required_time = $Today->addHour(2)->toTimeString(); // Add 2 hour to current time
@@ -176,6 +183,7 @@ class MerchantController extends Controller
 
         $date = Carbon::now()->toDateString();
         
+        # If today is not 
         if($daySelect != $dayInt)
         {
             $date = Carbon::now()->next($daySelect)->toDateString();
@@ -186,8 +194,18 @@ class MerchantController extends Controller
         return $pickUp;
     }
 
+    public function destroyOldOrder(Request $request)
+    {
+        $id = $request->get('order_id');
+        
+        PickUpOrder::find($id)->forceDelete();
+    }
+
     public function showMerchant($id)
     {
+        $user_id = Auth::id();
+
+        # <Start> Get Data for Organization
         $todayDate = Carbon::now()->format('l');
 
         $day = app(CooperativeController::class)->getDayIntegerByDayName($todayDate);
@@ -203,16 +221,43 @@ class MerchantController extends Controller
         $open_hour = date('h:i A', strtotime($oh->open_hour));
         
         $close_hour = date('h:i A', strtotime($oh->close_hour));
+        # <End> Get Data for Organization
+        
+        // $order = PickUpOrder::where([
+        //     ['user_id', $user_id],
+        //     ['organization_id', $id],
+        //     ['status', 1],
+        // ])->first();
 
-        $product_item = ProductItem::with(['product_group' => function($q) use ($id){
-            $q->where('product_group.organization_id', $id);
-        }])
-        ->orderBy('name')
+        // $pickup_time = Carbon::parse($order->pickup_date)->toTimeString();
+
+        $product_item = DB::table('product_item as pi')
+        ->join('product_group as pg', 'pg.id', '=', 'pi.product_group_id')
+        ->where([
+            ['pg.organization_id', $id],
+            ['pg.deleted_at', NULL],
+            ['pi.deleted_at', NULL],
+            // ['q.slot_time', '>=', $pickup_time]
+        ])
+        ->select('pi.id', 'pi.name as item_name', 'pi.desc', 'pi.price', 'pi.image', 'pi.status', 'pi.product_group_id')
+        ->orderBy('pi.product_group_id', 'asc')
+        ->orderBy('item_name')  
         ->get();
+
+        
+        // $product_item = ProductItem::with(['product_group' => function($q) use ($id){
+        //     $q->where('product_group.organization_id', $id);
+        // }])
+        // ->orderBy('product_group_id', 'asc')
+        // ->orderBy('name')
+        // ->get();
 
         $product_type = ProductGroup::where('organization_id', $id)
+        ->orderBy('id', 'asc')
         ->get();
-
+        
+        $product_price = array();
+        $temp = array();
         $jenis = array();
         foreach($product_item as $item)
         {
@@ -223,7 +268,6 @@ class MerchantController extends Controller
                     $temp[] = [
                         'type_id' => strval($type->id),
                         'type_name' => $type->name,
-                        'type_status' => $type->status,
                     ];
                     
                     $product_price[$item->id] = number_format((double)$item->price, 2, '.', '') ;
@@ -232,148 +276,271 @@ class MerchantController extends Controller
         }
         $jenis = array_unique($temp, SORT_REGULAR);
 
+        // dd($jenis);
+
         return view('merchant.show', compact('merchant', 'oh', 'product_item', 'open_hour', 'close_hour', 'jenis', 'product_price'));
     }
 
     public function fetchItem(Request $request)
     {
-        $id = $request->get('i_id');
-   
-        $item = ProductItem::where('id', $id)
+        $i_id = $request->get('i_id');
+        $o_id = $request->get('o_id');
+        
+        $item = ProductItem::where('id', $i_id)
         ->select('id', 'name', 'price', 'quantity', 'status')
         ->first();
 
-        $modal = '';
+        $maxQuantity = $this->getMaxQuantityBySlotTime($i_id, $o_id);
 
-        $modal = '<div class="text-center">Quantity Available : '.$item->quantity.'</div>';
-        $modal = $modal.'<div class="d-inline"><input id="quantity_input" type="text" value="1" name="quantity_input"></div>';
+        $modal = '<input id="quantity_input" type="text" value="1" name="quantity_input">';
 
-        return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $item->quantity]);
+        return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $maxQuantity]);
+    }
+
+    private function getMaxQuantityBySlotTime($item_id, $org_id)
+    {
+        $user_id = Auth::id();
+
+        $order = PickUpOrder::where([
+            ['user_id', $user_id],
+            ['organization_id', $org_id],
+            ['status', 1],
+        ])->first();
+        
+        $pickup_time = Carbon::parse($order->pickup_date)->toTimeString();
+        
+        $item = ProductItem::find($item_id);
+
+        $queueCount = Queue::where('product_group_id', $item->product_group_id)->where('slot_time', '<=', $pickup_time)->count();
+
+        $i_quantity = $item->quantity;
+
+        $maxQuantity = $i_quantity * $queueCount;
+
+        return $maxQuantity;
     }
 
     public function storeItem(Request $request)
     {
+        # Data
+        $msg = '';
         $i_id = $request->get('i_id');
         $o_id = $request->get('o_id');
         $quantity = $request->get('quantity');
-
         $userID = Auth::id();
 
-        $item = ProductItem::where('id', $i_id)->first();
+        # Get user order
+        $order = PickUpOrder::where([
+            ['user_id', $userID],
+            ['organization_id', $o_id],
+            ['status', 1],
+        ])->first();
 
-        // Check if quantity request is less or equal to quantity available
-        if($quantity <= $item->quantity) // if true
+        $cart = ProductOrder::where([
+            ['status', 1],
+            ['product_item_id', $i_id],
+            ['pickup_order_id', $order->id],
+        ]);
+
+        $cartExist = $cart->exists();
+
+        # If cart exists assigned product_order_id
+        if($cartExist)
         {
-            $order = PickUpOrder::where([
-                ['user_id', $userID],
-                ['status', 1],
-                ['organization_id', $o_id]
-            ])->first();
-            
-            // Check if order already exists
-            if($order) // order exists
+            $p_o_id = $cart->first()->id;
+            $p_queue = DB::table('product_queue')->where('product_order_id', $p_o_id);
+            # If product_queue of user order is exists -> delete data to replace
+            if($p_queue->exists())
             {
-                $cartExist = ProductOrder::where([
-                    ['status', 1],
-                    ['product_item_id', $i_id],
-                    ['pickup_order_id', $order->id],
-                ])->first();
+                $p_queue->delete();
+            }
+        }
 
-                // If same item exists in cart
-                if($cartExist) // if exists (update)
+        $userOrderDateTime = $order->pickup_date;
+
+        # Get ID for all order of the same day
+        $allItem = $this->checkDateForQueue($userOrderDateTime, $o_id, $i_id);
+
+        $MAX_ITEM_QUANTITY = ProductItem::find($i_id)->quantity;
+
+        # Get queue available based on day and time
+        $queue = $this->getQueueData($userOrderDateTime);
+
+        if(count($queue) != 0)
+        {
+            # Get data for product_queue
+            $pq_data = $this->getProductQueueData($queue, $quantity, $allItem, $MAX_ITEM_QUANTITY);
+
+            if($pq_data == 0) {
+                $msg = 'Harap maaf, kuantiti yang dimasukkan melebihi kekosongan yang ada';
+                return response()->json(['alert' => $msg]);
+            }
+            else
+            {
+                if($cartExist)
                 {
-                    if($quantity > $cartExist->quantity) // request quant more than existing quant
-                    {
-                        $newQuantity = intval($item->quantity - ($quantity - $cartExist->quantity)); // decrement stock
-                    }
-                    else if($quantity < $cartExist->quantity) // request quant less than existing quant
-                    {
-                        $newQuantity = intval($item->quantity + ($cartExist->quantity - $quantity)); // increment stock
-                    }
-                    else if($quantity == $cartExist->quantity) // request quant equal existing quant
-                    {
-                        $newQuantity = intval((int)$item->quantity - 0); // stock not change
-                    }
-
-                    ProductOrder::where('id', $cartExist->id)->update([
-                        'quantity' => $quantity
-                    ]);
+                    $cart->update(['quantity' => $quantity,]);
                 }
-                else // if not exists (insert)
+                else
                 {
-                    ProductOrder::create([
+                    $newOrder = ProductOrder::create([
                         'quantity' => $quantity,
                         'status' => 1,
                         'product_item_id' => $i_id,
-                        'pickup_order_id' => $order->id
+                        'pickup_order_id' => $order->id,
                     ]);
-
-                    $newQuantity = intval((int)$item->quantity - (int)$quantity);
+    
+                    $p_o_id = $newOrder->id;
                 }
-
-                $cartItem = DB::table('product_order as po')
-                                ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                                ->where('po.pickup_order_id', $order->id)
-                                ->where('po.status', 1)
-                                ->select('po.quantity', 'pi.price')
-                                ->get();
-
-                $newTotalPrice = 0;
                 
-                foreach($cartItem as $row)
+                # merge product_queue data with product_order_id
+                for($j = 0; $j < count($pq_data); $j++)
                 {
-                    $newTotalPrice += doubleval($row->price * $row->quantity);
+                    $data[] = array_merge($pq_data[$j], array("product_order_id" => $p_o_id));
+                }
+                
+                $item_price = ProductItem::find($i_id)->price;
+
+                if($order->total_price != null)
+                {
+                    $cal_total_price = $this->calculateTotalPrice($order->id);
+                } else {
+                    $cal_total_price = $item_price * $quantity;
                 }
 
-                PickUpOrder::where([
-                    ['user_id', $userID],
-                    ['status', 1],
-                    ['organization_id', $o_id]
-                ])
-                ->update([
-                    'total_price' => $newTotalPrice
-                ]);
+                $total_price = number_format($cal_total_price, 2, '.', '');
+                
+                PickUpOrder::find($order->id)->update(['total_price' => $total_price]);
+                
+                DB::table('product_queue')->insert($data);
+                
+                return response()->json(['success' => 'Item Berjaya Direkodkan', 'alert' => $msg]);
             }
-            else // order did not exists
-            {
-                $totalPrice = $item->price * (int)$quantity;
-
-                $newQuantity = intval((int)$item->quantity - (int)$quantity);
-
-                $newOrder = PickUpOrder::create([
-                    'total_price' => $totalPrice,
-                    'status' => 1,
-                    'user_id' => $userID,
-                    'organization_id' => $o_id
-                ]);
-
-                ProductOrder::create([
-                    'quantity' => $quantity,
-                    'status' => 1,
-                    'product_item_id' => $i_id,
-                    'pickup_order_id' => $newOrder->id
-                ]);
-            }
-
-            // check if quantity is 0 after add to cart
-            if($newQuantity != 0) // if not 0
-            {
-                ProductItem::where('id', $i_id)->update(['quantity' => $newQuantity]);
-            }
-            else // if 0 (change item status)
-            {
-                ProductItem::where('id', $i_id)
-                ->update(['quantity' => $newQuantity, 'status' => 0]);
-            }
-            Session::flash('success', 'Item Berjaya Ditambah');
-            return View::make('layouts/flash-messages');
         }
-        else // if false
+        else {
+            $msg = 'Harap maaf, kuantiti yang dimasukkan melebihi kekosongan yang ada';
+            return response()->json(['alert' => $msg]);
+        }
+    }
+
+    private function checkDateForQueue($order_datetime, $organization_id, $item_id)
+    {
+        $startDaySelect = Carbon::parse($order_datetime)->startOfDay()->format('Y-m-d H:i:s');
+        $endDaySelect = Carbon::parse($order_datetime)->endOfDay()->format('Y-m-d H:i:s');
+        
+        $allOrder = PickUpOrder::join('product_order', 'product_order.pickup_order_id', '=', 'pickup_order.id')
+        ->where([
+            ['pickup_date', '>=', $startDaySelect],
+            ['pickup_date', '<=', $endDaySelect],
+            ['organization_id', $organization_id],
+            ['product_item_id', $item_id],
+        ])
+        ->whereIn('pickup_order.status', [1, 2, 3])
+        ->pluck('product_order.id')
+        ->toArray();
+
+        return $allOrder;
+    }
+
+    private function getQueueData($order_datetime)
+    {
+        $today_date = Carbon::now()->toDateString();
+        $today_time = Carbon::now()->minute(0)->second(0)->addHour()->toTimeString();
+
+        $date_pick_up = Carbon::parse($order_datetime)->toDateString();
+        $time_pick_up = Carbon::parse($order_datetime)->toTimeString();
+
+        if($date_pick_up != $today_date) {
+            $queue = Queue::where('slot_time', '<=', $time_pick_up)
+            ->orderBy('id', 'desc')
+            ->get();
+        } else {
+            $queue = Queue::where([
+                ['slot_time', '>', $today_time],
+                ['slot_time', '<=', $time_pick_up],
+            ])
+            ->orderBy('id', 'desc')
+            ->get();
+        }
+
+        return $queue;
+    }
+
+    private function getProductQueueData($arr_of_rows, $user_quantity, $all_order_id, $MAX_QUANTITY)
+    {
+        $remaining_quantity = (int)$user_quantity;
+        $pq_data = array();
+        # check every queue available that less than pickup time
+        foreach($arr_of_rows as $row)
         {
-            $message = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->quantity;
-            Session::flash('error', $message);
-            return View::make('layouts/flash-messages');
+            if($remaining_quantity <= 0) { break; } // If remaining quantity after calc is no more
+
+            $quantity_inside_table = 0; // Reset value
+
+            #get all order available based on queue id
+            $product_queue = DB::table('product_queue')
+            ->whereIn('product_order_id', $all_order_id)
+            ->where('queue_id', $row->id)
+            ->get();
+
+            # get total of item quantity
+            
+            foreach($product_queue as $pq_row)
+            {
+                $quantity_inside_table += $pq_row->quantity_slot; // Example = 14
+            }
+            
+            # Check if this slot is full or not
+            if($quantity_inside_table < $MAX_QUANTITY) // NOT FULL
+            {
+                # Get slot available for this slot because this slot is not full yet
+                $slot_availability = $MAX_QUANTITY - $quantity_inside_table; // Example = 15 - 1 = 14
+                
+                # Check if quantity inputted is more than slot available -> Example = 15 > 14
+                if($remaining_quantity > $slot_availability)
+                {
+                    $pq_data[] = [
+                        'quantity_slot' => $slot_availability, // Example = 14 -> Insert
+                        'queue_id' => $row->id,
+                    ];
+                    $remaining_quantity -= $slot_availability; // Example = 15 - 14 = 1
+                }
+                else // NEXT ITERATION
+                {
+                    $pq_data[] = [
+                        'quantity_slot' => $remaining_quantity, // Example = 1 -> INSERT
+                        'queue_id' => $row->id,
+                    ];
+                    $remaining_quantity -= $slot_availability; // Example = 1 - 15 = -14 -> BREAK LOOP
+                }
+            }
         }
+
+        if($remaining_quantity > 0) {
+            return 0;
+        } else {
+            return $pq_data;
+        }
+    }
+
+    private function calculateTotalPrice($order_id)
+    {
+        $item_in_cart = ProductOrder::join('product_item', 'product_item.id', '=', 'product_order.product_item_id')
+        ->where([
+            ['pickup_order_id', $order_id],
+            ['product_order.status', 1]
+        ])
+        ->select('product_order.quantity as quantity', 'product_item.price as price')
+        ->get();
+
+        $newTotalPrice = 0;
+        
+        foreach($item_in_cart as $row)
+        {
+            $newTotalPrice += doubleval($row->price * $row->quantity);
+        }
+
+        return $newTotalPrice;
     }
 
     public function showMerchantCart($id)
@@ -454,16 +621,16 @@ class MerchantController extends Controller
         # Initialize variable
         $duration = $pg->duration;
         $temp = $min_f;
-        $data = array(0 => ["slot_time" => $min, "status" => 1, "product_group_id" => $pg->id, "created_at" => Carbon::now(),
-        "updated_at" => Carbon::now()]); // Initialize first row of queue (opening hour/ Min)
+        $data = array(0 => ["slot_time" => $min, "status" => 1, "slot_number" => 1, "product_group_id" => $pg->id, "created_at" => Carbon::now(), "updated_at" => Carbon::now()]); // Initialize first row of queue (opening hour/ Min)
 
         # Loop until the total duration more or equal to total minutes
-        for($newDuration = $duration; $newDuration <= $total_minutes; $newDuration += $duration)
+        for($newDuration = $duration, $i = 2; $newDuration <= $total_minutes; $newDuration += $duration, $i++)
         {
             $temp_f = $temp->addMinutes($duration)->format('H:i:s');  // Add minutes to current time var
             $data[] = [
                 "slot_time" => $temp_f,
                 "status" => 1,
+                "slot_number" => $i,
                 "product_group_id" => $pg->id,
                 "created_at" => Carbon::now(),
                 "updated_at" => Carbon::now(),
@@ -476,37 +643,4 @@ class MerchantController extends Controller
 
         return back();
     }
-
-    # Testing function insert Item for Slot
-    public function testItem(Request $request)
-    {
-        # Get What Group ID the User Chose
-        $group_id = 8; // <- Value for Testing only
-
-        # Store Item Data
-        $item = ProductItem::create([
-            'name' => $request->item_name,
-            'quantity' => $request->item_quantity,
-            'price' => $request->item_price,
-            'status' => 1,
-            'product_group_id' => $group_id
-        ]);
-
-        # Get All Slot Time by Group ID
-        $queue = Queue::where('product_group_id', $group_id)->get();
-
-        # Store All Queue ID and Requested Item ID in an array
-        foreach($queue as $row)
-        {
-            $queue_id[] = [
-                "product_item_id" => $item->id,
-                "queue_id" => $row->id,
-            ];
-        }
-
-        # insert bridge data
-        DB::table('product_queue')->insert($queue_id);
-
-        return back();
-    }   
 }

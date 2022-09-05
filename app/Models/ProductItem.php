@@ -31,9 +31,4 @@ class ProductItem extends Model
         ->whereNull('deleted_at')
         ->withTimestamps();
     }
-
-    public function queue()
-    {
-        return $this->belongsToMany(Queue::class);
-    }
 }

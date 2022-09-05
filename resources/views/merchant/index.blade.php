@@ -96,15 +96,6 @@
   <input type="submit">
 </form>
 
-<h4>Item</h4>
-<form action="{{ route('merchant.testItem') }}" method="POST">
-  @csrf
-  <input type="text" placeholder="Nama makanan" name="item_name">
-  <input type="text" placeholder="Kuantiti" name="item_quantity">
-  <input type="text" placeholder="Harga" name="item_price">
-  <input type="submit">
-</form>
-
 {{-- Merchant Closed Modal --}}
 <div id="merchantClosedModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
@@ -171,6 +162,26 @@
 </div>
 {{-- end Order Time Modal --}}
 
+{{-- Order Exist Modal --}}
+<div id="orderExistModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title"><i class="fas fa-info-circle"></i>  Anda Mempunyai Pesanan Yang Masih Aktif</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            Anda mahu <strong>teruskan</strong> dengan pesanan yang masih aktif ataupun <strong>membatalkan</strong> pesanan tersebut dan membuat pesanan baharu?
+          </div>
+          <div class="modal-footer">
+            <button type="button" data-dismiss="modal" class="btn btn-danger" id="destroy_order">Batal Pesanan Lama</button>
+            <button type="button" data-dismiss="modal" class="btn btn-primary" id="proceed_order">Teruskan</button>
+          </div>
+      </div>
+  </div>
+</div>
+  {{-- end Order Exist Modal --}}
+
 
 @endsection
 
@@ -192,7 +203,7 @@
         }
       });
 
-      var org_id;
+      var org_id, path, order_id;
 
       $('#order_modal').click(function(e) {
         e.preventDefault();
@@ -218,9 +229,13 @@
             }
             else
             {
-              window.location.href = result.path;
+              path = result.path
+              order_id = result.order_id
+              $('#orderExistModal').modal('show')
+              
+              // console.log(result)
+              // window.location.href = result.path;
             }
-            console.log(result)
           },
           error:function(result)
           {
@@ -253,7 +268,7 @@
               }
             },
             error:function(result){
-              console.log(result)
+              console.log(result.responseText)
             }
           })
         }
@@ -288,10 +303,29 @@
             },
             error:function(result)
             {
-              console.log(result)
+              console.log(result.responseText)
             }
           })
         }
+      })
+
+      $('#proceed_order').click(function() {
+        window.location.href = path;
+      })
+
+      $('#destroy_order').click(function(e) {
+        e.preventDefault()
+        $.ajax({
+          url: "{{ route('merchant.destroyOldOrder') }}",
+          method: "POST",
+          data: { order_id:order_id },
+          success:function(result){
+            console.log(result)
+          },
+          error:function(result){
+            console.log(result.responseText)
+          }
+        })
       })
 
       function callAlert(message)

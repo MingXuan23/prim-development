@@ -15,11 +15,12 @@ class CreateQueuesTable extends Migration
     {
         Schema::create('queues', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->time('slot_time')->nullable();
-            $table->integer('status')->nullable();
+            $table->time('slot_time');
+            $table->integer('status');
+            $table->integer('slot_number');
             $table->unsignedBigInteger('product_group_id');
             $table->timestamps();
-
+            
             $table->foreign('product_group_id')->references('id')->on('product_group')->onDelete('cascade');
         });
     }

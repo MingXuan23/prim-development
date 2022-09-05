@@ -15,10 +15,11 @@ class CreateProductQueueTable extends Migration
     {
         Schema::create('product_queue', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('product_item_id')->index();
+            $table->integer('quantity_slot');
+            $table->unsignedBigInteger('product_order_id')->index();
             $table->unsignedBigInteger('queue_id')->index();
-
-            $table->foreign('product_item_id')->references('id')->on('product_item')->onDelete('cascade');
+            
+            $table->foreign('product_order_id')->references('id')->on('product_order')->onDelete('cascade');
             $table->foreign('queue_id')->references('id')->on('queues')->onDelete('cascade');
         });
     }
@@ -32,7 +33,7 @@ class CreateProductQueueTable extends Migration
     {
         Schema::dropIfExists('product_queue', function(Blueprint $table)
         {
-            $table->drop('product_item_id');
+            $table->drop('product_order_id');
             $table->drop('queue_id');
         });
     }
