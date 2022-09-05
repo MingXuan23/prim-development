@@ -159,6 +159,15 @@
 
                                 @role('Superadmin|Pentadbir|Guru|Warden')
                                 <li>
+                                    <a href="{{ route('dorm.indexReasonOuting') }}" class=" waves-effect">
+                                        <i class="fas fa-bus-alt"></i>
+                                        <span>Sebab Permintaan Keluar</span>
+                                    </a>
+                                </li>
+                                @endrole
+
+                                @role('Superadmin|Pentadbir|Guru|Warden')
+                                <li>
                                     <a href="{{ route('dorm.indexOuting') }}" class=" waves-effect">
                                         <i class="fas fa-bus"></i>
                                         <span>Outing</span>

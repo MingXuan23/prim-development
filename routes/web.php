@@ -358,4 +358,13 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/getStudentOutingByCategory', 'DormController@getStudentOutingByCategory')->name('dorm.getStudentOutingByCategory');
     Route::get('dorm/indexReportAll', 'DormController@indexReportAll')->name('dorm.indexReportAll');
     Route::get('dorm/resetOutingLimit', 'DormController@resetOutingLimit')->name('dorm.resetOutingLimit');
+
+    //reason outing
+    Route::get('dorm/getReasonOutingDatatable', 'DormController@getReasonOutingDatatable')->name('dorm.getReasonOutingDatatable');
+    Route::get('dorm/indexReasonOuting', 'DormController@indexReasonOuting')->name('dorm.indexReasonOuting');
+    Route::get('dorm/editOutingReason/{id}', 'DormController@editOutingReason')->name('dorm.editOutingReason');
+    Route::get('dorm/destroyReasonOuting/{id}', 'DormController@destroyReasonOuting')->name('dorm.destroyReasonOuting');
+    Route::get('dorm/createReasonOuting', 'DormController@createReasonOuting')->name('dorm.createReasonOuting');
+    Route::get('dorm/storeReasonOuting', 'DormController@storeReasonOuting')->name('dorm.storeReasonOuting');
+    Route::get('dorm/updateReasonOuting/{id}', 'DormController@updateReasonOuting')->name('dorm.updateReasonOuting');
 });
