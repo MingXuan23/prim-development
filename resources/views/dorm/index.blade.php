@@ -208,7 +208,7 @@
                     }, {
                         data: "nama",
                         name: 'nama',
-                        orderable: true,
+                        orderable: false,
                         searchable: true,
                     }, {
                         data: "parent_tel",
@@ -291,7 +291,7 @@
                     }, {
                         data: "nama",
                         name: 'nama',
-                        orderable: true,
+                        orderable: false,
                         searchable: true,
                     }, {
                         data: "parent_tel",
