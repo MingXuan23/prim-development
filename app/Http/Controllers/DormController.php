@@ -32,6 +32,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotifyMail;
+use App\Mail\NotifyArrive;
+use App\Mail\NotifyIn;
 
 use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
@@ -61,6 +63,7 @@ class DormController extends Controller
                 ['ou.user_id', Auth::user()->id],
                 ['ou.organization_id', $organization[0]->id],
             ]);
+
         $roles = $query->value('organization_roles.nama');
         $checkin = $query->value('ou.check_in_status');
 
@@ -343,8 +346,8 @@ class DormController extends Controller
             ->where('classifications.organization_id', $organization[0]->id)
             ->get();
 
-        //why is null
-        $outinglimit = DB::table('class_student')
+        
+        $students = DB::table('class_student')
             ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
             ->join('students', 'students.id', '=', 'class_student.student_id')
             ->where([
@@ -352,8 +355,8 @@ class DormController extends Controller
                 ['students.parent_tel', Auth::user()->telno],
                 ['class_student.status', 1],
             ])
-            ->select('class_student.id as id', 'class_student.outing_limit', 'class_student.dorm_id')
-            ->first();
+            ->select('class_student.id as id', 'class_student.outing_limit', 'class_student.dorm_id', 'students.nama', 'students.id as sid')
+            ->get();
 
         $outingdate = date('Y-m-d', strtotime(DB::table('outings')
             ->where([
@@ -364,7 +367,7 @@ class DormController extends Controller
             ->value("outings.start_date_time as start_date_time")));
 
         if (Auth::user()->hasRole('Penjaga')) {
-            return view('dorm.create', compact('organization', 'category', 'outingdate', 'outinglimit', 'balikKecemasan', 'balikKhas', 'outing'));
+            return view('dorm.create', compact('organization', 'category', 'outingdate', 'students', 'balikKecemasan', 'balikKhas', 'outing'));
         }
     }
 
@@ -414,7 +417,7 @@ class DormController extends Controller
         // 
         $this->validate($request, [
             'name'         =>  'required',
-            'email'        =>  'required',
+            // 'email'        =>  'required',
             'category'     =>  'required',
             'reason'       =>  'required',
             'start_date'   =>  'required',
@@ -424,19 +427,19 @@ class DormController extends Controller
         $classstudentid = DB::table('students')
             ->join('class_student', 'class_student.id', '=', 'students.id')
             ->where([
-                [strtoupper('students.nama'), strtoupper($request->get('name'))],
-                ['students.email', $request->get('email')],
-                ['students.parent_tel', Auth::user()->telno],
+                ['students.id', $request->get('name')],
+                // ['students.email', $request->get('email')],
+                // ['students.parent_tel', Auth::user()->telno],
                 ['class_student.outing_status', NULL],
             ])
             ->orWhere([
-                [strtoupper('students.nama'), strtoupper($request->get('name'))],
-                ['students.email', $request->get('email')],
-                ['students.parent_tel', Auth::user()->telno],
+                ['students.id', $request->get('name')],
+                // ['students.email', $request->get('email')],
+                // ['students.parent_tel', Auth::user()->telno],
                 ['class_student.outing_status', 0],
             ])
             ->value("class_student.id");
-
+       
         $outingtype = DB::table('classifications')
             ->where([
                 ['classifications.id', $request->get('category')],
@@ -1765,7 +1768,6 @@ class DormController extends Controller
                             'cs.outing_limit',
                             'classifications.name as catname'
                         )
-                        ->orderBy('so.status')
                         ->orderBy('so.apply_date_time', 'desc')
                         ->get();
                 }
@@ -1844,33 +1846,43 @@ class DormController extends Controller
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     if ($row->status == 0) {  //havent approved
+                        //user is penjaga
                         if (Auth::user()->hasRole('Penjaga')) {
+                            //
                             if ($row->apply_date_time >= now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                             }
-                            $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
-                        } elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == $balikKecemasan) {
-                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL) {
+                            //del btn
+                            $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>'; 
+                        } 
+                        //user is guard and outing category is balik kecemasan
+                        elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == $balikKecemasan) {
+                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
-                        } elseif (
-                            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')
-                            || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
-                        ) {
-                            if (strtoupper($row->catname) == $outing && $row->blacklist == 1) {
+                        }
+                        //user is warden, teacher, HEM
+                        elseif (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')
+                        || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) 
+                        {
+                            //user choose outings and is inside blacklist
+                            if(strtoupper($row->catname) == $outing && $row->blacklist == 1) {
                                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
-                            } else {
+                            }
+                            //
+                            else{
                                 $btn = $btn . '<a href="' . route('dorm.updateApprove', $row->id) . '" class="btn btn-primary m-1">Approve</a>';
                                 $btn = $btn . '<a href="' . route('dorm.updateTolak', $row->id) . '" class="btn btn-danger m-1">Tolak</a>';
                             }
                         }
-                    } elseif ($row->status == 1) { //approved
+                    } 
+                    elseif ($row->status == 1) { //approved
                         if (Auth::user()->hasRole('Penjaga')) {
                             if ($row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->out_date_time != NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateArriveTime', $row->id) . '" class="btn btn-primary m-1">Sampai</a>';
                             }
                         } elseif (Auth::user()->hasRole('Guard')) {
-                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL) {
+                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
 
@@ -1878,7 +1890,8 @@ class DormController extends Controller
                                 $btn = $btn . '<a href="' . route('dorm.updateInTime', $row->id) . '" class="btn btn-primary m-1">Masuk</a>';
                             }
                         }
-                    } elseif ($row->status == 2) {  //
+                    } 
+                    elseif ($row->status == 2) {  //ditolak
                         if (Auth::user()->hasRole('Penjaga')) {
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
@@ -2013,43 +2026,127 @@ class DormController extends Controller
             ->select('cs.dorm_id', 'classifications.name as catname', 'student_outing.apply_date_time')
             ->get();
 
+        $blacklist = 0;
+
         if (strtoupper($outingcat[0]->catname) == $outing && isset($outingcat[0]->dorm_id)) {
             if (strtotime($intime) > strtotime("18:00:00") || $intime->toDateString() > $outingcat[0]->apply_date_time) {
                 $blacklist = 1;
             }
-        } else if (!isset($dormid)) {
+            else{
+                $blacklist = 0;
+            }
+        } 
+        else if (!isset($dormid)) {
             $blacklist = NULL;
-        } else {
+        } 
+        else {
             $blacklist = 0;
         }
 
-        DB::table('student_outing')
+        $result = DB::table('student_outing')
+                ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+                ->where([
+                    ['student_outing.id', $id],
+                    ['student_outing.status', 1],
+                    ['cs.outing_status', 1],
+                ])
+                ->update([
+                    'student_outing.in_date_time' => $intime,
+                    'cs.outing_status' => 0,
+                    'cs.blacklist' => $blacklist,
+                ]);
+        
+        if($result){
+            $query = DB::table('student_outing')
             ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->join('students', 'students.id', '=', 'cs.student_id')
             ->where([
                 ['student_outing.id', $id],
                 ['student_outing.status', 1],
-                ['cs.outing_status', 1],
-            ])
-            ->update([
-                'student_outing.in_date_time' => $intime,
-                'cs.outing_status' => 0,
-                'cs.blacklist' => $blacklist,
             ]);
+
+            $student = $query
+            ->value('students.nama');
+
+            $telno = $query
+            ->value('students.parent_tel');
+            
+            // function to send user email
+            // get penjaga id and send to that penjaga only
+            $arrayRecipientEmail = DB::table('users')
+            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+            ->where('organization_user.check_in_status', '=', 1)
+            ->orWhere('organization_user.role_id', '=', 4)
+            ->orWhere('users.telno', '=', $telno)
+            ->select('users.email')
+            ->get();
+
+            if (isset($arrayRecipientEmail)) {
+                foreach ($arrayRecipientEmail as $email) {
+                    // dd("here inside foreach");
+                    Mail::to($email)->send(new NotifyIn($student));
+
+                    if (Mail::failures()) {
+                        // dd("fail");
+                        return response()->Fail('Sorry! Please try again latter');
+                    } else {
+                        // return response()->success('Great! Successfully send in your mail');
+                        // dd("successs", $email);
+                    }
+                }
+            } else {
+                // do nothing 1st
+            }
+        }
 
         return redirect('/dorm')->with('success', 'Tarikh dan masa masuk telah dicatatkan');
     }
 
     public function updateArriveTime($id)
     {
-        DB::table('student_outing')
-            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-            ->where([
-                ['student_outing.id', $id],
-                ['student_outing.status', 1],
-                ['cs.outing_status', 1],
-            ])
-            ->update(['student_outing.arrive_date_time' => now()->toDateTimeString()]);
+        $query = DB::table('student_outing')
+        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+        ->where([
+            ['student_outing.id', $id],
+            ['student_outing.status', 1],
+            ['cs.outing_status', 1],
+        ]);
 
+        $result = $query
+                ->update(['student_outing.arrive_date_time' => now()->toDateTimeString()]);
+        
+        if($result){
+            $student = $query
+            ->join('students', 'students.id', '=', 'cs.student_id')
+            ->value('students.nama');
+
+            // function to send user email
+            $arrayRecipientEmail = DB::table('users')
+            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+            ->where('organization_user.check_in_status', '=', 1)
+            ->orWhere('organization_user.role_id', '=', 4)
+            ->select('users.email')
+            ->get();
+
+            if (isset($arrayRecipientEmail)) {
+                foreach ($arrayRecipientEmail as $email) {
+                    // dd("here inside foreach");
+                    Mail::to($email)->send(new NotifyArrive($student));
+
+                    if (Mail::failures()) {
+                        // dd("fail");
+                        return response()->Fail('Sorry! Please try again latter');
+                    } else {
+                        // return response()->success('Great! Successfully send in your mail');
+                        // dd("successs", $email);
+                    }
+                }
+            } else {
+                // do nothing 1st
+            }
+        }
+
+    
         return redirect('/dorm')->with('success', 'Tarikh dan masa sampai destinasi telah dicatatkan');
     }
 

@@ -49,36 +49,36 @@
 
                     <div class="form-group">
                         <label>Nama Pelajar</label>
-                        <input type="text" name="name" class="form-control" placeholder="Nama Pelajar">
+                        <select name="name" class="form-control">
+                            @foreach($students as $row)
+                                @if ($loop->first)
+                                <option value="{{ $row->sid }}" selected>{{ $row->nama }}</option>
+                                @else
+                                <option value="{{ $row->sid }}">{{ $row->nama }}</option>
+                                @endif
+                            @endforeach
+                        </select>
                     </div>
 
-                    <div class="form-group">
+                    <!-- <div class="form-group">
                         <label>Email Pelajar</label>
                         <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
-                    </div>
+                    </div> -->
 
                     <input id="outingdate" value="{{$outingdate}}" hidden>
+                    <!-- 注意这个 好像错了哦 预备的code 放在word了-->
                     <div class="form-group">
                         <label>Kategori</label>
                         <select name="category" id="category" class="form-control">
                             <option value="" disabled selected>Pilih Kategori Keluar</option>
-                            @if($outinglimit->dorm_id != NULL)
-                                @foreach($category as $row)
-                                    @if(strtoupper($row->name) == $outing && $outingdate < date("Y-m-d"))
-                                    <!-- dont display option outings -->
-                                    @elseif(strtoupper($row->name) == $balikKhas && $outinglimit->outing_limit == 2)
-                                    <!-- dont display option balik khas -->
-                                    @else
-                                    <option value="{{ $row->id }}" >{{ $row->name }}</option>
-                                    @endif
-                                @endforeach
-                            @else
-                                @foreach($category as $row)  
-                                    @if(strtoupper($row->name) == $balikKecemasan)
-                                        <option value="{{ $row->id }}" >{{ $row->name }}</option>
-                                    @endif
-                                @endforeach
-                            @endif
+                            @foreach($category as $row)
+                                @if(strtoupper($row->name) == $outing && $outingdate < date("Y-m-d"))
+                                <!-- dont display option outings -->
+                                
+                                @else
+                                <option value="{{ $row->id }}" >{{ $row->name }}</option>
+                                @endif
+                            @endforeach
                         </select>
                     </div>
 
@@ -128,8 +128,7 @@
     
     $("#category").change(function() {
     
-        if ($("#organization option:selected").text().toUpperCase() == "SEKOLAH MENENGAH TEKNIK MELAKA" ||
-        $("#organization option:selected").text().toUpperCase() == "SEKOLAH MENENGAH TEKNIK BUKIT PIATU") {
+        if ($("#organization option:selected").val != '') {
             if($("#category option:selected").text().toUpperCase() == "OUTINGS")
             {
                 start_date.value = start_date.max = null;
