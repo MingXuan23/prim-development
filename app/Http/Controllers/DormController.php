@@ -95,6 +95,14 @@ class DormController extends Controller
         return view('dorm.outing.index', compact('organization'));
     }
 
+    public function indexReasonOuting()
+    {
+        // 
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.classification.index', compact('organization'));
+    }
+
     public function indexResident($id)
     {
         // 
@@ -370,6 +378,13 @@ class DormController extends Controller
         return view('dorm.outing.add', compact('organization'));
     }
 
+    public function createReasonOuting()
+    {
+        //
+        $organization = $this->getOrganizationByUserId();
+        return view('dorm.classification.add', compact('organization'));
+    }
+
     public function createResident()
     {
         // $userid     = Auth::id();
@@ -501,6 +516,23 @@ class DormController extends Controller
         ]);
 
         return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
+    }
+
+    public function storeReasonOuting(Request $request)
+    {
+        // 
+        $this->validate($request, [
+            'reason'        =>  'required',
+        ]);
+
+        DB::table('classifications')->insert([
+            'name' => $request->get('reason'),
+            'description'   => $request->get('description'),
+            'limit'   => $request->get('limit'),
+            'organization_id' => $request->get('organization'),
+        ]);
+
+        return redirect('/dorm/dorm/indexReasonOuting')->with('success', 'New Reason has been added successfully');
     }
 
     public function storeResident(Request $request)
@@ -668,6 +700,23 @@ class DormController extends Controller
         return view('dorm.outing.update', compact('outing', 'organization', 'id'));
     }
 
+    public function editOutingReason($id)
+    {
+        //  
+
+        $reason = DB::table('classifications')
+            ->where('classifications.id', $id)
+            ->select('classifications.id', 'classifications.name', 'classifications.description', 'classifications.organization_id', 'classifications.limit')
+            ->first();
+
+        // dd($reason);
+        // dd($reason->id);
+
+        $organization = $this->getOrganizationByUserId();
+
+        return view('dorm.classification.update', compact('reason', 'organization', 'id'));
+    }
+
     public function editResident($id)
     {
         //  
@@ -815,6 +864,31 @@ class DormController extends Controller
         return redirect('/dorm/dorm/indexOuting')->with('success', 'The data has been updated!');
     }
 
+    public function updateReasonOuting(Request $request, $id)
+    {
+        //
+        // dd($id);
+        $this->validate($request, [
+            'name'        =>  'required',
+            'organization'      =>  'required',
+        ]);
+
+        DB::table('classifications')
+            ->where('id', $id)
+            ->update(
+                [
+                    'name' => $request->get('name'),
+                    'description'   => $request->get('description'),
+                    'limit'   => $request->get('limit')
+
+                ]
+            );
+
+
+
+        return redirect('/dorm/dorm/indexReasonOuting')->with('success', 'The data has been updated!');
+    }
+
     public function updateResident(Request $request, $id)
     {
         // dd($id);
@@ -958,6 +1032,20 @@ class DormController extends Controller
             return View::make('layouts/flash-messages');
         } else {
             Session::flash('error', 'Outing Gagal Dipadam');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
+    public function destroyReasonOuting($id)
+    {
+        //
+        $result = DB::table('classifications')->where('classifications.id', $id)->delete();
+
+        if ($result) {
+            Session::flash('success', 'Sebab Berjaya Dipadam');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Sebab Gagal Dipadam');
             return View::make('layouts/flash-messages');
         }
     }
@@ -1118,6 +1206,38 @@ class DormController extends Controller
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
                 $btn = $btn . '<a href="' . route('dorm.editOuting', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['action']);
+            return $table->make(true);
+        }
+    }
+
+    public function getReasonOutingDatatable(Request $request)
+    {
+        // dd($request->oid);
+        if (request()->ajax()) {
+            $oid = $request->oid;
+            $hasOrganizaton = $request->hasOrganization;
+
+            $userId = Auth::id();
+
+            if ($oid != '' && !is_null($hasOrganizaton)) {
+
+                $data = DB::table('classifications')
+                    ->select('classifications.id', 'classifications.name', 'classifications.description', 'classifications.limit')
+                    ->where('classifications.organization_id', $oid)
+                    ->get();
+            }
+
+            $table = Datatables::of($data);
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<a href="' . route('dorm.editOutingReason', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });
@@ -1882,8 +2002,7 @@ class DormController extends Controller
         $blacklist = 0;
 
         if (strtoupper($outingcat[0]->catname) == $outing && isset($outingcat[0]->dorm_id)) {
-            if(strtotime($intime) > strtotime("18:00:00") || $intime->toDateString() > $outingcat[0]->apply_date_time)
-            {
+            if (strtotime($intime) > strtotime("18:00:00") || $intime->toDateString() > $outingcat[0]->apply_date_time) {
                 $blacklist = 1;
             }
             else{
