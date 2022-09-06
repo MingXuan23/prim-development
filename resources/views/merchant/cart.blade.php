@@ -5,15 +5,21 @@
 @include('layouts.datatable')
 
 <style>
-  .noborder{
-    border: none!important;
-  }
+.noborder{
+  border: none!important;
+}
 
 #img-size
 {
   width: 100px;
   height: 100px;
   object-fit: cover;
+}
+
+.loading {
+  width: 35px;
+  height: 35px;
+  display:none;
 }
 
 </style>
@@ -25,9 +31,9 @@
 <div class="row align-items-center">
   <div class="col-sm-6">
       <div class="page-title-box">
-          <h4 class="font-size-18">Koperasi</h4>
+          <h4 class="font-size-18">Peniaga</h4>
           <ol class="breadcrumb mb-0">
-              <li class="breadcrumb-item active">Koperasi >> Pesanan Anda</li>
+              <li class="breadcrumb-item active">Peniaga >> Pesanan Anda</li>
           </ol>
       </div>
   </div>
@@ -44,48 +50,37 @@
         <div class="card-body">
 
           @if(Session::has('success'))
-          <div class="alert alert-success">
-            <p>{{ Session::get('success') }}</p>
-          </div>
+            <div class="alert alert-success">
+              <p>{{ Session::get('success') }}</p>
+            </div>
           @endif
 
           <div class="table-responsive">
             <table class="table table-borderless" width="100%" cellspacing="0">
                 <thead>
                     <tr class="text-center">
-                      <th style="width: 20%">Gambar</th>
-                      <th style="width: 30%">Nama Item</th>
+                      <th style="width: 25%">Nama Item</th>
                       <th style="width: 20%">Kuantiti</th>
                       <th style="width: 30%">Harga Satu Unit (RM)</th>
-                      <th style="width: 10%">Action</th>
+                      <th style="width: 25%">Action</th>
                     </tr>
                 </thead>
                 
                 <tbody>
-                  {{-- @if(count($cart_item) != 0 || $cart)
-                  @foreach($cart_item as $row) --}}
-                    
+                  @forelse($cart_item as $row)
                     <tr class="text-center">
-                      <td>
-                          <img src="{{ URL('images/koperasi/default-item.png')}}" class="rounded img-fluid" id="img-size" style="background-color: rgb(61, 61, 61)">
-                          {{-- <img src="{{ URL('koperasi-item/'.$row->image)}}" class="rounded img-fluid" id="img-size"> --}}
-                      </td>
-                      <td class="align-middle"></td>
-                      <td class="align-middle"></td>
-                      <td class="align-middle"></td>
+                      <td class="align-middle">{{ $row->name }}</td>
+                      <td class="align-middle">{{ $row->quantity }}</td>
+                      <td class="align-middle">{{ number_format($row->price , 2, '.', '') }}</td>
                       <td class="align-middle">
-                        <form action="#" method="POST">
-                          @csrf
-                          @method('delete')
-                          <button type="submit" class="btn btn-danger">Buang</button>
-                        </form>
+                          <button type="button" data-cart-order-id="{{ $row->id }}" class="delete-item btn btn-danger">Buang</button>
                       </td>
                     </tr>
-                  
+                  @empty
                     <tr>
-                      <td colspan="5" class="text-center"><i>Tiada Item Buat Masa Sekarang.</i></td>
+                      <td colspan="4" class="text-center"><i>Tiada Item Buat Masa Sekarang.</i></td>
                     </tr>
-                  
+                  @endforelse
                 </tbody>
             </table>
           </div>
@@ -93,56 +88,30 @@
         </div>
       </div>
 
-      
-      <form action="#" method="POST">
-        @csrf
-        @method('PUT')
+      @if(count($cart_item) != 0)
         <div class="card mb-4 border">
           <div class="card-body p-4">
-
             <div class="table-responsive">
               <table class="table table-borderless mb-0">
-                
                   <tbody>
-                      <tr>
-                          <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
-                          
-                          <td class="lead">RM </td>
-                          
-                          <td class="lead">RM 0.00</td>
-                          
-                      </tr>
+                    <tr>
+                      <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
+                      <td class="lead">RM {{ number_format($cart->total_price , 2, '.', '') }}</td>
+                    </tr>
+
+                    <tr>
+                      <th class="text-muted" scope="row">Waktu Pengambilan:</th>
+                      <td class="lead">{{ $pickup_date }}</td>
+                    </tr>
                   </tbody>
-                
               </table>
-          </div>
-
-          </div>
-        </div>
-
-        
-        <div class="card mb-4 border">
-          <div class="card-body p-4">
-            <div class="row">
-              <div class="col">
-                <div class="form-group required">
-                  {{-- <label for="example-date-input" class="col-sm-2">Tarikh Pengambilan</label>
-                  <div class="col">
-                      <input class="form-control" type="date" value="{{ $tomorrowDate}}" min="{{ $tomorrowDate }}" id="date_pick_up">
-                  </div> --}}
-                  <label class="col-sm-2">Hari Pengambilan</label>
-                    <div class="col">
-                        <select class="form-control" data-parsley-required-message="Sila pilih hari" id="pick_up_date" required>
-                          <option value="" selected>Pilih Hari</option>
-                        </select>
-                        
-                    </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
+      <form action="{{ route('merchant.storeOrderPayment', ['o_id' => $id, 'p_id' => $cart->id]) }}" method="POST">
+        @csrf
+        @method('PUT')
         <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
@@ -157,21 +126,39 @@
             </div>
           </div>
         </div>
-        
-        <input type="hidden" name="week_status" id="week_status" value="">
-
+        @endif
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
-            <a href="#" type="button" class="btn btn-light mr-2">Kembali</a>
-              <button type="submit" class="btn btn-primary">Bayar</button>
+            <a href="{{ route('merchant.show', $id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
+            @if(count($cart_item) != 0)<button type="submit" class="btn-lg btn-primary">Bayar</button>@endif
           </div>
         </div>
-
       </form>
 
     </div>
   </div>
 </div>
+
+{{-- Delete Confirmation Modal --}}
+<div id="deleteConfirmModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title"><i class="fas fa-info-circle"></i>  Buang Item</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            Anda pasti mahu buang item ini?
+          </div>
+          <div class="modal-footer">
+            <button type="button" data-dismiss="modal" class="btn btn-light">Tidak</button>
+            <img class="loading" src="{{ URL('images/koperasi/loading-ajax.gif')}}">
+            <button type="button" data-dismiss="modal" class="btn btn-danger" id="delete_confirm_item">Buang</button>
+          </div>
+      </div>
+  </div>
+</div>
+  {{-- end Delete Confirmation Modal --}}
 
 
 
@@ -181,7 +168,42 @@
 
 <script>
   $(document).ready(function(){
-    $('.alert').delay(2000).fadeOut();
+
+    var order_cart_id = null
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $('.delete-item').click(function() {
+      order_cart_id = $(this).attr('data-cart-order-id')
+      $('#deleteConfirmModal').modal('show')
+    })
+
+    $('#delete_confirm_item').click(function() {
+      $.ajax({
+        url: "{{ route('merchant.destroyItem') }}",
+        method: "DELETE",
+        data: {oc_id:order_cart_id},
+        beforeSend:function() {
+          $('.loading').show()
+          $(this).hide()
+          $('.alert-success').empty()
+        },
+        success:function(result) {
+          $('.loading').hide()
+          $(this).show()
+          
+          location.reload()
+        },
+        error:function(result) {
+          console.log(result.responseText)
+        }
+      })
+    })
+
   });
 </script>
 

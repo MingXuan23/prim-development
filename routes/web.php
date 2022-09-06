@@ -179,14 +179,26 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi'], function() {
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'merchant'], function() {
     Route::get('/', 'MerchantController@merchantList')->name('merchant.index');
+
+    Route::get('order', 'MerchantController@showOrder')->name('merchant.order');
+    Route::delete('order/{id}', 'MerchantController@destroyOrder')->name('merchant.destroyOrder');
+
+    Route::get('history', 'MerchantController@showHistory')->name('merchant.history');
+
+    Route::get('list/{id}', 'MerchantController@showList')->name('merchant.list');
+
     Route::get('/{id}', 'MerchantController@showMerchant')->name('merchant.show');
-    Route::post('fetchItem', 'MerchantController@fetchItem')->name('merchant.fetchItem');
-    Route::post('store-item', 'MerchantController@storeItem')->name('merchant.storeItem');
-    Route::get('/{id}/merchant-cart', 'MerchantController@showMerchantCart')->name('merchant.cart');
     Route::post('fetchDay', 'MerchantController@fetchDay')->name('merchant.fetchDay');
     Route::post('fetchTime', 'MerchantController@fetchTime')->name('merchant.fetchTime');
     Route::post('storeOrderDate', 'MerchantController@storeOrderDate')->name('merchant.storeOrderDate');
     Route::post('destroyOldOrder', 'MerchantController@destroyOldOrder')->name('merchant.destroyOldOrder');
+
+    Route::post('fetchItem', 'MerchantController@fetchItem')->name('merchant.fetchItem');
+    Route::post('store-item', 'MerchantController@storeItem')->name('merchant.storeItem');
+
+    Route::get('/{id}/merchant-cart', 'MerchantController@showMerchantCart')->name('merchant.cart');
+    Route::delete('destroyItem', 'MerchantController@destroyCartItem')->name('merchant.destroyItem');
+    Route::put('{o_id}/merchant-cart/{p_id}', 'MerchantController@storeOrderAfterPayment')->name('merchant.storeOrderPayment');
     
     Route::post('testType', 'MerchantController@testType')->name('merchant.testType');
 });

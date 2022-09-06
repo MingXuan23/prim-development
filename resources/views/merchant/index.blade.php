@@ -45,34 +45,40 @@
     <div class="card">
       <div class="card-body">
         <div class="list-group">
-            @foreach($merchant as $row)
-              @if($oh_status[$row->id] == 1)
-              {{-- <a href="{{ route('merchant.show', $row->id) }}" class="list-group-item list-group-item-action flex-column"> --}}
-              <a id="order_modal" data-org-id="{{ $row->id }}" class="list-group-item list-group-item-action flex-column">
-              @csrf
-              @else
-              <a id="closed_modal" class="list-group-item list-group-item-action flex-column" style="opacity: 50%">
-              @endif
-                <div class="d-flex" >
-                    <img class="rounded img-fluid bg-dark" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
-                    <div class="flex-column ml-2">
-                        <h4 class="merchant_name" id="{{$oh_status[$row->id]}}">{{ $row->nama }}</h4>
-                        <div class="d-flex">
-                          <div class="justify-content-center align-items-center mr-2">
-                            <i class="fas fa-map-marker-alt"></i>
-                          </div>
-                          <p class="m-0">{{ $row->address }} , {{$row->city}} , {{$row->state}}</p>
+          @if(Session::has('success'))
+          <div class="alert alert-success">
+            <p>{{ Session::get('success') }}</p>
+          </div>
+          @endif
+
+          @foreach($merchant as $row)
+            @if($oh_status[$row->id] == 1)
+            {{-- <a href="{{ route('merchant.show', $row->id) }}" class="list-group-item list-group-item-action flex-column"> --}}
+            <a id="order_modal" data-org-id="{{ $row->id }}" class="list-group-item list-group-item-action flex-column">
+            @csrf
+            @else
+            <a id="closed_modal" class="list-group-item list-group-item-action flex-column" style="opacity: 50%">
+            @endif
+              <div class="d-flex" >
+                  <img class="rounded img-fluid bg-dark" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
+                  <div class="flex-column ml-2">
+                      <h4 class="merchant_name" id="{{$oh_status[$row->id]}}">{{ $row->nama }}</h4>
+                      <div class="d-flex">
+                        <div class="justify-content-center align-items-center mr-2">
+                          <i class="fas fa-map-marker-alt"></i>
                         </div>
-                        
-                        {{-- <p class="m-0"><i class="mdi mdi-bike-fast mr-2"></i>RM </p> --}}
-                        {{-- <p class="m-0"><i class="mdi mdi-food mr-2"></i> </p>--}}
-                    </div>
-                    <div class="arrow-icon ml-auto justify-content-end align-self-center">
-                        <h1><i class="fas fa-angle-right"></i></h1>
-                    </div>
-                </div>
-              </a>
-            @endforeach
+                        <p class="m-0">{{ $row->address }} , {{$row->city}} , {{$row->state}}</p>
+                      </div>
+                      
+                      {{-- <p class="m-0"><i class="mdi mdi-bike-fast mr-2"></i>RM </p> --}}
+                      {{-- <p class="m-0"><i class="mdi mdi-food mr-2"></i> </p>--}}
+                  </div>
+                  <div class="arrow-icon ml-auto justify-content-end align-self-center">
+                      <h1><i class="fas fa-angle-right"></i></h1>
+                  </div>
+              </div>
+            </a>
+          @endforeach
           {{-- <div class="text-center">
             <p><i>Tiada Restoran di dalam Negeri anda</i></p>
           </div> --}}
@@ -337,6 +343,8 @@
         popup.append('<p>'+message+'</p>')
         popup.delay(3000).fadeOut()
       }
+
+      $('.alert-success').delay(2000).fadeOut()
 
     })
 </script>

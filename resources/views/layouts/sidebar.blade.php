@@ -251,7 +251,7 @@
             <li>
                 <a href="#" class=" waves-effect">
                     <i class="mdi mdi-account-group"></i>
-                    <span>Admin Peniaga</span>
+                    <span>Urus Peniaga</span>
                 </a>
             </li>
             @endrole
@@ -278,13 +278,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('merchant.order') }}" class=" waves-effect">
                             <i class="ti-email"></i>
                             <span>Pesanan</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('merchant.history') }}" class=" waves-effect">
                             <i class="ti-clipboard"></i>
                             <span>Sejarah</span>
                         </a>

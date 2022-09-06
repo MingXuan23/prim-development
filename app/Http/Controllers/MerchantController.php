@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class MerchantController extends Controller
 {
@@ -41,24 +43,31 @@ class MerchantController extends Controller
         $user_id = Auth::id();
         $org_id = $request->get('o_id');
         $day_body = "";
+        $order_id = "";
 
         $query = PickUpOrder::where([['user_id', $user_id], ['organization_id', $org_id], ['status', 1]]);
+        $allDay = OrganizationHours::where('organization_id', $org_id)->where('status', 1)->get(); // Get all open day organization
+        
         $exist = $query->exists();
         
         # If Order already exists for this organization
         if(!$exist)
         {
-            $allDay = OrganizationHours::where('organization_id', $org_id)->where('status', 1)->get(); // Get all open day organization
-
             $day_body = $this->getDayBody($allDay);
-
-            return response()->json(['day_body' => $day_body]);
         }
         else
         {
             $order = $query->first();
-            return response()->json(['order_id' => $order->id, 'path' => '/merchant/'.$org_id, 'day_body' => $day_body]);
+            $order_id = $order->id;
+
+            $isDelete = $this->deleteExpiredOrder($order_id);
+
+            if($isDelete)
+            {
+                $day_body = $this->getDayBody($allDay);
+            }
         }
+        return response()->json(['order_id' => $order_id, 'path' => '/merchant/'.$org_id, 'day_body' => $day_body]);
     }
 
     private function getDayBody($all_open_days)
@@ -94,6 +103,23 @@ class MerchantController extends Controller
         }
 
         return $body;
+    }
+
+    private function deleteExpiredOrder($id)
+    {
+        $order = DB::table('pickup_order')->where('id', $id);
+        $getOrder = $order->first();
+        
+        $expiredDate_pickup = Carbon::now()->subHours(2)->toDateTimeString();
+        $expiredDate_created = Carbon::now()->subDay()->toDateTimeString();
+
+        if($getOrder->pickup_date <= $expiredDate_pickup || $getOrder->created_at <= $expiredDate_created)
+        {
+            $order->delete();
+            return 1; // deleted
+        }
+
+        return 0; // not delete
     }
 
     public function fetchTime(Request $request)
@@ -560,36 +586,168 @@ class MerchantController extends Controller
                     ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
                     ->where('po.status', 1)
                     ->where('po.pickup_order_id', $cart->id)
-                    ->select('po.id', 'po.quantity', 'pi.name', 'pi.price', 'pi.image')
+                    ->select('po.id', 'po.quantity', 'pi.name', 'pi.price')
                     ->get();
 
-            // $tomorrowDate = Carbon::tomorrow()->format('Y-m-d');
+            $pickup_date = Carbon::parse($cart->pickup_date)->format('d-m-Y H:i A');
 
-            $allDay = OrganizationHours::where([
-                ['organization_id', $id],
-                ['status', 1],
-            ])->get();
-            
-            $isPast = array();
-            
-            foreach($allDay as $row)
-            {
-                $TodayDate = Carbon::now()->format('l');
-                // $MondayNextWeek = Carbon::now()->next(1);
-
-                $day = $this->getDayIntegerByDayName($TodayDate);
-
-                $key = strval($row->day);
-                
-                $isPast = $this->getDayStatus($day, $row->day, $isPast, $key);
-            }
-            return view('koperasi.cart', compact('cart', 'cart_item', 'allDay', 'isPast' ,'id'));
+            return view('merchant.cart', compact('cart', 'cart_item','id', 'pickup_date'));
         }
         else
         {
-            return view('koperasi.cart', compact('cart', 'cart_item' , 'id'));
+            // Coming soon - display page cart is empty
+            return view('merchant.cart', compact('cart', 'cart_item' , 'id'));
         }
-        return view('merchant.cart');
+    }
+
+    public function destroyCartItem(Request $request)
+    {
+        $id = $request->get('oc_id');
+
+        $cart_item = ProductOrder::where('id', $id);
+
+        $item = $cart_item->first();
+
+        $cart_item->forceDelete();
+
+        $allCartItem = DB::table('product_order')
+                        ->where('pickup_order_id', $item->pickup_order_id)
+                        ->where('status', 1)
+                        ->count();
+        
+        // If cart is not empty
+        if($allCartItem != 0)
+        {
+            $newTotalPrice = $this->calculateTotalPrice($item->pickup_order_id);
+        }
+        else
+        {
+            $newTotalPrice = null;
+        }
+        
+        PickUpOrder::find($item->pickup_order_id)->update(['total_price' => $newTotalPrice]);
+    }
+
+    public function storeOrderAfterPayment(Request $request, $o_id, $p_id)
+    {   
+        PickUpOrder::find($p_id)->update([
+            'note' => $request->note,
+            'status' => 2,
+        ]);
+
+        ProductOrder::where('pickup_order_id', $p_id)->update(['status' => 2]);
+
+        return redirect('/merchant')->with('success', 'Pesanan Berjaya direkodkan');
+    }
+
+    public function showOrder()
+    {
+        $userID = Auth::id();
+        $total_price[] = 0;
+        $pickup_date[] = 0;
+        
+        $order = DB::table('pickup_order as pu')
+                ->join('organizations as o', 'pu.organization_id', '=', 'o.id')
+                ->whereIn('status', [2,4])
+                ->where('o.type_org', 2132)
+                ->where('pu.user_id', $userID)
+                ->select('pu.*', 'o.nama as merchant_name', 'o.telno as merchant_telno')
+                ->orderBy('pu.status', 'desc')
+                ->orderBy('pu.pickup_date', 'asc')
+                ->orderBy('pu.updated_at', 'desc')
+                ->paginate(5);
+
+        foreach($order as $row)
+        {
+            $total_price[$row->id] = number_format($row->total_price, 2, '.', '');
+            $pickup_date[$row->id] = Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+        }
+
+        return view('merchant.order', compact('order', 'total_price', 'pickup_date'));
+    }
+
+    public function destroyOrder($id)
+    {
+        $order = PickUpOrder::find($id);
+        $order->update(['status' => 200]);
+        $result_order = $order->delete();
+        
+        $cart = ProductOrder::where('pickup_order_id', $id);
+        $cart->update(['status' => 200]);
+        $result_cart = $cart->delete();
+        
+        if($result_order && $result_cart)
+        {
+            Session::flash('success', 'Pesanan Berjaya Dibuang');
+            return View::make('layouts/flash-messages');
+        }
+        else
+        {
+            Session::flash('error', 'Pesanan Gagal Dibuang');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
+    public function showHistory()
+    {
+        $userID = Auth::id();
+        $total_price[] = 0;
+        $pickup_date[] = 0;
+        
+        $history = DB::table('pickup_order as pu')
+                ->join('organizations as o', 'pu.organization_id', '=', 'o.id')
+                ->whereIn('status', [3,100,200])
+                ->where('pu.user_id', $userID)
+                ->where('o.type_org', 2132)
+                ->select('pu.*', 'o.nama as merchant_name', 'o.telno as merchant_telno')
+                ->orderBy('pu.status', 'desc')
+                ->orderBy('pu.pickup_date', 'asc')
+                ->orderBy('pu.updated_at', 'desc')
+                ->paginate(5);
+
+        foreach($history as $row)
+        {
+            $total_price[$row->id] = number_format($row->total_price, 2, '.', '');
+            $pickup_date[$row->id] = Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+        }
+
+        return view('merchant.history', compact('history', 'total_price', 'pickup_date'));
+    }
+
+    public function showList($id)
+    {
+        $userID = Auth::id();
+
+        // Get Information about the order
+        $list = DB::table('pickup_order as pu')
+                ->join('organizations as o', 'pu.organization_id', '=', 'o.id')
+                ->where('pu.id', $id)
+                ->where('pu.status', '>' , 0)
+                ->where('pu.user_id', $userID)
+                ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
+                        'o.id','o.nama', 'o.parent_org', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state')
+                ->first();
+
+        $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
+        $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
+        $total_order_price = number_format($list->total_price, 2, '.', '');
+
+        // get all product based on order
+        $item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+                ->where('po.pickup_order_id', $id)
+                ->select('po.id', 'pi.name', 'pi.price', 'po.quantity')
+                ->get();
+
+        $total_price[] = array();
+        
+        foreach($item as $row)
+        {
+            $price[$row->id] = number_format($row->price, 2, '.', '');
+            $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2, '.', ''); // calculate total for each item in cart
+        }
+
+        return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price'));
     }
 
     # Testing function for insert product group data and queue data

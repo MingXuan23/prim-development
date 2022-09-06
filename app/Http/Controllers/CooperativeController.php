@@ -577,7 +577,7 @@ class CooperativeController extends Controller
         $queryKO = PickUpOrder::where('id', $id);
         $queryKO->update(['status' => 200]);
         $resultKO = $queryKO->delete();
-
+        
         $queryPO = ProductOrder::where('pickup_order_id', $id);
 
         $order = $queryPO->get();
