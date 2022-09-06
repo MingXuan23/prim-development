@@ -161,7 +161,7 @@
                                 <li>
                                     <a href="{{ route('dorm.indexReasonOuting') }}" class=" waves-effect">
                                         <i class="fas fa-bus-alt"></i>
-                                        <span>Sebab Permintaan Keluar</span>
+                                        <span>Sebab Permintaan</span>
                                     </a>
                                 </li>
                                 @endrole

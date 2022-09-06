@@ -51,9 +51,24 @@
                     </select>
                 </div>
 
+
+
+                <div class="form-group">
+                    <label>Kategori Sebab Permintaan Keluar</label>
+                    <select id="optionReason" class="form-control" name="reason">
+                        @foreach($reasonlist as $list)
+                        @if($list->id == $reason->id)
+                        <option value="{{$list->name}}" selected>{{$list->name}}</option>
+                        @else
+                        <option value="{{$list->name}}">{{$list->name}}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Nama Sebab Permintaan Keluar</label>
-                    <input type="text" name="name" class="form-control" placeholder="Nama Sebab Permintaan Keluar" value="{{$reason->name}}">
+                    <input type="text" name="name" class="form-control" placeholder="Nama Sebab Permintaan Keluar" value="{{$reason->fake_name}}">
                 </div>
 
                 <div class="form-group">
@@ -64,6 +79,16 @@
                 <div class="form-group">
                     <label>Limit Permintaan Keluar</label>
                     <input type="number" name="limit" class="form-control" placeholder="Limit Pelajar boleh Keluar untuk Sebab ini" value="{{$reason->limit}}">
+                </div>
+
+                <div class="form-group">
+                    <label>Hari Sebelum Permintaan Keluar</label>
+                    <input type="number" name="day" class="form-control" placeholder="Hanya Membenarkan Penjaga Memohon Beberapa Hari Sebelum Hari ingin Keluar. Letak 0 Jika Boleh Mohon Pada Hari yang Sama. " value="{{$reason->day_before}}">
+                </div>
+
+                <div class="form-group">
+                    <label>Masa Limit Balik</label>
+                    <input type="time" name="time" class="form-control" placeholder="Pelajar akan Diletakkan dalam Blacklist Jika Lewat Balik Asrama Selepas Masa Ini. " value="{{$reason->time_limit}}">
                 </div>
 
                 <div class="form-group mb-0">

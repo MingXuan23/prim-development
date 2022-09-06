@@ -68,6 +68,7 @@
                                 <th>Sebab Permintaan Keluar</th>
                                 <th>Deskripsi</th>
                                 <th>Limit Keluar</th>
+                                <th>Limit Masa Balik</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -152,8 +153,8 @@
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
                 }, {
-                    data: "name",
-                    name: 'name',
+                    data: "fake_name",
+                    name: 'fake_name',
                     orderable: true,
                     searchable: true
                 }, {
@@ -164,6 +165,11 @@
                 }, {
                     data: "limit",
                     name: 'limit',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: "time_limit",
+                    name: 'time_limit',
                     orderable: false,
                     searchable: false
                 }, {

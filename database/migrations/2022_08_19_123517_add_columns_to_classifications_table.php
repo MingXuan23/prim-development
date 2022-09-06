@@ -15,7 +15,10 @@ class AddColumnsToClassificationsTable extends Migration
     {
         Schema::table('classifications', function (Blueprint $table) {
             //
-            $table->integer('limit')->unsigned()->nullable();
+            $table->integer('limit')->unsigned();
+            $table->time('time_limit')->nullable();
+            $table->integer('day_before')->unsigned();
+            $table->string('fake_name');
             $table->bigInteger('organization_id')->unsigned();
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });

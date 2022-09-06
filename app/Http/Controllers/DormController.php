@@ -379,6 +379,7 @@ class DormController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
+
         return view('dorm.classification.add', compact('organization'));
     }
 
@@ -519,14 +520,32 @@ class DormController extends Controller
     {
         // 
         $this->validate($request, [
-            'reason'        =>  'required',
+            'optionReason'        =>  'required',
+            'name'                => 'required',
+            'day'                 => 'required'
         ]);
 
+        if ($request->get('optionReason') == 5) {
+            $name = $request->get('name');
+        } else if ($request->get('optionReason') == 1) {
+            $name = "Outings";
+        } else if ($request->get('optionReason') == 2) {
+            $name = "Balik Wajib";
+        } else if ($request->get('optionReason') == 3) {
+            $name = "Balik Khas";
+        } else if ($request->get('optionReason') == 4) {
+            $name = "Balik Kecemasan";
+        }
+
+
         DB::table('classifications')->insert([
-            'name' => $request->get('reason'),
+            'name'       => $name,
+            'fake_name' => $request->get('name'),
             'description'   => $request->get('description'),
             'limit'   => $request->get('limit'),
+            'day_before' => $request->get('day'),
             'organization_id' => $request->get('organization'),
+            'time_limit'    => $request->get('time')
         ]);
 
         return redirect('/dorm/dorm/indexReasonOuting')->with('success', 'New Reason has been added successfully');
@@ -703,15 +722,19 @@ class DormController extends Controller
 
         $reason = DB::table('classifications')
             ->where('classifications.id', $id)
-            ->select('classifications.id', 'classifications.name', 'classifications.description', 'classifications.organization_id', 'classifications.limit')
+            ->select('classifications.id', 'classifications.time_limit', 'classifications.day_before', 'classifications.fake_name', 'classifications.name as name', 'classifications.description', 'classifications.organization_id', 'classifications.limit')
             ->first();
 
-        // dd($reason);
+        $reasonlist = DB::table('classifications')
+            ->select('classifications.id', 'classifications.time_limit', 'classifications.day_before', 'classifications.fake_name', 'classifications.name as name', 'classifications.description', 'classifications.organization_id', 'classifications.limit')
+            ->get();
+
+        // dd($reason->description);
         // dd($reason->id);
 
         $organization = $this->getOrganizationByUserId();
 
-        return view('dorm.classification.update', compact('reason', 'organization', 'id'));
+        return view('dorm.classification.update', compact('reason', 'organization', 'id', 'reasonlist'));
     }
 
     public function editResident($id)
@@ -868,6 +891,8 @@ class DormController extends Controller
         $this->validate($request, [
             'name'        =>  'required',
             'organization'      =>  'required',
+            'day'           => 'required',
+            'reason'    => 'required'
         ]);
 
         DB::table('classifications')
@@ -876,7 +901,9 @@ class DormController extends Controller
                 [
                     'name' => $request->get('name'),
                     'description'   => $request->get('description'),
-                    'limit'   => $request->get('limit')
+                    'limit'   => $request->get('limit'),
+                    'time_limit'    => $request->get('time'),
+                    'day_before'    => $request->get('day')
 
                 ]
             );
@@ -1224,7 +1251,7 @@ class DormController extends Controller
             if ($oid != '' && !is_null($hasOrganizaton)) {
 
                 $data = DB::table('classifications')
-                    ->select('classifications.id', 'classifications.name', 'classifications.description', 'classifications.limit')
+                    ->select('classifications.id', 'classifications.time_limit', 'classifications.name', 'classifications.fake_name', 'classifications.description', 'classifications.limit')
                     ->where('classifications.organization_id', $oid)
                     ->get();
             }
