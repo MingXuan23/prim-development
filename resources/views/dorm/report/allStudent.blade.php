@@ -32,14 +32,12 @@
 
                 <div class="form-group">
                     <label>Tarikh Mula</label>
-                    <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
-                            placeholder="Pilih Tarikh Mula">
+                    <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date" placeholder="Pilih Tarikh Mula">
                 </div>
 
                 <div class="form-group">
                     <label>Tarikh Tamat</label>
-                    <input onclick="this.showPicker()" class="form-control" id="end_date" name="end_date" type="date"
-                            placeholder="Pilih Tarikh Tamat">
+                    <input onclick="this.showPicker()" class="form-control" id="end_date" name="end_date" type="date" placeholder="Pilih Tarikh Tamat">
                 </div>
             </div>
 
@@ -51,6 +49,7 @@
             <div class="card-header">Senarai</div>
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
+                <a style="margin: 19px; " href="#" class="btn btn-success " data-toggle="modal" data-target="#modelId2"> <i class="fa fa-print"></i> Print</a>
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.resetOutingLimit') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Set Outing Limit To Empty</a>
             </div>
 
@@ -95,8 +94,7 @@
 
         <!-- Modal -->
         <!-- export -->
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
+        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -113,23 +111,61 @@
                                 <label>Organisasi</label>
                                 <select name="organExport" id="organExport" class="form-control">
                                     @foreach($organization as $row)
-                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Tarikh Mula</label>
-                                <input onclick="this.showPicker()" class="form-control" id="from" name="from" type="date"
-                                        placeholder="Pilih Tarikh Mula">
+                                <input onclick="this.showPicker()" class="form-control" id="from" name="from" type="date" placeholder="Pilih Tarikh Mula">
                             </div>
 
                             <div class="form-group">
                                 <label>Tarikh Tamat</label>
-                                <input onclick="this.showPicker()" class="form-control" id="to" name="to" type="date"
-                                        placeholder="Pilih Tarikh Tamat">
+                                <input onclick="this.showPicker()" class="form-control" id="to" name="to" type="date" placeholder="Pilih Tarikh Tamat">
                             </div>
                             <div class="modal-footer">
                                 <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- print -->
+        <div class="modal fade" id="modelId2" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Print Laporan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <form action="{{ route('dorm.printallrequest') }}" method="get">
+                        <div class="modal-body">
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                                <label>Organisasi</label>
+                                <select name="organExport" id="organExport" class="form-control">
+                                    @foreach($organization as $row)
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tarikh Mula</label>
+                                <input onclick="this.showPicker()" class="form-control" id="from" name="from" type="date" placeholder="Pilih Tarikh Mula">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Tarikh Tamat</label>
+                                <input onclick="this.showPicker()" class="form-control" id="to" name="to" type="date" placeholder="Pilih Tarikh Tamat">
+                            </div>
+                            <div class="modal-footer">
+                                <button id="buttonExport" type="submit" class="btn btn-primary">Print</button>
                             </div>
                         </div>
                     </form>
@@ -151,9 +187,9 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    $(document).ready(function(){
+    $(document).ready(function() {
         end_date.max = start_date.max = end_date.value = start_date.value = new Date().toISOString().split("T")[0];
-        
+
         var requestTable;
 
         if ($("#organization").val() != "") {
@@ -224,15 +260,14 @@
         });
 
         $('#organExport').change(function() {
-            var organizationid    = $("#organExport").val();
+            var organizationid = $("#organExport").val();
             $('#requestTable').DataTable().destroy();
             // var _token            = $('input[name="_token"]').val();
             fetch_data(organizationid);
         });
 
         $('#end_date').change(function() {
-            if(end_date.value < start_date.value)
-            {
+            if (end_date.value < start_date.value) {
                 end_date.value = start_date.value;
             }
             to.value = end_date.value;
@@ -249,8 +284,7 @@
         });
 
         $('#to').change(function() {
-            if(to.value < from.value)
-            {
+            if (to.value < from.value) {
                 to.value = from.value;
             }
             var organizationid = $("#organExport").val();

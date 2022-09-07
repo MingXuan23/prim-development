@@ -438,6 +438,46 @@ class DormController extends Controller
         return $pdf->download('Report ' . $details->studentName . '.pdf');
     }
 
+    public function printallrequest(Request $request)
+    {
+        // $student_id = $request->student_id;
+
+        $details = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+            ->where('class_organization.organization_id', '=', $request->organExport)
+            ->select(
+                'organizations.nama as schoolName',
+                'organizations.address as schoolAddress',
+                'organizations.postcode as schoolPostcode',
+                'organizations.state as schoolState',
+            )
+            ->first();
+
+        // dd($details->studentName);
+        $data = DB::table('students')
+            ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+            ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+            ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+            ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+            ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+            ->where([
+                ['ou.organization_id',  $request->organExport],
+            ])
+            ->whereBetween('so.apply_date_time', [$request->from, $request->to])
+            ->select('classifications.name as catname', DB::raw('count("so.id") as total'))
+            ->groupBy('classifications.name')
+            ->get();
+
+        $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details'));
+
+        return $pdf->download('Report.pdf');
+    }
+
     /**
      * Show the form for creating a new resource.
      *
