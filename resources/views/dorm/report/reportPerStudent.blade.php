@@ -48,10 +48,10 @@
             <div class="card-header">Laporan {{$studentName->studentName}}</div>
             <div>
                 <span hidden id="getId">{{$id}}</span>
-                <!-- <a style="margin: 19px;" href="#" class="btn btn-primary allBtn"> <i class="far fa-id-badge"></i> All</a>
-                <a style="margin: 19px;" href="#" class="btn btn-primary blacklistBtn"> <i class="far fa-id-badge"></i> Blacklist</a>-->
                 <a style="margin: 19px; float: right;" href="#" class="btn btn-success exportCat" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export Category</a>
                 <a style="margin: 19px; float: right;" href="#" class="btn btn-success exportAll" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Export All</a>
+                <a style="margin: 19px; float: right;" href="#" class="btn btn-success printAll" data-toggle="modal" data-target="#modelId3"> <i class="fa fa-print"></i> Print All</a>
+                <a style="margin: 19px; float: right;" href="#" class="btn btn-success printCat" data-toggle="modal" data-target="#modelId4"> <i class="fa fa-print"></i> Print Category</a>
             </div>
 
             <div class="card-body">
@@ -159,6 +159,83 @@
                                     <input name="studentid" value="{{$id}}" hidden></input>
 
                                     <button type="submit" class="btn btn-primary">Export Semua</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- print all reason modal-->
+                <div class="modal fade" id="modelId3" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Print All</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <!-- print pelajar -->
+                            <form action="{{ route('dorm.printall') }}" method="get">
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label> Tarikh bermula</label>
+                                        <input type="date" id="fromTime" name="fromTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label> Tarikh berakhir</label>
+                                        <input type="date" id="untilTime" name="untilTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    {{ csrf_field() }}
+                                    <input name="studentid" value="{{$id}}" hidden></input>
+
+                                    <button type="submit" class="btn btn-primary">Print Semua</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- print particular reason modal-->
+                <div class="modal fade" id="modelId4" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Print Category</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <!-- category -->
+                            <form action="{{ route('dorm.printcategory') }}" method="get">
+                                <div class="modal-body">
+
+                                    {{ csrf_field() }}
+                                    <div class="form-group">
+                                        <!-- category list -->
+                                        <label>Kategori</label>
+                                        <select name="category" id="category" class="form-control">
+                                            <option value="" selected disabled>Pilih Kategori</option>
+                                            @foreach($applicationCat as $row)
+                                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <input name="studentid" value="{{$id}}" hidden></input>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label> Tarikh bermula</label>
+                                        <input type="date" id="fromTime" name="fromTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label> Tarikh berakhir</label>
+                                        <input type="date" id="untilTime" name="untilTime" min="{{$minDate}}" max="{{$maxDate}}" class="form-control">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Print Kategori</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>

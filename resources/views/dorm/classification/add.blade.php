@@ -49,7 +49,7 @@
                 <!-- real name -->
                 <div class="form-group">
                     <label>Kategori Sebab Permintaan Keluar</label>
-                    <select id="optionReason" name="optionReason" class="form-control">
+                    <select id="optionReason" class="form-control" name="optionReason">
                         <option value=1>Outings</option>
                         <option value=2>Balik Wajib</option>
                         <option value=3>Balik Khas</option>

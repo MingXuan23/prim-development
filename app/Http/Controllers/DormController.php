@@ -34,7 +34,9 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\NotifyMail;
 use App\Mail\NotifyArrive;
 use App\Mail\NotifyIn;
-
+use App\Mail\NotifyApproval;
+use App\Mail\NotifyOut;
+use PDF;
 use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
 
@@ -320,6 +322,160 @@ class DormController extends Controller
         return view('dorm.report.reportPerStudent', compact('studentName', 'applicationCat', 'id', 'minDate', 'maxDate'));
     }
 
+    public function printcategory(Request $request)
+    {
+        // $student_id = $request->student_id;
+
+        $details = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+            ->where('class_student.id', '=', $request->studentid)
+            ->select(
+                'students.nama as studentName',
+                'classes.nama as className',
+                'organizations.nama as schoolName',
+                'organizations.address as schoolAddress',
+                'organizations.postcode as schoolPostcode',
+                'organizations.state as schoolState',
+                'dorms.name as dormName'
+            )
+            ->first();
+
+        $data = DB::table('student_outing')
+            ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+            ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
+            ->join('users as wardenUser', 'wardenUser.id', '=', 'warden.user_id')
+            ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
+            ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->select(
+                'classifications.name as classificationName',
+                'student_outing.out_date_time as outTime',
+                'student_outing.reason',
+                'wardenUser.name as wardenName',
+                'student_outing.in_date_time as inTime',
+                'guardUser.name as guardName'
+            )->orderBy('student_outing.apply_date_time');
+
+        if ($request->fromTime == null || $request->untilTime == null) {
+            $data = $data
+                ->where('class_student.id', $request->studentid)
+                ->where('student_outing.classification_id', '=', $request->category)
+                ->get();
+        } else {
+
+            $data = $data
+                ->where('class_student.id', $request->studentid)
+                ->where('student_outing.apply_date_time', '>=', $request->fromTime)
+                ->where('student_outing.apply_date_time', '<=', $request->untilTime)
+                ->where('student_outing.classification_id', '=', $request->category)
+                ->get();
+        }
+
+        $pdf = PDF::loadView('dorm.report.reportPerStudentPdfTemplate', compact('data', 'details'));
+
+        return $pdf->download('Report ' . $details->studentName . '.pdf');
+    }
+
+    public function printall(Request $request)
+    {
+        // $student_id = $request->student_id;
+
+        $details = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+            ->where('class_student.id', '=', $request->studentid)
+            ->select(
+                'students.nama as studentName',
+                'classes.nama as className',
+                'organizations.nama as schoolName',
+                'organizations.address as schoolAddress',
+                'organizations.postcode as schoolPostcode',
+                'organizations.state as schoolState',
+                'dorms.name as dormName'
+            )
+            ->first();
+
+        // dd($details->studentName);
+        $data = DB::table('student_outing')
+            ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+            ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
+            ->join('users as wardenUser', 'wardenUser.id', '=', 'warden.user_id')
+            ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
+            ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->select(
+                'classifications.name as classificationName',
+                'student_outing.out_date_time as outTime',
+                'student_outing.reason',
+                'wardenUser.name as wardenName',
+                'student_outing.in_date_time as inTime',
+                'guardUser.name as guardName'
+            )
+            ->orderBy('student_outing.apply_date_time');
+        if ($request->fromTime == null || $request->untilTime == null) {
+            $data = $data
+                ->where('class_student.id', $request->studentid)
+                ->get();
+        } else {
+            $data = $data
+                ->where('class_student.id', $request->studentid)
+                ->where('student_outing.apply_date_time', '>=', $request->fromTime)
+                ->where('student_outing.apply_date_time', '<=', $request->untilTime)
+                ->get();
+        }
+
+        $pdf = PDF::loadView('dorm.report.reportPerStudentPdfTemplate', compact('data', 'details'));
+
+        return $pdf->download('Report ' . $details->studentName . '.pdf');
+    }
+
+    public function printallrequest(Request $request)
+    {
+        // $student_id = $request->student_id;
+
+        $details = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+            ->where('class_organization.organization_id', '=', $request->organExport)
+            ->select(
+                'organizations.nama as schoolName',
+                'organizations.address as schoolAddress',
+                'organizations.postcode as schoolPostcode',
+                'organizations.state as schoolState',
+            )
+            ->first();
+
+        // dd($details->studentName);
+        $data = DB::table('students')
+            ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+            ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
+            ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+            ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+            ->join('classifications', 'classifications.id', '=', 'so.classification_id')
+            ->where([
+                ['ou.organization_id',  $request->organExport],
+            ])
+            ->whereBetween('so.apply_date_time', [$request->from, $request->to])
+            ->select('classifications.name as catname', DB::raw('count("so.id") as total'))
+            ->groupBy('classifications.name')
+            ->get();
+
+        $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details'));
+
+        return $pdf->download('Report.pdf');
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -430,7 +586,7 @@ class DormController extends Controller
                 ['class_student.outing_status', 0],
             ])
             ->value("class_student.id");
-       
+
         $outingtype = DB::table('classifications')
             ->where([
                 ['classifications.id', $request->get('category')],
@@ -1965,8 +2121,8 @@ class DormController extends Controller
                                 $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                             }
                             //del btn
-                            $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>'; 
-                        } 
+                            $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
+                        }
                         //user is guard and outing category is balik kecemasan
                         elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == $balikKecemasan) {
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
@@ -1974,21 +2130,21 @@ class DormController extends Controller
                             }
                         }
                         //user is warden, teacher, HEM
-                        elseif (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')
-                        || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) 
-                        {
+                        elseif (
+                            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')
+                            || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
+                        ) {
                             //user choose outings and is inside blacklist
-                            if(strtoupper($row->catname) == $outing && $row->blacklist == 1) {
+                            if (strtoupper($row->catname) == $outing && $row->blacklist == 1) {
                                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
                             }
                             //
-                            else{
+                            else {
                                 $btn = $btn . '<a href="' . route('dorm.updateApprove', $row->id) . '" class="btn btn-primary m-1">Approve</a>';
                                 $btn = $btn . '<a href="' . route('dorm.updateTolak', $row->id) . '" class="btn btn-danger m-1">Tolak</a>';
                             }
                         }
-                    } 
-                    elseif ($row->status == 1) { //approved
+                    } elseif ($row->status == 1) { //approved
                         if (Auth::user()->hasRole('Penjaga')) {
                             if ($row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->out_date_time != NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateArriveTime', $row->id) . '" class="btn btn-primary m-1">Sampai</a>';
@@ -2002,8 +2158,7 @@ class DormController extends Controller
                                 $btn = $btn . '<a href="' . route('dorm.updateInTime', $row->id) . '" class="btn btn-primary m-1">Masuk</a>';
                             }
                         }
-                    } 
-                    elseif ($row->status == 2) {  //ditolak
+                    } elseif ($row->status == 2) {  //ditolak
                         if (Auth::user()->hasRole('Penjaga')) {
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
@@ -2039,9 +2194,47 @@ class DormController extends Controller
                 ]);
         }
 
-        if ($studentouting)
+        if ($studentouting) {
+            $arrayRecipientEmail = DB::table('users')
+                ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                // ->where('organization_user.role_id', '=', 6)
+                ->orWhere('organization_user.role_id', '=', 4)
+                ->select('users.email')
+                ->get();
+            // dd($arrayRecipientEmail);
+
+            if (isset($arrayRecipientEmail)) {
+                foreach ($arrayRecipientEmail as $email) {
+                    // dd("here inside foreach");
+                    $student = DB::table('student_outing')
+                        ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+                        ->join('students', 'students.id', '=', 'class_student.student_id')
+                        ->where('student_outing.id', $id)
+                        ->value('students.nama');
+                    $status = DB::table('student_outing')
+                        ->where('student_outing.id', $id)
+                        ->value('student_outing.status');
+
+                    if ($status == 1)
+                        $statusApprove = "disahkan";
+                    else if ($status == 2)
+                        $statusApprove = "ditolakkan";
+                    Mail::to($email)->send(new NotifyApproval($student, $statusApprove));
+
+
+                    if (Mail::failures()) {
+                        // dd("fail");
+                        return response()->Fail('Sorry! Please try again latter');
+                    } else {
+                        // return response()->success('Great! Successfully send in your mail');
+                        // dd("successs", $email);
+                    }
+                }
+            } else {
+                // do nothing 1st
+            }
             return redirect('/dorm')->with('success', 'Permintaan pelajar telah disahkan');
-        else
+        } else
             return redirect('/dorm')->withErrors('Kemaskini data tidak berjaya');
     }
 
@@ -2059,9 +2252,48 @@ class DormController extends Controller
                 ]);
         }
 
-        if ($studentouting)
+        if ($studentouting) {
+            $arrayRecipientEmail = DB::table('users')
+                ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                // ->where('organization_user.role_id', '=', 6)
+                ->orWhere('organization_user.role_id', '=', 4)
+                ->select('users.email')
+                ->get();
+            // dd($arrayRecipientEmail);
+
+            if (isset($arrayRecipientEmail)) {
+                foreach ($arrayRecipientEmail as $email) {
+                    // dd("here inside foreach");
+                    // Mail::to($email)->send(new NotifyMail());
+                    $student = DB::table('student_outing')
+                        ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+                        ->join('students', 'students.id', '=', 'class_student.student_id')
+                        ->where('student_outing.id', $id)
+                        ->value('students.nama');
+                    $status = DB::table('student_outing')
+                        ->where('student_outing.id', $id)
+                        ->value('student_outing.status');
+                    if ($status == 1)
+                        $statusApprove = "disahkan";
+                    else if ($status == 2)
+                        $statusApprove = "ditolakkan";
+                    Mail::to($email)->send(new NotifyApproval($student, $statusApprove));
+
+
+                    if (Mail::failures()) {
+                        // dd("fail");
+                        return response()->Fail('Sorry! Please try again latter');
+                    } else {
+                        // return response()->success('Great! Successfully send in your mail');
+                        // dd("successs", $email);
+                    }
+                }
+            } else {
+                // do nothing 1st
+                // dd("gg");
+            }
             return redirect('/dorm')->with('success', 'Permintaan pelajar ditolak');
-        else
+        } else
             return redirect('/dorm')->withErrors('Kemaskini data tidak berjaya');
     }
 
@@ -2120,6 +2352,41 @@ class DormController extends Controller
                     'student_outing.guard_id' => Auth::user()->id,
                 ]);
         }
+
+        $arrayRecipientEmail = DB::table('users')
+            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+            // ->where('organization_user.role_id', '=', 6)
+            ->orWhere('organization_user.role_id', '=', 4)
+            ->orWhere('organization_user.check_in_status', '=', 1)
+            ->select('users.email')
+            ->get();
+        // dd($arrayRecipientEmail);
+
+        if (isset($arrayRecipientEmail)) {
+            foreach ($arrayRecipientEmail as $email) {
+                // dd("here inside foreach");
+                // Mail::to($email)->send(new NotifyMail());
+                $student = DB::table('student_outing')
+                    ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+                    ->join('students', 'students.id', '=', 'class_student.student_id')
+                    ->where('student_outing.id', $id)
+                    ->value('students.nama');
+
+                Mail::to($email)->send(new NotifyOut($student));
+
+
+                if (Mail::failures()) {
+                    // dd("fail");
+                    return response()->Fail('Sorry! Please try again latter');
+                } else {
+                    // return response()->success('Great! Successfully send in your mail');
+                    // dd("successs", $email);
+                }
+            }
+        } else {
+            // do nothing 1st
+            // dd("gg");
+        }
         return redirect('/dorm')->with('success', 'Tarikh dan masa keluar telah dicatatkan');
     }
 
@@ -2141,55 +2408,52 @@ class DormController extends Controller
         if (strtoupper($outingcat[0]->catname) == $outing && isset($outingcat[0]->dorm_id)) {
             if (strtotime($intime) > strtotime("18:00:00") || $intime->toDateString() > $outingcat[0]->apply_date_time) {
                 $blacklist = 1;
-            }
-            else{
+            } else {
                 $blacklist = 0;
             }
-        } 
-        else if (!isset($dormid)) {
+        } else if (!isset($dormid)) {
             $blacklist = NULL;
-        } 
-        else {
+        } else {
             $blacklist = 0;
         }
 
         $result = DB::table('student_outing')
-                ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-                ->where([
-                    ['student_outing.id', $id],
-                    ['student_outing.status', 1],
-                    ['cs.outing_status', 1],
-                ])
-                ->update([
-                    'student_outing.in_date_time' => $intime,
-                    'cs.outing_status' => 0,
-                    'cs.blacklist' => $blacklist,
-                ]);
-        
-        if($result){
-            $query = DB::table('student_outing')
             ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-            ->join('students', 'students.id', '=', 'cs.student_id')
             ->where([
                 ['student_outing.id', $id],
                 ['student_outing.status', 1],
+                ['cs.outing_status', 1],
+            ])
+            ->update([
+                'student_outing.in_date_time' => $intime,
+                'cs.outing_status' => 0,
+                'cs.blacklist' => $blacklist,
             ]);
 
+        if ($result) {
+            $query = DB::table('student_outing')
+                ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+                ->join('students', 'students.id', '=', 'cs.student_id')
+                ->where([
+                    ['student_outing.id', $id],
+                    ['student_outing.status', 1],
+                ]);
+
             $student = $query
-            ->value('students.nama');
+                ->value('students.nama');
 
             $telno = $query
-            ->value('students.parent_tel');
-            
+                ->value('students.parent_tel');
+
             // function to send user email
             // get penjaga id and send to that penjaga only
             $arrayRecipientEmail = DB::table('users')
-            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            ->where('organization_user.check_in_status', '=', 1)
-            ->orWhere('organization_user.role_id', '=', 4)
-            ->orWhere('users.telno', '=', $telno)
-            ->select('users.email')
-            ->get();
+                ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                ->where('organization_user.check_in_status', '=', 1)
+                ->orWhere('organization_user.role_id', '=', 4)
+                ->orWhere('users.telno', '=', $telno)
+                ->select('users.email')
+                ->get();
 
             if (isset($arrayRecipientEmail)) {
                 foreach ($arrayRecipientEmail as $email) {
@@ -2215,28 +2479,28 @@ class DormController extends Controller
     public function updateArriveTime($id)
     {
         $query = DB::table('student_outing')
-        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-        ->where([
-            ['student_outing.id', $id],
-            ['student_outing.status', 1],
-            ['cs.outing_status', 1],
-        ]);
+            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->where([
+                ['student_outing.id', $id],
+                ['student_outing.status', 1],
+                ['cs.outing_status', 1],
+            ]);
 
         $result = $query
-                ->update(['student_outing.arrive_date_time' => now()->toDateTimeString()]);
-        
-        if($result){
+            ->update(['student_outing.arrive_date_time' => now()->toDateTimeString()]);
+
+        if ($result) {
             $student = $query
-            ->join('students', 'students.id', '=', 'cs.student_id')
-            ->value('students.nama');
+                ->join('students', 'students.id', '=', 'cs.student_id')
+                ->value('students.nama');
 
             // function to send user email
             $arrayRecipientEmail = DB::table('users')
-            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            ->where('organization_user.check_in_status', '=', 1)
-            ->orWhere('organization_user.role_id', '=', 4)
-            ->select('users.email')
-            ->get();
+                ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                ->where('organization_user.check_in_status', '=', 1)
+                ->orWhere('organization_user.role_id', '=', 4)
+                ->select('users.email')
+                ->get();
 
             if (isset($arrayRecipientEmail)) {
                 foreach ($arrayRecipientEmail as $email) {
@@ -2256,7 +2520,7 @@ class DormController extends Controller
             }
         }
 
-    
+
         return redirect('/dorm')->with('success', 'Tarikh dan masa sampai destinasi telah dicatatkan');
     }
 

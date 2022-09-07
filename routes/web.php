@@ -359,6 +359,11 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/getStudentOutingByCategory', 'DormController@getStudentOutingByCategory')->name('dorm.getStudentOutingByCategory');
     Route::get('dorm/indexReportAll', 'DormController@indexReportAll')->name('dorm.indexReportAll');
     Route::get('dorm/resetOutingLimit', 'DormController@resetOutingLimit')->name('dorm.resetOutingLimit');
+    Route::get('dorm/printcategory', 'DormController@printcategory')->name('dorm.printcategory');
+    Route::get('dorm/printall', 'DormController@printall')->name('dorm.printall');
+    Route::get('dorm/printallrequest', 'DormController@printallrequest')->name('dorm.printallrequest');
+
+
 
     //reason outing
     Route::get('dorm/getReasonOutingDatatable', 'DormController@getReasonOutingDatatable')->name('dorm.getReasonOutingDatatable');
