@@ -36,6 +36,7 @@ use App\Mail\NotifyArrive;
 use App\Mail\NotifyIn;
 use App\Mail\NotifyApproval;
 use App\Mail\NotifyOut;
+use PDF;
 use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
 
@@ -321,6 +322,120 @@ class DormController extends Controller
 
 
         return view('dorm.report.reportPerStudent', compact('studentName', 'applicationCat', 'id', 'minDate', 'maxDate'));
+    }
+
+    public function printcategory(Request $request)
+    {
+        // $student_id = $request->student_id;
+
+        $details = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+            ->where('class_student.id', '=', $request->studentid)
+            ->select(
+                'students.nama as studentName',
+                'classes.nama as className',
+                'organizations.nama as schoolName',
+                'organizations.address as schoolAddress',
+                'organizations.postcode as schoolPostcode',
+                'organizations.state as schoolState',
+                'dorms.name as dormName'
+            )
+            ->first();
+
+        $data = DB::table('student_outing')
+            ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+            ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
+            ->join('users as wardenUser', 'wardenUser.id', '=', 'warden.user_id')
+            ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
+            ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->select(
+                'classifications.name as classificationName',
+                'student_outing.out_date_time as outTime',
+                'student_outing.reason',
+                'wardenUser.name as wardenName',
+                'student_outing.in_date_time as inTime',
+                'guardUser.name as guardName'
+            )->orderBy('student_outing.apply_date_time');
+
+        if ($request->fromTime == null || $request->untilTime == null) {
+            $data = $data
+                ->where('class_student.id', $request->studentid)
+                ->where('student_outing.classification_id', '=', $request->category)
+                ->get();
+        } else {
+
+            $data = $data
+                ->where('class_student.id', $request->studentid)
+                ->where('student_outing.apply_date_time', '>=', $request->fromTime)
+                ->where('student_outing.apply_date_time', '<=', $request->untilTime)
+                ->where('student_outing.classification_id', '=', $request->category)
+                ->get();
+        }
+
+        $pdf = PDF::loadView('dorm.report.reportPerStudentPdfTemplate', compact('data', 'details'));
+
+        return $pdf->download('Report ' . $details->studentName . '.pdf');
+    }
+
+    public function printall(Request $request)
+    {
+        // $student_id = $request->student_id;
+
+        $details = DB::table('class_student')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
+            ->where('class_student.id', '=', $request->studentid)
+            ->select(
+                'students.nama as studentName',
+                'classes.nama as className',
+                'organizations.nama as schoolName',
+                'organizations.address as schoolAddress',
+                'organizations.postcode as schoolPostcode',
+                'organizations.state as schoolState',
+                'dorms.name as dormName'
+            )
+            ->first();
+
+        // dd($details->studentName);
+        $data = DB::table('student_outing')
+            ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+            ->join('organization_user as warden', 'warden.id', '=', 'student_outing.warden_id')
+            ->join('users as wardenUser', 'wardenUser.id', '=', 'warden.user_id')
+            ->join('organization_user as guard', 'guard.id', '=', 'student_outing.guard_id')
+            ->join('users as guardUser', 'guardUser.id', '=', 'guard.user_id')
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->select(
+                'classifications.name as classificationName',
+                'student_outing.out_date_time as outTime',
+                'student_outing.reason',
+                'wardenUser.name as wardenName',
+                'student_outing.in_date_time as inTime',
+                'guardUser.name as guardName'
+            )
+            ->orderBy('student_outing.apply_date_time');
+        if ($request->fromTime == null || $request->untilTime == null) {
+            $data = $data
+                ->where('class_student.id', $request->studentid)
+                ->get();
+        } else {
+            $data = $data
+                ->where('class_student.id', $request->studentid)
+                ->where('student_outing.apply_date_time', '>=', $request->fromTime)
+                ->where('student_outing.apply_date_time', '<=', $request->untilTime)
+                ->get();
+        }
+
+        $pdf = PDF::loadView('dorm.report.reportPerStudentPdfTemplate', compact('data', 'details'));
+
+        return $pdf->download('Report ' . $details->studentName . '.pdf');
     }
 
     /**
