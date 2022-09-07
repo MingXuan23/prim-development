@@ -31,14 +31,14 @@
             @method('PUT') 
             {{csrf_field()}}
             <div class="card-body">
-
+                <input id="outingdate" value="{{$outingdate}}" hidden>
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
                         @foreach($organization as $row)
-                        @if($row->id == $studentouting->oid)
-                        <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
-                        @endif
+                            @if($row->id == $studentouting->oid)
+                                <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
@@ -56,11 +56,9 @@
                 <div class="form-group">
                     <label>Kategori</label>
                     <select name="category" id="category" class="form-control">
-                        @foreach($category as $row)  
+                        @foreach($category as $row)
                             @if($row->name == $studentouting->categoryname)
-                            <option value="{{ $row->id }}" selected>{{ $row->name }}</option>
-                            @else
-                            <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                <option value="{{ $row->id }}‡{{$row->day_before}}‡{{$row->name}}" selected>{{ $row->fake_name }}</option>
                             @endif
                         @endforeach
                     </select>
@@ -105,5 +103,38 @@
 
 <script>
 
+    $("#start_date").focus(function() {
+        if ($("#organization option:selected").val != '') {
+            var selectedCat = $("#category option:selected").val().split('‡');
+            console.log(selectedCat[2]);
+            if(selectedCat[2].toUpperCase() == "OUTINGS")
+            {
+                start_date.value = start_date.max = null;
+                start_date.value = start_date.min = start_date.max = $("#outingdate").val();
+            }
+            else if(selectedCat[1] != 0)
+            {
+                start_date.value = start_date.max = null;
+                
+                var today = new Date();
+                
+                var day = today.getDate() + parseInt(selectedCat[1]) + 1;
+                var month = today.getMonth();
+                var year = today.getFullYear();
+
+                var d = new Date (year, month, day);
+                start_date.min = d.toISOString().split('T')[0];
+            }
+            else
+            {
+                start_date.value = start_date.max = null;
+                start_date.min = new Date().toISOString().split("T")[0];
+            }
+        }
+        else{
+            start_date.value = start_date.max = null;
+            start_date.min = new Date().toISOString().split("T")[0];
+        }
+    });
 </script>
 @endsection

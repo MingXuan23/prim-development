@@ -311,6 +311,7 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/updateTolak/{id}', 'DormController@updateTolak')->name('dorm.updateTolak');
     Route::get('dorm/updateCheckIn/{id}', 'DormController@updateCheckIn')->name('dorm.updateCheckIn');
     Route::get('dorm/updateBlacklist/{id}', 'DormController@updateBlacklist')->name('dorm.updateBlacklist');
+    Route::get('dorm/fetchCategory', "DormController@fetchCategory")->name('dorm.fetchCategory');
 
     // outing
     Route::get('dorm/storeOuting', 'DormController@storeOuting')->name('dorm.storeOuting');

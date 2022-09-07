@@ -49,13 +49,10 @@
 
                     <div class="form-group">
                         <label>Nama Pelajar</label>
-                        <select name="name" class="form-control">
-                            @foreach($students as $row)
-                                @if ($loop->first)
-                                <option value="{{ $row->sid }}" selected>{{ $row->nama }}</option>
-                                @else
-                                <option value="{{ $row->sid }}">{{ $row->nama }}</option>
-                                @endif
+                        <select name="name" id="name" class="form-control">
+                            <option value="" selected disabled>Pilih Pelajar</option>
+                            @foreach($student as $row)
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -66,19 +63,10 @@
                     </div> -->
 
                     <input id="outingdate" value="{{$outingdate}}" hidden>
-                    <!-- 注意这个 好像错了哦 预备的code 放在word了-->
                     <div class="form-group">
                         <label>Kategori</label>
                         <select name="category" id="category" class="form-control">
                             <option value="" disabled selected>Pilih Kategori Keluar</option>
-                            @foreach($category as $row)
-                                @if(strtoupper($row->name) == $outing && $outingdate < date("Y-m-d"))
-                                <!-- dont display option outings -->
-                                
-                                @else
-                                <option value="{{ $row->id }}" >{{ $row->name }}</option>
-                                @endif
-                            @endforeach
                         </select>
                     </div>
 
@@ -120,43 +108,61 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-
     $(document).ready(function() {
+        // do ajax call function to get the category for user based on dorm value
+        
+        $("#name").prop("selectedIndex", 1).trigger('change');
+        fetchCategory($("#name").val());
 
+        $('#name').change(function() {
+            
+            if($(this).val() != '')
+            {
+                var studentid = $("#name option:selected").val();
+                var _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('dorm.fetchCategory') }}",
+                    method:"GET",
+                    data:{ sid:studentid,
+                            oid:$("#organization option:selected").val(),
+                            _token:_token },
+                    success:function(result)
+                    {  
+                        $('#category').empty();
+                        $("#category").append("<option value='' disabled selected> Pilih Kategori Keluar</option>");
+                        jQuery.each(result.success, function(key, value){
+                            $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                        });
+                    }
+
+                });
+            }
+        });
+
+        function fetchCategory(studentid = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('dorm.fetchCategory') }}",
+                method:"GET",
+                data:{ sid:studentid,
+                    oid:$("#organization option:selected").val(),
+                        _token:_token },
+                success:function(result)
+                {
+                    $('#category').empty();
+                    $("#category").append("<option value='' disabled selected> Pilih Kategori Keluar </option>");
+                    jQuery.each(result.success, function(key, value){
+                        $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                    });
+                }
+            })
+        }
+        
     });
 
     
-    $("#category").change(function() {
     
-        if ($("#organization option:selected").val != '') {
-            if($("#category option:selected").text().toUpperCase() == "OUTINGS")
-            {
-                start_date.value = start_date.max = null;
-                start_date.value = start_date.min = start_date.max = $("#outingdate").val();
-            }
-            else if($("#category option:selected").text().toUpperCase() == "BALIK KHAS")
-            {
-                start_date.value = start_date.max = null;
-
-                var today = new Date();
-                var day = today.getDate() + 3;
-                var month = today.getMonth();
-                var year = today.getFullYear();
-
-                var d = new Date (year, month, day);
-                start_date.min = d.toISOString().split('T')[0];
-            }
-            else
-            {
-                start_date.value = start_date.max = null;
-                start_date.min = new Date().toISOString().split("T")[0];
-            }
-        }
-        else{
-            start_date.value = start_date.max = null;
-            start_date.min = new Date().toISOString().split("T")[0];
-        }
-    });
 
 </script>
 @endsection
+

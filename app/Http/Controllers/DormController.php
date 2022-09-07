@@ -40,9 +40,7 @@ use function PHPUnit\Framework\isNull;
 
 class DormController extends Controller
 {
-    private $balikKecemasan = "BALIK KECEMASAN";
-    private $balikKhas = "BALIK KHAS";
-    private $outing = "OUTINGS";
+    private $categoryReal = array("BALIK KECEMASAN", "BALIK KHAS", "OUTINGS", "BALIK WAJIB");
     /**
      * Display a listing of the resource.
      *
@@ -330,34 +328,25 @@ class DormController extends Controller
 
     //
     //
+
     //create or add files
     public function create()
     {
-
-        $outing = $this->outing;
-        $balikKecemasan = $this->balikKecemasan;
-        $balikKhas = $this->balikKhas;
-        //如果是住校的 那么就有全部选项 如果不是住校那么久只有kecemasan
-        // 如果outing limit 已经是2了那么就不要display khas的了
-        // $userid     = Auth::id();
         $organization = $this->getOrganizationByUserId();
 
-        $category = DB::table('classifications')
-            ->where('classifications.organization_id', $organization[0]->id)
-            ->get();
-
+        //get student that is belongs to the logged in parent
+        $student = DB::table('students')
+        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+        ->join('users', 'users.telno', '=', 'students.parent_tel')
+        ->join('organization_user as ou', 'ou.user_id', '=', 'users.id')
+        ->where([
+            ['ou.user_id', Auth::user()->id],
+            ['ou.organization_id', $organization[0]->id],
+            ['cs.status', 1],
+        ])
+        ->select('students.id', 'students.nama', 'cs.dorm_id')
+        ->get();
         
-        $students = DB::table('class_student')
-            ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
-            ->join('students', 'students.id', '=', 'class_student.student_id')
-            ->where([
-                ['co.organization_id', $organization[0]->id],
-                ['students.parent_tel', Auth::user()->telno],
-                ['class_student.status', 1],
-            ])
-            ->select('class_student.id as id', 'class_student.outing_limit', 'class_student.dorm_id', 'students.nama', 'students.id as sid')
-            ->get();
-
         $outingdate = date('Y-m-d', strtotime(DB::table('outings')
             ->where([
                 ['outings.organization_id', $organization[0]->id],
@@ -367,7 +356,7 @@ class DormController extends Controller
             ->value("outings.start_date_time as start_date_time")));
 
         if (Auth::user()->hasRole('Penjaga')) {
-            return view('dorm.create', compact('organization', 'category', 'outingdate', 'students', 'balikKecemasan', 'balikKhas', 'outing'));
+            return view('dorm.create', compact('organization', 'outingdate', 'student'));
         }
     }
 
@@ -414,7 +403,7 @@ class DormController extends Controller
     // store functions
     public function store(Request $request)
     {
-        // 
+        //
         $this->validate($request, [
             'name'         =>  'required',
             // 'email'        =>  'required',
@@ -423,6 +412,8 @@ class DormController extends Controller
             'start_date'   =>  'required',
             'organization' =>  'required',
         ]);
+
+        $categoryReal = $this->categoryReal;
 
         $classstudentid = DB::table('students')
             ->join('class_student', 'class_student.id', '=', 'students.id')
@@ -446,7 +437,8 @@ class DormController extends Controller
             ])
             ->value('classifications.name');
 
-        if (strtoupper($outingtype) == "OUTINGS") {
+        // $categoryReal[2] = "OUTINGS"
+        if (strtoupper($outingtype) == $categoryReal[2]) {
             $outingid = DB::table('outings')
                 ->where('outings.organization_id', $request->get('organization'))
                 ->where('outings.start_date_time', '>=', $request->get('start_date'))
@@ -676,10 +668,12 @@ class DormController extends Controller
         //
         $studentouting = DB::table('student_outing')
             ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
             ->join('students', 'students.id', '=', 'cs.student_id')
             ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
             ->where([
                 ['student_outing.id', $id],
+                ['cs.status', 1],
                 ['student_outing.status', 0],
             ])
             ->select(
@@ -688,20 +682,64 @@ class DormController extends Controller
                 'students.nama',
                 'students.email',
                 'student_outing.reason',
+                'cs.dorm_id',
                 'classifications.name as categoryname',
-                'classifications.organization_id as oid'
+                'classifications.fake_name',
+                'classifications.organization_id as oid',
+                DB::raw('count("student_outing.id") as total')
             )
+            ->groupBy('classifications.name')
             ->first();
-
+               
         if (isset($studentouting)) {
             $organization = $this->getOrganizationByUserId();
+            $categoryReal = $this->categoryReal;
 
             $category = DB::table('classifications')
-                ->where('classifications.organization_id', $organization[0]->id)
-                ->get();
+            ->where('classifications.organization_id', $organization[0]->id)
+            ->get();
+            
+            $outingdate = date('Y-m-d', strtotime(DB::table('outings')
+                ->where([
+                    ['outings.organization_id', $organization[0]->id],
+                    ['outings.end_date_time', '>', now()],
+                ])
+                ->orderBy("outings.start_date_time")
+                ->value("outings.start_date_time as start_date_time")));
+            
+            foreach($category as $cat)
+            {
+                // <!-- check whether the selected student use this category before -->
+                // 
+                // live in dorm
+                if($studentouting->dorm_id != NULL)
+                {
+                    if(strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString())
+                    {
+                        //remove the element
+                        $category = $category->except($cat->id-1);
+                    }
+                    elseif($cat->limit > 0 && $studentouting->total >= $cat->limit && $cat->name == $studentouting->catname)
+                    {
+                        //remove the element
+                        $category = $category->except($cat->id-1);
+                        
+                    }
+                }
+                //outside
+                else
+                {
+                    if(strtoupper($cat->name) != $categoryReal[0])
+                    {
+                        //remove the element
+                        $category = $category->except($cat->id-1);
+                    }
+                }
+            }
 
-
-            return view('dorm.update', compact('studentouting', 'category', 'organization'));
+            if (Auth::user()->hasRole('Penjaga')) {
+                return view('dorm.update', compact('organization', 'outingdate', 'category', 'studentouting'));
+            }
         }
     }
 
@@ -819,10 +857,17 @@ class DormController extends Controller
                 ['students.nama', $request->get('name')],
                 ['students.email', $request->get('email')],
                 ['class_student.outing_status', 0],
-                ['class_student.blacklist', 0],
-                ['users.id', Auth::id()],
+                ['users.id', Auth::user()->id],
+            ])
+            ->orWhere([
+                ['students.nama', $request->get('name')],
+                ['students.email', $request->get('email')],
+                ['class_student.outing_status', null],
+                ['users.id', Auth::user()->id],
             ])
             ->value("class_student.id");
+
+        $categoryReal = $this->categoryReal;
 
         $outingtype = DB::table('classifications')
             ->where([
@@ -830,7 +875,7 @@ class DormController extends Controller
             ])
             ->value('classifications.name');
 
-        if (strtoupper($outingtype) == "OUTINGS") {
+        if (strtoupper($outingtype) == $categoryReal[2]) {
             $outingid = DB::table('outings')
                 ->where('outings.organization_id', $request->get('organization'))
                 ->where('outings.start_date_time', '>=', $request->get('start_date'))
@@ -1720,6 +1765,75 @@ class DormController extends Controller
         return response()->json(['success' => $list]);
     }
 
+    public function fetchCategory(Request $request)
+    {
+        $sid = $request->get('sid');
+        $oid = $request->get('oid');
+        $categoryReal = $this->categoryReal;
+
+        // get the category to display for the selected student
+        $studentouting = DB::table('student_outing')
+        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+        ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+        ->join('students', 'students.id', '=', 'cs.student_id')
+        ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+        ->where([
+            ['students.parent_tel', Auth::user()->telno],
+            ['students.id', $sid],
+            ['cs.status', 1],
+            ['student_outing.status', '<>', 0],
+        ])
+        ->select('students.id', 'cs.dorm_id',
+        'classifications.id as cid', 'classifications.name as catname', 'classifications.fake_name', DB::raw('count("student_outing.id") as total'))
+        ->groupBy('classifications.name')
+        ->get();
+
+        $category = DB::table('classifications')
+            ->where('classifications.organization_id', $oid)
+            ->get();
+
+        $outingdate = date('Y-m-d', strtotime(DB::table('outings')
+        ->where([
+            ['outings.organization_id', $oid],
+            ['outings.end_date_time', '>', now()],
+        ])
+        ->orderBy("outings.start_date_time")
+        ->value("outings.start_date_time as start_date_time")));
+
+        foreach($studentouting as $row){
+            foreach($category as $cat)
+            {
+                // <!-- check whether the selected student use this category before -->
+                // 
+                // live in dorm
+                if($row->dorm_id != NULL)
+                {
+                    if(strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString())
+                    {
+                        //remove the element
+                        $category = $category->except($cat->id-1);
+                    }
+                    elseif($cat->limit > 0 && $row->total >= $cat->limit && $cat->name == $row->catname)
+                    {
+                        //remove the element
+                        $category = $category->except($cat->id-1);
+                        
+                    }
+                }
+                //outside
+                else
+                {
+                    if(strtoupper($cat->name) != $categoryReal[0])
+                    {
+                        //remove the element
+                        $category = $category->except($cat->id-1);
+                    }
+                }
+            }
+        }
+        return response()->json(['success' => $category]);
+    }
+
     // 拿created at当天的application而已吗
     // 需不需要让user选display approve和pending的呢？
     // for button：
@@ -1840,9 +1954,7 @@ class DormController extends Controller
 
                 $table->addColumn('action', function ($row) {
 
-                    $balikKecemasan = $this->balikKecemasan;
-                    $balikKhas = $this->balikKhas;
-                    $outing = $this->outing;
+                    $categoryReal = $this->categoryReal;
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     if ($row->status == 0) {  //havent approved
@@ -1955,10 +2067,7 @@ class DormController extends Controller
 
     public function updateOutTime($id)
     {
-
-        $balikKecemasan = $this->balikKecemasan;
-        $balikKhas = $this->balikKhas;
-
+        $categoryReal = $this->categoryReal;
         $catname = DB::table('student_outing')
             ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
             ->where([
@@ -2017,7 +2126,8 @@ class DormController extends Controller
     public function updateInTime($id)
     {
         $intime = now();
-        $outing = $this->outing;
+        
+        $categoryReal = $this->categoryReal;
 
         $outingcat = DB::table('student_outing')
             ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')

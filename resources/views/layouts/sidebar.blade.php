@@ -178,7 +178,7 @@
                                 @role('Superadmin|Pentadbir|Guru|Warden|Guard')
                                 <li>
                                     <a href="{{ route('teacher.perananindex') }}" class=" waves-effect">
-                                        <i class="	far fa-address-card"></i>
+                                        <i class="far fa-address-card"></i>
                                         <span>Peranan</span>
                                     </a>
                                 </li>
@@ -196,7 +196,7 @@
                                 @role('Superadmin|Pentadbir|Guru|Warden')
                                 <li>
                                     <a href="{{ route('dorm.indexStudentlist') }}" class=" waves-effect">
-                                        <i class="fas fa-building"></i>
+                                        <i class="fas fa-user-cog"></i>
                                         <span>Student List</span>
                                     </a>
                                 </li>
