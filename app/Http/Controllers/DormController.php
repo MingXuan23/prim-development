@@ -1079,12 +1079,6 @@ class DormController extends Controller
                 ]
             );
 
-        // DB::table('class_organization')->where('class_id', $id)
-        //     ->update([
-        //         'organization_id' => $request->get('organization'),
-        //         'organ_user_id'    =>  $request->get('classTeacher')
-        //     ]);
-
         return redirect('/dorm/dorm/indexOuting')->with('success', 'The data has been updated!');
     }
 
@@ -1537,7 +1531,7 @@ class DormController extends Controller
                         ['ou.organization_id', $oid],
                     ])
                     ->whereBetween('so.apply_date_time', [$start_date, $end_date])
-                    ->select('classifications.name as catname', DB::raw('count("so.id") as total'))
+                    ->select('classifications.fake_name as catname', DB::raw('count("so.id") as total'))
                     ->groupBy('classifications.name')
                     ->get();
 
@@ -2036,7 +2030,8 @@ class DormController extends Controller
                             'so.reason',
                             'cs.blacklist',
                             'cs.outing_limit',
-                            'classifications.name as catname'
+                            'classifications.name as catname',
+                            'classifications.fake_name'
                         )
                         ->orderBy('so.apply_date_time', 'desc')
                         ->get();
@@ -2061,7 +2056,8 @@ class DormController extends Controller
                             'so.reason',
                             'cs.blacklist',
                             'cs.outing_limit',
-                            'classifications.name as catname'
+                            'classifications.name as catname',
+                            'classifications.fake_name'
                         )
                         ->orderBy('so.apply_date_time', 'desc')
                         ->get();
@@ -2086,7 +2082,8 @@ class DormController extends Controller
                             'so.reason',
                             'cs.blacklist',
                             'cs.outing_limit',
-                            'classifications.name as catname'
+                            'classifications.name as catname',
+                            'classifications.fake_name'
                         )
                         ->orderBy('so.apply_date_time')
                         ->get();
@@ -2124,7 +2121,7 @@ class DormController extends Controller
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
                         //user is guard and outing category is balik kecemasan
-                        elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == $balikKecemasan) {
+                        elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == $categoryReal[0]) {
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
@@ -2135,7 +2132,7 @@ class DormController extends Controller
                             || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
                         ) {
                             //user choose outings and is inside blacklist
-                            if (strtoupper($row->catname) == $outing && $row->blacklist == 1) {
+                            if (strtoupper($row->catname) == $categoryReal[2] && $row->blacklist == 1) {
                                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button></div>';
                             }
                             //
@@ -2314,7 +2311,7 @@ class DormController extends Controller
             ])
             ->value('cs.outing_limit');
 
-        if (strtoupper($catname) == $balikKecemasan) {
+        if (strtoupper($catname) == $categoryReal[0]) {
             DB::table('student_outing')
                 ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
                 ->where([
@@ -2326,7 +2323,7 @@ class DormController extends Controller
                     'cs.outing_status' => 1,
                     'student_outing.guard_id' => Auth::user()->id,
                 ]);
-        } else if (strtoupper($catname) == $balikKhas) {
+        } else if (strtoupper($catname) == $categoryReal[1]) {
             DB::table('student_outing')
                 ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
                 ->where([
@@ -2405,7 +2402,7 @@ class DormController extends Controller
 
         $blacklist = 0;
 
-        if (strtoupper($outingcat[0]->catname) == $outing && isset($outingcat[0]->dorm_id)) {
+        if (strtoupper($outingcat[0]->catname) == $categoryReal[2] && isset($outingcat[0]->dorm_id)) {
             if (strtotime($intime) > strtotime("18:00:00") || $intime->toDateString() > $outingcat[0]->apply_date_time) {
                 $blacklist = 1;
             } else {

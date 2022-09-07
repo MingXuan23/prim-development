@@ -90,6 +90,21 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
+    $(document).ready(function() {
+
+        var today = new Date();
+        today.setSeconds(0, 0);
+        var now = today.toISOString().replace(/:00.000Z/, "");
+
+        start_date.min = now;
+        end_date.min = start_date.value;
+    });
+
+    $('#start_date').change(function() {
+        if (start_date.value != "") {
+            end_date.min = start_date.value;
+        }
+    });
     
 </script>
 @endsection

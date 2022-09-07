@@ -161,7 +161,42 @@
     });
 
     
+    $("#category").change(function() {
     
+        //这里不会做呀呀呀呀呀呀 
+        // 怎么样拿到outings 这个字
+        if ($("#organization option:selected").val != '') {
+            var selectedCat = $("#category option:selected").val().split('‡');
+            console.log(selectedCat[2]);
+            if(selectedCat[2].toUpperCase() == "OUTINGS")
+            {
+                start_date.value = start_date.max = null;
+                start_date.value = start_date.min = start_date.max = $("#outingdate").val();
+            }
+            else if(selectedCat[1] != 0)
+            {
+                start_date.value = start_date.max = null;
+                
+                var today = new Date();
+                
+                var day = today.getDate() + parseInt(selectedCat[1]) + 1;
+                var month = today.getMonth();
+                var year = today.getFullYear();
+
+                var d = new Date (year, month, day);
+                start_date.min = d.toISOString().split('T')[0];
+            }
+            else
+            {
+                start_date.value = start_date.max = null;
+                start_date.min = new Date().toISOString().split("T")[0];
+            }
+        }
+        else{
+            start_date.value = start_date.max = null;
+            start_date.min = new Date().toISOString().split("T")[0];
+        }
+    });
 
 </script>
 @endsection
