@@ -7,8 +7,7 @@
 <body>
 
 
-    <p>{{$student}} telah sampai di destinasi.</p>
-
+    <p>{{$student}} telah keluar sekolah.</p>
 
 
 </body>
