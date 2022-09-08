@@ -57,11 +57,7 @@
                 <div class="form-group">
                     <label>Kategori</label>
                     <select name="category" id="category" class="form-control">
-                        @foreach($category as $row)
-                            @if($row->name == $studentouting->categoryname)
-                                <option value="{{ $row->id }}‡{{$row->day_before}}‡{{$row->name}}" selected>{{ $row->fake_name }}</option>
-                            @endif
-                        @endforeach
+                        <option value="{{ $studentouting->cid }}‡{{$studentouting->day_before}}‡{{$studentouting->categoryname}}" selected>{{ $studentouting->fake_name }}</option>
                     </select>
                 </div>
 

@@ -851,6 +851,8 @@ class DormController extends Controller
                 'students.email',
                 'student_outing.reason',
                 'cs.dorm_id',
+                'classifications.id as cid',
+                'classifications.day_before',
                 'classifications.name as categoryname',
                 'classifications.fake_name',
                 'classifications.organization_id as oid',
@@ -883,38 +885,38 @@ class DormController extends Controller
                 ->orderBy("outings.end_date_time")
                 ->value("outings.end_date_time as end_date_time")));
             
-            foreach($category as $cat)
-            {
-                // <!-- check whether the selected student use this category before -->
-                // 
-                // live in dorm
-                if($studentouting->dorm_id != NULL)
-                {
-                    if(strtoupper($cat->name) == $categoryReal[2])
-                    {
-                        if(now()->toDateString() > $end || now()->toDateString() < $start)
-                        {
-                            //remove the element
-                            $category = $category->except($cat->id-1);
-                        }
-                    }
-                    elseif($cat->limit > 0 && $studentouting->total >= $cat->limit && $cat->name == $studentouting->catname)
-                    {
-                        //remove the element
-                        $category = $category->except($cat->id - 1);
-                    }
-                }
-                //outside
-                else {
-                    if (strtoupper($cat->name) != $categoryReal[0]) {
-                        //remove the element
-                        $category = $category->except($cat->id - 1);
-                    }
-                }
-            }
+                // foreach($category as $cat)
+                // {
+                //     // <!-- check whether the selected student use this category before -->
+                //     // 
+                //     // live in dorm
+                //     if($studentouting->dorm_id != NULL)
+                //     {
+                //         if(strtoupper($cat->name) == $categoryReal[2])
+                //         {
+                //             if(now()->toDateString() > $end || now()->toDateString() < $start)
+                //             {
+                //                 //remove the element
+                //                 $category = $category->except($cat->id-1);
+                //             }
+                //         }
+                //         elseif($cat->limit > 0 && $studentouting->total >= $cat->limit && $cat->name == $studentouting->catname)
+                //         {
+                //             //remove the element
+                //             $category = $category->except($cat->id - 1);
+                //         }
+                //     }
+                //     //outside
+                //     else {
+                //         if (strtoupper($cat->name) != $categoryReal[0]) {
+                //             //remove the element
+                //             $category = $category->except($cat->id - 1);
+                //         }
+                //     }
+                // }
 
             if (Auth::user()->hasRole('Penjaga')) {
-                return view('dorm.update', compact('organization', 'start', 'end', 'category', 'studentouting'));
+                return view('dorm.update', compact('organization', 'start', 'end', 'studentouting'));
             }
         }
     }
