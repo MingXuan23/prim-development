@@ -74,11 +74,13 @@ class DormController extends Controller
             ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
             ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
             ->where([
-                ['ou.organization_id', $organization[0]->id],
+                // ['ou.organization_id', $organization[0]->id],
                 ['ou.user_id', Auth::user()->id],
             ])
-            ->value('cs.blacklist');
+            ->select('cs.blacklist', 'ou.organization_id as oid', 'students.nama')
+            ->get();
 
+        // dd($isblacklisted);
         // dd($roles);
         return view('dorm.index', compact('roles', 'checkin', 'organization', 'isblacklisted'));
     }
@@ -2032,7 +2034,9 @@ class DormController extends Controller
                     }
                 }
             }
-        } else {
+        } 
+        else 
+        {
             foreach ($category as $cat) {
                 $dorm = DB::table("class_student")
                     ->where('class_student.student_id', $sid)
@@ -2112,6 +2116,7 @@ class DormController extends Controller
                             'classifications.fake_name'
                         )
                         ->orderBy('so.apply_date_time', 'desc')
+                        ->groupBy('so.id')
                         ->get();
                 }
                 //approved or kecemasan && havent expired
@@ -2138,6 +2143,7 @@ class DormController extends Controller
                             'classifications.fake_name'
                         )
                         ->orderBy('so.apply_date_time', 'desc')
+                        ->groupBy('so.id')
                         ->get();
                 }
                 // pending && havent expired
@@ -2164,6 +2170,7 @@ class DormController extends Controller
                             'classifications.fake_name'
                         )
                         ->orderBy('so.apply_date_time')
+                        ->groupBy('so.id')
                         ->get();
                 }
             }
@@ -2502,13 +2509,13 @@ class DormController extends Controller
             ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
             ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
             ->where('student_outing.id', $id)
-            ->select('cs.dorm_id', 'classifications.name as catname', 'student_outing.apply_date_time')
+            ->select('cs.dorm_id', 'classifications.name as catname', 'classifications.day_before', 'student_outing.apply_date_time')
             ->get();
 
         $blacklist = 0;
 
         if (strtoupper($outingcat[0]->catname) == $categoryReal[2] && isset($outingcat[0]->dorm_id)) {
-            if (strtotime($intime) > strtotime("18:00:00") || $intime->toDateString() > $outingcat[0]->apply_date_time) {
+            if (strtotime($intime) > strtotime($outingcat[0]->day_before) || $intime->toDateString() > $outingcat[0]->apply_date_time) {
                 $blacklist = 1;
             } else {
                 $blacklist = 0;
