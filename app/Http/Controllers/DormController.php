@@ -630,7 +630,7 @@ class DormController extends Controller
                     // Mail::to($email)->send(new NotifyMail());
                     Mail::to($email)->send(new NotifyMail());
 
-
+                    dd("is notify mail");
                     if (Mail::failures()) {
                         // dd("fail");
                         return response()->Fail('Sorry! Please try again latter');
@@ -1948,16 +1948,38 @@ class DormController extends Controller
             ->orderBy("outings.start_date_time")
             ->value("outings.start_date_time as start_date_time")));
 
-        foreach ($studentouting as $row) {
+        if (count($studentouting) > 0) {
+            foreach ($studentouting as $row) {
+                foreach ($category as $cat) {
+                    // <!-- check whether the selected student use this category before -->
+                    // live in dorm
+                    if ($row->dorm_id != NULL) {
+                        if (strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString()) {
+                            //remove the element
+                            $category = $category->except($cat->id - 1);
+                        } elseif ($cat->limit > 0 && $row->total >= $cat->limit && $cat->name == $row->catname) {
+                            $category = $category->except($cat->id - 1);
+                        }
+                    }
+                    //outside
+                    else {
+                        if (strtoupper($cat->name) != $categoryReal[0]) {
+                            //remove the element
+                            $category = $category->except($cat->id - 1);
+                        }
+                    }
+                }
+            }
+        } else {
             foreach ($category as $cat) {
-                // <!-- check whether the selected student use this category before -->
-                // 
+                $dorm = DB::table("class_student")
+                    ->where('class_student.student_id', $sid)
+                    ->value('class_student.dorm_id');
+
                 // live in dorm
-                if ($row->dorm_id != NULL) {
+                if ($dorm != NULL) {
                     if (strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString()) {
-                        //remove the element
-                        $category = $category->except($cat->id - 1);
-                    } elseif ($cat->limit > 0 && $row->total >= $cat->limit && $cat->name == $row->catname) {
+                        return response()->json(['success' => $category]);
                         //remove the element
                         $category = $category->except($cat->id - 1);
                     }
