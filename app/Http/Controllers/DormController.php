@@ -604,7 +604,12 @@ class DormController extends Controller
                 ->where('outings.start_date_time', '>=', $request->get('start_date'))
                 ->where('outings.end_date_time', '>', $request->get('start_date'))
                 ->value('outings.id');
-        } else {
+
+            if($outingid == NULL){
+                return redirect('/dorm/create')->withErrors('Selected outings date and time is not available');
+            }
+        } 
+        else {
             $outingid = NULL;
         }
 
@@ -2054,7 +2059,7 @@ class DormController extends Controller
                 }
             }
         }
-        return response()->json(['success' => $category]);
+        return response()->json(['success' => $category, 'start' => $start, 'end' => $end]);
     }
 
     // 拿created at当天的application而已吗

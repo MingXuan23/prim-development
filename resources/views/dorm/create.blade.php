@@ -57,8 +57,7 @@
                         <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
                     </div> -->
 
-                    <input id="start" value="{{$start}}" hidden>
-                    <input id="end" value="{{$end}}" hidden>
+                    
                     <div class="form-group">
                         <label>Kategori</label>
                         <select name="category" id="category" class="form-control">
@@ -106,6 +105,8 @@
 <script>
     $(document).ready(function() {
         // do ajax call function to get the category for user based on dorm value
+        var start;
+        var end;
         $("#organization").prop("selectedIndex", 1).trigger('change');
         fetchStudent($("#organization").val());
 
@@ -173,6 +174,8 @@
                         jQuery.each(result.success, function(key, value){
                             $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
                         });
+                        start = result.start;
+                        end = result.end;
                     }
 
                 });
@@ -194,50 +197,49 @@
                     jQuery.each(result.success, function(key, value){
                         $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
                     });
+                    start = result.start;
+                    end = result.end;
                 }
             })
         }
-        
-    });
+       
+        $("#category").change(function() {
+            if ($("#organization option:selected").val != '') {
+                var selectedCat = $("#category option:selected").val().split('‡');
+                console.log(selectedCat[2]);
+                if(selectedCat[2].toUpperCase() == "OUTINGS")
+                {
+                    console.log("this is " + start);
+                    start_date.value = start_date.max = null;
+                    start_date.min = start;
+                    start_date.max = end;
+                }
+                else if(selectedCat[1] != 0)
+                {
+                    console.log("here");
+                    start_date.value = start_date.max = null;
+                    
+                    var today = new Date();
+                    
+                    var day = today.getDate() + parseInt(selectedCat[1]) + 1;
+                    var month = today.getMonth();
+                    var year = today.getFullYear();
 
-    
-    $("#category").change(function() {
-    
-        //这里不会做呀呀呀呀呀呀 
-        // 怎么样拿到outings 这个字
-        if ($("#organization option:selected").val != '') {
-            var selectedCat = $("#category option:selected").val().split('‡');
-            console.log(selectedCat[2]);
-            if(selectedCat[2].toUpperCase() == "OUTINGS")
-            {
-                start_date.value = start_date.max = null;
-                start_date.min = $("#start").val()
-                start_date.max = $("#end").val();
+                    var d = new Date (year, month, day);
+                    start_date.min = d.toISOString().split('T')[0];
+                }
+                else
+                {
+                    start_date.value = start_date.max = null;
+                    start_date.min = new Date().toISOString().split("T")[0];
+                }
             }
-            else if(selectedCat[1] != 0)
-            {
-                console.log("here");
-                start_date.value = start_date.max = null;
-                
-                var today = new Date();
-                
-                var day = today.getDate() + parseInt(selectedCat[1]) + 1;
-                var month = today.getMonth();
-                var year = today.getFullYear();
-
-                var d = new Date (year, month, day);
-                start_date.min = d.toISOString().split('T')[0];
-            }
-            else
-            {
+            else{
                 start_date.value = start_date.max = null;
                 start_date.min = new Date().toISOString().split("T")[0];
             }
-        }
-        else{
-            start_date.value = start_date.max = null;
-            start_date.min = new Date().toISOString().split("T")[0];
-        }
+        });
+        
     });
 
 </script>
