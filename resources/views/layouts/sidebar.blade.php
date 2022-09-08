@@ -246,13 +246,39 @@
             </ul>
             </li>
             @endrole
-
+            
             @role('Superadmin|Merchant_Admin')
             <li>
-                <a href="#" class=" waves-effect">
-                    <i class="mdi mdi-account-group"></i>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="mdi mdi-account-edit"></i>
                     <span>Urus Peniaga</span>
                 </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    <li>
+                        <a href="{{ route('admin.merchant.index') }}" class=" waves-effect">
+                            <i class="ti-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.merchant.hours') }}" class=" waves-effect">
+                            <i class="ti-timer"></i>
+                            <span>Waktu Operasi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.merchant.product') }}" class=" waves-effect">
+                            <i class="ti-package"></i>
+                            <span>Urus Produk</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.merchant.order') }}" class=" waves-effect">
+                            <i class="ti-email"></i>
+                            <span>Pesanan</span>
+                        </a>
+                    </li>
+                </ul>  
             </li>
             @endrole
 

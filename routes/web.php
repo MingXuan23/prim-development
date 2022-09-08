@@ -177,7 +177,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi'], function() {
     Route::get('/{id}/list', 'CooperativeController@indexList')->name('koperasi.list');
 });
 
-Route::group(['middleware' => ['auth'], 'prefix' => 'merchant'], function() {
+Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => 'Merchant'], function() {
     Route::get('/', 'MerchantController@merchantList')->name('merchant.index');
 
     Route::get('order', 'MerchantController@showOrder')->name('merchant.order');
@@ -202,6 +202,21 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant'], function() {
     
     Route::post('testType', 'MerchantController@testType')->name('merchant.testType');
 });
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'admin-merchant', 'namespace' => 'Merchant'], function() {
+    Route::get('/', 'AdminMerchantController@index')->name('admin.merchant.index');
+
+    Route::get('/operation-hours', 'AdminMerchantController@showOperationHours')->name('admin.merchant.hours');
+    Route::get('/operation-hours/check-orders', 'AdminMerchantController@editExistingOrder')->name('admin.merchant.order-exist');
+    
+    Route::get('/product-dashboard', 'AdminMerchantController@showProductDashboard')->name('admin.merchant.product');
+    Route::get('/product-dashboard/product-item-list', 'AdminMerchantController@showProductItem')->name('admin.merchant.product-item');
+
+    Route::get('/show-orders', 'AdminMerchantController@showAllOrder')->name('admin.merchant.order');
+    Route::get('/show-orders/history', 'AdminMerchantController@showHistoryOrder')->name('admin.merchant.history');
+});
+
+
 
 Route::group(['middleware' => ['auth']], function () {
     Route::resources([

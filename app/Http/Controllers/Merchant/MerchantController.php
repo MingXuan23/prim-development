@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Merchant;
 
 use App\Models\Organization;
 use App\Models\OrganizationHours;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use App\Http\Controllers\Controller;
 
 class MerchantController extends Controller
 {
@@ -22,7 +23,7 @@ class MerchantController extends Controller
     {
         $todayDate = Carbon::now()->format('l');
 
-        $day = app(CooperativeController::class)->getDayIntegerByDayName($todayDate);
+        $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($todayDate);
 
         $merchant = Organization::with(['organization_hours' => function($q) use ($day){
             $q->where('organization_hours.day', $day);
@@ -83,11 +84,11 @@ class MerchantController extends Controller
         {
             $TodayDay = Carbon::now()->format('l'); // Get Day Name
 
-            $day = app(CooperativeController::class)->getDayIntegerByDayName($TodayDay); // Return integer based on name
+            $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($TodayDay); // Return integer based on name
 
             $key = strval($row->day);
 
-            $isPast = app(CooperativeController::class)->getDayStatus($day, $row->day, $isPast, $key); // Check and return day is past or this week
+            $isPast = app('App\Http\Controllers\CooperativeController')->getDayStatus($day, $row->day, $isPast, $key); // Check and return day is past or this week
         }
 
         foreach($all_open_days as $row)
@@ -131,7 +132,7 @@ class MerchantController extends Controller
         
         $TodayDay = $Today->format('l');
 
-        $TodayDayInt = app(CooperativeController::class)->getDayIntegerByDayName($TodayDay);
+        $TodayDayInt = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($TodayDay);
 
         $op_hour = OrganizationHours::where('organization_id', $org_id)
                     ->where('day', $daySelected)
@@ -205,7 +206,7 @@ class MerchantController extends Controller
     {
         $todayDate = Carbon::now()->format('l');
 
-        $dayInt = app(CooperativeController::class)->getDayIntegerByDayName($todayDate);
+        $dayInt = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($todayDate);
 
         $date = Carbon::now()->toDateString();
         
@@ -234,7 +235,7 @@ class MerchantController extends Controller
         # <Start> Get Data for Organization
         $todayDate = Carbon::now()->format('l');
 
-        $day = app(CooperativeController::class)->getDayIntegerByDayName($todayDate);
+        $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($todayDate);
 
         $merchant = Organization::with(['organization_hours' => function($q) use ($day){
             $q->where('organization_hours.day', $day);
@@ -317,7 +318,7 @@ class MerchantController extends Controller
         ->first();
 
         $maxQuantity = $this->getMaxQuantityBySlotTime($i_id, $o_id);
-
+        
         $modal = '<input id="quantity_input" type="text" value="1" name="quantity_input">';
 
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $maxQuantity]);
@@ -332,18 +333,31 @@ class MerchantController extends Controller
             ['organization_id', $org_id],
             ['status', 1],
         ])->first();
+
+        $min_open_day = $this->getDayOrder($order->pickup_date);
         
         $pickup_time = Carbon::parse($order->pickup_date)->toTimeString();
-        
+            
         $item = ProductItem::find($item_id);
 
-        $queueCount = Queue::where('product_group_id', $item->product_group_id)->where('slot_time', '<=', $pickup_time)->count();
+        $queueCount = Queue::where('product_group_id', $item->product_group_id)
+        ->where('slot_time', '>=', $min_open_day)
+        ->where('slot_time', '<=', $pickup_time)
+        ->count();
 
         $i_quantity = $item->quantity;
-
         $maxQuantity = $i_quantity * $queueCount;
 
         return $maxQuantity;
+    }
+
+    private function getDayOrder($dateOrder)
+    {
+        $todayDate = Carbon::parse($dateOrder)->format('l');
+        $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($todayDate);
+        $min_open_day = OrganizationHours::where('day', $day)->first()->open_hour;
+
+        return $min_open_day;
     }
 
     public function storeItem(Request $request)
@@ -470,6 +484,8 @@ class MerchantController extends Controller
 
     private function getQueueData($order_datetime)
     {
+        $min_open_day = $this->getDayOrder($order_datetime);
+
         $today_date = Carbon::now()->toDateString();
         $today_time = Carbon::now()->minute(0)->second(0)->addHour()->toTimeString();
 
@@ -477,12 +493,15 @@ class MerchantController extends Controller
         $time_pick_up = Carbon::parse($order_datetime)->toTimeString();
 
         if($date_pick_up != $today_date) {
-            $queue = Queue::where('slot_time', '<=', $time_pick_up)
+            $queue = Queue::where([
+                ['slot_time', '>=', $min_open_day],
+                ['slot_time', '<=', $time_pick_up],
+            ])
             ->orderBy('id', 'desc')
             ->get();
         } else {
             $queue = Queue::where([
-                ['slot_time', '>', $today_time],
+                ['slot_time', '>=', $today_time],
                 ['slot_time', '<=', $time_pick_up],
             ])
             ->orderBy('id', 'desc')

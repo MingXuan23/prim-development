@@ -314,7 +314,7 @@
           })
         }
       })
-
+      
       $('#proceed_order').click(function() {
         window.location.href = path;
       })

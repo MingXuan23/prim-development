@@ -205,7 +205,7 @@
         },
         error:function(result)
         {
-          console.log(result)
+          console.log(result.responseText)
         }
       })
     })
