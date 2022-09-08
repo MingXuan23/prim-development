@@ -49,7 +49,6 @@ class TeacherController extends Controller
             ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
             ->where([
                 ['ou.user_id', Auth::user()->id],
-                ['ou.organization_id', $organization[0]->id],
             ])
             ->value('organization_roles.nama');
 

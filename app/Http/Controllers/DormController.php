@@ -492,17 +492,17 @@ class DormController extends Controller
 
         //get student that is belongs to the logged in parent
         $student = DB::table('students')
-        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-        ->join('users', 'users.telno', '=', 'students.parent_tel')
-        ->join('organization_user as ou', 'ou.user_id', '=', 'users.id')
-        ->where([
-            ['ou.user_id', Auth::user()->id],
-            ['ou.organization_id', $organization[0]->id],
-            ['cs.status', 1],
-        ])
-        ->select('students.id', 'students.nama', 'cs.dorm_id')
-        ->get();
-        
+            ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+            ->join('users', 'users.telno', '=', 'students.parent_tel')
+            ->join('organization_user as ou', 'ou.user_id', '=', 'users.id')
+            ->where([
+                ['ou.user_id', Auth::user()->id],
+                ['ou.organization_id', $organization[0]->id],
+                ['cs.status', 1],
+            ])
+            ->select('students.id', 'students.nama', 'cs.dorm_id')
+            ->get();
+
         $outingdate = date('Y-m-d', strtotime(DB::table('outings')
             ->where([
                 ['outings.organization_id', $organization[0]->id],
@@ -846,15 +846,15 @@ class DormController extends Controller
             )
             ->groupBy('classifications.name')
             ->first();
-               
+
         if (isset($studentouting)) {
             $organization = $this->getOrganizationByUserId();
             $categoryReal = $this->categoryReal;
 
             $category = DB::table('classifications')
-            ->where('classifications.organization_id', $organization[0]->id)
-            ->get();
-            
+                ->where('classifications.organization_id', $organization[0]->id)
+                ->get();
+
             $outingdate = date('Y-m-d', strtotime(DB::table('outings')
                 ->where([
                     ['outings.organization_id', $organization[0]->id],
@@ -862,33 +862,25 @@ class DormController extends Controller
                 ])
                 ->orderBy("outings.start_date_time")
                 ->value("outings.start_date_time as start_date_time")));
-            
-            foreach($category as $cat)
-            {
+
+            foreach ($category as $cat) {
                 // <!-- check whether the selected student use this category before -->
                 // 
                 // live in dorm
-                if($studentouting->dorm_id != NULL)
-                {
-                    if(strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString())
-                    {
+                if ($studentouting->dorm_id != NULL) {
+                    if (strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString()) {
                         //remove the element
-                        $category = $category->except($cat->id-1);
-                    }
-                    elseif($cat->limit > 0 && $studentouting->total >= $cat->limit && $cat->name == $studentouting->catname)
-                    {
+                        $category = $category->except($cat->id - 1);
+                    } elseif ($cat->limit > 0 && $studentouting->total >= $cat->limit && $cat->name == $studentouting->catname) {
                         //remove the element
-                        $category = $category->except($cat->id-1);
-                        
+                        $category = $category->except($cat->id - 1);
                     }
                 }
                 //outside
-                else
-                {
-                    if(strtoupper($cat->name) != $categoryReal[0])
-                    {
+                else {
+                    if (strtoupper($cat->name) != $categoryReal[0]) {
                         //remove the element
-                        $category = $category->except($cat->id-1);
+                        $category = $category->except($cat->id - 1);
                     }
                 }
             }
@@ -1923,60 +1915,58 @@ class DormController extends Controller
 
         // get the category to display for the selected student
         $studentouting = DB::table('student_outing')
-        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
-        ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
-        ->join('students', 'students.id', '=', 'cs.student_id')
-        ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
-        ->where([
-            ['students.parent_tel', Auth::user()->telno],
-            ['students.id', $sid],
-            ['cs.status', 1],
-            ['student_outing.status', '<>', 0],
-        ])
-        ->select('students.id', 'cs.dorm_id',
-        'classifications.id as cid', 'classifications.name as catname', 'classifications.fake_name', DB::raw('count("student_outing.id") as total'))
-        ->groupBy('classifications.name')
-        ->get();
+            ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+            ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+            ->join('students', 'students.id', '=', 'cs.student_id')
+            ->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->where([
+                ['students.parent_tel', Auth::user()->telno],
+                ['students.id', $sid],
+                ['cs.status', 1],
+                ['student_outing.status', '<>', 0],
+            ])
+            ->select(
+                'students.id',
+                'cs.dorm_id',
+                'classifications.id as cid',
+                'classifications.name as catname',
+                'classifications.fake_name',
+                DB::raw('count("student_outing.id") as total')
+            )
+            ->groupBy('classifications.name')
+            ->get();
 
         $category = DB::table('classifications')
             ->where('classifications.organization_id', $oid)
             ->get();
 
         $outingdate = date('Y-m-d', strtotime(DB::table('outings')
-        ->where([
-            ['outings.organization_id', $oid],
-            ['outings.end_date_time', '>', now()],
-        ])
-        ->orderBy("outings.start_date_time")
-        ->value("outings.start_date_time as start_date_time")));
+            ->where([
+                ['outings.organization_id', $oid],
+                ['outings.end_date_time', '>', now()],
+            ])
+            ->orderBy("outings.start_date_time")
+            ->value("outings.start_date_time as start_date_time")));
 
-        foreach($studentouting as $row){
-            foreach($category as $cat)
-            {
+        foreach ($studentouting as $row) {
+            foreach ($category as $cat) {
                 // <!-- check whether the selected student use this category before -->
                 // 
                 // live in dorm
-                if($row->dorm_id != NULL)
-                {
-                    if(strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString())
-                    {
+                if ($row->dorm_id != NULL) {
+                    if (strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString()) {
                         //remove the element
-                        $category = $category->except($cat->id-1);
-                    }
-                    elseif($cat->limit > 0 && $row->total >= $cat->limit && $cat->name == $row->catname)
-                    {
+                        $category = $category->except($cat->id - 1);
+                    } elseif ($cat->limit > 0 && $row->total >= $cat->limit && $cat->name == $row->catname) {
                         //remove the element
-                        $category = $category->except($cat->id-1);
-                        
+                        $category = $category->except($cat->id - 1);
                     }
                 }
                 //outside
-                else
-                {
-                    if(strtoupper($cat->name) != $categoryReal[0])
-                    {
+                else {
+                    if (strtoupper($cat->name) != $categoryReal[0]) {
                         //remove the element
-                        $category = $category->except($cat->id-1);
+                        $category = $category->except($cat->id - 1);
                     }
                 }
             }
@@ -2390,7 +2380,7 @@ class DormController extends Controller
     public function updateInTime($id)
     {
         $intime = now();
-        
+
         $categoryReal = $this->categoryReal;
 
         $outingcat = DB::table('student_outing')
