@@ -37,12 +37,9 @@
                     <div class="form-group">
                         <label>Nama Organisasi</label>
                         <select name="organization" id="organization" class="form-control">
+                        <option value="" selected disabled>Pilih Organisasi</option>
                             @foreach($organization as $row)
-                                @if ($loop->first)
-                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                @else
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                @endif
                             @endforeach
                         </select>
                     </div>
@@ -51,9 +48,7 @@
                         <label>Nama Pelajar</label>
                         <select name="name" id="name" class="form-control">
                             <option value="" selected disabled>Pilih Pelajar</option>
-                            @foreach($student as $row)
-                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endforeach
+                            
                         </select>
                     </div>
 
@@ -111,6 +106,50 @@
 <script>
     $(document).ready(function() {
         // do ajax call function to get the category for user based on dorm value
+        $("#organization").prop("selectedIndex", 1).trigger('change');
+        fetchStudent($("#organization").val());
+
+        $('#organization').change(function() {
+            
+            if($(this).val() != '')
+            {
+                var organizationid = $("#organization option:selected").val();
+                var _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('dorm.fetchStudent') }}",
+                    method:"GET",
+                    data:{ oid:organizationid,
+                            _token:_token },
+                    success:function(result)
+                    {  
+                        $('#name').empty();
+                        $("#name").append("<option value='' disabled selected> Pilih Pelajar</option>");
+                        jQuery.each(result.success, function(key, value){
+                            $("#name").append("<option value='"+ value.id + "'>" + value.nama + "</option>");
+                        });
+                    }
+
+                });
+            }
+        });
+
+        function fetchStudent(organizationid = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('dorm.fetchStudent') }}",
+                method:"GET",
+                data:{ oid:organizationid,
+                        _token:_token },
+                success:function(result)
+                {
+                    $('#name').empty();
+                    $("#name").append("<option value='' disabled selected> Pilih Pelajar</option>");
+                    jQuery.each(result.success, function(key, value){
+                        $("#name").append("<option value='"+ value.id + "'>" + value.nama + "</option>");
+                    });
+                }
+            })
+        }
         
         $("#name").prop("selectedIndex", 1).trigger('change');
         fetchCategory($("#name").val());

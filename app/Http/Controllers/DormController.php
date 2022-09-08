@@ -64,7 +64,9 @@ class DormController extends Controller
                 ['ou.organization_id', $organization[0]->id],
             ]);
 
+        // $roles = $query->select('organization_roles.nama')->get();
         $roles = $query->value('organization_roles.nama');
+        // dd($roles);
         $checkin = $query->value('ou.check_in_status');
 
         $isblacklisted = DB::table('students')
@@ -488,19 +490,12 @@ class DormController extends Controller
     //create or add files
     public function create()
     {
-        $organization = $this->getOrganizationByUserId();
-
-        //get student that is belongs to the logged in parent
-        $student = DB::table('students')
-        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-        ->join('users', 'users.telno', '=', 'students.parent_tel')
-        ->join('organization_user as ou', 'ou.user_id', '=', 'users.id')
-        ->where([
-            ['ou.user_id', Auth::user()->id],
-            ['ou.organization_id', $organization[0]->id],
-            ['cs.status', 1],
-        ])
-        ->select('students.id', 'students.nama', 'cs.dorm_id')
+        // $organization = $this->getOrganizationByUserId();
+        $organization = DB::table('organizations')
+        ->join('organization_user as ou', 'ou.organization_id', '=', 'organizations.id')
+        ->where('ou.user_id', Auth::user()->id)
+        ->select('organizations.id', 'organizations.nama')
+        ->distinct()
         ->get();
         
         $start = date('Y-m-d', strtotime(DB::table('outings')
@@ -519,9 +514,9 @@ class DormController extends Controller
             ->orderBy("outings.end_date_time")
             ->value("outings.end_date_time as end_date_time")));
 
-        if (Auth::user()->hasRole('Penjaga')) {
-            return view('dorm.create', compact('organization', 'start', 'end', 'student'));
-        }
+        
+        return view('dorm.create', compact('organization', 'start', 'end'));
+        
     }
 
     public function createOuting()
@@ -595,6 +590,7 @@ class DormController extends Controller
             ])
             ->value("class_student.id");
 
+        
         $outingtype = DB::table('classifications')
             ->where([
                 ['classifications.id', $request->get('category')],
@@ -626,6 +622,7 @@ class DormController extends Controller
 
             $arrayRecipientEmail = DB::table('users')
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                ->where('organization_user.organization_id', $request->get('organization'))
                 ->where('organization_user.check_in_status', '=', 1)
                 ->orWhere('organization_user.role_id', '=', 4)
                 ->select('users.email')
@@ -1930,6 +1927,27 @@ class DormController extends Controller
         return response()->json(['success' => $list]);
     }
 
+    public function fetchStudent(Request $request)
+    {
+        $oid = $request->get('oid');
+        
+        //get student that is belongs to the logged in parent
+        $student = DB::table('students')
+        ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+        ->where([
+            ['ou.organization_id', $oid],
+            ['ou.user_id', Auth::user()->id],
+            ['cs.status', 1],
+        ])
+        ->select('students.nama', 'students.id')
+        ->distinct()
+        ->get();
+
+        return response()->json(['success' => $student]);
+    }
+
     public function fetchCategory(Request $request)
     {
         $sid = $request->get('sid');
@@ -2405,13 +2423,40 @@ class DormController extends Controller
                 ]);
         }
 
+        $query = DB::table('student_outing')
+        ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
+        ->join('students', 'students.id', '=', 'cs.student_id')
+        ->where([
+            ['student_outing.id', $id],
+            ['student_outing.status', 1],
+        ]);
+
+        $telno = $query
+                ->value('students.parent_tel');
+            
+        $oid = $query->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->value('classifications.organization_id');
+
         $arrayRecipientEmail = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
             // ->where('organization_user.role_id', '=', 6)
-            ->orWhere('organization_user.role_id', '=', 4)
-            ->orWhere('organization_user.check_in_status', '=', 1)
+            // ->orWhere('organization_user.role_id', '=', 4)
+            // ->orWhere('organization_user.check_in_status', '=', 1)
+            ->where([
+                ['organization_user.organization_id', '=', $oid],
+                ['organization_user.check_in_status', '=', 1],
+            ])
+            ->orWhere([
+                ['organization_user.role_id', '=', 4],
+                ['organization_user.organization_id', '=', $oid],
+            ])
+            ->orWhere([
+                ['organization_user.organization_id', '=', $oid],
+                ['users.telno', '=', $telno],
+            ])
             ->select('users.email')
             ->get();
+
         // dd($arrayRecipientEmail);
 
         if (isset($arrayRecipientEmail)) {
@@ -2496,14 +2541,26 @@ class DormController extends Controller
 
             $telno = $query
                 ->value('students.parent_tel');
+            
+            $oid = $query->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+            ->value('classifications.organization_id');
 
             // function to send user email
             // get penjaga id and send to that penjaga only
             $arrayRecipientEmail = DB::table('users')
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-                ->where('organization_user.check_in_status', '=', 1)
-                ->orWhere('organization_user.role_id', '=', 4)
-                // ->orWhere('users.telno', '=', $telno)
+                ->where([
+                    ['organization_user.organization_id', '=', $oid],
+                    ['organization_user.check_in_status', '=', 1],
+                ])
+                ->orWhere([
+                    ['organization_user.role_id', '=', 4],
+                    ['organization_user.organization_id', '=', $oid],
+                ])
+                ->orWhere([
+                    ['organization_user.organization_id', '=', $oid],
+                    ['users.telno', '=', $telno],
+                ])
                 ->select('users.email')
                 ->get();
 
@@ -2546,14 +2603,23 @@ class DormController extends Controller
                 ->join('students', 'students.id', '=', 'cs.student_id')
                 ->value('students.nama');
 
+            $oid = $query->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')->value('classifications.organization_id');
+
             // function to send user email
             $arrayRecipientEmail = DB::table('users')
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-                ->where('organization_user.check_in_status', '=', 1)
-                ->orWhere('organization_user.role_id', '=', 4)
+                ->where([
+                    ['organization_user.organization_id', '=', $oid],
+                    ['organization_user.check_in_status', '=', 1]
+                ])
+                ->orWhere([
+                    ['organization_user.role_id', '=', 4],
+                    ['organization_user.organization_id', '=', $oid],
+                ])
                 ->select('users.email')
                 ->get();
 
+                // dd($arrayRecipientEmail);
             if (isset($arrayRecipientEmail)) {
                 foreach ($arrayRecipientEmail as $email) {
                     // dd("here inside foreach");
