@@ -32,7 +32,7 @@
             {{csrf_field()}}
             <div class="card-body">
                 <input id="start" value="{{$start}}" hidden>
-                <input id="start" value="{{$end}}" hidden>
+                <input id="end" value="{{$end}}" hidden>
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
@@ -110,7 +110,7 @@
             console.log(selectedCat[2]);
             if(selectedCat[2].toUpperCase() == "OUTINGS")
             {
-                start_date.value = start_date.max = null;
+                // start_date.value = start_date.max = null;
                 start_date.min = $("#start").val()
                 start_date.max = $("#end").val();
             }

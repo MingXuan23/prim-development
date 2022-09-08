@@ -177,6 +177,7 @@
             }
             else if(selectedCat[1] != 0)
             {
+                console.log("here");
                 start_date.value = start_date.max = null;
                 
                 var today = new Date();
