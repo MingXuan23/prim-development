@@ -75,6 +75,7 @@ class DormController extends Controller
             ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
             ->where([
                 // ['ou.organization_id', $organization[0]->id],
+                ['cs.blacklist', 1],
                 ['ou.user_id', Auth::user()->id],
             ])
             ->select('cs.blacklist', 'ou.organization_id as oid', 'students.nama')
