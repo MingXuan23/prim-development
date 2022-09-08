@@ -62,7 +62,8 @@
                         <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
                     </div> -->
 
-                    <input id="outingdate" value="{{$outingdate}}" hidden>
+                    <input id="start" value="{{$start}}" hidden>
+                    <input id="end" value="{{$end}}" hidden>
                     <div class="form-group">
                         <label>Kategori</label>
                         <select name="category" id="category" class="form-control">
@@ -171,7 +172,8 @@
             if(selectedCat[2].toUpperCase() == "OUTINGS")
             {
                 start_date.value = start_date.max = null;
-                start_date.value = start_date.min = start_date.max = $("#outingdate").val();
+                start_date.min = $("#start").val()
+                start_date.max = $("#end").val();
             }
             else if(selectedCat[1] != 0)
             {

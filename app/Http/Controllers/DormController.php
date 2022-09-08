@@ -503,7 +503,7 @@ class DormController extends Controller
         ->select('students.id', 'students.nama', 'cs.dorm_id')
         ->get();
         
-        $outingdate = date('Y-m-d', strtotime(DB::table('outings')
+        $start = date('Y-m-d', strtotime(DB::table('outings')
             ->where([
                 ['outings.organization_id', $organization[0]->id],
                 ['outings.end_date_time', '>', now()],
@@ -511,8 +511,16 @@ class DormController extends Controller
             ->orderBy("outings.start_date_time")
             ->value("outings.start_date_time as start_date_time")));
 
+        $end = date('Y-m-d', strtotime(DB::table('outings')
+            ->where([
+                ['outings.organization_id', $organization[0]->id],
+                ['outings.end_date_time', '>', now()],
+            ])
+            ->orderBy("outings.end_date_time")
+            ->value("outings.end_date_time as end_date_time")));
+
         if (Auth::user()->hasRole('Penjaga')) {
-            return view('dorm.create', compact('organization', 'outingdate', 'student'));
+            return view('dorm.create', compact('organization', 'start', 'end', 'student'));
         }
     }
 
@@ -630,7 +638,6 @@ class DormController extends Controller
                     // Mail::to($email)->send(new NotifyMail());
                     Mail::to($email)->send(new NotifyMail());
 
-                    dd("is notify mail");
                     if (Mail::failures()) {
                         // dd("fail");
                         return response()->Fail('Sorry! Please try again latter');
@@ -855,13 +862,21 @@ class DormController extends Controller
             ->where('classifications.organization_id', $organization[0]->id)
             ->get();
             
-            $outingdate = date('Y-m-d', strtotime(DB::table('outings')
+            $start = date('Y-m-d', strtotime(DB::table('outings')
+            ->where([
+                ['outings.organization_id', $organization[0]->id],
+                ['outings.end_date_time', '>', now()],
+            ])
+            ->orderBy("outings.start_date_time")
+            ->value("outings.start_date_time as start_date_time")));
+
+            $end = date('Y-m-d', strtotime(DB::table('outings')
                 ->where([
                     ['outings.organization_id', $organization[0]->id],
                     ['outings.end_date_time', '>', now()],
                 ])
-                ->orderBy("outings.start_date_time")
-                ->value("outings.start_date_time as start_date_time")));
+                ->orderBy("outings.end_date_time")
+                ->value("outings.end_date_time as end_date_time")));
             
             foreach($category as $cat)
             {
@@ -870,10 +885,13 @@ class DormController extends Controller
                 // live in dorm
                 if($studentouting->dorm_id != NULL)
                 {
-                    if(strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString())
+                    if(strtoupper($cat->name) == $categoryReal[2])
                     {
-                        //remove the element
-                        $category = $category->except($cat->id-1);
+                        if(now()->toDateString() > $end || now()->toDateString() < $start)
+                        {
+                            //remove the element
+                            $category = $category->except($cat->id-1);
+                        }
                     }
                     elseif($cat->limit > 0 && $studentouting->total >= $cat->limit && $cat->name == $studentouting->catname)
                     {
@@ -894,7 +912,7 @@ class DormController extends Controller
             }
 
             if (Auth::user()->hasRole('Penjaga')) {
-                return view('dorm.update', compact('organization', 'outingdate', 'category', 'studentouting'));
+                return view('dorm.update', compact('organization', 'start', 'end', 'category', 'studentouting'));
             }
         }
     }
@@ -1942,13 +1960,21 @@ class DormController extends Controller
             ->where('classifications.organization_id', $oid)
             ->get();
 
-        $outingdate = date('Y-m-d', strtotime(DB::table('outings')
-        ->where([
-            ['outings.organization_id', $oid],
-            ['outings.end_date_time', '>', now()],
-        ])
-        ->orderBy("outings.start_date_time")
-        ->value("outings.start_date_time as start_date_time")));
+        $start = date('Y-m-d', strtotime(DB::table('outings')
+            ->where([
+                ['outings.organization_id', $oid],
+                ['outings.end_date_time', '>', now()],
+            ])
+            ->orderBy("outings.start_date_time")
+            ->value("outings.start_date_time as start_date_time")));
+
+        $end = date('Y-m-d', strtotime(DB::table('outings')
+            ->where([
+                ['outings.organization_id', $oid],
+                ['outings.end_date_time', '>', now()],
+            ])
+            ->orderBy("outings.end_date_time")
+            ->value("outings.end_date_time as end_date_time")));
         
         if(count($studentouting) > 0){
             foreach($studentouting as $row){
@@ -1958,10 +1984,13 @@ class DormController extends Controller
                     // live in dorm
                     if($row->dorm_id != NULL)
                     {
-                        if(strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString())
+                        if(strtoupper($cat->name) == $categoryReal[2])
                         {
-                            //remove the element
-                            $category = $category->except($cat->id-1);
+                            if(now()->toDateString() > $end || now()->toDateString() < $start)
+                            {
+                                //remove the element
+                                $category = $category->except($cat->id-1);
+                            }
                         }
                         elseif($cat->limit > 0 && $row->total >= $cat->limit && $cat->name == $row->catname)
                         {
@@ -1991,11 +2020,13 @@ class DormController extends Controller
                 // live in dorm
                 if($dorm != NULL)
                 {
-                    if(strtoupper($cat->name) == $categoryReal[2] && $outingdate < now()->toDateString())
+                    if(strtoupper($cat->name) == $categoryReal[2])
                     {
-                        return response()->json(['success' => $category]);
-                        //remove the element
-                        $category = $category->except($cat->id-1);
+                        if(now()->toDateString() > $end || now()->toDateString() < $start)
+                        {
+                            //remove the element
+                            $category = $category->except($cat->id-1);
+                        }
                     }
                 }
                 //outside
@@ -2476,7 +2507,7 @@ class DormController extends Controller
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
                 ->where('organization_user.check_in_status', '=', 1)
                 ->orWhere('organization_user.role_id', '=', 4)
-                ->orWhere('users.telno', '=', $telno)
+                // ->orWhere('users.telno', '=', $telno)
                 ->select('users.email')
                 ->get();
 
