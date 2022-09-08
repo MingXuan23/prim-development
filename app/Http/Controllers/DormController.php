@@ -1986,7 +1986,7 @@ class DormController extends Controller
             ->get();
 
         $category = DB::table('classifications')
-            ->where('classifications.organization_id', $oid)
+            // ->where('classifications.organization_id', $oid)
             ->get();
 
         $start = date('Y-m-d', strtotime(DB::table('outings')
@@ -2010,6 +2010,7 @@ class DormController extends Controller
                 foreach($category as $cat)
                 {
                     // <!-- check whether the selected student use this category before -->
+                    
                     // live in dorm
                     if($row->dorm_id != NULL)
                     {
@@ -2018,6 +2019,7 @@ class DormController extends Controller
                             if(now()->toDateString() > $end || now()->toDateString() < $start)
                             {
                                 //remove the element
+                                // 这个方法不适合 
                                 $category = $category->except($cat->id-1);
                             }
                         }
@@ -2033,12 +2035,14 @@ class DormController extends Controller
                             $category = $category->except($cat->id - 1);
                         }
                     }
+                    
                 }
             }
         } 
         else 
         {
             foreach ($category as $cat) {
+                
                 $dorm = DB::table("class_student")
                     ->where('class_student.student_id', $sid)
                     ->value('class_student.dorm_id');
@@ -2059,11 +2063,15 @@ class DormController extends Controller
                 else {
                     if (strtoupper($cat->name) != $categoryReal[0]) {
                         //remove the element
-                        $category = $category->except($cat->id - 1);
+                        $category = $category->except($cat->id-1);
                     }
                 }
+                
             }
         }
+
+
+        
         return response()->json(['success' => $category, 'start' => $start, 'end' => $end]);
     }
 

@@ -172,7 +172,10 @@
                         $('#category').empty();
                         $("#category").append("<option value='' disabled selected> Pilih Kategori Keluar</option>");
                         jQuery.each(result.success, function(key, value){
-                            $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                            if(value.organization_id == $("#organization option:selected").val())
+                            {
+                                $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                            }
                         });
                         start = result.start;
                         end = result.end;
@@ -195,7 +198,10 @@
                     $('#category').empty();
                     $("#category").append("<option value='' disabled selected> Pilih Kategori Keluar </option>");
                     jQuery.each(result.success, function(key, value){
-                        $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                        if(value.organization_id == $("#organization option:selected").val())
+                        {
+                            $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                        }
                     });
                     start = result.start;
                     end = result.end;
