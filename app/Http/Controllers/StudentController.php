@@ -208,7 +208,7 @@ class StudentController extends Controller
             ->where('organization_id', $co->oid)
             ->where('role_id', 6)
             ->first();
-        dd($newparent->id);
+        // dd($newparent->id);
         $user = User::find($newparent->id);
 
         // role parent

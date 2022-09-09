@@ -50,6 +50,7 @@
                                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                                         @endif
                                     @endif
+                                    @break
                                 @endif
                             @endforeach
                         @endforeach

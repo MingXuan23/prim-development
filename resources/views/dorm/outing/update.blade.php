@@ -48,6 +48,7 @@
                                             @else
                                             <option value="{{ $row->id }}">{{ $row->nama }}</option>
                                             @endif
+                                            @break
                                         @endif
                                     @endif
                                 @endforeach

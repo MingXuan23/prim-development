@@ -45,6 +45,7 @@
                                             @if($role->nama != "Penjaga")
                                             <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                             @endif
+                                            @break
                                         @endif
                                     @endforeach
                                 @endforeach

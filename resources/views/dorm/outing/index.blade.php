@@ -28,6 +28,7 @@
                                 @if($role->organization_id == $row->id)
                                     @if($role->nama != "Penjaga")
                                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                        @break
                                     @endif
                                 @endif
                             @endforeach
@@ -131,6 +132,7 @@
                                                 @if($role->nama != "Penjaga")
                                                     <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                                 @endif
+                                                @break
                                             @endif
                                         @endforeach
                                     @endforeach

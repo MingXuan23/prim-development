@@ -36,6 +36,7 @@
                                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                                         @endif
                                     @endif
+                                    @break
                                 @endif
                             @endforeach
                         @endforeach
@@ -152,6 +153,7 @@
                                             @if($role->nama != "Penjaga")
                                             <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                             @endif
+                                            @break
                                         @endif
                                     @endforeach
                                 @endforeach
