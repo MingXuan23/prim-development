@@ -89,15 +89,29 @@ class DormController extends Controller
     public function indexReportAll()
     {
         $organization = $this->getOrganizationByUserId();
-        return view('dorm.report.allStudent', compact('organization'));
+        $roles = DB::table('organization_roles')
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->select('organization_roles.nama', 'ou.organization_id')
+                ->get();
+        return view('dorm.report.allStudent', compact('organization', 'roles'));
     }
 
     public function indexOuting()
     {
         // 
         $organization = $this->getOrganizationByUserId();
+        $roles = DB::table('organization_roles')
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->select('organization_roles.nama', 'ou.organization_id')
+                ->get();
 
-        return view('dorm.outing.index', compact('organization'));
+        return view('dorm.outing.index', compact('organization', 'roles'));
     }
 
     public function indexReasonOuting()
@@ -113,6 +127,14 @@ class DormController extends Controller
         // 
         $userId = Auth::id();
         $organization = $this->getOrganizationByUserId();
+
+        $roles = DB::table('organization_roles')
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->select('organization_roles.nama', 'ou.organization_id')
+                ->get();
         // dd($organization[0]->id);
         if (
             Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
@@ -129,7 +151,7 @@ class DormController extends Controller
         }
 
         // dd($dorm);
-        return view("dorm.resident.index", compact('dorm', 'organization'));
+        return view("dorm.resident.index", compact('dorm', 'organization', 'roles'));
     }
 
     public function indexDorm()
@@ -445,13 +467,19 @@ class DormController extends Controller
     {
         // $student_id = $request->student_id;
 
+        $this->validate($request, [
+            'organPDF'      =>  'required',
+            'pdf_from'      =>  'required',
+            'pdf_to'        =>  'required',
+        ]);
+
         $details = DB::table('class_student')
             ->join('students', 'students.id', '=', 'class_student.student_id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
             ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
-            ->where('class_organization.organization_id', '=', $request->organExport)
+            ->where('class_organization.organization_id', '=', $request->organPDF)
             ->select(
                 'organizations.nama as schoolName',
                 'organizations.address as schoolAddress',
@@ -459,7 +487,7 @@ class DormController extends Controller
                 'organizations.state as schoolState',
             )
             ->first();
-
+        
         // dd($details->studentName);
         $data = DB::table('students')
             ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -469,15 +497,15 @@ class DormController extends Controller
             ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
             ->join('classifications', 'classifications.id', '=', 'so.classification_id')
             ->where([
-                ['ou.organization_id',  $request->organExport],
+                ['ou.organization_id',  $request->organPDF],
             ])
-            ->whereBetween('so.apply_date_time', [$request->from, $request->to])
-            ->select('classifications.name as catname', DB::raw('count("so.id") as total'))
+            ->whereBetween('so.apply_date_time', [$request->pdf_from, $request->pdf_to])
+            ->select('classifications.Fake_name as catname', DB::raw('count("so.id") as total'))
             ->groupBy('classifications.name')
             ->get();
 
         $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details'));
-
+        
         return $pdf->download('Report.pdf');
     }
 
@@ -526,7 +554,16 @@ class DormController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
-        return view('dorm.outing.add', compact('organization'));
+
+        $roles = DB::table('organization_roles')
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->select('organization_roles.nama', 'ou.organization_id')
+                ->get();
+
+        return view('dorm.outing.add', compact('organization', 'roles'));
     }
 
     public function createReasonOuting()
@@ -542,8 +579,16 @@ class DormController extends Controller
         // $userid     = Auth::id();
         $organization = $this->getOrganizationByUserId();
 
+        $roles = DB::table('organization_roles')
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->select('organization_roles.nama', 'ou.organization_id')
+                ->get();
+
         $dormlist =  $this->getDormByOrganizationId();
-        return view('dorm.resident.add', compact('dormlist', 'organization'));
+        return view('dorm.resident.add', compact('dormlist', 'organization', 'roles'));
     }
 
     public function createDorm()
@@ -932,7 +977,15 @@ class DormController extends Controller
 
         $organization = $this->getOrganizationByUserId();
 
-        return view('dorm.outing.update', compact('outing', 'organization', 'id'));
+        $roles = DB::table('organization_roles')
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->select('organization_roles.nama', 'ou.organization_id')
+                ->get();
+
+        return view('dorm.outing.update', compact('outing', 'organization', 'id', 'roles'));
     }
 
     public function editOutingReason($id)
@@ -982,7 +1035,16 @@ class DormController extends Controller
             ->get();
 
         $organization = $this->getOrganizationByUserId();
-        return view('dorm.resident.update', compact('resident', 'dormlist', 'organization'));
+
+        $roles = DB::table('organization_roles')
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                ])
+                ->select('organization_roles.nama', 'ou.organization_id')
+                ->get();
+
+        return view('dorm.resident.update', compact('resident', 'dormlist', 'organization', 'roles'));
     }
 
     public function getID($id)
@@ -1550,11 +1612,13 @@ class DormController extends Controller
                     ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
                     ->join('classifications', 'classifications.id', '=', 'so.classification_id')
                     ->where([
-                        ['ou.organization_id', $oid],
+                        // ['ou.organization_id', $oid],
+                        ['classifications.organization_id',  $oid],
                     ])
                     ->whereBetween('so.apply_date_time', [$start_date, $end_date])
-                    ->select('classifications.fake_name as catname', DB::raw('count("so.id") as total'))
+                    ->select('so.id', 'classifications.fake_name as catname', DB::raw('count("so.id") as total'))
                     ->groupBy('classifications.name')
+                    ->distinct()
                     ->get();
 
                 $table = Datatables::of($data);
