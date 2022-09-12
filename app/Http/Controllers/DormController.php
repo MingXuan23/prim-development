@@ -630,7 +630,7 @@ class DormController extends Controller
                     // Mail::to($email)->send(new NotifyMail());
                     Mail::to($email)->send(new NotifyMail());
 
-                    dd("is notify mail");
+                    // dd("is notify mail");
                     if (Mail::failures()) {
                         // dd("fail");
                         return response()->Fail('Sorry! Please try again latter');
@@ -2204,13 +2204,40 @@ class DormController extends Controller
         }
 
         if ($studentouting) {
+            $getOrganization = DB::table('users')
+                ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                ->where('users.id', '=', Auth::user()->id)
+                ->whereIn('organization_user.role_id', [4, 7])
+                ->value('organization_user.organization_id');
+            // dd($getOrganization);
+
+            $getTelno = DB::table('student_outing')
+                ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+                ->join('students', 'students.id', '=', 'class_student.student_id')
+                ->where('student_outing.id', $id)
+                ->value('students.parent_tel');
+            // dd($getTelno);
+
             $arrayRecipientEmail = DB::table('users')
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-                // ->where('organization_user.role_id', '=', 6)
-                ->orWhere('organization_user.role_id', '=', 4)
-                ->select('users.email')
+                ->join('organization_user_student', 'organization_user_student.organization_user_id', '=', 'organization_user.id')
+                ->join('students', 'students.id', '=', 'organization_user_student.student_id')
+                // ->where('organization_user.organization_id', 4)
+                // ->where('organization_user.organization_id', '=', $getOrganization)
+                // ->where([
+                //     // ['organization_user.role_id', '=', '4'],
+                //     ['organization_user.organization_id', '=', $getOrganization],
+                // ])
+                // ->orWhere([
+                //     ['organization_user.role_id', '=', 6],
+                //     ['students.parent_tel', '=', $getTelno],
+                //     ['organization_user.organization_id', '=', $getOrganization],
+                // ])
+                ->select('users.name', 'users.email')
                 ->get();
-            // dd($arrayRecipientEmail);
+
+
+            dd($getTelno, $getOrganization, $arrayRecipientEmail);
 
             if (isset($arrayRecipientEmail)) {
                 foreach ($arrayRecipientEmail as $email) {
