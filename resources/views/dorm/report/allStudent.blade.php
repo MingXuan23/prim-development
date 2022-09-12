@@ -25,7 +25,14 @@
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected disabled>Pilih Organisasi</option>
                         @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @foreach($roles as $role)
+                                @if($role->organization_id == $row->id)
+                                    @if($role->nama != "Penjaga")
+                                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                        @break
+                                    @endif
+                                @endif
+                            @endforeach
                         @endforeach
                     </select>
                 </div>
@@ -111,7 +118,14 @@
                                 <label>Organisasi</label>
                                 <select name="organExport" id="organExport" class="form-control">
                                     @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                        @foreach($roles as $role)
+                                            @if($role->organization_id == $row->id)
+                                                @if($role->nama != "Penjaga")
+                                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                                    @break
+                                                @endif
+                                            @endif
+                                        @endforeach
                                     @endforeach
                                 </select>
                             </div>
@@ -149,23 +163,30 @@
                             {{ csrf_field() }}
                             <div class="form-group">
                                 <label>Organisasi</label>
-                                <select name="organExport" id="organExport" class="form-control">
+                                <select name="organPDF" id="organPDF" class="form-control">
                                     @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                        @foreach($roles as $role)
+                                            @if($role->organization_id == $row->id)
+                                                @if($role->nama != "Penjaga")
+                                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                                    @break
+                                                @endif
+                                            @endif
+                                        @endforeach
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group">
                                 <label>Tarikh Mula</label>
-                                <input onclick="this.showPicker()" class="form-control" id="from" name="from" type="date" placeholder="Pilih Tarikh Mula">
+                                <input onclick="this.showPicker()" class="form-control" id="pdf_from" name="pdf_from" type="date" placeholder="Pilih Tarikh Mula">
                             </div>
 
                             <div class="form-group">
                                 <label>Tarikh Tamat</label>
-                                <input onclick="this.showPicker()" class="form-control" id="to" name="to" type="date" placeholder="Pilih Tarikh Tamat">
+                                <input onclick="this.showPicker()" class="form-control" id="pdf_to" name="pdf_to" type="date" placeholder="Pilih Tarikh Tamat">
                             </div>
                             <div class="modal-footer">
-                                <button id="buttonExport" type="submit" class="btn btn-primary">Print</button>
+                                <button id="buttonPrint" type="submit" class="btn btn-primary">Print</button>
                             </div>
                         </div>
                     </form>
@@ -198,7 +219,7 @@
         }
 
         if ($("#organExport").val() != "") {
-            $("#organExport").prop("selectedIndex", 1).trigger('change');
+            $("#organExport").prop("selectedIndex", 0).trigger('change');
             // fetch_data($("#organExport").val());
         }
 
@@ -297,6 +318,16 @@
             var organizationid = $("#organExport").val();
             $('#requestTable').DataTable().destroy();
             fetch_data(organizationid);
+        });
+
+        $('#pdf_to').change(function() {
+            if (pdf_to.value < pdf_from.value) {
+                pdf_to.value = pdf_from.value;
+            }
+        });
+
+        $('#pdf_from').change(function() {
+            pdf_to.min = pdf_from.value;
         });
 
         // csrf token for ajax

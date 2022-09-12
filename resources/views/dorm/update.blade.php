@@ -31,7 +31,8 @@
             @method('PUT') 
             {{csrf_field()}}
             <div class="card-body">
-                <input id="outingdate" value="{{$outingdate}}" hidden>
+                <input id="start" value="{{$start}}" hidden>
+                <input id="end" value="{{$end}}" hidden>
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
@@ -56,11 +57,7 @@
                 <div class="form-group">
                     <label>Kategori</label>
                     <select name="category" id="category" class="form-control">
-                        @foreach($category as $row)
-                            @if($row->name == $studentouting->categoryname)
-                                <option value="{{ $row->id }}‡{{$row->day_before}}‡{{$row->name}}" selected>{{ $row->fake_name }}</option>
-                            @endif
-                        @endforeach
+                        <option value="{{ $studentouting->cid }}‡{{$studentouting->day_before}}‡{{$studentouting->categoryname}}" selected>{{ $studentouting->fake_name }}</option>
                     </select>
                 </div>
 
@@ -109,8 +106,9 @@
             console.log(selectedCat[2]);
             if(selectedCat[2].toUpperCase() == "OUTINGS")
             {
-                start_date.value = start_date.max = null;
-                start_date.value = start_date.min = start_date.max = $("#outingdate").val();
+                // start_date.value = start_date.max = null;
+                start_date.min = $("#start").val()
+                start_date.max = $("#end").val();
             }
             else if(selectedCat[1] != 0)
             {

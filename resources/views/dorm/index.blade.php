@@ -43,15 +43,23 @@
             <div class="card-header">Senarai Permintaan Keluar</div>
             
             <div>
-                @if($isblacklisted == 1)    
-                    <div class="alert-danger" style="margin: 19px; padding: 10px;">
-                        Pelajar dalam blacklist
-                    </div>
+                @if(count($isblacklisted) > 0)
+                <div class="alert-danger" style="margin: 19px; padding: 10px;">
+                Pelajar dalam blacklist<br>
+                @foreach($isblacklisted as $row)
+                    @if($row->blacklist == 1)    
+                    <li>{{$row->nama}}</li>
+                    @endif
+                @endforeach
+                </div>
                 @endif
+                
+                
                 @if($roles == "Penjaga")
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
 
+                <!-- after check in didnt change to 1 -->
                 @if($roles == "Warden")
                     @if($checkin == 1)
                     <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', $checkin)}}" class="btn btn-primary"> <i class="fas fa-minus"></i> Check Out</a>
@@ -59,6 +67,7 @@
                     <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', 0)}}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
                     @endif
                 @endif
+             
             </div>
 
             <div class="card-body">
@@ -89,14 +98,14 @@
                                 <th>No Tel Penjaga</th>
                                 <th>Tarikh keluar dimohon</th>
                                 <th>Kategori</th>
-                                @if($roles == "Penjaga" || $roles == "Guard")
-                                    <th>Status</th>
-                                    <th>Tarikh dan Masa Keluar</th>
-                                    <th>Tarikh dan Masa Sampai</th>
-                                    <th>Tarikh dan Masa Masuk</th>
-                                @else
-                                    <th>Alasan</th>
-                                @endif
+                                    @if($roles == "Penjaga" || $roles == "Guard")
+                                        <th>Status</th>
+                                        <th>Tarikh dan Masa Keluar</th>
+                                        <th>Tarikh dan Masa Sampai</th>
+                                        <th>Tarikh dan Masa Masuk</th>
+                                    @else
+                                        <th>Alasan</th>
+                                    @endif
                                 <th>Action</th>
                             </tr>
                         </thead>

@@ -37,12 +37,9 @@
                     <div class="form-group">
                         <label>Nama Organisasi</label>
                         <select name="organization" id="organization" class="form-control">
+                        <option value="" selected disabled>Pilih Organisasi</option>
                             @foreach($organization as $row)
-                                @if ($loop->first)
-                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                @else
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                @endif
                             @endforeach
                         </select>
                     </div>
@@ -51,9 +48,7 @@
                         <label>Nama Pelajar</label>
                         <select name="name" id="name" class="form-control">
                             <option value="" selected disabled>Pilih Pelajar</option>
-                            @foreach($student as $row)
-                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endforeach
+                            
                         </select>
                     </div>
 
@@ -62,7 +57,7 @@
                         <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
                     </div> -->
 
-                    <input id="outingdate" value="{{$outingdate}}" hidden>
+                    
                     <div class="form-group">
                         <label>Kategori</label>
                         <select name="category" id="category" class="form-control">
@@ -110,6 +105,52 @@
 <script>
     $(document).ready(function() {
         // do ajax call function to get the category for user based on dorm value
+        var start;
+        var end;
+        $("#organization").prop("selectedIndex", 1).trigger('change');
+        fetchStudent($("#organization").val());
+
+        $('#organization').change(function() {
+            
+            if($(this).val() != '')
+            {
+                var organizationid = $("#organization option:selected").val();
+                var _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('dorm.fetchStudent') }}",
+                    method:"GET",
+                    data:{ oid:organizationid,
+                            _token:_token },
+                    success:function(result)
+                    {  
+                        $('#name').empty();
+                        $("#name").append("<option value='' disabled selected> Pilih Pelajar</option>");
+                        jQuery.each(result.success, function(key, value){
+                            $("#name").append("<option value='"+ value.id + "'>" + value.nama + "</option>");
+                        });
+                    }
+
+                });
+            }
+        });
+
+        function fetchStudent(organizationid = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('dorm.fetchStudent') }}",
+                method:"GET",
+                data:{ oid:organizationid,
+                        _token:_token },
+                success:function(result)
+                {
+                    $('#name').empty();
+                    $("#name").append("<option value='' disabled selected> Pilih Pelajar</option>");
+                    jQuery.each(result.success, function(key, value){
+                        $("#name").append("<option value='"+ value.id + "'>" + value.nama + "</option>");
+                    });
+                }
+            })
+        }
         
         $("#name").prop("selectedIndex", 1).trigger('change');
         fetchCategory($("#name").val());
@@ -131,8 +172,13 @@
                         $('#category').empty();
                         $("#category").append("<option value='' disabled selected> Pilih Kategori Keluar</option>");
                         jQuery.each(result.success, function(key, value){
-                            $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                            if(value.organization_id == $("#organization option:selected").val())
+                            {
+                                $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                            }
                         });
+                        start = result.start;
+                        end = result.end;
                     }
 
                 });
@@ -152,50 +198,54 @@
                     $('#category').empty();
                     $("#category").append("<option value='' disabled selected> Pilih Kategori Keluar </option>");
                     jQuery.each(result.success, function(key, value){
-                        $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                        if(value.organization_id == $("#organization option:selected").val())
+                        {
+                            $("#category").append("<option value='"+ value.id + "‡" + value.day_before + "‡" + value.name +"'>" + value.fake_name + "</option>");
+                        }
                     });
+                    start = result.start;
+                    end = result.end;
                 }
             })
         }
-        
-    });
+       
+        $("#category").change(function() {
+            if ($("#organization option:selected").val != '') {
+                var selectedCat = $("#category option:selected").val().split('‡');
+                console.log(selectedCat[2]);
+                if(selectedCat[2].toUpperCase() == "OUTINGS")
+                {
+                    console.log("this is " + start);
+                    start_date.value = start_date.max = null;
+                    start_date.min = start;
+                    start_date.max = end;
+                }
+                else if(selectedCat[1] != 0)
+                {
+                    console.log("here");
+                    start_date.value = start_date.max = null;
+                    
+                    var today = new Date();
+                    
+                    var day = today.getDate() + parseInt(selectedCat[1]) + 1;
+                    var month = today.getMonth();
+                    var year = today.getFullYear();
 
-    
-    $("#category").change(function() {
-    
-        //这里不会做呀呀呀呀呀呀 
-        // 怎么样拿到outings 这个字
-        if ($("#organization option:selected").val != '') {
-            var selectedCat = $("#category option:selected").val().split('‡');
-            console.log(selectedCat[2]);
-            if(selectedCat[2].toUpperCase() == "OUTINGS")
-            {
-                start_date.value = start_date.max = null;
-                start_date.value = start_date.min = start_date.max = $("#outingdate").val();
+                    var d = new Date (year, month, day);
+                    start_date.min = d.toISOString().split('T')[0];
+                }
+                else
+                {
+                    start_date.value = start_date.max = null;
+                    start_date.min = new Date().toISOString().split("T")[0];
+                }
             }
-            else if(selectedCat[1] != 0)
-            {
-                start_date.value = start_date.max = null;
-                
-                var today = new Date();
-                
-                var day = today.getDate() + parseInt(selectedCat[1]) + 1;
-                var month = today.getMonth();
-                var year = today.getFullYear();
-
-                var d = new Date (year, month, day);
-                start_date.min = d.toISOString().split('T')[0];
-            }
-            else
-            {
+            else{
                 start_date.value = start_date.max = null;
                 start_date.min = new Date().toISOString().split("T")[0];
             }
-        }
-        else{
-            start_date.value = start_date.max = null;
-            start_date.min = new Date().toISOString().split("T")[0];
-        }
+        });
+        
     });
 
 </script>
