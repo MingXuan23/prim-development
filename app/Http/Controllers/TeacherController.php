@@ -215,23 +215,40 @@ class TeacherController extends Controller
     {
         $this->validate($request, [
             'name'          =>  'required',
-            'email'         =>  'required|email|unique:users',
+            'email'         =>  'required',
             'telno'         =>  'required',
             'organization'  =>  'required',
             'peranan'       =>  'required'
         ]);
 
-        $newteacher = new Teacher([
-            'name'           =>  $request->get('name'),
-            'email'          =>  $request->get('email'),
-            'password'       =>  Hash::make('abc123'),
-            'telno'          =>  $request->get('telno'),
-            'remember_token' =>  $request->get('_token'),
-            // 'created_at'     =>  now(),
-        ]);
-        $newteacher->save();
 
-        // dd($newteacher);
+        //check if parent role exists or teacher ?
+        $ifExists = DB::table('users as u')
+            ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+            ->whereIn('ou.role_id', [5, 6])
+            ->where('u.email', '=', "{$request->get('email')}")
+            ->where('u.telno', '=', "{$request->get('telno')}")
+            ->get()
+            ->count();
+
+        //if the user is completely new
+        if ($ifExists == 0) {
+            $newteacher = new Teacher([
+                'name'           =>  $request->get('name'),
+                'email'          =>  $request->get('email'),
+                'password'       =>  Hash::make('abc123'),
+                'telno'          =>  $request->get('telno'),
+                'remember_token' =>  $request->get('_token'),
+                // 'created_at'     =>  now(),
+            ]);
+            $newteacher->save();
+        } else {
+            //get the teacher or parent id
+            $newteacher = DB::table('users')
+                ->where('users.email', '=', $request->get('email'))
+                ->where('users.telno', '=', $request->get('telno'))
+                ->first();
+        }
 
         //if the user create warden
         if ($request->get('peranan') == 1) {
@@ -254,7 +271,7 @@ class TeacherController extends Controller
 
             $user = User::find($newteacher->id);
 
-            // role guru
+            // role warden
             $rolename = OrganizationRole::find(7);
             $user->assignRole($rolename->nama);
 
