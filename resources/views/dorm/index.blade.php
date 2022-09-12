@@ -32,130 +32,108 @@
                         @endforeach
                     </select>
                 </div>
+
+                <div class="form-group">
+                    <label>Nama Peranan</label>
+                    <select name="roles" id="roles" class="form-control">
+                        <option value="" selected disabled>Pilih Peranan</option>
+                        
+                    </select>
+                </div>
             </div>
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">Senarai Permintaan Keluar</div>
 
+                    <div id="blacklist" class="alert-danger" style="margin: 19px; padding: 10px;"> Pelajar dalam blacklist<br>
+                        <div id = "flag" ></div>
+                    </div>
 
-        </div>
-    </div>
+                    <div id="Nbtn"></div>
 
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">Senarai Permintaan Keluar</div>
-            
-            <div>
-                @if(count($isblacklisted) > 0)
-                <div class="alert-danger" style="margin: 19px; padding: 10px;">
-                Pelajar dalam blacklist<br>
-                @foreach($isblacklisted as $row)
-                    @if($row->blacklist == 1)    
-                    <li>{{$row->nama}}</li>
-                    @endif
-                @endforeach
-                </div>
-                @endif
-                
-                
-                @if($roles == "Penjaga")
-                <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
-                @endif
+                    <div class="card-body">
 
-                <!-- after check in didnt change to 1 -->
-                @if($roles == "Warden")
-                    @if($checkin == 1)
-                    <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', $checkin)}}" class="btn btn-primary"> <i class="fas fa-minus"></i> Check Out</a>
-                    @else
-                    <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', 0)}}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>
-                    @endif
-                @endif
-             
-            </div>
+                        @if(count($errors) > 0)
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                <li>{{$error}}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+                        @if(\Session::has('success'))
+                        <div class="alert alert-success">
+                            <p>{{ \Session::get('success') }}</p>
+                        </div>
+                        @endif
 
-            <div class="card-body">
-
-                @if(count($errors) > 0)
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                        <li>{{$error}}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-                @if(\Session::has('success'))
-                <div class="alert alert-success">
-                    <p>{{ \Session::get('success') }}</p>
-                </div>
-                @endif
-
-                <div class="flash-message"></div>
-                <input id="roles" value= "{{$roles}}" hidden>
-                <div class="table-responsive">
-                    <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                        <thead>
-                            <tr style="text-align:center">
-                                <th> No. </th>
-                                <th>Nama Pelajar</th>
-                                <th>No Tel Penjaga</th>
-                                <th>Tarikh keluar dimohon</th>
-                                <th>Kategori</th>
-                                    @if($roles == "Penjaga" || $roles == "Guard")
+                        <div class="flash-message"></div>
+                        <div class="table-responsive">
+                            <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                <thead>
+                                    <tr style="text-align:center" id="parentNGuard">
+                                        <th> No. </th>
+                                        <th>Nama Pelajar</th>
+                                        <th>No Tel Penjaga</th>
+                                        <th>Tarikh keluar dimohon</th>
+                                        <th>Kategori</th>
                                         <th>Status</th>
+                                        <th>Alasan</th>
                                         <th>Tarikh dan Masa Keluar</th>
                                         <th>Tarikh dan Masa Sampai</th>
                                         <th>Tarikh dan Masa Masuk</th>
-                                    @else
-                                        <th>Alasan</th>
-                                    @endif
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                    </table>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        {{-- confirmation delete modal --}}
-        <div id="deleteConfirmationModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Padam Permintaan</h4>
-                    </div>
-                    <div class="modal-body">
-                        Adakah anda pasti?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
-                            name="delete">Padam</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                {{-- confirmation delete modal --}}
+                <div id="deleteConfirmationModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Padam Permintaan</h4>
+                            </div>
+                            <div class="modal-body">
+                                Adakah anda pasti?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
+                                    name="delete">Padam</button>
+                                <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        {{-- end confirmation delete modal --}}
+                {{-- end confirmation delete modal --}}
 
-        {{-- confirmation unblock modal --}}
-        <div id="unblockConfirmationModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Unblock Pelajar</h4>
-                    </div>
-                    <div class="modal-body">
-                        Adakah anda pasti?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="unblock"
-                            name="unblock">Unblock</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                {{-- confirmation unblock modal --}}
+                <div id="unblockConfirmationModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Unblock Pelajar</h4>
+                            </div>
+                            <div class="modal-body">
+                                Adakah anda pasti?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" data-dismiss="modal" class="btn btn-primary" id="unblock"
+                                    name="unblock">Unblock</button>
+                                <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+                {{-- end confirmation unblock modal --}}
         </div>
-        {{-- end confirmation unblock modal --}}
-        
     </div>
-</div>
+
+    
 
 
 @endsection
@@ -173,22 +151,25 @@
 <script>
     $(document).ready(function() {
 
+        $('#blacklist').hide();
         var requestTable;
+        var roleid;
 
-        if ($("#organization").val() != "") {
+        if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetch_data($("#organization").val());
+            fetchRole($("#organization").val(), "#roles");
         }
 
-        function fetch_data(oid = '') {
-            if($("#roles").val() == "Penjaga" || $("#roles").val() == "Guard"){
+        function fetch_data(roleid = '') {
+            if($("#roles option:selected").text().toUpperCase() == "PENJAGA" || $("#roles option:selected").text().toUpperCase() == "GUARD"){
                 requestTable = $('#requestTable').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
                         url: "{{ route('dorm.getStudentOutingDatatable') }}",
                         data: {
-                            oid: oid,
+                            oid: $("#organization").val(),
+                            rid: roleid,
                             hasOrganization: true
                         },
                         type: 'GET',
@@ -199,7 +180,7 @@
                         "className": "text-center",
                         "width": "2%"
                     }, {
-                        "targets": [1, 2, 3, 4, 5, 6, 7, 8], // your case first column
+                        "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // your case first column
                         "className": "text-center",
                     },],
                     
@@ -240,6 +221,11 @@
                         orderable: false,
                         searchable: false
                     },{
+                        data: "reason",
+                        name: 'reason',
+                        orderable: false,
+                        searchable: false
+                    },{
                         data: "out_date_time",
                         name: 'out_date_time',
                         orderable: false,
@@ -264,14 +250,14 @@
                 });
             }
             else{
-                
                 requestTable = $('#requestTable').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
                         url: "{{ route('dorm.getStudentOutingDatatable') }}",
                         data: {
-                            oid: oid,
+                            oid: $("#organization").val(),
+                            rid: roleid,
                             hasOrganization: true
                         },
                         type: 'GET',
@@ -331,57 +317,90 @@
                     
                 });
             }
+
         }
 
         $('#organization').change(function() {
-            var organizationid = $("#organization option:selected").val();
+            var organizationid    = $("#organization").val();
+            var _token            = $('input[name="_token"]').val();
+            fetchRole(organizationid, "#roles");
+        });
+
+        var track = 0;
+        function fetchRole(organizationid = '', roleId = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('dorm.fetchRole') }}",
+                method:"GET",
+                data:{ oid:organizationid,
+                        _token:_token },
+                success:function(result)
+                {
+                    $(roleId).empty();
+                    $(roleId).append("<option value='' disabled selected> Pilih Asrama</option>");
+                    jQuery.each(result.success, function(key, value){
+                        $(roleId).append("<option value='"+ value.id + "‡" + value.check_in_status + "'>" + value.name + "</option>");
+                        
+                    });
+                   
+                    jQuery.each(result.isblacklisted, function(key, value){
+                        $('#flag').empty();
+                        if(value.blacklist == 1)
+                        {
+                            track = 1;
+                            $('#flag').append('<li>' + value.nama + '</li>');
+                        }
+                    });
+                }
+            })
+        }
+
+        $('#roles').change(function() {
+            roleid = $("#roles option:selected").val().split("‡")[0];
+            checkinstatus = $("#roles option:selected").val().split("‡")[1];
+            rolename = $("#roles option:selected").text().toUpperCase();
+            if(track == 1 ){
+                $('#blacklist').show();
+            }
+            $('#Nbtn').empty();
+            $('#parentNGuard').empty();
+            if(rolename == "PENJAGA" || rolename == "GUARD"){
+                $('#parentNGuard').append('<th> No. </th><th>Nama Pelajar</th><th>No Tel Penjaga</th><th>Tarikh keluar dimohon</th>' + 
+                                        '<th>Kategori</th><th>Status</th><th>Alasan</th><th>Tarikh dan Masa Keluar</th><th>Tarikh dan Masa Sampai</th>' + 
+                                        '<th>Tarikh dan Masa Masuk</th><th>Action</th>');
+                if(rolename == "PENJAGA"){
+                    $('#Nbtn').append('<a style="margin: 19px; float: right;" href="{{ route("dorm.create") }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>');
+                }
+            }
+            else{
+                $('#parentNGuard').append('<th> No. </th><th>Nama Pelajar</th><th>No Tel Penjaga</th><th>Tarikh keluar dimohon</th>' + 
+                                        '<th>Kategori</th><th>Alasan</th><th>Action</th>');
+            }
+            if(rolename == "WARDEN"){
+                if(checkinstatus == 1){
+                    $('#Nbtn').append('<a style="margin: 19px; float: right;" href="{{ route("dorm.updateCheckIn",' + checkinstatus + ')}}" class="btn btn-primary"> <i class="fas fa-minus"></i> Check Out</a>');
+                }
+                else{
+                    $('#Nbtn').append('<a style="margin: 19px; float: right;" href="{{ route("dorm.updateCheckIn",' + 0 + ')}}" class="btn btn-primary"> <i class="fas fa-plus"></i> Check In</a>');
+                }
+            }
             $('#requestTable').DataTable().destroy();
-            fetch_data(organizationid);
+            
+            fetch_data(roleid);
         });
 
         // csrf token for ajax
         $.ajaxSetup({
-            headers: {
+                headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
 
-        var student_outing_id;
+        var resident_id;
 
-        $(document).on('click', '.deleteBtn', function(){
-            student_outing_id = $(this).attr('id');
+        $(document).on('click', '.btn-danger', function(){
+            resident_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
-        });
-
-        $(document).on('click', '.unblockBtn', function(){
-            student_outing_id = $(this).attr('id');
-            $('#unblockConfirmationModal').modal('show');
-        });
-
-        $('#unblock').click(function() {
-            console.log(student_outing_id);
-            $.ajax({
-                type: 'GET',
-                dataType: 'html',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    // _method: 'DELETE'
-                },
-                url: "/dorm/dorm/updateBlacklist/" + student_outing_id,
-                success: function(data) {
-                    setTimeout(function() {
-                        $('#confirmModal').modal('hide');
-                    }, 2000);
-                    
-                    $('div.flash-message').html(data);
-
-                    requestTable.ajax.reload();
-                },
-                error: function (data) {
-                    console.log("hellllll");
-                    $('div.flash-message').html(data);
-                }
-            })
         });
 
         $('#delete').click(function() {
@@ -390,9 +409,9 @@
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
-                    _method: 'DELETE'
+                    // _method: 'DELETE'
                 },
-                url: "/dorm/" + student_outing_id,
+                url: "/dorm/dorm/destroyResident/" + resident_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
@@ -407,10 +426,9 @@
                 }
             })
         });
-
         
-
         $('.alert').delay(3000).fadeOut();
+        
 
     });
 </script>

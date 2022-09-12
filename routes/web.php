@@ -313,6 +313,7 @@ Route::group(['prefix' => 'dorm'], function () {
     Route::get('dorm/updateBlacklist/{id}', 'DormController@updateBlacklist')->name('dorm.updateBlacklist');
     Route::get('dorm/fetchCategory', "DormController@fetchCategory")->name('dorm.fetchCategory');
     Route::get('dorm/fetchStudent', "DormController@fetchStudent")->name('dorm.fetchStudent');
+    Route::get('dorm/fetchRole', "DormController@fetchRole")->name('dorm.fetchRole');
 
     // outing
     Route::get('dorm/storeOuting', 'DormController@storeOuting')->name('dorm.storeOuting');

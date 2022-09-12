@@ -43,6 +43,7 @@ use function PHPUnit\Framework\isNull;
 class DormController extends Controller
 {
     private $categoryReal = array("BALIK KECEMASAN", "BALIK KHAS", "OUTINGS", "BALIK WAJIB");
+    
     /**
      * Display a listing of the resource.
      *
@@ -57,33 +58,8 @@ class DormController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
-        $query = DB::table('organization_roles')
-            ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-            ->where([
-                ['ou.user_id', Auth::user()->id],
-                ['ou.organization_id', $organization[0]->id],
-            ]);
-
-        // $roles = $query->select('organization_roles.nama')->get();
-        $roles = $query->value('organization_roles.nama');
-        // dd($roles);
-        $checkin = $query->value('ou.check_in_status');
-
-        $isblacklisted = DB::table('students')
-            ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
-            ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
-            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-            ->where([
-                // ['ou.organization_id', $organization[0]->id],
-                ['cs.blacklist', 1],
-                ['ou.user_id', Auth::user()->id],
-            ])
-            ->select('cs.blacklist', 'ou.organization_id as oid', 'students.nama')
-            ->get();
-
-        // dd($isblacklisted);
-        // dd($roles);
-        return view('dorm.index', compact('roles', 'checkin', 'organization', 'isblacklisted'));
+        
+        return view('dorm.index', compact('organization'));
     }
 
     public function indexReportAll()
@@ -2001,6 +1977,38 @@ class DormController extends Controller
         return response()->json(['success' => $list]);
     }
 
+    public function fetchRole(Request $request)
+    {
+        $oid = $request->get('oid');
+        $rid = $request->get('rid');
+
+        $query = DB::table('organization_roles')
+        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+        ->select('organization_roles.id', 'organization_roles.nama as name', 'ou.check_in_status');
+
+        $list = $query
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                    ['ou.organization_id', $oid],
+                ])
+                ->get();
+            
+            $isblacklisted = DB::table('students')
+            ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+            ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+            ->where([
+                // ['ou.organization_id', $organization[0]->id],
+                ['cs.blacklist', 1],
+                ['ou.user_id', Auth::user()->id],
+            ])
+            ->select('cs.blacklist', 'ou.organization_id as oid', 'students.nama')
+            ->get();
+
+        return response()->json(['success' => $list, 'isblacklisted' => $isblacklisted]);
+    }
+
+
     public function fetchStudent(Request $request)
     {
         $oid = $request->get('oid');
@@ -2145,18 +2153,24 @@ class DormController extends Controller
     // 需不需要让user选display approve和pending的呢？
     // for button：
     // 如果是kecemasan， status=0 也要display给guard
+    private $roles = "PN";
     public function getStudentOutingDatatable(Request $request)
     {
         if (request()->ajax()) {
+
             $oid = $request->oid;
+            $rid = $request->rid;
+           
             $hasOrganizaton = $request->hasOrganization;
-            $roles = DB::table('organization_roles')
+            $roles = strtoupper(DB::table('organization_roles')
                 ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
                 ->where([
                     ['ou.user_id', Auth::user()->id],
                     ['ou.organization_id', $oid],
+                    ['organization_roles.id', $rid],
                 ])
-                ->value('organization_roles.nama');
+                ->value('organization_roles.nama'));
+            
 
             $data = DB::table('students')
                 ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -2165,11 +2179,13 @@ class DormController extends Controller
                 ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
                 ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
                 ->join('classifications', 'classifications.id', '=', 'so.classification_id');
-
+            
+            $this->roles = $roles;
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
                 //can view all application
-                if (Auth::user()->hasRole('Penjaga')) {
+                if ($roles == "PENJAGA") {
+                    
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
@@ -2195,7 +2211,7 @@ class DormController extends Controller
                         ->get();
                 }
                 //approved or kecemasan && havent expired
-                else if (Auth::user()->hasRole('Guard')) {
+                else if ($roles == "GUARD") {
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
@@ -2256,6 +2272,7 @@ class DormController extends Controller
                 $table->addColumn('result', function ($row) {
                     $btn = '<div class="d-flex justify-content-center">';
                     if ($row->status == 0) {
+                        
                         $btn = $btn . '<span class="badge badge-danger"> Diproses </span></div>';
                     } elseif ($row->status == 1) {
                         $btn = $btn . '<span class="badge badge-success"> Sah </span></div>';
@@ -2266,13 +2283,13 @@ class DormController extends Controller
                 });
 
                 $table->addColumn('action', function ($row) {
-
+                    
                     $categoryReal = $this->categoryReal;
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
                     if ($row->status == 0) {  //havent approved
                         //user is penjaga
-                        if (Auth::user()->hasRole('Penjaga')) {
+                        if ($this->roles == "PENJAGA") {
                             //
                             if ($row->apply_date_time >= now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
@@ -2281,15 +2298,15 @@ class DormController extends Controller
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
                         //user is guard and outing category is balik kecemasan
-                        elseif (Auth::user()->hasRole('Guard') && strtoupper($row->catname) == $categoryReal[0]) {
+                        elseif ($this->roles == "GUARD" && strtoupper($row->catname) == $categoryReal[0]) {
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
                         }
                         //user is warden, teacher, HEM
                         elseif (
-                            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')
-                            || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
+                            $this->roles == 'SUPERADMIN' || $this->roles == 'PENTADBIR'
+                            || $this->roles == 'GURU' || $this->roles == 'WARDEN'
                         ) {
                             //user choose outings and is inside blacklist
                             if (strtoupper($row->catname) == $categoryReal[2] && $row->blacklist == 1) {
@@ -2302,12 +2319,14 @@ class DormController extends Controller
                             }
                         }
                     } elseif ($row->status == 1) { //approved
-                        if (Auth::user()->hasRole('Penjaga')) {
+                        if ($this->roles == 'PENJAGA') {
                             if ($row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->out_date_time != NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateArriveTime', $row->id) . '" class="btn btn-primary m-1">Sampai</a>';
                             }
-                        } elseif (Auth::user()->hasRole('Guard')) {
+                        } elseif ($this->roles == 'GUARD') {
+                            
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
+                                
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
 
@@ -2316,7 +2335,7 @@ class DormController extends Controller
                             }
                         }
                     } elseif ($row->status == 2) {  //ditolak
-                        if (Auth::user()->hasRole('Penjaga')) {
+                        if ($this->roles == 'PENJAGA') {
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
                     }
