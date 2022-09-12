@@ -301,7 +301,7 @@ Route::group(['prefix' => 'polimas'], function () {
 
 // Route::get('asrama', 'AsramaController@index')->name('asrama.index');
 Route::resource('dorm', 'DormController');
-Route::group(['prefix' => 'dorm'], function () {
+Route::group(['prefix' => 'sekolah'], function () {
     // application
     Route::get('dorm/getStudentOutingDatatable', 'DormController@getStudentOutingDatatable')->name('dorm.getStudentOutingDatatable');
     Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');

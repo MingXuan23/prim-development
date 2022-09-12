@@ -302,7 +302,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "/dorm/dorm/getReportDatatable/" + student_id,
+                    url: "/sekolah/dorm/getReportDatatable/" + student_id,
                     data: {
                         catId: catId,
                         hasOrganization: true,
