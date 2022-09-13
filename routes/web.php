@@ -266,7 +266,7 @@ Route::group(['prefix' => 'polimas'], function () {
     });
 });
 
-Route::group([['middleware' => 'auth'], ['prefix' => 'LHDN']], function () {
+Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
     Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
     Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
     Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
