@@ -27,7 +27,7 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('teacher.wardenupdate', $teacher->uid) }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('teacher.perananupdate', $teacher->uid) }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
 
