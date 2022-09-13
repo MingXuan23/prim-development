@@ -56,9 +56,17 @@ class DormController extends Controller
     //index functions
     public function index()
     {
-        //
         $organization = $this->getOrganizationByUserId();
+        //
         
+        // dd($id);
+        // $organization = DB::table('organizations')
+        // ->join('organization_user as ou', 'ou.organization_id', '=', 'organizations.id')
+        // ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
+        // ->where([
+        //     ['ou.user_id', Auth::user()->id],
+        //     ['or.id', $id],
+        // ]);
         return view('dorm.index', compact('organization'));
     }
 
@@ -2825,9 +2833,9 @@ class DormController extends Controller
         return redirect('/dorm')->with('success', 'Data is successfully updated');
     }
 
-    public function resetOutingLimit()
-    {
-        $organization = $this->getOrganizationByUserId();
+    public function resetOutingLimit(Request $request)
+    {   
+        dd($request->oid);
         if (Auth::user()->hasRole('Superadmin')) {
             $result = DB::table('class_student')
                 ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
@@ -2840,7 +2848,7 @@ class DormController extends Controller
                 ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
                 ->where([
                     ['class_student.status', 1],
-                    ['co.organization_id', $organization[0]->id],
+                    ['co.organization_id', $oid],
                 ])
                 ->update(['class_student.outing_limit' => NULL]);
         }
