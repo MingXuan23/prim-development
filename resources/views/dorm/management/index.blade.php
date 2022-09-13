@@ -345,7 +345,7 @@
                     "_token": "{{ csrf_token() }}",
                     _method: 'GET'
                 },
-                url: "/dorm/dorm/destroyDorm/" + dorm_id,
+                url: "/sekolah/dorm/destroyDorm/" + dorm_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
@@ -372,7 +372,7 @@
                     "_token": "{{ csrf_token() }}",
                     _method: 'GET'
                 },
-                url: "/dorm/dorm/clearDorm/" + dorm_id,
+                url: "/sekolah/dorm/clearDorm/" + dorm_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');

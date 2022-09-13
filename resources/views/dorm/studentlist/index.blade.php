@@ -573,7 +573,7 @@
                     "_token": "{{ csrf_token() }}",
                     //_method: 'DELETE'
                 },
-                url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
+                url: "/sekolah/dorm/blockStudent/" + student_id + "/" + block_status,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
@@ -601,7 +601,7 @@
                     "_token": "{{ csrf_token() }}",
                     //_method: 'DELETE'
                 },
-                url: "/dorm/dorm/blockStudent/" + student_id + "/" + block_status,
+                url: "/sekolah/dorm/blockStudent/" + student_id + "/" + block_status,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');

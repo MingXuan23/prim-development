@@ -24,14 +24,14 @@
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected disabled>Pilih Organisasi</option>
                         @foreach($organization as $row)
-                            @foreach($roles as $role)
-                                @if($role->organization_id == $row->id)
-                                    @if($role->nama != "Penjaga")
-                                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                        @break
-                                    @endif
-                                @endif
-                            @endforeach
+                        @foreach($roles as $role)
+                        @if($role->organization_id == $row->id)
+                        @if($role->nama != "Penjaga")
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @break
+                        @endif
+                        @endif
+                        @endforeach
                         @endforeach
                     </select>
                 </div>
@@ -127,14 +127,14 @@
                                 <label>Organisasi</label>
                                 <select name="organ" id="organ" class="form-control">
                                     @foreach($organization as $row)
-                                        @foreach($roles as $role)
-                                            @if($role->organization_id == $row->id)
-                                                @if($role->nama != "Penjaga")
-                                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                                @endif
-                                                @break
-                                            @endif
-                                        @endforeach
+                                    @foreach($roles as $role)
+                                    @if($role->organization_id == $row->id)
+                                    @if($role->nama != "Penjaga")
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @endif
+                                    @break
+                                    @endif
+                                    @endforeach
                                     @endforeach
                                 </select>
                             </div>
@@ -250,7 +250,7 @@
                     "_token": "{{ csrf_token() }}",
                     //   _method: 'DELETE'
                 },
-                url: "/dorm/dorm/destroyOuting/" + outing_id,
+                url: "/sekolah/dorm/destroyOuting/" + outing_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');

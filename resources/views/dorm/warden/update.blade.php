@@ -8,9 +8,9 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Warden</h4>
+            <h4 class="font-size-18">Peranan</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Guru >> Edit Warden</li>
+                <li class="breadcrumb-item active">Guru >> Edit Peranan</li>
             </ol>
         </div>
     </div>
@@ -27,7 +27,7 @@
             </ul>
         </div>
         @endif
-        <form method="post" action="{{ route('teacher.wardenupdate', $teacher->uid) }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('teacher.perananupdate', $teacher->uid) }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
 

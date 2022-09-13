@@ -210,7 +210,7 @@
                     "_token": "{{ csrf_token() }}",
                     //_method: 'DELETE'
                 },
-                url: "/dorm/dorm/destroyReasonOuting/" + reason_id,
+                url: "/sekolah/dorm/destroyReasonOuting/" + reason_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');

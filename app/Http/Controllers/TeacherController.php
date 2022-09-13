@@ -334,7 +334,7 @@ class TeacherController extends Controller
     }
 
     //for warden use
-    public function wardenedit($id)
+    public function perananedit($ou_id)
     {
         //
         // $teacher = $this->teacher->getOrganizationByUserId($id);
@@ -342,10 +342,19 @@ class TeacherController extends Controller
         $teacher = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
             ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
-            ->where('users.id', $id)
-            ->where('organization_user.role_id', 7)
+            ->where('organization_user.id', $ou_id)
+            // ->where('organization_user.role_id', 7)
             ->select('organizations.id as organization_id', 'users.id as uid', 'users.name as tcname',  'users.email as email', 'users.telno as telno', 'organization_user.role_id as role_id')
             ->first();
+
+        $id = DB::table('organization_user')
+            ->join('users', 'users.id', '=', 'organization_user.user_id')
+            // ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
+            ->where('organization_user.id', $ou_id)
+            // ->where('organization_user.role_id', 7)
+            ->value('users.id');
+
+        // dd($ou_id, $id);
 
         $organization = $this->getOrganizationByUserId();
 
@@ -389,11 +398,11 @@ class TeacherController extends Controller
     }
 
     //for warden use
-    public function wardenupdate(Request $request, $id)
+    public function perananupdate(Request $request, $id)
     {
         //
         $uid = User::find($id);
-        //dd($id);
+        // dd($uid);
 
         $this->validate($request, [
             'name'          =>  'required',
@@ -402,7 +411,7 @@ class TeacherController extends Controller
         ]);
 
         $teacherupdate    = DB::table('users')
-            ->where('id', $id)
+            ->where('users.id',  $uid->id)
             ->update(
                 [
                     'name'      => $request->get('name'),
@@ -413,14 +422,14 @@ class TeacherController extends Controller
             );
 
         DB::table('organization_user')
-            ->where('user_id', $id)
+            ->where('organization_user.user_id', $id)
             ->update(
                 [
                     'organization_id'      => $request->get('organization'),
                 ]
             );
 
-        return redirect('/teacher/warden')->with('success', 'The data has been updated!');
+        return redirect('/teacher/peranan')->with('success', 'The data has been updated!');
     }
 
     public function destroy($id)
@@ -549,7 +558,7 @@ class TeacherController extends Controller
                     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
                     ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
                     ->join('users', 'users.id', '=', 'organization_user.user_id')
-                    ->select('organizations.id as oid', 'organization_user.status as status', 'organization_roles.nama as roleName', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
+                    ->select('organizations.id as oid', 'organization_user.id as ou_id', 'organization_user.status as status', 'organization_roles.nama as roleName', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
                     ->where('organizations.id', $oid)
                     ->whereIn('organization_user.role_id', $arrayPeranan)
                     ->orderBy('roleName');
@@ -560,7 +569,7 @@ class TeacherController extends Controller
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                $btn = $btn . '<a href="' . route('teacher.perananedit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<a href="' . route('teacher.perananedit', $row->ou_id) . '" class="btn btn-primary m-1">Edit</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });
