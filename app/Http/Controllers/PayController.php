@@ -411,16 +411,25 @@ class PayController extends AppBaseController
                 $telno = NULL;
                 $fpx_buyerName = "Penderma Tanpa Nama";
             }
-
+            
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
 
-            $success_transaction = DB::table('donation_transaction as dt')
-                ->leftJoin('transactions as t', 't.id', 'dt.transaction_id')
-                ->where('t.status', 'success')
-                ->where('dt.donation_id', $request->d_id)
-                ->count();
+            if (isset($request->icno))
+            {
+                $success_transaction = DB::table('donation_transaction as dt')
+                    ->leftJoin('transactions as t', 't.id', 'dt.transaction_id')
+                    ->where('t.status', 'success')
+                    ->where('t.icno', '!=', null)
+                    ->where('dt.donation_id', $request->d_id)
+                    ->count();
+    
+                $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad($success_transaction, 6, '0', STR_PAD_LEFT);
+            }
+            else
+            {
+                $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            }
 
-            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad($success_transaction, 6, '0', STR_PAD_LEFT);
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
