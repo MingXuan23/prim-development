@@ -43,7 +43,7 @@ use function PHPUnit\Framework\isNull;
 class DormController extends Controller
 {
     private $categoryReal = array("BALIK KECEMASAN", "BALIK KHAS", "OUTINGS", "BALIK WAJIB");
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -58,7 +58,7 @@ class DormController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
-        
+
         return view('dorm.index', compact('organization'));
     }
 
@@ -158,7 +158,7 @@ class DormController extends Controller
             ->get();
 
 
-        // return redirect('/dorm/dorm/getAllStudentlistDatatable')->with('success', 'Dorms have been added successfully');
+        // return redirect('/sekolah/dorm/getAllStudentlistDatatable')->with('success', 'Dorms have been added successfully');
 
         return view('dorm.studentlist.index', compact('organization', 'studentlist', 'dormlist'));
     }
@@ -230,12 +230,12 @@ class DormController extends Controller
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
         if (!in_array($etx, $formats)) {
 
-            return redirect('/dorm/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+            return redirect('/sekolah/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
 
         Excel::import(new DormImport($request->organ), public_path('/uploads/excel/' . $namaFile));
 
-        return redirect('/dorm/dorm/indexDorm')->with('success', 'Dorms have been added successfully');
+        return redirect('/sekolah/dorm/indexDorm')->with('success', 'Dorms have been added successfully');
     }
 
     public function residentimport(Request $request)
@@ -251,7 +251,7 @@ class DormController extends Controller
         $etx = $file->getClientOriginalExtension();
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
         if (!in_array($etx, $formats)) {
-            return redirect('/dorm/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+            return redirect('/sekolah/dorm/indexDorm')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
 
         //get the accomodate number for the particular dorm
@@ -265,9 +265,9 @@ class DormController extends Controller
 
         if ($student_inside <= $accomodate_number) {
             Excel::import(new ResidentImport($request->dorm), public_path('/uploads/excel/' . $namaFile));
-            return redirect('/dorm/dorm/indexDorm')->with('success', 'Residents have been added successfully');
+            return redirect('/sekolah/dorm/indexDorm')->with('success', 'Residents have been added successfully');
         } else
-            return redirect('/dorm/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the dorm is full');
+            return redirect('/sekolah/dorm/indexDorm')->with('fail', 'Residents have not been added successfully because the dorm is full');
     }
 
     public function allcategoryexport(Request $request)
@@ -697,7 +697,7 @@ class DormController extends Controller
             'organization_id' => $request->get('organization'),
         ]);
 
-        return redirect('/dorm/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
+        return redirect('/sekolah/dorm/indexOuting')->with('success', 'New outing date and time has been added successfully');
     }
 
     public function storeReasonOuting(Request $request)
@@ -732,7 +732,7 @@ class DormController extends Controller
             'time_limit'    => $request->get('time')
         ]);
 
-        return redirect('/dorm/dorm/indexReasonOuting')->with('success', 'New Reason has been added successfully');
+        return redirect('/sekolah/dorm/indexReasonOuting')->with('success', 'New Reason has been added successfully');
     }
 
     public function storeResident(Request $request)
@@ -810,10 +810,10 @@ class DormController extends Controller
                 ->where('dorms.id', $newdormid)
                 ->update(['student_inside_no' => $dorm[0]->student_inside_no + 1]);
 
-            return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
+            return redirect()->to('/sekolah/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
         }
 
-        return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student already has accommodation']);
+        return redirect()->to('/sekolah/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student already has accommodation']);
     }
 
 
@@ -835,7 +835,7 @@ class DormController extends Controller
             'student_inside_no' => 0
         ]);
 
-        return redirect('/dorm/dorm/indexDorm')->with('success', 'New dorm has been added successfully');
+        return redirect('/sekolah/dorm/indexDorm')->with('success', 'New dorm has been added successfully');
     }
 
     /**
@@ -1139,7 +1139,7 @@ class DormController extends Controller
                 ]
             );
 
-        return redirect('/dorm/dorm/indexOuting')->with('success', 'The data has been updated!');
+        return redirect('/sekolah/dorm/indexOuting')->with('success', 'The data has been updated!');
     }
 
     public function updateReasonOuting(Request $request, $id)
@@ -1168,7 +1168,7 @@ class DormController extends Controller
 
 
 
-        return redirect('/dorm/dorm/indexReasonOuting')->with('success', 'The data has been updated!');
+        return redirect('/sekolah/dorm/indexReasonOuting')->with('success', 'The data has been updated!');
     }
 
     public function updateResident(Request $request, $id)
@@ -1249,10 +1249,10 @@ class DormController extends Controller
                     ->where('dorms.id', $olddormid[0]->dormid)
                     ->update(['student_inside_no' => $olddormid[0]->student_inside_no - 1]);
 
-                return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
+                return redirect()->to('/sekolah/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
             }
         }
-        return redirect()->to('/dorm/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found  |  Student is reside in the dorm']);
+        return redirect()->to('/sekolah/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found  |  Student is reside in the dorm']);
     }
 
     public function updateDorm(Request $request, $id)
@@ -1276,7 +1276,7 @@ class DormController extends Controller
                 ]
             );
 
-        return redirect('/dorm/dorm/indexDorm')->with('success', 'The data has been updated!');
+        return redirect('/sekolah/dorm/indexDorm')->with('success', 'The data has been updated!');
     }
 
 
@@ -1983,17 +1983,17 @@ class DormController extends Controller
         $rid = $request->get('rid');
 
         $query = DB::table('organization_roles')
-        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-        ->select('organization_roles.id', 'organization_roles.nama as name', 'ou.check_in_status');
+            ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+            ->select('organization_roles.id', 'organization_roles.nama as name', 'ou.check_in_status');
 
         $list = $query
-                ->where([
-                    ['ou.user_id', Auth::user()->id],
-                    ['ou.organization_id', $oid],
-                ])
-                ->get();
-            
-            $isblacklisted = DB::table('students')
+            ->where([
+                ['ou.user_id', Auth::user()->id],
+                ['ou.organization_id', $oid],
+            ])
+            ->get();
+
+        $isblacklisted = DB::table('students')
             ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
             ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
             ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
@@ -2147,7 +2147,7 @@ class DormController extends Controller
 
             $oid = $request->oid;
             $rid = $request->rid;
-           
+
             $hasOrganizaton = $request->hasOrganization;
             $roles = strtoupper(DB::table('organization_roles')
                 ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
@@ -2157,7 +2157,7 @@ class DormController extends Controller
                     ['organization_roles.id', $rid],
                 ])
                 ->value('organization_roles.nama'));
-            
+
 
             $data = DB::table('students')
                 ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -2166,13 +2166,13 @@ class DormController extends Controller
                 ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
                 ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
                 ->join('classifications', 'classifications.id', '=', 'so.classification_id');
-            
+
             $this->roles = $roles;
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
                 //can view all application
                 if ($roles == "PENJAGA") {
-                    
+
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
@@ -2259,7 +2259,7 @@ class DormController extends Controller
                 $table->addColumn('result', function ($row) {
                     $btn = '<div class="d-flex justify-content-center">';
                     if ($row->status == 0) {
-                        
+
                         $btn = $btn . '<span class="badge badge-danger"> Diproses </span></div>';
                     } elseif ($row->status == 1) {
                         $btn = $btn . '<span class="badge badge-success"> Sah </span></div>';
@@ -2270,7 +2270,7 @@ class DormController extends Controller
                 });
 
                 $table->addColumn('action', function ($row) {
-                    
+
                     $categoryReal = $this->categoryReal;
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
@@ -2311,9 +2311,9 @@ class DormController extends Controller
                                 $btn = $btn . '<a href="' . route('dorm.updateArriveTime', $row->id) . '" class="btn btn-primary m-1">Sampai</a>';
                             }
                         } elseif ($this->roles == 'GUARD') {
-                            
+
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
-                                
+
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
 
@@ -2846,9 +2846,9 @@ class DormController extends Controller
         }
 
         if ($result) {
-            return redirect('/dorm/dorm/indexReportAll')->with('success', 'Data is successfully updated');
+            return redirect('/sekolah/dorm/indexReportAll')->with('success', 'Data is successfully updated');
         } else {
-            return redirect('/dorm/dorm/indexReportAll')->withErrors('Failed to update data');
+            return redirect('/sekolah/dorm/indexReportAll')->withErrors('Failed to update data');
         }
     }
 }
