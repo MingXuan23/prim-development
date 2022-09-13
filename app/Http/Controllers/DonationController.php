@@ -485,8 +485,13 @@ class DonationController extends Controller
 
     public function indexLHDN()
     {
-        $donations = Donation::where('lhdn_reference_code', '!=', null)->get();
-        return view('lhdn.index', compact('donations'));
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Admin LHDN'))
+        {
+            $donations = Donation::where('lhdn_reference_code', '!=', null)->get();
+            return view('lhdn.index', compact('donations'));
+        }
+
+        return view('errors.404');
     }
 
     public function getLHDNHistoryDatatable(Request $request)
@@ -500,9 +505,6 @@ class DonationController extends Controller
             ->where('transactions.status', 'success')
             ->orderBy('transactions.datetime_created', 'desc')
             ->get();
-        
-            
-
 
         if (request()->ajax()) {
             return datatables()->of($listhistory)
@@ -532,6 +534,12 @@ class DonationController extends Controller
             ->where('dt.transaction_id', $id)
             ->select('d.*')
             ->first();
+
+        if(!isset($donation->lhdn_reference_code))
+        {
+            return view('errors.404');
+        }
+        
         $organization = $this->organization->getOrganizationByDonationId($donation->id);
         return view('lhdn.receipt', compact('donation', 'organization', 'transaction'));
     }
