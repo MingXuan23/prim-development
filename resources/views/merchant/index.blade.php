@@ -94,14 +94,6 @@
   </div>
 </div>
 
-<h4>Type</h4>
-<form action="{{ route('merchant.testType') }}" method="POST">
-  @csrf
-  <input type="text" placeholder="Categori" name="type_name">
-  <input type="text" placeholder="Restock setiap berapa minit" name="duration">
-  <input type="submit">
-</form>
-
 {{-- Merchant Closed Modal --}}
 <div id="merchantClosedModal" class="modal fade" role="dialog">
   <div class="modal-dialog">

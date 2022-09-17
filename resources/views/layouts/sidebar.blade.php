@@ -254,12 +254,12 @@
                     <span>Urus Peniaga</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
-                    <li>
+                    {{-- <li>
                         <a href="{{ route('admin.merchant.index') }}" class=" waves-effect">
                             <i class="ti-home"></i>
                             <span>Dashboard</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li>
                         <a href="{{ route('admin.merchant.hours') }}" class=" waves-effect">
                             <i class="ti-timer"></i>
@@ -290,7 +290,7 @@
                 </a>
             </li>
             @endrole
-
+            
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>

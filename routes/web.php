@@ -199,19 +199,34 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
     Route::get('/{id}/merchant-cart', 'MerchantController@showMerchantCart')->name('merchant.cart');
     Route::delete('destroyItem', 'MerchantController@destroyCartItem')->name('merchant.destroyItem');
     Route::put('{o_id}/merchant-cart/{p_id}', 'MerchantController@storeOrderAfterPayment')->name('merchant.storeOrderPayment');
-    
-    Route::post('testType', 'MerchantController@testType')->name('merchant.testType');
 });
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'admin-merchant', 'namespace' => 'Merchant'], function() {
     Route::get('/', 'AdminMerchantController@index')->name('admin.merchant.index');
-
-    Route::get('/operation-hours', 'AdminMerchantController@showOperationHours')->name('admin.merchant.hours');
-    Route::get('/operation-hours/check-orders', 'AdminMerchantController@editExistingOrder')->name('admin.merchant.order-exist');
+    Route::get('/list/{id}', 'AdminMerchantController@showList')->name('admin.merchant.list');
+    Route::delete('destroy-order', 'AdminMerchantController@destroyOrder')->name('admin.merchant.destroy-order');
     
+    /* Operation Dashboard Route */
+    Route::get('/operation-hours', 'AdminMerchantController@showOperationHours')->name('admin.merchant.hours');
+    Route::post('edit-operation-hours', 'AdminMerchantController@editOperationHours')->name('admin.merchant.edit-hours');
+    Route::put('update-operation-hours', 'AdminMerchantController@updateOperationHours')->name('admin.merchant.update-hours');
+    Route::get('/operation-hours/check-orders/{id}', 'AdminMerchantController@editExistingOrder')->name('admin.merchant.order-exist');
+    Route::post('change-date-time', 'AdminMerchantController@changeOrderExistDateTime')->name('admin.merchant.change-datetime');
+    Route::put('update-new-operation-hours', 'AdminMerchantController@updateNewOperationHours')->name('admin.merchant.update-new-hours');
+    
+    /* Product Dashboard Route */
     Route::get('/product-dashboard', 'AdminMerchantController@showProductDashboard')->name('admin.merchant.product');
-    Route::get('/product-dashboard/product-item-list', 'AdminMerchantController@showProductItem')->name('admin.merchant.product-item');
-
+    Route::post('/product-dashboard', 'AdminMerchantController@storeProductGroup')->name('admin.merchant.store-group');
+    Route::get('/product-dashboard/{id}', 'AdminMerchantController@showProductItem')->name('admin.merchant.product-item');
+    Route::put('update-product-group', 'AdminMerchantController@updateProductGroup')->name('admin.merchant.update-group');
+    Route::delete('delete-product-group', 'AdminMerchantController@destroyProductGroup')->name('admin.merchant.destroy-group');
+    Route::post('store-product-item', 'AdminMerchantController@storeProductItem')->name('admin.merchant.store-item');
+    Route::get('/product-dashboard/{id}/edit/{item}', 'AdminMerchantController@editProductItem')->name('admin.merchant.edit-item');
+    Route::put('update-product-item', 'AdminMerchantController@updateProductItem')->name('admin.merchant.update-item');
+    Route::get('get-item-for-destroy', 'AdminMerchantController@getItemForDestroy')->name('admin.merchant.get-item-destroy');
+    Route::delete('destroy-item', 'AdminMerchantController@destoryProductItem')->name('admin.merchant.destroy-item');
+    
+    /* Order Dashboard Route */
     Route::get('/show-orders', 'AdminMerchantController@showAllOrder')->name('admin.merchant.order');
     Route::get('/show-orders/history', 'AdminMerchantController@showHistoryOrder')->name('admin.merchant.history');
 });

@@ -83,7 +83,7 @@
       
       <div class="card-body">
         
-          @if(count($product_type) != 0 && count($product_item) != 0)
+          {{-- @if(count($product_type) != 0 && count($product_item) != 0)
           @foreach($product_type as $type)
           
             <div class="d-flex justify-content-start" id="{{ $type->type_name }}">
@@ -127,7 +127,7 @@
             </div>
           
           @endforeach
-          @endif
+          @endif --}}
         
         
 

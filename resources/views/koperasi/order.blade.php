@@ -70,7 +70,7 @@
                       <button type="button" id="{{ $row->id }}" class="btn btn-warning btn-block">Pilih Hari Lain</button>
                     </div>
                     <div class="row d-block m-1">
-                      <button type="button" id="{{ $row->id }}" class="btn btn-danger btn-block">Batal</button>
+                      <button type="button" id="{{ $row->id }}" class="btn btn-danger btn-block">Buang</button>
                     </div>
                   </td>
                 </tr>

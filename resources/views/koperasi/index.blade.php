@@ -90,7 +90,7 @@
       if($(this).val() != '')
       {
         var sekolah_id = $(this).children(":selected").val();
-
+        
         $.ajax({
           url: "{{ route('koperasi.fetchKoop') }}",
           method: "POST",

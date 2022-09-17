@@ -24,7 +24,7 @@ class MerchantController extends Controller
         $todayDate = Carbon::now()->format('l');
 
         $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($todayDate);
-
+        
         $merchant = Organization::with(['organization_hours' => function($q) use ($day){
             $q->where('organization_hours.day', $day);
         }])
@@ -334,7 +334,7 @@ class MerchantController extends Controller
             ['status', 1],
         ])->first();
 
-        $min_open_day = $this->getDayOrder($order->pickup_date);
+        $min_open_day = $this->getDayOrder($order->pickup_date, $org_id);
         
         $pickup_time = Carbon::parse($order->pickup_date)->toTimeString();
             
@@ -351,11 +351,11 @@ class MerchantController extends Controller
         return $maxQuantity;
     }
 
-    private function getDayOrder($dateOrder)
+    private function getDayOrder($dateOrder, $organization_id)
     {
         $todayDate = Carbon::parse($dateOrder)->format('l');
         $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($todayDate);
-        $min_open_day = OrganizationHours::where('day', $day)->first()->open_hour;
+        $min_open_day = OrganizationHours::where('organization_id', $organization_id)->where('day', $day)->first()->open_hour;
 
         return $min_open_day;
     }
@@ -375,7 +375,8 @@ class MerchantController extends Controller
             ['organization_id', $o_id],
             ['status', 1],
         ])->first();
-
+        
+        # Get in cart data based on item id and order id
         $cart = ProductOrder::where([
             ['status', 1],
             ['product_item_id', $i_id],
@@ -401,10 +402,12 @@ class MerchantController extends Controller
         # Get ID for all order of the same day
         $allItem = $this->checkDateForQueue($userOrderDateTime, $o_id, $i_id);
 
-        $MAX_ITEM_QUANTITY = ProductItem::find($i_id)->quantity;
+        $item = ProductItem::find($i_id);
+        $product_group_id = $item->product_group_id;
+        $MAX_ITEM_QUANTITY = $item->quantity;
 
         # Get queue available based on day and time
-        $queue = $this->getQueueData($userOrderDateTime);
+        $queue = $this->getQueueData($userOrderDateTime, $o_id, $product_group_id);
 
         if(count($queue) != 0)
         {
@@ -429,7 +432,7 @@ class MerchantController extends Controller
                         'product_item_id' => $i_id,
                         'pickup_order_id' => $order->id,
                     ]);
-    
+                    
                     $p_o_id = $newOrder->id;
                 }
                 
@@ -447,7 +450,7 @@ class MerchantController extends Controller
                 } else {
                     $cal_total_price = $item_price * $quantity;
                 }
-
+                
                 $total_price = number_format($cal_total_price, 2, '.', '');
                 
                 PickUpOrder::find($order->id)->update(['total_price' => $total_price]);
@@ -463,7 +466,7 @@ class MerchantController extends Controller
         }
     }
 
-    private function checkDateForQueue($order_datetime, $organization_id, $item_id)
+    public function checkDateForQueue($order_datetime, $organization_id, $item_id)
     {
         $startDaySelect = Carbon::parse($order_datetime)->startOfDay()->format('Y-m-d H:i:s');
         $endDaySelect = Carbon::parse($order_datetime)->endOfDay()->format('Y-m-d H:i:s');
@@ -478,13 +481,13 @@ class MerchantController extends Controller
         ->whereIn('pickup_order.status', [1, 2, 3])
         ->pluck('product_order.id')
         ->toArray();
-
+        
         return $allOrder;
     }
 
-    private function getQueueData($order_datetime)
-    {
-        $min_open_day = $this->getDayOrder($order_datetime);
+    private function getQueueData($order_datetime, $organization_id, $pg_id)
+    {   
+        $min_open_day = $this->getDayOrder($order_datetime, $organization_id);
 
         $today_date = Carbon::now()->toDateString();
         $today_time = Carbon::now()->minute(0)->second(0)->addHour()->toTimeString();
@@ -494,6 +497,7 @@ class MerchantController extends Controller
 
         if($date_pick_up != $today_date) {
             $queue = Queue::where([
+                ['product_group_id', $pg_id],
                 ['slot_time', '>=', $min_open_day],
                 ['slot_time', '<=', $time_pick_up],
             ])
@@ -501,6 +505,7 @@ class MerchantController extends Controller
             ->get();
         } else {
             $queue = Queue::where([
+                ['product_group_id', $pg_id],
                 ['slot_time', '>=', $today_time],
                 ['slot_time', '<=', $time_pick_up],
             ])
@@ -560,7 +565,7 @@ class MerchantController extends Controller
                 }
             }
         }
-
+        
         if($remaining_quantity > 0) {
             return 0;
         } else {
@@ -767,57 +772,5 @@ class MerchantController extends Controller
         }
 
         return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price'));
-    }
-
-    # Testing function for insert product group data and queue data
-    public function testType(Request $request)
-    {
-        # Insert Product Group Data
-        $pg = ProductGroup::create([
-            'name' => $request->type_name,
-            'duration' => $request->duration,
-            'organization_id' => 4,
-        ]);
-
-        # Get Maximum and Minimum value of when the organization close(max) and open(min)
-        $max = OrganizationHours::where('organization_id', 4)->max('close_hour');
-        $min = OrganizationHours::where('organization_id', 4)->min('open_hour');
-
-        # Formatting Value
-        $max_f = Carbon::parse($max);
-        $min_f = Carbon::parse($min);
-
-        # Get Difference of Min and Max
-        $diffTime = $max_f->diff($min_f)->format('%H:%I:%S');
-
-        # Convert Time Difference into Minutes
-        $time = Carbon::parse($diffTime); // Formatting
-        $start_of_day = Carbon::parse($diffTime)->startOfDay(); // Get 00:00:00
-        $total_minutes = $time->diffInMinutes($start_of_day); // Get minutes by differenciate time in minutes
-
-        # Initialize variable
-        $duration = $pg->duration;
-        $temp = $min_f;
-        $data = array(0 => ["slot_time" => $min, "status" => 1, "slot_number" => 1, "product_group_id" => $pg->id, "created_at" => Carbon::now(), "updated_at" => Carbon::now()]); // Initialize first row of queue (opening hour/ Min)
-
-        # Loop until the total duration more or equal to total minutes
-        for($newDuration = $duration, $i = 2; $newDuration <= $total_minutes; $newDuration += $duration, $i++)
-        {
-            $temp_f = $temp->addMinutes($duration)->format('H:i:s');  // Add minutes to current time var
-            $data[] = [
-                "slot_time" => $temp_f,
-                "status" => 1,
-                "slot_number" => $i,
-                "product_group_id" => $pg->id,
-                "created_at" => Carbon::now(),
-                "updated_at" => Carbon::now(),
-            ];
-            $temp = Carbon::parse($temp_f); // Reformat time so it can perform addMinutes method
-        }
-
-        # Insert in Queue Table
-        Queue::insert($data);
-
-        return back();
     }
 }
