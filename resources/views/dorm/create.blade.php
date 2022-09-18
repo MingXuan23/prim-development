@@ -52,11 +52,6 @@
                         </select>
                     </div>
 
-                    <!-- <div class="form-group">
-                        <label>Email Pelajar</label>
-                        <input type="text" name="email" class="form-control" placeholder="Email Pelajar">
-                    </div> -->
-
                     
                     <div class="form-group">
                         <label>Kategori</label>

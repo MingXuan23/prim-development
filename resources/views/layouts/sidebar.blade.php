@@ -149,57 +149,108 @@
                             <ul class="sub-menu mm-collapse" aria-expanded="false">
                                 @role('Superadmin')
                                 <li>
-                                    
                                     <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.index') }}" class=" waves-effect">
+                                    <a href="{{ route('dorm.indexRequest', 1) }}" class=" waves-effect">
                                         <i class="fas fa-book"></i>
                                         <span>Permintaan</span>
                                     </a>
                                 </li>
                                 @endrole
 
-                                @role('Admin|Pentadbir|Guru')
+                                <!-- have all roles -->
+                                @hasallroles('Warden|Pentadbir|Guru')
                                 <li>
                                     <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.index') }}" class=" waves-effect">
+                                    <a href="{{ route('dorm.indexRequest', 7) }}" class=" waves-effect">
                                         <i class="fas fa-book"></i>
-                                        <span>Permintaan</span>
+                                        <span>Proses Permintaan</span>
                                     </a>
                                 </li>
-                                @endrole
-
-                                @role('Warden')
-                                <li>
-                                    
-                                    <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.index') }}" class=" waves-effect">
-                                        <i class="fas fa-book"></i>
-                                        <span>Permintaan</span>
-                                    </a>
-                                </li>
+                                @else
+                                    <!-- is pentadbir and guru-->
+                                    @hasallroles('Pentadbir|Guru')
+                                    <li>
+                                        <!-- need to change to index later -->
+                                        <a href="{{ route('dorm.indexRequest', 5) }}" class=" waves-effect">
+                                            <i class="fas fa-book"></i>
+                                            <span>Permintaan Pelajar</span>
+                                        </a>
+                                    </li>
+                                    @else
+                                    <!-- is pentadbir and warden -->
+                                        @hasallroles('Pentadbir|Warden')
+                                        <li>
+                                            <!-- need to change to index later -->
+                                            <a href="{{ route('dorm.indexRequest', 7) }}" class=" waves-effect">
+                                                <i class="fas fa-book"></i>
+                                                <span>Permintaan Pelajar</span>
+                                            </a>
+                                        </li>
+                                        @else
+                                    <!-- is guru and warden-->
+                                            @hasallroles('Guru|Warden')
+                                            <li>
+                                                <!-- need to change to index later -->
+                                                <a href="{{ route('dorm.indexRequest', 7) }}" class=" waves-effect">
+                                                    <i class="fas fa-book"></i>
+                                                    <span>Permintaan Pelajar</span>
+                                                </a>
+                                            </li>
+                                            @else
+                                                @role('Pentadbir')
+                                                <li>
+                                                    <!-- need to change to index later -->
+                                                    <a href="{{ route('dorm.indexRequest', 4) }}" class=" waves-effect">
+                                                        <i class="fas fa-book"></i>
+                                                        <span>Permintaan</span>
+                                                    </a>
+                                                </li>
+                                                @else
+                                                    @role('Guru')
+                                                    <li>
+                                                        <!-- need to change to index later -->
+                                                        <a href="{{ route('dorm.indexRequest', 5) }}" class=" waves-effect">
+                                                            <i class="fas fa-book"></i>
+                                                            <span>Permintaan</span>
+                                                        </a>
+                                                    </li> 
+                                                    @else
+                                                        @role('Warden')
+                                                        <li>
+                                                            <!-- need to change to index later -->
+                                                            <a href="{{ route('dorm.indexRequest', 7) }}" class=" waves-effect">
+                                                                <i class="fas fa-book"></i>
+                                                                <span>Permintaan Pelajar</span>
+                                                            </a>
+                                                        </li> 
+                                                        @endrole
+                                                    @endrole
+                                                @endrole
+                                            @endrole
+                                        @endrole
+                                    @endrole
                                 @endrole
 
                                 @role('Penjaga')
                                 <li>
-                                    
                                     <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.index') }}" class=" waves-effect">
+                                    <a href="{{ route('dorm.indexRequest', 6) }}" class=" waves-effect">
                                         <i class="fas fa-book"></i>
-                                        <span>Permintaan</span>
+                                        <span>Permintaan Anak</span>
                                     </a>
                                 </li>
                                 @endrole
 
                                 @role('Guard')
                                 <li>
-                                    
                                     <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.index') }}" class=" waves-effect">
+                                    <a href="{{ route('dorm.indexRequest', 8) }}" class=" waves-effect">
                                         <i class="fas fa-book"></i>
                                         <span>Permintaan</span>
                                     </a>
                                 </li>
                                 @endrole
+                                
 
                                 @role('Superadmin|Pentadbir|Guru|Warden')
                                 <li>

@@ -43,7 +43,7 @@ use function PHPUnit\Framework\isNull;
 class DormController extends Controller
 {
     private $categoryReal = array("BALIK KECEMASAN", "BALIK KHAS", "OUTINGS", "BALIK WAJIB");
-
+    private $roles = 0;
     /**
      * Display a listing of the resource.
      *
@@ -54,8 +54,53 @@ class DormController extends Controller
     //
     //
     //index functions
-    public function index()
+    public function indexRequest($id)
     {
+        // $organization = $this->getOrganizationByUserId();
+        $organization = DB::table('organizations')
+        ->join('organization_user as ou', 'ou.organization_id', '=', 'organizations.id')
+        ->where([
+            ['ou.role_id', $id],
+            ['ou.user_id', Auth::user()->id]
+        ])
+        ->select('organizations.id as id', 'organizations.nama')
+        ->get();
+
+        $roles = $id;
+
+        if(count($organization) > 0)
+        {
+            $checkin = DB::table('organization_roles')
+                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                ->where([
+                    ['ou.user_id', Auth::user()->id],
+                    ['ou.organization_id', $organization[0]->id],
+                ])
+                ->value('ou.check_in_status');
+
+            $isblacklisted = DB::table('students')
+                ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+                ->join('organization_user_student as ous', 'ous.student_id', '=', 'students.id')
+                ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                ->where([
+                    // ['ou.organization_id', $organization[0]->id],
+                    ['ou.user_id', Auth::user()->id],
+                    ['cs.blacklist', 1]
+                ])
+                ->select('cs.blacklist', 'students.nama')
+                ->get();
+
+            // dd($roles);
+            return view('dorm.index', compact('roles', 'checkin', 'organization', 'isblacklisted'));
+        }
+        else{
+            //return 404
+        }
+    }
+
+    public function index($id)
+    {
+        dd($id);
         $organization = $this->getOrganizationByUserId();
         //
         
@@ -632,8 +677,10 @@ class DormController extends Controller
         if (strtoupper($outingtype) == $categoryReal[2]) {
             $outingid = DB::table('outings')
                 ->where('outings.organization_id', $request->get('organization'))
-                ->where('outings.start_date_time', '>=', $request->get('start_date'))
-                ->where('outings.end_date_time', '>', $request->get('start_date'))
+                ->where([
+                    // ['outings.start_date_time', '>=', $request->get('start_date')],
+                    ['outings.end_date_time', '>', $request->get('start_date')],
+                ])
                 ->value('outings.id');
 
             if ($outingid == NULL) {
@@ -684,9 +731,9 @@ class DormController extends Controller
                 // do nothing 1st
             }
 
-            return redirect('/dorm')->with('success', 'New application has been added successfully');
+            return redirect('/sekolah/dorm/indexRequest/6')->with('success', 'New application has been added successfully');
         } else {
-            return redirect('/dorm')->withErrors('Failed to submit application');
+            return redirect('/sekolah/dorm/indexRequest/6')->withErrors('Failed to submit application');
         }
     }
 
@@ -2148,24 +2195,15 @@ class DormController extends Controller
     // 需不需要让user选display approve和pending的呢？
     // for button：
     // 如果是kecemasan， status=0 也要display给guard
-    private $roles = "PN";
+    
     public function getStudentOutingDatatable(Request $request)
     {
         if (request()->ajax()) {
 
             $oid = $request->oid;
             $rid = $request->rid;
-
+            $this->roles = $rid;
             $hasOrganizaton = $request->hasOrganization;
-            $roles = strtoupper(DB::table('organization_roles')
-                ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-                ->where([
-                    ['ou.user_id', Auth::user()->id],
-                    ['ou.organization_id', $oid],
-                    ['organization_roles.id', $rid],
-                ])
-                ->value('organization_roles.nama'));
-
 
             $data = DB::table('students')
                 ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -2175,12 +2213,9 @@ class DormController extends Controller
                 ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
                 ->join('classifications', 'classifications.id', '=', 'so.classification_id');
 
-            $this->roles = $roles;
-
             if ($oid != '' && !is_null($hasOrganizaton)) {
                 //can view all application
-                if ($roles == "PENJAGA") {
-
+                if ($rid == 6) {
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
@@ -2204,9 +2239,10 @@ class DormController extends Controller
                         ->orderBy('so.apply_date_time', 'desc')
                         ->groupBy('so.id')
                         ->get();
+
                 }
                 //approved or kecemasan && havent expired
-                else if ($roles == "GUARD") {
+                else if ($rid == 8) {
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
@@ -2229,6 +2265,31 @@ class DormController extends Controller
                             'classifications.fake_name'
                         )
                         ->orderBy('so.apply_date_time', 'desc')
+                        ->groupBy('so.id')
+                        ->get();
+                        
+                }
+                else if($rid == 1){
+                    $data = $data
+                        ->where([
+                            ['ou.organization_id', $oid],
+                        ])
+                        ->select(
+                            'so.id as id',
+                            'students.nama',
+                            'students.parent_tel',
+                            'so.apply_date_time',
+                            'so.out_date_time',
+                            'so.arrive_date_time',
+                            'so.in_date_time',
+                            'so.status as status',
+                            'so.reason',
+                            'cs.blacklist',
+                            'cs.outing_limit',
+                            'classifications.name as catname',
+                            'classifications.fake_name'
+                        )
+                        ->orderBy('so.apply_date_time')
                         ->groupBy('so.id')
                         ->get();
                 }
@@ -2284,24 +2345,24 @@ class DormController extends Controller
                     $btn = '<div class="d-flex justify-content-center">';
                     if ($row->status == 0) {  //havent approved
                         //user is penjaga
-                        if ($this->roles == "PENJAGA") {
+                        if ($this->roles == 6) {
                             //
                             if ($row->apply_date_time >= now()->toDateString()) {
-                                $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                                $btn = $btn . '<a href="' . route('dorm.edit', $row->id) . '" class="btn btn-primary m-1">Ubah</a>';
                             }
                             //del btn
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
                         //user is guard and outing category is balik kecemasan
-                        elseif ($this->roles == "GUARD" && strtoupper($row->catname) == $categoryReal[0]) {
+                        elseif ($this->roles == 8 && strtoupper($row->catname) == $categoryReal[0]) {
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $row->id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
                         }
                         //user is warden, teacher, HEM
                         elseif (
-                            $this->roles == 'SUPERADMIN' || $this->roles == 'PENTADBIR'
-                            || $this->roles == 'GURU' || $this->roles == 'WARDEN'
+                            $this->roles == 1 || $this->roles == 4
+                            || $this->roles == 5 || $this->roles == 7
                         ) {
                             //user choose outings and is inside blacklist
                             if (strtoupper($row->catname) == $categoryReal[2] && $row->blacklist == 1) {
@@ -2314,11 +2375,11 @@ class DormController extends Controller
                             }
                         }
                     } elseif ($row->status == 1) { //approved
-                        if ($this->roles == 'PENJAGA') {
+                        if ($this->roles == 6) {
                             if ($row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->out_date_time != NULL) {
                                 $btn = $btn . '<a href="' . route('dorm.updateArriveTime', $row->id) . '" class="btn btn-primary m-1">Sampai</a>';
                             }
-                        } elseif ($this->roles == 'GUARD') {
+                        } elseif ($this->roles == 8) {
 
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
 
@@ -2330,7 +2391,7 @@ class DormController extends Controller
                             }
                         }
                     } elseif ($row->status == 2) {  //ditolak
-                        if ($this->roles == 'PENJAGA') {
+                        if ($this->roles == 6) {
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
                     }
