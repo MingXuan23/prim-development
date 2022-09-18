@@ -1169,9 +1169,9 @@ class DormController extends Controller
                     'updated_at'        => now(),
                 ]);
 
-            return redirect('/dorm')->with('success', 'The application has been updated');
+            return redirect('/sekolah/dorm/indexRequest/6')->with('success', 'The application has been updated');
         } else {
-            return redirect('/dorm')->withErrors('Information not matched');
+            return redirect('/sekolah/dorm/indexRequest/6')->withErrors('Information not matched');
         }
     }
 
