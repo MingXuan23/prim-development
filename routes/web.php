@@ -254,7 +254,7 @@ Route::group(['prefix' => 'session'], function () {
 });
 
 Route::group(['prefix' => 'polimas'], function () {
-    Route::get('/', 'PolimasController@indexLogin');
+    // Route::get('/', 'PolimasController@indexLogin');
     Route::group(['middleware' => ['auth']], function () {
         Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
         Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
