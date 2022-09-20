@@ -51,11 +51,11 @@
                         @endforeach
                     </div>
                 @endif
-                @if($roles == 6)
+                @if($roles == 6 || $roles == 1)
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
 
-                @if($roles == 7)
+                @if($roles == 7 || $roles == 1)
                     @if($checkin == 1)
                     <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', $checkin)}}" class="btn btn-primary"> <i class="fas fa-minus"></i> Daftar Keluar</a>
                     @else
@@ -200,7 +200,7 @@
                         "className": "text-center",
                         "width": "2%"
                     }, {
-                        "targets": [1, 2, 3, 4, 5, 6, 7, 8], // your case first column
+                        "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9], // your case first column
                         "className": "text-center",
                     },],
                     
@@ -208,7 +208,6 @@
                         [1, 'asc']
                     ],
                     columns: [{
-                        
                         "data": null,
                         searchable: false,
                         "sortable": false,
@@ -283,7 +282,7 @@
                         "className": "text-center",
                         "width": "2%"
                     }, {
-                        "targets": [1, 2, 3, 4, 5, 6, 7, 8], // your case first column
+                        "targets": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], // your case first column
                         "className": "text-center",
                     },],
                     
@@ -291,7 +290,6 @@
                         [1, 'asc']
                     ],
                     columns: [{
-                        
                         "data": null,
                         searchable: false,
                         "sortable": false,
@@ -353,8 +351,8 @@
                 });
             }
             else{
+                console.log(oid);
                 requestTable = $('#requestTable').DataTable({
-                    
                     processing: true,
                     serverSide: true,
                     ajax: {
@@ -365,14 +363,13 @@
                             hasOrganization: true
                         },
                         type: 'GET',
-
                     },
                     'columnDefs': [{
                         "targets": [0], // your case first column
                         "className": "text-center",
                         "width": "2%"
                     }, {
-                        "targets": [1, 2, 3, 4, 5], // your case first column
+                        "targets": [1, 2, 3, 4, 5, 6], // your case first column
                         "className": "text-center",
                     },],
                     
@@ -380,7 +377,6 @@
                         [1, 'asc']
                     ],
                     columns: [{
-                        
                         "data": null,
                         searchable: false,
                         "sortable": false,
@@ -417,9 +413,10 @@
                         name: 'action',
                         orderable: false,
                         searchable: false
-                    }, ]
+                    }, ]    
                     
                 });
+                console.log("123");
             }
         }
 
@@ -455,6 +452,7 @@
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
+                    rid: $("#roles").val(),
                     // _method: 'DELETE'
                 },
                 url: "/sekolah/dorm/updateBlacklist/" + student_outing_id,
@@ -480,6 +478,7 @@
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
+                    rid: $("#roles").val(),
                     _method: 'DELETE'
                 },
                 url: "/dorm/" + student_outing_id,
@@ -497,9 +496,7 @@
                 }
             })
         });
-
         
-
         $('.alert').delay(3000).fadeOut();
 
     });
