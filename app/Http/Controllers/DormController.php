@@ -1200,7 +1200,7 @@ class DormController extends Controller
             ->where('id', $id)
             ->update(
                 [
-                    'name' => $request->get('name'),
+                    'fake_name' => $request->get('name'),
                     'description'   => $request->get('description'),
                     'limit'   => $request->get('limit'),
                     'time_limit'    => $request->get('time'),
@@ -2172,9 +2172,6 @@ class DormController extends Controller
                 }
             }
         }
-
-
-
         return response()->json(['success' => $category, 'start' => $start, 'end' => $end]);
     }
 
