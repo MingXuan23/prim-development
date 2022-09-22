@@ -252,6 +252,6 @@ return [
         'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
-    'date_format' => 'm/d/Y',
+    'date_format' => 'd/m/Y',
 
 ];
