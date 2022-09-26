@@ -136,7 +136,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
     <strong><p>The transaction has been cancelled by your own/rejected by your banking service. Please try again later.</p></strong>
     <p>Please ensure with your bank account that no deductions were made. If there any, contact with your bank services.</p>
     <p>You will be redirected to the main page in <span id="time">Loading...</span></p>
-    <p>Click <a href="/derma">here</a> if you're not redirecting to other page.</p>
+    <p>Click <a href="/derma?failed=1">here</a> if you're not redirecting to other page.</p>
 </div>
 @endsection
 
