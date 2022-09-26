@@ -150,7 +150,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
         document.getElementById("time").innerHTML = seconds;
         time--;
         if (time == 0) {
-            window.location.href = "/derma";
+            window.location.href = "/derma?failed=1";
         }
     }, 1000);
 </script>
