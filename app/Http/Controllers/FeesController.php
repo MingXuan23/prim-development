@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Fee;
-use App\Models\Organization;
-use App\Models\Transaction;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Yajra\DataTables\DataTables;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\View;
-use Psy\Command\WhereamiCommand;
-use App\Http\Controllers\AppBaseController;
-use App\Models\Category;
+use App\Models\Fee;
 use App\Models\Fee_New;
+use App\Models\Category;
 use App\Models\ClassModel;
+use App\Models\Transaction;
+use App\Models\Organization;
+use Illuminate\Http\Request;
+use Psy\Command\WhereamiCommand;
+use Yajra\DataTables\DataTables;
+use App\Exports\ExportYuranStatus;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\AppBaseController;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 class FeesController extends AppBaseController
@@ -1317,7 +1319,6 @@ class FeesController extends AppBaseController
                 ->get();
         }
 
-
         return response()->json(['success' => $list]);
     }
 
@@ -1357,6 +1358,20 @@ class FeesController extends AppBaseController
         }
         
         return response()->json(['success' => $lists]);
+    }
+
+    public function fecthYuranByOrganizationId(Request $request)
+    {
+        $oid = $request->oid;
+
+        $yurans = DB::table('fees_new')
+            ->where('organization_id', $oid)
+            ->select('id', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
+        
+        return response()->json(['success' => $yurans]);
     }
 
     public function studentDebtDatatable(Request $request)
@@ -1412,5 +1427,14 @@ class FeesController extends AppBaseController
 
             return $table->make(true);
         }
+    }
+
+    public function ExportAllYuranStatus(Request $request)
+    {
+        $yuran = DB::table('fees_new')
+            ->where('id', $request->yuranExport)
+            ->first();
+
+        return Excel::download(new ExportYuranStatus($yuran), $yuran->name . '.xlsx');
     }
 }

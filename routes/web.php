@@ -132,6 +132,8 @@ Route::group(['prefix' => 'fees'], function () {
     
     Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
+
+    Route::post('/list-fetchYuranbyOrganId', 'FeesController@fecthYuranByOrganizationId')->name('fees.fetchYuranByOrganId');
 });
 
 Route::group(['prefix' => 'parent'], function () {
@@ -222,6 +224,8 @@ Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
+
+Route::post('/exportAllYuranStatus', 'FeesController@ExportAllYuranStatus')->name('exportAllYuranStatus');
 
 
 Route::group(['prefix' => 'notification'], function () {
