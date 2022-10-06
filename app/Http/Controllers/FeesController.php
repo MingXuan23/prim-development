@@ -506,12 +506,11 @@ class FeesController extends AppBaseController
 
     public function StoreCategoryA(Request $request)
     {
-        $dt = Carbon::now();
         $price          = $request->get('price');
         $quantity       = $request->get('quantity');
         $oid            = $request->get('organization');
-        $date_started   = $dt->toDateString($request->get('date_started'));
-        $date_end       = $dt->toDateString($request->get('date_end'));
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
         $total          = $price * $quantity;
 
         $target = ['data' => 'ALL'];
@@ -703,9 +702,6 @@ class FeesController extends AppBaseController
 
     public function StoreCategoryB(Request $request)
     {
-        // dd($request->toArray());
-        $dt = Carbon::now();
-
         $gender         = "";
         $class          = $request->get('cb_class');
         $level          = $request->get('level');
@@ -715,8 +711,8 @@ class FeesController extends AppBaseController
         $quantity       = $request->get('quantity');
         $desc           = $request->get('description');
         $oid            = $request->get('organization');
-        $date_started   = $dt->toDateString($request->get('date_started'));
-        $date_end       = $dt->toDateString($request->get('date_end'));
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
         $total          = $price * $quantity;
         $category       = "Kategory B";
 
@@ -746,8 +742,6 @@ class FeesController extends AppBaseController
     public function StoreCategoryC(Request $request)
     {
         // dd($request->toArray());
-        $dt = Carbon::now();
-
         $gender     = $request->get('gender');
         $class      = $request->get('cb_class');
         $level      = $request->get('level');
@@ -757,8 +751,8 @@ class FeesController extends AppBaseController
         $quantity       = $request->get('quantity');
         $desc           = $request->get('description');
         $oid            = $request->get('organization');
-        $date_started   = $dt->toDateString($request->get('date_started'));
-        $date_end       = $dt->toDateString($request->get('date_end'));
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
         $total          = $price * $quantity;
         $category       = "Kategory C";
 
