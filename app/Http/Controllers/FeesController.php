@@ -1080,6 +1080,7 @@ class FeesController extends AppBaseController
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
             ->select('fees_new.*', 'students.id as studentid')
+            ->orderBy('fees_new.name')
             ->where('student_fees_new.status', 'Debt')
             ->get();
 
