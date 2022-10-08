@@ -29,7 +29,7 @@
         </div>
         @endif
 
-        <form method="post" action="{{ route('dorm.updateResident', $resident[0]->id) }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('dorm.updateResident', $resident->id) }}" enctype="multipart/form-data">
             <!-- 注意这个 -->
             
             {{csrf_field()}}
@@ -41,18 +41,9 @@
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected>Pilih Organisasi</option>
                         @foreach($organization as $row)
-                            @foreach($roles as $role)
-                                @if($role->organization_id == $row->id)
-                                    @if($role->nama != "Penjaga")
-                                        @if($row->id == $role->organization_id)
-                                        <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
-                                        @else
-                                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                        @endif
-                                    @endif
-                                    @break
-                                @endif
-                            @endforeach
+                            @if($row->id == $resident->organization_id)
+                            <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
+                            @endif
                         @endforeach
                     </select>
                 </div>
@@ -62,7 +53,7 @@
                     <select name="dorm" id="dorm" class="form-control">
                         <option value="" disabled selected>Pilih Asrama</option>
                         @foreach($dormlist as $row)
-                        @if($row->id == $resident[0]->dorm_id)
+                        @if($row->id == $resident->dorm_id)
                         <option value="{{ $row->id }}" selected> {{ $row->name }} </option>
                         @else
                         <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -74,12 +65,12 @@
                 <div class="form-group">
                     <label>Nama Penuh Pelajar</label>
                     <input type="text" name="name" class="form-control" placeholder="Nama Penuh"
-                        value="{{ $resident[0]->studentname }}" readonly>
+                        value="{{ $resident->studentname }}" readonly>
                 </div>
 
                 <div class="form-group">
                     <label>Email Pelajar</label>
-                    <input type="text" name="email" class="form-control" placeholder="Email Pelajar" value="{{ $resident[0]->email }}" readonly>
+                    <input type="text" name="email" class="form-control" placeholder="Email Pelajar" value="{{ $resident->email }}" readonly>
                 </div>
                 
                 <div class="form-group mb-0">

@@ -40,14 +40,7 @@
                             <select name="organization" id="organization" class="form-control">
                                 <option value="" selected>Pilih Organisasi</option>
                                 @foreach($organization as $row)
-                                    @foreach($roles as $role)
-                                        @if($role->organization_id == $row->id)
-                                            @if($role->nama != "Penjaga")
-                                            <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                            @endif
-                                            @break
-                                        @endif
-                                    @endforeach
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>           
                                 @endforeach
                             </select>
                         </div>

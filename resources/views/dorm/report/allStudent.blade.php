@@ -25,14 +25,8 @@
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected disabled>Pilih Organisasi</option>
                         @foreach($organization as $row)
-                            @foreach($roles as $role)
-                                @if($role->organization_id == $row->id)
-                                    @if($role->nama != "Penjaga")
-                                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                        @break
-                                    @endif
-                                @endif
-                            @endforeach
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            
                         @endforeach
                     </select>
                 </div>
@@ -118,14 +112,7 @@
                                 <label>Organisasi</label>
                                 <select name="organExport" id="organExport" class="form-control">
                                     @foreach($organization as $row)
-                                        @foreach($roles as $role)
-                                            @if($role->organization_id == $row->id)
-                                                @if($role->nama != "Penjaga")
-                                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                                    @break
-                                                @endif
-                                            @endif
-                                        @endforeach
+                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>

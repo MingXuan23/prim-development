@@ -174,6 +174,7 @@
                         });
                         start = result.start;
                         end = result.end;
+                        console.log("start : " + start);
                     }
 
                 });
@@ -220,23 +221,20 @@
 
                     var d = new Date (year, month, day);
 
-                    if(start >= d.toISOString().split('T')[0])
+                    if(end >= d.toISOString().split('T')[0])
                     {
-                        console.log("this is " + end);
                         start_date.value = start_date.max = null;
                         start_date.min = start;
                         start_date.max = end;
                     }
                     else
                     {
-                        console.log(start < d.toISOString().split('T')[0]);
-                        alert("No outings date and time is available");
+                        alert("No outings date and time is available for selection");
                         $("#start_date").prop('disabled', true);
                     }
                 }
                 else if(selectedCat[1] != 0)
                 {
-                    console.log("here");
                     start_date.value = start_date.max = null;
                     
                     var today = new Date();

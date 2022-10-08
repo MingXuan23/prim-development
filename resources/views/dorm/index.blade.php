@@ -230,7 +230,7 @@
                         orderable: false,
                         searchable: false
                     }, {
-                        data: "catname",
+                        data: "fake_name",
                         name: 'catname',
                         orderable: false,
                         searchable: false
@@ -312,7 +312,7 @@
                         orderable: false,
                         searchable: false
                     }, {
-                        data: "catname",
+                        data: "fake_name",
                         name: 'catname',
                         orderable: false,
                         searchable: false
@@ -399,7 +399,7 @@
                         orderable: false,
                         searchable: false
                     }, {
-                        data: "catname",
+                        data: "fake_name",
                         name: 'catname',
                         orderable: false,
                         searchable: false
