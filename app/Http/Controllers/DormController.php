@@ -2360,7 +2360,7 @@ class DormController extends Controller
                         }
                         if ($this->roles == 8 ||  $this->roles == 1) {
 
-                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time >= now()->toDateString()) {
+                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time > now()->toDateString()) {
 
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
