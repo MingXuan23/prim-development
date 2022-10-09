@@ -630,7 +630,9 @@ class PayController extends AppBaseController
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
                 case 'School':
-                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+
+                    Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
 
                     $list_student_fees_id = DB::table('student_fees_new')
                         ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
