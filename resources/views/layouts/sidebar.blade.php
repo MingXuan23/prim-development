@@ -170,12 +170,12 @@
                             </a>
                         </li>
         
-                        <li>
+                        {{-- <li>
                             <a href="{{ route('parent.dependent') }}" class=" waves-effect">
                             <i class="fas fa-child"></i>
                             <span>Carian Tanggungan</span>
                             </a>
-                        </li>
+                        </li> --}}
                         @endrole
                         
                         @role('Superadmin|Pentadbir')
