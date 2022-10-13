@@ -77,13 +77,13 @@
                                          @endif
                                         </td>
                                         <td>
-                                          @if($item->product_type_id == 1)
+                                          @if($item->product_group_id == 1)
                                           Barang sekolah
-                                          @elseif($item->product_type_id == 2)
+                                          @elseif($item->product_group_id == 2)
                                           Alat tulis
-                                          @elseif($item->product_type_id == 3)
+                                          @elseif($item->product_group_id == 3)
                                           Buku Kerja
-                                          @elseif($item->product_type_id == 4)
+                                          @elseif($item->product_group_id == 4)
                                           Makanan dan Minuman
                                           @endif
                                         </td>

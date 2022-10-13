@@ -73,6 +73,7 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
     Route::get('testRepeater', 'OrganizationController@testRepeater');
+    Route::post('parent-koop', 'OrganizationController@fetchAvailableParentKoop')->name('organization.fetchAvailableParentKoop');
 });
 
 Route::group(['prefix' => 'teacher'], function () {
@@ -189,6 +190,13 @@ Route::group(['prefix' => 'koperasi'], function () {
     Route::get('/Confirm','CooperativeController@indexConfirm')->name('koperasi.indexConfirm');
     Route::get('/Confirm/update/{id}','CooperativeController@storeConfirm')->name('koperasi.storeConfirm');
     Route::get('/Confirm/delete/{id}','CooperativeController@notConfirm')->name('koperasi.notConfirm');
+});
+
+Route::group(['prefix' => 'koperasi'], function () {
+    Route::get('/koop','CooperativeController@indexKoop')->name('koperasi.indexKoop');
+    Route::get('/koop/{id}','CooperativeController@koopShop')->name('koperasi.koopShop');
+    Route::get('/koop/store/{id}','CooperativeController@storeKoop')->name('koperasi.storeKoop');
+    Route::get('/koop/{id}/cart','CooperativeController@koopCart')->name('koperasi.koopCart');
 });
 
 Route::group(['middleware' => ['auth']], function () {

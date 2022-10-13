@@ -27,20 +27,47 @@ class OrganizationController extends Controller
         // after launch remove where
         $type_org = TypeOrganization::all();
         
-        $parent_org = Organization::whereIn('type_org', [1, 2, 3])->get();
-
-        $parent_org = $this->getAvailableSchoolForKoop();
-
-        Organization::where('parent_org');
-
         $states = Jajahan::negeri();
-        return view('organization.add', compact('type_org', 'parent_org', 'states'));
+        return view('organization.add', compact('type_org', 'states'));
     }
 
     public function getDistrict(Request $request)
     {
         $districts = Jajahan::daerah($request->state_id);
         return $districts;
+    }
+
+    public function fetchAvailableParentKoop(Request $request)
+    {
+        $state = $request->get('negeri');
+        $allSchool = Organization::whereIn('type_org', [1, 2, 3])->get();
+        $allKoop = Organization::where('type_org', 1039)->get();
+
+        $isNotParent = array();
+        foreach($allSchool as $school)
+        {
+            if(count($allKoop) != 0)
+            {
+                foreach($allKoop as $koop)
+                {
+                    if($school->id != $koop->parent_org)
+                    {
+                        $isNotParent[] += (int)$school->id;
+                    }
+                }
+            }
+            else
+            {
+                $isNotParent[] += (int)$school->id;
+            }
+        }
+
+        $parent_org = Organization::whereIn('id', $isNotParent)
+                    ->where('state', $state)
+                    ->select('id', 'nama')
+                    ->get();
+
+        return response()->json(['success' => $parent_org]);
     }
 
     public function store(OrganizationRequest $request)
@@ -84,6 +111,14 @@ class OrganizationController extends Controller
             $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
             //$organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
             $user->assignRole('Koop_Admin');
+
+            $this->insertOrganizationHours($organization->id);
+        }
+
+        // Merchant
+        if ($request->type_org == 2132) {
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 2015]);
+            $user->assignRole('Merchant_Admin');
 
             $this->insertOrganizationHours($organization->id);
         }
@@ -221,6 +256,8 @@ class OrganizationController extends Controller
             $code = 'PT' . str_pad($id, 5, '0', STR_PAD_LEFT);
         } elseif ($typeOrg == 1039) { // Koperasi
             $code = 'KP' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 2132) { // Merchant
+            $code = 'MC' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
         return $code;
@@ -281,15 +318,22 @@ class OrganizationController extends Controller
         $isNotParent = array();
         foreach($allSchool as $school)
         {
-            foreach($allKoop as $koop)
+            if(count($allKoop) != 0)
             {
-                if($school->id != $koop->parent_org)
+                foreach($allKoop as $koop)
                 {
-                    $isNotParent[] += (int)$school->id;
+                    if($school->id != $koop->parent_org)
+                    {
+                        $isNotParent[] += (int)$school->id;
+                    }
                 }
             }
+            else
+            {
+                $isNotParent[] += (int)$school->id;
+            }
         }
-
+        
         $parent_org = Organization::whereIn('id', $isNotParent)->get();
 
         return $parent_org;

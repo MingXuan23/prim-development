@@ -275,7 +275,7 @@
         </div>
         <div class="col-md-4 p-2">
 
-            <button id="btn-byr" disabled class="btn btn-success float-right" type="submit">Proses
+            <button id="btn-byr"  class="btn btn-success float-right" type="submit">Proses
                 Pembayaran</button>
             {{-- </form> --}}
         </div>

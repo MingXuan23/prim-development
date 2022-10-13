@@ -56,20 +56,7 @@
                         </div>
                     </div>
 
-                    <div class="row" id="parent_org_class" style="display: none;">
-                        <div class="col">
-                            <div class="form-group required">
-                                <label class="control-label">Sekolah</label>
-                                <select name="parent_org" id="parent_org" class="form-control"
-                                    data-parsley-required-message="Sila pilih jenis organisasi">
-                                    <option value="" selected>Pilih Sekolah</option>
-                                    @foreach($parent_org as $row)
-                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+                    
 
                     <div class="row">
                         <div class="col">
@@ -145,6 +132,21 @@
                         <textarea name="address" class="form-control" rows="4" placeholder="Alamat"
                             data-parsley-required-message="Sila masukkan alamat organisasi" required></textarea>
                     </div>
+
+                    <div class="row" id="parent_org_class" style="display: none;">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Sekolah</label>
+                                <select name="parent_org" id="parent_org" class="form-control"
+                                    data-parsley-required-message="Sila pilih jenis organisasi">
+                                    <option value="" selected>Pilih Sekolah</option>
+                                    {{-- @foreach($parent_org as $row)
+                                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                    @endforeach --}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div class="form-group mb-0">
                         <div class="text-right">
@@ -209,18 +211,49 @@
                 }
             })
         });
-        
+
         $('#type_org').on('change', function(){
             var type_org = $(this).children(":selected").text();
+            if(type_org != "Koperasi")
+            {
+                $('#parent_org_class').attr('style', 'display: none;');
+            }
+        })
+        
+        $('#state').on('change', function(){
             
-            if(type_org == "Koperasi")
+            var type_org = $('#type_org').children(":selected").text();
+            var negeri = $(this).children(":selected").val();
+            
+            if(type_org == "Koperasi" && negeri != null)
             {
                 $('#parent_org_class').removeAttr('style');
+                $.ajax({
+                    url: "{{ route('organization.fetchAvailableParentKoop') }}",
+                    type: "POST",
+                    data: {
+                        negeri:negeri
+                    },
+                    success: function(data) {
+                        var parent_org = $('#parent_org');
+                        parent_org.empty();
+                        parent_org.append("<option value='' disabled selected>Pilih Sekolah</option>")
+
+                        $.each(data.success, function(index, value)
+                        {
+                            parent_org.append("<option value='"+value.id+"'>"+value.nama+"</option>")
+                        })
+                    },
+                    error: function(data) {
+                        console.log(data);
+                    }
+                })
             }
             else
             {
                 $('#parent_org_class').attr('style', 'display: none;');
             }
+            
         }); 
     });
 

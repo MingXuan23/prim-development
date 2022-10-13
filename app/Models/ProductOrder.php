@@ -10,7 +10,7 @@ class ProductOrder extends Model
     use SoftDeletes;
 
     protected $table = "product_order";
-    protected $fillable = ['quantity', 'status', 'product_item_id', 'koop_order_id'];
+    protected $fillable = ['quantity', 'status', 'product_item_id', 'pickup_order_id'];
 
     public function product_item()
     {

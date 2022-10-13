@@ -308,6 +308,35 @@
             </li>
             @endrole
 
+            @role('Superadmin|Penjaga')
+            <li>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="mdi mdi-border-color"></i>
+                    <span>Koop</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    <li>
+                        <a href="{{ route('koperasi.indexKoop') }}" class=" waves-effect">
+                            <i class="mdi mdi-book"></i>
+                            <span>Koop Sekolah</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('koperasi.order') }}" class=" waves-effect">
+                            <i class="ti-email"></i>
+                            <span>Pesanan Koperasi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('koperasi.history') }}" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Sejarah Koperasi</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @endrole
+
             {{-- @role('Superadmin|Pentadbir|Guru')
                 <li>
                     <a href="{{ route('chat-user') }}" class=" waves-effect">

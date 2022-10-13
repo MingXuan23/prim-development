@@ -41,7 +41,12 @@ class TypeOrganizationsTableSeeder extends Seeder
             5 =>
             array(
                 "id" => 1039,
-                "name" => "Koperasi",
+                "nama" => "Koperasi",
+            ),
+            6 => 
+            array(
+                "id" => 2132,
+                "nama" => "Peniaga",
             ),
         ));
     }

@@ -10,7 +10,7 @@
 <div class="row">
   <div class="col-md-12">
     <div class="page-title-box">
-      <h4 class="font-size-18">{{ $koperasi->nama}}</h4>
+    <h4 class="font-size-18">{{ $koperasi->nama }}</h4>
       koperasi >> pengesahan
       <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
@@ -108,7 +108,6 @@
                 </td>
               </tr>
             @endforeach
-            </tbody>
           </table>
         </div>
       </div>
