@@ -167,7 +167,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
     Route::post('/updatePwd/{id}', 'ProfileController@updatePwd')->name('profile.updatePwd');
 });
 
-Route::group(['prefix' => 'koperasi'], function() {
+Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi'], function() {
     Route::delete('/{org_id}/edit/{id}', 'CooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
     Route::post('/koperasi/fetchKoop', 'CooperativeController@fetchKoop')->name('koperasi.fetchKoop');
     Route::get('/order', 'CooperativeController@indexOrder')->name('koperasi.order');
@@ -178,6 +178,7 @@ Route::group(['prefix' => 'koperasi'], function() {
     Route::get('/{id}/list', 'CooperativeController@indexList')->name('koperasi.list');
 });
 
+<<<<<<< HEAD
 Route::group(['prefix' => 'koperasi'], function () {
     Route::get('/admin','CooperativeController@indexAdmin')->name('koperasi.indexAdmin');
     Route::get('/produk','CooperativeController@createProduct')->name('koperasi.createProduct');
@@ -193,6 +194,9 @@ Route::group(['prefix' => 'koperasi'], function () {
 });
 
 Route::group(['prefix' => 'merchant'], function() {
+=======
+Route::group(['middleware' => ['auth'], 'prefix' => 'merchant'], function() {
+>>>>>>> c0abeece0593a7229455e3823e86ee46b918c4eb
     Route::get('/', 'MerchantController@merchantList')->name('merchant.index');
     Route::get('/{id}', 'MerchantController@showMerchant')->name('merchant.show');
     Route::post('fetchItem', 'MerchantController@fetchItem')->name('merchant.fetchItem');
@@ -201,9 +205,9 @@ Route::group(['prefix' => 'merchant'], function() {
     Route::post('fetchDay', 'MerchantController@fetchDay')->name('merchant.fetchDay');
     Route::post('fetchTime', 'MerchantController@fetchTime')->name('merchant.fetchTime');
     Route::post('storeOrderDate', 'MerchantController@storeOrderDate')->name('merchant.storeOrderDate');
+    Route::post('destroyOldOrder', 'MerchantController@destroyOldOrder')->name('merchant.destroyOldOrder');
     
     Route::post('testType', 'MerchantController@testType')->name('merchant.testType');
-    Route::post('testItem', 'MerchantController@testItem')->name('merchant.testItem');
 });
 
 Route::group(['middleware' => ['auth']], function () {

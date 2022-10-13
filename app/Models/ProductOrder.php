@@ -22,4 +22,9 @@ class ProductOrder extends Model
     {
         return $this->belongsTo(PickUpOrder::class);
     }
+
+    public function queues()
+    {
+        return $this->belongsToMany(Queue::class);
+    }
 }

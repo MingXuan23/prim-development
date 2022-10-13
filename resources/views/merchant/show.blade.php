@@ -20,14 +20,6 @@
 
 #img-size
 {
-  width: 200px;
-  height: 200px;
-  border-radius: 14px;
-  object-fit: contain;
-}
-
-#test-size
-{
   max-width: 100%;
   height: auto;
   width: 100px;
@@ -52,6 +44,12 @@
   display: inline-block;
   text-align: left;
   vertical-align: middle;
+}
+
+.loading {
+  width: 35px;
+  height: 35px;
+  display:none;
 }
 </style>
 
@@ -94,15 +92,6 @@
       </div>
       
       <div class="card-body">
-        @if(Session::has('success'))
-          <div class="alert alert-success">
-            <p>{{ Session::get('success') }}</p>
-          </div>
-        @elseif(Session::has('error'))
-          <div class="alert alert-danger">
-            <p>{{ Session::get('error') }}</p>
-          </div>
-        @endif
 
         <div class="flash-message"></div>
 
@@ -119,13 +108,13 @@
                 <div class="d-flex">
                   <div class="d-flex justify-content-center align-items-start">
                     <div>
-                      <img class="img-fluid" id="test-size" src="{{ URL('images/koperasi/default-item.png')}}" alt="Card image cap">
+                      <img class="img-fluid" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
                     </div>
                   </div>
                   <div class="col">
                     <div class="d-flex align-items-start flex-column h-100" >
                       <div>
-                        <h4 class="mt-2">{{ $product->name }}</h4> 
+                        <h4 class="mt-2">{{ $product->item_name }}</h4> 
                       </div>
                       <div>
                         <p class="card-text"><i>{{ $product->desc }} </i></p>
@@ -165,10 +154,11 @@
         </button>
       </div>
       <div class="modal-body">
+        <div class="alert alert-danger" id="item_alert"></div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-        <button type="button" class="cart-add-btn btn btn-primary">Tambah di Cart</button>
+      <div class="modal-footer justify-content-center">
+        <img class="loading" src="{{ URL('images/koperasi/loading-ajax.gif')}}">
+        <button type="button" class="cart-add-btn btn btn-primary btn-block">Semak Ketersediaan</button>
       </div>
     </div>
   </div>
@@ -182,15 +172,11 @@
 
 <script>
   $(document).ready(function(){
-    $('.alert-success').delay(2000).fadeOut();
-    $('.alert-danger').delay(4000).fadeOut();
-
-    var item_id;
-    var org_id;
-
+    var item_id, org_id;
+    
     $.ajaxSetup({
       headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
 
@@ -204,28 +190,29 @@
       $.ajax({
         url: "{{ route('merchant.fetchItem') }}",
         method: "POST",
-        data: {i_id:item_id},
+        data: {i_id:item_id, o_id:org_id},
+        beforeSend:function() {
+          $('#addToCartModal').modal('show')
+          $('.modal-body').append("<div class='text-center'><img src='{{ URL('images/koperasi/loading-ajax.gif')}}' style='width:40px;height:40px;'></div>")
+        },
         success:function(result)
         {
+          $('.modal-body').empty()
           $('.modal-title').append(result.item.name)
           $('.modal-body').append(result.body)
 
           quantityExceedHandler($("input[name='quantity_input']"), result.quantity)
-          
         },
         error:function(result)
         {
           console.log(result)
         }
       })
-
-      $('#addToCartModal').modal('show')
     })
 
     $('.cart-add-btn').click(function(){
       var quantity = $("input[name='quantity_input']").val()
-      // var org_id = $("input[name='org_id']").val()
-      // console.log(org_id)
+
       $.ajax({
         url: "{{ route('merchant.storeItem') }}",
         method: "POST",
@@ -234,18 +221,36 @@
           o_id:org_id,
           quantity:quantity,
         },
+        beforeSend: function() {
+          $('.cart-add-btn').css('display', 'none')
+          $('.loading').show()
+        },
         success:function(result)
-        {
-          $('#addToCartModal').modal('hide');
-          $('div.flash-message').html(result);
+        { 
+          $('.cart-add-btn').show()
+          $('.loading').hide()
+          $('div.flash-message').empty()
+          
+          if(result.alert == '')
+          {
+            $('#addToCartModal').modal('hide')
+
+            var message = "<div class='alert alert-success'>"+result.success+"</div>"
+            $('div.flash-message').show()
+            $('div.flash-message').append(message)
+            $('div.flash-message').delay(3000).fadeOut()
+          }
+          else
+          {
+            $('#item_alert').append(result.alert)
+          }
         },
         error:function(result)
         {
-          console.log(result)
+          console.log(result.responseText)
         }
       })
     })
-
 
     function quantityExceedHandler(i_Quantity, maxQuantity)
     {
@@ -280,6 +285,10 @@
         }
       });
     }
+
+    $('.alert-success').delay(2000).fadeOut()
+    $('.alert-danger').delay(4000).fadeOut()
+    
 
     
   });

@@ -137,7 +137,7 @@ class CooperativeController extends Controller
                                 ->where('po.status', 1)
                                 ->select('po.quantity', 'pi.price')
                                 ->get();
-
+                
                 $newTotalPrice = 0;
                 
                 foreach($cartItem as $row)
@@ -229,7 +229,7 @@ class CooperativeController extends Controller
                             ->join('product_item as pi', 'pt.id', '=', 'pi.product_group_id')
                             ->select('pt.id as type_id', 'pt.name as type_name')
                             ->where('pt.organization_id', $koperasi->id)
-                            ->distinct() 
+                            ->distinct()
                             ->get();
 
         $k_open_hour = date('h:i A', strtotime($koperasi->open_hour));
