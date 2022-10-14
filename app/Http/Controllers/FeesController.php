@@ -1072,6 +1072,7 @@ class FeesController extends AppBaseController
             ->distinct()
             ->orderBy('students.id')
             ->orderBy('fees_new.category')
+            ->where('fees_new.status', 1)
             ->where('student_fees_new.status', 'Debt')
             ->get();
 
@@ -1081,6 +1082,7 @@ class FeesController extends AppBaseController
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
             ->select('fees_new.*', 'students.id as studentid')
             ->orderBy('fees_new.name')
+            ->where('fees_new.status', 1)
             ->where('student_fees_new.status', 'Debt')
             ->get();
 
@@ -1092,6 +1094,7 @@ class FeesController extends AppBaseController
             ->select('fees_new.category', 'organization_user.organization_id')
             ->distinct()
             ->orderBy('fees_new.category')
+            ->where('fees_new.status', 1)
             ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
@@ -1104,6 +1107,7 @@ class FeesController extends AppBaseController
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
             ->select('fees_new.*')
             ->orderBy('fees_new.category')
+            ->where('fees_new.status', 1)
             ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
