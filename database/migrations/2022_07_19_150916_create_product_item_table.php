@@ -15,7 +15,7 @@ class CreateProductItemTable extends Migration
     {
         Schema::create('product_item', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name')->nullable();
+            $table->string('name');
             $table->string('desc')->nullable();
             $table->integer('quantity')->nullable();
             $table->double('price', 8, 2)->nullable();

@@ -15,10 +15,10 @@ class CreateOrganizationHoursTable extends Migration
     {
         Schema::create('organization_hours', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('day')->nullable();
+            $table->integer('day');
             $table->time('open_hour')->nullable();
             $table->time('close_hour')->nullable();
-            $table->integer('status')->nullable();
+            $table->integer('status');
             $table->timestamps();
             $table->unsignedBigInteger('organization_id')->index();
 

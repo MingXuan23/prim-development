@@ -28,22 +28,11 @@
 
 @section('content')
 
-<div class="row align-items-center">
-  <div class="col-sm-6">
-      <div class="page-title-box">
-          <h4 class="font-size-18">Peniaga</h4>
-          <ol class="breadcrumb mb-0">
-              <li class="breadcrumb-item active">Peniaga >> Pesanan Anda</li>
-          </ol>
-      </div>
-  </div>
-</div>
-
 <div class="container">
   <div class="row d-flex justify-content-center align-items-center">
     <div class="col">
       <div class="d-flex justify-content-center align-items-center">
-        <span class="h2 mb-4">Senarai Pesanan</span>
+        <span class="h2 m-4">Senarai Pesanan</span>
       </div>
 
       <div class="card">
@@ -73,7 +62,7 @@
                       <td class="align-middle">{{ $row->quantity }}</td>
                       <td class="align-middle">{{ number_format($row->price , 2, '.', '') }}</td>
                       <td class="align-middle">
-                          <button type="button" data-cart-order-id="{{ $row->id }}" class="delete-item btn btn-danger">Buang</button>
+                          <button type="button" data-cart-order-id="{{ $row->id }}" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>
                       </td>
                     </tr>
                   @empty

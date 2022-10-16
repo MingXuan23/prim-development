@@ -20,8 +20,6 @@
     </div>
 </div>
 
-<h5>Isi Pesanan</h5>
-
 <div class="row">
     <div class="col-12">
       <div class="card">
@@ -46,7 +44,9 @@
                     </div>
                 </a>
                 @empty
-                <p><i>Tiada Jenis Produk</i></p>
+                <div class="row justify-content-center align-items-center">
+                    <i>Tiada Jenis Produk</i>
+                </div>
                 @endforelse
             </div>
         </div>
@@ -66,8 +66,22 @@
                 @csrf
                 <div class="modal-body">
                     <div class="alert" id="popup" style="display: none"></div>
-                    <input type="text" placeholder="Categori" name="name" id="name" required>
-                    <input type="number" placeholder="Restock setiap berapa minit" name="duration" id="duration" required>
+                    <div class="row justify-content-between align-items-center m-2">
+                        
+                        <div class="form-group required">
+                            <label class="col">Nama Kategori</label>
+                            <div class="col">
+                                <input class="form-control" type="text" placeholder="Categori" name="name" id="name" required>
+                            </div>
+                        </div>
+                        <div class="form-group required">
+                            <label class="col">Durasi perbuatan produk (minit)</label>
+                            <div class="col">
+                                <input class="form-control" type="number" placeholder="Durasi" name="duration" id="duration" required>
+                            </div>
+                        </div>
+                        
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>

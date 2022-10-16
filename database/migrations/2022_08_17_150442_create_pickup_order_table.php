@@ -19,8 +19,9 @@ class CreatePickupOrderTable extends Migration
             $table->dateTime('pickup_date')->nullable();
             $table->double('total_price', 8, 2)->nullable();
             $table->mediumText('note')->nullable();
-            $table->integer('status')->nullable();
+            $table->integer('status');
             $table->softDeletes();
+            $table->dateTime('expired_at')->nullable();
             $table->unsignedBigInteger('user_id')->index();
             $table->unsignedBigInteger('organization_id')->index();
 

@@ -21,7 +21,7 @@
       <div class="page-title-box">
           <h4 class="font-size-18"></i>Kemaskini Produk Item</h4>
           <div class="form-group">
-            <label>Urus Produk <i class="fas fa-angle-right"></i> Product Item <i class="fas fa-angle-right"></i> Kemaskini - {{ $item->name }}</label>
+            <label><a href="{{ route('admin.merchant.product') }}" class="text-muted">Urus Produk</a> <i class="fas fa-angle-right"></i> <a href="{{ route('admin.merchant.product-item', $group->id) }}" class="text-muted">{{ $group->name }}</a> <i class="fas fa-angle-right"></i> Kemaskini - {{ $item->name }}</label>
           </div>
       </div>
   </div>
@@ -50,12 +50,17 @@
                 @else
                 <img class="rounded img-fluid bg-dark" id="img-size" src="{{ URL($image_url.$item->image) }}">
                 @endif
-                <div class="form-group">
+                <div class="form-group required custom-file" style="margin-top: 9px">
+                  <label class="custom-file-label" for="image">Gambar Item</label>
+                  <input class="custom-file-input" type="file" name="image" id="image">
+                </div>
+                {{-- <div class="form-group">
+                  
                     <label>Ubah Gambar</label>
                     <div class="fallback">
                         <input name="image" type="file">
                     </div>
-                </div>
+                </div> --}}
             </div>
 
             <div class="col-xl-9">

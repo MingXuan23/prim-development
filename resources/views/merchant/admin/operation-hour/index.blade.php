@@ -24,41 +24,44 @@
         </div>
         @endif
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-striped table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>Hari</th>
-                        <th>Buka/Tutup</th>
-                        <th>Waktu Buka</th>
-                        <th>Waktu Tutup</th>
-                        <th>Action</th>
+                        <th style="width: 10%" class="text-center">Hari</th>
+                        <th style="width: 10%" class="text-center">Buka/Tutup</th>
+                        <th style="width: 20%">Waktu Buka</th>
+                        <th style="width: 20%">Waktu Tutup</th>
+                        <th style="width: 10%" class="text-center">Action</th>
                     </tr>
                 </thead>
                 
                 <tbody>
                     @foreach($hour as $row)
                     <tr>
-                        <td>{{ $dayName[$row->day] }}</td>
-                        <td>
+                        <td class="text-center align-middle">{{ $day_name[$row->day] }}</td>
+                        <td class="text-center align-middle">
                             {!! ($row->status == 1) 
                             ? "<span class='badge rounded-pill bg-success text-white'>Buka</span>"
                             : "<span class='badge rounded-pill bg-danger text-white'>Tutup</span>" !!}
                         </td>
-                        <td>
+                        <td class="align-middle">
                             {!! ($row->status == 1) 
                             ? date_format(date_create($row->open_hour), "h:i A")
                             : "" !!}    
                         </td>
-                        <td>
+                        <td class="align-middle">
                             {!! ($row->status == 1) 
                             ? date_format(date_create($row->close_hour), "h:i A")
                             : "" !!}
                         </td>
-                        <td>
-                            <button data-hour-id="{{ $row->id }}" class="edit-time-btn btn btn-primary">Edit</button>
+                        <td class="text-center align-middle">
+                            <button data-hour-id="{{ $row->id }}" class="edit-time-btn btn btn-primary"><i class="fas fa-pencil-alt"></i></button>
                         </td>
                     </tr>
                     @endforeach
+                    <tr>
+                        <td colspan="5" class="text-center"><i>Sebarang perubahan boleh menyebabkan pesanan perlu dikemaskini.</i></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -70,7 +73,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Edit</h4>
+                <h4 class="modal-title">Kemaskini Hari <strong class="day-name"></strong></h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -150,7 +153,7 @@
                     $('.order-exists').empty()
                 },
                 success:function(result) {
-                    // status = result.hour.status
+                    $('.day-name').empty().append(result.day_name[result.hour.day])
                     if(result.hour.status == 1)
                     {
                         $('.status option[value='+result.hour.status+']').attr('selected', true)

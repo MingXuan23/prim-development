@@ -17,7 +17,7 @@ class CreateQueuesTable extends Migration
             $table->bigIncrements('id');
             $table->time('slot_time');
             $table->integer('status');
-            $table->integer('slot_number');
+            $table->integer('slot_number')->nullable();
             $table->unsignedBigInteger('product_group_id');
             $table->timestamps();
             

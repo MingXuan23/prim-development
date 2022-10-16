@@ -276,36 +276,51 @@ class OrganizationController extends Controller
                 'day' => 1,
                 'status' => 0,
                 'organization_id' => $id,
+                'created_at' => now(),
+                'updated_at' => now(),
+
             ],
             [
                 'day' => 2,
                 'status' => 0,
                 'organization_id' => $id,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'day' => 3,
                 'status' => 0,
                 'organization_id' => $id,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'day' => 4,
                 'status' => 0,
                 'organization_id' => $id,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'day' => 5,
                 'status' => 0,
                 'organization_id' => $id,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'day' => 6,
                 'status' => 0,
                 'organization_id' => $id,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
             [
                 'day' => 0,
                 'status' => 0,
                 'organization_id' => $id,
+                'created_at' => now(),
+                'updated_at' => now(),
             ],
         ]);
     }

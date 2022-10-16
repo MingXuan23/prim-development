@@ -29,7 +29,7 @@ class MerchantController extends Controller
             $q->where('organization_hours.day', $day);
         }])
         ->where('type_org', 2132)
-        ->get();
+        ->paginate(5);
         
         foreach($merchant as $row)
         {
@@ -45,62 +45,80 @@ class MerchantController extends Controller
         $org_id = $request->get('o_id');
         $day_body = "";
         $order_id = "";
+        $pickup_date = "";
 
-        $query = PickUpOrder::where([['user_id', $user_id], ['organization_id', $org_id], ['status', 1]]);
-        $allDay = OrganizationHours::where('organization_id', $org_id)->where('status', 1)->get(); // Get all open day organization
-        
-        $exist = $query->exists();
+        $order = PickUpOrder::where([
+            ['user_id', $user_id], ['organization_id', $org_id], ['status', 1]
+        ])
+        ->select('id', 'pickup_date')
+        ->first();
+
+         // Get all open day organization
         
         # If Order already exists for this organization
-        if(!$exist)
+        if(!$order)
         {
-            $day_body = $this->getDayBody($allDay);
+            $day_body = $this->getDayBody($org_id);
         }
         else
         {
-            $order = $query->first();
             $order_id = $order->id;
-
+            $pickup_date = Carbon::parse($order->pickup_date)->format('Y-m-d h:i A');
             $isDelete = $this->deleteExpiredOrder($order_id);
 
             if($isDelete)
             {
-                $day_body = $this->getDayBody($allDay);
+                $day_body = $this->getDayBody($org_id);
             }
         }
-        return response()->json(['order_id' => $order_id, 'path' => '/merchant/'.$org_id, 'day_body' => $day_body]);
+        return response()->json(['order_id' => $order_id, 'pickup_date' => $pickup_date, 'path' => '/merchant/'.$org_id, 'day_body' => $day_body]);
     }
 
-    private function getDayBody($all_open_days)
+    private function getDayBody($organization_id)
     {
-        $dayNameMY = array("Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu");
-        $dayNameEN = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
+        $day_name_MY = array("Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu");
 
         $body = "";
+        $max_day = 7; // Check database organization
 
-        $isPast = array();
-        
-        foreach($all_open_days as $row)
-        {
-            $TodayDay = Carbon::now()->format('l'); // Get Day Name
+        $today_day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName(Carbon::now()->format('l')); // Return integer based on name
 
-            $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($TodayDay); // Return integer based on name
-
-            $key = strval($row->day);
-
-            $isPast = app('App\Http\Controllers\CooperativeController')->getDayStatus($day, $row->day, $isPast, $key); // Check and return day is past or this week
-        }
+        $all_open_days = OrganizationHours::where('organization_id', $organization_id)->where('status', 1)->get();
 
         foreach($all_open_days as $row)
         {
-            if($TodayDay == $dayNameEN[$row->day]) // If day array is Today
+            if($today_day == $row->day)
             {
                 $body .= "<option value='".$row->day."'>Hari ini</option>";
+                $day = $row->day;
             }
-            else
+        }
+
+        $all_day_except_open = OrganizationHours::where([
+            ['organization_id', $organization_id],
+            ['status', 1],
+            ['day', '!=' , $day],
+        ])->get();
+
+        for($i = 0; $i < $max_day; $i++)
+        {
+            # If the day is Saturday, then change it to Sunday if it still looping
+            if($day == 7 && $i < $max_day)
             {
-                $body .= "<option value='".$row->day."'>". $dayNameMY[$row->day]." ".$isPast[$row->day]."</option>";
+                $day = 0;
             }
+            
+            if($day != $today_day)
+            {
+                foreach($all_day_except_open as $row)
+                {
+                    if($day == $row->day)
+                    {
+                        $body .= "<option value='".$day."'>".$day_name_MY[$day]."</option>";
+                    }
+                }
+            }
+            $day++;
         }
 
         return $body;
@@ -147,7 +165,7 @@ class MerchantController extends Controller
         
         if($daySelected == $TodayDayInt) // If day selected in select option is today
         {
-            $min_required_time = $Today->addHour(2)->toTimeString(); // Add 2 hour to current time
+            $min_required_time = $Today->addHour(1)->toTimeString(); // Add 1 hour to current time
 
             // check if current time(after add) is between open and close hour
             if($min <= $min_required_time && $max >= $min_required_time)
@@ -249,14 +267,6 @@ class MerchantController extends Controller
         
         $close_hour = date('h:i A', strtotime($oh->close_hour));
         # <End> Get Data for Organization
-        
-        // $order = PickUpOrder::where([
-        //     ['user_id', $user_id],
-        //     ['organization_id', $id],
-        //     ['status', 1],
-        // ])->first();
-
-        // $pickup_time = Carbon::parse($order->pickup_date)->toTimeString();
 
         $product_item = DB::table('product_item as pi')
         ->join('product_group as pg', 'pg.id', '=', 'pi.product_group_id')
@@ -264,20 +274,11 @@ class MerchantController extends Controller
             ['pg.organization_id', $id],
             ['pg.deleted_at', NULL],
             ['pi.deleted_at', NULL],
-            // ['q.slot_time', '>=', $pickup_time]
         ])
         ->select('pi.id', 'pi.name as item_name', 'pi.desc', 'pi.price', 'pi.image', 'pi.status', 'pi.product_group_id')
         ->orderBy('pi.product_group_id', 'asc')
         ->orderBy('item_name')  
         ->get();
-
-        
-        // $product_item = ProductItem::with(['product_group' => function($q) use ($id){
-        //     $q->where('product_group.organization_id', $id);
-        // }])
-        // ->orderBy('product_group_id', 'asc')
-        // ->orderBy('name')
-        // ->get();
 
         $product_type = ProductGroup::where('organization_id', $id)
         ->orderBy('id', 'asc')
@@ -318,10 +319,35 @@ class MerchantController extends Controller
         ->first();
 
         $maxQuantity = $this->getMaxQuantityBySlotTime($i_id, $o_id);
-        
-        $modal = '<input id="quantity_input" type="text" value="1" name="quantity_input">';
+
+        $modal = $this->createQuantityBody($i_id, $o_id, $maxQuantity);
 
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $maxQuantity]);
+    }
+
+    private function createQuantityBody($item_id, $organization_id, $max_quantity_by_slot)
+    {
+        $user_id = Auth::id();
+
+        $order = DB::table('product_order as po')->join('pickup_order as pu', 'pu.id', '=', 'po.pickup_order_id')
+        ->where([
+            ['pu.user_id', $user_id],
+            ['pu.organization_id', $organization_id],
+            ['po.product_item_id', $item_id],
+            ['pu.status', 1],
+        ])
+        ->select('quantity')
+        ->first();
+
+        $body = '<div class="row justify-content-center"><i>Kuantiti Maximum : '.$max_quantity_by_slot.'</i></div>';
+        if(!$order) {
+            $body .= '<input id="quantity_input" type="text" value="1" name="quantity_input">';
+        } else {
+            $body .= '<input id="quantity_input" type="text" value="'.$order->quantity.'" name="quantity_input">';
+            $body .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->quantity.'</i></div>';
+        }
+
+        return $body;
     }
 
     private function getMaxQuantityBySlotTime($item_id, $org_id)
@@ -334,7 +360,7 @@ class MerchantController extends Controller
             ['status', 1],
         ])->first();
 
-        $min_open_day = $this->getDayOrder($order->pickup_date, $org_id);
+        $min_open_day = $this->getOpenHourByDate($order->pickup_date, $org_id);
         
         $pickup_time = Carbon::parse($order->pickup_date)->toTimeString();
             
@@ -351,7 +377,7 @@ class MerchantController extends Controller
         return $maxQuantity;
     }
 
-    private function getDayOrder($dateOrder, $organization_id)
+    private function getOpenHourByDate($dateOrder, $organization_id)
     {
         $todayDate = Carbon::parse($dateOrder)->format('l');
         $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($todayDate);
@@ -368,7 +394,7 @@ class MerchantController extends Controller
         $o_id = $request->get('o_id');
         $quantity = $request->get('quantity');
         $userID = Auth::id();
-
+        
         # Get user order
         $order = PickUpOrder::where([
             ['user_id', $userID],
@@ -384,18 +410,9 @@ class MerchantController extends Controller
         ]);
 
         $cartExist = $cart->exists();
-
-        # If cart exists assigned product_order_id
-        if($cartExist)
-        {
-            $p_o_id = $cart->first()->id;
-            $p_queue = DB::table('product_queue')->where('product_order_id', $p_o_id);
-            # If product_queue of user order is exists -> delete data to replace
-            if($p_queue->exists())
-            {
-                $p_queue->delete();
-            }
-        }
+        
+        # If product queue data exists
+        $temp_pqueue = $this->checkProductQueueExists($cart);
 
         $userOrderDateTime = $order->pickup_date;
 
@@ -408,13 +425,19 @@ class MerchantController extends Controller
 
         # Get queue available based on day and time
         $queue = $this->getQueueData($userOrderDateTime, $o_id, $product_group_id);
-
+        
         if(count($queue) != 0)
         {
             # Get data for product_queue
             $pq_data = $this->getProductQueueData($queue, $quantity, $allItem, $MAX_ITEM_QUANTITY);
 
             if($pq_data == 0) {
+                if(count($temp_pqueue) != 0) {
+                    foreach($temp_pqueue as $row)
+                    {
+                        DB::table('product_queue')->insert($row);
+                    }
+                }
                 $msg = 'Harap maaf, kuantiti yang dimasukkan melebihi kekosongan yang ada';
                 return response()->json(['alert' => $msg]);
             }
@@ -423,6 +446,7 @@ class MerchantController extends Controller
                 if($cartExist)
                 {
                     $cart->update(['quantity' => $quantity,]);
+                    $p_o_id = $cart->first()->id;
                 }
                 else
                 {
@@ -466,6 +490,34 @@ class MerchantController extends Controller
         }
     }
 
+    private function checkProductQueueExists($cart)
+    {
+        $temp_pqueue = array();
+        $cartExist = $cart->exists();
+
+        if($cartExist)
+        {
+            $p_o_id = $cart->first()->id;
+            $p_queue = DB::table('product_queue')->where('product_order_id', $p_o_id)->get();
+            # If product_queue of user order is exists -> delete data to replace
+            if(count($p_queue) != 0)
+            {
+                foreach($p_queue as $row)
+                {
+                    $temp_pqueue[] = [
+                        'quantity_slot' => $row->quantity_slot,
+                        'product_order_id' => $row->product_order_id,
+                        'queue_id' => $row->queue_id,
+                    ];
+                    
+                    DB::table('product_queue')->where('id', $row->id)->delete();
+                }
+            }
+        }
+
+        return $temp_pqueue;
+    }
+
     public function checkDateForQueue($order_datetime, $organization_id, $item_id)
     {
         $startDaySelect = Carbon::parse($order_datetime)->startOfDay()->format('Y-m-d H:i:s');
@@ -487,7 +539,7 @@ class MerchantController extends Controller
 
     private function getQueueData($order_datetime, $organization_id, $pg_id)
     {   
-        $min_open_day = $this->getDayOrder($order_datetime, $organization_id);
+        $min_open_day = $this->getOpenHourByDate($order_datetime, $organization_id);
 
         $today_date = Carbon::now()->toDateString();
         $today_time = Carbon::now()->minute(0)->second(0)->addHour()->toTimeString();
@@ -684,7 +736,7 @@ class MerchantController extends Controller
         foreach($order as $row)
         {
             $total_price[$row->id] = number_format($row->total_price, 2, '.', '');
-            $pickup_date[$row->id] = Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+            $pickup_date[$row->id] = Carbon::parse($row->pickup_date)->format('d/m/y h:i A');
         }
 
         return view('merchant.order', compact('order', 'total_price', 'pickup_date'));

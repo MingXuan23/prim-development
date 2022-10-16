@@ -57,6 +57,14 @@
 
 @section('content')
 
+<div class="row align-items-center">
+  <div class="col-sm-6">
+      <div class="page-title-box">
+          <h4 class="font-size-18"><a href="{{ route('merchant.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
+      </div>
+  </div>
+</div>
+
 <div class="row mt-4 ">
   <div class="col-12">
     <div class="card border border-dark">
@@ -227,6 +235,7 @@
         },
         success:function(result)
         { 
+          console.log(result)
           $('.cart-add-btn').show()
           $('.loading').hide()
           $('div.flash-message').empty()
@@ -239,10 +248,17 @@
             $('div.flash-message').show()
             $('div.flash-message').append(message)
             $('div.flash-message').delay(3000).fadeOut()
+            $("html, body").animate({ scrollTop: 0 }, "slow");
           }
           else
           {
-            $('#item_alert').append(result.alert)
+            $('#addToCartModal').modal('hide')
+
+            var message = "<div class='alert alert-danger'>"+result.alert+"</div>"
+            $('div.flash-message').show()
+            $('div.flash-message').append(message)
+            $('div.flash-message').delay(3000).fadeOut()
+            $("html, body").animate({ scrollTop: 0 }, "slow");
           }
         },
         error:function(result)

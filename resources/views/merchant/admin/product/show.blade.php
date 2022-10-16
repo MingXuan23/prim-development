@@ -19,7 +19,7 @@
 <div class="row align-items-center">
     <div class="col">
         <div class="page-title-box">
-            <h4 class="font-size-18">Urus Produk <i class="fas fa-angle-right"></i> Produk Item</h4>
+            <h4 class="font-size-18"><a href="{{ route('admin.merchant.product') }}" class="text-muted">Urus Produk</a> <i class="fas fa-angle-right"></i> {{ $group->name }}</h4>
         </div>
     </div>
     <div class="d-flex mr-3">
@@ -45,12 +45,12 @@
                 <thead>
                     <tr>
                         <th>No.</th>
-                        <th>Gambar</th>
+                        <th class="text-center">Gambar</th>
                         <th>Nama</th>
                         <th>Deskripsi</th>
                         <th>Kuantiti Per Slot</th>
                         <th>Harga (RM)</th>
-                        <th>Action</th>
+                        <th class="text-center">Action</th>
                     </tr>
                 </thead>
                 
@@ -58,7 +58,7 @@
                     @php($i = 0)
                     @forelse($item as $row)
                     <tr>
-                      <td>{{ ++$i }}.</td>
+                      <td class="align-middle">{{ ++$i }}.</td>
                       <td class="text-center">
                         <img class="rounded img-fluid bg-dark" id="img-size" src="
                         @if($row->image == null)
@@ -68,13 +68,13 @@
                         @endif
                         ">
                       </td>
-                      <td>{{ $row->name }}</td>
-                      <td>{!! $row->desc ?: "<i>Tiada Deskripsi</i>" !!}</td>
-                      <td>{{ $row->quantity }}</td>
-                      <td>{{ number_format($row->price, 2, '.', '') }}</td>
-                      <td>
-                        <a href="{{ route('admin.merchant.edit-item', ['id' => $group->id, 'item' => $row->id]) }}" class="edit-item-modal btn btn-primary">Edit</a>
-                        <button data-item-id="{{ $row->id }}" data-image-url="{{ $image_url }}" class="delete-item-modal btn btn-danger">Buang</button>
+                      <td class="align-middle">{{ $row->name }}</td>
+                      <td class="align-middle">{!! $row->desc ?: "<i>Tiada Deskripsi</i>" !!}</td>
+                      <td class="align-middle">{{ $row->quantity }}</td>
+                      <td class="align-middle">{{ number_format($row->price, 2, '.', '') }}</td>
+                      <td class="align-middle text-center">
+                        <a href="{{ route('admin.merchant.edit-item', ['id' => $group->id, 'item' => $row->id]) }}" class="edit-item-modal btn btn-primary"><i class="fas fa-pencil-alt"></i></a>
+                        <button data-item-id="{{ $row->id }}" data-image-url="{{ $image_url }}" class="delete-item-modal btn btn-danger"><i class="fas fa-trash-alt"></i></button>
                       </td>
                     </tr>
                     @empty
@@ -100,11 +100,23 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-body">
-                    <input type="hidden" name="group_id" value="{{ $group->id }}">
-                    <input type="text" placeholder="Categori" value="{{ $group->name }}" name="name" required>
-                    <input type="number" placeholder="Restock setiap berapa minit" value="{{ $group->duration }}" name="duration" required>
+                    <div class="row justify-content-between align-items-center m-2">
+                        <div class="form-group required">
+                            <label class="col">Nama Kategori</label>
+                            <div class="col">
+                                <input class="form-control" type="text" placeholder="Categori" name="name" id="name" value="{{ $group->name }}" required>
+                            </div>
+                        </div>
+                        <div class="form-group required">
+                            <label class="col">Durasi perbuatan produk (minit)</label>
+                            <div class="col">
+                                <input class="form-control" type="number" placeholder="Durasi" name="duration" id="duration" value="{{ $group->duration }}" required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
+                    <input type="hidden" name="group_id" value="{{ $group->id }}">
                     <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
                     <button type="submit" id="update_group" class="btn btn-primary">Kemaskini</button>
                 </div>
@@ -150,12 +162,48 @@
                 @csrf
                 <div class="modal-body">
                     <div class="alert" id="popup" style="display: none"></div>
+                    <div class="row justify-content-center align-items-center">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Nama Item</label>
+                                <input class="form-control" type="text" placeholder="Nama Item" name="item_name" id="item_name" required>
+                            </div>
+                            
+                        </div>
+
+                        <div class="col" style="margin-top: 13px">
+                            <div class="form-group required custom-file">
+                                <label class="custom-file-label" for="item_image">Gambar Item</label>
+                                <input class="custom-file-input" type="file" name="item_image" id="item_image">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Deskripsi Item</label>
+                                <input class="form-control" type="text" placeholder="Deskripsi" name="item_desc" id="item_desc">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Kuantiti Setiap Durasi</label>
+                                <input class="form-control" type="number" placeholder="Kuantiti Per Slot" name="item_quantity" id="item_quantity" min="1" step="1" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group required">
+                                <label class="control-label">Harga (RM)</label>
+                                <input class="form-control" type="number" placeholder="Harga" name="item_price" id="item_price" min="0.01" step="any" required>
+                            </div>
+                        </div>
+                    </div>
                     <input type="hidden" name="group_id" value="{{ $group->id }}">
-                    <input type="text" placeholder="Nama Item" name="item_name" id="item_name" required>
-                    <input type="file" name="item_image" id="item_image">
-                    <input type="text" placeholder="Deskripsi" name="item_desc" id="item_desc">
-                    <input type="number" placeholder="Kuantiti Per Slot" name="item_quantity" id="item_quantity" min="1" step="1" required>
-                    <input type="number" placeholder="Harga" name="item_price" id="item_price" min="0.01" step="any" required>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
@@ -196,6 +244,11 @@
     $(document).ready(function() {
         $('.alert-success').delay(2000).fadeOut()
         $('.alert-danger').delay(3000).fadeOut()
+
+        $(".custom-file-input").on("change", function() {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
         
         $.ajaxSetup({
             headers: {

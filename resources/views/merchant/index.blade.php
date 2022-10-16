@@ -40,6 +40,8 @@
   </div> --}}
 </div>
 
+@csrf
+
 <div class="row">
   <div class="col-12">
     <div class="card">
@@ -51,43 +53,43 @@
           </div>
           @endif
 
-          @foreach($merchant as $row)
+          @forelse($merchant as $row)
             @if($oh_status[$row->id] == 1)
-            {{-- <a href="{{ route('merchant.show', $row->id) }}" class="list-group-item list-group-item-action flex-column"> --}}
-            <a id="order_modal" data-org-id="{{ $row->id }}" class="list-group-item list-group-item-action flex-column">
-            @csrf
+            <a data-org-id="{{ $row->id }}" class="order_modal list-group-item list-group-item-action flex-column">
             @else
-            <a id="closed_modal" class="list-group-item list-group-item-action flex-column" style="opacity: 50%">
+            <a class="closed_modal list-group-item list-group-item-action flex-column" style="opacity: 50%">
             @endif
               <div class="d-flex" >
                   <img class="rounded img-fluid bg-dark" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
                   <div class="flex-column ml-2">
-                      <h4 class="merchant_name" id="{{$oh_status[$row->id]}}">{{ $row->nama }}</h4>
+                      <h4 class="merchant_name">
+                        {!! 
+                        $oh_status[$row->id] == 1 ? $row->nama : $row->nama." <label class='text-danger'>Closed</label>" 
+                        !!}
+                      </h4>
                       <div class="d-flex">
                         <div class="justify-content-center align-items-center mr-2">
                           <i class="fas fa-map-marker-alt"></i>
                         </div>
                         <p class="m-0">{{ $row->address }} , {{$row->city}} , {{$row->state}}</p>
                       </div>
-                      
-                      {{-- <p class="m-0"><i class="mdi mdi-bike-fast mr-2"></i>RM </p> --}}
-                      {{-- <p class="m-0"><i class="mdi mdi-food mr-2"></i> </p>--}}
                   </div>
                   <div class="arrow-icon ml-auto justify-content-end align-self-center">
                       <h1><i class="fas fa-angle-right"></i></h1>
                   </div>
               </div>
             </a>
-          @endforeach
-          {{-- <div class="text-center">
-            <p><i>Tiada Restoran di dalam Negeri anda</i></p>
-          </div> --}}
-
-          {{-- <div class="row mt-2 ">
-            <div class="col d-flex justify-content-end">
-              this is for links
+            @empty
+            <div class="text-center">
+              <p><i>Tiada Peniaga buat masa sekarang</i></p>
             </div>
-          </div> --}}
+          @endforelse
+          
+          <div class="row mt-2 ">
+            <div class="col d-flex justify-content-end">
+              {{ $merchant->links() }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -169,7 +171,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-            Anda mahu <strong>teruskan</strong> dengan pesanan yang masih aktif ataupun <strong>membatalkan</strong> pesanan tersebut dan membuat pesanan baharu?
+            Anda mempunyai pesanan yang <strong>aktif</strong> pada <strong id="exists_date_time"></strong> ataupun <strong>membatalkan</strong> pesanan tersebut dan membuat pesanan baharu?
           </div>
           <div class="modal-footer">
             <button type="button" data-dismiss="modal" class="btn btn-danger" id="destroy_order">Batal Pesanan Lama</button>
@@ -187,11 +189,7 @@
 
 <script>
     $(document).ready(function() {
-      if($('.merchant_name').attr('id') == 0){
-        $('.merchant_name').append(' <label class="text-danger">Closed</label>')
-      }
-
-      $('#closed_modal').click(function(){
+      $('.closed_modal').click(function(){
           $('#merchantClosedModal').modal('show')
       })
 
@@ -203,10 +201,10 @@
 
       var org_id, path, order_id;
 
-      $('#order_modal').click(function(e) {
+      $('.order_modal').click(function(e) {
         e.preventDefault();
         org_id = $(this).attr('data-org-id')
-
+        
         $.ajax({
           url: "{{ route('merchant.fetchDay') }}",
           method: "POST",
@@ -229,6 +227,8 @@
             {
               path = result.path
               order_id = result.order_id
+              
+              $('#exists_date_time').empty().append(result.pickup_date)
               $('#orderExistModal').modal('show')
               
               // console.log(result)

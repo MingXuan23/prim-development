@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
+use Yajra\DataTables\DataTables;
 
 class AdminMerchantController extends Controller
 {
@@ -45,18 +47,19 @@ class AdminMerchantController extends Controller
     /* START OPERATION HOURS SECTION */
     public function showOperationHours()
     {
-        $dayName = array('Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu');
+        $day_name = array('Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu');
         $org_id = $this->getOrganizationId();
         $hour = OrganizationHours::where('organization_id', $org_id)->get();
 
-        return view('merchant.admin.operation-hour.index', compact('dayName', 'hour'));
+        return view('merchant.admin.operation-hour.index', compact('day_name', 'hour'));
     }
 
     public function editOperationHours(Request $request)
     {
+        $day_name = array('Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu');
         $hour = OrganizationHours::find($request->hour_id);
 
-        return response()->json(['hour' => $hour]);
+        return response()->json(['hour' => $hour, 'day_name' => $day_name]);
     }
 
     public function updateOperationHours(Request $request)
@@ -320,7 +323,7 @@ class AdminMerchantController extends Controller
             # Get all order that are on the same date
             $all_order[$row->id] = app('App\Http\Controllers\Merchant\MerchantController')
             ->checkDateForQueue($date_time, $org_id, $row->product_item_id);
-
+            
             # Get queue id based on the change date time
             $queue[$row->id] = $this->getQueueArray($date_time, $org_id, $item->product_group_id);
 
@@ -543,34 +546,6 @@ class AdminMerchantController extends Controller
         }
     }
 
-    public function destroyOrder(Request $request)
-    {
-        $id = $request->o_id;
-
-        $order = PickUpOrder::find($id);
-        $order->update(['status' => 100]);
-        $update_order = $order->delete();
-        
-        $cart = ProductOrder::where('pickup_order_id', $id);
-        $getCartID = $cart->select('id')->get();
-
-        foreach($getCartID as $row)
-        {
-            $po_id[] = $row->id;
-        }
-        
-        $delete_pq = DB::table('product_queue')->whereIn('product_order_id', $po_id)->delete();
-
-        $cart->update(['status' => 100]);
-        $update_cart = $cart->delete();
-        
-        if($update_order && $delete_pq && $update_cart) {
-            Session::flash('success', 'Pesanan Berjaya Dibuang');
-        } else {
-            Session::flash('error', 'Pesanan Gagal Dibuang');
-        }
-    }
-
     public function updateNewOperationHours(Request $request)
     {
         $update_hour = OrganizationHours::find($request->hour_id)->update([
@@ -607,7 +582,7 @@ class AdminMerchantController extends Controller
             'organization_id' => $org_id,
         ]);
 
-        $queue = $this->getQueueByMinutes($pg, $org_id);
+        $queue = $this->getQueueByMinutes($pg);
         
         # Insert in Queue Table
         Queue::insert($queue);
@@ -615,31 +590,15 @@ class AdminMerchantController extends Controller
         return back()->with('success', 'Jenis Produk Berjaya Direkodkan');
     }
 
-    private function getQueueByMinutes($product_group, $organization_id)
+    private function getQueueByMinutes($product_group)
     {
-        # Get Maximum and Minimum value of when the organization close(max) and open(min)
-        $max = OrganizationHours::where('organization_id', $organization_id)->max('close_hour');
-        $min = OrganizationHours::where('organization_id', $organization_id)->min('open_hour');
-
-        # Formatting Value
-        $max_f = Carbon::parse($max);
-        $min_f = Carbon::parse($min);
-
-        # Get Difference of Min and Max
-        $diffTime = $max_f->diff($min_f)->format('%H:%I:%S');
-
-        # Convert Time Difference into Minutes
-        $time = Carbon::parse($diffTime); // Formatting
-        $start_of_day = Carbon::parse($diffTime)->startOfDay(); // Get 00:00:00
-        $total_minutes = $time->diffInMinutes($start_of_day); // Get minutes by differenciate time in minutes
-
-        # Initialize variable
+        $start_day = Carbon::now()->startOfDay()->toTimeString();
+        $total_minutes = 1440; // total minutes in a day
         $duration = $product_group->duration;
-        $temp = $min_f;
-        $data = array(0 => ["slot_time" => $min, "status" => 1, "slot_number" => 1, "product_group_id" => $product_group->id, "created_at" => Carbon::now(), "updated_at" => Carbon::now()]); // Initialize first row of queue (opening hour/ Min)
-
+        $temp = Carbon::parse($start_day);
+        $data = array(0 => ["slot_time" => $start_day, "status" => 1, "slot_number" => 1, "product_group_id" => $product_group->id, "created_at" => Carbon::now(), "updated_at" => Carbon::now()]); // Initialize first row of queue (opening hour/ Min)
         # Loop until the total duration more or equal to total minutes
-        for($newDuration = $duration, $i = 2; $newDuration <= $total_minutes; $newDuration += $duration, $i++)
+        for($newDuration = $duration, $i = 2; $newDuration < $total_minutes; $newDuration += $duration, $i++)
         {
             $temp_f = $temp->addMinutes($duration)->format('H:i:s');  // Add minutes to current time var
             $data[] = [
@@ -701,27 +660,29 @@ class AdminMerchantController extends Controller
     public function destroyProductGroup(Request $request)
     {
         $item = DB::table('product_item')
-        ->where('product_group_id', $request->group_id);
+        ->where('product_group_id', $request->group_id)->get();
 
-        $item_image = $item->first()->image;
-
-        if($item_image != NULL)
+        foreach($item as $row)
         {
-            $file = public_path($request->image_url.$item_image);
-            $exists = File::exists($file);
-            
-            if($exists)
+            if($row->image != NULL)
             {
-                File::delete($file);
+                $file = public_path($request->image_url.$row->image);
+                $exists = File::exists($file);
+                
+                if($exists)
+                {
+                    File::delete($file);
+                }
             }
+
+            DB::table('product_item')->where('id',$row->id)->update([
+                'status' => 0,
+                'deleted_at' => Carbon::now()->toDateTimeString(),
+            ]);
         }
 
-        $item->update([
-            'status' => 0,
-            'deleted_at' => Carbon::now()->toDateTimeString(),
-        ]);
-
         ProductGroup::find($request->group_id)->delete();
+        DB::table('queues')->where('product_group_id', $request->group_id)->delete();
 
         return redirect('/admin-merchant/product-dashboard')->with('success', 'Jenis Produk Berjaya Dibuang');
     }
@@ -775,13 +736,13 @@ class AdminMerchantController extends Controller
     public function editProductItem(Request $request, $id, $item_id)
     {
         $item = ProductItem::find($item_id);
-        
-        $org_id = ProductGroup::find($id)->organization_id;
+        $group = ProductGroup::find($id);
+        $org_id = $group->organization_id;
         $org_name = Organization::find($org_id)->nama;
 
         $image_url = "merchant-image/product-item/".$org_name."/";
 
-        return view('merchant.admin.product.edit', compact('item', 'image_url'));
+        return view('merchant.admin.product.edit', compact('item', 'image_url', 'group'));
     }
 
     public function updateProductItem(Request $request)
@@ -858,11 +819,225 @@ class AdminMerchantController extends Controller
         return view('merchant.admin.order.index');
     }
 
+    public function getAllOrder(Request $request)
+    {
+        $org_id = $this->getOrganizationId();
+        $total_price[] = 0;
+        $pickup_date[] = 0;
+        $filteredID = array();
+        $order_day = $request->order_day;
+
+        $order = DB::table('pickup_order as pu')
+                ->join('users as u', 'pu.user_id', '=', 'u.id')
+                ->whereIn('status', [2,4])
+                ->where('organization_id', $org_id)
+                ->select('pu.id', 'pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
+                'u.name', 'u.telno')
+                ->orderBy('status', 'desc')
+                ->orderBy('pickup_date', 'asc')
+                ->orderBy('pu.updated_at', 'desc')
+                ->get();
+        
+        if(request()->ajax()) 
+        {
+            if($order_day == "") 
+            {
+                $order = $order;
+            }
+            else
+            {
+                foreach($order as $row) {
+                    $day_pickup = Carbon::parse($row->pickup_date)->format('l');
+                    $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($day_pickup);
+                    if($day == $order_day) {
+                        $filteredID[] = $row->id;
+                    }
+                }
+
+                $order = DB::table('pickup_order as pu')
+                ->join('users as u', 'pu.user_id', '=', 'u.id')
+                ->whereIn('pu.id', $filteredID)
+                ->select('pu.id', 'pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
+                'u.name', 'u.telno')
+                ->orderBy('status', 'desc')
+                ->orderBy('pickup_date', 'asc')
+                ->orderBy('pu.updated_at', 'desc');
+            }
+
+            $table = Datatables::of($order);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == 2) {
+                    $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya dibayar</span>';
+                    return $btn;
+                } else {
+                    $btn = '<span class="badge rounded-pill bg-danger text-white">Tidak Diambil</span>';
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $btn = '<div class="d-flex justify-content-center align-items-center">';
+                $btn = $btn.'<button type="button" class="btn-done-pickup btn btn-primary mr-2" data-order-id="'.$row->id.'"><i class="fas fa-clipboard-check"></i></button>';
+                $btn = $btn.'<button type="button" class="btn-cancel-order btn btn-danger" data-order-id="'.$row->id.'">';
+                $btn = $btn.'<i class="fas fa-trash-alt"></i></button></div>';
+
+                return $btn;
+            });
+
+            $table->editColumn('note', function ($row) {
+                if($row->note != null) {
+                    return $row->note;
+                } else {
+                    return "<i>Tiada Nota</i>";
+                }
+                return number_format($row->total_price, 2, '.', '');
+            });
+
+            $table->editColumn('total_price', function ($row) {
+                $total_price = number_format($row->total_price, 2, '.', '');
+                $total = $total_price." | ";
+                $total = $total."<a href='".route('admin.merchant.list', $row->id)."'>Lihat Pesanan</a>";
+                return $total;
+            });
+
+            $table->editColumn('pickup_date', function ($row) {
+                return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+            });
+
+            $table->rawColumns(['note', 'total_price', 'status', 'action']);
+
+            return $table->make(true);
+        }
+    }
+
+    public function confirmOrder(Request $request)
+    {
+        $order_id = $request->o_id;
+        $update_order = PickUpOrder::find($order_id)->update(['status' => 3]);
+        $update_cart = ProductOrder::where('pickup_order_id', $order_id)->update(['status' => 3]);
+
+        if ($update_order && $update_cart) {
+            Session::flash('success', 'Pesanan Berjaya Diambil');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Pesanan Gagal Disahkan');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
     public function showHistoryOrder()
     {
         return view('merchant.admin.order.history');
     }
+
+    public function getAllHistory(Request $request)
+    {
+        $org_id = $this->getOrganizationId();
+        $total_price[] = 0;
+        $pickup_date[] = 0;
+        $filteredID = array();
+        $order_day = $request->order_day;
+
+        $order = DB::table('pickup_order as pu')
+                ->join('users as u', 'pu.user_id', '=', 'u.id')
+                ->whereIn('status', [3,100, 200])
+                ->where('organization_id', $org_id)
+                ->select('pu.id', 'pu.pickup_date', 'pu.total_price', 'pu.status',
+                'u.name', 'u.telno')
+                ->orderBy('pickup_date', 'asc')
+                ->orderBy('pu.updated_at', 'desc')
+                ->get();
+        
+        if(request()->ajax()) 
+        {
+            if($order_day == "") 
+            {
+                $order = $order;
+            }
+            else
+            {
+                foreach($order as $row) {
+                    $day_pickup = Carbon::parse($row->pickup_date)->format('l');
+                    $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($day_pickup);
+                    if($day == $order_day) {
+                        $filteredID[] = $row->id;
+                    }
+                }
+
+                $order = DB::table('pickup_order as pu')
+                ->join('users as u', 'pu.user_id', '=', 'u.id')
+                ->whereIn('pu.id', $filteredID)
+                ->select('pu.id', 'pu.pickup_date', 'pu.total_price', 'pu.status',
+                'u.name', 'u.telno')
+                ->orderBy('pickup_date', 'asc')
+                ->orderBy('pu.updated_at', 'desc');
+            }
+
+            $table = Datatables::of($order);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == 3) {
+                    $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya diambil</span>';
+                    return $btn;
+                } else if($row->status == 100) {
+                    $btn = '<span class="badge rounded-pill bg-danger text-white">Dibatalkan</span>';
+                    return $btn;
+                } else if($row->status == 200) {
+                    $btn = '<span class="badge rounded-pill bg-danger text-white">Dibatalkan</span>';
+                    return $btn;
+                }
+            });
+
+            $table->editColumn('total_price', function ($row) {
+                $total_price = number_format($row->total_price, 2, '.', '');
+                $total = $total_price." | ";
+                $total = $total."<a href='".route('admin.merchant.list', $row->id)."'>Lihat Pesanan</a>";
+                return $total;
+            });
+
+            $table->editColumn('pickup_date', function ($row) {
+                return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+            });
+
+            $table->rawColumns(['total_price', 'status']);
+
+            return $table->make(true);
+        }
+    }
     /* END ORDER SECTION */
+
+    public function destroyOrder(Request $request)
+    {
+        $id = $request->o_id;
+
+        $order = PickUpOrder::find($id);
+        $order->update(['status' => 100]);
+        $update_order = $order->delete();
+        
+        $cart = ProductOrder::where('pickup_order_id', $id);
+        $getCartID = $cart->select('id')->get();
+
+        $po_id = array();
+
+        foreach($getCartID as $row)
+        {
+            $po_id[] = $row->id;
+        }
+        
+        $delete_pq = DB::table('product_queue')->whereIn('product_order_id', $po_id)->delete();
+
+        $cart->update(['status' => 100]);
+        $update_cart = $cart->delete();
+        
+        if($update_order && $delete_pq && $update_cart) {
+            Session::flash('success', 'Pesanan Berjaya Dibuang');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Pesanan Gagal Dibuang');
+            return View::make('layouts/flash-messages');
+        }
+    }
 
     public function showList($id)
     {

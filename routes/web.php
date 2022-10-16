@@ -228,7 +228,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin-merchant', 'namespace
     
     /* Order Dashboard Route */
     Route::get('/show-orders', 'AdminMerchantController@showAllOrder')->name('admin.merchant.order');
+    Route::get('order-list', 'AdminMerchantController@getAllOrder')->name('admin.merchant.order-list');
+    Route::post('confirm-order', 'AdminMerchantController@confirmOrder')->name('admin.merchant.confirm-order');
     Route::get('/show-orders/history', 'AdminMerchantController@showHistoryOrder')->name('admin.merchant.history');
+    Route::get('history-list', 'AdminMerchantController@getAllHistory')->name('admin.merchant.history-list');
 });
 
 
