@@ -34,7 +34,7 @@
                               <div class="form-group required">
                                 <select name="type" id="type" class="form-control"
                                     data-parsley-required-message="Sila masukkan jenis produk" required>
-                                    <option value="{{ $edit->product_type_id }}">{{$test->type_name }}</option>
+                                    <option value="{{ $edit->product_group_id }}">{{$test->type_name }}</option>
                                     @foreach($type as $row)
                                      <option value="{{ $row->id }}">{{ $row->name }}</option>
                                      @endforeach

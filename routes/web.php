@@ -192,6 +192,13 @@ Route::group(['prefix' => 'koperasi'], function () {
     Route::get('/Confirm/delete/{id}','CooperativeController@notConfirm')->name('koperasi.notConfirm');
 });
 
+Route::group(['prefix' => 'koperasi'], function () {
+    Route::get('/koop','CooperativeController@indexKoop')->name('koperasi.indexKoop');
+    Route::get('/koop/{id}','CooperativeController@koopShop')->name('koperasi.koopShop');
+    Route::get('/koop/store/{id}','CooperativeController@storeKoop')->name('koperasi.storeKoop');
+    Route::get('/koop/{id}/cart','CooperativeController@koopCart')->name('koperasi.koopCart');
+});
+
 Route::group(['middleware' => ['auth'], 'prefix' => 'merchant'], function() {
     Route::get('/', 'MerchantController@merchantList')->name('merchant.index');
 

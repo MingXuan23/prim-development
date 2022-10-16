@@ -161,6 +161,7 @@ class CooperativeController extends Controller
                 $newQuantity = intval((int)$item->quantity - (int)$request->item_quantity);
 
                 $newOrder = PickUpOrder::create([
+                    'method_status' => 1,
                     'total_price' => $totalPrice,
                     'status' => 1,
                     'user_id' => $userID,
@@ -305,7 +306,7 @@ class CooperativeController extends Controller
         $org = PickUpOrder::where('id', $id)->select('organization_id as id')->first();
 
         $daySelect = (int)$request->week_status;
-        
+                
         $pickUp = Carbon::now()->next($daySelect)->toDateString();
         
         PickUpOrder::where([
@@ -634,7 +635,7 @@ class CooperativeController extends Controller
         else if($date == "Sunday") { $day = 0; }
         return $day;
     }
-
+    
     public function indexAdmin( )
     {
         $userID = Auth::id();
@@ -656,7 +657,7 @@ class CooperativeController extends Controller
     public function createProduct()
     {
         
-        $type = DB::table('product_type')->get();
+        $type = DB::table('product_group')->get();
         return view('koperasi-admin.add',compact('type'));
     }
 
@@ -692,7 +693,7 @@ class CooperativeController extends Controller
         'quantity' => $request->input('quantity'),
         'price' => $request->input('price'),
         'status'=> $request->input('status'),
-        'product_type_id' => $request ->input('type'),
+        'product_group_id' => $request ->input('type'),
         'organization_id' => $org->id,     
        ]);
 
@@ -712,12 +713,12 @@ class CooperativeController extends Controller
         
         $edit = DB::table('product_item')->where('id',$id)->first();
         $test = DB::table('product_item as p')
-        ->join('product_type as pt', 'p.product_type_id', '=', 'pt.id')
+        ->join('product_group as pt', 'p.product_group_id', '=', 'pt.id')
         ->select('p.*', 'pt.name as type_name')
         ->get()
         ->where('id',$id)
         ->first();
-        $type = DB::table('product_type')->get();
+        $type = DB::table('product_group')->get();
         return view('koperasi-admin.edit',compact('type'),compact('test'))
         ->with('test',$test)
         ->with('edit',$edit);
@@ -739,7 +740,7 @@ class CooperativeController extends Controller
             'quantity' => $request->quantity,
             'price' => $request->price,
             'status'=> $request->status,
-            'product_type_id' => $request->type,
+            'product_group_id' => $request->type,
             'organization_id' => $org->id,
           
         ]);
@@ -872,20 +873,22 @@ class CooperativeController extends Controller
                     ->where('ou.role_id', 1239)
                     ->first();
 
-        $customer = DB::table('koop_order as o')
+        $customer = DB::table('pickup_order as o')
                     ->join('users as ou','o.user_id','=','ou.id')
-                    ->select('o.*','ou.*','o.id as id')
+                    ->join('organization_user as op','o.organization_id','=','op.organization_id')
+                    ->where('op.user_id', $userID)
+                    ->select('o.*','ou.*','op.*','o.id as id','o.status as status')
                     ->get();
 
-
         return view('koperasi-admin.confirm',compact('koperasi'),compact('customer'))->with('customer',$customer);
+        // return view('koperasi-admin.confirm');
+ 
     }
 
     public function storeConfirm(Request $request,Int $id)
     {
         $userID = Auth::id();
-
-        $customer = DB::table('koop_order')
+        $customer = DB::table('pickup_order')
                     ->where('id',$id)
                     ->update([
                         'status' => 3 ,
@@ -897,7 +900,7 @@ class CooperativeController extends Controller
     {
         $userID = Auth::id();
 
-        $customer = DB::table('koop_order')
+        $customer = DB::table('pickup_order')
                     ->where('id',$id)
                     ->update([
                         'status' => 4 ,
@@ -905,4 +908,62 @@ class CooperativeController extends Controller
          return redirect('koperasi/Confirm');
     }
 
+    public function indexKoop()
+    {
+        $sekolah = DB::table('organizations')
+                   ->where('type_org',1039)
+                   ->get();
+        return view('koop.index',compact('sekolah'))->with('sekolah',$sekolah);
+    }
+
+    public function koopShop(Int $id)
+    {
+        $sekolah = DB::table('organizations')
+        ->where('type_org',1039)
+        ->where('id',$id)
+        ->get();
+
+        $product = DB::table('product_item as p')
+        ->where('p.organization_id',$id)
+        ->get();
+
+        
+        $todayDate = Carbon::now()->format('l');
+
+        $day = $this->getDayIntegerByDayName($todayDate);
+
+        $koperasi = DB::table('organizations as o')
+        ->join('organization_hours as oh', 'o.id', '=', 'oh.organization_id')
+        ->where('o.id', $id)
+        ->where('oh.day', $day)
+        ->select('o.id', 'o.nama', 'o.telno', 'o.address', 'o.city', 'o.postcode', 'o.state', 'o.parent_org',
+                'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
+        ->first();
+
+        $k_open_hour = date('h:i A', strtotime($koperasi->open_hour));
+        
+        $k_close_hour = date('h:i A', strtotime($koperasi->close_hour));
+
+        return view('koop.koop')
+        ->with('sekolah',$sekolah)
+        ->with('product',$product)
+        ->with('koperasi',$koperasi)
+        ->with('k_open_hour', $k_open_hour)
+        ->with('k_close_hour', $k_close_hour);
+    }
+
+    public function storeKoop()
+    {
+        return redirect('koperasi/koop');
+    }
+
+    public function koopCart(Int $id)
+    {
+        $sekolah = DB::table('organizations')
+        ->where('type_org',1039)
+        ->where('id',$id)
+        ->get();
+
+        return view('koop.cart',)->with('sekolah',$sekolah);
+    }
 }
