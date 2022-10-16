@@ -10,6 +10,7 @@
 |
 */
 
+use App\Http\Controllers\CooperativeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -177,7 +178,21 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi'], function() {
     Route::get('/{id}/list', 'CooperativeController@indexList')->name('koperasi.list');
 });
 
-Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => 'Merchant'], function() {
+Route::group(['prefix' => 'koperasi'], function () {
+    Route::get('/admin','CooperativeController@indexAdmin')->name('koperasi.indexAdmin');
+    Route::get('/produk','CooperativeController@createProduct')->name('koperasi.createProduct');
+    Route::post('/produk','CooperativeController@storeProduct')->name('koperasi.storeProduct');
+    Route::get('/produk/update/{id}','CooperativeController@editProduct')->name('koperasi.editProduct');
+    Route::post('/produk/update/{id}','CooperativeController@updateProduct')->name('koperasi.updateProduct');
+    Route::get('/produk/delete/{id}','CooperativeController@deleteProduct')->name('koperasi.deleteProduct');
+    Route::get('/openingHours','CooperativeController@indexOpening')->name('koperasi.indexOpening');
+    Route::post('/openingHours','CooperativeController@storeOpening')->name('koperasi.storeOpening');
+    Route::get('/Confirm','CooperativeController@indexConfirm')->name('koperasi.indexConfirm');
+    Route::get('/Confirm/update/{id}','CooperativeController@storeConfirm')->name('koperasi.storeConfirm');
+    Route::get('/Confirm/delete/{id}','CooperativeController@notConfirm')->name('koperasi.notConfirm');
+});
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'merchant'], function() {
     Route::get('/', 'MerchantController@merchantList')->name('merchant.index');
 
     Route::get('order', 'MerchantController@showOrder')->name('merchant.order');

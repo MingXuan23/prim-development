@@ -26,7 +26,6 @@ class OrganizationController extends Controller
     {
         // after launch remove where
         $type_org = TypeOrganization::all();
-        
         $states = Jajahan::negeri();
         return view('organization.add', compact('type_org', 'states'));
     }
