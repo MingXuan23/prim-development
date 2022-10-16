@@ -275,3 +275,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
     Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
     Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
 });
+
+Route::group(['prefix' => 'clothing', 'namespace' => 'Clothing'],function() {
+    Route::get('', 'ClothingLandingPageController@indexClothing')->name('clothing.index');
+    Route::get('/{link}', 'ClothingLandingPageController@urlProduct')->name('clothing.url');
+});

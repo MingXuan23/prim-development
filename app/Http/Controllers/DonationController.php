@@ -282,7 +282,7 @@ class DonationController extends Controller
                         ->where('url', '=' , $link)
                         ->first();
         // dd($donation);
-
+        
         if($donation->status == 0)
         {
             return view('errors.404');
