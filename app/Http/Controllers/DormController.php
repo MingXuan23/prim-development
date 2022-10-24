@@ -80,13 +80,23 @@ class DormController extends Controller
 
         if(count($organization) > 0)
         {
-            $checkin = DB::table('organization_roles')
+            if(Auth::user()->hasRole('Superadmin')){
+                $checkin = DB::table('organization_roles')
+                    ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                    ->where([
+                        ['ou.user_id', Auth::user()->id],
+                    ])
+                    ->value('ou.check_in_status');
+            }
+            else{
+                $checkin = DB::table('organization_roles')
                 ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
                 ->where([
                     ['ou.user_id', Auth::user()->id],
                     ['ou.organization_id', $organization[0]->id],
                 ])
                 ->value('ou.check_in_status');
+            }
 
             $isblacklisted = DB::table('students')
                 ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -2903,15 +2913,17 @@ class DormController extends Controller
         // dd($id);
         preg_match_all('!\d+!', $id, $rolesCheckIn);
 
+        
         $organization = $this->getOrganizationByUserId();
 
-        if(count($rolesCheckIn) <= 1){
-            $rolesCheckIn[1] = 0;
+        if(count($rolesCheckIn[0]) == 1){
+            $rolesCheckIn[0][1] = 0;
         }
 
         //is superadmin
-        if((int)$rolesCheckIn[0] == 1){
-            if ((int)$rolesCheckIn[1] == 1) {
+        if(Auth::user()->hasRole('Superadmin')){
+            if ((int)$rolesCheckIn[0][1] == 1) {
+                
                 $result = DB::table('organization_user as ou')
                     ->where([
                         ['ou.user_id', Auth::user()->id],
@@ -2931,7 +2943,7 @@ class DormController extends Controller
             } 
         }
 
-        if ((int)$rolesCheckIn[1] == 1) {
+        if ((int)$rolesCheckIn[0][1] == 1) {
             $result = DB::table('organization_user as ou')
                 ->where([
                     ['ou.organization_id', $organization[0]->id],
@@ -2952,11 +2964,12 @@ class DormController extends Controller
                 ]);
         } 
 
+        
         if($result){
-            return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0])->with('success', 'Data is successfully updated');
+            return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0][0])->with('success', 'Data is successfully updated');
         }
         else{
-            return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0])->withErrors('Anda tidak dibenarkan untuk daftar masuk');
+            return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0][0]);
         }
     }
 
