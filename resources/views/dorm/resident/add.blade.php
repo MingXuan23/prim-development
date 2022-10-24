@@ -58,16 +58,19 @@
                     <div class="form-row">
                         <div class="form-group col-md-12">
                             <label>Nama Penuh Murid</label>
-                            <input type="text" name="name" class="form-control" placeholder="Nama Penuh Murid">
+                            <select name="name" id="name" class="form-control">
+                                <option value="" selected disabled>Pilih Pelajar</option>
+                                
+                            </select>
                         </div>
                     </div>
 
-                    <div class="form-row">
+                    <!-- <div class="form-row">
                         <div class="form-group col-md-12">
                             <label>Email Pelajar</label>
                             <input type="text" id="email" name="email" class="form-control" placeholder="Email Pelajar">
                         </div>
-                    </div>
+                    </div> -->
                     
                     <div class="form-group mb-0">
                         <div>
@@ -98,6 +101,7 @@
     $(document).ready(function(){
         
         $("#organization").prop("selectedIndex", 1).trigger('change');
+        $("#name").prop("selectedIndex", 0);
         fetchDorm($("#organization").val());
 
         $('#organization').change(function() {
@@ -125,6 +129,48 @@
                 });
             }
         });
+
+        $('#dorm').change(function(){
+            if($(this).val() != '')
+            {
+                var organizationid    = $("#organization option:selected").val();
+                var _token            = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('dorm.schoolStudent') }}",
+                    method:"POST",
+                    data:{ oid:organizationid,
+                            _token:_token },
+                    success:function(result)
+                    {  
+                        $('#name').empty();
+                        $("#name").append("<option value='' disabled selected> Pilih Pelajar</option>");
+                        jQuery.each(result.success, function(key, value){
+                            $("#name").append("<option value='"+ value.id + "'>" + value.nama + "</option>");
+                        });
+                    }
+
+                });
+            }
+        })
+
+        function schoolStudent(organizationid = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('dorm.schoolStudent') }}",
+                method:"POST",
+                data:{ oid:organizationid,
+                        _token:_token },
+                success:function(result)
+                {
+                    $('#name').empty();
+                    $("#name").append("<option value='' disabled selected> Pilih Pelajar</option>");
+                    jQuery.each(result.success, function(key, value){
+                        $("#name").append("<option value='"+ value.id + "'>" + value.nama + "</option>");
+                    });
+                }
+            })
+        }
+        
 
         function fetchDorm(organizationid = ''){
             var _token = $('input[name="_token"]').val();

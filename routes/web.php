@@ -303,7 +303,6 @@ Route::resource('dorm', 'DormController');
 Route::group(['prefix' => 'sekolah'], function () {
     // application
     Route::get('dorm/indexRequest/{id}','DormController@indexRequest')->name('dorm.indexRequest');
-    // Route::get('dorm/{id}','DormController@index')->name('dorm.indexRequest');
     Route::get('dorm/getStudentOutingDatatable', 'DormController@getStudentOutingDatatable')->name('dorm.getStudentOutingDatatable');
     Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
     Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
@@ -333,7 +332,7 @@ Route::group(['prefix' => 'sekolah'], function () {
     Route::get('dorm/updateResident/{id}', 'DormController@updateResident')->name('dorm.updateResident');
     Route::post('dorm/destroyResident/{id}', 'DormController@destroyResident')->name('dorm.destroyResident');
     Route::post('dorm/fetchDorm', 'DormController@fetchDorm')->name('dorm.fetchDorm');
-    Route::post('dorm/fetchClass', 'DormController@fetchClass')->name('dorm.fetchClass');
+    Route::post('dorm/schoolStudent', 'DormController@schoolStudent')->name('dorm.schoolStudent');
     Route::get('dorm/getResidentsDatatable', 'DormController@getResidentsDatatable')->name('dorm.getResidentsDatatable');
 
     //dorm management

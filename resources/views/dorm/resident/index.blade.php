@@ -27,7 +27,7 @@
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected disabled>Pilih Organisasi</option>
                         @foreach($organization as $row)
-                        @if($row->id == $dorm[0]->organization_id)
+                        @if($row->id == $dorm->organization_id)
                         <option value="{{ $row->id }}" selected> {{ $row->nama }} </option>
                         @else
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
@@ -37,9 +37,9 @@
                     </select>
                 </div>
 
-                @foreach($dorm as $row)
-                <option id="isselecteddorm" value="{{ $row->id }}" hidden>{{$row->name}}</option>
-                @endforeach
+
+                <option id="isselecteddorm" value="{{ $dorm->id }}" hidden>{{$dorm->name}}</option>
+
                 <div class="form-group">
                     <label>Nama Asrama </label>
                     <select name="dorm" id="dorm" class="form-control">

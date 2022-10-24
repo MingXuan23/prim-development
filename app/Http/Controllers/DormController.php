@@ -103,9 +103,9 @@ class DormController extends Controller
             // dd($roles);
             return view('dorm.index', compact('roles', 'checkin', 'organization', 'isblacklisted'));
         }
-        else{
-            //return 404
-        }
+
+        return view('errors.404');
+        
     }
 
     public function indexReportAll()
@@ -148,7 +148,6 @@ class DormController extends Controller
     public function indexResident($id)
     {
         // 
-        $userId = Auth::id();
         $organization = $this->getOrganizationByRole();
 
         $roles = DB::table('organization_roles')
@@ -158,23 +157,32 @@ class DormController extends Controller
             ])
             ->select('organization_roles.nama', 'ou.organization_id')
             ->get();
-        // dd($organization[0]->id);
-        if (
-            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
-            Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
-        ) {
+
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')) 
+        {
             $dorm = DB::table('dorms')
-                ->select('dorms.organization_id', 'dorms.id as id', 'dorms.name')
                 ->where([
-                    // ['organizations.id', $organization[0]->id],
                     ['dorms.id', $id],
                 ])
+                ->select('dorms.organization_id', 'dorms.id as id', 'dorms.name')
                 ->orderBy('dorms.name')
-                ->get();
+                ->first();
         }
 
-        // dd($dorm);
-        return view("dorm.resident.index", compact('dorm', 'organization', 'roles'));
+        if(isset($dorm)){
+            $organ = $organization->toArray();
+            foreach($organ as $organ){
+                if(in_array($dorm->organization_id, $organ)){
+                    foreach($roles as $roles){
+                        if($dorm->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard"){
+                            return view("dorm.resident.index", compact('dorm', 'organization', 'roles'));
+                        }
+                    }
+                }
+            }
+        }
+
+        return view('errors.404');
     }
 
     public function indexDorm()
@@ -800,15 +808,11 @@ class DormController extends Controller
         $this->validate($request, [
             'name'              =>  'required',
             'organization'      =>  'required',
-            'email'             =>  'required',
             'dorm'              =>  'required'
         ]);
 
         $organizationid = $request->get('organization');
         $neworganizationid = (int)$organizationid;
-
-        $stdname = $request->get('name');
-        $stdemail = $request->get('email');
 
         $dormid = $request->get('dorm');
         $newdormid = (int)$dormid;
@@ -817,8 +821,7 @@ class DormController extends Controller
         $student = DB::table('students')
             ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
             ->where([
-                [strtoupper('students.nama'), strtoupper($stdname)],
-                ['students.email', $stdemail],
+                ['students.id', $request->get('name')],
                 ['cs.status', 1],
             ])
             ->select('students.id as id', 'cs.dorm_id', 'cs.blacklist')
@@ -927,6 +930,7 @@ class DormController extends Controller
                 'student_outing.apply_date_time',
                 'students.nama',
                 'students.email',
+                'students.parent_tel',
                 'student_outing.reason',
                 'cs.dorm_id',
                 'classifications.id as cid',
@@ -939,7 +943,7 @@ class DormController extends Controller
             ->groupBy('classifications.name')
             ->first();
 
-        if (isset($studentouting)) {
+        if (isset($studentouting) && str_contains($studentouting->parent_tel, Auth::user()->telno)) {
             $organization = $this->getOrganizationByUserId();
             $categoryReal = $this->categoryReal;
 
@@ -967,6 +971,7 @@ class DormController extends Controller
                 return view('dorm.update', compact('organization', 'start', 'end', 'studentouting'));
             }
         }
+        return view('errors.404');
     }
 
     public function editOuting($id)
@@ -980,15 +985,27 @@ class DormController extends Controller
 
         $organization = $this->getOrganizationByUserId();
 
-        $roles = DB::table('organization_roles')
-            ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-            ->where([
-                ['ou.user_id', Auth::user()->id],
-            ])
-            ->select('organization_roles.nama', 'ou.organization_id')
-            ->get();
-
-        return view('dorm.outing.update', compact('outing', 'organization', 'id', 'roles'));
+        if(isset($outing)){
+            $organ = $organization->toArray();
+            foreach($organ as $organ){
+                if(in_array($outing->organization_id, $organ)){
+                    $roles = DB::table('organization_roles')
+                        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                        ->where([
+                            ['ou.user_id', Auth::user()->id],
+                        ])
+                        ->select('organization_roles.nama', 'ou.organization_id')
+                        ->get();
+                    foreach($roles as $roles){
+                        if($outing->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard"){
+                            return view('dorm.outing.update', compact('outing', 'organization', 'id', 'roles'));
+                        }
+                    }
+                }
+            }
+        }
+    
+        return view('errors.404');
     }
 
     public function editOutingReason($id)
@@ -1019,35 +1036,49 @@ class DormController extends Controller
         $resident = DB::table('dorms')
             ->join('class_student', 'class_student.dorm_id', '=', 'dorms.id')
             ->join('students', 'students.id', '=', 'class_student.student_id')
-            ->select('dorms.id as dorm_id', 'dorms.organization_id', 'dorms.name as dormname', 'class_student.student_id as id', 'students.nama as studentname', 'students.email', 'students.parent_tel')
+            ->select('dorms.id as dorm_id', 'dorms.organization_id', 'dorms.name as dormname', 'class_student.student_id as id', 'students.nama as studentname', 'students.parent_tel')
             ->where([
                 ['class_student.id', $id],
                 ['class_student.status', 1],
             ])
             ->orderBy('dorms.name')
             ->first();
+        
+        $organization = $this->getOrganizationByUserId();
 
-        $dormlist = DB::table('dorms')
-            ->join('organizations', 'organizations.id', '=', 'dorms.organization_id')
-            ->select('dorms.id as id', 'dorms.name')
-            ->where([
-                ['dorms.organization_id', $resident->organization_id]
+        if(isset($resident)){
+            $organ = $organization->toArray();
+            foreach($organ as $organ){
+                if(in_array($resident->organization_id, $organ)){
+                    
+                    $roles = DB::table('organization_roles')
+                    ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                    ->where([
+                        ['ou.user_id', Auth::user()->id],
+                    ])
+                    ->select('organization_roles.nama', 'ou.organization_id')
+                    ->get();
 
-            ])
-            ->orderBy('dorms.name')
-            ->get();
+                    foreach($roles as $roles){
+                        if($resident->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard"){
+                            $dormlist = DB::table('dorms')
+                            ->join('organizations', 'organizations.id', '=', 'dorms.organization_id')
+                            ->select('dorms.id as id', 'dorms.name')
+                            ->where([
+                                ['dorms.organization_id', $resident->organization_id]
 
-        $organization = $this->getOrganizationByRole();
+                            ])
+                            ->orderBy('dorms.name')
+                            ->get();
 
-        $roles = DB::table('organization_roles')
-            ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-            ->where([
-                ['ou.user_id', Auth::user()->id],
-            ])
-            ->select('organization_roles.nama', 'ou.organization_id')
-            ->get();
-
-        return view('dorm.resident.update', compact('resident', 'dormlist', 'organization', 'roles'));
+                            return view('dorm.resident.update', compact('resident', 'dormlist', 'organization', 'roles'));
+                        }
+                    }
+                }
+            }
+        }
+  
+        return view ('errors.404');
     }
 
     public function getID($id)
@@ -1203,16 +1234,12 @@ class DormController extends Controller
         // dd($id);
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required',
             'dorm' => 'required',
             'organization' => 'required'
         ]);
 
         $organizationid = $request->get('organization');
         $neworganizationid = (int)$organizationid;
-
-        $stdname = $request->get('name');
-        $stdemail = $request->get('email');
 
         $dormid = $request->get('dorm');
         $newdormid = (int)$dormid;
@@ -1229,8 +1256,7 @@ class DormController extends Controller
             ->join('students', 'students.id', '=', 'class_student.student_id')
             ->where([
                 ['class_student.id', $id],
-                ['students.nama', $stdname],
-                ['students.email', $stdemail]
+                ['students.nama', $request->get('name')],
             ])
             ->select('class_student.id as id', 'class_student.student_id', 'class_student.dorm_id')
             ->get();
@@ -1276,10 +1302,10 @@ class DormController extends Controller
                     ->where('dorms.id', $olddormid[0]->dormid)
                     ->update(['student_inside_no' => $olddormid[0]->student_inside_no - 1]);
 
-                return redirect()->to('/sekolah/dorm/indexResident/' . $newdormid)->with('success', 'New student has been added successfully');
+                return redirect()->to('/sekolah/dorm/indexResident/' . $newdormid)->with('success', 'Student has been added successfully');
             }
         }
-        return redirect()->to('/sekolah/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm', 'Possible problem: Dorm is full  |  Student not found  |  Student is reside in the dorm']);
+        return redirect()->to('/sekolah/dorm/indexResident/' . $newdormid)->withErrors(['Failed to add student into dorm']);
     }
 
     public function updateDorm(Request $request, $id)
@@ -1471,15 +1497,18 @@ class DormController extends Controller
     }
 
     public function getOrganizationByRole(){
+        $userId = Auth::user()->id;
         if(Auth::user()->hasRole('Superadmin')){
             return Organization::all();
         }
         else{
-            return DB::table('organizations')
-            ->join('organization_user as ou', 'ou.organization_id', '=', 'organizations.id')
-            ->where('ou.user_id', Auth::user()->id)
-            ->whereIn('ou.role_id', [4,5,7,8])
+            return Organization::whereHas('user', function ($query) use ($userId) {
+                $query->where('user_id', $userId)->Where(function ($query) {
+                    $query->whereIn('organization_user.role_id', [2, 4, 5, 7, 8]);
+                });
+            })
             ->select('organizations.id as id', 'organizations.nama')
+            ->distinct()
             ->get();
         }
     }
@@ -2078,6 +2107,23 @@ class DormController extends Controller
             ->distinct()
             ->get();
         }
+
+        return response()->json(['success' => $student]);
+    }
+
+    public function schoolStudent(Request $request)
+    {
+        $oid = $request->get('oid');
+        $student = DB::table('students')
+        ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
+        ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+        ->where([
+            ['co.organization_id', $oid],
+            ['cs.status', 1],
+        ])
+        ->select('students.nama', 'students.id')
+        ->distinct()
+        ->get();
 
         return response()->json(['success' => $student]);
     }
