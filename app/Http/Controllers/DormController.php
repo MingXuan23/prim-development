@@ -99,9 +99,10 @@ class DormController extends Controller
                 ])
                 ->select('cs.blacklist', 'students.nama')
                 ->get();
-
-            // dd($roles);
-            return view('dorm.index', compact('roles', 'checkin', 'organization', 'isblacklisted'));
+            
+            $checkNum = $roles."|".$checkin;
+            // dd($checkNum);
+            return view('dorm.index', compact('roles', 'checkin', 'checkNum', 'organization', 'isblacklisted'));
         }
 
         return view('errors.404');
@@ -169,12 +170,12 @@ class DormController extends Controller
                 ->first();
         }
 
-        if(isset($dorm)){
+        if(isset($dorm) || Auth::user()->hasRole('Superadmin')){
             $organ = $organization->toArray();
             foreach($organ as $organ){
-                if(in_array($dorm->organization_id, $organ)){
+                if(in_array($dorm->organization_id, $organ) || Auth::user()->hasRole('Superadmin')){
                     foreach($roles as $roles){
-                        if($dorm->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard"){
+                        if(($dorm->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard") || Auth::user()->hasRole('Superadmin')){
                             return view("dorm.resident.index", compact('dorm', 'organization', 'roles'));
                         }
                     }
@@ -985,19 +986,19 @@ class DormController extends Controller
 
         $organization = $this->getOrganizationByUserId();
 
-        if(isset($outing)){
+        if(isset($outing) || Auth::user()->hasRole('Superadmin')){
             $organ = $organization->toArray();
             foreach($organ as $organ){
-                if(in_array($outing->organization_id, $organ)){
+                if(in_array($outing->organization_id, $organ) || Auth::user()->hasRole('Superadmin')){
                     $roles = DB::table('organization_roles')
-                        ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
-                        ->where([
-                            ['ou.user_id', Auth::user()->id],
-                        ])
-                        ->select('organization_roles.nama', 'ou.organization_id')
-                        ->get();
+                    ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
+                    ->where([
+                        ['ou.user_id', Auth::user()->id],
+                    ])
+                    ->select('organization_roles.nama', 'ou.organization_id')
+                    ->get();
                     foreach($roles as $roles){
-                        if($outing->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard"){
+                        if(Auth::user()->hasRole('Superadmin') || ($outing->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard")){
                             return view('dorm.outing.update', compact('outing', 'organization', 'id', 'roles'));
                         }
                     }
@@ -1046,10 +1047,10 @@ class DormController extends Controller
         
         $organization = $this->getOrganizationByUserId();
 
-        if(isset($resident)){
+        if(isset($resident) || Auth::user()->hasRole('Superadmin')){
             $organ = $organization->toArray();
             foreach($organ as $organ){
-                if(in_array($resident->organization_id, $organ)){
+                if(in_array($resident->organization_id, $organ) || Auth::user()->hasRole('Superadmin')){
                     
                     $roles = DB::table('organization_roles')
                     ->join('organization_user as ou', 'ou.role_id', '=', 'organization_roles.id')
@@ -1060,7 +1061,7 @@ class DormController extends Controller
                     ->get();
 
                     foreach($roles as $roles){
-                        if($resident->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard"){
+                        if($resident->organization_id == $roles->organization_id && $roles->nama != "Penjaga" && $roles->nama != "Guard" || Auth::user()->hasRole('Superadmin')){
                             $dormlist = DB::table('dorms')
                             ->join('organizations', 'organizations.id', '=', 'dorms.organization_id')
                             ->select('dorms.id as id', 'dorms.name')
@@ -1117,7 +1118,6 @@ class DormController extends Controller
         //
         $this->validate($request, [
             'name'         =>  'required',
-            'email'        =>  'required',
             'category'     =>  'required',
             'reason'       =>  'required',
             'start_date'   =>  'required',
@@ -2900,10 +2900,39 @@ class DormController extends Controller
 
     public function updateCheckIn($id)
     {
+        // dd($id);
+        preg_match_all('!\d+!', $id, $rolesCheckIn);
+
         $organization = $this->getOrganizationByUserId();
 
-        if ($id == 1) {
-            DB::table('organization_user as ou')
+        if(count($rolesCheckIn) <= 1){
+            $rolesCheckIn[1] = 0;
+        }
+
+        //is superadmin
+        if((int)$rolesCheckIn[0] == 1){
+            if ((int)$rolesCheckIn[1] == 1) {
+                $result = DB::table('organization_user as ou')
+                    ->where([
+                        ['ou.user_id', Auth::user()->id],
+                    ])
+                    ->update([
+                        'ou.check_in_status' => 0,
+                    ]);
+            }
+            else {
+                $result = DB::table('organization_user as ou')
+                    ->where([
+                        ['ou.user_id', Auth::user()->id],
+                    ])
+                    ->update([
+                        'ou.check_in_status' => 1,
+                    ]);
+            } 
+        }
+
+        if ((int)$rolesCheckIn[1] == 1) {
+            $result = DB::table('organization_user as ou')
                 ->where([
                     ['ou.organization_id', $organization[0]->id],
                     ['ou.user_id', Auth::user()->id],
@@ -2911,8 +2940,9 @@ class DormController extends Controller
                 ->update([
                     'ou.check_in_status' => 0,
                 ]);
-        } else {
-            DB::table('organization_user as ou')
+        }
+        else {
+            $result = DB::table('organization_user as ou')
                 ->where([
                     ['ou.organization_id', $organization[0]->id],
                     ['ou.user_id', Auth::user()->id],
@@ -2920,8 +2950,14 @@ class DormController extends Controller
                 ->update([
                     'ou.check_in_status' => 1,
                 ]);
+        } 
+
+        if($result){
+            return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0])->with('success', 'Data is successfully updated');
         }
-        return redirect('/dorm')->with('success', 'Data is successfully updated');
+        else{
+            return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0])->withErrors('Anda tidak dibenarkan untuk daftar masuk');
+        }
     }
 
     public function resetOutingLimit(Request $request)

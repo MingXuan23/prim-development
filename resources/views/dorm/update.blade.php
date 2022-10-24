@@ -49,10 +49,10 @@
                     <input type="text" name="name" class="form-control" placeholder="Nama Penuh" value="{{$studentouting->nama}}" readonly>
                 </div>
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label>Email Pelajar</label>
                     <input type="text" name="email" class="form-control" placeholder="Email" value="{{ $studentouting->email }}" readonly>
-                </div>
+                </div> -->
 
                 <div class="form-group">
                     <label>Kategori</label>

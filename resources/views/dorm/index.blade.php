@@ -57,9 +57,9 @@
 
                 @if($roles == 7 || $roles == 1)
                     @if($checkin == 1)
-                    <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', $checkin)}}" class="btn btn-primary"> <i class="fas fa-minus"></i> Daftar Keluar</a>
+                    <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', $checkNum)}}" class="btn btn-primary"> <i class="fas fa-minus"></i> Daftar Keluar</a>
                     @else
-                    <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', 0)}}" class="btn btn-primary"> <i class="fas fa-plus"></i> Daftar Masuk</a>
+                    <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', $checkNum)}}" class="btn btn-primary"> <i class="fas fa-plus"></i> Daftar Masuk</a>
                     @endif
                 @endif
             </div>
