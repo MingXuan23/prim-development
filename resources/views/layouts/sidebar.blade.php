@@ -314,7 +314,7 @@
             </li>
             @endrole
             
-            <li>
+            {{-- <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
                     <span>Peniaga</span>
@@ -339,7 +339,7 @@
                         </a>
                     </li>
                 </ul>  
-            </li>
+            </li> --}}
 
             @role('Superadmin|Penjaga')
             <li>

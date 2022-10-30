@@ -1,27 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Cooperative\User;
 
+use App\Http\Controllers\Controller;
+use App\Models\PickUpOrder;
+use App\Models\ProductItem;
+use App\Models\ProductOrder;
+use App\Models\OrganizationHours;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Carbon;
-use App\Models\PickUpOrder;
-use App\Models\ProductItem;
-use App\Models\ProductOrder;
-use App\Models\OrganizationHours;
-use App\Models\Organization;
 
-
-class CooperativeController extends Controller
+class UserCooperativeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $userID = Auth::id();
@@ -605,308 +600,7 @@ class CooperativeController extends Controller
         }
     }
 
-    public function getDayStatus($todayDay, $allDay, $arr, $key_index)
-    {
-        // If today is Sunday
-        if($todayDay == 0) 
-        { $arr[$key_index] = "Minggu Hadapan"; } // Pick up date always next week
-        else
-        {
-            // if array of day available is sunday
-            if($allDay == 0) { $arr[$key_index] = "Minggu Ini"; } // Pick up date for Sunday always this week
-            // if today day is passed or today
-            else if($todayDay >= $allDay) { $arr[$key_index] = "Minggu Hadapan"; } // Pick up date must next week
-            // if today day is not passed yet
-            else if($todayDay < $allDay) { $arr[$key_index] = "Minggu Ini"; } // Pick up date available this week
-        }
-
-        return $arr;
-    }
-
-    public function getDayIntegerByDayName($date)
-    {
-        $day = null;
-        if($date == "Monday") { $day = 1; }
-        else if($date == "Tuesday") { $day = 2; }
-        else if($date == "Wednesday") { $day = 3; }
-        else if($date == "Thursday") { $day = 4; }
-        else if($date == "Friday") { $day = 5; }
-        else if($date == "Saturday") { $day = 6; }
-        else if($date == "Sunday") { $day = 0; }
-        return $day;
-    }
-    
-    public function indexAdmin( )
-    {
-        $userID = Auth::id();
-        $koperasi = DB::table('organizations as o')
-                    ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
-                    ->where('ou.user_id', $userID)
-                    ->where('ou.role_id', 1239)
-                    ->first();
-
-        $product = DB::table('product_item as p')
-                    ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
-                    ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
-                    ->select('p.*')
-                    ->where('ou.user_id', $userID)
-                    ->get();
-        return view('koperasi-admin.index', compact('koperasi'))
-        ->with('product',$product);
-    }
-
-    public function createProduct()
-    {
-        $type = DB::table('product_group')->get();
-        return view('koperasi-admin.add',compact('type'));
-    }
-
-    public function storeProduct(Request $request)
-    {
-        $link = explode(" ", $request->nama);
-        $str = implode("-", $link);
-        // dd($request->organization_picture);
-        
-        $file_name = '';
-
-        if (!is_null($request->image)) {
-            $extension = $request->image->extension();
-            $storagePath  = $request->image->move(public_path('koperasi-item'), $str . '.' . $extension);
-            $file_name = basename($storagePath);
-        }
-        else
-        {
-            $file_name = null;
-        }
-
-        $userID = Auth::id();
-        $org = DB::table('organizations as o')
-                ->join('organization_user as os', 'o.id', 'os.organization_id')
-                ->where('os.user_id', $userID)
-                ->select('o.id')
-                ->first();
-
-       $add = DB::table('product_item') -> insert([
-        'name' => $request->input('nama'),
-        'desc' => $request->input('description'),
-        'image' => $file_name,
-        'quantity' => $request->input('quantity'),
-        'price' => $request->input('price'),
-        'status'=> $request->input('status'),
-        'product_group_id' => $request ->input('type'),
-        'organization_id' => $org->id,     
-       ]);
-
-
-    //    $add = DB::table('product_item');
-    //    if($request->hasfile('image'))
-    //    {
-    //        $request -> file('image')->move('photo/',$request->file('image')->getClientOriginalName());
-    //        $add->image =$request->file('image')->getClientOriginalName();
-    //        $add -> upsert(['image' => $request->input('image')]);
-    //    }
-       return redirect('koperasi/admin')->with('success','Product created successfully.');
-    }
-
-    public function editProduct(Int $id)
-    {
-        
-        $edit = DB::table('product_item')->where('id',$id)->first();
-        $test = DB::table('product_item as p')
-        ->join('product_group as pt', 'p.product_group_id', '=', 'pt.id')
-        ->select('p.*', 'pt.name as type_name')
-        ->get()
-        ->where('id',$id)
-        ->first();
-        $type = DB::table('product_group')->get();
-        return view('koperasi-admin.edit',compact('type'),compact('test'))
-        ->with('test',$test)
-        ->with('edit',$edit);
-    }
-
-    public function updateProduct(Request $request,Int $id)
-    {
-        $userID = Auth::id();
-        $org = DB::table('organizations as o')
-        ->join('organization_user as os', 'o.id', 'os.organization_id')
-        ->where('os.user_id', $userID)
-        ->select('o.id')
-        ->first();
-      
-        $update = DB::table('product_item')->where('id',$id)->update([
-            'name' => $request->nama,
-            'desc' => $request->description,
-            'image' => $request->image,
-            'quantity' => $request->quantity,
-            'price' => $request->price,
-            'status'=> $request->status,
-            'product_group_id' => $request->type,
-            'organization_id' => $org->id,
-          
-        ]);
-        if($request->quantity ==0)
-        {
-            DB::table('product_item')->where('id',$id)->update(['status'=> 0]);
-        }
-        return redirect('koperasi/admin')->with('success','Product updated successfully.');
-    }
-
-
-    public function deleteProduct(Int $id)
-    {
-        $delete = DB::table('product_item')->where('id',$id)->delete();
-        return redirect('koperasi/admin')->with('success','Product deleted successfully.');
-
-    }
-
-    public function indexOpening()
-    {
-        $userID = Auth::id();
-        $koperasi = DB::table('organizations as o')
-                    ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
-                    ->where('ou.user_id', $userID)
-                    ->where('ou.role_id', 1239)
-                    ->first();
-
-        $hour = DB::table('organization_hours as o')
-                ->join('organization_user as ou','o.organization_id','=','ou.organization_id')
-                ->select('o.*')
-                ->where('ou.user_id', $userID)
-                ->get();
-
-
- 
-        return view('koperasi-admin.opening' , compact('koperasi'), compact('hour'))
-        ->with('hour',$hour);
-    }
-
-    public function storeOpening(Request $request)
-    {
-        $userID = Auth::id();
-        $org = DB::table('organizations as o')
-                ->join('organization_user as os', 'o.id', 'os.organization_id')
-                ->where('os.user_id', $userID)
-                ->select('o.id')
-                ->first();
-
-
-        // $hour = DB::table('organization_hours')
-        if($request->day == 1)
-        {
-            $hour = DB::table('organization_hours')
-            ->where('day','=',1)
-            ->where('organization_id','=',$org->id,)
-            ->update(['open_hour'=>$request->open,
-            'close_hour'=>$request->close,
-            'status' => $request->status,]);
-
-
-            
-        }
-        else if($request->day == 2)
-        {
-            $hour = DB::table('organization_hours')
-            ->where('day','=',2)
-            ->where('organization_id','=',$org->id,)
-            ->update(['open_hour'=>$request->open,
-            'close_hour'=>$request->close,
-            'status' => $request->status,]);
-        }
-        else if($request->day==3)
-        {
-            $hour = DB::table('organization_hours')
-            ->where('day','=',3)
-            ->where('organization_id','=',$org->id,)
-            ->update(['open_hour'=>$request->open,
-            'close_hour'=>$request->close,
-            'status' => $request->status,]);
-        }
-        else if($request->day==4)
-        {
-            $hour = DB::table('organization_hours')
-            ->where('day','=',4)
-            ->where('organization_id','=',$org->id,)
-            ->update(['open_hour'=>$request->open,
-            'close_hour'=>$request->close,
-            'status' => $request->status,]);
-        }
-        else if($request->day==5)
-        {
-            $hour = DB::table('organization_hours')
-            ->where('day','=',5)
-            ->where('organization_id','=',$org->id,)
-            ->update(['open_hour'=>$request->open,
-            'close_hour'=>$request->close,
-            'status' => $request->status,]);
-        }
-        else if($request->day==6)
-        {
-            $hour = DB::table('organization_hours')
-            ->where('day','=',6)
-            ->where('organization_id','=',$org->id,)
-            ->update(['open_hour'=>$request->open,
-            'close_hour'=>$request->close,
-            'status' => $request->status,]);
-        }
-        else if($request->day==0)
-        {
-            $hour = DB::table('organization_hours')
-            ->where('day','=',0)
-            ->where('organization_id','=',$org->id,)
-            ->update(['open_hour'=>$request->open,
-            'close_hour'=>$request->close,
-            'status' => $request->status,]);
-        }
-                // ->where('day')
-                // ->update([
-                //     'open_hour'=>$request->open,
-                //  ]);
-        return redirect('koperasi/openingHours');
-    }
-
-    public function indexConfirm()
-    {
-        $userID = Auth::id();
-        $koperasi = DB::table('organizations as o')
-                    ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
-                    ->where('ou.user_id', $userID)
-                    ->where('ou.role_id', 1239)
-                    ->first();
-
-        $customer = DB::table('pickup_order as o')
-                    ->join('users as ou','o.user_id','=','ou.id')
-                    ->join('organization_user as op','o.organization_id','=','op.organization_id')
-                    ->where('op.user_id', $userID)
-                    ->select('o.*','ou.*','op.*','o.id as id','o.status as status')
-                    ->get();
-
-        return view('koperasi-admin.confirm',compact('koperasi'),compact('customer'))->with('customer',$customer);
-        // return view('koperasi-admin.confirm');
- 
-    }
-
-    public function storeConfirm(Request $request,Int $id)
-    {
-        $userID = Auth::id();
-        $customer = DB::table('pickup_order')
-                    ->where('id',$id)
-                    ->update([
-                        'status' => 3 ,
-                    ]);
-         return redirect('koperasi/Confirm');
-    }
-
-    public function notConfirm(Request $request,Int $id)
-    {
-        $userID = Auth::id();
-
-        $customer = DB::table('pickup_order')
-                    ->where('id',$id)
-                    ->update([
-                        'status' => 4 ,
-                    ]);
-         return redirect('koperasi/Confirm');
-    }
+    /*-------------------------- START KOOP SHOP --------------------------*/
 
     public function indexKoop()
     {
@@ -965,5 +659,38 @@ class CooperativeController extends Controller
         ->get();
 
         return view('koop.cart',)->with('sekolah',$sekolah);
+    }
+
+    /*-------------------------- END KOOP SHOP --------------------------*/
+
+    public function getDayStatus($todayDay, $allDay, $arr, $key_index)
+    {
+        // If today is Sunday
+        if($todayDay == 0) 
+        { $arr[$key_index] = "Minggu Hadapan"; } // Pick up date always next week
+        else
+        {
+            // if array of day available is sunday
+            if($allDay == 0) { $arr[$key_index] = "Minggu Ini"; } // Pick up date for Sunday always this week
+            // if today day is passed or today
+            else if($todayDay >= $allDay) { $arr[$key_index] = "Minggu Hadapan"; } // Pick up date must next week
+            // if today day is not passed yet
+            else if($todayDay < $allDay) { $arr[$key_index] = "Minggu Ini"; } // Pick up date available this week
+        }
+
+        return $arr;
+    }
+
+    public function getDayIntegerByDayName($date)
+    {
+        $day = null;
+        if($date == "Monday") { $day = 1; }
+        else if($date == "Tuesday") { $day = 2; }
+        else if($date == "Wednesday") { $day = 3; }
+        else if($date == "Thursday") { $day = 4; }
+        else if($date == "Friday") { $day = 5; }
+        else if($date == "Saturday") { $day = 6; }
+        else if($date == "Sunday") { $day = 0; }
+        return $day;
     }
 }
