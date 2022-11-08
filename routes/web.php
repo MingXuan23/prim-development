@@ -203,6 +203,19 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
     });
 });
 
+Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => 'Merchant'], function() {
+    Route::group(['prefix' => 'regular'], function() {
+        Route::get('', 'RegularMerchantController@index')->name('merchant.regular.index');
+        Route::get('{id}', 'RegularMerchantController@show')->name('merchant.regular.show');
+        Route::post('fetch-item', 'RegularMerchantController@fetchItem')->name('merchant.regular.fetch-item');
+        Route::post('store-item', 'RegularMerchantController@storeItemInCart')->name('merchant.regular.store-item');
+        Route::get('test_edit', 'RegularMerchantController@test_edit')->name('test_edit');
+        Route::get('pesanan-dalam-proses', 'RegularMerchantController@pickup_order_list')->name('pickup.order.list');
+        Route::get('sejarah-pesanan', 'RegularMerchantController@pickup_order_history')->name('pickup.order.history');
+        Route::get('info-pesanan', 'RegularMerchantController@pickup_order_detail')->name('pickup.order.detail');
+    });
+});
+
 // Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi'], function() {
 //     Route::delete('/{org_id}/edit/{id}', 'CooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
 //     Route::post('/koperasi/fetchKoop', 'CooperativeController@fetchKoop')->name('koperasi.fetchKoop');

@@ -92,12 +92,15 @@ class OrganizationController extends Controller
         ]);
 
         Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($request->type_org, $organization->id)]);
-
+        
         //attach foreign key to pivot table
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
 
         $user = Auth::user();
         $user->assignRole('Admin');
+
+        $type_org = TypeOrganization::find($request->type_org);
+        $role = $this->assignRoleForOrganization($type_org->nama);
 
         if ($request->type_org == 1 || $request->type_org == 2 || $request->type_org == 3) {
             $organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 4]);
@@ -105,19 +108,27 @@ class OrganizationController extends Controller
         }
 
         // Koperasi
-        if ($request->type_org == 1039) {
+        if ($type_org->nama == "Koperasi") {
             Organization::where('id', $organization->id)->update(['parent_org' => $request->parent_org]);
-            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
             //$organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
-            $user->assignRole('Koop_Admin');
+            $user->assignRole($role->nama);
 
             $this->insertOrganizationHours($organization->id);
         }
 
-        // Merchant
-        if ($request->type_org == 2132) {
-            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 2015]);
-            $user->assignRole('Merchant_Admin');
+        // Schedule Merchant
+        if ($type_org->nama == "Peniaga Barang Berjadual") {
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
+            $user->assignRole($role->nama);
+            
+            $this->insertOrganizationHours($organization->id);
+        }
+
+        // Schedule Merchant
+        if ($type_org->nama == "Peniaga Barang Umum") {
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
+            $user->assignRole($role->nama);
 
             $this->insertOrganizationHours($organization->id);
         }
@@ -255,8 +266,10 @@ class OrganizationController extends Controller
             $code = 'PT' . str_pad($id, 5, '0', STR_PAD_LEFT);
         } elseif ($typeOrg == 1039) { // Koperasi
             $code = 'KP' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 2132) { // Merchant
-            $code = 'MC' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 2132) { // Schedule Merchant
+            $code = 'PBJ' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        } elseif ($typeOrg == 3111) { // Regular Merchant
+            $code = 'PBU' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
         return $code;
@@ -266,6 +279,26 @@ class OrganizationController extends Controller
     {
         $states = Jajahan::negeri();
         return view('test.repeater', compact('states'));
+    }
+
+    private function assignRoleForOrganization($type_org_name)
+    {
+        $role = '';
+
+        if($type_org_name == "Koperasi")
+        {
+            $role = OrganizationRole::where('nama', '=', 'Koop Admin')->first();
+        } 
+        else if($type_org_name == "Peniaga Barang Berjadual")
+        {
+            $role = OrganizationRole::where('nama', '=', 'Schedule Merchant Admin')->first();
+        }
+        else if($type_org_name == "Peniaga Barang Umum")
+        {
+            $role = OrganizationRole::where('nama', '=', 'Regular Merchant Admin')->first();
+        }
+
+        return $role;
     }
 
     public function insertOrganizationHours($id)

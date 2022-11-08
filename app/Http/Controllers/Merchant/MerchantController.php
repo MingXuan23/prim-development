@@ -22,7 +22,7 @@ class MerchantController extends Controller
     public function merchantList()
     {
         $todayDate = Carbon::now()->format('l');
-
+        
         $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($todayDate);
         
         $merchant = Organization::with(['organization_hours' => function($q) use ($day){
@@ -260,7 +260,7 @@ class MerchantController extends Controller
         }])
         ->where('id', $id)
         ->first();
-
+        
         $oh = $merchant->organization_hours->first();
 
         $open_hour = date('h:i A', strtotime($oh->open_hour));
