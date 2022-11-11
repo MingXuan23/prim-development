@@ -8,10 +8,13 @@ use App\Models\OrganizationHours;
 use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use Carbon\CarbonPeriod;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
+use Yajra\DataTables\DataTables;
 
 class RegularMerchantController extends Controller
 {
@@ -234,64 +237,6 @@ class RegularMerchantController extends Controller
         return response()->json(['success' => 'Item Berjaya Direkodkan', 'alert' => $msg]);
     }
 
-    private function calculateNewQuantity($user_qty, $qty_available, $cart_qty)
-    {
-        $new_stock_qty = null;
-
-        if($user_qty > $cart_qty) // request qty more than existing qty
-        {
-            $new_stock_qty = intval($qty_available - ($user_qty - $cart_qty)); // decrement stock
-        }
-        else if($user_qty < $cart_qty) // request qty less than existing qty
-        {
-            $new_stock_qty = intval($qty_available + ($cart_qty - $user_qty)); // increment stock
-        }
-        else if($user_qty == $cart_qty) // request qty equal existing qty
-        {
-            $new_stock_qty = intval((int)$qty_available - 0); // stock not change
-        }
-
-        return $new_stock_qty;
-    }
-
-    private function updateQuantityAvailable($item_id, $new_stock_qty)
-    {
-        // check if quantity is 0 after add to cart
-        if($new_stock_qty != 0) // if not 0
-        {
-            ProductItem::where('id', $item_id)->update(['quantity_available' => $new_stock_qty]);
-            $msg = '';
-        }
-        else // if 0 (change item status)
-        {
-            ProductItem::where('id', $item_id)
-            ->update(['quantity_available' => $new_stock_qty, 'status' => 0]);
-            $msg = 'restart';
-        }
-
-        return $msg;
-    }
-
-    private function calculateTotalPrice($order_id) 
-    {
-        $new_total_price = null;
-
-        $cart_item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                    ->where('po.pgng_order_id', $order_id)
-                    ->select('po.quantity as qty', 'pi.price', 'pi.selling_quantity as unit_qty')
-                    ->get();
-            
-        if(count($cart_item) != 0) {
-            foreach($cart_item as $row)
-            {
-                $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
-            }
-        }
-
-        return $new_total_price;
-    }
-
     public function showCart($org_id)
     {
         $cart_item = array(); // empty if cart is empty
@@ -449,16 +394,255 @@ class RegularMerchantController extends Controller
         return redirect('/merchant/regular/')->with('success', 'Pesanan Anda Berjaya Direkod!');
     }
 
+    public function showAllOrder()
+    {
+        return view('merchant.order');
+    }
+
+    public function getAllOrder(Request $request)
+    {
+        $total_price[] = 0;
+        $pickup_date[] = 0;
+        $status = ['Paid'];
+        
+        $order = $this->getAllOrderQuery($status);
+        
+        if(request()->ajax()) 
+        {
+            $table = Datatables::of($order);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == 'Paid') {
+                    $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya dibayar</span>';
+                    return $btn;
+                } else {
+                    $btn = '<span class="badge rounded-pill bg-danger text-white">Tidak Diambil</span>';
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $btn = '<div class="d-flex justify-content-center align-items-center">';
+                $btn = $btn.'<button type="button" class="btn-cancel-order btn btn-danger" data-order-id="'.$row->id.'">';
+                $btn = $btn.'<i class="fas fa-trash-alt"></i></button></div>';
+
+                return $btn;
+            });
+
+            $table->editColumn('note', function ($row) {
+                if($row->note != null) {
+                    return $row->note;
+                } else {
+                    return "<i>Tiada Nota</i>";
+                }
+            });
+
+            $table->editColumn('total_price', function ($row) {
+                $total_price = number_format($row->total_price, 2, '.', '');
+                $total = $total_price." | ";
+                $total = $total."<a href='".route('merchant.order-detail', $row->id)."'>Lihat Pesanan</a>";
+                return $total;
+            });
+
+            $table->editColumn('pickup_date', function ($row) {
+                return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+            });
+
+            $table->rawColumns(['note', 'total_price', 'status', 'action']);
+
+            return $table->make(true);
+        }
+    }
+
+    public function deletePaidOrder(Request $request)
+    {
+        $id = $request->o_id;
+
+        $delete_order = DB::table('pgng_orders')->where('id', $id)->update([
+            'status' => 'Cancel by user',
+            'deleted_at' => Carbon::now(),
+        ]);
+        
+        if($delete_order) {
+            Session::flash('success', 'Pesanan Berjaya Dibuang');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Pesanan Gagal Dibuang');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
+    public function showOrderHistory()
+    {
+        return view('merchant.history');
+    }
+
+    public function getOrderHistory(Request $request)
+    {
+        $total_price[] = 0;
+        $pickup_date[] = 0;
+        $status = ['Cancel by user', 'Cancel by merchant', 'Delivered', 'Picked-Up'];
+        
+        $order = $this->getAllOrderQuery($status);
+        
+        if(request()->ajax()) 
+        {
+            $table = Datatables::of($order);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == 'Picked-Up') {
+                    $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya diambil</span>';
+                    return $btn;
+                } else {
+                    $btn = '<span class="badge rounded-pill bg-danger text-white">Tidak Diambil</span>';
+                    return $btn;
+                }
+            });
+
+            $table->editColumn('note', function ($row) {
+                if($row->note != null) {
+                    return $row->note;
+                } else {
+                    return "<i>Tiada Nota</i>";
+                }
+            });
+
+            $table->editColumn('total_price', function ($row) {
+                $total_price = number_format($row->total_price, 2, '.', '');
+                $total = $total_price." | ";
+                $total = $total."<a href='".route('merchant.order-detail', $row->id)."'>Lihat Pesanan</a>";
+                return $total;
+            });
+
+            $table->editColumn('pickup_date', function ($row) {
+                return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+            });
+
+            $table->rawColumns(['note', 'total_price', 'status']);
+
+            return $table->make(true);
+        }
+    }
+
+    public function showOrderDetail($order_id)
+    {
+        // Get Information about the order
+        $list = DB::table('pgng_orders as pu')
+                ->join('organizations as o', 'o.id', 'pu.organization_id')
+                ->where('pu.id', $order_id)
+                ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
+                        'o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state')
+                ->first();
+
+        $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
+        $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
+        $total_order_price = number_format($list->total_price, 2, '.', '');
+
+        // get all product based on order
+        $item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                ->where('po.pgng_order_id', $order_id)
+                ->select('po.id', 'pi.name', 'pi.price', 'po.quantity', 'po.selling_quantity')
+                ->get();
+
+        $total_price[] = array();
+        $price[] = array();
+        
+        foreach($item as $row)
+        {
+            $price[$row->id] = number_format($row->price, 2, '.', '');
+            $total_price[$row->id] = number_format(doubleval($row->price * ($row->quantity * $row->selling_quantity)), 2, '.', ''); // calculate total for each item in cart
+        }
+
+        return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price'));
+    }
+
+    private function calculateNewQuantity($user_qty, $qty_available, $cart_qty)
+    {
+        $new_stock_qty = null;
+
+        if($user_qty > $cart_qty) // request qty more than existing qty
+        {
+            $new_stock_qty = intval($qty_available - ($user_qty - $cart_qty)); // decrement stock
+        }
+        else if($user_qty < $cart_qty) // request qty less than existing qty
+        {
+            $new_stock_qty = intval($qty_available + ($cart_qty - $user_qty)); // increment stock
+        }
+        else if($user_qty == $cart_qty) // request qty equal existing qty
+        {
+            $new_stock_qty = intval((int)$qty_available - 0); // stock not change
+        }
+
+        return $new_stock_qty;
+    }
+
+    private function updateQuantityAvailable($item_id, $new_stock_qty)
+    {
+        // check if quantity is 0 after add to cart
+        if($new_stock_qty != 0) // if not 0
+        {
+            ProductItem::where('id', $item_id)->update(['quantity_available' => $new_stock_qty]);
+            $msg = '';
+        }
+        else // if 0 (change item status)
+        {
+            ProductItem::where('id', $item_id)
+            ->update(['quantity_available' => $new_stock_qty, 'status' => 0]);
+            $msg = 'restart';
+        }
+
+        return $msg;
+    }
+
+    private function calculateTotalPrice($order_id) 
+    {
+        $new_total_price = null;
+
+        $cart_item = DB::table('product_order as po')
+                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                    ->where('po.pgng_order_id', $order_id)
+                    ->select('po.quantity as qty', 'pi.price', 'pi.selling_quantity as unit_qty')
+                    ->get();
+            
+        if(count($cart_item) != 0) {
+            foreach($cart_item as $row)
+            {
+                $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
+            }
+        }
+
+        return $new_total_price;
+    }
+
     private function compareDateWithToday($date)
     {
         $today = Carbon::now();
         $date_f = Carbon::parse($date);
-
+        
         if($today->format('d-m-Y') == $date_f->format('d-m-Y')) {
             return true;
         } else {
             return false;
         }
+    }
+
+    private function getAllOrderQuery($status)
+    {
+        $user_id = Auth::id();
+
+        $order = DB::table('pgng_orders as pu')
+                ->join('organizations as o', 'pu.organization_id', 'o.id')
+                ->whereIn('status', $status)
+                ->where('user_id', $user_id)
+                ->select('pu.id', 'pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
+                'o.nama', 'o.telno')
+                ->orderBy('status', 'desc')
+                ->orderBy('pickup_date', 'asc')
+                ->orderBy('pu.updated_at', 'desc')
+                ->get();
+
+        return $order;
     }
 
     private function getDayIntegerByDayName($date)

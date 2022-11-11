@@ -1,73 +1,107 @@
 @extends('layouts.master')
 
 @section('css')
-
-@include('layouts.datatable');
-
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+@include('layouts.datatable')
 @endsection
 
 @section('content')
 
+<div class="row align-items-center">
+    <div class="col-sm-6">
+        <div class="page-title-box">
+            <h4 class="font-size-18"><a href="{{ route('merchant.all-orders') }}" class="text-muted">Semua Pesanan</a> <i class="fas fa-angle-right"></i> Sejarah Pesanan</h4>
+        </div>
+    </div>
+</div>
+
 <div class="card mb-3">
     <div class="card-header">
-      <i class="ti-email mr-2"></i>Sejarah Pesanan Anda</div>
+      <i class="ti-email mr-2"></i>Sejarah Pesanan</div>
     <div class="card-body">
-
+      
       <div class="table-responsive">
-        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-  
+        <table class="table table-striped table-bordered" id="orderTable" width="100%" cellspacing="0">
           <thead>
             <tr>
               <th style="width: 2%">No.</th>
-              <th style="width: 15%">Peniaga</th>
-              <th style="width: 10%">No Telefon Peniaga</th>
+              <th style="width: 15%">Pelanggan</th>
+              <th style="width: 10%">No Telefon</th>
               <th style="width: 10%">Tarikh Pengambilan</th>
               <th style="width: 10%">Jumlah (RM)</th>
               <th style="width: 10%" class="text-center">Status</th>
             </tr>
           </thead>
-  
-          <tbody>
-            @php($i = 0)
-            @forelse($history as $row)
-              @csrf
-                <tr>
-                  <td class="align-middle">{{ ++$i }}.</td>
-                  <td class="align-middle">{{ $row->merchant_name }}</td>
-                  <td class="align-middle">{{ $row->merchant_telno }}</td>
-                  <td class="align-middle">{{ $pickup_date[$row->id] }}</td>
-                  <td class="align-middle">
-                    {{ $total_price[$row->id] }} |
-                    <a href="{{ route('merchant.list', $row->id) }}">Lihat Pesanan</a>
-                  </td>
-                  <td class="align-middle text-center">
-                    @if($row->status == 3)
-                    <span class="badge rounded-pill bg-success text-white btn-block">Berjaya Diambil</span>
-                    @elseif($row->status == 100 || $row->status == 200)
-                    <span class="badge rounded-pill bg-danger text-white btn-block">Dibatalkan</span>
-                    @endif
-                  </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="text-center"><i>Tiada Sejarah Rekod Pesanan.</i></td>
-                </tr>
-            @endforelse
-              
-          </tbody>
         </table>
       </div>
-      <div class="row mt-2 ">
-        <div class="col d-flex justify-content-end">
-          {{ $history->links() }}
-        </div>
-      </div>
     </div>
-    {{-- <div class="card-footer small text-muted"></div> --}}
 </div>
 
 @endsection
 
 @section('script')
+
+<script>
+  $(document).ready(function() {
+    fetch_data()
+
+    function fetch_data() {
+        orderTable = $('#orderTable').DataTable({
+            pageLength: 5,
+            lengthMenu: [[5, 15, 30, -1], [5, 15, 30, "Semua"]],
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('merchant.get-order-history') }}",
+                data: {},
+                type: 'GET',
+            },
+            language : {
+                "infoEmpty": "Tiada Rekod",
+                "emptyTable": "<i>Tiada Pesanan Buat Masa Sekarang</i>",
+                "lengthMenu": "Papar _MENU_ rekod setiap halaman",
+                "zeroRecords": "<i>Tiada Pesanan Buat Masa Sekarang</i>",
+                "info": "Memaparkan halaman _PAGE_ daripada _PAGES_",
+                "paginate": {
+                    "next":       "Seterusnya",
+                    "previous":   "Sebelumnya"
+                },
+                "search": "Cari:",
+            },
+            'columnDefs': [{
+                "targets": [0, 1, 2, 3, 4], // your case first column
+                "className": "align-middle",
+            },],
+            columns: [{
+                "data": null,
+                searchable: false,
+                "sortable": false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1 + ".";
+                }
+            }, {
+                data: "nama",
+                name: 'nama',
+            }, {
+                data: "telno",
+                name: 'telno',
+            }, {
+                data: "pickup_date",
+                name: 'pickup_date',
+            }, {
+                data: 'total_price',
+                name: 'total_price',
+            }, {
+                data: 'status',
+                name: 'status',
+                orderable: false,
+                searchable: false,
+                "className": "align-middle text-center",
+            },]
+        });
+    }
+  })
+  
+</script>
 
 @endsection

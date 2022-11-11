@@ -51,13 +51,13 @@
 
     <div class="row">
       <div class="col d-flex justify-content-center align-items-center text-center mb-3">
-        @if($list->status == 2)
+        @if($list->status == 'Paid')
         <span class="badge rounded-pill bg-info text-white">Selesai Dibayar</span>
-        @elseif($list->status == 100)
+        @elseif($list->status == 'Cancel by merchant')
         <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Restoran</span>
-        @elseif($list->status == 200)
+        @elseif($list->status == 'Cancel by user')
         <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Anda</span>
-        @elseif($list->status == 3)
+        @elseif($list->status == 'Picked-Up')
         <span class="badge rounded-pill bg-success text-white">Berjaya Diambil</span>
         @endif
       </div>
@@ -127,7 +127,7 @@
               <tr>
                 <td>{{ $row->name }}</td>
                 <td>{{ $price[$row->id] }}</td>
-                <td>{{ $row->quantity }}</td>
+                <td>{{ $row->quantity * $row->selling_quantity }}</td>
                 <td>{{ $total_price[$row->id] }}</td>
               </tr>
             @endforeach

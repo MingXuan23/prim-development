@@ -362,15 +362,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('merchant.all-orders') }}" class=" waves-effect">
                             <i class="ti-email"></i>
                             <span>Pesanan</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class=" waves-effect">
-                            <i class="ti-clipboard"></i>
-                            <span>Sejarah</span>
                         </a>
                     </li>
                 </ul>  
