@@ -5,10 +5,9 @@ namespace App\Http\Controllers\Merchant;
 use App\Http\Controllers\Controller;
 use App\Models\Organization;
 use App\Models\OrganizationHours;
-use App\Models\PickUpOrder;
 use App\Models\ProductItem;
-use App\Models\ProductGroup;
 use App\Models\ProductOrder;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,9 +17,9 @@ class RegularMerchantController extends Controller
 {
     public function index()
     {
-        $todayDate = Carbon::now()->format('l');
+        $todayDate = Carbon::now()->format('l'); // Format to day name
         
-        $day = $this->getDayIntegerByDayName($todayDate);
+        $day = $this->getDayIntegerByDayName($todayDate); // Convert to integer
 
         $merchant = Organization::
         join('organization_hours as oh', 'oh.organization_id', 'organizations.id')
@@ -53,9 +52,8 @@ class RegularMerchantController extends Controller
         $merchant = Organization::
         join('organization_hours as oh', 'oh.organization_id', 'organizations.id')
         ->where([
-            ['deleted_at', null],
-            ['type_org', 3111],
-            ['day', $day]
+            ['day', $day],
+            ['organizations.id', $id]
         ])
         ->select('organizations.id as id', 'nama', 'address', 'postcode', 'state', 'city',
         'day', 'open_hour', 'close_hour', 'status')
@@ -73,7 +71,7 @@ class RegularMerchantController extends Controller
         ->get();
             
         $product_item = DB::table('product_item as pi')
-        ->join('product_group as pg', 'pg.id', '=', 'pi.product_group_id')
+        ->join('product_group as pg', 'pg.id', 'pi.product_group_id')
         ->where([
             ['pg.organization_id', $id],
             ['pg.deleted_at', NULL],
@@ -91,47 +89,43 @@ class RegularMerchantController extends Controller
     {
         $i_id = $request->get('i_id');
         $o_id = $request->get('o_id');
+        $user_id = Auth::id();
         $modal = '';
         
         $item = ProductItem::where('id', $i_id)
-        ->select('id', 'type', 'name', 'price', 'quantity_available', 'selling_quantity')
+        ->select('id', 'type', 'name', 'price', 'quantity_available as qty', 'selling_quantity as unit_qty')
         ->first();
-
-        if($item->type == 'have inventory') {
-            $maxQuantity = ($item->quantity_available / $item->selling_quantity);
-            $modal .= '<div class="row justify-content-center"><i>Kuantiti Maximum : '.$item->quantity_available.'</i></div>';
-        } else if($item->type == 'no inventory') {
-            $maxQuantity = 999;
-        }
-
-        $modal .= $this->createQuantityBody($i_id, $o_id, $item->selling_quantity);
-
-        return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $maxQuantity]);
-    }
-
-    private function createQuantityBody($item_id, $organization_id, $unit_qty)
-    {
-        $body = '';
-        $user_id = Auth::id();
 
         $order = DB::table('product_order as po')->join('pgng_orders as pu', 'pu.id', 'po.pgng_order_id')
         ->where([
             ['pu.user_id', $user_id],
-            ['pu.organization_id', $organization_id],
-            ['po.product_item_id', $item_id],
+            ['pu.organization_id', $o_id],
+            ['po.product_item_id', $i_id],
             ['pu.status', 'In cart'],
         ])
-        ->select('quantity')
+        ->select('quantity as qty', 'selling_quantity as unit_qty')
         ->first();
         
-        if(!$order) {
-            $body .= '<input id="quantity_input" type="text" value="1" name="quantity_input">';
-        } else {
-            $body .= '<input id="quantity_input" type="text" value="'.$order->quantity.'" name="quantity_input">';
-            $body .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->quantity.' X '.$unit_qty.' Unit</i></div>';
+        if($item->type == 'have inventory') {
+            if($order) { // Order exists in cart
+                $max_quantity = ($item->qty + ($order->qty * $order->unit_qty)); // (20 + (5 * 2)) = 
+            } else {
+                $max_quantity = $item->qty / $item->unit_qty;
+            }
+            
+            $modal .= '<div class="row justify-content-center"><i>Kuantiti Inventori : '.$item->qty.'</i></div>';
+        } else if($item->type == 'no inventory') {
+            $max_quantity = 999;
         }
 
-        return $body;
+        if(!$order) {
+            $modal .= '<input id="quantity_input" type="text" value="1" name="quantity_input">';
+        } else {
+            $modal .= '<input id="quantity_input" type="text" value="'.$order->qty.'" name="quantity_input">';
+            $modal .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->qty.' X '.$order->unit_qty.' Unit</i></div>';
+        }
+
+        return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);
     }
 
     public function storeItemInCart(Request $request)
@@ -143,12 +137,6 @@ class RegularMerchantController extends Controller
         $item = ProductItem::where('id', $request->i_id)
         ->select('type', 'quantity_available as qty', 'selling_quantity as unit_qty', 'price')
         ->first();
-        
-        // Check if quantity request is less or equal to quantity available
-        if($item->type == 'have inventory' && $request->qty > $item->qty) {
-            $msg = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->qty;
-            return response()->json(['alert' => $msg]);
-        }
 
         $order = DB::table('pgng_orders')
         ->where([
@@ -156,6 +144,12 @@ class RegularMerchantController extends Controller
             ['status', 'In cart'],
             ['organization_id', $request->o_id]
         ])->select('id')->first();
+
+        // Check if quantity request is less or equal to quantity available
+        if($item->type == 'have inventory' && ($request->qty * $item->unit_qty) > $item->qty && !$order) {
+            $msg = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->qty;
+            return response()->json(['alert' => $msg]);
+        }
         
         // Check if order already exists
         if($order) // order exists
@@ -163,14 +157,19 @@ class RegularMerchantController extends Controller
             $cart_exist = ProductOrder::where([
                 ['product_item_id', $request->i_id],
                 ['pgng_order_id', $order->id],
-            ])->select('id', 'quantity')->first();
+            ])->select('id', 'quantity as qty', 'selling_quantity as unit_qty')->first();
 
             // If same item exists in cart
             if($cart_exist) // if exists (update)
             {
                 if($item->type == 'have inventory') {
                     $user_quantity = $request->qty * $item->unit_qty;
-                    $new_stock_qty = $this->calculateNewQuantity($user_quantity, $item->qty, $cart_exist->quantity);
+                    $cart_quantity = $cart_exist->qty * $cart_exist->unit_qty;
+                    $new_stock_qty = $this->calculateNewQuantity($user_quantity, $item->qty, $cart_quantity);
+                    if($new_stock_qty < 0) {
+                        $msg = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->qty;
+                        return response()->json(['alert' => $msg]);
+                    }
                 }
 
                 ProductOrder::where('id', $cart_exist->id)->update([
@@ -182,6 +181,10 @@ class RegularMerchantController extends Controller
             {
                 if($item->type == 'have inventory') {
                     $new_stock_qty = intval((int)$item->qty - (int)($request->qty * $item->unit_qty));
+                    if($new_stock_qty < 0) {
+                        $msg = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->qty;
+                        return response()->json(['alert' => $msg]);
+                    }
                 }
                 
                 ProductOrder::create([
@@ -192,16 +195,7 @@ class RegularMerchantController extends Controller
                 ]);
             }
 
-            $cart_item = DB::table('product_order as po')
-                            ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                            ->where('po.pgng_order_id', $order->id)
-                            ->select('po.quantity as qty', 'pi.price', 'pi.selling_quantity as unit_qty')
-                            ->get();
-            
-            foreach($cart_item as $row)
-            {
-                $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
-            }
+            $new_total_price = $this->calculateTotalPrice($order->id);
 
             DB::table('pgng_orders')->where('id', $order->id)->update([
                 'total_price' => $new_total_price
@@ -244,15 +238,15 @@ class RegularMerchantController extends Controller
     {
         $new_stock_qty = null;
 
-        if($user_qty > $cart_qty) // request quant more than existing quant
+        if($user_qty > $cart_qty) // request qty more than existing qty
         {
             $new_stock_qty = intval($qty_available - ($user_qty - $cart_qty)); // decrement stock
         }
-        else if($user_qty < $cart_qty) // request quant less than existing quant
+        else if($user_qty < $cart_qty) // request qty less than existing qty
         {
             $new_stock_qty = intval($qty_available + ($cart_qty - $user_qty)); // increment stock
         }
-        else if($user_qty == $cart_qty) // request quant equal existing quant
+        else if($user_qty == $cart_qty) // request qty equal existing qty
         {
             $new_stock_qty = intval((int)$qty_available - 0); // stock not change
         }
@@ -278,9 +272,193 @@ class RegularMerchantController extends Controller
         return $msg;
     }
 
-    public function test_edit()
+    private function calculateTotalPrice($order_id) 
     {
-        return view('merchant.regular.cart');
+        $new_total_price = null;
+
+        $cart_item = DB::table('product_order as po')
+                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                    ->where('po.pgng_order_id', $order_id)
+                    ->select('po.quantity as qty', 'pi.price', 'pi.selling_quantity as unit_qty')
+                    ->get();
+            
+        if(count($cart_item) != 0) {
+            foreach($cart_item as $row)
+            {
+                $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
+            }
+        }
+
+        return $new_total_price;
+    }
+
+    public function showCart($org_id)
+    {
+        $cart_item = array(); // empty if cart is empty
+        $user_id = Auth::id();
+
+        $cart = DB::table('pgng_orders')->where([
+            ['status', 'In cart'],
+            ['organization_id', $org_id],
+            ['user_id', $user_id],
+        ])->select('id', 'total_price', 'organization_id as org_id')->first();
+        
+        if($cart) {
+            $cart_item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+                ->where('po.pgng_order_id', $cart->id)
+                ->select('po.id', 'po.quantity', 'po.selling_quantity', 'pi.name', 'pi.price')
+                ->get();
+        }
+
+        return view('merchant.regular.cart', compact('cart', 'cart_item'));
+    }
+
+    public function destroyItemInCart(Request $request)
+    {
+        $cart_id = $request->cart_id;
+        
+        $cart_item = ProductOrder::where('id', $cart_id)
+        ->select('quantity as qty', 'selling_quantity as unit_qty', 'product_item_id as i_id', 'pgng_order_id as o_id')
+        ->first();
+        $product_item = ProductItem::where('id', $cart_item->i_id)
+        ->select('id', 'type', 'quantity_available as qty')
+        ->first();
+        
+        if($product_item->type == 'have inventory') {
+            $new_quantity = intval($product_item->qty + ($cart_item->qty * $cart_item->unit_qty)); // increment quantity
+            /* If previous product item is being unavailable because of added item in cart,
+            after the item deleted, the quantity in product_item will increment back and
+            the item will be available */
+            if($product_item->qty == 0)
+            {
+                ProductItem::where('id', $product_item->id)->update([
+                    'quantity_available' => $new_quantity,
+                    'status' => 1,
+                ]);
+            }
+            else
+            {
+                ProductItem::where('id', $product_item->id)->update([
+                    'quantity_available' => $new_quantity,
+                ]);
+            }
+        }
+        
+        ProductOrder::where('id', $cart_id)->forceDelete();
+        
+        $total_price = $this->calculateTotalPrice($cart_item->o_id);
+
+        if($total_price != null) {
+            DB::table('pgng_orders')->where('id', $cart_item->o_id)->update([
+                'updated_at' => Carbon::now(),
+                'total_price' => $total_price
+            ]);
+        } else {
+            DB::table('pgng_orders')->where('id', $cart_item->o_id)->delete();
+        }
+    }
+
+    public function fetchDisabledDates(Request $request) 
+    {
+        $start_date = Carbon::now();
+        $end_date = Carbon::now()->addMonths(2);
+        $dates = array();
+        $period = CarbonPeriod::create($start_date, $end_date);
+
+        $org_day = OrganizationHours::where('organization_id', $request->org_id)
+        ->where('status', 0)
+        ->select('day')->get();
+
+        foreach($period as $row) {
+            $day_name = $row->format('l');
+            $day_int = $this->getDayIntegerByDayName($day_name);
+            foreach($org_day as $org) {
+                if($day_int == $org->day) {
+                    $dates[] = $row->format('m/d/Y');
+                }
+            }
+        }
+        
+        return response()->json(['dates' => $dates, 'org_id' => $org_day]);
+    }
+
+    public function fetchOperationHours(Request $request)
+    {
+        $date = Carbon::parse($request->date);
+        $day_int = $this->getDayIntegerByDayName($date->format('l'));
+
+        $op_hour = OrganizationHours::where('organization_id', $request->org_id)
+        ->where('day', $day_int)
+        ->select('open_hour', 'close_hour')
+        ->first();
+
+        $open_hour = Carbon::parse($op_hour->open_hour)->format('g:i A');
+        $close_hour = Carbon::parse($op_hour->close_hour)->format('g:i A');
+
+        $open_hour_f = Carbon::parse($op_hour->open_hour)->format('G:i');
+        $close_hour_f = Carbon::parse($op_hour->close_hour)->format('G:i');
+
+        $isToday = $this->compareDateWithToday($date);
+
+        if($isToday) {
+            $current_time = Carbon::now()->format('G:i');
+            $temp_open_hour = Carbon::parse($op_hour->open_hour)->format('G:i');
+            if($current_time >= $temp_open_hour) { // 00 >= 8
+                $open_hour_f = $current_time;
+                $body = '<p>Waktu Buka dari Sekarang - '.$close_hour.'</p>';
+            } else {
+                $body = '<p>Waktu Buka dari '.$open_hour.' - '.$close_hour.'</p>';
+            }
+        } else {
+            $body = '<p>Waktu Buka dari '.$open_hour.' - '.$close_hour.'</p>';
+        }
+
+        return response()->json(['min' => $open_hour_f, 'max' => $close_hour_f, 'body' => $body]);
+    }
+
+    public function storeOrder(Request $request)
+    {
+        $pickup_date = $request->pickup_date;
+        $pickup_time = $request->pickup_time;
+        $note = $request->note;
+        $o_id = $request->order_id;
+        $order_type = $request->order_type;
+
+        $isToday = $this->compareDateWithToday($pickup_date);
+
+        if($isToday) {
+            $current_time = Carbon::now()->format('G:i');
+            if(Carbon::parse($pickup_time)->format('G:i') < $current_time) { // 11 < 12
+                return back()->with('error', 'Sila pilih masa yang sesuai');
+            }
+        }
+        
+        if($order_type == 'Pick-Up') {
+            $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('h:i:s');
+
+            DB::table('pgng_orders')->where('id', $o_id)->update([
+                'updated_at' => Carbon::now(),
+                'order_type' => $order_type,
+                'pickup_date' => $pickup_datetime,
+                'note' => $note,
+                'status' => 'Paid'
+            ]);
+        }
+
+        return redirect('/merchant/regular/')->with('success', 'Pesanan Anda Berjaya Direkod!');
+    }
+
+    private function compareDateWithToday($date)
+    {
+        $today = Carbon::now();
+        $date_f = Carbon::parse($date);
+
+        if($today->format('d-m-Y') == $date_f->format('d-m-Y')) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private function getDayIntegerByDayName($date)

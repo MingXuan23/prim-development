@@ -2,6 +2,8 @@
 
 @section('css')
 
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
 @include('layouts.datatable')
 
 <style>
@@ -42,34 +44,40 @@
             <div class="alert alert-success">
               <p>{{ Session::get('success') }}</p>
             </div>
+          @elseif(Session::has('error'))
+            <div class="alert alert-danger">
+              <p>{{ Session::get('error') }}</p>
+            </div>
           @endif
 
           <div class="table-responsive">
             <table class="table table-borderless" width="100%" cellspacing="0">
                 <thead>
                     <tr class="text-center">
-                      <th style="width: 25%">Nama Item</th>
-                      <th style="width: 20%">Kuantiti</th>
-                      <th style="width: 30%">Harga Satu Unit (RM)</th>
-                      <th style="width: 25%">Action</th>
+                      <th style="width: 25%">Nama</th>
+                      <th style="width: 15%">Kuantiti</th>
+                      <th style="width: 25%">Kuantiti Penuh</th>
+                      <th style="width: 20%">Harga Satu Unit (RM)</th>
+                      <th style="width: 15%">Action</th>
                     </tr>
                 </thead>
                 
                 <tbody>
-                  {{-- @forelse($cart_item as $row) --}}
+                  @forelse($cart_item as $row)
                     <tr class="text-center">
-                      <td class="align-middle">nama item</td>
-                      <td class="align-middle">kuantiti</td>
-                      <td class="align-middle">harga</td>
+                      <td class="align-middle">{{ $row->name }}</td>
+                      <td class="align-middle">{{ $row->quantity }}</td>
+                      <td class="align-middle">{{ $row->selling_quantity * $row->quantity }}</td>
+                      <td class="align-middle">{{ number_format((double)$row->price, 2, '.', '') }}</td>
                       <td class="align-middle">
-                          <button type="button" data-cart-order-id="#" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+                          <button type="button" data-cart-order-id="{{ $row->id }}" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>
                       </td>
                     </tr>
-                  {{-- @empty --}}
+                  @empty
                     <tr>
-                      <td colspan="4" class="text-center"><i>Tiada Item Buat Masa Sekarang.</i></td>
+                      <td colspan="5" class="text-center"><i>Tiada Item Buat Masa Sekarang.</i></td>
                     </tr>
-                  {{-- @endforelse --}}
+                  @endforelse
                 </tbody>
             </table>
           </div>
@@ -77,7 +85,7 @@
         </div>
       </div>
 
-    
+      @if($cart)
         <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="table-responsive">
@@ -85,28 +93,67 @@
                   <tbody>
                     <tr>
                       <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
-                      <td class="lead">RM total</td>
+                      <td class="lead">RM {{ number_format((double)$cart->total_price, 2, '.', '') }}</td>
                     </tr>
-
-                    <tr>
-                      <th class="text-muted" scope="row">Waktu Pengambilan:</th>
-                      <td class="lead">Tarikh ambil</td>
-                    </tr>
-                  </tbody>
+                  </tbody> 
               </table>
             </div>
           </div>
         </div>
 
-      <form action="#" method="POST">
+      <form action="{{ route('merchant.regular.store-order') }}" method="POST">
         @csrf
-        @method('PUT')
+        <div class="card mb-4 border">
+          <div class="card-body p-4">
+
+            <div class="row">
+              <div class="col">
+                <div class="form-group required">
+                  <label class="col">Jenis Pesanan</label>
+                  <div class="col">
+                    <select class="form-control" data-parsley-required-message="Sila pilih jenis pesanan" id="order_type" required>
+                      <option value="" selected>Pilih Jenis Pesanan</option>
+                      {{-- <option value="Delivery">Penghantaran</option> --}}
+                      <option value="Pick-Up">Ambil Sendiri</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+
+              <input type="hidden" id="org_id" value="{{ $cart->org_id }}">
+
+              <div class="col-6 pickup-date-div" hidden>
+                <div class="form-group required">
+                  <label class="col">Tarikh Pengambilan</label>
+                  <div class="col">
+                    <input type="text" class="form-control" name="pickup_date" id="datepicker" placeholder="Klik untuk pilih tarikh" readonly required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-6 pickup-time-div" hidden>
+                <div class="form-group required">
+                  <label class="col">Masa Pengambilan</label>
+                  <div class="col timepicker-section">
+                    <input type="time" class="form-control" name="pickup_time" id="timepicker" required>
+                    <p class="time-range"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
         <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
               <div class="col">
                 <div class="form-group required">
-                  <label class="col">Nota kepada Koperasi</label>
+                  <label class="col">Nota kepada Peniaga</label>
                   <div class="col">
                     <input type="text" name="note" class="form-control" placeholder="Optional">
                   </div>
@@ -115,15 +162,18 @@
             </div>
           </div>
         </div>
+
+        <input type="hidden" name="order_id" value="{{ $cart->id }}">
+        <input type="hidden" name="order_type" id="hidden_order_type">
         
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
-            <a href="#" type="button" class="btn-lg btn-light mr-2">Kembali</a>
+            <a href="{{ route('merchant.regular.show', $cart->org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
             <button type="submit" class="btn-lg btn-primary">Bayar</button>
           </div>
         </div>
       </form>
-
+      @endif
     </div>
   </div>
 </div>
@@ -155,10 +205,12 @@
 
 @section('script')
 
+{{-- <script src="https://code.jquery.com/jquery-3.6.0.js"></script> --}}
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
 <script>
   $(document).ready(function(){
-
-    var order_cart_id = null
+    var org_id = $('input#org_id').val()
 
     $.ajaxSetup({
       headers: {
@@ -166,10 +218,111 @@
       }
     });
 
+    $('#order_type').change(function() {
+      type_val = $(this).children(':selected').val()
+      $('#hidden_order_type').val(type_val)
+      if(type_val == 'Pick-Up') {
+        $('.pickup-date-div').removeAttr('hidden')
+      } else {
+        $('.pickup-date-div').attr('hidden', true)
+        $('.pickup-time-div').attr('hidden', true)
+      }
+    })
+
+    $('#datepicker').change(function() {
+      date_val = $(this).val()
+      if(date_val != null) {
+        $('.pickup-time-div').removeAttr('hidden')
+        $.ajax({
+          url: '{{ route("merchant.regular.fetch-hours") }}',
+          method: 'POST',
+          data: {org_id:org_id, date:date_val},
+          beforeSend:function() {
+            $('.time-range').empty()
+          },
+          success:function(result) {
+            $('#timepicker').attr('min', result.min)
+            $('#timepicker').attr('max', result.max)
+            $('.time-range').append(result.body)
+          },
+          error:function(result) {
+            console.log(result.responseText)
+          }
+        })
+      } else {
+        $('.pickup-time-div').attr('hidden', true)
+      }
+    })
+    
+    var order_cart_id = null
+
     $('.delete-item').click(function() {
       order_cart_id = $(this).attr('data-cart-order-id')
       $('#deleteConfirmModal').modal('show')
     })
+
+    $('#delete_confirm_item').click(function() {
+      $.ajax({
+        url: "{{ route('merchant.regular.destroy-item') }}",
+        method: "DELETE",
+        data: {cart_id:order_cart_id},
+        beforeSend:function() {
+          $('.loading').show()
+          $(this).hide()
+          $('.alert-success').empty()
+        },
+        success:function(result) {
+          $('.loading').hide()
+          $(this).show()
+          
+          location.reload()
+        },
+        error:function(result) {
+          console.log(result.responseText)
+        }
+      })
+    })
+
+    var dates = []
+    
+
+    $(document).ready(function() {
+      $.ajax({
+        url: '{{ route("merchant.regular.disabled-dates") }}',
+        method: 'post',
+        data: {org_id:org_id},
+        success:function(result) {
+          $.each(result.dates, function(index, value) {
+            dates.push(value)
+          })
+        },
+        error:function(result) {
+          console.log(result.responseText)
+        }
+      })
+    })
+
+    $("#datepicker").datepicker({
+        minDate: 0,
+        maxDate: '+1m',
+        dateFormat: 'mm/dd/yy',
+        dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
+        beforeShowDay: editDays
+    })
+
+    disabledDates = dates
+    
+    function editDays(date) {
+      for (var i = 0; i < disabledDates.length; i++) {
+        if (new Date(disabledDates[i]).toString() == date.toString()) {             
+          return [false];
+        }
+      }
+      return [true];
+    }
+
+    $('.alert-success').delay(2000).fadeOut()
+    $('.alert-danger').delay(4000).fadeOut()
 
   });
 </script>

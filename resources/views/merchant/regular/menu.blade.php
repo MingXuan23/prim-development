@@ -72,7 +72,7 @@
       <div class="card-header text-white" id="has-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
-          <a href="{{ route('test_edit') }}"><i class="mdi mdi-cart fa-3x"></i></a>
+          <a href="{{ route('merchant.regular.cart', $merchant->id) }}"><i class="mdi mdi-cart fa-3x"></i></a>
         </div>
         
         <p><i class="fas fa-map-marker-alt mr-2"></i> {{ $merchant->address }}, {{ $merchant->city }}, {{ $merchant->state }}</p>

@@ -324,7 +324,7 @@ class UserCooperativeController extends Controller
     public function destroyItemCart($org_id, $id)
     {
         $userID = Auth::id();
-
+        
         $cart_item = ProductOrder::where('id', $id);
 
         $item = $cart_item->first();

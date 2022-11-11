@@ -209,7 +209,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
         Route::get('{id}', 'RegularMerchantController@show')->name('merchant.regular.show');
         Route::post('fetch-item', 'RegularMerchantController@fetchItem')->name('merchant.regular.fetch-item');
         Route::post('store-item', 'RegularMerchantController@storeItemInCart')->name('merchant.regular.store-item');
-        Route::get('test_edit', 'RegularMerchantController@test_edit')->name('test_edit');
+        Route::get('{id}/cart', 'RegularMerchantController@showCart')->name('merchant.regular.cart');
+        Route::delete('destroy-item', 'RegularMerchantController@destroyItemInCart')->name('merchant.regular.destroy-item');
+        Route::post('fetch-disabled-dates', 'RegularMerchantController@fetchDisabledDates')->name('merchant.regular.disabled-dates');
+        Route::post('fetch-hours', 'RegularMerchantController@fetchOperationHours')->name('merchant.regular.fetch-hours');
+        Route::post('store-order', 'RegularMerchantController@storeOrder')->name('merchant.regular.store-order');
         Route::get('pesanan-dalam-proses', 'RegularMerchantController@pickup_order_list')->name('pickup.order.list');
         Route::get('sejarah-pesanan', 'RegularMerchantController@pickup_order_history')->name('pickup.order.history');
         Route::get('info-pesanan', 'RegularMerchantController@pickup_order_detail')->name('pickup.order.detail');
