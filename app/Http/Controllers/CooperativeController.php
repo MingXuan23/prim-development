@@ -646,7 +646,8 @@ class CooperativeController extends Controller
                     ->first();
 
         $product = DB::table('product_item as p')
-                    ->join('organization_user as ou','p.organization_id','=','ou.organization_id')
+                    ->join('product_group as pg','p.product_group_id','=','pg.id')
+                    ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
                     ->select('p.*')
                     ->where('ou.user_id', $userID)
                     ->get();
