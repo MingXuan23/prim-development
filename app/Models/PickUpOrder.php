@@ -12,7 +12,7 @@ class PickUpOrder extends Model
 
     protected $table = "pickup_order";
     
-    protected $fillable = ['pickup_date', 'total_price', 'note', 'status', 'user_id', 'organization_id'];
+    protected $fillable = ['pickup_date', 'total_price', 'note', 'status', 'user_id', 'organization_id', 'transaction_id'];
     public $timestamps = true;
 
     public function user()

@@ -46,7 +46,12 @@ class TypeOrganizationsTableSeeder extends Seeder
             6 =>
             array(
                 "id" => 2132,
-                "nama" => "Peniaga",
+                "nama" => "Peniaga Barang Berjadual",
+            ),
+            7 =>
+            array(
+                "id" => 3111,
+                "nama" => "Peniaga Barang Umum",
             ),
         ));
     }

@@ -60,7 +60,7 @@
 <div class="row align-items-center">
   <div class="col-sm-6">
       <div class="page-title-box">
-          <h4 class="font-size-18"><a href="{{ route('merchant.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
+          <h4 class="font-size-18"><a href="{{ route('merchant.regular.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
       </div>
   </div>
 </div>
@@ -72,27 +72,26 @@
       <div class="card-header text-white" id="has-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
-          <a href="{{ route('merchant.cart', $merchant->id) }}"><i class="mdi mdi-cart fa-3x"></i></a>
+          <a href="{{ route('merchant.regular.cart', $merchant->id) }}"><i class="mdi mdi-cart fa-3x"></i></a>
         </div>
         
-        {{-- <p><i class="fas fa-school mr-2"></i> {{ $org->nama }}</p> --}}
         <p><i class="fas fa-map-marker-alt mr-2"></i> {{ $merchant->address }}, {{ $merchant->city }}, {{ $merchant->state }}</p>
 
-        <div class="d-flex">
+        {{-- <div class="d-flex">
           @if($oh->status != 0)
           <p class="mr-4"><b>Waktu Buka</b></p>
           <p>Hari ini {{ $open_hour }} - {{ $close_hour }}</p>
           @else
           <p><b>Tutup pada hari ini</b></p>
           @endif
-        </div>
+        </div> --}}
       </div>
 
       <div class="m-2">
         <nav class="nav">
-          @foreach($jenis as $row)
-          <a class="nav-item nav-link" id="{{ $row['type_id'] }}" href="#{{ $row['type_name'] }}">
-            {{ $row['type_name'] }}
+          @foreach($product_group as $row)
+          <a class="nav-item nav-link" id="{{ $row->id }}" href="#{{ $row->name }}">
+            {{ $row->name }}
           </a>
           @endforeach
         </nav>
@@ -100,50 +99,56 @@
       </div>
       
       <div class="card-body">
-
+        
         <div class="flash-message"></div>
 
-        @foreach($jenis as $type)
-          <div class="d-flex justify-content-start" id="{{ $type['type_name'] }}">
-            <h3 class="mb-4 ml-2">{{ $type['type_name']}}</h3>
+        @foreach($product_group as $group)
+          <div class="d-flex justify-content-start" id="{{ $group->name }}">
+            <h3 class="mb-4 ml-2">{{ $group->name }}</h3>
           </div>
 
-          @foreach($product_item as $product)
-          @if($product->product_group_id == $type['type_id'])
-          <div class="row">
-            <div class="col">
-              <div class="card border p-2" id="shadow-bg" >
-                <div class="d-flex">
-                  <div class="d-flex justify-content-center align-items-start">
-                    <div>
-                      <img class="img-fluid" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="d-flex align-items-start flex-column h-100" >
-                      <div>
-                        <h4 class="mt-2">{{ $product->item_name }}</h4> 
-                      </div>
-                      <div>
-                        <p class="card-text"><i>{{ $product->desc }} </i></p>
-                      </div>
-                      <div class="mt-auto d-flex justify-content-between align-items-center w-100">
-                        <div class="">
-                          <p class="card-text"><b>RM</b> {{ $product_price[$product->id] }}</p>
+          @foreach($product_item as $item)
+            @if($item->product_group_id == $group->id)
+              <div class="row">
+                <div class="col">
+                  <div class="card border p-2" id="shadow-bg">
+                    <div class="d-flex">
+                      <div class="d-flex justify-content-center align-items-start">
+                        <div>
+                          <img class="img-fluid" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
                         </div>
-                        <div class="ml-auto">
-                          @csrf
-                          <input type="hidden" name="org_id" id="org_id" value="{{ $merchant->id }}">
-                          <button type="button" class="btn btn-success" id="{{ $product->id }}"><i class="mdi mdi-cart"></i></button>
+                      </div>
+                      <div class="col">
+                        <div class="d-flex align-items-start flex-column h-100" >
+                          <div>
+                            <h4 class="mt-2">{{ $item->name }} <span class="badge badge-light">{{ $item->selling_quantity }} {{ $item->collective_noun }}</span>
+                              @if($item->status != 1) <label class="text-danger">Kehabisan Stok</label> @endif
+                            </h4> 
+                          </div>
+                          <div>
+                            <p class="card-text"><i>{{ $item->desc }}</i></p>
+                          </div>
+                          <div class="mt-auto d-flex justify-content-between align-items-center w-100">
+                            <div class="">
+                              <p class="card-text"><b>RM</b> {{ number_format((double)($item->price * $item->selling_quantity), 2, '.', '') }}</p>
+                            </div>
+                            <div class="ml-auto">
+                              @csrf
+                              @if($item->status != 0)
+                              <div class="button-cart-section">
+                                <button type="button" class="btn btn-success btn-item-modal" data-item-id="{{ $item->id }}" data-org-id="{{ $merchant->id }}"><i class="mdi mdi-cart"></i></button>
+                              </div>
+                              @endif
+                            </div>
+                            
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-          @endif
+            @endif
           @endforeach
         
         @endforeach
@@ -166,7 +171,7 @@
       </div>
       <div class="modal-footer justify-content-center">
         <img class="loading" src="{{ URL('images/koperasi/loading-ajax.gif')}}">
-        <button type="button" class="cart-add-btn btn btn-primary btn-block">Semak Ketersediaan</button>
+        <button type="button" class="cart-add-btn btn btn-primary btn-block">Tambah</button>
       </div>
     </div>
   </div>
@@ -188,15 +193,15 @@
       }
     });
 
-    $('.btn-success').click(function(e) {
+    $('.btn-item-modal').click(function(e) {
       e.preventDefault()
       $('.modal-title').empty()
       $('.modal-body').empty()
-      item_id = $(this).attr('id')
-      org_id = $("input[name='org_id']").val()
+      item_id = $(this).attr('data-item-id')
+      org_id = $(this).attr('data-org-id')
       
       $.ajax({
-        url: "{{ route('merchant.fetchItem') }}",
+        url: "{{ route('merchant.regular.fetch-item') }}",
         method: "POST",
         data: {i_id:item_id, o_id:org_id},
         beforeSend:function() {
@@ -208,7 +213,7 @@
           $('.modal-body').empty()
           $('.modal-title').append(result.item.name)
           $('.modal-body').append(result.body)
-
+          
           quantityExceedHandler($("input[name='quantity_input']"), result.quantity)
         },
         error:function(result)
@@ -222,12 +227,12 @@
       var quantity = $("input[name='quantity_input']").val()
 
       $.ajax({
-        url: "{{ route('merchant.storeItem') }}",
+        url: "{{ route('merchant.regular.store-item') }}",
         method: "POST",
         data: {
           i_id:item_id,
           o_id:org_id,
-          quantity:quantity,
+          qty:quantity,
         },
         beforeSend: function() {
           $('.cart-add-btn').css('display', 'none')
@@ -252,13 +257,17 @@
           }
           else
           {
-            $('#addToCartModal').modal('hide')
+            if(result.alert == 'restart') {
+              location.reload()
+            } else {
+              $('#addToCartModal').modal('hide')
 
-            var message = "<div class='alert alert-danger'>"+result.alert+"</div>"
-            $('div.flash-message').show()
-            $('div.flash-message').append(message)
-            $('div.flash-message').delay(3000).fadeOut()
-            $("html, body").animate({ scrollTop: 0 }, "slow");
+              var message = "<div class='alert alert-danger'>"+result.alert+"</div>"
+              $('div.flash-message').show()
+              $('div.flash-message').append(message)
+              $('div.flash-message').delay(3000).fadeOut()
+              $("html, body").animate({ scrollTop: 0 }, "slow");
+            }
           }
         },
         error:function(result)
