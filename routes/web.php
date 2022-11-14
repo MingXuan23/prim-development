@@ -10,7 +10,6 @@
 |
 */
 
-use App\Http\Controllers\CooperativeController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -178,7 +177,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::delete('/order/{id}', 'UserCooperativeController@destroyUserOrder')->name('koperasi.destroyUserOrder');
         Route::get('/history', 'UserCooperativeController@indexHistory')->name('koperasi.history');
         Route::get('/{id}/list', 'UserCooperativeController@indexList')->name('koperasi.list');
-
+        
         // Koop_Shop
         Route::get('/koop','UserCooperativeController@indexKoop')->name('koperasi.indexKoop');
         Route::get('/koop/{id}','UserCooperativeController@koopShop')->name('koperasi.koopShop');

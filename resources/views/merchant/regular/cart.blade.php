@@ -163,6 +163,23 @@
           </div>
         </div>
 
+        <div class="card mb-4 border">
+          <div class="card-body p-4">
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label>Pilih Bank</label>
+                  <select name="bankid" id="bankid" class="form-control"
+                      data-parsley-required-message="Sila pilih bank" required>
+                      <option value="">Pilih bank</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+
         <input type="hidden" name="order_id" value="{{ $cart->id }}">
         <input type="hidden" name="order_type" id="hidden_order_type">
         
@@ -216,6 +233,25 @@
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
+    });
+    
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: "/fpx/getBankList",
+        success: function(data) {
+            jQuery.each(data.data, function(key, value){
+                arr.push(key);
+            });
+            for(var i = 0; i < arr.length; i++){
+                arr.sort();
+                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
+            }
+
+        },
+        error: function (data) {
+            // console.log(data);
+        }
     });
 
     $('#order_type').change(function() {
