@@ -140,6 +140,8 @@ Route::group(['prefix' => 'fees'], function () {
 
     Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
+
+    Route::post('/list-fetchYuranbyOrganId', 'FeesController@fecthYuranByOrganizationId')->name('fees.fetchYuranByOrganId');
 });
 
 Route::group(['prefix' => 'parent'], function () {
@@ -256,6 +258,8 @@ Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-pag
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
 
+Route::post('/exportAllYuranStatus', 'FeesController@ExportAllYuranStatus')->name('exportAllYuranStatus');
+
 
 Route::group(['prefix' => 'notification'], function () {
     Route::get('/', 'HomeController@showNotification')->name('index.notification');
@@ -287,7 +291,7 @@ Route::group(['prefix' => 'session'], function () {
 });
 
 Route::group(['prefix' => 'polimas'], function () {
-    Route::get('/', 'PolimasController@indexLogin');
+    // Route::get('/', 'PolimasController@indexLogin');
     Route::group(['middleware' => ['auth']], function () {
         Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
         Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
@@ -298,11 +302,16 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
     });
 });
+Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
+    Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
+    Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
+    Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
+});
 
 Route::resource('dorm', 'DormController');
 Route::group(['prefix' => 'sekolah'], function () {
     // application
-    Route::get('dorm/indexRequest/{id}','DormController@indexRequest')->name('dorm.indexRequest');
+    Route::get('dorm/indexRequest/{id}', 'DormController@indexRequest')->name('dorm.indexRequest');
     Route::get('dorm/getStudentOutingDatatable', 'DormController@getStudentOutingDatatable')->name('dorm.getStudentOutingDatatable');
     Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
     Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');

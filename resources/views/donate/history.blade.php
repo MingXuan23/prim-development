@@ -131,11 +131,11 @@
             if(startDate === "" || endDate === ""){
                 alert( "input date cant be empty." );
             }
-            else if(startDate > endDate)
+            else if(process(startDate) > process(endDate))
             {
                 alert( "invalid date." );
             }
-            else if(endDate > getTodayDate())
+            else if(process(endDate) > new Date())
             {
                 alert( "invalid date." );
             }
@@ -145,22 +145,9 @@
             }
         });
 
-        function getTodayDate()
-        {
-            let date = new Date();
-            let year = date.getFullYear();
-            let month = date.getMonth() + 1;
-            let dt = date.getDate();
-
-            if (dt < 10) {
-                dt = '0' + dt;
-            }
-            
-            if (month < 10) {
-                month = '0' + month;
-            }
-
-            return dt + '-' + month + '-' + year;
+        function process(date){
+            var parts = date.split("-");
+            return new Date(parts[2], parts[1] - 1, parts[0]);
         }
 
         function fetch_data(start_Date = "", end_Date = ""){

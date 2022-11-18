@@ -51,6 +51,16 @@
                             </a>
                         </li>
                         @endrole
+
+                        @role('Superadmin|Admin LHDN')
+                        <li>
+                            <a href="{{ route('lhdn.index') }}" class=" waves-effect">
+                                <i class="fas fa-donate"></i>
+                                <span>Derma LHDN</span>
+                            </a>
+                        </li>
+                        @endrole
+
                     </ul>
                 </li>
 
@@ -140,94 +150,94 @@
                         @endrole
 
                         @role('Superadmin|Pentadbir|Admin|Guru|Warden|Penjaga|Guard')
-                            <li>
-                                <a href="javascript: void(0);" class="has-arrow waves-effect">
-                                    <i class="fas fa-book"></i>
-                                    <span>Permohonan</span>
-                                </a>
-                                
-                                <ul class="sub-menu mm-collapse" aria-expanded="false">
-                                    @role('Superadmin')
-                                    <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 1) }}" class=" waves-effect">
-                                            <i class="fas fa-search"></i>
-                                            <span>Superadmin View</span>
-                                        </a>
-                                    </li>
-                                    @endrole
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="fas fa-book"></i>
+                                <span>Permohonan</span>
+                            </a>
 
-                                    @role('Admin')
-                                    <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 2) }}" class=" waves-effect">
-                                            <!-- <i class="fas fa-user-friends"></i> -->
-                                            <i class="fas fa-user-cog"></i>
+                            <ul class="sub-menu mm-collapse" aria-expanded="false">
+                                @role('Superadmin')
+                                <li>
+                                    <!-- need to change to index later -->
+                                    <a href="{{ route('dorm.indexRequest', 1) }}" class=" waves-effect">
+                                        <i class="fas fa-search"></i>
+                                        <span>Superadmin View</span>
+                                    </a>
+                                </li>
+                                @endrole
 
-                                            <span>Paparan Admin</span>
-                                        </a>
-                                    </li>
-                                    @endrole
-                                    
-                                    @role('Pentadbir')
-                                    <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 4) }}" class=" waves-effect">
-                                            <!-- <i class="fas fa-list"></i> -->
-                                            <i class="fas fa-user-cog"></i>
-                                            <span>Paparan Pentadbir</span>
-                                        </a>
-                                    </li>
-                                    @endrole
+                                @role('Admin')
+                                <li>
+                                    <!-- need to change to index later -->
+                                    <a href="{{ route('dorm.indexRequest', 2) }}" class=" waves-effect">
+                                        <!-- <i class="fas fa-user-friends"></i> -->
+                                        <i class="fas fa-user-cog"></i>
 
-                                    @role('Guru')
-                                    <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 5) }}" class=" waves-effect">
-                                            <i class="fas fa-chalkboard-teacher"></i>
-                                            <!-- <span>Permintaan(Guru)</span> -->
-                                            <span>Paparan Guru</span>
-                                        </a>
-                                    </li>
-                                    @endrole
+                                        <span>Paparan Admin</span>
+                                    </a>
+                                </li>
+                                @endrole
 
-                                    @role('Penjaga')
-                                    <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 6) }}" class=" waves-effect">
-                                            <i class="fas fa-user-friends"></i>
-                                            <!-- <span>Permintaan Anak</span> -->
-                                            <span>Paparan Penjaga</span>
-                                        </a>
-                                    </li>
-                                    @endrole
+                                @role('Pentadbir')
+                                <li>
+                                    <!-- need to change to index later -->
+                                    <a href="{{ route('dorm.indexRequest', 4) }}" class=" waves-effect">
+                                        <!-- <i class="fas fa-list"></i> -->
+                                        <i class="fas fa-user-cog"></i>
+                                        <span>Paparan Pentadbir</span>
+                                    </a>
+                                </li>
+                                @endrole
 
-                                    @role('Warden')
-                                    <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 7) }}" class=" waves-effect">
-                                            <!-- <i class="fas fa-book"></i>
+                                @role('Guru')
+                                <li>
+                                    <!-- need to change to index later -->
+                                    <a href="{{ route('dorm.indexRequest', 5) }}" class=" waves-effect">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                        <!-- <span>Permintaan(Guru)</span> -->
+                                        <span>Paparan Guru</span>
+                                    </a>
+                                </li>
+                                @endrole
+
+                                @role('Penjaga')
+                                <li>
+                                    <!-- need to change to index later -->
+                                    <a href="{{ route('dorm.indexRequest', 6) }}" class=" waves-effect">
+                                        <i class="fas fa-user-friends"></i>
+                                        <!-- <span>Permintaan Anak</span> -->
+                                        <span>Paparan Penjaga</span>
+                                    </a>
+                                </li>
+                                @endrole
+
+                                @role('Warden')
+                                <li>
+                                    <!-- need to change to index later -->
+                                    <a href="{{ route('dorm.indexRequest', 7) }}" class=" waves-effect">
+                                        <!-- <i class="fas fa-book"></i>
                                             <span>Semak Permintaan</span> -->
-                                            <!-- <i class="fas fa-id-card"></i> -->
-                                            <i class="fas fa-user-lock"></i>
-                                            <span>Paparan Warden</span>
-                                        </a>
-                                    </li>
-                                    @endrole
+                                        <!-- <i class="fas fa-id-card"></i> -->
+                                        <i class="fas fa-user-lock"></i>
+                                        <span>Paparan Warden</span>
+                                    </a>
+                                </li>
+                                @endrole
 
-                                    @role('Guard')
-                                    <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 8) }}" class=" waves-effect">
-                                            <!-- <i class="fas fa-book"></i>
+                                @role('Guard')
+                                <li>
+                                    <!-- need to change to index later -->
+                                    <a href="{{ route('dorm.indexRequest', 8) }}" class=" waves-effect">
+                                        <!-- <i class="fas fa-book"></i>
                                             <span>Permintaan</span> -->
-                                            <i class="fas fa-user-shield"></i>
-                                            <span>Paparan Guard</span>
-                                        </a>
-                                    </li>
-                                    @endrole
-                                </ul>
-                            </li>
+                                        <i class="fas fa-user-shield"></i>
+                                        <span>Paparan Guard</span>
+                                    </a>
+                                </li>
+                                @endrole
+                            </ul>
+                        </li>
                         @endrole
 
                         @role('Superadmin|Pentadbir|Guru|Warden|Penjaga|Guard')
@@ -238,7 +248,7 @@
                             </a>
                             <ul class="sub-menu mm-collapse" aria-expanded="false">
                                 <!-- used to be Permintaan -->
-                                
+
 
                                 @role('Superadmin|Pentadbir|Guru|Warden')
                                 <li>
@@ -315,75 +325,75 @@
                             </a>
                         </li>
 
-                        <li>
+                        {{-- <li>
                             <a href="{{ route('parent.dependent') }}" class=" waves-effect">
-                                <i class="fas fa-child"></i>
-                                <span>Carian Tanggungan</span>
-                            </a>
-                        </li>
-                        @endrole
+                        <i class="fas fa-child"></i>
+                        <span>Carian Tanggungan</span>
+                        </a>
+                </li> --}}
+                @endrole
 
-                        @role('Superadmin|Pentadbir')
-                        <li>
-                            <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
-                                <i class="fas fa-list-ul"></i>
-                                <span>Laporan</span>
-                            </a>
-                        </li>
-                        @endrole
-
-                        @role('Superadmin|Pentadbir|Guru')
-                        <li>
-                            <a href="{{ route('fees.category.report') }}" class=" waves-effect">
-                                <i class="ti-clipboard"></i>
-                                <span>Laporan Yuran</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
-                                <i class="fas fa-search"></i>
-                                <span>Laporan Kelas</span>
-                            </a>
-                        </li>
-                        @endrole
-
-                        @role('Superadmin|Pentadbir|Guru|Penjaga')
-
-                        <li>
-                            <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
-                                <i class="ti-clipboard"></i>
-                                <span>Sejarah Bayaran</span>
-                            </a>
-                        </li>
-                        @endrole
-
-                        @role('Superadmin|Pentadbir')
-                        <li>
-                            <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
-                                <i class="fas fa-user-cog"></i>
-                                <span>Kategori A</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ route('fees.B') }}" class=" waves-effect" aria-expanded="true">
-                                <i class="fas fa-user-cog"></i>
-                                <span>Kategori B</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ route('fees.C') }}" class=" waves-effect" aria-expanded="true">
-                                <i class="fas fa-user-cog"></i>
-                                <span>Kategori C</span>
-                            </a>
-                        </li>
-                        @endrole
-
-                    </ul>
+                @role('Superadmin|Pentadbir')
+                <li>
+                    <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
+                        <i class="fas fa-list-ul"></i>
+                        <span>Laporan</span>
+                    </a>
                 </li>
                 @endrole
+
+                @role('Superadmin|Pentadbir|Guru')
+                <li>
+                    <a href="{{ route('fees.category.report') }}" class=" waves-effect">
+                        <i class="ti-clipboard"></i>
+                        <span>Laporan Yuran</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
+                        <i class="fas fa-search"></i>
+                        <span>Laporan Kelas</span>
+                    </a>
+                </li>
+                @endrole
+
+                @role('Superadmin|Pentadbir|Guru|Penjaga')
+
+                <li>
+                    <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
+                        <i class="ti-clipboard"></i>
+                        <span>Sejarah Bayaran</span>
+                    </a>
+                </li>
+                @endrole
+
+                @role('Superadmin|Pentadbir')
+                <li>
+                    <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Kategori A</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('fees.B') }}" class=" waves-effect" aria-expanded="true">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Kategori B</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{{ route('fees.C') }}" class=" waves-effect" aria-expanded="true">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Kategori C</span>
+                    </a>
+                </li>
+                @endrole
+
+            </ul>
+            </li>
+            @endrole
             </ul>
         </div>
     </div>

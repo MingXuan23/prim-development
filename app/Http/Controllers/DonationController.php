@@ -73,7 +73,7 @@ class DonationController extends Controller
                     ->where('organizations.id', $oid)
                     ->orderBy('donations.nama');
                 }
-            } 
+            }
             elseif ($hasOrganizaton == "false") {
                 $data = DB::table('donations')
                     ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
@@ -81,7 +81,7 @@ class DonationController extends Controller
                     ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url')
                     ->where('donations.status', 1)
                     ->orderBy('donations.nama');
-            } 
+            }
             elseif ($hasOrganizaton == "true") {
                 $data = DB::table('organizations')
                     ->join('donation_organization', 'donation_organization.organization_id', '=', 'organizations.id')
@@ -180,7 +180,7 @@ class DonationController extends Controller
         if (!Auth::user()->hasRole('Superadmin')) {
             return view('errors.400');
         }
-        
+
         return view('donate.history');
     }
 
@@ -272,7 +272,7 @@ class DonationController extends Controller
             ->get();
         }
     }
-    
+
     public function urlDonation($link)
     {
         $user = "";
@@ -305,12 +305,12 @@ class DonationController extends Controller
         $donation = DB::table('donations')
                         ->where('url', '=' , $link)
                         ->first();
-        
+
         if($donation->status == 0)
         {
             return view('errors.404');
         }
-        
+
         return view('paydonate.anonymous.index', compact('donation'));
     }
 
@@ -331,7 +331,7 @@ class DonationController extends Controller
         $end_date = Carbon::createFromFormat(config('app.date_format'), $request->date_end)->format('Y-m-d');
 
         $file_name = '';
-        
+
         if (!is_null($request->donation_poster)) {
             $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
             $file_name = basename($storagePath);
@@ -393,9 +393,9 @@ class DonationController extends Controller
         $file_name = '';
 
         // dd($request->donation_type);
-        
+
         if (!is_null($request->donation_poster)) {
-            
+
             // Delete existing image before update with new image;
             $donation = $this->donation->getDonationById($id);
 
@@ -404,7 +404,7 @@ class DonationController extends Controller
                 $destination = public_path('donation-poster') . '/' . $donation->donation_poster;
                 unlink($destination);
             }
-            
+
             $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
             $file_name = basename($storagePath);
         }
@@ -432,7 +432,7 @@ class DonationController extends Controller
         $result = DB::table('donations')
                     ->where('id', '=', $id)
                     ->delete();
-        
+
 
         if ($result) {
             Session::flash('success', 'Derma Berjaya Dipadam');
@@ -450,36 +450,97 @@ class DonationController extends Controller
             case 1:
                 $code = 'STU' . str_pad($id, 3, '0', STR_PAD_LEFT);
                 break;
-            
+
             case 2:
                 $code = 'FB' . str_pad($id, 3, '0', STR_PAD_LEFT);
                 break;
-            
+
             case 3:
                 $code = 'STEM' . str_pad($id, 3, '0', STR_PAD_LEFT);
                 break;
-            
+
             case 4:
                 $code = 'THFZ' . str_pad($id, 3, '0', STR_PAD_LEFT);
                 break;
-            
+
             case 5:
                 $code = 'MJD' . str_pad($id, 3, '0', STR_PAD_LEFT);
                 break;
-            
+
             case 6:
                 $code = 'RIBD' . str_pad($id, 3, '0', STR_PAD_LEFT);
                 break;
-            
+
             case 7:
                 $code = 'NGO' . str_pad($id, 3, '0', STR_PAD_LEFT);
                 break;
-            
+
             case 8:
                 $code = 'LA' . str_pad($id, 3, '0', STR_PAD_LEFT);
                 break;
         }
 
         return $code;
+    }
+
+    public function indexLHDN()
+    {
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Admin LHDN'))
+        {
+            $donations = Donation::where('lhdn_reference_code', '!=', null)->get();
+            return view('lhdn.index', compact('donations'));
+        }
+
+        return view('errors.404');
+    }
+
+    public function getLHDNHistoryDatatable(Request $request)
+    {
+        $listhistory = DB::table('transactions')
+            ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
+            ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
+            ->select('transactions.id as id', 'donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
+            ->where('donations.id', $request->dermaId)
+            ->where('transactions.icno', '!=', null)
+            ->where('transactions.status', 'success')
+            ->orderBy('transactions.datetime_created', 'desc')
+            ->get();
+
+        if (request()->ajax()) {
+            return datatables()->of($listhistory)
+                ->editColumn('datetime_created', function ($data) {
+                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created)->format('d/m/Y');
+                    return $formatedDate;
+                })
+                ->editColumn('amount', function ($data) {
+                    return number_format($data->amount, 2);
+                })
+                ->addColumn('action', function ($row) {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a class="btn btn-primary" href="' . route('lhdn-receipt', $row->id) .'">papar resit</a></div>';
+    
+                    return $btn;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
+    }
+
+    public function getLHDNReceipt($id)
+    {
+        $transaction = Transaction ::find($id);
+        $donation = DB::table('donations as d')
+            ->leftJoin('donation_transaction as dt', 'dt.donation_id', 'd.id')
+            ->where('dt.transaction_id', $id)
+            ->select('d.*')
+            ->first();
+
+        if(!isset($donation->lhdn_reference_code))
+        {
+            return view('errors.404');
+        }
+        
+        $organization = $this->organization->getOrganizationByDonationId($donation->id);
+        return view('lhdn.receipt', compact('donation', 'organization', 'transaction'));
     }
 }
