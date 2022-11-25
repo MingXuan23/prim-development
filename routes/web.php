@@ -66,7 +66,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
 });
 
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
-Route::get('sumbangan_lhdn/{link}', 'DonationController@lhdndonate')->name('LHDNdonate');
 Route::get('sumbangan_anonymous/{link}', 'DonationController@anonymouIndex')->name('ANONdonate');
 
 Route::group(['prefix' => 'organization'], function () {
@@ -302,6 +301,8 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
     });
 });
+
+
 Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
     Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
     Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');

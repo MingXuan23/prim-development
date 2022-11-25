@@ -52,15 +52,15 @@
                         </li>
                         @endrole
 
-                        @role('Superadmin|Admin LHDN')
+                        {{-- @role('Superadmin|Admin LHDN')
                         <li>
                             <a href="{{ route('lhdn.index') }}" class=" waves-effect">
                                 <i class="fas fa-donate"></i>
                                 <span>Derma LHDN</span>
                             </a>
                         </li>
-                        @endrole
-
+                        @endrole --}}
+                        
                     </ul>
                 </li>
 

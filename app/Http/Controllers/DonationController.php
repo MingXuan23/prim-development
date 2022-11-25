@@ -292,11 +292,6 @@ class DonationController extends Controller
             $user = $this->user->getUserById();
         }
 
-        if($donation->lhdn_reference_code != NULL)
-        {
-            return view('paydonate.lhdn.index', compact('donation', 'user'));
-        }
-
         return view('paydonate.pay', compact('donation', 'user'));
     }
 
@@ -317,7 +312,7 @@ class DonationController extends Controller
     public function create()
     {
         $organization = $this->getOrganizationByUserId();
-        $donation_type = DB::table('donation_type')->get();
+        $donation_type = DB::table('donation_type')->orderBy('nama')->get();
 
         return view('donate.add', compact('organization', 'donation_type'));
     }
@@ -364,7 +359,7 @@ class DonationController extends Controller
         $organizations = $this->getOrganizationByUserId();
         $organization = $this->organization->getOrganizationByDonationId($id);
         $donation = DB::table('donations')->where('id', $id)->first();
-        $donation_type = DB::table('donation_type')->get();
+        $donation_type = DB::table('donation_type')->orderBy('nama')->get();
         $current_type = DB::table('donation_type')
                         ->where('id', '=', $donation->donation_type)
                         ->select('nama')
