@@ -357,24 +357,24 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hammer"></i>
-                                    Masjid/Surau Baru </a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i>
                                     Derma Khas </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-university"></i>
+                                    IPTA / Universiti</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hammer"></i>
+                                    Masjid/Surau Baru </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-school"></i>
                                     PIBG Sekolah </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hand-holding-usd"></i>
-                                    Aktiviti STEM </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
@@ -640,7 +640,7 @@
 
     $(document).ready(function() {
         window.onload = function() {
-            document.getElementById("2").click();
+            document.getElementById("8").click();
         };
 
         $.ajax({

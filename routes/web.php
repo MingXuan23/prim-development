@@ -132,6 +132,8 @@ Route::group(['prefix' => 'fees'], function () {
     
     Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
+
+    Route::post('/list-fetchYuranbyOrganId', 'FeesController@fecthYuranByOrganizationId')->name('fees.fetchYuranByOrganId');
 });
 
 Route::group(['prefix' => 'parent'], function () {
@@ -351,7 +353,7 @@ Route::get('successpay', 'PayController@successPay')->name('successpay');
 Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
 Route::get('feespay', 'PayController@fees_pay')->name('feespay');
 Route::get('receiptfee', 'PayController@viewReceipt')->name('receiptfee');
-Route::get('receipttest/{transaction_id}', 'PayController@ReceiptFees')->name('receipttest');
+Route::get('viewfeereceipt/{transaction_id}', 'PayController@viewReceiptFees')->name('receipttest');
 
 Route::get('feesparent', 'FeesController@parentpay')->name('parentpay');
 
@@ -374,6 +376,8 @@ Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
 Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file');
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
+
+Route::post('/exportAllYuranStatus', 'FeesController@ExportAllYuranStatus')->name('exportAllYuranStatus');
 
 
 Route::group(['prefix' => 'notification'], function () {
@@ -399,9 +403,28 @@ Route::get('/receipt', 'PayController@showReceipt');
 
 Route::get('list', 'LandingPageController@getDonationDatatable')->name('landing-page.getOrganizationDatatable');
 
-
 Route::group(['prefix' => 'session'], function () {
     Route::get('session/get', 'SessionController@accessSessionData')->name('getsession');
     Route::get('session/set', 'SessionController@storeSessionData')->name('setsession');
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
+
+Route::group(['prefix' => 'polimas'], function () {
+    // Route::get('/', 'PolimasController@indexLogin');
+    Route::group(['middleware' => ['auth']], function () {
+        Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
+        Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
+        Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
+        Route::get('/student-list', 'PolimasController@getStudentDatatable')->name('polimas.student.getStudentDatatable');
+        Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
+        Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
+        Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
+    });
+});
+
+/* 
+Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
+    Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
+    Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
+    Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
+}); */

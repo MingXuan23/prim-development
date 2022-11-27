@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class TypeOrganizationsTableSeeder extends Seeder
 {
@@ -11,8 +12,8 @@ class TypeOrganizationsTableSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('type_organizations')->delete();
-        \DB::table('type_organizations')->insert(array(
+        DB::table('type_organizations')->delete();
+        DB::table('type_organizations')->insert(array(
             0 =>
             array(
                 "id" => 1,
@@ -40,18 +41,18 @@ class TypeOrganizationsTableSeeder extends Seeder
             ),
             5 =>
             array(
-                "id" => 1039,
-                "nama" => "Koperasi",
+                "id" => 6,
+                "nama" => "Rumah Anak Yatim",
             ),
             6 =>
             array(
-                "id" => 2132,
-                "nama" => "Peniaga Barang Berjadual",
+                "id" => 7,
+                "nama" => "Pusat Tahfiz",
             ),
             7 =>
             array(
-                "id" => 3111,
-                "nama" => "Peniaga Barang Umum",
+                "id" => 8,
+                "nama" => "Kedai Makanan",
             ),
         ));
     }

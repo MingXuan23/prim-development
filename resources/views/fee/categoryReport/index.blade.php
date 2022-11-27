@@ -13,75 +13,120 @@
         </div>
     </div>
 </div>
-<div class="container">
 
-    <div class="row d-flex justify-content-center">
-        <div class="col-md-12">
-            <div class="card card-primary">
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-primary">
 
-                @if(count($errors) > 0)
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                        <li>{{$error}}</li>
+            @if(count($errors) > 0)
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                    <li>{{$error}}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+            
+            @if(\Session::has('success'))
+            <div class="alert alert-success">
+                <p>{{ \Session::get('success') }}</p>
+            </div>
+            @endif
+            
+            <div class="flash-message"></div>
+            
+            <div class="card-body">
+
+                <div class="form-group">
+                    <label>Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
-                    </ul>
+                    </select>
                 </div>
-                @endif
-                
-                @if(\Session::has('success'))
-                <div class="alert alert-success">
-                    <p>{{ \Session::get('success') }}</p>
+
+                <div id="dkelas" class="form-group">
+                    <label> Kelas </label>
+                    <select name="classes" id="classes" class="form-control">
+                        <option value="0" disabled selected>Pilih Kelas</option>
+                    </select>
                 </div>
-                @endif
-                
-                <div class="flash-message"></div>
-                
-                <div class="card-body">
 
-                    <div class="form-group">
-                        <label>Organisasi</label>
-                        <select name="organization" id="organization" class="form-control">
-                            <option value="" selected>Pilih Organisasi</option>
-                            @foreach($organization as $row)
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endforeach
-                        </select>
+                <div id="yuran" class="form-group">
+                    <label> Yuran </label>
+                    <select name="fees" id="fees" class="form-control">
+                        <option value="0" disabled selected>Pilih Yuran</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="col-md-12">
+                <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-success"  data-toggle="modal" data-target="#modalByYuran"><i class="fas fa-plus"></i> Export Yuran</a>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="table-responsive">
+                        <table id="yuranTable" class="table table-bordered table-striped dt-responsive wrap"
+                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <thead>
+                                <tr style="text-align:center">
+                                    <th>No</th>
+                                    <th>Nama Murid</th>
+                                    <th>Jantina</th>
+                                    <th>Status Pembayaran</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
-
-                    <div id="dkelas" class="form-group">
-                        <label> Kelas </label>
-                        <select name="classes" id="classes" class="form-control">
-                            <option value="0" disabled selected>Pilih Kelas</option>
-                        </select>
-                    </div>
-
-                    <div id="yuran" class="form-group">
-                        <label> Yuran </label>
-                        <select name="fees" id="fees" class="form-control">
-                            <option value="0" disabled selected>Pilih Yuran</option>
-                        </select>
-                    </div>
-
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <div class="table-responsive">
-            <table id="yuranTable" class="table table-bordered table-striped dt-responsive wrap"
-                style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                <thead>
-                    <tr style="text-align:center">
-                        <th>No</th>
-                        <th>Nama Murid</th>
-                        <th>Jantina</th>
-                        <th>Status Pembayaran</th>
-                    </tr>
-                </thead>
-            </table>
+{{-- modal export yuran --}}
+<div class="modal fade" id="modalByYuran" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export Yuran</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form action="{{ route('exportAllYuranStatus') }}" method="post">
+                <div class="modal-body">
+                    {{ csrf_field() }}
+                    <div class="form-group">
+                        <label>Organisasi</label>
+                        <select name="organExport" id="organExport" class="form-control">
+                            <option value="" disabled selected>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Name Yuran</label>
+                        <select name="yuranExport" id="yuranExport" class="form-control">
+
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
 @endsection
 
 
@@ -96,8 +141,32 @@
 
 <script>
     $(document).ready(function(){
+
+        function fetchClass(organizationid = '', yuranId = ''){
+            var _token = $('input[name="_token"]').val();
+            $.ajax({
+                url:"{{ route('fees.fetchYuranByOrganId') }}",
+                method:"POST",
+                data:{ oid:organizationid,
+                        _token:_token },
+                success:function(result)
+                {
+                    $(yuranId).empty();
+                    $(yuranId).append("<option value='' disabled selected> Pilih Kelas</option>");
+                    jQuery.each(result.success, function(key, value){
+                        $(yuranId).append("<option value='"+ value.id +"'>" + value.name + "</option>");
+                    });
+                }
+            })
+        }
+
+        $('#organExport').change(function() {
+            var organizationid    = $("#organExport").val();
+            var _token            = $('input[name="_token"]').val();
+            fetchClass(organizationid, '#yuranExport');
+        });
         
-        if($("#organization").val() != ""){
+        if($("#organization").val() == ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetch_data($("#organization").val());
         }
@@ -212,7 +281,6 @@
         });
 
         $('.alert').delay(3000).fadeOut();
-
     });
 </script>
 @endsection

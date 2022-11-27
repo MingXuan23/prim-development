@@ -52,20 +52,8 @@ class RoleTableSeeder extends Seeder
             ),
             6 =>
             array(
-                "id" => 1239,
-                "name" => "Koop Admin",
-                "guard_name" => "web"
-            ),
-            7 =>
-            array(
-                "id" => 2015,
-                "name" => "Schedule Merchant Admin",
-                "guard_name" => "web"
-            ),
-            8 =>
-            array(
-                "id" => 3114,
-                "name" => "Regular Merchant Admin",
+                "id" => 7,
+                "name" => "Admin Polimas",
                 "guard_name" => "web"
             ),
         ));

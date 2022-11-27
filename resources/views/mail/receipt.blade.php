@@ -287,7 +287,8 @@
                                 <tbody><tr>
                                     <td class="content-block">
                                         <h2>{{ $organizationName }}</h2>
-                                        <h3 style="font-size: 14px !important">{{ $organizationTelNo }} | {{ $organizationEmail }}</h3>
+                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">({{ $ogranizationAddress }})</h3>
+                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">{{ $organizationTelNo }} | {{ $organizationEmail }}</h3>
                                     </td>
                                 </tr>
                                 <tr>
@@ -296,10 +297,10 @@
                                             <tbody>
                                                 <tr>
                                                 <td>
-                                                    Nama: {{ $transactionUsername }}<br>
-                                                    Email: {{ $transactionEmail }}<br>
-                                                    Donation ID: {{ $transactionName }}<br>
-                                                    Tarikh Derma: {{ date('d-m-Y', strtotime($transactionDate)) }}
+                                                    <b>Nama :</b> {{ $transactionUsername }}<br>
+                                                    <b>Email :</b> {{ $transactionEmail }}<br>
+                                                    <b>Nombor Resit :</b> {{ $transactionName }}<br>
+                                                    <b>Tarikh Derma :</b> {{ date('d-m-Y', strtotime($transactionDate)) }}
                                                 </td>
                                             </tr>
                                             <tr>

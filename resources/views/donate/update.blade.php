@@ -34,22 +34,22 @@
             <div class="card-body">
                 <p class="card-title-desc">Bahagian bertanda * wajib diisi</p>
                 
-                <div class="form-group ">
-                    <label class="control-label">Nama Derma</label>
-                    <input type="text" name="nama" class="form-control" placeholder="Nama Penuh" 
-                    data-parsley-required-message="Sila masukkan nama derma" value="{{ $donation->nama }}" required>
+                <div class="form-group">
+                    <label class="control-label">Nama Organisasi</label>
+                    <input type="text" name="nama" class="form-control" value="{{ $organization->nama }}" readonly>
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group col-md-6 required">
+                    <div class="form-group required col-md-6">
                         <label class="control-label">Nama Derma</label>
                         <input type="text" name="nama" class="form-control" placeholder="Nama Penuh" 
                         data-parsley-required-message="Sila masukkan nama derma" value="{{ $donation->nama }}" required>
                     </div>
+                    
                     <div class="form-group required col-md-6">
                         <label class="control-label">Jenis Derma</label>
                         <select name="donation_type" id="donation_type" class="form-control" data-parsley-required-message="Sila masukkan jenis derma" required>
-                            <option value="$donation->donation_type">{{ $current_type->nama }}</option>
+                            <option value="{{ $donation->donation_type }}">{{ $current_type->nama }}</option>
                             @foreach($donation_type as $row)
                                 @if ($row->id != $donation->donation_type)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>

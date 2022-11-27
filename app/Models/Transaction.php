@@ -125,7 +125,10 @@ class Transaction extends Model
     public function getDonorByDonationId($id)
     {
         $donor = Transaction::with(["donation"])->whereHas('donation', function ($query) use ($id) {
-            $query->where("donations.id", $id);
+            $query->where([
+                ["donations.id", $id],
+                ["transactions.status", 'success']
+            ]);
         })->get();
 
         return $donor;
