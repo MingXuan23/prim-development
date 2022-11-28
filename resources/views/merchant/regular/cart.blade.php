@@ -100,8 +100,8 @@
             </div>
           </div>
         </div>
-
-      <form action="{{ route('merchant.regular.store-order') }}" method="POST">
+        
+      <form action="{{ route('fpxIndex') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="card mb-4 border">
           <div class="card-body p-4">
@@ -122,7 +122,7 @@
             </div>
 
             <div class="row">
-
+              
               <input type="hidden" id="org_id" value="{{ $cart->org_id }}">
 
               <div class="col-6 pickup-date-div" hidden>
@@ -179,7 +179,8 @@
           </div>
         </div>
         
-
+        <input type="hidden" name="amount" id="total_price" value="2.00">
+        <input type="hidden" name="desc" id="desc" value="Merchant">
         <input type="hidden" name="order_id" value="{{ $cart->id }}">
         <input type="hidden" name="order_type" id="hidden_order_type">
         

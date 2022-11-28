@@ -208,6 +208,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
     Route::group(['prefix' => 'regular'], function() {
         // Index
         Route::get('', 'RegularMerchantController@index')->name('merchant.regular.index');
+        // Route::get('/test-email', 'RegularMerchantController@test_mail')->name('test.mer.mail');
         // Orders
         Route::get('all-orders', 'RegularMerchantController@showAllOrder')->name('merchant.all-orders');
         Route::get('get-all-orders', 'RegularMerchantController@getAllOrder')->name('merchant.get-all-orders');
@@ -227,96 +228,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
         Route::post('store-order', 'RegularMerchantController@storeOrder')->name('merchant.regular.store-order');
     });
 });
-
-// Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi'], function() {
-//     Route::delete('/{org_id}/edit/{id}', 'CooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
-//     Route::post('/koperasi/fetchKoop', 'CooperativeController@fetchKoop')->name('koperasi.fetchKoop');
-//     Route::get('/order', 'CooperativeController@indexOrder')->name('koperasi.order');
-//     Route::get('/order/fetchDay', 'CooperativeController@fetchAvailableDay')->name('koperasi.fetchDay');
-//     Route::post('/order/update-pick-up-date', 'CooperativeController@updatePickUpDate')->name('koperasi.updatePickUpDate');
-//     Route::delete('/order/{id}', 'CooperativeController@destroyUserOrder')->name('koperasi.destroyUserOrder');
-//     Route::get('/history', 'CooperativeController@indexHistory')->name('koperasi.history');
-//     Route::get('/{id}/list', 'CooperativeController@indexList')->name('koperasi.list');
-// });
-
-// Route::group(['prefix' => 'koperasi'], function () {
-//     Route::get('/admin','CooperativeController@indexAdmin')->name('koperasi.indexAdmin');
-//     Route::get('/produk','CooperativeController@createProduct')->name('koperasi.createProduct');
-//     Route::post('/produk','CooperativeController@storeProduct')->name('koperasi.storeProduct');
-//     Route::get('/produk/update/{id}','CooperativeController@editProduct')->name('koperasi.editProduct');
-//     Route::post('/produk/update/{id}','CooperativeController@updateProduct')->name('koperasi.updateProduct');
-//     Route::get('/produk/delete/{id}','CooperativeController@deleteProduct')->name('koperasi.deleteProduct');
-//     Route::get('/openingHours','CooperativeController@indexOpening')->name('koperasi.indexOpening');
-//     Route::post('/openingHours','CooperativeController@storeOpening')->name('koperasi.storeOpening');
-//     Route::get('/Confirm','CooperativeController@indexConfirm')->name('koperasi.indexConfirm');
-//     Route::get('/Confirm/update/{id}','CooperativeController@storeConfirm')->name('koperasi.storeConfirm');
-//     Route::get('/Confirm/delete/{id}','CooperativeController@notConfirm')->name('koperasi.notConfirm');
-// });
-
-// Route::group(['prefix' => 'koperasi'], function () {
-//     Route::get('/koop','CooperativeController@indexKoop')->name('koperasi.indexKoop');
-//     Route::get('/koop/{id}','CooperativeController@koopShop')->name('koperasi.koopShop');
-//     Route::get('/koop/store/{id}','CooperativeController@storeKoop')->name('koperasi.storeKoop');
-//     Route::get('/koop/{id}/cart','CooperativeController@koopCart')->name('koperasi.koopCart');
-// });
-
-// Route::group(['middleware' => ['auth'], 'prefix' => 'merchant'], function() {
-//     Route::get('/', 'MerchantController@merchantList')->name('merchant.index');
-
-//     Route::get('order', 'MerchantController@showOrder')->name('merchant.order');
-//     Route::delete('order/{id}', 'MerchantController@destroyOrder')->name('merchant.destroyOrder');
-
-//     Route::get('history', 'MerchantController@showHistory')->name('merchant.history');
-
-//     Route::get('list/{id}', 'MerchantController@showList')->name('merchant.list');
-
-//     Route::get('/{id}', 'MerchantController@showMerchant')->name('merchant.show');
-//     Route::post('fetchDay', 'MerchantController@fetchDay')->name('merchant.fetchDay');
-//     Route::post('fetchTime', 'MerchantController@fetchTime')->name('merchant.fetchTime');
-//     Route::post('storeOrderDate', 'MerchantController@storeOrderDate')->name('merchant.storeOrderDate');
-//     Route::post('destroyOldOrder', 'MerchantController@destroyOldOrder')->name('merchant.destroyOldOrder');
-
-//     Route::post('fetchItem', 'MerchantController@fetchItem')->name('merchant.fetchItem');
-//     Route::post('store-item', 'MerchantController@storeItem')->name('merchant.storeItem');
-
-//     Route::get('/{id}/merchant-cart', 'MerchantController@showMerchantCart')->name('merchant.cart');
-//     Route::delete('destroyItem', 'MerchantController@destroyCartItem')->name('merchant.destroyItem');
-//     Route::put('{o_id}/merchant-cart/{p_id}', 'MerchantController@storeOrderAfterPayment')->name('merchant.storeOrderPayment');
-// });
-
-// Route::group(['middleware' => ['auth'], 'prefix' => 'admin-merchant', 'namespace' => 'Merchant'], function() {
-//     Route::get('/', 'AdminMerchantController@index')->name('admin.merchant.index');
-//     Route::get('/list/{id}', 'AdminMerchantController@showList')->name('admin.merchant.list');
-//     Route::delete('destroy-order', 'AdminMerchantController@destroyOrder')->name('admin.merchant.destroy-order');
-    
-//     /* Operation Dashboard Route */
-//     Route::get('/operation-hours', 'AdminMerchantController@showOperationHours')->name('admin.merchant.hours');
-//     Route::post('edit-operation-hours', 'AdminMerchantController@editOperationHours')->name('admin.merchant.edit-hours');
-//     Route::put('update-operation-hours', 'AdminMerchantController@updateOperationHours')->name('admin.merchant.update-hours');
-//     Route::get('/operation-hours/check-orders/{id}', 'AdminMerchantController@editExistingOrder')->name('admin.merchant.order-exist');
-//     Route::post('change-date-time', 'AdminMerchantController@changeOrderExistDateTime')->name('admin.merchant.change-datetime');
-//     Route::put('update-new-operation-hours', 'AdminMerchantController@updateNewOperationHours')->name('admin.merchant.update-new-hours');
-    
-//     /* Product Dashboard Route */
-//     Route::get('/product-dashboard', 'AdminMerchantController@showProductDashboard')->name('admin.merchant.product');
-//     Route::post('/product-dashboard', 'AdminMerchantController@storeProductGroup')->name('admin.merchant.store-group');
-//     Route::get('/product-dashboard/{id}', 'AdminMerchantController@showProductItem')->name('admin.merchant.product-item');
-//     Route::put('update-product-group', 'AdminMerchantController@updateProductGroup')->name('admin.merchant.update-group');
-//     Route::delete('delete-product-group', 'AdminMerchantController@destroyProductGroup')->name('admin.merchant.destroy-group');
-//     Route::post('store-product-item', 'AdminMerchantController@storeProductItem')->name('admin.merchant.store-item');
-//     Route::get('/product-dashboard/{id}/edit/{item}', 'AdminMerchantController@editProductItem')->name('admin.merchant.edit-item');
-//     Route::put('update-product-item', 'AdminMerchantController@updateProductItem')->name('admin.merchant.update-item');
-//     Route::get('get-item-for-destroy', 'AdminMerchantController@getItemForDestroy')->name('admin.merchant.get-item-destroy');
-//     Route::delete('destroy-item', 'AdminMerchantController@destoryProductItem')->name('admin.merchant.destroy-item');
-    
-//     /* Order Dashboard Route */
-//     Route::get('/show-orders', 'AdminMerchantController@showAllOrder')->name('admin.merchant.order');
-//     Route::get('order-list', 'AdminMerchantController@getAllOrder')->name('admin.merchant.order-list');
-//     Route::post('confirm-order', 'AdminMerchantController@confirmOrder')->name('admin.merchant.confirm-order');
-//     Route::get('/show-orders/history', 'AdminMerchantController@showHistoryOrder')->name('admin.merchant.history');
-//     Route::get('history-list', 'AdminMerchantController@getAllHistory')->name('admin.merchant.history-list');
-// });
-
 
 
 Route::group(['middleware' => ['auth']], function () {

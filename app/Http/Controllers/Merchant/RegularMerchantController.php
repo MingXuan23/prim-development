@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Merchant;
 
+use App\User;
 use App\Http\Controllers\Controller;
+use App\Mail\MerchantOrderReceipt;
 use App\Models\Organization;
 use App\Models\OrganizationHours;
+use App\Models\PgngOrder;
+use App\Models\Transaction;
 use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use Carbon\CarbonPeriod;
@@ -14,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Mail;
 use Yajra\DataTables\DataTables;
 
 class RegularMerchantController extends Controller
@@ -23,12 +28,13 @@ class RegularMerchantController extends Controller
         $todayDate = Carbon::now()->format('l'); // Format to day name
         
         $day = $this->getDayIntegerByDayName($todayDate); // Convert to integer
+        $type_org_id = DB::table('type_organizations')->where('nama', 'Peniaga Barang Umum')->first()->id;
 
         $merchant = Organization::
         join('organization_hours as oh', 'oh.organization_id', 'organizations.id')
         ->where([
             ['deleted_at', null],
-            ['type_org', 3111],
+            ['type_org', $type_org_id],
             ['day', $day]
         ])
         ->select('organizations.id as id', 'nama', 'address', 'postcode', 'state', 'city', 'organization_picture',
@@ -345,7 +351,7 @@ class RegularMerchantController extends Controller
         $close_hour_f = Carbon::parse($op_hour->close_hour)->format('G:i');
 
         $isToday = $this->compareDateWithToday($date);
-
+        
         if($isToday) {
             $current_time = Carbon::now()->format('G:i');
             $temp_open_hour = Carbon::parse($op_hour->open_hour)->format('G:i');
@@ -391,6 +397,13 @@ class RegularMerchantController extends Controller
             ]);
         }
 
+        $order = PgngOrder::where('id', $o_id)->first();
+        $organization = Organization::find($order->organization_id);
+        $transaction = Transaction::find(7);
+        $user = User::find(Auth::id());
+
+        Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+        
         return redirect('/merchant/regular/')->with('success', 'Pesanan Anda Berjaya Direkod!');
     }
 
@@ -556,6 +569,13 @@ class RegularMerchantController extends Controller
 
         return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price'));
     }
+
+    // public function test_mail()
+    // {
+        
+
+    //     return new MerchantOrderReceipt($order, $organization, $transaction, $user);
+    // }
 
     private function calculateNewQuantity($user_qty, $qty_available, $cart_qty)
     {

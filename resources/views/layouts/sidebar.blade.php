@@ -239,7 +239,8 @@
             </li>
             @endrole
             
-            {{-- @role('Superadmin|Merchant_Admin')
+
+            {{-- @role('Superadmin|Regular Merchant Admin')
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-account-edit"></i>
@@ -247,25 +248,25 @@
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                        <a href="{{ route('admin.merchant.index') }}" class=" waves-effect">
+                        <a href="#" class=" waves-effect">
                             <i class="ti-home"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.merchant.hours') }}" class=" waves-effect">
+                        <a href="#" class=" waves-effect">
                             <i class="ti-timer"></i>
                             <span>Waktu Operasi</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.merchant.product') }}" class=" waves-effect">
+                        <a href="#" class=" waves-effect">
                             <i class="ti-package"></i>
                             <span>Urus Produk</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.merchant.order') }}" class=" waves-effect">
+                        <a href="#" class=" waves-effect">
                             <i class="ti-email"></i>
                             <span>Pesanan</span>
                         </a>
@@ -274,42 +275,7 @@
             </li>
             @endrole --}}
 
-            @role('Superadmin|Regular Merchant Admin')
-            <li>
-                <a href="javascript: void(0);" class="has-arrow waves-effect">
-                    <i class="mdi mdi-account-edit"></i>
-                    <span>Urus Peniaga</span>
-                </a>
-                <ul class="sub-menu mm-collapse" aria-expanded="false">
-                    <li>
-                        <a href="#" class=" waves-effect">
-                            <i class="ti-home"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class=" waves-effect">
-                            <i class="ti-timer"></i>
-                            <span>Waktu Operasi</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class=" waves-effect">
-                            <i class="ti-package"></i>
-                            <span>Urus Produk</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class=" waves-effect">
-                            <i class="ti-email"></i>
-                            <span>Pesanan</span>
-                        </a>
-                    </li>
-                </ul>  
-            </li>
-            @endrole
-
-            @role('Superadmin|Koop Admin')
+            {{-- @role('Superadmin|Koop Admin')
             <li>
             <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fas fa-file-invoice-dollar"></i>
@@ -339,9 +305,9 @@
                 </li>
             </ul>
             </li>
-            @endrole
+            @endrole --}}
             
-            <li>
+            {{-- <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
                     <span>Peniaga</span>
@@ -360,9 +326,9 @@
                         </a>
                     </li>
                 </ul>  
-            </li>
+            </li> --}}
 
-            @role('Superadmin|Penjaga')
+            {{-- @role('Superadmin|Penjaga')
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>
@@ -418,7 +384,7 @@
                     </li>
                 </ul>
             </li>
-            @endrole
+            @endrole --}}
 
             {{-- @role('Superadmin|Pentadbir|Guru')
                 <li>
