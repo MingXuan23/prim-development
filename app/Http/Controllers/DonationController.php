@@ -423,11 +423,11 @@ class DonationController extends Controller
 
     public function destroy($id)
     {
-        // dd($id);
         $result = DB::table('donations')
                     ->where('id', '=', $id)
-                    ->delete();
-
+                    ->update(
+                        ['status' => 0]
+                    );
 
         if ($result) {
             Session::flash('success', 'Derma Berjaya Dipadam');
