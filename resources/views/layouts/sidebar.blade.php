@@ -240,7 +240,7 @@
                         </li>
                         @endrole
 
-                        @role('Superadmin|Pentadbir|Guru|Warden|Penjaga|Guard')
+                        @role('Superadmin|Pentadbir|Guru|Warden|Guard')
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="fas fa-hotel"></i>
