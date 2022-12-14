@@ -344,15 +344,31 @@ class TeacherController extends Controller
             $role_id = DB::table('organization_user')
             ->where('user_id',$login_user->id)
             ->value('role_id');
+            $organisation_id = DB::table('organization_user')
+            ->where('user_id',$login_user->id)
+            ->value('organization_id');
+            $request_organization_id = DB::table('organization_user')
+            ->where('id',$ou_id)
+            ->value('organization_id');
             // parent role
             $parent_role_id = 6;
             // authorised role = superadmin, admin, pentadbir
-            $authorised_role = [1,2,4];
-            // if the user entered 
-            if(!in_array($role_id,$authorised_role))
+            $superadmin = 1;
+            $authorised_role = [2,4];
+            // user only can view his own organisation 
+            if($role_id != $superadmin)
             {
-                if($role_id != $ou_id)
+                if($organisation_id == $request_organization_id)
                 {
+                    if(!in_array($role_id,$authorised_role))
+                    {
+                        if($role_id != $ou_id)
+                        {
+                            return view('errors.404');
+                        }
+                    }
+                }
+                else{
                     return view('errors.404');
                 }
             }
