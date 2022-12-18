@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -34,7 +35,7 @@
                 <input id="start" value="{{$start}}" hidden>
                 <input id="end" value="{{$end}}" hidden>
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
+                    <label class="control-label required">Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
                         @foreach($organization as $row)
                             @if($row->id == $studentouting->oid)
@@ -45,7 +46,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Nama Pelajar</label>
+                    <label class="control-label required">Nama Pelajar</label>
                     <input type="text" name="name" class="form-control" placeholder="Nama Penuh" value="{{$studentouting->nama}}" readonly>
                 </div>
 
@@ -55,22 +56,22 @@
                 </div> -->
 
                 <div class="form-group">
-                    <label>Kategori</label>
+                    <label class="control-label required">Kategori</label>
                     <select name="category" id="category" class="form-control">
                         <option value="{{ $studentouting->cid }}‡{{$studentouting->day_before}}‡{{$studentouting->categoryname}}" selected>{{ $studentouting->fake_name }}</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>Alasan</label>
-                    <textarea name="reason" class="form-control" placeholder="Alasan Keluar" max-length="50" cols="30"
-                        rows="5">{{ $studentouting->reason }}</textarea>
+                    <label class="control-label required">Tarikh Keluar</label>
+                    <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
+                            placeholder="Pilih Tarikh Keluar" value="{{$studentouting->apply_date_time}}">
                 </div>
 
                 <div class="form-group">
-                    <label>Tarikh Keluar</label>
-                    <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
-                            placeholder="Pilih Tarikh Keluar" value="{{$studentouting->apply_date_time}}">
+                    <label class="control-label required">Alasan</label>
+                    <textarea name="reason" class="form-control" placeholder="Alasan Keluar" max-length="50" cols="30"
+                        rows="5">{{ $studentouting->reason }}</textarea>
                 </div>
 
                 <div class="form-group mb-0">

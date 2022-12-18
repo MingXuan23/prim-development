@@ -90,7 +90,7 @@
 
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label>Email Penjaga&nbsp(optional)</label>
+                        <label>Email Penjaga</label>
                         <input type="text" id="parent_email" name="parent_email" class="form-control" placeholder="Email">
                     </div>
 

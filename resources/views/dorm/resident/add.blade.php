@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -35,8 +36,8 @@
                 {{csrf_field()}}
                 <div class="card-body">
                     <div class="form-row">
-                        <div class="form-group col-md-12 required">
-                            <label>Nama Organisasi</label>
+                        <div class="form-group col-md-12">
+                            <label class="control-label required">Nama Organisasi</label>
                             <select name="organization" id="organization" class="form-control">
                                 <option value="" selected>Pilih Organisasi</option>
                                 @foreach($organization as $row)
@@ -48,7 +49,7 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label> Nama Asrama</label>
+                            <label class="control-label required"> Nama Asrama</label>
                             <select name="dorm" id="dorm" class="form-control">
                                 <option value="" disabled selected>Pilih Asrama</option>
                             </select>
@@ -57,7 +58,7 @@
 
                     <div class="form-row">
                         <div class="form-group col-md-12">
-                            <label>Nama Penuh Murid</label>
+                            <label class="control-label required">Nama Penuh Murid</label>
                             <select name="name" id="name" class="form-control">
                                 <option value="" selected disabled>Pilih Pelajar</option>
                                 

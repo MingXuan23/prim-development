@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -35,7 +36,7 @@
                 {{csrf_field()}}
                 <div class="card-body">
                     <div class="form-group">
-                        <label>Nama Organisasi</label>
+                        <label class="control-label required">Nama Organisasi</label>
                         <select name="organization" id="organization" class="form-control">
                         <option value="" selected disabled>Pilih Organisasi</option>
                             @foreach($organization as $row)
@@ -45,7 +46,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Nama Pelajar</label>
+                        <label class="control-label required">Nama Pelajar</label>
                         <select name="name" id="name" class="form-control">
                             <option value="" selected disabled>Pilih Pelajar</option>
                             
@@ -54,22 +55,22 @@
 
                     
                     <div class="form-group">
-                        <label>Kategori</label>
+                        <label class="control-label required">Kategori</label>
                         <select name="category" id="category" class="form-control">
                             <option value="" disabled selected>Pilih Kategori Keluar</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label>Alasan</label>
-                        <textarea name="reason" class="form-control" placeholder="Alasan Keluar" max-length="50" cols="30"
-                            rows="5"></textarea>
+                        <label class="control-label required">Tarikh Keluar</label>
+                        <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
+                                placeholder="Pilih Tarikh Keluar">
                     </div>
 
                     <div class="form-group">
-                        <label>Tarikh Keluar</label>
-                        <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
-                                placeholder="Pilih Tarikh Keluar">
+                        <label class="control-label required">Alasan</label>
+                        <textarea name="reason" class="form-control" placeholder="Alasan Keluar" max-length="50" cols="30"
+                            rows="5"></textarea>
                     </div>
 
                     <div class="form-group mb-0">
@@ -215,13 +216,12 @@
                 {
                     var today = new Date();
                     
-                    var day = today.getDate() + parseInt(selectedCat[1]) + 1;
-                    var month = today.getMonth();
-                    var year = today.getFullYear();
+                    // var day = today.getDate() + parseInt(selectedCat[1]) + 1;
+                    // var month = today.getMonth();
+                    // var year = today.getFullYear();
+                    // var d = new Date (year, month, day);
 
-                    var d = new Date (year, month, day);
-
-                    if(end >= d.toISOString().split('T')[0])
+                    if(end >= today.toISOString().split('T')[0])
                     {
                         start_date.value = start_date.max = null;
                         start_date.min = start;

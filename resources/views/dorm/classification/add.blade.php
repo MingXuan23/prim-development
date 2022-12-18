@@ -2,6 +2,7 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -32,7 +33,7 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
+                    <label class="control-label required">Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
                         <option value="" selected>Pilih Organisasi</option>
                         @foreach($organization as $row)
@@ -48,7 +49,7 @@
 
                 <!-- real name -->
                 <div class="form-group">
-                    <label>Kategori Sebab Permintaan Keluar</label>
+                    <label class="control-label required">Kategori Sebab Permintaan Keluar</label>
                     <select id="optionReason" class="form-control" name="optionReason">
                         <option value=1>Outings</option>
                         <option value=2>Balik Wajib</option>
@@ -60,7 +61,7 @@
 
                 <!-- fake name -->
                 <div class="form-group">
-                    <label>Nama Sebab Permintaan Keluar</label>
+                    <label class="control-label required">Nama Sebab Permintaan Keluar</label>
                     <input type="text" name="name" class="form-control" placeholder="Nama Sebab Permintaan Keluar">
                 </div>
 
@@ -70,12 +71,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Limit Keluar</label>
+                    <label class="control-label required">Limit Keluar</label>
                     <input type="number" name="limit" class="form-control" placeholder="Limit Pelajar boleh Keluar untuk Sebab Ini pada Setiap Tahun. Letak 0 Jika Tiada Limit. ">
                 </div>
 
                 <div class="form-group">
-                    <label>Hari Sebelum Permintaan Keluar</label>
+                    <label class="control-label required">Hari Sebelum Permintaan Keluar</label>
                     <input type="number" name="day" class="form-control" placeholder="Hanya Membenarkan Penjaga Memohon Beberapa Hari Sebelum Hari ingin Keluar. Letak 0 Jika Boleh Mohon Pada Hari yang Sama.  ">
                 </div>
 

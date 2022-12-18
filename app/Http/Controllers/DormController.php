@@ -726,10 +726,19 @@ class DormController extends Controller
 
             $arrayRecipientEmail = DB::table('users')
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-                ->where('organization_user.organization_id', $request->get('organization'))
-                ->where('organization_user.check_in_status', '=', 1)
-                ->orWhere('organization_user.role_id', '=', 4)
+                ->where([
+                    ['organization_user.organization_id', $request->get('organization')],
+                    ['organization_user.check_in_status', '=', 1]
+                ])
+                ->orWhere([
+                    ['organization_user.organization_id', $request->get('organization')],
+                    ['organization_user.role_id', '=', 4]
+                ])
+                // ->where('organization_user.organization_id', $request->get('organization'))
+                // ->where('organization_user.check_in_status', '=', 1)
+                // ->orWhere('organization_user.role_id', '=', 4)
                 ->select('users.email')
+                ->distinct()
                 ->get();
             // dd($arrayRecipientEmail);
 
@@ -740,7 +749,7 @@ class DormController extends Controller
                     Mail::to($email)->send(new NotifyMail());
 
                     if (Mail::failures()) {
-                        dd("fail");
+                        // dd("fail");
                         return response()->Fail('Sorry! Please try again latter');
                     } else {
                         // return redirect('/dorm')->with('success', 'Great! Successfully send in your mail');
@@ -2417,7 +2426,7 @@ class DormController extends Controller
                         }
                         if ($this->roles == 8 ||  $this->roles == 1) {
 
-                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time > now()->toDateString()) {
+                            if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time >= now()->toDateString()) {
 
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
@@ -2570,6 +2579,7 @@ class DormController extends Controller
                 ->join('students', 'students.id', '=', 'organization_user_student.student_id')
                 ->where('students.parent_tel', '=', $getTelno)
                 ->value('users.id');
+
             $arrayRecipientEmail = DB::table('users')
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
                 ->where([
@@ -2582,6 +2592,7 @@ class DormController extends Controller
                     ['organization_user.organization_id', '=', $getOrganization],
                 ])
                 ->select('users.email')
+                ->distinct()
                 ->get();
             // dd($arrayRecipientEmail);
 
@@ -2710,6 +2721,7 @@ class DormController extends Controller
                 ['users.telno', '=', $telno],
             ])
             ->select('users.email')
+            ->distinct()
             ->get();
 
         // dd($arrayRecipientEmail);
@@ -2816,7 +2828,10 @@ class DormController extends Controller
                     ['users.telno', '=', $telno],
                 ])
                 ->select('users.email')
+                ->distinct()
                 ->get();
+            
+            // dd($arrayRecipientEmail);
 
             if (isset($arrayRecipientEmail)) {
                 foreach ($arrayRecipientEmail as $email) {
@@ -2872,6 +2887,7 @@ class DormController extends Controller
                     ['organization_user.organization_id', '=', $oid],
                 ])
                 ->select('users.email')
+                ->distinct()
                 ->get();
 
             // dd($arrayRecipientEmail);
