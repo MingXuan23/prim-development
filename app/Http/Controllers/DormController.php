@@ -364,6 +364,7 @@ class DormController extends Controller
     //report function
     public function reportPerStudent($id)
     {
+        
         $studentName = DB::table('class_student')
             ->join('students', 'students.id', '=', 'class_student.student_id')
             ->where('class_student.id', $id)

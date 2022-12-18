@@ -336,9 +336,43 @@ class TeacherController extends Controller
     //for warden use
     public function perananedit($ou_id)
     {
-        //
+        
         // $teacher = $this->teacher->getOrganizationByUserId($id);
-
+        if(Auth::user())
+        {
+            $login_user = Auth::user();
+            $role_id = DB::table('organization_user')
+            ->where('user_id',$login_user->id)
+            ->value('role_id');
+            $organisation_id = DB::table('organization_user')
+            ->where('user_id',$login_user->id)
+            ->value('organization_id');
+            $request_organization_id = DB::table('organization_user')
+            ->where('id',$ou_id)
+            ->value('organization_id');
+            // parent role
+            $parent_role_id = 6;
+            // authorised role = superadmin, admin, pentadbir
+            $superadmin = 1;
+            $authorised_role = [2,4];
+            // user only can view his own organisation 
+            if($role_id != $superadmin)
+            {
+                if($organisation_id == $request_organization_id)
+                {
+                    if(!in_array($role_id,$authorised_role))
+                    {
+                        if($role_id != $ou_id)
+                        {
+                            return view('errors.404');
+                        }
+                    }
+                }
+                else{
+                    return view('errors.404');
+                }
+            }
+        }
         $teacher = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
             ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
