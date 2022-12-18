@@ -108,7 +108,7 @@
             {
               $.each(result.success, function(key, value){
                 $('#koop').append("<p>"+value.nama+"</p>");
-                var url = '{{ route("koperasi.show", ":id") }}';
+                var url = '{{ route("koperasi.koopShop", ":id") }}';
                 url = url.replace(':id', value.id);
                 $('#koop').append("<a href='"+url+"') }}' class='btn btn-success waves-effect waves-light'>Pesan</a>");
               })

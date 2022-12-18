@@ -18,11 +18,12 @@ class AdminOrderCooperativeController extends Controller
                     ->where('ou.role_id', 1239)
                     ->first();
 
-        $customer = DB::table('pickup_order as o')
+        $customer = DB::table('pgng_orders as o')
                     ->join('users as ou','o.user_id','=','ou.id')
                     ->join('organization_user as op','o.organization_id','=','op.organization_id')
                     ->where('op.user_id', $userID)
                     ->select('o.*','ou.*','op.*','o.id as id','o.status as status')
+                    ->where('o.status', 2)
                     ->get();
 
         return view('koperasi-admin.confirm',compact('koperasi'),compact('customer'))->with('customer',$customer);
@@ -33,7 +34,7 @@ class AdminOrderCooperativeController extends Controller
     public function storeConfirm(Request $request,Int $id)
     {
         $userID = Auth::id();
-        $customer = DB::table('pickup_order')
+        $customer = DB::table('pgng_orders')
                     ->where('id',$id)
                     ->update([
                         'status' => 3 ,
@@ -45,7 +46,7 @@ class AdminOrderCooperativeController extends Controller
     {
         $userID = Auth::id();
 
-        $customer = DB::table('pickup_order')
+        $customer = DB::table('pgng_orders')
                     ->where('id',$id)
                     ->update([
                         'status' => 4 ,

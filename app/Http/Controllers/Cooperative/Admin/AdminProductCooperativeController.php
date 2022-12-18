@@ -30,7 +30,17 @@ class AdminProductCooperativeController extends Controller
 
     public function createProduct()
     {
-        $type = DB::table('product_group')->get();
+        $userID = Auth::id();
+        $org = DB::table('organizations as o')
+        ->join('organization_user as os', 'o.id', 'os.organization_id')
+        ->where('os.user_id', $userID)
+        ->select('o.id')
+        ->first();
+
+        $type = DB::table('product_group as p')
+        ->where('p.organization_id',$org->id)
+        ->get();
+
         return view('koperasi-admin.add',compact('type'));
     }
 
@@ -59,15 +69,15 @@ class AdminProductCooperativeController extends Controller
                 ->select('o.id')
                 ->first();
 
+
        $add = DB::table('product_item') -> insert([
         'name' => $request->input('nama'),
         'desc' => $request->input('description'),
         'image' => $file_name,
-        'quantity' => $request->input('quantity'),
+        'quantity_available' => $request->input('quantity'),
         'price' => $request->input('price'),
         'status'=> $request->input('status'),
-        'product_group_id' => $request ->input('type'),
-        'organization_id' => $org->id,     
+        'product_group_id' => $request->input('type'),   
        ]);
 
 
@@ -82,16 +92,30 @@ class AdminProductCooperativeController extends Controller
     }
 
     public function editProduct(Int $id)
-    {
-        
+    {    
+        $userID = Auth::id();
+
+        $org = DB::table('organizations as o')
+        ->join('organization_user as os', 'o.id', 'os.organization_id')
+        ->where('os.user_id', $userID)
+        ->select('o.id')
+        ->first();
+
+  
+
         $edit = DB::table('product_item')->where('id',$id)->first();
+
         $test = DB::table('product_item as p')
         ->join('product_group as pt', 'p.product_group_id', '=', 'pt.id')
         ->select('p.*', 'pt.name as type_name')
         ->get()
         ->where('id',$id)
         ->first();
-        $type = DB::table('product_group')->get();
+
+        $type = DB::table('product_group as p')
+                ->where('p.organization_id',$org->id)
+                ->get();
+  
         return view('koperasi-admin.edit',compact('type'),compact('test'))
         ->with('test',$test)
         ->with('edit',$edit);
@@ -110,11 +134,11 @@ class AdminProductCooperativeController extends Controller
             'name' => $request->nama,
             'desc' => $request->description,
             'image' => $request->image,
-            'quantity' => $request->quantity,
+            'quantity_available' => $request->quantity,
             'price' => $request->price,
             'status'=> $request->status,
             'product_group_id' => $request->type,
-            'organization_id' => $org->id,
+            
           
         ]);
         if($request->quantity ==0)

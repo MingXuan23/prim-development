@@ -11,7 +11,7 @@ class ProductItem extends Model
     use SoftDeletes;
 
     protected $table = "product_item";
-    protected $fillable = ['name', 'desc', 'type', 'quantity', 'price', 'image', 'status', 'product_group_id'];
+    protected $fillable = ['name', 'desc', 'type', 'quantity_available', 'price', 'image', 'status', 'product_group_id'];
     public $timestamps = true;
 
     public function product_order()

@@ -186,7 +186,7 @@
 
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
-            <a href="{{ route('koperasi.show', $id) }}" type="button" class="btn btn-light mr-2">Kembali</a>
+            <a href="{{ route('koperasi.koopShop', $id) }}" type="button" class="btn btn-light mr-2">Kembali</a>
             @if($cart)
               <button type="submit" class="btn btn-primary">Bayar</button>
             @endif

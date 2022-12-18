@@ -84,7 +84,7 @@ class CooperativeController extends Controller
         // Check if quantity request is less or equal to quantity available
         if($request->item_quantity <= $item->quantity) // if true
         {
-            $order = PickUpOrder::where([
+            $order = PgngOrder::where([
                 ['user_id', $userID],
                 ['status', 1],
                 ['organization_id', $request->org_id]
@@ -94,9 +94,8 @@ class CooperativeController extends Controller
             if($order) // order exists
             {
                 $cartExist = ProductOrder::where([
-                    ['status', 1],
                     ['product_item_id', $request->item_id],
-                    ['pickup_order_id', $order->id],
+                    ['pgng_order_id', $order->id],
                 ])->first();
 
                 // If same item exists in cart
@@ -131,10 +130,10 @@ class CooperativeController extends Controller
                     $newQuantity = intval((int)$item->quantity - (int)$request->item_quantity);
                 }
 
+
                 $cartItem = DB::table('product_order as po')
                                 ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                                ->where('po.pickup_order_id', $order->id)
-                                ->where('po.status', 1)
+                                ->where('po.pgng_order_id', $order->id)
                                 ->select('po.quantity', 'pi.price')
                                 ->get();
                 
@@ -145,7 +144,7 @@ class CooperativeController extends Controller
                     $newTotalPrice += doubleval($row->price * $row->quantity);
                 }
 
-                PickUpOrder::where([
+                PgngOrder::where([
                     ['user_id', $userID],
                     ['status', 1],
                     ['organization_id', $request->org_id]
@@ -690,7 +689,7 @@ class CooperativeController extends Controller
         'name' => $request->input('nama'),
         'desc' => $request->input('description'),
         'image' => $file_name,
-        'quantity' => $request->input('quantity'),
+        'quantity_available' => $request->input('quantity'),
         'price' => $request->input('price'),
         'status'=> $request->input('status'),
         'product_group_id' => $request ->input('type'),

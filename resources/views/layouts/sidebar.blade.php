@@ -370,7 +370,7 @@
                 </ul>  
             </li>
 
-            @role('Superadmin|Penjaga')
+            <!-- @role('Superadmin|Penjaga') -syah punye
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>
@@ -397,19 +397,19 @@
                     </li>
                 </ul>
             </li>
-            @endrole
+            @endrole -->
 
-            @role('Superadmin|Penjaga')
+            @role('Superadmin|Penjaga') <!--haziq nye-->
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>
-                    <span>Koop</span>
+                    <span>Koperasi</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                        <a href="{{ route('koperasi.indexKoop') }}" class=" waves-effect">
+                        <a href="{{ route('koperasi.index') }}" class=" waves-effect">
                             <i class="mdi mdi-book"></i>
-                            <span>Koop Sekolah</span>
+                            <span>Koperasi Sekolah</span>
                         </a>
                     </li>
                     <li>

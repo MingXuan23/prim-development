@@ -8,6 +8,7 @@ use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use App\Models\OrganizationHours;
 use App\Models\Organization;
+use App\Models\PgngOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -77,9 +78,9 @@ class UserCooperativeController extends Controller
         $item = ProductItem::where('id', $request->item_id)->first();
 
         // Check if quantity request is less or equal to quantity available
-        if($request->item_quantity <= $item->quantity) // if true
+        if($request->item_quantity <= $item->quantity_available) // if true
         {
-            $order = PickUpOrder::where([
+            $order = PgngOrder::where([
                 ['user_id', $userID],
                 ['status', 1],
                 ['organization_id', $request->org_id]
@@ -88,26 +89,30 @@ class UserCooperativeController extends Controller
             // Check if order already exists
             if($order) // order exists
             {
-                $cartExist = ProductOrder::where([
-                    ['status', 1],
-                    ['product_item_id', $request->item_id],
-                    ['pickup_order_id', $order->id],
-                ])->first();
-
+                // $cartExist = ProductOrder::where([
+                //     ['product_item_id', $request->item_id],
+                //     ['pgng_order_id', $order->id],
+                // ])->first();
+                $cartExist = DB::table('product_order as po')
+                            ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
+                            ->where('pg.status',1)
+                            ->where('po.product_item_id',$request->id)
+                            ->where('pg.id',$order->id)
+                            ->first();
                 // If same item exists in cart
                 if($cartExist) // if exists (update)
                 {
                     if($request->item_quantity > $cartExist->quantity) // request quant more than existing quant
                     {
-                        $newQuantity = intval($item->quantity - ($request->item_quantity - $cartExist->quantity)); // decrement stock
+                        $newQuantity = intval($item->quantity_available - ($request->item_quantity - $cartExist->quantity)); // decrement stock
                     }
                     else if($request->item_quantity < $cartExist->quantity) // request quant less than existing quant
                     {
-                        $newQuantity = intval($item->quantity + ($cartExist->quantity - $request->item_quantity)); // increment stock
+                        $newQuantity = intval($item->quantity_available + ($cartExist->quantity- $request->item_quantity)); // increment stock
                     }
                     else if($request->item_quantity == $cartExist->quantity) // request quant equal existing quant
                     {
-                        $newQuantity = intval((int)$item->quantity - 0); // stock not change
+                        $newQuantity = intval((int)$item->quantity_available - 0); // stock not change
                     }
 
                     ProductOrder::where('id', $cartExist->id)->update([
@@ -120,16 +125,16 @@ class UserCooperativeController extends Controller
                         'quantity' => $request->item_quantity,
                         'status' => 1,
                         'product_item_id' => $request->item_id,
-                        'pickup_order_id' => $order->id
+                        'pgng_order_id' => $order->id
                     ]);
 
-                    $newQuantity = intval((int)$item->quantity - (int)$request->item_quantity);
+                    $newQuantity = intval((int)$item->quantity_available - (int)$request->item_quantity);
                 }
+
 
                 $cartItem = DB::table('product_order as po')
                                 ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                                ->where('po.pickup_order_id', $order->id)
-                                ->where('po.status', 1)
+                                ->where('po.pgng_order_id', $order->id)
                                 ->select('po.quantity', 'pi.price')
                                 ->get();
                 
@@ -140,7 +145,7 @@ class UserCooperativeController extends Controller
                     $newTotalPrice += doubleval($row->price * $row->quantity);
                 }
 
-                PickUpOrder::where([
+                PgngOrder::where([
                     ['user_id', $userID],
                     ['status', 1],
                     ['organization_id', $request->org_id]
@@ -153,9 +158,9 @@ class UserCooperativeController extends Controller
             {
                 $totalPrice = $item->price * (int)$request->item_quantity;
 
-                $newQuantity = intval((int)$item->quantity - (int)$request->item_quantity);
+                $newQuantity = intval((int)$item->quantity_available - (int)$request->item_quantity);
 
-                $newOrder = PickUpOrder::create([
+                $newOrder = PgngOrder::create([
                     'method_status' => 1,
                     'total_price' => $totalPrice,
                     'status' => 1,
@@ -167,26 +172,26 @@ class UserCooperativeController extends Controller
                     'quantity' => $request->item_quantity,
                     'status' => 1,
                     'product_item_id' => $request->item_id,
-                    'pickup_order_id' => $newOrder->id
+                    'pgng_order_id' => $newOrder->id
                 ]);
             }
 
             // check if quantity is 0 after add to cart
             if($newQuantity != 0) // if not 0
             {
-                ProductItem::where('id', $request->item_id)->update(['quantity' => $newQuantity]);
+                ProductItem::where('id', $request->item_id)->update(['quantity_available' => $newQuantity]);
             }
             else // if 0 (change item status)
             {
                 ProductItem::where('id', $request->item_id)
-                ->update(['quantity' => $newQuantity, 'status' => 0]);
+                ->update(['quantity_available' => $newQuantity, 'status' => 0]);
             }
             
             return back()->with('success', 'Item Berjaya Ditambah!');
         }
         else // if false
         {
-            $message = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->quantity;
+            $message = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->quantity_available;
             return back()->with('error', $message);
         }
         // dd($request->all());
@@ -246,7 +251,7 @@ class UserCooperativeController extends Controller
         $cart_item = array(); // empty if cart is empty
         $user_id = Auth::id();
 
-        $cart = PickUpOrder::where([
+        $cart = PgngOrder::where([
             ['status', 1],
             ['organization_id', $id],
             ['user_id', $user_id],
@@ -254,12 +259,19 @@ class UserCooperativeController extends Controller
         
         if($cart)
         {
+            // $cart_item = DB::table('product_order as po')
+            //         ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+            //         ->where('po.status', 1)
+            //         ->where('po.pgng_order_id', $cart->id)
+            //         ->select('po.id', 'po.quantity', 'pi.name', 'pi.price', 'pi.image')
+            //         ->get();
             $cart_item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                    ->where('po.status', 1)
-                    ->where('po.pickup_order_id', $cart->id)
-                    ->select('po.id', 'po.quantity', 'pi.name', 'pi.price', 'pi.image')
-                    ->get();
+            ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+            ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
+            ->where('pg.status', 1)
+            ->where('po.pgng_order_id', $cart->id)
+            ->select('pg.id', 'po.quantity', 'pi.name', 'pi.price', 'pi.image')
+            ->get();
 
             // $tomorrowDate = Carbon::tomorrow()->format('Y-m-d');
 
@@ -298,13 +310,13 @@ class UserCooperativeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $org = PickUpOrder::where('id', $id)->select('organization_id as id')->first();
+        $org = PgngOrder::where('id', $id)->select('organization_id as id')->first();
 
         $daySelect = (int)$request->week_status;
                 
         $pickUp = Carbon::now()->next($daySelect)->toDateString();
         
-        PickUpOrder::where([
+        PgngOrder::where([
             ['status', 1],
             ['id', $id],
         ])->update([
@@ -313,42 +325,44 @@ class UserCooperativeController extends Controller
             'status' => 2,
         ]);
 
-        ProductOrder::where([
-            ['status', 1],
-            ['pickup_order_id', $id],
-        ])->update(['status' => 2]);
+        // ProductOrder::where([
+        //     ['status', 1],
+        //     ['pickup_order_id', $id],
+        // ])->update(['status' => 2]);
 
-        return redirect('/koperasi/'.$org->id)->with('success', 'Pesanan Anda Berjaya Direkod!');
+        return redirect('/koperasi/koop/'.$org->id)->with('success', 'Pesanan Anda Berjaya Direkod!');
     }
 
     public function destroyItemCart($org_id, $id)
     {
         $userID = Auth::id();
-        
-        $cart_item = ProductOrder::where('id', $id);
+
+        // $cart_item = ProductOrder::where('pgng_order_id', $id);
+        $cart_item = ProductOrder::where('pgng_order_id', $id);
 
         $item = $cart_item->first();
 
+        // $product_item = ProductOrder::where('product_item_id', $item->product_item_id);
         $product_item = ProductItem::where('id', $item->product_item_id);
 
         $product_item_quantity = $product_item->first();
 
-        $newQuantity = intval($product_item_quantity->quantity + $item->quantity); // increment quantity
+        $newQuantity = intval($product_item_quantity->quantity_available + $item->quantity); // increment quantity
 
         /* If previous product item is being unavailable because of added item in cart,
            after the item deleted, the quantity in product_item will increment back and
            the item will be available */
-        if($product_item_quantity->quantity == 0)
+        if($product_item_quantity->quantity_available == 0)
         {
             $product_item->update([
-                'quantity' => $newQuantity,
+                'quantity_available' => $newQuantity,
                 'status' => 1,
             ]);
         }
         else
         {
             $product_item->update([
-                'quantity' => $newQuantity,
+                'quantity_available' => $newQuantity,
             ]);
         }
 
@@ -356,8 +370,9 @@ class UserCooperativeController extends Controller
 
         $allCartItem = DB::table('product_order as po')
                         ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                        ->where('po.pickup_order_id', $item->pickup_order_id)
-                        ->where('po.status', 1)
+                        ->join('pgng_Orders as pg','po.pgng_order_id','=','pg.id')
+                        ->where('pg.id', $item->pgng_order_id)
+                        ->where('pg.status', 1)
                         ->select('po.quantity', 'pi.price')
                         ->get();
         
@@ -373,7 +388,7 @@ class UserCooperativeController extends Controller
                 $newTotalPrice += doubleval($row->price * $row->quantity);
             }
 
-            PickUpOrder::where([
+            PgngOrder::where([
                 ['user_id', $userID],
                 ['status', 1],
                 ['organization_id', $org_id],
@@ -381,7 +396,7 @@ class UserCooperativeController extends Controller
         }
         else // If cart is empty (delete order)
         {
-            PickUpOrder::where([
+            PgngOrder::where([
                 ['user_id', $userID],
                 ['status', 1],
                 ['organization_id', $org_id],
@@ -407,7 +422,7 @@ class UserCooperativeController extends Controller
     {
         $userID = Auth::id();
 
-        $query = DB::table('pickup_order as ko')
+        $query = DB::table('pgng_orders as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                 ->whereIn('status', [2,4])
                 ->where('user_id', $userID)
@@ -444,12 +459,12 @@ class UserCooperativeController extends Controller
             if($row->pickup_date == $key && $isPast[$row->pickup_date] == 1)
             {
                 // Status changed to overdue
-                PickUpOrder::where('pickup_date', $row->pickup_date)->update(['status' => 4]);
+                PgngOrder::where('pickup_date', $row->pickup_date)->update(['status' => 4]);
             }
             else
             {
                 // Status is still not picked
-                PickUpOrder::where('pickup_date', $row->pickup_date)->update(['status' => 2]);
+                PgngOrder::where('pickup_date', $row->pickup_date)->update(['status' => 2]);
             }
         }
 
@@ -462,7 +477,7 @@ class UserCooperativeController extends Controller
     {
         $userID = Auth::id();
 
-        $query = DB::table('pickup_order as ko')
+        $query = DB::table('pgng_orders as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                 ->whereIn('status', [3, 100, 200])
                 ->where('user_id', $userID)
@@ -482,7 +497,7 @@ class UserCooperativeController extends Controller
         $userID = Auth::id();
 
         // Get Information about the order
-        $list_detail = DB::table('pickup_order as ko')
+        $list_detail = DB::table('pgng_orders as ko')
                         ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                         ->where('ko.id', $id)
                         ->where('ko.status', '>' , 0)
@@ -509,11 +524,12 @@ class UserCooperativeController extends Controller
         // get all product based on order
         $item = DB::table('product_order as po')
                 ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                ->where('po.pickup_order_id', $id)
-                ->where('po.status', '>', 0)
+                ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
+                ->where('po.pgng_order_id', $id)
+                ->where('pg.status', '>', 0)
                 ->select('pi.name', 'pi.price', 'po.quantity')
                 ->get();
-
+                // dd($item);
 
         $totalPrice = array();
         
@@ -530,7 +546,7 @@ class UserCooperativeController extends Controller
     {   
         $order_id = $request->get('oID');
 
-        $order = PickUpOrder::where('id', $order_id)->first();
+        $order = PgngOrder::where('id', $order_id)->first();
 
         $allDay = OrganizationHours::where('organization_id', $order->organization_id)->where('status', 1)->get();
         
@@ -557,7 +573,7 @@ class UserCooperativeController extends Controller
 
         $pickUp = Carbon::now()->next($daySelect)->toDateString();
 
-        $result = PickUpOrder::where('id', $order_id)->update(['pickup_date' => $pickUp]);
+        $result = PgngOrder::where('id', $order_id)->update(['pickup_date' => $pickUp]);
         
         $this->indexOrder(); // Recall function to recheck status
 
@@ -572,11 +588,11 @@ class UserCooperativeController extends Controller
 
     public function destroyUserOrder($id)
     {
-        $queryKO = PickUpOrder::where('id', $id);
+        $queryKO = PgngOrder::where('id', $id);
         $queryKO->update(['status' => 200]);
         $resultKO = $queryKO->delete();
         
-        $queryPO = ProductOrder::where('pickup_order_id', $id);
+        $queryPO = ProductOrder::where('pgng_order_id', $id);
 
         $order = $queryPO->get();
 
@@ -617,8 +633,9 @@ class UserCooperativeController extends Controller
         ->where('id',$id)
         ->get();
 
-        $product = DB::table('product_item as p')
-        ->where('p.organization_id',$id)
+        $product = DB::table('product_group as p')
+         ->join('product_item as pg','p.id','pg.product_group_id')
+         ->where('p.organization_id',$id)
         ->get();
 
         

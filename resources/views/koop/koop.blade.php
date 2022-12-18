@@ -47,10 +47,7 @@
   color:white;
 }
 
-.card-img-top 
-{
-   
-}
+
 </style>
 @endsection
 
@@ -80,7 +77,22 @@
                                 <h4 class="my-3"></h4>
                                 <div class="card-group">
                                     <div class="card mb-4">
+                                        @if($sekolah->organization_picture == NULL)
+                                        
+                                        <div class="col-lg-4">
+                                            <div class="card text-white bg-dark">
+                                                <div class="card-body">
+                                                <blockquote class="card-blockquote mb-0">
+                                                <img class="card-img-top img-fluid" src="{{ URL('images/koperasi/default-item.png')}}" alt="Card image cap">
+                                                 </blockquote>
+                                                 </div>
+                                            </div>
+                                        </div>
+                                        @else
                                         <img class="card-img-top img-fluid" src="{{$sekolah->organization_picture}}" alt="Card image cap" style="height: 300px;">
+                                        @endif
+
+                                        <!-- <img class="card-img-top img-fluid" src="{{ URL('images/koperasi/default-item.png')}}" alt="Card image cap" style="height: 300px;"> -->
                                         <div class="card-body">
                                             <h4 class="card-title">{{$sekolah->nama}}</h4>
                                             <p class="card-text">
@@ -114,7 +126,19 @@
         
         <!-- Simple card -->
         <div class="card">
+            @if($product->image == NULL)
+    
+                                            <div class="card text-white bg-dark">
+                                                <div class="card-body">
+                                                <blockquote class="card-blockquote mb-0">
+                                                <img class="card-img-top img-fluid" src="{{ URL('images/koperasi/default-item.png')}}" alt="Card image cap">
+                                                 </blockquote>
+                                                 </div>
+                                            </div>
+
+            @else
             <img class="card-img-top img-fluid" src="{{$product->image}}" alt="Card image cap">
+            @endif
             @if($product->status == 0) 
                                          <div class="d-flex justify-content-center"><span class="badge badge-danger">not aivalable</span></div>
                                          @else

@@ -67,7 +67,7 @@
                                         <td>
                                           <img src="{{ URL('koperasi-item/'.$item->image)  }}" width="80px">
                                         </td>
-                                        <td>{{ $item->quantity }}</td>
+                                        <td>{{ $item->quantity_available }}</td>
                                         <td>{{ number_format($item->price,2)}}</td>
                                         <td>
                                          @if($item->status == 0) 
