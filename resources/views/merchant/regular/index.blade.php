@@ -57,7 +57,7 @@
             @if($row->status == 1)
             <a href="{{ route('merchant.regular.show', $row->id) }}" class="order_modal list-group-item list-group-item-action flex-column">
             @else
-            <a class="closed_modal list-group-item list-group-item-action flex-column" style="opacity: 50%">
+            <a class="closed-modal list-group-item list-group-item-action flex-column" style="opacity: 50%">
             @endif
               <div class="d-flex" >
                   <img class="rounded img-fluid bg-dark" id="img-size" src="
@@ -88,6 +88,25 @@
               <p><i>Tiada Peniaga buat masa sekarang</i></p>
             </div>
           @endforelse
+          {{-- <div class="test">
+          </div>
+          <a href="" class="order_modal list-group-item list-group-item-action flex-column" hidden>
+            <div class="d-flex">
+                <img class="rounded img-fluid bg-dark" id="img-size" src="">
+                <div class="flex-column ml-2">
+                    <h4 class="merchant_name"></h4>
+                    <div class="d-flex">
+                      <div class="justify-content-center align-items-center mr-2">
+                        <i class="fas fa-map-marker-alt"></i>
+                      </div>
+                      <p class="m-0"></p>
+                    </div>
+                </div>
+                <div class="arrow-icon ml-auto justify-content-end align-self-center">
+                    <h1><i class="fas fa-angle-right"></i></h1>
+                </div>
+            </div>
+          </a> --}}
           
           <div class="row mt-2 ">
             <div class="col d-flex justify-content-end">
@@ -125,15 +144,58 @@
 
 <script>
     $(document).ready(function() {
-      $('.closed_modal').click(function(){
-          $('#merchantClosedModal').modal('show')
-      })
+
+      
 
       $.ajaxSetup({
         headers: {
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
       });
+
+      var state
+
+      
+
+      // fetch_merchant()
+
+      $('.closed-modal').click(function(){
+          $('#merchantClosedModal').modal('show')
+      })
+
+      // function test(){
+      //   alert('test')
+      // }
+
+      // function fetch_merchant(state='') {
+      //   $.ajax({
+      //     url: "{{ route('merchant.fetch-merchant') }}",
+      //     method: "GET",
+      //     data: state,
+      //     beforeSend:function() {
+
+      //     },
+      //     success:function(result) {
+      //       for(var i = 0; i < result.count; i++) {
+      //         var isClose = ""
+      //         var route = "/merchant/regular/"+result.merchant[i].id
+      //         var pic_url = "/"+result.merchant[i].picture
+      //         if(result.merchant[i].status != 1) {
+      //           route = ""
+      //         }
+      //         $('.test').append('<a href="'+route+'" class=" order-modal list-group-item list-group-item-action flex-column" disabled><div class="d-flex"><img class="rounded img-fluid bg-dark" id="img-size" src="'+pic_url+'"><div class="flex-column ml-2"><h4 class="merchant_name">'+result.merchant[i].nama+'</h4><div class="d-flex"><div class="justify-content-center align-items-center mr-2"><i class="fas fa-map-marker-alt"></i></div><p class="m-0">'+result.merchant[i].address+' , '+result.merchant[i].city+' , '+result.merchant[i].state+'</p></div></div><div class="arrow-icon ml-auto justify-content-end align-self-center"><h1><i class="fas fa-angle-right"></i></h1></div></div></a>')
+      //       }
+      //       console.log(result)
+      //     },
+      //     error:function(result) {
+      //       console.log(result.responseText)
+      //     }
+      //   })
+      // }
+
+      // $('.order_modal').click(function(){
+        
+      // })
 
       function callAlert(message)
       {

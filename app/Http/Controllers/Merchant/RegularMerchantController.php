@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Concerns\FromView;
 use Yajra\DataTables\DataTables;
 
 class RegularMerchantController extends Controller
@@ -50,6 +51,59 @@ class RegularMerchantController extends Controller
         // }
 
         return view('merchant.regular.index', compact('merchant'));
+    }
+
+    public function test_index(Request $request)
+    {
+        $merchant_arr = array();
+        if($request->ajax()) {
+            $todayDate = Carbon::now()->format('l'); // Format to day name
+        
+            $day = $this->getDayIntegerByDayName($todayDate); // Convert to integer
+            $type_org_id = DB::table('type_organizations')->where('nama', 'Peniaga Barang Umum')->first()->id;
+
+            $merchant = Organization::
+            join('organization_hours as oh', 'oh.organization_id', 'organizations.id')
+            ->where([
+                ['deleted_at', null],
+                ['type_org', $type_org_id],
+                ['day', $day]
+            ])
+            ->select('organizations.id as id', 'nama', 'address', 'postcode', 'state', 'city', 'organization_picture as picture',
+            'day', 'open_hour', 'close_hour', 'status')
+            ->orderBy('status', 'desc')
+            ->get();
+
+            $count = 0;
+
+            foreach($merchant as $row)
+            {
+                $nama = $row->nama;
+                $picture = "images/koperasi/default-item.png";
+                if($row->picture != null){
+                    $picture = "organization_picture/".$row->picture;
+                }
+                if($row->status == 0) {
+                    $nama = $row->nama." <label class='text-danger'>Closed</label>";
+                }
+                $merchant_arr[] = array(
+                    "id" => $row->id,
+                    "nama" => $nama,
+                    "address" => $row->address,
+                    "postcode" => $row->postcode,
+                    "state" => $row->state,
+                    "city" => $row->city,
+                    "picture" => $picture,
+                    "day" => $row->day,
+                    "open_hour" => $row->open_hour,
+                    "close_hour" => $row->status,
+                );
+
+                $count++;
+            }
+
+            return response()->json(['merchant' => $merchant_arr, 'count' => $count]);
+        }
     }
 
     public function show($id)

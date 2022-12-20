@@ -77,6 +77,10 @@ class OrganizationController extends Controller
         
         $file_name = '';
 
+        if($this->orgIsExist($request->type_org, $request->nama)) {
+            return back()->withInput()->with('error', 'Nama Organisasi Telah Diambil');
+        }
+
         if (!is_null($request->organization_picture)) {
             $extension = $request->organization_picture->extension();
             $storagePath  = $request->organization_picture->storeAs('/public/organization-picture', $str . '.' . $extension);
@@ -91,7 +95,9 @@ class OrganizationController extends Controller
             'organization_picture' => $file_name,
         ]);
 
-        Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($request->type_org, $organization->id)]);
+        $type_org = TypeOrganization::find($request->type_org);
+
+        Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($type_org->nama , $organization->id)]);
         
         //attach foreign key to pivot table
         $organization->user()->attach(Auth::id(), ['role_id' => 2]);
@@ -99,7 +105,6 @@ class OrganizationController extends Controller
         $user = Auth::user();
         $user->assignRole('Admin');
 
-        $type_org = TypeOrganization::find($request->type_org);
         $role = $this->assignRoleForOrganization($type_org->nama);
 
         if ($request->type_org == 1 || $request->type_org == 2 || $request->type_org == 3) {
@@ -250,25 +255,25 @@ class OrganizationController extends Controller
 
     public function generateOrganizationCode($typeOrg, $id)
     {
-        if ($typeOrg == 1) {
+        if ($typeOrg == "SK /SJK") {
             $code = 'SK' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 2) {
+        } elseif ($typeOrg == "SRA /SRAI") {
             $code = 'SA' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 3) {
+        } elseif ($typeOrg == "SMK /SMJK") {
             $code = 'SM' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 4) {
+        } elseif ($typeOrg == "Masjid") {
             $code = 'MS' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 5) {
+        } elseif ($typeOrg == "NGO") {
             $code = 'NGO' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 6) {
+        } elseif ($typeOrg == "Rumah Anak Yatim") {
             $code = 'RAY' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 7) {
+        } elseif ($typeOrg == "Pusat Tahfiz") {
             $code = 'PT' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 1039) { // Koperasi
+        } elseif ($typeOrg == "Koperasi") { // Koperasi
             $code = 'KP' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 2132) { // Schedule Merchant
+        } elseif ($typeOrg == "Peniaga Barang Berjadual") { // Schedule Merchant
             $code = 'PBJ' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == 3111) { // Regular Merchant
+        } elseif ($typeOrg == "Peniaga Barang Umum") { // Regular Merchant
             $code = 'PBU' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
@@ -384,5 +389,21 @@ class OrganizationController extends Controller
         $parent_org = Organization::whereIn('id', $isNotParent)->get();
 
         return $parent_org;
+    }
+
+    private function orgIsExist($type_org_id, $org_name)
+    {
+        $type_org = TypeOrganization::find($type_org_id);
+        $org = Organization::where('type_org', $type_org->id)->select('nama')->get();
+
+        if($type_org->nama == 'Peniaga Barang Umum') {
+            foreach($org as $row) {
+                if($row->nama == $org_name) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
     }
 }

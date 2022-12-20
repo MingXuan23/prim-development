@@ -208,6 +208,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
     Route::group(['prefix' => 'regular'], function() {
         // Index
         Route::get('', 'RegularMerchantController@index')->name('merchant.regular.index');
+        Route::get('fetch-merchant', 'RegularMerchantController@test_index')->name('merchant.fetch-merchant');
         // Route::get('/test-email', 'RegularMerchantController@test_mail')->name('test.mer.mail');
         // Orders
         Route::get('all-orders', 'RegularMerchantController@showAllOrder')->name('merchant.all-orders');
