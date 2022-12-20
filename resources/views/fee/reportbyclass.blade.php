@@ -214,8 +214,6 @@
                 }
             });
 
-
-
         });
   
         // csrf token for ajax

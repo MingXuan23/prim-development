@@ -230,33 +230,33 @@ class MobileApiController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $id = $request->id;
+        try {
+            $id = $request->id;
 
-        $validator = Validator::make($request->all(), [
-            'name'      => 'required',
-            'telno'     => "required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
-            'email'     => "required|email|unique:users,email,$id",
-        ]);
+            $validator = Validator::make($request->all(), [
+                'name'      => 'required',
+                'telno'     => "required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
+                'email'     => "required|email|unique:users,email,$id",
+            ]);
+            
+            DB::table('users')
+                ->where('id', $id)
+                ->update(
+                    [
+                        'name'      => $request->post('name'),
+                        'email'     => $request->post('email'),
+                        'username'  => $request->post('username'),
+                        'telno'     => $request->post('telno'),
+                        'address'   => $request->post('address'),
+                        'state'     => $request->post('state'),
+                        'postcode'  => $request->post('postcode')
+                    ]
+                );
 
-        if($validator->fails())
-        {
+            return response(200);
+            
+        } catch (\Throwable $th) {
             return response(401);
         }
-
-        $userUpdate = DB::table('users')
-            ->where('id', $id)
-            ->update(
-                [
-                    'name'      => $request->post('name'),
-                    'email'     => $request->post('email'),
-                    'username'  => $request->post('username'),
-                    'telno'     => $request->post('telno'),
-                    'address'   => $request->post('address'),
-                    'state'     => $request->post('state'),
-                    'postcode'  => $request->post('postcode')
-                ]
-            );
-        
-        return response(200); 
     }
 }

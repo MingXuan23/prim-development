@@ -71,6 +71,7 @@ class ProfileController extends Controller
                     'email'     => $request->post('email'),
                     'username'  => $request->post('username'),
                     'telno'     => $request->post('telno'),
+                    'icno'      => $request->post('icno'),
                     'address'   => $request->post('address'),
                     'state'     => $request->post('state'),
                     'postcode'  => $request->post('postcode')

@@ -29,6 +29,12 @@
                 </ul>
             </div>
             @endif
+
+            @if(\Session::has('error'))
+                <div class="alert alert-danger">
+                    <p>{{ \Session::get('error') }}</p>
+                </div>
+            @endif
             {{-- {{ route('sekolah.store') }} --}}
             <form method="post" action="{{ route('organization.store') }} " enctype="multipart/form-data"
                 class="form-validation">
@@ -254,7 +260,9 @@
                 $('#parent_org_class').attr('style', 'display: none;');
             }
             
-        }); 
+        });
+
+        $('.alert').delay(3000).fadeOut()
     });
 
 </script>

@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Fee;
-use App\Models\Organization;
-use App\Models\Transaction;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Yajra\DataTables\DataTables;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\View;
-use Psy\Command\WhereamiCommand;
-use App\Http\Controllers\AppBaseController;
-use App\Models\Category;
+use App\Models\Fee;
 use App\Models\Fee_New;
+use App\Models\Category;
 use App\Models\ClassModel;
+use App\Models\Transaction;
+use App\Models\Organization;
+use Illuminate\Http\Request;
+use Psy\Command\WhereamiCommand;
+use Yajra\DataTables\DataTables;
+use App\Exports\ExportYuranStatus;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\AppBaseController;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 class FeesController extends AppBaseController
@@ -504,12 +506,11 @@ class FeesController extends AppBaseController
 
     public function StoreCategoryA(Request $request)
     {
-        $dt = Carbon::now();
         $price          = $request->get('price');
         $quantity       = $request->get('quantity');
         $oid            = $request->get('organization');
-        $date_started   = $dt->toDateString($request->get('date_started'));
-        $date_end       = $dt->toDateString($request->get('date_end'));
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
         $total          = $price * $quantity;
 
         $target = ['data' => 'ALL'];
@@ -701,9 +702,6 @@ class FeesController extends AppBaseController
 
     public function StoreCategoryB(Request $request)
     {
-        // dd($request->toArray());
-        $dt = Carbon::now();
-
         $gender         = "";
         $class          = $request->get('cb_class');
         $level          = $request->get('level');
@@ -713,8 +711,8 @@ class FeesController extends AppBaseController
         $quantity       = $request->get('quantity');
         $desc           = $request->get('description');
         $oid            = $request->get('organization');
-        $date_started   = $dt->toDateString($request->get('date_started'));
-        $date_end       = $dt->toDateString($request->get('date_end'));
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
         $total          = $price * $quantity;
         $category       = "Kategory B";
 
@@ -744,8 +742,6 @@ class FeesController extends AppBaseController
     public function StoreCategoryC(Request $request)
     {
         // dd($request->toArray());
-        $dt = Carbon::now();
-
         $gender     = $request->get('gender');
         $class      = $request->get('cb_class');
         $level      = $request->get('level');
@@ -755,8 +751,8 @@ class FeesController extends AppBaseController
         $quantity       = $request->get('quantity');
         $desc           = $request->get('description');
         $oid            = $request->get('organization');
-        $date_started   = $dt->toDateString($request->get('date_started'));
-        $date_end       = $dt->toDateString($request->get('date_end'));
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
         $total          = $price * $quantity;
         $category       = "Kategory C";
 
@@ -1076,6 +1072,7 @@ class FeesController extends AppBaseController
             ->distinct()
             ->orderBy('students.id')
             ->orderBy('fees_new.category')
+            ->where('fees_new.status', 1)
             ->where('student_fees_new.status', 'Debt')
             ->get();
 
@@ -1084,6 +1081,8 @@ class FeesController extends AppBaseController
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
             ->select('fees_new.*', 'students.id as studentid')
+            ->orderBy('fees_new.name')
+            ->where('fees_new.status', 1)
             ->where('student_fees_new.status', 'Debt')
             ->get();
 
@@ -1095,6 +1094,7 @@ class FeesController extends AppBaseController
             ->select('fees_new.category', 'organization_user.organization_id')
             ->distinct()
             ->orderBy('fees_new.category')
+            ->where('fees_new.status', 1)
             ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
@@ -1107,6 +1107,7 @@ class FeesController extends AppBaseController
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
             ->select('fees_new.*')
             ->orderBy('fees_new.category')
+            ->where('fees_new.status', 1)
             ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
@@ -1317,7 +1318,6 @@ class FeesController extends AppBaseController
                 ->get();
         }
 
-
         return response()->json(['success' => $list]);
     }
 
@@ -1357,6 +1357,20 @@ class FeesController extends AppBaseController
         }
         
         return response()->json(['success' => $lists]);
+    }
+
+    public function fecthYuranByOrganizationId(Request $request)
+    {
+        $oid = $request->oid;
+
+        $yurans = DB::table('fees_new')
+            ->where('organization_id', $oid)
+            ->select('id', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get();
+        
+        return response()->json(['success' => $yurans]);
     }
 
     public function studentDebtDatatable(Request $request)
@@ -1412,5 +1426,14 @@ class FeesController extends AppBaseController
 
             return $table->make(true);
         }
+    }
+
+    public function ExportAllYuranStatus(Request $request)
+    {
+        $yuran = DB::table('fees_new')
+            ->where('id', $request->yuranExport)
+            ->first();
+
+        return Excel::download(new ExportYuranStatus($yuran), $yuran->name . '.xlsx');
     }
 }

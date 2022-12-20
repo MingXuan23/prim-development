@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,24 +16,45 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+Route::post('fpxIndex', 'PayController@fpxIndex')->name('api.fpxIndex');
 
 Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
-
 
 // mobile api
 Route::get('donateFromMobile', 'PayController@donateFromMobile');
 
-Route::get('mobile/getAllDonation', 'MobileApiController@getAllDonation');
-Route::get('mobile/getAllDonationType', 'MobileApiController@getAllDonationType');
-Route::get('mobile/getAllDonationQuantity', 'MobileApiController@getAllDonationQuantity');
-Route::get('mobile/getAllDonationTypeQuantity', 'MobileApiController@getAllDonationTypeQuantity');
-Route::get('mobile/getAllStatistic', 'MobileApiController@getAllStatistic');
-Route::get('mobile/getallmytransactionhistory', 'MobileApiController@getallmytransactionhistory');
-Route::get('mobile/getlatesttransaction', 'MobileApiController@getlatesttransaction');
-Route::get('mobile/gettransactionbymonth', 'MobileApiController@gettransactionbymonth');
-Route::get('mobile/gettransactionbyyear', 'MobileApiController@gettransactionbyyear');
-Route::get('mobile/donationnumberbyorganization', 'MobileApiController@donationnumberbyorganization');
-Route::get('mobile/getdonationbycategory', 'MobileApiController@getdonationbycategory');
+Route::group(['prefix' => 'mobile'], function () {
+    Route::get('/getAllDonation', 'MobileApiController@getAllDonation');
+    Route::get('/getAllDonationType', 'MobileApiController@getAllDonationType');
+    Route::get('/getAllDonationQuantity', 'MobileApiController@getAllDonationQuantity');
+    Route::get('/getAllDonationTypeQuantity', 'MobileApiController@getAllDonationTypeQuantity');
+    Route::get('/getAllStatistic', 'MobileApiController@getAllStatistic');
+    Route::get('/getallmytransactionhistory', 'MobileApiController@getallmytransactionhistory');
+    Route::get('/getlatesttransaction', 'MobileApiController@getlatesttransaction');
+    Route::get('/gettransactionbymonth', 'MobileApiController@gettransactionbymonth');
+    Route::get('/gettransactionbyyear', 'MobileApiController@gettransactionbyyear');
+    Route::get('/donationnumberbyorganization', 'MobileApiController@donationnumberbyorganization');
+    Route::get('/getdonationbycategory', 'MobileApiController@getdonationbycategory');
+    
+    Route::post('/login', 'MobileApiController@login');
+    Route::post('/updateProfile', 'MobileApiController@updateProfile');
+    
+    //route for mobile dish
+    Route::group(['prefix' => 'dish'], function (){
+        Route::get('/getOrganizationWithDish', 'DishController@getOrganizationWithDish');
+        Route::get('/getAllDishes', 'DishController@getAllDishes');
+        Route::get('/getAllAvailableDates', 'DishController@getAllAvailableDates');
+        Route::post('/storeDishAvailable', 'DishController@storeDishAvailable');
+    });
 
-Route::post('mobile/login', 'MobileApiController@login');
-Route::post('mobile/updateProfile', 'MobileApiController@updateProfile');
+    //route for mobile order
+    Route::group(['prefix' => 'order'], function (){
+        Route::get('/getAllOrderById/{id}', 'OrderController@getAllOrderById');
+        Route::get('/getAllOrderByOrganId/{id}', 'OrderController@getAllOrderByOrganId');
+
+        Route::post('/orderTransaction', 'OrderController@orderTransaction');
+        Route::post('/updateStatusToDelivering', 'OrderController@updateStatusToDelivering');
+        Route::post('/updateStatusToDelivered', 'OrderController@updateStatusToDelivered');
+    });
+     
+});

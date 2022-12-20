@@ -2,25 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\User;
+use App\Models\Order;
+use App\Models\Fee_New;
+use App\Models\Student;
+use App\Models\Donation;
+use App\Mail\OrderReceipt;
+use App\Mail\MerchantOrderReceipt;
+use App\Models\PgngOrder;
+use App\Models\Transaction;
+use App\Models\Organization;
+use Illuminate\Http\Request;
 use App\Mail\DonationReceipt;
 use App\Models\Dev\DevTransaction;
-use App\Models\Transaction;
-use App\User;
-use App\Models\Donation;
-use App\Models\Organization;
-use App\Models\Student;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\AppBaseController;
-use App\Models\Fee_New;
 use Illuminate\Support\Facades\Redirect;
-use League\CommonMark\Inline\Parser\EscapableParser;
 use phpDocumentor\Reflection\Types\Null_;
+use App\Http\Controllers\AppBaseController;
+use League\CommonMark\Inline\Parser\EscapableParser;
 
 class PayController extends AppBaseController
 {
@@ -388,15 +393,12 @@ class PayController extends AppBaseController
 
     public function fpxIndex(Request $request)
     {
-        // dd($request);
-        // $user = Auth::id();
-        // dd($request->toArray());
-        $user       = User::find(Auth::id());
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
         
         if ($request->desc == 'Donation') {
-            $organization = $this->organization->getOrganizationByDonationId($request->o_id);
+            $user = User::find(Auth::id());
+            $organization = $this->organization->getOrganizationByDonationId($request->d_id);
 
             if(isset($request->email))
             {
@@ -410,17 +412,20 @@ class PayController extends AppBaseController
                 $telno = NULL;
                 $fpx_buyerName = "Penderma Tanpa Nama";
             }
-
+            
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
-            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->o_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . rand(10000, 99999);
+
+            $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
             // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
         } 
-        else if (($request->desc == 'School_Fees'))
+        else if ($request->desc == 'School_Fees')
         {
+            $user = User::find(Auth::id());
             $organization = Organization::find($request->o_id);
             
             $fpx_buyerEmail      = $user->email;
@@ -432,7 +437,73 @@ class PayController extends AppBaseController
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         }
+        else if($request->desc == 'Food_Order')
+        {
+            $user = User::find($request->user_id);
+            $organization = Organization::find($request->o_id);
+            $fpx_buyerEmail      = $user->email;
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "FOPRIM" . date('YmdHis') . rand(10000, 99999);
 
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
+        }
+        else if($request->desc == 'Merchant')
+        {
+            $pickup_date = $request->pickup_date;
+            $pickup_time = $request->pickup_time;
+            $note = $request->note;
+            $gng_order_id = $request->order_id;
+            $order_type = $request->order_type;
+
+            $today = Carbon::now();
+            $date_f = Carbon::parse($pickup_date);
+            
+            if($today->format('d-m-Y') == $date_f->format('d-m-Y')) {
+                $isToday = true;
+            } else {
+                $isToday = false;
+            }
+            
+            if($isToday) {
+                $current_time = Carbon::now()->format('G:i');
+                if(Carbon::parse($pickup_time)->format('G:i') < $current_time) { // 11 < 12
+                    return back()->with('error', 'Sila pilih masa yang sesuai');
+                }
+            }
+            
+            if($order_type == 'Pick-Up') {
+                $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('h:i:s');
+
+                DB::table('pgng_orders')->where('id', $gng_order_id)->update([
+                    'updated_at' => Carbon::now(),
+                    'order_type' => $order_type,
+                    'pickup_date' => $pickup_datetime,
+                    'note' => $note,
+                    'status' => 'Pending'
+                ]);
+            }
+
+            $gng_order = DB::table('pgng_orders')
+            ->where('id', $gng_order_id)
+            ->select('user_id', 'organization_id')
+            ->first();
+
+            $ficts_seller_id = "SE00054277";
+
+            $user = User::find($gng_order->user_id);
+            $organization = Organization::find($gng_order->organization_id);
+            $fpx_buyerEmail      = $user->email;
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "FOPRIM" . date('YmdHis') . rand(10000, 99999);
+
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerId       = config('app.env') == 'production' ? $ficts_seller_id : "SE00013841";
+        }
 
         $fpx_msgType        = "AR";
         $fpx_msgToken       = "01";
@@ -470,12 +541,9 @@ class PayController extends AppBaseController
         $transaction->status        = 'Pending';
         $transaction->email         = $fpx_buyerEmail;
         $transaction->telno         = $telno;
+        $transaction->user_id       = $user ? $user->id : null;
         $transaction->username      = strtoupper($fpx_buyerName);
         $transaction->fpx_checksum  = $fpx_checkSum;
-
-        if ($user) {
-            $transaction->user_id   = Auth::id();
-        }
 
         $list_student_fees_id   = $getstudentfees;
         $list_parent_fees_id    = $getparentfees;
@@ -513,7 +581,25 @@ class PayController extends AppBaseController
                             ]);
                     }
                 }
-            } else {
+            } 
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'F')
+            {
+                $result = DB::table('orders')
+                ->where('id', $request->order_id)
+                ->update([
+                    'transaction_id' => $transaction->id
+                ]);
+            }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'M')
+            {
+                $result = DB::table('pgng_orders')
+                ->where('id', $gng_order_id)
+                ->update([
+                    'status' => 'Paid',
+                    'transaction_id' => $transaction->id
+                ]);
+            }
+            else {
                 $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
         }
@@ -579,123 +665,104 @@ class PayController extends AppBaseController
                     break;
             }
         } else {
-            Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
+            Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed' . $request->fpx_debitAuthCode]);
         }
     }
 
     // callback for FPX
     public function transactionReceipt(Request $request)
     {
-
         $case = explode("_", $request->fpx_sellerExOrderNo);
-        // $text = explode("/", $request->fpx_buyerIban);
 
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
                 case 'School':
-                    // $response = Http::post('https://dev.prim.my/api/devtrans', [
-                    //     $this->sendResponse($request->toArray(), "Success")
-                    // ]);
 
-                    // return Redirect::away('https://dev.prim.my/api/devtrans')->with();
-                    // return Redirect::away('https://dev.prim.my/api/devtrans')->with($request->toArray());
-
+                    Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
                     $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $userid = $transaction->user_id;;
-                    $transaction->transac_no = $request->fpx_fpxTxnId;
-                    $transaction->status = "Success";
 
-                    $res_student = DB::table('student_fees_new')
+                    $list_student_fees_id = DB::table('student_fees_new')
                         ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
                         ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
                         ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
                         ->where('transactions.id', $transaction->id)
                         ->get();
 
-                    $res_parent  = DB::table('fees_new')
+                    $list_parent_fees_id  = DB::table('fees_new')
                         ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
                         ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
                         ->select('fees_new_organization_user.*')
                         ->orderBy('fees_new.category')
-                        ->where('organization_user.user_id', $userid)
+                        ->where('organization_user.user_id', $transaction->user_id)
                         ->where('organization_user.role_id', 6)
                         ->where('organization_user.status', 1)
                         ->where('fees_new_organization_user.transaction_id', $transaction->id)
                         ->get();
 
-                    $res_student ? $list_student_fees_id = $res_student : $list_student_fees_id = "";
-                    $res_parent ? $list_parent_fees_id = $res_parent : $list_student_fees_id = "";
 
-                    if ($transaction->save()) {
+                    for ($i = 0; $i < count($list_student_fees_id); $i++) {
 
-                        if ($list_student_fees_id) {
-                            for ($i = 0; $i < count($list_student_fees_id); $i++) {
+                        // ************************* update student fees status fees by transactions *************************
+                        $res  = DB::table('student_fees_new')
+                            ->where('id', $list_student_fees_id[$i]->student_fees_id)
+                            ->update(['status' => 'Paid']);
 
-                                // ************************* update student fees status fees by transactions *************************
-                                $res  = DB::table('student_fees_new')
-                                    ->where('id', $list_student_fees_id[$i]->student_fees_id)
-                                    ->update(['status' => 'Paid']);
-
-                                // ************************* check the student if have still debt *************************
-
-                                $check_debt = DB::table('students')
-                                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                                    ->select('students.*')
-                                    ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
-                                    ->where('student_fees_new.status', 'Debt')
-                                    ->get();
-
-
-                                // ************************* update status fees for student if all fees completed paid*************************
-
-                                if (count($check_debt) == 0) {
-                                    DB::table('class_student')
-                                        ->where('id', $list_student_fees_id[$i]->class_student_id)
-                                        ->update(['fees_status' => 'Completed']);
-                                }
+                        // ************************* check the student if have still debt *************************
+                        
+                        if ($i == count($list_student_fees_id) - 1)
+                        {
+                            $check_debt = DB::table('students')
+                                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                                ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                                ->select('students.*')
+                                ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
+                                ->where('student_fees_new.status', 'Debt')
+                                ->count();
+    
+    
+                            // ************************* update status fees for student if all fees completed paid*************************
+    
+                            if ($check_debt == 0) {
+                                DB::table('class_student')
+                                    ->where('id', $list_student_fees_id[$i]->class_student_id)
+                                    ->update(['fees_status' => 'Completed']);
                             }
-                        }
-
-                        if ($list_parent_fees_id) {
-                            for ($i = 0; $i < count($list_parent_fees_id); $i++) {
-
-                                // ************************* update status fees for parent *************************
-                                $res = DB::table('fees_new_organization_user')
-                                    ->where('id', $list_parent_fees_id[$i]->id)
-                                    ->update([
-                                        'status' => 'Paid'
-                                    ]);
-
-                                // ************************* check the parent if have still debt *************************
-
-                                $check_debt = DB::table('organization_user')
-                                    ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
-                                    ->select('fees_new_organization_user.*')
-                                    ->where('organization_user.user_id', $userid)
-                                    ->where('organization_user.role_id', 6)
-                                    ->where('organization_user.status', 1)
-                                    ->where('fees_new_organization_user.status', 'Debt')
-                                    ->get();
-
-                                // ************************* update status fees for organization user (parent) if all fees completed paid *************************
-
-                                if (count($check_debt) == 0) {
-                                    DB::table('organization_user')
-                                        ->where('user_id', $userid)
-                                        ->where('role_id', 6)
-                                        ->where('status', 1)
-                                        ->update(['fees_status' => 'Completed']);
-                                }
-                            }
-                        }
-
-                        if ($res) {
-                            return $this->ReceiptFees($transaction->id);
-                        } else {
-                            return view('errors.500');
                         }
                     }
+
+                    for ($i = 0; $i < count($list_parent_fees_id); $i++) {
+
+                        // ************************* update status fees for parent *************************
+                        DB::table('fees_new_organization_user')
+                            ->where('id', $list_parent_fees_id[$i]->id)
+                            ->update([
+                                'status' => 'Paid'
+                            ]);
+
+                        // ************************* check the parent if have still debt *************************
+                        if ($i == count($list_student_fees_id) - 1)
+                        {
+                            $check_debt = DB::table('organization_user')
+                                ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
+                                ->where('organization_user.user_id', $transaction->user_id)
+                                ->where('organization_user.role_id', 6)
+                                ->where('organization_user.status', 1)
+                                ->where('fees_new_organization_user.status', 'Debt')
+                                ->count();
+    
+                            // ************************* update status fees for organization user (parent) if all fees completed paid *************************
+    
+                            if ($check_debt == 0) {
+                                DB::table('organization_user')
+                                    ->where('user_id', $transaction->user_id)
+                                    ->where('role_id', 6)
+                                    ->where('status', 1)
+                                    ->update(['fees_status' => 'Completed']);
+                            }
+                        }
+                    }
+                    
+                    return $this->ReceiptFees($transaction->id);
                     break;
 
                 case 'Donation':
@@ -715,12 +782,60 @@ class PayController extends AppBaseController
                     return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
 
                     break;
+                    
+                case 'Food':
+                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction->status = "Success";
+                    $transaction->save();
+
+                    $userid = $transaction->user_id;
+
+                    $order = Order::where('transaction_id', '=', $transaction->id)->first();
+                    $user = User::find($transaction->user_id);
+                    $organization = Organization::find($order->organ_id);
+                    
+                    $order_dishes = DB::table('order_dish as od')
+                        ->leftJoin('dishes as d', 'd.id', 'od.dish_id')
+                        ->leftJoin('orders as o', 'o.id', 'od.order_id')
+                        ->where('od.order_id', $order->id)
+                        ->orderBy('d.name')
+                        ->get();
+                    
+                    Mail::to($transaction->email)->send(new OrderReceipt($order, $organization, $transaction, $user));
+
+                    return view('order.receipt', compact('order_dishes', 'organization', 'transaction', 'user'));
+
+                    break;
+                
+                case 'Merchant':
+                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction->status = "Success";
+                    $transaction->save();
+
+                    $order = PgngOrder::where('transaction_id', $transaction->id)->first();
+                    $item = DB::table('product_order as po')
+                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                    ->where('po.pgng_order_id', $order->id)
+                    ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                    ->get();
+                    $organization = Organization::find($order->organization_id);
+                    $user = User::find($order->user_id);
+                    
+                    Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+                    
+                    return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+
+                    break;
+                        
                 default:
                     return view('errors.500');
                     break;
             }
             return view('errors.500');
-        } else {
+        } 
+        else {
             Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
             $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
             return view('fpx.transactionFailed', compact('request', 'user'));
@@ -863,6 +978,122 @@ class PayController extends AppBaseController
         // dd($get_fees);
 
         return view('fee.pay.receipt', compact('getparent', 'get_transaction', 'get_student', 'get_category', 'get_fees', 'getfees_categoryA', 'get_organization'));
+    }
+
+    public function viewReceiptFees($transaction_id)
+    {
+        // parent user id
+
+        // dd($transaction_id);
+        $userid = DB::table("transactions")
+                ->where('id', $transaction_id)
+                ->select('user_id as id')
+                ->first();
+        
+        $userid = $userid->id;
+        
+        $id = $transaction_id;
+
+        // details parents
+        $getparent = DB::table('users')
+            ->where('id', $userid)
+            ->first();
+
+        // details transaction
+        $get_transaction = Transaction::where('id', $id)->first();
+
+        // details students by transactions 
+        $get_student = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', 'class_organization.class_id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+            ->select('students.*', 'classes.nama as classname')
+            ->distinct()
+            ->orderBy('students.id')
+            ->orderBy('fees_new.category')
+            ->where('fees_transactions_new.transactions_id', $id)
+            ->where('student_fees_new.status', 'Paid')
+            ->get();
+
+        // get category fees by transactions
+        $get_category = DB::table('fees_new')
+            ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+            ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->select('fees_new.category', 'students.id as studentid')
+            ->distinct()
+            ->orderBy('students.id')
+            ->orderBy('fees_new.category')
+            ->where('fees_transactions_new.transactions_id', $id)
+            ->where('student_fees_new.status', 'Paid')
+            ->get();
+
+        // dd($get_category);
+
+        // get fees
+        $get_fees = DB::table('fees_new')
+            ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+            ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+            ->join('students', 'students.id', '=', 'class_student.student_id')
+            ->select('fees_new.*', 'students.id as studentid')
+            ->orderBy('students.id')
+            ->orderBy('fees_new.category')
+            ->where('fees_transactions_new.transactions_id', $id)
+            ->where('student_fees_new.status', 'Paid')
+            ->get();
+
+        // get transaction for fees category A
+        $getfees_categoryA  = DB::table('fees_new')
+            ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+            ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+            ->select('fees_new.*')
+            ->orderBy('fees_new.name')
+            ->where('organization_user.user_id', $userid)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
+            ->where('fees_new_organization_user.status', 'Paid')
+            ->where('fees_new_organization_user.transaction_id', $id)
+            ->get();
+
+        // $getfees_categoryA ? $getfees_categoryA = 1 : $getfees_categoryA = "";
+        // dd(count($getfees_categoryA));
+        if (count($get_category) != 0) {
+            $oid = DB::table('fees_new')
+                ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+                ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+                ->select('fees_new.organization_id')
+                ->distinct()
+                ->where('fees_transactions_new.transactions_id', $id)
+                ->where('student_fees_new.status', 'Paid')
+                ->first();
+
+            $get_organization = DB::table('organizations')->where('id', $oid->organization_id)->first();
+        }
+
+        if (count($getfees_categoryA) != 0) {
+            // dd($getfees_categoryA);
+            $oid = DB::table('fees_new')
+                ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+                ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+                ->select('fees_new.organization_id')
+                ->distinct()
+                ->where('organization_user.user_id', $userid)
+                ->where('organization_user.role_id', 6)
+                ->where('organization_user.status', 1)
+                ->where('fees_new_organization_user.status', 'Paid')
+                ->where('fees_new_organization_user.transaction_id', $id)
+                ->first();
+
+            $get_organization = DB::table('organizations')->where('id', $oid->organization_id)->first();
+        }
+        // dd($get_fees);
+
+        return view('fee.pay.view-receipt', compact('getparent', 'get_transaction', 'get_student', 'get_category', 'get_fees', 'getfees_categoryA', 'get_organization'));
     }
 
     public function getDetailReceipt($id)
