@@ -469,7 +469,7 @@ class PayController extends AppBaseController
             
             if($isToday) {
                 $current_time = Carbon::now()->format('G:i');
-                if(Carbon::parse($pickup_time)->format('G:i') < $current_time) { // 11 < 12
+                if(Carbon::parse($pickup_time)->lt($current_time)) { // 11 < 12
                     return back()->with('error', 'Sila pilih masa yang sesuai');
                 }
             }

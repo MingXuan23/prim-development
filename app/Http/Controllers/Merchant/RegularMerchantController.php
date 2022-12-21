@@ -118,9 +118,11 @@ class RegularMerchantController extends Controller
             ['day', $day],
             ['organizations.id', $id]
         ])
-        ->select('organizations.id as id', 'nama', 'address', 'postcode', 'state', 'city',
+        ->select('organizations.id as id', 'nama', 'address', 'postcode', 'state', 'city', 'fixed_charges',
         'day', 'open_hour', 'close_hour', 'status')
         ->first();
+
+        $fixed_charges = $merchant->fixed_charges != null ? $merchant->fixed_charges : 0;
 
         $product_group = DB::table('product_group as pg')
         ->join('product_item as pi', 'pi.product_group_id', 'pg.id')
@@ -145,7 +147,14 @@ class RegularMerchantController extends Controller
         ->orderBy('pi.name')  
         ->get();
 
-        return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item'));
+        $price = array();
+
+        foreach($product_item as $row)
+        {
+            $price[$row->id] = number_format((double)(($row->price * $row->selling_quantity) + $fixed_charges), 2, '.', '');
+        }
+
+        return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price'));
     }
 
     public function fetchItem(Request $request)
@@ -267,7 +276,8 @@ class RegularMerchantController extends Controller
         }
         else // order did not exists
         {
-            $total_price = $item->price * (int)($request->qty * $item->unit_qty);
+            $fixed_charges = $this->getFixedCharges($request->o_id);
+            $total_price = ($item->price * (int)($request->qty * $item->unit_qty)) + $fixed_charges;
 
             if($item->type == 'have inventory') {
                 $new_stock_qty = intval((int)$item->qty - (int)($request->qty * $item->unit_qty));
@@ -299,6 +309,7 @@ class RegularMerchantController extends Controller
 
     public function showCart($org_id)
     {
+        $price = array();
         $cart_item = array(); // empty if cart is empty
         $user_id = Auth::id();
 
@@ -314,9 +325,16 @@ class RegularMerchantController extends Controller
                 ->where('po.pgng_order_id', $cart->id)
                 ->select('po.id', 'po.quantity', 'po.selling_quantity', 'pi.name', 'pi.price')
                 ->get();
+
+            $fixed_charges = $this->getFixedCharges($org_id);
+
+            foreach($cart_item as $row)
+            {
+                $price[$row->id] = number_format((double)(($row->price * $row->selling_quantity) + $fixed_charges), 2, '.', '');
+            }
         }
 
-        return view('merchant.regular.cart', compact('cart', 'cart_item'));
+        return view('merchant.regular.cart', compact('cart', 'cart_item', 'price'));
     }
 
     public function destroyItemInCart(Request $request)
@@ -405,21 +423,34 @@ class RegularMerchantController extends Controller
         $close_hour_f = Carbon::parse($op_hour->close_hour)->format('G:i');
 
         $isToday = $this->compareDateWithToday($date);
-        
-        if($isToday) {
-            $current_time = Carbon::now()->format('G:i');
-            $temp_open_hour = Carbon::parse($op_hour->open_hour)->format('G:i');
-            if($current_time >= $temp_open_hour) { // 00 >= 8
-                $open_hour_f = $current_time;
-                $body = '<p>Waktu Buka dari Sekarang - '.$close_hour.'</p>';
+
+        $current_time = Carbon::now()->format('G:i');
+        if($current_time > $close_hour_f) { // 12 > 11
+            $isOpen = false;
+            $body = '<p>Tutup pada masa ini</p>';
+        } else {
+            $isOpen = true;
+            if($isToday) {
+                $temp_open_hour = Carbon::parse($op_hour->open_hour)->format('G:i');
+                if($current_time >= $temp_open_hour) { // 00 >= 8
+                    $open_hour_f = $current_time;
+                    $body = '<p>Waktu Buka dari Sekarang - '.$close_hour.'</p>';
+                } else {
+                    $body = '<p>Waktu Buka dari '.$open_hour.' - '.$close_hour.'</p>';
+                }
             } else {
                 $body = '<p>Waktu Buka dari '.$open_hour.' - '.$close_hour.'</p>';
             }
-        } else {
-            $body = '<p>Waktu Buka dari '.$open_hour.' - '.$close_hour.'</p>';
         }
+        
+        $response = array(
+            "open" => $isOpen,
+            "min" => $open_hour_f,
+            "max" => $close_hour_f,
+            'body' => $body
+        );
 
-        return response()->json(['min' => $open_hour_f, 'max' => $close_hour_f, 'body' => $body]);
+        return response()->json(['hour' => $response]);
     }
 
     public function storeOrder(Request $request)
@@ -678,6 +709,9 @@ class RegularMerchantController extends Controller
                     ->where('po.pgng_order_id', $order_id)
                     ->select('po.quantity as qty', 'pi.price', 'pi.selling_quantity as unit_qty')
                     ->get();
+
+        $org_id = PgngOrder::where('id', $order_id)->select('organization_id as org_id')->first()->org_id;
+        $fixed_charges = $this->getFixedCharges($org_id);
             
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)
@@ -686,7 +720,7 @@ class RegularMerchantController extends Controller
             }
         }
 
-        return $new_total_price;
+        return $new_total_price + (count($cart_item) * $fixed_charges);
     }
 
     private function compareDateWithToday($date)
@@ -717,6 +751,14 @@ class RegularMerchantController extends Controller
                 ->get();
 
         return $order;
+    }
+
+    private function getFixedCharges($org_id)
+    {
+        $fixed_charges = Organization::find($org_id)->fixed_charges;
+        $fixed_charges = $fixed_charges != null ? $fixed_charges : 0;
+
+        return $fixed_charges;
     }
 
     private function getDayIntegerByDayName($date)

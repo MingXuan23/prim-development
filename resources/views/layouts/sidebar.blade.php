@@ -240,7 +240,7 @@
             @endrole
             
 
-            @role('Regular Merchant Admin')
+            {{-- @role('Regular Merchant Admin')
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-account-edit"></i>
@@ -254,7 +254,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.operation-hour') }}" class=" waves-effect">
                             <i class="ti-timer"></i>
                             <span>Waktu Operasi</span>
                         </a>
@@ -273,7 +273,7 @@
                     </li>
                 </ul>  
             </li>
-            @endrole
+            @endrole --}}
 
             {{-- @role('Superadmin|Koop Admin')
             <li>
@@ -307,7 +307,7 @@
             </li>
             @endrole --}}
             
-            <li>
+            {{-- <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
                     <span>Peniaga</span>
@@ -326,9 +326,9 @@
                         </a>
                     </li>
                 </ul>  
-            </li>
+            </li> --}}
 
-            <!-- @role('Superadmin|Penjaga') -syah punye
+            {{-- <!-- @role('Superadmin|Penjaga') -syah punye
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>
@@ -355,9 +355,9 @@
                     </li>
                 </ul>
             </li>
-            @endrole -->
+            @endrole --> --}}
 
-            @role('Superadmin|Penjaga') <!--haziq nye-->
+            {{-- @role('Superadmin|Penjaga') <!--haziq nye-->
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>

@@ -130,7 +130,7 @@
                           </div>
                           <div class="mt-auto d-flex justify-content-between align-items-center w-100">
                             <div class="">
-                              <p class="card-text"><b>RM</b> {{ number_format((double)($item->price * $item->selling_quantity), 2, '.', '') }}</p>
+                              <p class="card-text"><b>RM</b> {{ $price[$item->id] }}</p>
                             </div>
                             <div class="ml-auto">
                               @csrf

@@ -68,7 +68,7 @@
                       <td class="align-middle">{{ $row->name }}</td>
                       <td class="align-middle">{{ $row->quantity }}</td>
                       <td class="align-middle">{{ $row->selling_quantity * $row->quantity }}</td>
-                      <td class="align-middle">{{ number_format((double)$row->price, 2, '.', '') }}</td>
+                      <td class="align-middle">{{ $price[$row->id] }}</td>
                       <td class="align-middle">
                           <button type="button" data-cart-order-id="{{ $row->id }}" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>
                       </td>
@@ -280,9 +280,15 @@
             $('.time-range').empty()
           },
           success:function(result) {
-            $('#timepicker').attr('min', result.min)
-            $('#timepicker').attr('max', result.max)
-            $('.time-range').append(result.body)
+            if(result.hour.open) {
+              $('#timepicker').prop('disabled', false)
+              $('#timepicker').attr('min', result.hour.min)
+              $('#timepicker').attr('max', result.hour.max)
+              $('.time-range').append(result.hour.body)
+            } else {
+              $('#timepicker').prop('disabled', true)
+              $('.time-range').append(result.hour.body)
+            }
           },
           error:function(result) {
             console.log(result.responseText)

@@ -104,7 +104,7 @@ class OrganizationController extends Controller
 
         $user = Auth::user();
         $user->assignRole('Admin');
-
+        
         $role = $this->assignRoleForOrganization($type_org->nama);
 
         if ($request->type_org == 1 || $request->type_org == 2 || $request->type_org == 3) {

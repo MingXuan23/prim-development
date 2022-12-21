@@ -228,6 +228,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
         Route::post('fetch-hours', 'RegularMerchantController@fetchOperationHours')->name('merchant.regular.fetch-hours');
         Route::post('store-order', 'RegularMerchantController@storeOrder')->name('merchant.regular.store-order');
     });
+
+    Route::group(['prefix' => 'admin-regular', 'namespace' => 'AdminRegular'], function() {
+        Route::get('/operation-hour', 'OperationHourController@index')->name('admin-reg.operation-hour');
+        Route::post('edit-hour', 'OperationHourController@edit')->name('admin-reg.edit-hour');
+    });
 });
 
 
