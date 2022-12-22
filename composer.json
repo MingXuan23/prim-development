@@ -23,6 +23,7 @@
         "silviolleite/laravelpwa": "^2.0",
         "spatie/laravel-permission": "^3.18",
         "stripe/stripe-php": "^7.67",
+        "symfony/symfony": "5.4.x",
         "yajra/laravel-datatables-oracle": "^9.15"
     },
     "require-dev": {
@@ -35,6 +36,7 @@
         "phpunit/phpunit": "^8.5.8|^9.3.3"
     },
     "config": {
+        "platform-check": false,
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
