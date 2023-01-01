@@ -18,14 +18,17 @@
   box-shadow: 11px 10px 20px 8px rgba(0,0,0,0.10);
 }
 
-#img-size
+.img-size
 {
   max-width: 100%;
   height: auto;
   width: 100px;
   border-radius: 14px;
   object-fit: contain;
-  background-color:rgb(61, 61, 61)
+}
+
+.default-img {
+  background-color:rgb(61, 61, 61);
 }
 
 .nav-link{
@@ -115,7 +118,11 @@
                     <div class="d-flex">
                       <div class="d-flex justify-content-center align-items-start">
                         <div>
-                          <img class="img-fluid" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
+                          @if($item->image == null)
+                          <img class="img-fluid img-size default-img" src="{{ URL('images/koperasi/default-item.png')}}">
+                          @else
+                          <img class="img-fluid img-size" src="{{ URL('merchant-image/product-item/'.$merchant->nama.'/'.$image_url[$item->id])}}">
+                          @endif
                         </div>
                       </div>
                       <div class="col">

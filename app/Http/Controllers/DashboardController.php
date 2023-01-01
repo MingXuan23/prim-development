@@ -50,7 +50,7 @@ class DashboardController extends AppBaseController
     {
         $organizationID = $request->id;
         $duration = $request->duration;
-
+        
         if ($duration == "day") {
             try {
                 $response = Transaction::getTotalDonorByDay($organizationID);

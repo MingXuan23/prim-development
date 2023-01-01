@@ -127,6 +127,7 @@ class RegularMerchantController extends Controller
         $product_group = DB::table('product_group as pg')
         ->join('product_item as pi', 'pi.product_group_id', 'pg.id')
         ->where([
+            ['pi.status', 1],
             ['pg.organization_id', $id],
             ['pg.deleted_at', NULL],
             ['pi.deleted_at', NULL],
@@ -138,6 +139,7 @@ class RegularMerchantController extends Controller
         $product_item = DB::table('product_item as pi')
         ->join('product_group as pg', 'pg.id', 'pi.product_group_id')
         ->where([
+            ['pi.status', 1],
             ['pg.organization_id', $id],
             ['pg.deleted_at', NULL],
             ['pi.deleted_at', NULL],
@@ -148,13 +150,15 @@ class RegularMerchantController extends Controller
         ->get();
 
         $price = array();
+        $image_url = array();
 
         foreach($product_item as $row)
         {
             $price[$row->id] = number_format((double)(($row->price * $row->selling_quantity) + $fixed_charges), 2, '.', '');
+            $image_url[$row->id] = $row->image;
         }
 
-        return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price'));
+        return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price', 'image_url'));
     }
 
     public function fetchItem(Request $request)
@@ -425,7 +429,7 @@ class RegularMerchantController extends Controller
         $isToday = $this->compareDateWithToday($date);
 
         $current_time = Carbon::now()->format('G:i');
-        if($current_time > $close_hour_f) { // 12 > 11
+        if($current_time > $close_hour_f && $isToday) { // 12 > 11
             $isOpen = false;
             $body = '<p>Tutup pada masa ini</p>';
         } else {

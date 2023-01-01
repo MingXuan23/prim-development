@@ -240,7 +240,7 @@
             @endrole
             
 
-            {{-- @role('Regular Merchant Admin')
+            @role('Regular Merchant Admin')
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-account-edit"></i>
@@ -248,7 +248,7 @@
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.home') }}" class=" waves-effect">
                             <i class="ti-home"></i>
                             <span>Dashboard</span>
                         </a>
@@ -260,20 +260,20 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.product-group') }}" class=" waves-effect">
                             <i class="ti-package"></i>
                             <span>Urus Produk</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.orders') }}" class=" waves-effect">
                             <i class="ti-email"></i>
                             <span>Pesanan</span>
                         </a>
                     </li>
                 </ul>  
             </li>
-            @endrole --}}
+            @endrole
 
             {{-- @role('Superadmin|Koop Admin')
             <li>
@@ -307,7 +307,7 @@
             </li>
             @endrole --}}
             
-            {{-- <li>
+            <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
                     <span>Peniaga</span>
@@ -326,7 +326,7 @@
                         </a>
                     </li>
                 </ul>  
-            </li> --}}
+            </li>
 
             {{-- <!-- @role('Superadmin|Penjaga') -syah punye
             <li>

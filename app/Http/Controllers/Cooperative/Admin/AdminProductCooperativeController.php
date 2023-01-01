@@ -11,11 +11,12 @@ class AdminProductCooperativeController extends Controller
 {
     public function indexAdmin( )
     {
+        $role_id = DB::table('roles')->where('name', 'Koop Admin')->first()->id;
         $userID = Auth::id();
         $koperasi = DB::table('organizations as o')
                     ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
                     ->where('ou.user_id', $userID)
-                    ->where('ou.role_id', 1239)
+                    ->where('ou.role_id', $role_id)
                     ->first();
 
         $product = DB::table('product_item as p')

@@ -242,7 +242,7 @@ class OrganizationController extends Controller
             ->select("o.*")
             ->distinct()
             ->where('ou.user_id', $userId)
-            ->whereIn('ou.role_id', [2, 1239])
+            ->whereIn('ou.role_id', [2])
             ->get();
         }
         

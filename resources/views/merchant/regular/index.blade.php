@@ -62,7 +62,7 @@
               <div class="d-flex" >
                   <img class="rounded img-fluid bg-dark" id="img-size" src="
                   {!! $row->organization_picture != null ? 
-                    URL('organization_picture/'.$row->organization_picture) : 
+                    URL('organization-picture/'.$row->organization_picture) : 
                     URL('images/koperasi/default-item.png')
                   !!}">
                   <div class="flex-column ml-2">

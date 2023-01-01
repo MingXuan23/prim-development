@@ -230,8 +230,45 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
     });
 
     Route::group(['prefix' => 'admin-regular', 'namespace' => 'AdminRegular'], function() {
-        Route::get('/operation-hour', 'OperationHourController@index')->name('admin-reg.operation-hour');
+        # Main Dashboard
+        Route::get('/home', 'DashboardController@index')->name('admin-reg.home');
+        Route::get('get-latest-orders', 'DashboardController@getLatestOrdersByNow')->name('admin-reg.latest-orders');
+        Route::get('get-total-order', 'DashboardController@getTotalOrder')->name('admin-reg.total-order');
+        Route::get('get-total-income', 'DashboardController@getTotalIncome')->name('admin-reg.total-income');
+        Route::get('get-all-transaction', 'DashboardController@getAllTransaction')->name('admin-reg.all-transaction');
+        Route::get('/home/edit', 'DashboardController@edit')->name('admin-reg.edit-merchant');
+        Route::put('update-merchant', 'DashboardController@update')->name('admin-reg.update-merchant');
+
+        # Operation hour Dashboard
+        Route::get('/operation-hours', 'OperationHourController@index')->name('admin-reg.operation-hour');
         Route::post('edit-hour', 'OperationHourController@edit')->name('admin-reg.edit-hour');
+        Route::put('update-hour', 'OperationHourController@update')->name('admin-reg.update-hour');
+        Route::get('/operation-hours/check-orders/{hour_id}', 'OperationHourController@editSameDateOrders')->name('admin-reg.edit-same-order');
+        Route::post('change-pickup-date', 'OperationHourController@changeOrderPickupDate')->name('admin-reg.change-date');
+        Route::put('new-update-hour', 'OperationHourController@updateNew')->name('admin-reg.new-update-hour');
+
+        # Product Dashboard
+        Route::get('/product-group-list', 'ProductController@indexProductGroup')->name('admin-reg.product-group');
+        Route::post('store-group', 'ProductController@storeProductGroup')->name('admin-reg.store-group');
+        Route::get('/product-group-list/{id}', 'ProductController@showProductItem')->name('admin-reg.product-item');
+        Route::put('update-group', 'ProductController@updateProductGroup')->name('admin-reg.update-group');
+        Route::delete('destroy-group', 'ProductController@destroyProductGroup')->name('admin-reg.destroy-group');
+        Route::post('store-item', 'ProductController@storeProductItem')->name('admin-reg.store-item');
+        Route::get('destroy-body', 'ProductController@displayDestroyItemBody')->name('admin-reg.destroy-body');
+        Route::delete('destroy-item', 'ProductController@destroyProductItem')->name('admin-reg.destroy-item');
+        Route::get('/product-group-list/{id}/{item}', 'ProductController@editProductItem')->name('admin-reg.edit-item');
+        Route::put('update-item', 'ProductController@updateProductItem')->name('admin-reg.update-item');
+        
+        # Order Dashboard
+        Route::get('orders', 'OrderController@index')->name('admin-reg.orders');
+        Route::get('all-orders', 'OrderController@getAllOrders')->name('admin-reg.all-orders');
+        Route::post('picked-up-order','OrderController@orderPickedUp')->name('admin-reg.order-picked-up');
+        Route::delete('destroy-order', 'OrderController@destroy')->name('admin-reg.destroy-order');
+        Route::get('orders/history', 'OrderController@showHistory')->name('admin-reg.history');
+        Route::get('all-histories', 'OrderController@getAllHistories')->name('admin-reg.all-histories');
+
+        # Order details
+        Route::get('order-details/{order_id}', 'OrderController@showList')->name('admin-reg.order-detail');
     });
 });
 

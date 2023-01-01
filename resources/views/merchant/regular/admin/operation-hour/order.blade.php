@@ -50,11 +50,11 @@
                         <td>{{ $pickup_date[$row->id] }}</td>
                         <td>
                             {{ number_format($row->total_price, 2, '.', '') }} |
-                            <a href="{{ route('admin.merchant.list', $row->id) }}">Lihat Pesanan</a>
+                            <a href="{{ route('admin-reg.order-detail', $row->id) }}">Lihat Pesanan</a>
                         </td>
                         <td class="btn-section">
-                            <button data-order-id="{{ $row->id }}" class="btn-edit-order btn btn-primary">Ubah Hari dan Masa</button>
-                            <button data-order-id="{{ $row->id }}" class="btn-cancel-order btn btn-danger">Buang</button>
+                            <button data-order-id="{{ $row->id }}" class="btn-edit-order btn btn-primary">Ubah Tarikh dan Waktu</button>
+                            <button data-order-id="{{ $row->id }}" class="btn-cancel-order btn btn-danger">Batal</button>
                         </td>
                     </tr>
                     @empty
@@ -69,13 +69,13 @@
             <div class="col d-flex justify-content-end">
               <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
               @if(count($order) == 0)
-              <form action="{{ route('admin.merchant.update-new-hours') }}" method="POST">
+              <form action="{{ route('admin-reg.new-update-hour') }}" method="POST">
                 @csrf
                 @method('PUT')
-                <input type="hidden" name="hour_id" id="hour_id" value="{{ $hour_id }}">
-                <input type="hidden" name="status" id="status" value="{{ $status }}">
-                <input type="hidden" name="updated_open" id="updated_open" value="{{ $open }}">
-                <input type="hidden" name="updated_close" id="updated_close" value="{{ $close }}">
+                <input type="hidden" name="hour_id" id="hour_id" value="{{ $time_arr['hour_id'] }}">
+                <input type="hidden" name="status" id="status" value="{{ $time_arr['status'] }}">
+                <input type="hidden" name="updated_open" id="updated_open" value="{{ $time_arr['opening_time'] }}">
+                <input type="hidden" name="updated_close" id="updated_close" value="{{ $time_arr['closing_time'] }}">
                 <button type="submit" class="btn-lg btn-primary">Kemaskini</button>
               </form>
               @else
@@ -112,10 +112,10 @@
                         min="{{ date_format(now(), "Y-m-d H:i") }}" 
                         value="{{ date_format(now(), "Y-m-d H:i") }}" 
                     >
-                    <input type="hidden" name="day" id="day" value="{{ $day }}">
-                    <input type="hidden" name="status" id="status" value="{{ $status }}">
-                    <input type="hidden" name="updated_open" id="updated_open" value="{{ $open }}">
-                    <input type="hidden" name="updated_close" id="updated_close" value="{{ $close }}">
+                    <input type="hidden" name="day" id="day" value="{{ $time_arr['day'] }}">
+                    <input type="hidden" name="status" id="status" value="{{ $time_arr['status'] }}">
+                    <input type="hidden" name="updated_open" id="updated_open" value="{{ $time_arr['opening_time']}}">
+                    <input type="hidden" name="updated_close" id="updated_close" value="{{ $time_arr['closing_time'] }}">
                   </div>
                 </div>
               </div>
@@ -203,7 +203,7 @@
             var close = $('input#updated_close').val()
             
             $.ajax({
-                url: "{{ route('admin.merchant.change-datetime') }}",
+                url: "{{ route('admin-reg.change-date') }}",
                 method: "POST",
                 data: { o_id:order_id,
                         date_time:date_time,
@@ -236,11 +236,11 @@
 
         $('#delete_order').click(function() {
             $.ajax({
-                url: "{{ route('admin.merchant.destroy-order') }}",
+                url: "{{ route('admin-reg.destroy-order') }}",
                 method: "DELETE",
                 data: {o_id:order_id},
                 beforeSend:function() {
-
+                    
                 },
                 success:function(result) {
                     location.reload()

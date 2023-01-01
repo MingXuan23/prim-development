@@ -203,27 +203,26 @@
             var close_hour = $('#close_hour').val()
 
             $.ajax({
-                url: "",
+                url: "{{ route('admin-reg.update-hour') }}",
                 method: "PUT",
                 data: {hour_id:hour_id, status:status, open_hour:open_hour, close_hour:close_hour},
                 beforeSend:function() {
                     $('.alert-danger').empty()
                 },
                 success:function(result) {
-                    if(result.status == "error_order") {
-                        $('.alert-danger').show().append(result.alert)
+                    if(result.response.status == "order-exist") {
+                        $('.alert-danger').show().append(result.response.alert)
                         $('#btn-check-order').show()
                         $('#btn-update-hour').prop('disabled', true)
-                        $('.order-exists').append(result.order)
+                        $('.order-exists').append(result.response.order)
                         $('.status').prop('disabled', true)
                         $('#open_hour').prop('disabled', true)
                         $('#close_hour').prop('disabled', true)
-                        console.log(result)
                     }
-                    else if(result.status == "error_time") {
-                        $('.alert-danger').show().append(result.alert)
+                    else if(result.response.status == "invalid-time") {
+                        $('.alert-danger').show().append(result.response.alert)
                     }
-                    else if(result.status == "success") {
+                    else if(result.response == "success") {
                         location.reload()
                     }
                 },
