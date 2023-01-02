@@ -2153,7 +2153,7 @@ class DormController extends Controller
         $sid = $request->get('sid');
         $oid = $request->get('oid');
         $categoryReal = $this->categoryReal;
-
+        
         // get the category to display for the selected student
         $studentouting = DB::table('student_outing')
             ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
@@ -2166,6 +2166,7 @@ class DormController extends Controller
                 ['cs.status', 1],
                 ['student_outing.status', '>', 0], //get processed application
             ])
+            ->whereYear('student_outing.apply_date_time', now()->year)
             ->select(
                 'students.id',
                 'cs.dorm_id',
@@ -2234,11 +2235,6 @@ class DormController extends Controller
         }
         return response()->json(['success' => $category, 'start' => $start, 'end' => $end, 'studentouting' => $studentouting]);
     }
-
-    // 拿created at当天的application而已吗
-    // 需不需要让user选display approve和pending的呢？
-    // for button：
-    // 如果是kecemasan， status=0 也要display给guard
     
     public function getStudentOutingDatatable(Request $request)
     {
