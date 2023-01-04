@@ -104,7 +104,7 @@ class OrganizationController extends Controller
 
         $user = Auth::user();
         $user->assignRole('Admin');
-
+        
         $role = $this->assignRoleForOrganization($type_org->nama);
 
         if ($request->type_org == 1 || $request->type_org == 2 || $request->type_org == 3) {
@@ -242,7 +242,7 @@ class OrganizationController extends Controller
             ->select("o.*")
             ->distinct()
             ->where('ou.user_id', $userId)
-            ->whereIn('ou.role_id', [2, 1239])
+            ->whereIn('ou.role_id', [2])
             ->get();
         }
         

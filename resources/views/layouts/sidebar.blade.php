@@ -248,25 +248,25 @@
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.home') }}" class=" waves-effect">
                             <i class="ti-home"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.operation-hour') }}" class=" waves-effect">
                             <i class="ti-timer"></i>
                             <span>Waktu Operasi</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.product-group') }}" class=" waves-effect">
                             <i class="ti-package"></i>
                             <span>Urus Produk</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.orders') }}" class=" waves-effect">
                             <i class="ti-email"></i>
                             <span>Pesanan</span>
                         </a>
@@ -328,7 +328,7 @@
                 </ul>  
             </li>
 
-            <!-- @role('Superadmin|Penjaga') -syah punye
+            {{-- <!-- @role('Superadmin|Penjaga') -syah punye
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>
@@ -355,9 +355,9 @@
                     </li>
                 </ul>
             </li>
-            @endrole -->
+            @endrole --> --}}
 
-            @role('Superadmin|Penjaga') <!--haziq nye-->
+            {{-- @role('Superadmin|Penjaga') <!--haziq nye-->
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>

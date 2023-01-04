@@ -11,7 +11,7 @@ class AdminProductCooperativeController extends Controller
 {
     public function indexAdmin( )
     {
-        $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
+        $role_id = DB::table('roles')->where('name', 'Koop Admin')->first()->id;
         $userID = Auth::id();
         $koperasi = DB::table('organizations as o')
                     ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')

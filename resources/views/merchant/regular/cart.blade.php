@@ -52,13 +52,13 @@
 
           <div class="table-responsive">
             <table class="table table-borderless" width="100%" cellspacing="0">
-                <thead>
+                <thead class="thead-dark">
                     <tr class="text-center">
                       <th style="width: 25%">Nama</th>
                       <th style="width: 15%">Kuantiti</th>
                       <th style="width: 25%">Kuantiti Penuh</th>
                       <th style="width: 20%">Harga Satu Unit (RM)</th>
-                      <th style="width: 15%">Action</th>
+                      <th style="width: 15%">Buang</th>
                     </tr>
                 </thead>
                 
@@ -68,7 +68,7 @@
                       <td class="align-middle">{{ $row->name }}</td>
                       <td class="align-middle">{{ $row->quantity }}</td>
                       <td class="align-middle">{{ $row->selling_quantity * $row->quantity }}</td>
-                      <td class="align-middle">{{ number_format((double)$row->price, 2, '.', '') }}</td>
+                      <td class="align-middle">{{ $price[$row->id] }}</td>
                       <td class="align-middle">
                           <button type="button" data-cart-order-id="{{ $row->id }}" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>
                       </td>
@@ -92,6 +92,14 @@
               <table class="table table-borderless mb-0">
                   <tbody>
                     <tr>
+                      <th class="text-muted" scope="row">Jumlah Kasar:</th>
+                      <td class="lead">RM {{ number_format((double)($cart->total_price - $fixed_charges), 2, '.', '') }}</td>
+                    </tr>
+                    <tr>
+                      <th class="text-muted" scope="row">Cas Servis:</th>
+                      <td class="lead">RM {{ number_format((double)$fixed_charges, 2, '.', '') }}</td>
+                    </tr>
+                    <tr>
                       <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
                       <td class="lead">RM {{ number_format((double)$cart->total_price, 2, '.', '') }}</td>
                     </tr>
@@ -101,7 +109,7 @@
           </div>
         </div>
         
-      <form action="{{ route('fpxIndex') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('merchant.regular.store-order', ['org_id' => $cart->org_id, 'order_id' => $cart->id]) }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="card mb-4 border">
           <div class="card-body p-4">
@@ -125,16 +133,16 @@
               
               <input type="hidden" id="org_id" value="{{ $cart->org_id }}">
 
-              <div class="col-6 pickup-date-div" hidden>
+              <div class="col pickup-date-div" hidden>
                 <div class="form-group required">
                   <label class="col">Tarikh Pengambilan</label>
                   <div class="col">
-                    <input type="text" class="form-control" name="pickup_date" id="datepicker" placeholder="Klik untuk pilih tarikh" readonly required>
+                    <input type="text" class="form-control" name="pickup_date" id="datepicker" placeholder="Pilih tarikh" readonly required>
                   </div>
                 </div>
               </div>
 
-              <div class="col-6 pickup-time-div" hidden>
+              <div class="col pickup-time-div" hidden>
                 <div class="form-group required">
                   <label class="col">Masa Pengambilan</label>
                   <div class="col timepicker-section">
@@ -162,35 +170,20 @@
             </div>
           </div>
         </div>
-
-        <div class="card mb-4 border">
-          <div class="card-body p-4">
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label>Pilih Bank</label>
-                  <select name="bankid" id="bankid" class="form-control"
-                      data-parsley-required-message="Sila pilih bank" required>
-                      <option value="">Pilih bank</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         
-        <input type="hidden" name="amount" id="total_price" value="2.00">
-        <input type="hidden" name="desc" id="desc" value="Merchant">
-        <input type="hidden" name="order_id" value="{{ $cart->id }}">
         <input type="hidden" name="order_type" id="hidden_order_type">
         
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
             <a href="{{ route('merchant.regular.show', $cart->org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
-            <button type="submit" class="btn-lg btn-primary">Bayar</button>
+            <button type="submit" class="btn-lg btn-primary">Teruskan</button>
           </div>
         </div>
       </form>
+      @else
+      <div class="d-flex justify-content-center">
+        <a href="{{ route('merchant.regular.show', $org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
+      </div>
       @endif
     </div>
   </div>
@@ -236,27 +229,6 @@
       }
     });
 
-    var arr = [];
-    
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: "/fpx/getBankList",
-        success: function(data) {
-            jQuery.each(data.data, function(key, value){
-                arr.push(key);
-            });
-            for(var i = 0; i < arr.length; i++){
-                arr.sort();
-                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-            }
-
-        },
-        error: function (data) {
-            // console.log(data);
-        }
-    });
-
     $('#order_type').change(function() {
       type_val = $(this).children(':selected').val()
       $('#hidden_order_type').val(type_val)
@@ -280,9 +252,15 @@
             $('.time-range').empty()
           },
           success:function(result) {
-            $('#timepicker').attr('min', result.min)
-            $('#timepicker').attr('max', result.max)
-            $('.time-range').append(result.body)
+            if(result.hour.open) {
+              $('#timepicker').prop('disabled', false)
+              $('#timepicker').attr('min', result.hour.min)
+              $('#timepicker').attr('max', result.hour.max)
+              $('.time-range').append(result.hour.body)
+            } else {
+              $('#timepicker').prop('disabled', true)
+              $('.time-range').append(result.hour.body)
+            }
           },
           error:function(result) {
             console.log(result.responseText)
@@ -297,6 +275,7 @@
 
     $('.delete-item').click(function() {
       order_cart_id = $(this).attr('data-cart-order-id')
+      fixed_charges = $(this).attr('data-charge')
       $('#deleteConfirmModal').modal('show')
     })
 

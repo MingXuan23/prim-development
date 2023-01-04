@@ -18,14 +18,17 @@
   box-shadow: 11px 10px 20px 8px rgba(0,0,0,0.10);
 }
 
-#img-size
+.img-size
 {
   max-width: 100%;
   height: auto;
   width: 100px;
-  border-radius: 14px;
+  border-radius: 10px;
   object-fit: contain;
-  background-color:rgb(61, 61, 61)
+}
+
+.default-img {
+  background-color:rgb(61, 61, 61);
 }
 
 .nav-link{
@@ -51,6 +54,20 @@
   height: 35px;
   display:none;
 }
+
+.cart-btn {
+  position: relative;
+}
+
+.cart-btn .notification {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  padding: 5px 10px;
+  border-radius: 50%;
+  background: red;
+  color: white;
+}
 </style>
 
 @endsection
@@ -72,7 +89,7 @@
       <div class="card-header text-white" id="has-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
-          <a href="{{ route('merchant.regular.cart', $merchant->id) }}"><i class="mdi mdi-cart fa-3x"></i></a>
+          <a href="{{ route('merchant.regular.cart', $merchant->id) }}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i>{!! $cart_counter != 0 ? "<span class='notification'>".$cart_counter."</span>" : '' !!}</a>
         </div>
         
         <p><i class="fas fa-map-marker-alt mr-2"></i> {{ $merchant->address }}, {{ $merchant->city }}, {{ $merchant->state }}</p>
@@ -106,7 +123,7 @@
           <div class="d-flex justify-content-start" id="{{ $group->name }}">
             <h3 class="mb-4 ml-2">{{ $group->name }}</h3>
           </div>
-
+          
           @foreach($product_item as $item)
             @if($item->product_group_id == $group->id)
               <div class="row">
@@ -115,7 +132,11 @@
                     <div class="d-flex">
                       <div class="d-flex justify-content-center align-items-start">
                         <div>
-                          <img class="img-fluid" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
+                          @if($item->image == null)
+                          <img class="img-fluid img-size default-img" src="{{ URL('images/koperasi/default-item.png')}}">
+                          @else
+                          <img class="img-fluid img-size" src="{{ URL('merchant-image/product-item/'.$merchant->nama.'/'.$image_url[$item->id])}}">
+                          @endif
                         </div>
                       </div>
                       <div class="col">
@@ -130,7 +151,7 @@
                           </div>
                           <div class="mt-auto d-flex justify-content-between align-items-center w-100">
                             <div class="">
-                              <p class="card-text"><b>RM</b> {{ number_format((double)($item->price * $item->selling_quantity), 2, '.', '') }}</p>
+                              <p class="card-text"><b>RM</b> {{ $price[$item->id] }}</p>
                             </div>
                             <div class="ml-auto">
                               @csrf
