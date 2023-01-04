@@ -275,7 +275,7 @@
             </li>
             @endrole
 
-            {{-- @role('Superadmin|Koop Admin')
+             @role('Superadmin|Koop Admin')
             <li>
             <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fas fa-file-invoice-dollar"></i>
@@ -284,7 +284,7 @@
 
             <ul class="sub-menu mm-collapse" aria-expanded="false">
                 <li>
-                    <a href="{{ route('koperasi.indexAdmin') }}" class=" waves-effect">
+                    <a href="{{ route('koperasi.productMenu') }}" class=" waves-effect">
                     <i class="typcn typcn-pencil"></i>
                     <span>Produk</span>
                     </a>
@@ -305,7 +305,7 @@
                 </li>
             </ul>
             </li>
-            @endrole --}}
+            @endrole 
             
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -384,7 +384,7 @@
                     </li>
                 </ul>
             </li>
-            @endrole --}}
+            @endrole 
 
             {{-- @role('Superadmin|Pentadbir|Guru')
                 <li>

@@ -188,6 +188,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
     });
 
     Route::group(['namespace' => 'Admin'], function() {
+        Route::get('/produkmenu','AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
+        Route::get('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
+        Route::post('/produktype','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
+
         Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
         Route::get('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
         Route::post('/produk','AdminProductCooperativeController@storeProduct')->name('koperasi.storeProduct');

@@ -20,6 +20,7 @@ class UserCooperativeController extends Controller
 {
     public function index()
     {
+        $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $userID = Auth::id();
 
         $stdID = DB::table('organization_user as ou')
@@ -42,7 +43,7 @@ class UserCooperativeController extends Controller
                     ->distinct()
                     ->get();
         
-        $koperasi = Organization::where('type_org', 1039)->select('id', 'nama', 'parent_org')->get();
+        $koperasi = Organization::where('type_org', $role_id)->select('id', 'nama', 'parent_org')->get();
 
         return view('koperasi.index', compact('koperasi', 'orgID'));
     }
@@ -420,13 +421,14 @@ class UserCooperativeController extends Controller
 
     public function indexOrder()
     {
+        $type_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $userID = Auth::id();
 
         $query = DB::table('pgng_orders as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                 ->whereIn('status', [2,4])
                 ->where('user_id', $userID)
-                ->where('type_org', 1039)
+                ->where('type_org', $type_id)
                 ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno')
                 ->orderBy('ko.status', 'desc')
                 ->orderBy('ko.pickup_date', 'asc')
@@ -475,13 +477,14 @@ class UserCooperativeController extends Controller
 
     public function indexHistory()
     {
+        $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $userID = Auth::id();
 
         $query = DB::table('pgng_orders as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                 ->whereIn('status', [3, 100, 200])
                 ->where('user_id', $userID)
-                ->where('o.type_org', 1039)
+                ->where('o.type_org', $role_id)
                 ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno')
                 ->orderBy('ko.status', 'desc')
                 ->orderBy('ko.pickup_date', 'asc')
@@ -628,8 +631,9 @@ class UserCooperativeController extends Controller
 
     public function koopShop(Int $id)
     {
+        $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $sekolah = DB::table('organizations')
-        ->where('type_org',1039)
+        ->where('type_org',$role_id)
         ->where('id',$id)
         ->get();
 

@@ -11,11 +11,12 @@ class AdminProductCooperativeController extends Controller
 {
     public function indexAdmin( )
     {
+        $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
         $userID = Auth::id();
         $koperasi = DB::table('organizations as o')
                     ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
                     ->where('ou.user_id', $userID)
-                    ->where('ou.role_id', 1239)
+                    ->where('ou.role_id', $role_id)
                     ->first();
 
         $product = DB::table('product_item as p')
@@ -26,6 +27,51 @@ class AdminProductCooperativeController extends Controller
                     ->get();
         return view('koperasi-admin.index', compact('koperasi'))
         ->with('product',$product);
+    }
+
+    public function productMenu()
+    {
+        $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
+        $userID = Auth::id();
+        $koperasi = DB::table('organizations as o')
+        ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+        ->where('ou.user_id', $userID)
+        ->where('ou.role_id', $role_id)
+        ->first();
+        return view('koperasi-admin.productmenu', compact('koperasi'));
+    }
+
+    public function createType()
+    {
+        $userID = Auth::id();
+        $org = DB::table('organizations as o')
+        ->join('organization_user as os', 'o.id', 'os.organization_id')
+        ->where('os.user_id', $userID)
+        ->select('o.id')
+        ->first();
+
+        $type = DB::table('product_group as p')
+        ->where('p.organization_id',$org->id)
+        ->get();
+
+        return view('koperasi-admin.addtype',compact('type'));
+    }
+
+    public function storeType(Request $request)
+    {
+        $userID = Auth::id();
+        $org = DB::table('organizations as o')
+                ->join('organization_user as os', 'o.id', 'os.organization_id')
+                ->where('os.user_id', $userID)
+                ->select('o.id')
+                ->first();
+
+       $add = DB::table('product_group') -> insert([
+        'name' => $request->input('name'), 
+        'organization_id' =>$org->id,
+       ]);
+
+       return redirect('koperasi/produkmenu')->with('success','Product type successfully.');
     }
 
     public function createProduct()
