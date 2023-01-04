@@ -23,7 +23,7 @@
   max-width: 100%;
   height: auto;
   width: 100px;
-  border-radius: 14px;
+  border-radius: 10px;
   object-fit: contain;
 }
 
@@ -54,6 +54,20 @@
   height: 35px;
   display:none;
 }
+
+.cart-btn {
+  position: relative;
+}
+
+.cart-btn .notification {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  padding: 5px 10px;
+  border-radius: 50%;
+  background: red;
+  color: white;
+}
 </style>
 
 @endsection
@@ -75,7 +89,7 @@
       <div class="card-header text-white" id="has-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
-          <a href="{{ route('merchant.regular.cart', $merchant->id) }}"><i class="mdi mdi-cart fa-3x"></i></a>
+          <a href="{{ route('merchant.regular.cart', $merchant->id) }}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i>{!! $cart_counter != 0 ? "<span class='notification'>".$cart_counter."</span>" : '' !!}</a>
         </div>
         
         <p><i class="fas fa-map-marker-alt mr-2"></i> {{ $merchant->address }}, {{ $merchant->city }}, {{ $merchant->state }}</p>
@@ -109,7 +123,7 @@
           <div class="d-flex justify-content-start" id="{{ $group->name }}">
             <h3 class="mb-4 ml-2">{{ $group->name }}</h3>
           </div>
-
+          
           @foreach($product_item as $item)
             @if($item->product_group_id == $group->id)
               <div class="row">

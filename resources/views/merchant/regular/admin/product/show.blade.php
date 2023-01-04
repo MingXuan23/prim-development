@@ -22,10 +22,9 @@
             <h4 class="font-size-18"><a href="{{ route('admin-reg.product-group') }}" class="text-muted">Urus Produk</a> <i class="fas fa-angle-right"></i> {{ $group->name }}</h4>
         </div>
     </div>
-    <div class="d-flex mr-3">
-        <button id="delete-product-group-modal" class="btn btn-danger mr-2">Buang Jenis Produk</button>
-        <button id="edit-product-group" class="btn btn-primary mr-2">Edit Jenis Produk</button>
-        <button id="add-product-item-modal" class="btn btn-primary">Tambah Produk Item</button>
+    <div class="d-flex justify-content-end mr-3">
+        <button id="delete-product-group-modal" class="btn btn-danger mr-2"><i class="fas fa-trash-alt"></i> Jenis Produk</button>
+        <button id="edit-product-group" class="btn btn-primary mr-2"><i class="fas fa-pencil-alt"></i> Jenis Produk</button>
     </div>
 </div>
 
@@ -40,26 +39,31 @@
             <p>{{ Session::get('error') }}</p>
           </div>
         @endif
+        <div class="d-flex justify-content-end mb-3">
+            <button id="add-product-item-modal" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Produk Item</button>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
+                
+                <thead class="thead-dark">
                     <tr>
-                        <th>No.</th>
-                        <th class="text-center">Gambar</th>
-                        <th>Nama</th>
-                        <th>Deskripsi</th>
-                        <th>Inventori</th>
-                        <th>Harga (RM)</th>
-                        <th>Status</th>
-                        <th class="text-center">Action</th>
+                        <th style="width:1%" scope="col">No.</th>
+                        <th style="width:12%" class="text-center">Gambar</th>
+                        <th style="width:10%">Nama</th>
+                        <th style="width:12%">Deskripsi</th>
+                        <th style="width:12%" class="text-center">Inventori</th>
+                        <th style="width:12%" class="text-center">Harga (RM)</th>
+                        <th style="width:5%" class="text-center">Status</th>
+                        <th style="width:10%" class="text-center">Action</th>
                     </tr>
                 </thead>
                 
                 <tbody>
                     @forelse($item as $row)
                     <tr>
-                        <td class="align-middle">{{ $loop->iteration }}.</td>
-                        <td class="text-center">
+                        <td class="align-middle" scope="row"><b>{{ $loop->iteration }}</b></td>
+                        <td class="align-middle text-center">
                             <img class="rounded img-fluid bg-dark" id="img-size" src="
                             @if($row->image == null)
                             {{ URL('images/koperasi/default-item.png') }}
@@ -70,19 +74,38 @@
                         </td>
                         <td class="align-middle">{{ $row->name }}</td>
                         <td class="align-middle">{!! $row->desc ?: "<i>Tiada Deskripsi</i>" !!}</td>
-                        <td class="align-middle">
-                            {!! $row->type == "have inventory" ? $row->quantity_available : "Tiada Inventori" !!} <br>
-                            Kuantiti Dijual - {{ $row->selling_quantity }} <br>
-                            Kata Nama Kuantiti - {{ $row->collective_noun }}
+                        <td class="align-middle text-center">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Inventori
+                                  <span class="badge badge-primary badge-pill">{!! $row->type == "have inventory" ? $row->quantity_available : "Tiada Inventori" !!}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Kuantiti Dijual
+                                  <span class="badge badge-primary badge-pill">{{ $row->selling_quantity }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Kata Nama Kuantiti
+                                  <span class="badge badge-primary badge-pill">{{ $row->collective_noun }}</span>
+                                </li>
+                              </ul>
                         </td>
-                        <td class="align-middle">
-                            Seunit - {{ number_format($row->price, 2, '.', '') }} <br>
-                            Setiap Kuantiti - {{ number_format($row->price * $row->selling_quantity, 2, '.', '') }}
+                        <td class="align-middle text-center">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Seunit
+                                  <span class="badge badge-primary badge-pill">{{ number_format($row->price, 2, '.', '') }}</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Setiap Kuantiti
+                                  <span class="badge badge-primary badge-pill">{{ number_format($row->price * $row->selling_quantity, 2, '.', '') }}</span>
+                                </li>
+                              </ul>
                         </td>
                         <td class="text-center align-middle">
                             {!! ($row->status == 1) 
-                                ? "<span class='badge rounded-pill bg-success text-white'>Aktif</span>"
-                                : "<span class='badge rounded-pill bg-danger text-white'>Tidak Aktif</span>" !!}
+                                ? "<span class='badge rounded-pill bg-success text-white p-2'>Aktif</span>"
+                                : "<span class='badge rounded-pill bg-danger text-white p-2'>Tidak Aktif</span>" !!}
                         </td>
                         <td class="align-middle text-center">
                             <a href="{{ route('admin-reg.edit-item', ['id' => $group->id, 'item' => $url_name[$row->id]]) }}" class="edit-item-modal btn btn-primary"><i class="fas fa-pencil-alt"></i></a>
@@ -105,7 +128,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Edit Jenis Produk</h4>
+                <h4 class="modal-title">Kemaskini Jenis Produk</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <form action="{{ route('admin-reg.update-group') }}" method="POST">

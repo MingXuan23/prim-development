@@ -205,28 +205,29 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
 });
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => 'Merchant'], function() {
-    Route::group(['prefix' => 'regular'], function() {
+    Route::group(['prefix' => 'regular', 'namespace' => 'Regular'], function() {
         // Index
-        Route::get('', 'RegularMerchantController@index')->name('merchant.regular.index');
-        Route::get('fetch-merchant', 'RegularMerchantController@test_index')->name('merchant.fetch-merchant');
-        // Route::get('/test-email', 'RegularMerchantController@test_mail')->name('test.mer.mail');
+        Route::get('', 'LandingPageController@index')->name('merchant.regular.index');
+        Route::get('fetch-merchant', 'LandingPageController@test_index')->name('merchant.fetch-merchant');
         // Orders
-        Route::get('all-orders', 'RegularMerchantController@showAllOrder')->name('merchant.all-orders');
-        Route::get('get-all-orders', 'RegularMerchantController@getAllOrder')->name('merchant.get-all-orders');
-        Route::delete('delete-order', 'RegularMerchantController@deletePaidOrder')->name('merchant.delete-order');
-        Route::get('all-orders/history', 'RegularMerchantController@showOrderHistory')->name('merchant.order-history');
-        Route::get('get-order-history', 'RegularMerchantController@getOrderHistory')->name('merchant.get-order-history');
-        Route::get('{order_id}/order-details', 'RegularMerchantController@showOrderDetail')->name('merchant.order-detail');
+        Route::get('all-orders', 'HistoryController@index')->name('merchant.all-orders');
+        Route::get('get-all-orders', 'HistoryController@getAllOrder')->name('merchant.get-all-orders');
+        Route::delete('delete-order', 'HistoryController@deletePaidOrder')->name('merchant.delete-order');
+        Route::get('all-orders/history', 'HistoryController@history')->name('merchant.order-history');
+        Route::get('get-order-history', 'HistoryController@getOrderHistory')->name('merchant.get-order-history');
+        Route::get('{order_id}/order-details', 'HistoryController@showOrderDetail')->name('merchant.order-detail');
         // Menu
-        Route::get('{id}', 'RegularMerchantController@show')->name('merchant.regular.show');
-        Route::post('fetch-item', 'RegularMerchantController@fetchItem')->name('merchant.regular.fetch-item');
-        Route::post('store-item', 'RegularMerchantController@storeItemInCart')->name('merchant.regular.store-item');
+        Route::get('{id}', 'OrderController@index')->name('merchant.regular.show');
+        Route::post('fetch-item', 'OrderController@fetchItem')->name('merchant.regular.fetch-item');
+        Route::post('store-item', 'OrderController@storeItemInCart')->name('merchant.regular.store-item');
         // Cart
-        Route::get('{id}/cart', 'RegularMerchantController@showCart')->name('merchant.regular.cart');
-        Route::delete('destroy-item', 'RegularMerchantController@destroyItemInCart')->name('merchant.regular.destroy-item');
-        Route::post('fetch-disabled-dates', 'RegularMerchantController@fetchDisabledDates')->name('merchant.regular.disabled-dates');
-        Route::post('fetch-hours', 'RegularMerchantController@fetchOperationHours')->name('merchant.regular.fetch-hours');
-        Route::post('store-order', 'RegularMerchantController@storeOrder')->name('merchant.regular.store-order');
+        Route::get('{id}/cart', 'OrderController@showCart')->name('merchant.regular.cart');
+        Route::delete('destroy-item', 'OrderController@destroyItemInCart')->name('merchant.regular.destroy-item');
+        Route::post('fetch-disabled-dates', 'OrderController@fetchDisabledDates')->name('merchant.regular.disabled-dates');
+        Route::post('fetch-hours', 'OrderController@fetchOperationHours')->name('merchant.regular.fetch-hours');
+        Route::post('{org_id}/cart/{order_id}/payment', 'OrderController@store')->name('merchant.regular.store-order');
+        // Payment
+        // Route::get('{org_id}/cart/{order_id}/payment', 'OrderController@showPayment')->name('merchant.regular.payment');
     });
 
     Route::group(['prefix' => 'admin-regular', 'namespace' => 'AdminRegular'], function() {
@@ -246,7 +247,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
         Route::get('/operation-hours/check-orders/{hour_id}', 'OperationHourController@editSameDateOrders')->name('admin-reg.edit-same-order');
         Route::post('change-pickup-date', 'OperationHourController@changeOrderPickupDate')->name('admin-reg.change-date');
         Route::put('new-update-hour', 'OperationHourController@updateNew')->name('admin-reg.new-update-hour');
-
+        
         # Product Dashboard
         Route::get('/product-group-list', 'ProductController@indexProductGroup')->name('admin-reg.product-group');
         Route::post('store-group', 'ProductController@storeProductGroup')->name('admin-reg.store-group');

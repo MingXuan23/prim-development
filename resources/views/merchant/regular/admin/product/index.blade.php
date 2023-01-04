@@ -16,7 +16,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-end mr-3">
-        <button id="add-product-group" class="btn btn-primary">Tambah Jenis Produk</button>
+        <button id="add-product-group" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Jenis Produk</button>
     </div>
 </div>
 

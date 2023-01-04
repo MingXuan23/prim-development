@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Merchant\AdminRegular;
 
+use App\Http\Controllers\Merchant\RegularMerchantController;
 use App\Models\Organization;
 use App\Models\TypeOrganization;
 use App\Models\PgngOrder;
@@ -13,40 +14,19 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Artisan;
 use Yajra\DataTables\DataTables;
 
 class DashboardController extends Controller
 {
-    private function getOrganizationId()
-    {
-        $role_id = DB::table('organization_roles')->where('nama', 'Regular Merchant Admin')->first()->id;
-        $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
-
-        $org_id = DB::table('organizations as o')
-        ->join('organization_user as ou', 'ou.organization_id', 'o.id')
-        ->where([
-            ['user_id', Auth::id()],
-            ['role_id', $role_id],
-            ['status', 1],
-            ['type_org', $type_org_id],
-            ['deleted_at', NULL],
-        ])
-        ->select('o.id')
-        ->first()->id;
-        
-        return $org_id;
-    }
-
     public function index()
     {
-        $org_name = DB::table('organizations')->where('id',$this->getOrganizationId())->select('nama')->first()->nama;
+        $org_name = DB::table('organizations')->where('id', RegularMerchantController::getOrganizationId())->select('nama')->first()->nama;
         return view('merchant.regular.admin.dashboard.index', compact('org_name'));
     }
 
     public function edit()
     {
-        $org_id = $this->getOrganizationId();
+        $org_id = RegularMerchantController::getOrganizationId();
         $org = Organization::find($org_id);
         $states = Jajahan::negeri();
 
@@ -112,7 +92,7 @@ class DashboardController extends Controller
 
     public function getLatestOrdersByNow()
     {
-        $org_id = $this->getOrganizationId();
+        $org_id = RegularMerchantController::getOrganizationId();
 
         $order = DB::table('pgng_orders as pu')
                 ->join('users as u', 'pu.user_id', 'u.id')
@@ -157,7 +137,7 @@ class DashboardController extends Controller
         try {
             $transac = DB::table('pgng_orders as pu')
                     ->join('users as u', 'pu.user_id', 'u.id')
-                    ->where('organization_id', $this->getOrganizationId())
+                    ->where('organization_id', RegularMerchantController::getOrganizationId())
                     ->whereIn('status', ['Paid', 'Picked-Up'])
                     ->select('u.name', 'pu.pickup_date', 'pu.total_price')
                     ->get();
@@ -175,7 +155,7 @@ class DashboardController extends Controller
         if ($duration == "day") {
             try {
                 $order = DB::table('pgng_orders')
-                ->where('organization_id', $this->getOrganizationId())
+                ->where('organization_id', RegularMerchantController::getOrganizationId())
                 ->whereBetween('pickup_date', [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->count();
@@ -187,7 +167,7 @@ class DashboardController extends Controller
         } elseif ($duration == "week") {
             try {
                 $order = DB::table('pgng_orders')
-                ->where('organization_id', $this->getOrganizationId())
+                ->where('organization_id', RegularMerchantController::getOrganizationId())
                 ->whereBetween('pickup_date', [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->count();
@@ -199,7 +179,7 @@ class DashboardController extends Controller
         } elseif ($duration == "month") {
             try {
                 $order = DB::table('pgng_orders')
-                ->where('organization_id', $this->getOrganizationId())
+                ->where('organization_id', RegularMerchantController::getOrganizationId())
                 ->whereBetween('pickup_date', [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->count();
@@ -218,7 +198,7 @@ class DashboardController extends Controller
         if ($duration == "day") {
             try {
                 $income = DB::table('pgng_orders')
-                ->where('organization_id', $this->getOrganizationId())
+                ->where('organization_id', RegularMerchantController::getOrganizationId())
                 ->whereBetween('pickup_date', [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->sum('total_price');
@@ -232,7 +212,7 @@ class DashboardController extends Controller
         } elseif ($duration == "week") {
             try {
                 $income = DB::table('pgng_orders')
-                ->where('organization_id', $this->getOrganizationId())
+                ->where('organization_id', RegularMerchantController::getOrganizationId())
                 ->whereBetween('pickup_date', [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->sum('total_price');
@@ -246,7 +226,7 @@ class DashboardController extends Controller
         } elseif ($duration == "month") {
             try {
                 $income = DB::table('pgng_orders')
-                ->where('organization_id', $this->getOrganizationId())
+                ->where('organization_id', RegularMerchantController::getOrganizationId())
                 ->whereBetween('pickup_date', [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->sum('total_price');

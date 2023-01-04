@@ -2,44 +2,22 @@
 
 namespace App\Http\Controllers\Merchant\AdminRegular;
 
+use App\Http\Controllers\Merchant\RegularMerchantController;
 use App\Models\Organization;
-use App\Models\TypeOrganization;
 use App\Models\ProductItem;
 use App\Models\ProductGroup;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Session;
 
 class ProductController extends Controller
 {
-    private function getOrganizationId()
-    {
-        $role_id = DB::table('organization_roles')->where('nama', 'Regular Merchant Admin')->first()->id;
-        $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
-
-        $org_id = DB::table('organizations as o')
-        ->join('organization_user as ou', 'ou.organization_id', 'o.id')
-        ->where([
-            ['user_id', Auth::id()],
-            ['role_id', $role_id],
-            ['status', 1],
-            ['type_org', $type_org_id],
-            ['deleted_at', NULL],
-        ])
-        ->select('o.id')
-        ->first()->id;
-        
-        return $org_id;
-    }
-
     public function indexProductGroup()
     {
-        $org_id = $this->getOrganizationId();
+        $org_id = RegularMerchantController::getOrganizationId();
 
         $group = ProductGroup::where('organization_id', $org_id)->get();
 
@@ -48,7 +26,7 @@ class ProductController extends Controller
 
     public function storeProductGroup(Request $request)
     {
-        $org_id = $this->getOrganizationId();
+        $org_id = RegularMerchantController::getOrganizationId();
         # Insert Product Group Data
         $pg = ProductGroup::create([
             'name' => $request->name,
@@ -68,7 +46,7 @@ class ProductController extends Controller
         $group = ProductGroup::find($id);
         $item = ProductItem::where('product_group_id', $id)->get();
 
-        $org_id = $this->getOrganizationId();
+        $org_id = RegularMerchantController::getOrganizationId();
         $org_name = Organization::find($org_id)->nama;
 
         foreach($item as $row){
@@ -273,8 +251,6 @@ class ProductController extends Controller
             $extension = $image_arr['img']->extension();
             $storagePath  = $image_arr['img']->move(public_path($image_arr['img_url']), $str.'.'.$extension);
             $file_name = basename($storagePath);
-
-            Artisan::call('cache:clear');
         }
 
         return $file_name;
@@ -287,6 +263,8 @@ class ProductController extends Controller
         $item = DB::table('product_item as pi')->join('product_group as pg', 'pg.id', 'pi.product_group_id')
         ->where('pg.organization_id', $request->org_id)->select('pi.name as name')->get();
 
+        $old_name = DB::table('product_item')->where('id', $request->id)->select('name')->first()->name;
+
         foreach($item as $row)
         {
             $isSame = (strtolower($row->name) == strtolower($request->item_name)) ? true : false;
@@ -298,7 +276,7 @@ class ProductController extends Controller
             $alert .= " Sila isi tempat kosong yang diperlukan.";
         }
 
-        if($isSame) {
+        if($isSame && $request->item_name != $old_name) {
             $alert .= " Terdapat item dengan nama yang sama dalam organisasi anda";
         }
 

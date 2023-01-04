@@ -452,39 +452,44 @@ class PayController extends AppBaseController
         }
         else if($request->desc == 'Merchant')
         {
-            $pickup_date = $request->pickup_date;
-            $pickup_time = $request->pickup_time;
-            $note = $request->note;
+            // $pickup_date = $request->pickup_date;
+            // $pickup_time = $request->pickup_time;
+            // $note = $request->note;
             $gng_order_id = $request->order_id;
-            $order_type = $request->order_type;
+            // $order_type = $request->order_type;
 
-            $today = Carbon::now();
-            $date_f = Carbon::parse($pickup_date);
+            // $today = Carbon::now();
+            // $date_f = Carbon::parse($pickup_date);
             
-            if($today->format('d-m-Y') == $date_f->format('d-m-Y')) {
-                $isToday = true;
-            } else {
-                $isToday = false;
-            }
+            // if($today->format('d-m-Y') == $date_f->format('d-m-Y')) {
+            //     $isToday = true;
+            // } else {
+            //     $isToday = false;
+            // }
             
-            if($isToday) {
-                $current_time = Carbon::now()->format('G:i');
-                if(Carbon::parse($pickup_time)->lt($current_time)) { // 11 < 12
-                    return back()->with('error', 'Sila pilih masa yang sesuai');
-                }
-            }
+            // if($isToday) {
+            //     $current_time = Carbon::now()->format('G:i');
+            //     if(Carbon::parse($pickup_time)->lt($current_time)) { // 11 < 12
+            //         return back()->with('error', 'Sila pilih masa yang sesuai');
+            //     }
+            // }
             
-            if($order_type == 'Pick-Up') {
-                $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('h:i:s');
+            // if($order_type == 'Pick-Up') {
+            //     $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('h:i:s');
 
-                DB::table('pgng_orders')->where('id', $gng_order_id)->update([
-                    'updated_at' => Carbon::now(),
-                    'order_type' => $order_type,
-                    'pickup_date' => $pickup_datetime,
-                    'note' => $note,
-                    'status' => 'Pending'
-                ]);
-            }
+            //     DB::table('pgng_orders')->where('id', $gng_order_id)->update([
+            //         'updated_at' => Carbon::now(),
+            //         'order_type' => $order_type,
+            //         'pickup_date' => $pickup_datetime,
+            //         'note' => $note,
+            //         'status' => 'Pending'
+            //     ]);
+            // }
+
+            DB::table('pgng_orders')->where('id', $gng_order_id)->update([
+                'updated_at' => Carbon::now(),
+                'status' => 'Pending'
+            ]);
 
             $gng_order = DB::table('pgng_orders')
             ->where('id', $gng_order_id)

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Merchant\AdminRegular;
 
+use App\Http\Controllers\Merchant\RegularMerchantController;
 use App\Models\TypeOrganization;
 use App\Models\PgngOrder;
 use App\Models\ProductOrder;
@@ -16,26 +17,6 @@ use Yajra\DataTables\DataTables;
 
 class OrderController extends Controller
 {
-    private function getOrganizationId()
-    {
-        $role_id = DB::table('organization_roles')->where('nama', 'Regular Merchant Admin')->first()->id;
-        $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
-
-        $org_id = DB::table('organizations as o')
-        ->join('organization_user as ou', 'ou.organization_id', 'o.id')
-        ->where([
-            ['user_id', Auth::id()],
-            ['role_id', $role_id],
-            ['status', 1],
-            ['type_org', $type_org_id],
-            ['deleted_at', NULL],
-        ])
-        ->select('o.id')
-        ->first()->id;
-        
-        return $org_id;
-    }
-
     public function index()
     {
         return view('merchant.regular.admin.order.index');
@@ -43,7 +24,7 @@ class OrderController extends Controller
 
     public function getAllOrders(Request $request)
     {
-        $org_id = $this->getOrganizationId();
+        $org_id = RegularMerchantController::getOrganizationId();
         $total_price[] = 0;
         $pickup_date[] = 0;
         $filteredID = array();
@@ -87,7 +68,7 @@ class OrderController extends Controller
             }
             
             $table = Datatables::of($order);
-
+            
             $table->addColumn('status', function ($row) {
                 if ($row->status == "Paid") {
                     $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya dibayar</span>';
@@ -153,7 +134,7 @@ class OrderController extends Controller
 
     public function getAllHistories(Request $request)
     {
-        $org_id = $this->getOrganizationId();
+        $org_id = RegularMerchantController::getOrganizationId();
         $total_price[] = 0;
         $pickup_date[] = 0;
         $filteredID = array();

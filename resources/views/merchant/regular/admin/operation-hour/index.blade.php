@@ -24,13 +24,13 @@
         </div>
         @endif
         <div class="table-responsive">
-            <table class="table table-striped table-bordered" id="dataTable" width="100%" cellspacing="0">
-                <thead>
+            <table class="table table-striped" id="dataTable" width="30%" cellspacing="0">
+                <thead class="thead-dark">
                     <tr>
                         <th style="width: 10%" class="text-center">Hari</th>
                         <th style="width: 10%" class="text-center">Buka/Tutup</th>
-                        <th style="width: 20%">Waktu Buka</th>
-                        <th style="width: 20%">Waktu Tutup</th>
+                        <th style="width: 20%" class="text-center">Waktu Buka</th>
+                        <th style="width: 20%" class="text-center">Waktu Tutup</th>
                         <th style="width: 10%" class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -41,15 +41,15 @@
                         <td class="text-center align-middle">{{ $day_name[$row->day] }}</td>
                         <td class="text-center align-middle">
                             {!! ($row->status == 1) 
-                            ? "<span class='badge rounded-pill bg-success text-white'>Buka</span>"
-                            : "<span class='badge rounded-pill bg-danger text-white'>Tutup</span>" !!}
+                            ? "<span class='badge rounded-pill bg-success text-white p-2'>Buka</span>"
+                            : "<span class='badge rounded-pill bg-danger text-white p-2'>Tutup</span>" !!}
                         </td>
-                        <td class="align-middle">
+                        <td class="text-center align-middle">
                             {!! ($row->status == 1) 
                             ? date_format(date_create($row->open_hour), "h:i A")
                             : "" !!}    
                         </td>
-                        <td class="align-middle">
+                        <td class="text-center align-middle">
                             {!! ($row->status == 1) 
                             ? date_format(date_create($row->close_hour), "h:i A")
                             : "" !!}
