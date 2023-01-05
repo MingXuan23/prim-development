@@ -40,6 +40,24 @@
                         <input type="text" name="nama" class="form-control" placeholder="Nama Organisasi"
                             value="{{ $org->nama }}" data-parsley-required-message="Sila masukkan nama organisasi" required>
                     </div>
+
+                    {{-- @if(Auth::user()->hasRole('Koop_Admin')) 
+                        <div class="form-group required">
+                            <label class="control-label">Sekolah</label>
+                            <select name="parent_org" id="parent_org" class="form-control"
+                                data-parsley-required-message="Sila pilih jenis organisasi" required>                         
+                                <option value="" selected>Pilih Sekolah</option>
+                                @foreach($parent_org as $row)
+                                    @if($row->id == $org->parent_org)
+                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    @else
+                                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif --}}
+
                     <div class="form-group">
                         <label>No Telefon</label>
                         <input type="text" name="telno" class="form-control phone_no" placeholder="No Telefon"

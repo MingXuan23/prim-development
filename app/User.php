@@ -3,8 +3,10 @@
 namespace App;
 
 use App\Models\Donation;
+use App\Models\KoopOrder;
 use App\Models\Organization;
 use App\Models\OrganizationRole;
+use App\Models\PickUpOrder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -54,6 +56,11 @@ class User extends Authenticatable
     public function donation()
     {
         return $this->belongsToMany(Donation::class, 'donation_user');
+    }
+
+    public function pickup_order()
+    {
+        return $this->hasOne(PickUpOrder::class);
     }
 
     public function getUserById()
