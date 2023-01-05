@@ -10,7 +10,7 @@ class Organization extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state', 'type_org', 'fixed_charges', 'district', 'city', 'organization_picture'];
+    protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state', 'type_org', 'fixed_charges', 'district', 'city', 'organization_picture', 'parent_org'];
 
     // public $timestamps = false;
 
@@ -39,6 +39,21 @@ class Organization extends Model
     public function typeOrganization()
     {
         return $this->belongsTo('TypeOrganization');
+    }
+
+    public function organization_hours()
+    {
+        return $this->hasMany(OrganizationHours::class);
+    }
+
+    public function product_item()
+    {
+        return $this->hasMany(ProductItem::class);
+    }
+    
+    public function pickup_order()
+    {
+        return $this->hasMany(PickUpOrder::class);
     }
 
     public function getOrganizationByDonationId($donationId)

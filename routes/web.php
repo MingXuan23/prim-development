@@ -73,6 +73,7 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
     Route::get('testRepeater', 'OrganizationController@testRepeater');
+    Route::post('parent-koop', 'OrganizationController@fetchAvailableParentKoop')->name('organization.fetchAvailableParentKoop');
 });
 
 Route::group(['prefix' => 'teacher'], function () {
@@ -175,6 +176,74 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
     Route::post('/updatePwd/{id}', 'ProfileController@updatePwd')->name('profile.updatePwd');
 });
 
+Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
+    Route::group(['namespace' => 'User'], function() {
+        // Koop School
+        Route::delete('/{org_id}/edit/{id}', 'UserCooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
+        Route::post('/koperasi/fetchKoop', 'UserCooperativeController@fetchKoop')->name('koperasi.fetchKoop');
+        Route::get('/order', 'UserCooperativeController@indexOrder')->name('koperasi.order');
+        Route::get('/order/fetchDay', 'UserCooperativeController@fetchAvailableDay')->name('koperasi.fetchDay');
+        Route::post('/order/update-pick-up-date', 'UserCooperativeController@updatePickUpDate')->name('koperasi.updatePickUpDate');
+        Route::delete('/order/{id}', 'UserCooperativeController@destroyUserOrder')->name('koperasi.destroyUserOrder');
+        Route::get('/history', 'UserCooperativeController@indexHistory')->name('koperasi.history');
+        Route::get('/{id}/list', 'UserCooperativeController@indexList')->name('koperasi.list');
+        
+        // Koop_Shop
+        Route::get('/koop','UserCooperativeController@indexKoop')->name('koperasi.indexKoop');
+        Route::get('/koop/{id}','UserCooperativeController@koopShop')->name('koperasi.koopShop');
+        Route::get('/koop/store/{id}','UserCooperativeController@storeKoop')->name('koperasi.storeKoop');
+        Route::get('/koop/{id}/cart','UserCooperativeController@koopCart')->name('koperasi.koopCart');
+    });
+
+    Route::group(['namespace' => 'Admin'], function() {
+        Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
+        Route::get('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
+        Route::post('/produk','AdminProductCooperativeController@storeProduct')->name('koperasi.storeProduct');
+        Route::get('/produk/update/{id}','AdminProductCooperativeController@editProduct')->name('koperasi.editProduct');
+        Route::post('/produk/update/{id}','AdminProductCooperativeController@updateProduct')->name('koperasi.updateProduct');
+        Route::get('/produk/delete/{id}','AdminProductCooperativeController@deleteProduct')->name('koperasi.deleteProduct');
+
+        Route::get('/openingHours','AdminOpeningHoursCooperativeController@indexOpening')->name('koperasi.indexOpening');
+        Route::post('/openingHours','AdminOpeningHoursCooperativeController@storeOpening')->name('koperasi.storeOpening');
+
+        Route::get('/Confirm','AdminOrderCooperativeController@indexConfirm')->name('koperasi.indexConfirm');
+        Route::get('/Confirm/update/{id}','AdminOrderCooperativeController@storeConfirm')->name('koperasi.storeConfirm');
+        Route::get('/Confirm/delete/{id}','AdminOrderCooperativeController@notConfirm')->name('koperasi.notConfirm');
+    });
+});
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => 'Merchant'], function() {
+    Route::group(['prefix' => 'regular'], function() {
+        // Index
+        Route::get('', 'RegularMerchantController@index')->name('merchant.regular.index');
+        Route::get('fetch-merchant', 'RegularMerchantController@test_index')->name('merchant.fetch-merchant');
+        // Route::get('/test-email', 'RegularMerchantController@test_mail')->name('test.mer.mail');
+        // Orders
+        Route::get('all-orders', 'RegularMerchantController@showAllOrder')->name('merchant.all-orders');
+        Route::get('get-all-orders', 'RegularMerchantController@getAllOrder')->name('merchant.get-all-orders');
+        Route::delete('delete-order', 'RegularMerchantController@deletePaidOrder')->name('merchant.delete-order');
+        Route::get('all-orders/history', 'RegularMerchantController@showOrderHistory')->name('merchant.order-history');
+        Route::get('get-order-history', 'RegularMerchantController@getOrderHistory')->name('merchant.get-order-history');
+        Route::get('{order_id}/order-details', 'RegularMerchantController@showOrderDetail')->name('merchant.order-detail');
+        // Menu
+        Route::get('{id}', 'RegularMerchantController@show')->name('merchant.regular.show');
+        Route::post('fetch-item', 'RegularMerchantController@fetchItem')->name('merchant.regular.fetch-item');
+        Route::post('store-item', 'RegularMerchantController@storeItemInCart')->name('merchant.regular.store-item');
+        // Cart
+        Route::get('{id}/cart', 'RegularMerchantController@showCart')->name('merchant.regular.cart');
+        Route::delete('destroy-item', 'RegularMerchantController@destroyItemInCart')->name('merchant.regular.destroy-item');
+        Route::post('fetch-disabled-dates', 'RegularMerchantController@fetchDisabledDates')->name('merchant.regular.disabled-dates');
+        Route::post('fetch-hours', 'RegularMerchantController@fetchOperationHours')->name('merchant.regular.fetch-hours');
+        Route::post('store-order', 'RegularMerchantController@storeOrder')->name('merchant.regular.store-order');
+    });
+
+    Route::group(['prefix' => 'admin-regular', 'namespace' => 'AdminRegular'], function() {
+        Route::get('/operation-hour', 'OperationHourController@index')->name('admin-reg.operation-hour');
+        Route::post('edit-hour', 'OperationHourController@edit')->name('admin-reg.edit-hour');
+    });
+});
+
+
 Route::group(['middleware' => ['auth']], function () {
     Route::resources([
         'school'             => 'SchoolController',
@@ -193,7 +262,8 @@ Route::group(['middleware' => ['auth']], function () {
         'activity'           => 'ActivityController',
         'session'            => 'SessionController',
         'profile'            => 'ProfileController',
-        'dorm'               => 'DormController'
+        'dorm'               => 'DormController',
+        'koperasi'           => 'Cooperative\User\UserCooperativeController',
     ]);
 });
 

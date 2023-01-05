@@ -420,6 +420,53 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="section-title">
+                            <!-- section title -->
+                            {{-- <span class="subtitle">Screenshots</span> --}}
+                            <h3 class="title extra">Our Team</h3>
+                        </div><!-- //. section title -->
+                    </div>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-lg-12 mb-200">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                            <div class="p-3">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">
+                            </div>
+                            <div class="pt-3">
+                                <h4>Yahya Bin Ibrahim</h4>
+                                <p>Chief Executive Officer</p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                            <div class="p-3">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">
+                            </div>
+                            <div class="pt-3">
+                                <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>
+                                <p>Chief Operating Officer</p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                            <div class="p-3">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">
+                            </div>
+                            <div class="pt-3">
+                                <h4>Muhammad 'Ammar Muhammad Sani</h4>
+                                <p>Chief Technology Officer</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
 
             <div class="container">
                 <div class="row justify-content-center">
@@ -536,8 +583,8 @@
                     <div class="col-lg-3 col-md-8">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Hubungi</h4>
-                            <p>Email : admin@prim.my </p>
-                            <p>Phone : 06 - 270 1000</p>
+                            <p>Email : yahya@utem.edu.my </p>
+                            <p>Phone : 60 13-647 7388</p>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">

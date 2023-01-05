@@ -136,40 +136,38 @@ class StudentController extends Controller
 
         $this->validate($request, [
             'name'              =>  'required',
-            // 'icno'              =>  'required|unique:students,icno',
             'classes'           =>  'required',
             'parent_name'       =>  'required',
-            'parent_email'      =>  'required',
-            // 'parent_icno'       =>  'required',
             'parent_phone'      =>  'required',
         ]);
 
         $ifExits = DB::table('users as u')
-            ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
-            ->where('u.email', '=', $request->get('parent_email'))
-            // ->where('u.icno', '=', $request->get('parent_icno'))
-            ->where('u.telno', '=', $request->get('parent_phone'))
-            ->where('ou.organization_id', $co->oid)
-            ->whereIn('ou.role_id', [5, 6])
-            ->get();
-
-        // dd($request->get('parent_email'), $request->get('parent_icno'), $request->get('parent_phone'),  $ifExits);
-
-        if (count($ifExits) == 0) { // if not teacher or parent
+                    ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+                    ->where('u.telno', '=', $request->get('parent_phone'))
+                    ->where('ou.organization_id', $co->oid)
+                    ->whereIn('ou.role_id', [5, 6])
+                    ->get();
+        
+        if(count($ifExits) == 0) { // if not teacher or parent
 
             $newparent = DB::table('users')
-                ->where('email', '=', $request->get('parent_email'))
-                ->where('telno', '=', $request->get('parent_phone'))
-                ->first();
-
+                            ->where('telno', '=', $request->get('parent_phone'))
+                            ->first();
+            
             // dd($newparent);
 
             if (empty($newparent)) {
                 $this->validate($request, [
                     'parent_phone'      =>  'required|unique:users,telno',
-                    'parent_email'     =>  'required|email|unique:users,email',
                 ]);
 
+                if ($request->parent_email != null)
+                {
+                    $this->validate($request, [
+                        'parent_email'     =>  'required|email|unique:users,email',
+                    ]);
+                }
+    
                 $newparent = new Parents([
                     'name'           =>  strtoupper($request->get('parent_name')),
                     'email'          =>  $request->get('parent_email'),
@@ -198,8 +196,8 @@ class StudentController extends Controller
             }
         } else {
             $newparent = DB::table('users')
-                ->where('email', '=', "{$request->get('parent_email')}")
-                ->first();
+                        ->where('telno', '=', "{$request->get('parent_phone')}")
+                        ->first();
         }
 
 

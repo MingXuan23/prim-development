@@ -69,6 +69,7 @@
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th> Nama Penderma </th>
+                                <th> No Transaksi </th>
                                 <th> Email </th>
                                 <th> No Telefon </th>
                                 <th> Tarikh Derma </th>
@@ -124,7 +125,7 @@
 
             },
             'columnDefs': [{
-                "targets": [2, 3, 4, 5],
+                "targets": [2, 3, 4, 5, 6],
                 "className": "text-center",
                 "width": "2%"
             },{
@@ -146,6 +147,10 @@
             }, {
                 data: "username",
                 name: 'username'
+            },
+            {
+                data: "description",
+                name: 'description'
             }, {
                 data: "email",
                 name: 'email',
