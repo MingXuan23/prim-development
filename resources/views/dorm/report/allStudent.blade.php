@@ -85,7 +85,6 @@
                                 <th> No. </th>
                                 <th>Kategori</th>
                                 <th>Bilangan Permintaan</th>
-                                <th>Details</th>
                             </tr>
                         </thead>
                     </table>
@@ -232,7 +231,7 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3], // your case first column
+                    "targets": [1, 2], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
@@ -251,11 +250,6 @@
                 }, {
                     data: 'total',
                     name: 'total'
-                }, {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
                 }, ]
 
             });

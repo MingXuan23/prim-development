@@ -38,7 +38,7 @@
                                 <h5 style="text-align: center">{{$details->schoolAddress}}, {{$details->schoolPostcode}} {{$details->schoolState}}</h5>
                                 <br>
                                 <br>
-                                <span> Laporan </span>
+                                <span> Laporan Bilangan Permintaan Berdasarkan Sebab </span>
 
                                 <br>
                                 <br>
