@@ -59,7 +59,7 @@
                 <th> Action </th>
               </tr>
             </thead>
-            @foreach($product as $item)
+            {{-- @foreach($product as $item)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->name }}</td>
@@ -84,7 +84,7 @@
                                             <button type="submit" class="btn btn-danger m-1">Padam</button>
                                         </td>
                                     </tr>
-                                @endforeach
+                                @endforeach --}}
           </table>
         </div>
       </div>
