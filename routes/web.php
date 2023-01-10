@@ -189,6 +189,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
 
     Route::group(['namespace' => 'Admin'], function() {
         Route::get('/produkmenu','AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
+        Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
+
         Route::get('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
         Route::post('/produktype','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
 

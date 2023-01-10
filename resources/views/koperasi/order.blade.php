@@ -224,7 +224,7 @@
           { 
             setTimeout(function() {
                 $('#dayModal').modal('hide');
-            }, 2000);
+            }, 1000);
 
             $('div.flash-message').html(result);
 
@@ -258,9 +258,9 @@
               },
               url: "/koperasi/order/" + o_id,
               success: function(result) {
-                setTimeout(function() {
-                    $('#deleteConfirmationModal').modal('hide');
-                }, 2000);
+                // setTimeout(function() {
+                //     $('#deleteConfirmationModal').modal('hide');
+                // }, 2000);
 
                 $('div.flash-message').html(result);
 

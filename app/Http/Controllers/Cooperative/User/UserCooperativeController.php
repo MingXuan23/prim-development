@@ -90,16 +90,17 @@ class UserCooperativeController extends Controller
             // Check if order already exists
             if($order) // order exists
             {
-                // $cartExist = ProductOrder::where([
-                //     ['product_item_id', $request->item_id],
-                //     ['pgng_order_id', $order->id],
-                // ])->first();
-                $cartExist = DB::table('product_order as po')
-                            ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
-                            ->where('pg.status',1)
-                            ->where('po.product_item_id',$request->id)
-                            ->where('pg.id',$order->id)
-                            ->first();
+                $cartExist = ProductOrder::where([
+                    ['product_item_id', $request->item_id],
+                    ['pgng_order_id', $order->id],
+                ])->first();
+                
+                // $cartExist = DB::table('product_order as po')
+                //             ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
+                //             ->where('pg.status',1)
+                //             ->where('po.product_item_id',$request->id)
+                //             ->where('pg.id',$order->id)
+                //             ->first();
                 // If same item exists in cart
                 if($cartExist) // if exists (update)
                 {
@@ -113,7 +114,7 @@ class UserCooperativeController extends Controller
                     }
                     else if($request->item_quantity == $cartExist->quantity) // request quant equal existing quant
                     {
-                        $newQuantity = intval((int)$item->quantity_available - 0); // stock not change
+                        $newQuantity = intval((int)$item->quantity_available + 0); // stock not change
                     }
 
                     ProductOrder::where('id', $cartExist->id)->update([
@@ -188,7 +189,7 @@ class UserCooperativeController extends Controller
                 ->update(['quantity_available' => $newQuantity, 'status' => 0]);
             }
             
-            return back()->with('success', 'Item Berjaya Ditambah!');
+            return back()->with('success', 'Item Berjaya Dikemaskini!');
         }
         else // if false
         {
@@ -371,7 +372,7 @@ class UserCooperativeController extends Controller
 
         $allCartItem = DB::table('product_order as po')
                         ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                        ->join('pgng_Orders as pg','po.pgng_order_id','=','pg.id')
+                        ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
                         ->where('pg.id', $item->pgng_order_id)
                         ->where('pg.status', 1)
                         ->select('po.quantity', 'pi.price')
@@ -429,6 +430,7 @@ class UserCooperativeController extends Controller
                 ->whereIn('status', [2,4])
                 ->where('user_id', $userID)
                 ->where('type_org', $type_id)
+                ->where('ko.deleted_at', null)
                 ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno')
                 ->orderBy('ko.status', 'desc')
                 ->orderBy('ko.pickup_date', 'asc')
@@ -591,24 +593,13 @@ class UserCooperativeController extends Controller
 
     public function destroyUserOrder($id)
     {
-        $queryKO = PgngOrder::where('id', $id);
-        $queryKO->update(['status' => 200]);
-        $resultKO = $queryKO->delete();
+        $queryKO = PgngOrder::find($id)->update(['status', 'Cancel by user']);
         
-        $queryPO = ProductOrder::where('pgng_order_id', $id);
+        $resultKO = PgngOrder::find($id)->delete();
+        
+        $resultPO = ProductOrder::where('pgng_order_id', $id)->delete();
 
-        $order = $queryPO->get();
-
-        // Increment product_item quantity after deleted
-        foreach($order as $row)
-        { 
-            ProductItem::where('id', $row->product_item_id)->increment('quantity', $row->quantity);
-        }
-
-        $queryPO->update(['status' => 200]);
-        $resultPO = $queryPO->delete();
-
-        $this->indexOrder(); // Recall function to recheck status
+        // $this->indexOrder(); // Recall function to recheck status
         
         if ($resultKO && $resultPO) {
             Session::flash('success', 'Pesanan Berjaya Dibuang');
@@ -623,8 +614,9 @@ class UserCooperativeController extends Controller
 
     public function indexKoop()
     {
+        $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $sekolah = DB::table('organizations')
-                   ->where('type_org',1039)
+                   ->where('type_org',$role_id)
                    ->get();
         return view('koop.index',compact('sekolah'))->with('sekolah',$sekolah);
     }

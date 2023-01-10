@@ -76,17 +76,7 @@
                                          <div class="d-flex justify-content-center"><span class="badge badge-success">aivalable</span></div>
                                          @endif
                                         </td>
-                                        <td>
-                                          @if($item->product_group_id == 1)
-                                          Barang sekolah
-                                          @elseif($item->product_group_id == 2)
-                                          Alat tulis
-                                          @elseif($item->product_group_id == 3)
-                                          Buku Kerja
-                                          @elseif($item->product_group_id == 4)
-                                          Makanan dan Minuman
-                                          @endif
-                                        </td>
+                                        <td>{{$item->type_name}}</td>
                                         <td>
                                          <a href ="{{ route('koperasi.editProduct',$item->id) }}"> <button type="button" data-dismiss="modal" class="btn btn-primary" id="edit" name="edit">Edit</button></a>
                                          <a href="{{ route('koperasi.deleteProduct',$item->id) }}" 
