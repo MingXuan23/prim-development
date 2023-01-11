@@ -56,7 +56,7 @@
         <div class="flash-message"></div>
 
         <div class="table-responsive">
-            <table class="table table-striped table-bordered" id="orderTable" width="100%" cellspacing="0">
+            <table class="table table-striped" id="orderTable" width="100%" cellspacing="0">
     
             <thead>
                 <tr>
@@ -179,8 +179,8 @@
         //     fetch_data(filter)
         // })
 
-        var btn = "<button type='button' data-dismiss='modal' class='btn btn-light'>Kembali</button>"
-        var order_id
+        let btn = "<button type='button' data-dismiss='modal' class='btn btn-light'>Kembali</button>"
+        let order_id
 
         $(document).on('click', '.btn-cancel-order', function(){
             order_id = $(this).attr('data-order-id')

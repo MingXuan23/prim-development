@@ -50,7 +50,7 @@
 
           <div class="table-responsive">
             <table class="table table-borderless" width="100%" cellspacing="0">
-                <thead>
+                <thead class="thead-dark">
                     <tr class="text-center">
                       <th style="width: 25%">Nama</th>
                       <th style="width: 15%">Kuantiti</th>
@@ -83,6 +83,10 @@
             <div class="table-responsive">
               <table class="table table-borderless mb-0">
                   <tbody>
+                    @if($response->note != null)<tr>
+                      <th class="text-muted" scope="row">Nota:</th>
+                      <td class="lead">{{ $response->note }}</td>
+                    </tr>@endif
                     <tr>
                       <th class="text-muted" scope="row">Tarikh Pengambilan:</th>
                       <td class="lead">{{ $response->pickup_date }}</td>

@@ -314,7 +314,7 @@
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                        <a href="{{ route('merchant.regular.index') }}" class=" waves-effect">
+                        <a href="{{ route('merchant-reg.index') }}" class=" waves-effect">
                             <i class="ti-bookmark-alt"></i>
                             <span>Semua Peniaga</span>
                         </a>

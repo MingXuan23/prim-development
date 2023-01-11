@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Merchant\AdminRegular;
 
 use App\Http\Controllers\Merchant\RegularMerchantController;
-use App\Models\TypeOrganization;
 use App\Models\PgngOrder;
 use App\Models\ProductOrder;
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
@@ -19,53 +18,54 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return view('merchant.regular.admin.order.index');
+        $merchant = RegularMerchantController::getAllMerchantOrganization();
+        return view('merchant.regular.admin.order.index', compact('merchant'));
     }
 
     public function getAllOrders(Request $request)
     {
-        $org_id = RegularMerchantController::getOrganizationId();
+        $org_id = $request->id;
         $total_price[] = 0;
         $pickup_date[] = 0;
-        $filteredID = array();
-        $order_day = $request->order_day;
+        $filter_type = $request->filterType;
+        $date = $request->date;
 
         $order = DB::table('pgng_orders as pu')
-                ->join('users as u', 'pu.user_id', '=', 'u.id')
-                ->whereIn('status', ["Paid"])
-                ->where('organization_id', $org_id)
+                ->join('users as u', 'pu.user_id', 'u.id')
                 ->select('pu.id', 'pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
                 'u.name', 'u.telno')
                 ->orderBy('status', 'desc')
                 ->orderBy('pickup_date', 'asc')
                 ->orderBy('pu.updated_at', 'desc')
-                ->get();
+                ->whereIn('status', ["Paid"])
+                ->where('organization_id', $org_id);
         
         if(request()->ajax()) 
         {
-            if($order_day == "") 
+            if(($filter_type == "" || $filter_type == "all") && $date == "") 
             {
-                $order = $order;
+                $order = $order->get();
             }
-            else
+            else if($filter_type == "date")
             {
-                foreach($order as $row) {
-                    $day_pickup = Carbon::parse($row->pickup_date)->format('l');
-                    $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($day_pickup);
-                    if($day == $order_day) {
-                        $filteredID[] = $row->id;
-                    }
-                }
-                
-                $order = DB::table('pgng_orders as pu')
-                ->join('users as u', 'pu.user_id', 'u.id')
-                ->whereIn('pu.id', $filteredID)
-                ->select('pu.id', 'pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
-                'u.name', 'u.telno')
-                ->orderBy('status', 'desc')
-                ->orderBy('pickup_date', 'asc')
-                ->orderBy('pu.updated_at', 'desc');
+                $order = $order->whereBetween('pickup_date', 
+                [Carbon::parse($date)->startOfDay()->toDateTimeString(),Carbon::parse($date)->endOfDay()->toDateTimeString()])->get();
             }
+            else if($filter_type == "today")
+            {
+                $order->whereBetween('pickup_date', 
+                [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->get();
+            }
+            else if($filter_type == "week")
+            {
+                $order->whereBetween('pickup_date', 
+                [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])->get();
+            }
+            else if($filter_type == "month")
+            {
+                $order->whereBetween('pickup_date', 
+                [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])->get();
+            }   
             
             $table = Datatables::of($order);
             
@@ -114,6 +114,28 @@ class OrderController extends Controller
         }
     }
 
+    public function countTotalOrders(Request $request)
+    {
+        $org_id = $request->id;
+
+        $count_all = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->count() ?: 0;
+        $count_today = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date', 
+        [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->count() ?: 0;
+        $count_week = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date', 
+        [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])->count() ?: 0;
+        $count_month = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date', 
+        [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])->count() ?: 0;
+
+        $response = [
+            'all' => $count_all,
+            'today' => $count_today,
+            'week' => $count_week,
+            'month' => $count_month
+        ];
+
+        return response()->json(['response' => $response]);
+    }
+
     public function orderPickedUp(Request $request)
     {
         $update_order = PgngOrder::find($request->o_id)->update(['status' => 'Picked-Up']);
@@ -127,18 +149,19 @@ class OrderController extends Controller
         }
     }
 
-    public function showHistory()
+    public function showHistory($id)
     {
-        return view('merchant.regular.admin.order.history');
+        $org = Organization::find($id);
+        return view('merchant.regular.admin.order.history', compact('org'));
     }
 
     public function getAllHistories(Request $request)
     {
-        $org_id = RegularMerchantController::getOrganizationId();
+        $org_id = $request->id;
         $total_price[] = 0;
         $pickup_date[] = 0;
-        $filteredID = array();
-        $order_day = $request->order_day;
+        $filter_type = $request->filterType;
+        $date = $request->date;
 
         $order = DB::table('pgng_orders as pu')
                 ->join('users as u', 'pu.user_id', 'u.id')
@@ -147,33 +170,34 @@ class OrderController extends Controller
                 ->select('pu.id', 'pu.pickup_date', 'pu.total_price', 'pu.status',
                 'u.name', 'u.telno')
                 ->orderBy('pickup_date', 'asc')
-                ->orderBy('pu.updated_at', 'desc')
-                ->get();
+                ->orderBy('pu.updated_at', 'desc');
         
         if(request()->ajax()) 
         {
-            if($order_day == "") 
+            if(($filter_type == "" || $filter_type == "all") && $date == "") 
             {
-                $order = $order;
+                $order = $order->get();
             }
-            else
+            else if($filter_type == "date")
             {
-                foreach($order as $row) {
-                    $day_pickup = Carbon::parse($row->pickup_date)->format('l');
-                    $day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($day_pickup);
-                    if($day == $order_day) {
-                        $filteredID[] = $row->id;
-                    }
-                }
-
-                $order = DB::table('pgng_orders as pu')
-                ->join('users as u', 'pu.user_id', 'u.id')
-                ->whereIn('pu.id', $filteredID)
-                ->select('pu.id', 'pu.pickup_date', 'pu.total_price', 'pu.status',
-                'u.name', 'u.telno')
-                ->orderBy('pickup_date', 'asc')
-                ->orderBy('pu.updated_at', 'desc');
+                $order = $order->whereBetween('pickup_date', 
+                [Carbon::parse($date)->startOfDay()->toDateTimeString(),Carbon::parse($date)->endOfDay()->toDateTimeString()])->get();
             }
+            else if($filter_type == "today")
+            {
+                $order->whereBetween('pickup_date', 
+                [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->get();
+            }
+            else if($filter_type == "week")
+            {
+                $order->whereBetween('pickup_date', 
+                [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])->get();
+            }
+            else if($filter_type == "month")
+            {
+                $order->whereBetween('pickup_date', 
+                [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])->get();
+            }  
 
             $table = Datatables::of($order);
 
@@ -198,7 +222,7 @@ class OrderController extends Controller
             });
 
             $table->editColumn('pickup_date', function ($row) {
-                return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+                return Carbon::parse($row->pickup_date)->format('d/m/y h:i A');
             });
 
             $table->rawColumns(['total_price', 'status']);

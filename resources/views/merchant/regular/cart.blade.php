@@ -2,6 +2,8 @@
 
 @section('css')
 
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
+{{-- <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet"> --}}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
 @include('layouts.datatable')
@@ -68,7 +70,7 @@
                       <td class="align-middle">{{ $row->name }}</td>
                       <td class="align-middle">{{ $row->quantity }}</td>
                       <td class="align-middle">{{ $row->selling_quantity * $row->quantity }}</td>
-                      <td class="align-middle">{{ $price[$row->id] }}</td>
+                      <td class="align-middle">{{ $response->price[$row->id] }}</td>
                       <td class="align-middle">
                           <button type="button" data-cart-order-id="{{ $row->id }}" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>
                       </td>
@@ -93,12 +95,12 @@
                   <tbody>
                     <tr>
                       <th class="text-muted" scope="row">Jumlah Kasar:</th>
-                      <td class="lead">RM {{ number_format((double)($cart->total_price - $fixed_charges), 2, '.', '') }}</td>
+                      <td class="lead">RM {{ number_format((double)($cart->total_price - $response->fixed_charges), 2, '.', '') }}</td>
                     </tr>
-                    <tr>
+                    @if($response->fixed_charges != null)<tr>
                       <th class="text-muted" scope="row">Cas Servis:</th>
-                      <td class="lead">RM {{ number_format((double)$fixed_charges, 2, '.', '') }}</td>
-                    </tr>
+                      <td class="lead">RM {{ number_format((double)$response->fixed_charges, 2, '.', '') }}</td>
+                    </tr>@endif
                     <tr>
                       <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
                       <td class="lead">RM {{ number_format((double)$cart->total_price, 2, '.', '') }}</td>
@@ -109,7 +111,7 @@
           </div>
         </div>
         
-      <form action="{{ route('merchant.regular.store-order', ['org_id' => $cart->org_id, 'order_id' => $cart->id]) }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('merchant-reg.store-order', ['org_id' => $cart->org_id, 'order_id' => $cart->id]) }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="card mb-4 border">
           <div class="card-body p-4">
@@ -117,14 +119,12 @@
             <div class="row">
               <div class="col">
                 <div class="form-group required">
-                  <label class="col">Jenis Pesanan</label>
-                  <div class="col">
-                    <select class="form-control" data-parsley-required-message="Sila pilih jenis pesanan" id="order_type" required>
-                      <option value="" selected>Pilih Jenis Pesanan</option>
-                      {{-- <option value="Delivery">Penghantaran</option> --}}
-                      <option value="Pick-Up">Ambil Sendiri</option>
-                    </select>
-                  </div>
+                  <label>Jenis Pesanan</label>
+                  <select class="form-control" data-parsley-required-message="Sila pilih jenis pesanan" id="order_type" required>
+                    <option value="" @if($cart->order_type == null) selected @endif>Pilih Jenis Pesanan</option>
+                    {{-- <option value="Delivery">Penghantaran</option> --}}
+                    <option value="Pick-Up" @if($cart->order_type == 'Pick-Up') selected @endif>Ambil Sendiri</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -135,18 +135,16 @@
 
               <div class="col pickup-date-div" hidden>
                 <div class="form-group required">
-                  <label class="col">Tarikh Pengambilan</label>
-                  <div class="col">
-                    <input type="text" class="form-control" name="pickup_date" id="datepicker" placeholder="Pilih tarikh" readonly required>
-                  </div>
+                  <label>Tarikh Pengambilan</label>
+                  <input type="text" value="{{ $response->pickup_date }}" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
                 </div>
               </div>
 
               <div class="col pickup-time-div" hidden>
                 <div class="form-group required">
-                  <label class="col">Masa Pengambilan</label>
-                  <div class="col timepicker-section">
-                    <input type="time" class="form-control" name="pickup_time" id="timepicker" required>
+                  <label>Masa Pengambilan</label>
+                  <div class="timepicker-section">
+                    <input type="time" value="{{ $response->pickup_time }}" class="form-control" name="pickup_time" id="timepicker" required>
                     <p class="time-range"></p>
                   </div>
                 </div>
@@ -160,29 +158,27 @@
           <div class="card-body p-4">
             <div class="row">
               <div class="col">
-                <div class="form-group required">
-                  <label class="col">Nota kepada Peniaga</label>
-                  <div class="col">
-                    <input type="text" name="note" class="form-control" placeholder="Optional">
-                  </div>
+                <div class="form-group">
+                  <label>Nota kepada Peniaga</label>
+                  <textarea class="form-control" name="note" placeholder="Optional">{{ $cart->note }}</textarea>
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        <input type="hidden" name="order_type" id="hidden_order_type">
+        <input type="hidden" name="order_type" id="hidden_order_type" value="{{ $cart->order_type }}">
         
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
-            <a href="{{ route('merchant.regular.show', $cart->org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
+            <a href="{{ route('merchant-reg.show', $cart->org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
             <button type="submit" class="btn-lg btn-primary">Teruskan</button>
           </div>
         </div>
       </form>
       @else
       <div class="d-flex justify-content-center">
-        <a href="{{ route('merchant.regular.show', $org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
+        <a href="{{ route('merchant-reg.show', $response->org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
       </div>
       @endif
     </div>
@@ -216,13 +212,22 @@
 
 @section('script')
 
-{{-- <script src="https://code.jquery.com/jquery-3.6.0.js"></script> --}}
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+{{-- <script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script> --}}
 
 <script>
   $(document).ready(function(){
-    var org_id = $('input#org_id').val()
-
+    let org_id = $('input#org_id').val()
+    let init_order_type = $('#hidden_order_type').val()
+    
+    if(init_order_type == 'Pick-Up'){
+      $('.pickup-date-div').removeAttr('hidden')
+      dateOnChange()
+    } else {
+      $('.pickup-date-div').attr('hidden', true)
+      $('.pickup-time-div').attr('hidden', true)
+    }
+    
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -230,7 +235,7 @@
     });
 
     $('#order_type').change(function() {
-      type_val = $(this).children(':selected').val()
+      let type_val = $(this).children(':selected').val()
       $('#hidden_order_type').val(type_val)
       if(type_val == 'Pick-Up') {
         $('.pickup-date-div').removeAttr('hidden')
@@ -241,25 +246,29 @@
     })
 
     $('#datepicker').change(function() {
-      date_val = $(this).val()
+      dateOnChange()
+    })
+
+    function dateOnChange() {
+      let date_val = $('#datepicker').val(), timePicker = $('#timepicker'), timeRange = $('.time-range')
       if(date_val != null) {
         $('.pickup-time-div').removeAttr('hidden')
         $.ajax({
-          url: '{{ route("merchant.regular.fetch-hours") }}',
+          url: '{{ route("merchant-reg.fetch-hours") }}',
           method: 'POST',
           data: {org_id:org_id, date:date_val},
           beforeSend:function() {
-            $('.time-range').empty()
+            timeRange.empty()
           },
           success:function(result) {
             if(result.hour.open) {
-              $('#timepicker').prop('disabled', false)
-              $('#timepicker').attr('min', result.hour.min)
-              $('#timepicker').attr('max', result.hour.max)
-              $('.time-range').append(result.hour.body)
+              timePicker.prop('disabled', false)
+              timePicker.attr('min', result.hour.min)
+              timePicker.attr('max', result.hour.max)
+              timeRange.append(result.hour.body)
             } else {
-              $('#timepicker').prop('disabled', true)
-              $('.time-range').append(result.hour.body)
+              timePicker.prop('disabled', true)
+              timeRange.append(result.hour.body)
             }
           },
           error:function(result) {
@@ -269,19 +278,18 @@
       } else {
         $('.pickup-time-div').attr('hidden', true)
       }
-    })
+    }
     
-    var order_cart_id = null
+    let order_cart_id = null
 
     $('.delete-item').click(function() {
       order_cart_id = $(this).attr('data-cart-order-id')
-      fixed_charges = $(this).attr('data-charge')
       $('#deleteConfirmModal').modal('show')
     })
 
     $('#delete_confirm_item').click(function() {
       $.ajax({
-        url: "{{ route('merchant.regular.destroy-item') }}",
+        url: "{{ route('merchant-reg.destroy-item') }}",
         method: "DELETE",
         data: {cart_id:order_cart_id},
         beforeSend:function() {
@@ -303,10 +311,9 @@
 
     var dates = []
     
-
     $(document).ready(function() {
       $.ajax({
-        url: '{{ route("merchant.regular.disabled-dates") }}',
+        url: '{{ route("merchant-reg.disabled-dates") }}',
         method: 'post',
         data: {org_id:org_id},
         success:function(result) {
@@ -319,9 +326,10 @@
         }
       })
     })
+    
 
     $("#datepicker").datepicker({
-        minDate: 0,
+        minDate: 1,
         maxDate: '+1m',
         dateFormat: 'mm/dd/yy',
         dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],

@@ -30,6 +30,26 @@ class RegularMerchantController extends Controller
         return $org_id;
     }
 
+    public static function getAllMerchantOrganization()
+    {
+        $role_id = DB::table('organization_roles')->where('nama', 'Regular Merchant Admin')->first()->id;
+        $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
+        
+        $org = DB::table('organizations as o')
+        ->join('organization_user as ou', 'ou.organization_id', 'o.id')
+        ->where([
+            ['user_id', Auth::id()],
+            ['role_id', $role_id],
+            ['status', 1],
+            ['type_org', $type_org_id],
+            ['deleted_at', NULL],
+        ])
+        ->select('o.*')
+        ->get();
+        
+        return $org;
+    }
+
     public static function compareDateWithToday($date)
     {
         $today = Carbon::now();

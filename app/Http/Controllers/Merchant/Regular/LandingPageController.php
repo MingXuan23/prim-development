@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Merchant\Regular;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Merchant\RegularMerchantController;
 use App\Models\Organization;
+use App\Models\OrganizationHours;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -13,31 +14,32 @@ class LandingPageController extends Controller
 {
     public function index()
     {
-        $todayDate = Carbon::now()->format('l'); // Format to day name
+        $all_merchant_org = null;
+        $merchants = null;
+        $is_open = array();
+        $opened_org = array();
         
-        $day = RegularMerchantController::getDayIntegerByDayName($todayDate); // Convert to integer
         $type_org_id = DB::table('type_organizations')->where('nama', 'Peniaga Barang Umum')->first()->id;
 
-        $merchant = Organization::
-        join('organization_hours as oh', 'oh.organization_id', 'organizations.id')
-        ->where([
+        $all_merchant_org = Organization::
+        where([
             ['deleted_at', null],
             ['type_org', $type_org_id],
-            ['day', $day]
         ])
-        ->select('organizations.id as id', 'nama', 'address', 'postcode', 'state', 'city', 'organization_picture',
-        'day', 'open_hour', 'close_hour', 'status')
-        ->orderBy('status', 'desc')
-        ->paginate(3);
+        ->select('id', 'nama', 'address', 'postcode', 'state', 'city', 'organization_picture')
+        ->get();
         
-        // dd($merchant);
-        
-        // foreach($merchant as $row)
-        // {
-        //     $oh_status[$row->id] = $row->organization_hours->first()->status;
-        // }
+        foreach($all_merchant_org as $row)
+        {
+            $is_open[$row->id] = $this->isOrgOpenThisWeek($row->id);
+            if($is_open[$row->id] == true) {
+                $opened_org[] = $row->id;
+            }
+        }
 
-        return view('merchant.regular.index', compact('merchant'));
+        $merchants = Organization::whereIn('id', $opened_org)->select('id', 'nama', 'address', 'postcode', 'state', 'city', 'organization_picture')->get();
+
+        return view('merchant.regular.index', compact('merchants', 'is_open'));
     }
 
     public function test_index(Request $request)
@@ -91,5 +93,19 @@ class LandingPageController extends Controller
 
             return response()->json(['merchant' => $merchant_arr, 'count' => $count]);
         }
+    }
+
+    private function isOrgOpenThisWeek($org_id)
+    {
+        $is_open = false;
+
+        $hours = OrganizationHours::where('organization_id', $org_id)->get();
+        foreach($hours as $row) {
+            if($row->status == 1) {
+                $is_open = true;
+            }
+        }
+
+        return $is_open;
     }
 }

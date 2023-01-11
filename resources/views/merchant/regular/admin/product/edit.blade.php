@@ -106,7 +106,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Harga (RM)</label>
-                            <input type="number" name="item_price" id="item_price" value="{{ number_format($item->price, 2, '.', '') }}" min="0.01" step="0.01" pattern="^\d*(\.\d{1,2})?$" class="form-control" required>
+                            <input type="number" name="item_price" id="item_price" value="{{ number_format($item->price, 2) }}" min="0.01" step="0.01" pattern="^\d*(\.\d{1,2})?$" class="form-control" required>
                         </div>
                     </div>
                 </div>

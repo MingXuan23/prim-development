@@ -8,6 +8,21 @@
 @endsection
 
 @section('content')
+<div style="padding-top: 12px" class="row">
+    <div class="col-md-12 ">
+        <div class=" align-items-center">
+            <div class="form-group card-title">
+                <select name="org" id="org_dropdown" class="form-control col-md-12">
+                    <option value="" selected>Pilih Organisasi</option>
+                    @foreach($merchant as $row)
+                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
         <div class="container-fluid">
             <!-- start page title -->
             <div class="page-title-box">
@@ -15,16 +30,17 @@
                     <div class="col-md-8">
                         <h4 class="page-title">Dashboard Peniaga</h4>
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item active">Selamat Datang {{ $org_name }}</li>
+                            <li class="breadcrumb-item active "><span class="org-name"></span></li> 
                         </ol>
+                        
                     </div>
-                    <div class="col-md-4 d-flex justify-content-end">
+                    {{-- <div class="col-md-4 d-flex justify-content-end">
                         <div class="d-none d-md-block">
                             <a class="btn btn-primary" href="{{ route('admin-reg.edit-merchant') }}">
                                 <i class="fas fa-cog mr-2"></i> Kemaskini
                             </a>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
             <!-- end page title -->
@@ -154,7 +170,29 @@
 <script src="{{ URL::asset('assets/libs/datatables/datatables.min.js') }}" defer></script>
 
 <script>
-    $(document).ready(() => {
+    
+    let orgId, dropdownLength = $('#org_dropdown').children('option').length
+
+    $(document).ready(function(){
+        if(dropdownLength > 1) {
+            $('#org_dropdown option')[1].selected = true
+            orgId = $('#org_dropdown option')[1].value
+            $('#orderTable').DataTable().destroy()
+            getTable(orgId)
+            getChart(orgId)
+        }
+    })
+
+    $('#org_dropdown').change(function() {
+        
+        orgId = $("#org_dropdown option:selected").val()
+        
+        $('#orderTable').DataTable().destroy()
+        getTable(orgId)
+        getChart(orgId)
+    })
+
+    function getTable(orgId = '') {
         orderTable = $('.order-table').DataTable({
             processing:   true,
             serverSide:   true,
@@ -166,6 +204,7 @@
             ajax: {
                 url: "{{ route('admin-reg.latest-orders') }}",
                 type: 'GET',
+                data: {id: orgId},
             },
             language : {
                 "infoEmpty": "Tiada Rekod",
@@ -193,15 +232,14 @@
                 "className": "align-middle text-center",
             }, ]
         });
+    }
 
-        getChart()
-        
-    })
 
-    let getChart = () => {
+    function getChart(orgId = '') {
         $.ajax({
             type: 'GET',
             url: '{{ route("admin-reg.all-transaction") }}',
+            data: {id: orgId},
             success: (result) => {
                 var date = new Array();
                 var username = new Array();
@@ -221,9 +259,11 @@
                 }
 
                 $('#order_label').html('Keseluruhan')
-                $('#total_order').html('RM ' + (Math.round(total_amount * 100) / 100).toFixed(2))
+                $('#total_income').html('RM ' + (Math.round(total_amount * 100) / 100).toFixed(2))
                 $('#income_label').html('Keseluruhan')
-                $('#total_income').html(total_order)
+                $('#total_order').html(total_order)
+
+                $('.org-name').empty().append('Selamat Datang ' + result.org_name)
 
                 var chart = new Chartist.Line('.ct-chart', {
                     labels: date,
@@ -248,28 +288,29 @@
     }
 
     let getTotalOrder = (id) => {
-        var duration;
+        let duration, orderLabel = $('#order_label');
 
         if (id == "btn_order_day") {
             duration = "day";
-            $('#order_label').html("Hari ini")
+            orderLabel.html("Hari ini")
         } else if (id == "btn_order_week") {
             duration = "week";
-            $('#order_label').html("Minggu ini")
+            orderLabel.html("Minggu ini")
         } else if (id == "btn_order_month") {
             duration = "month";
-            $('#order_label').html("Bulan ini")
+            orderLabel.html("Bulan ini")
         }
         
         $.ajax({
             type: 'GET',
             url: '{{ route("admin-reg.total-order") }}',
             data: {
-                duration: duration
+                duration: duration,
+                id: orgId
             },
             success: function(result) {
-                var order = result.order
-                var display_order = (order === null) ? 0 : order
+                let order = result.order
+                let display_order = (order === null) ? 0 : order
                 
                 $('#total_order').html(display_order)
             }
@@ -277,24 +318,25 @@
     }
 
     let getTotalIncome = (id) => {
-        var duration;
+        let duration, incomeLabel = $('#income_label');
 
         if (id == "btn_income_day") {
             duration = "day";
-            $('#income_label').html("Hari ini")
+            incomeLabel.html("Hari ini")
         } else if (id == "btn_income_week") {
             duration = "week";
-            $('#income_label').html("Minggu ini")
+            incomeLabel.html("Minggu ini")
         } else if (id == "btn_income_month") {
             duration = "month";
-            $('#income_label').html("Bulan ini")
+            incomeLabel.html("Bulan ini")
         }
         
         $.ajax({
             type: 'GET',
             url: '{{ route("admin-reg.total-income") }}',
             data: {
-                duration: duration
+                duration: duration,
+                id: orgId
             },
             success: function(result) {
                 var income = result.income

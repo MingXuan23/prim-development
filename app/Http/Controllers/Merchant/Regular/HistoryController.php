@@ -24,7 +24,7 @@ class HistoryController extends Controller
         $pickup_date[] = 0;
         $status = ['Paid'];
         
-        $order = $this->getAllOrderQuery($status);
+        $order = $this->getAllOrderQuery($status)->get();
         
         if(request()->ajax()) 
         {
@@ -101,11 +101,23 @@ class HistoryController extends Controller
         $total_price[] = 0;
         $pickup_date[] = 0;
         $status = ['Cancel by user', 'Cancel by merchant', 'Delivered', 'Picked-Up'];
+        $filter_type = $request->filterType;
+        $date = $request->date;
         
         $order = $this->getAllOrderQuery($status);
         
         if(request()->ajax()) 
         {
+            if(($filter_type == "" || $filter_type == "all") && $date == "") 
+            {
+                $order = $order->get();
+            }
+            else if($filter_type == "date")
+            {
+                $order = $order->whereBetween('pickup_date', 
+                [Carbon::parse($date)->startOfDay()->toDateTimeString(),Carbon::parse($date)->endOfDay()->toDateTimeString()])->get();
+            }
+            
             $table = Datatables::of($order);
 
             $table->addColumn('status', function ($row) {
@@ -188,8 +200,7 @@ class HistoryController extends Controller
                 'o.nama', 'o.telno')
                 ->orderBy('status', 'desc')
                 ->orderBy('pickup_date', 'asc')
-                ->orderBy('pu.updated_at', 'desc')
-                ->get();
+                ->orderBy('pu.updated_at', 'desc');
 
         return $order;
     }

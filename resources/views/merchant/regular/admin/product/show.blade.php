@@ -2,6 +2,8 @@
 
 @section('css')
 
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
+
 <style>
 #img-size
 {
@@ -10,21 +12,45 @@
   object-fit: cover;
 }
 
+/* style all input elements with a required attribute */
+/* input:required {
+    border-color: #800000;
+  border-width: 3px;
+} */
+
+input:required:invalid {
+    border: 1px solid red;
+    opacity: 1;
+}
+
+@media screen and (max-width: 768px) { 
+  #img-size
+  {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+  }
+
+  .desc{
+    font-size: 10px;
+  }
+}
+
 </style>
 
 @endsection
 
 @section('content')
 
-<div class="row align-items-center">
+<div class="row justify-content-between align-items-center">
     <div class="col">
         <div class="page-title-box">
             <h4 class="font-size-18"><a href="{{ route('admin-reg.product-group') }}" class="text-muted">Urus Produk</a> <i class="fas fa-angle-right"></i> {{ $group->name }}</h4>
         </div>
     </div>
-    <div class="d-flex justify-content-end mr-3">
-        <button id="delete-product-group-modal" class="btn btn-danger mr-2"><i class="fas fa-trash-alt"></i> Jenis Produk</button>
-        <button id="edit-product-group" class="btn btn-primary mr-2"><i class="fas fa-pencil-alt"></i> Jenis Produk</button>
+    <div class="d-flex justify-content-between mr-3">
+        <button id="delete-product-group-modal" class="btn btn-danger m-1"><i class="fas fa-trash-alt"></i> Jenis Produk</button>
+        <button id="edit-product-group" class="btn btn-primary m-1"><i class="fas fa-pencil-alt"></i> Jenis Produk</button>
     </div>
 </div>
 
@@ -73,7 +99,7 @@
                             ">
                         </td>
                         <td class="align-middle">{{ $row->name }}</td>
-                        <td class="align-middle">{!! $row->desc ?: "<i>Tiada Deskripsi</i>" !!}</td>
+                        <td class="align-middle desc">{!! $row->desc ?: "<i>Tiada Deskripsi</i>" !!}</td>
                         <td class="align-middle text-center">
                             <ul class="list-group">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -94,11 +120,11 @@
                             <ul class="list-group">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Seunit
-                                  <span class="badge badge-primary badge-pill">{{ number_format($row->price, 2, '.', '') }}</span>
+                                  <span class="badge badge-primary badge-pill">{{ number_format($row->price, 2) }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     Setiap Kuantiti
-                                  <span class="badge badge-primary badge-pill">{{ number_format($row->price * $row->selling_quantity, 2, '.', '') }}</span>
+                                  <span class="badge badge-primary badge-pill">{{ number_format($row->price * $row->selling_quantity, 2) }}</span>
                                 </li>
                               </ul>
                         </td>
@@ -108,8 +134,8 @@
                                 : "<span class='badge rounded-pill bg-danger text-white p-2'>Tidak Aktif</span>" !!}
                         </td>
                         <td class="align-middle text-center">
-                            <a href="{{ route('admin-reg.edit-item', ['id' => $group->id, 'item' => $url_name[$row->id]]) }}" class="edit-item-modal btn btn-primary"><i class="fas fa-pencil-alt"></i></a>
-                            <button data-item-id="{{ $row->id }}" data-image-url="{{ $image_url }}" class="delete-item-modal btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+                            <a href="{{ route('admin-reg.edit-item', ['id' => $group->id, 'item' => $row->id]) }}" class="edit-item-modal btn btn-primary m-1"><i class="fas fa-pencil-alt"></i></a>
+                            <button data-item-id="{{ $row->id }}" data-image-url="{{ $image_url }}" class="delete-item-modal btn btn-danger m-1"><i class="fas fa-trash-alt"></i></button>
                         </td>
                     </tr>
                     @empty
@@ -198,8 +224,8 @@
                             
                         </div>
 
-                        <div class="col" style="margin-top: 13px">
-                            <div class="form-group required custom-file">
+                        <div class="col" style="margin-bottom: 8px">
+                            <div class="form-group custom-file">
                                 <label class="custom-file-label" for="item_image">Gambar Item</label>
                                 <input class="custom-file-input" type="file" name="item_image" id="item_image" accept=".jpg,.jpeg,.png">
                             </div>
@@ -208,7 +234,7 @@
 
                     <div class="row">
                         <div class="col">
-                            <div class="form-group required">
+                            <div class="form-group">
                                 <label class="control-label">Deskripsi Item</label>
                                 <input class="form-control" type="text" placeholder="Deskripsi" name="item_desc" id="item_desc">
                             </div>
@@ -258,19 +284,23 @@
                         <div class="col">
                             <div class="form-group required">
                                 <label class="control-label">Kuantiti Dalam Inventori</label>
-                                <input class="form-control" type="number" placeholder="Kuantiti" name="item_quantity" id="item_quantity" min="1" step="1">
+                                <input class="form-control" type="number" placeholder="Kuantiti" name="item_quantity" id="item_quantity" min="1" step="1" oninput="this.value = Math.round(this.value);">
                             </div>
                         </div>
                     </div>
 
-                    <div class="row mb-4">
+                    <div class="row">
                         <div class="col">
-                            <label class="control-label">Kata Nama Kuantiti</label>
-                            <input class="form-control" type="text" placeholder="Kata Nama Kuantiti" name="collective_noun" id="collective_noun" value="Unit" required>
+                            <div class="form-group required">
+                                <label class="control-label">Kata Nama Kuantiti</label>
+                                <input class="form-control" type="text" placeholder="Kata Nama Kuantiti" name="collective_noun" id="collective_noun" value="Unit" required>
+                            </div>
                         </div>
                         <div class="col">
-                            <label class="control-label">Kuantiti Yang Ingin Dijual</label>
-                            <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" value="1" required>
+                            <div class="form-group required">
+                                <label class="control-label">Kuantiti Yang Ingin Dijual</label>
+                                <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" value="1" required>
+                            </div>
                         </div>
                     </div>
                     
@@ -351,9 +381,7 @@
             var name = $('#name').val()
             if(name == "")
             {
-                $('#popup').addClass('alert-danger')
-                $('#popup').empty().append('Sila isi ruangan kosong')
-                $('#popup').show()
+                $('#popup').addClass('alert-danger').empty().append('Sila isi ruangan kosong').show()
             }
         })
 
@@ -397,15 +425,11 @@
 
             if($('#have_inventory').is(':checked') == true){
                 if(name == "" && quantity == "" && price == "" && noun == "" && selling_quantity == ""){
-                    $('#popup').addClass('alert-danger')
-                    $('#popup').empty().append('Sila isi ruangan kosong')
-                    $('#popup').show()
+                    $('#popup').addClass('alert-danger').empty().append('Sila isi ruangan kosong').show()
                 }
             } else {
                 if(name == "" && price == "" && noun == "" && selling_quantity == "") {
-                    $('#popup').addClass('alert-danger')
-                    $('#popup').empty().append('Sila isi ruangan kosong')
-                    $('#popup').show()
+                    $('#popup').addClass('alert-danger').empty().append('Sila isi ruangan kosong').show()
                 }
             }
         })

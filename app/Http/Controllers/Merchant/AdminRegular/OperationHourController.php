@@ -4,29 +4,83 @@ namespace App\Http\Controllers\Merchant\AdminRegular;
 
 use App\Http\Controllers\Merchant\RegularMerchantController;
 use App\Models\OrganizationHours;
-use App\Models\TypeOrganization;
 use App\Models\PgngOrder;
 use App\Http\Controllers\Controller;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Yajra\DataTables\DataTables;
 
 class OperationHourController extends Controller
 {
+    private $day_name = array('Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu');
+    
     public function index()
     {
-        $day_name = array('Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu');
-        $org_id = RegularMerchantController::getOrganizationId();
-        $hour = OrganizationHours::where('organization_id', $org_id)->get();
+        $merchant = RegularMerchantController::getAllMerchantOrganization();
 
-        return view('merchant.regular.admin.operation-hour.index', compact('day_name', 'hour'));
+        return view('merchant.regular.admin.operation-hour.index', compact('merchant'));
+    }
+
+    public function getOperationHoursTable(Request $request)
+    {
+        $id = $request->id;
+
+        $hour = OrganizationHours::where('organization_id', $id)->get();
+
+        if(request()->ajax()) 
+        { 
+            $table = Datatables::of($hour);
+
+            $table->editColumn('day', function ($row) {
+                $day_name = $this->day_name;
+                return $day_name[$row->day];
+            });
+
+            $table->editColumn('status', function ($row) {
+                if ($row->status == 1) {
+                    $label = "<span class='badge rounded-pill bg-success text-white p-2'>Buka</span>";
+                    return $label;
+                } else {
+                    $label = "<span class='badge rounded-pill bg-danger text-white p-2'>Tutup</span>";
+                    return $label;
+                }
+            });
+
+            $table->editColumn('open_time', function ($row) {
+                if($row->status == 1) {
+                    $open = Carbon::parse($row->open_hour)->format('h:i A');
+                } else {
+                    $open = '';
+                }
+                return $open;
+            });
+
+            $table->editColumn('close_time', function ($row) {
+                if($row->status == 1) {
+                    $close = Carbon::parse($row->close_hour)->format('h:i A');
+                } else {
+                    $close = '';
+                }
+                return $close;
+            });
+
+            $table->editColumn('action', function ($row) {
+                $btn = '<button data-hour-id="'.$row->id.'" class="edit-time-btn btn btn-primary"><i class="fas fa-pencil-alt"></i></button>';
+                return $btn;
+            });
+
+            $table->rawColumns(['day', 'status', 'open_time', 'close_time', 'action']);
+
+            return $table->make(true);
+        }
     }
 
     public function edit(Request $request)
     {
-        $day_name = array('Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu');
+        $day_name = $this->day_name;
         $hour = OrganizationHours::find($request->hour_id);
 
         return response()->json(['hour' => $hour, 'day_name' => $day_name]);
@@ -66,6 +120,7 @@ class OperationHourController extends Controller
                 if(count($new_order) != 0)
                 {
                     $form_data = array(
+                        'org_id' => $get_hour->organization_id,
                         'hour_id' => $hour_id,
                         'new_order' => $new_order,
                         'day' => $get_hour->day,
@@ -86,6 +141,7 @@ class OperationHourController extends Controller
                 }
                 else
                 {
+                    // Feature idea - Delete all <In Cart> orders so it wont proceed to orders if the existing pickup_date is invalid
                     $hour->update([
                         'open_hour' => $open_hour,
                         'close_hour' => $close_hour,
@@ -100,6 +156,7 @@ class OperationHourController extends Controller
             if(count($order) != 0)
             {
                 $form_data = array(
+                    'org_id' => $get_hour->organization_id,
                     'hour_id' => $hour_id,
                     'new_order' => $order,
                     'day' => $get_hour->day,
@@ -119,6 +176,7 @@ class OperationHourController extends Controller
             }
             else
             {
+                // Feature idea - Delete all <In Cart> orders so it wont proceed to orders if the existing pickup_date is invalid
                 $hour->update([
                     'open_hour' => null,
                     'close_hour' => null,
@@ -141,7 +199,7 @@ class OperationHourController extends Controller
 
         foreach($order as $row)
         {
-            $pickup_day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName(Carbon::parse($row->pickup_date)->format('l'));
+            $pickup_day = RegularMerchantController::getDayIntegerByDayName(Carbon::parse($row->pickup_date)->format('l'));
             if($pickup_day == $choosen_day)
             {
                 $same_day_order[] = $row->id;
@@ -180,7 +238,7 @@ class OperationHourController extends Controller
         // $day = null;
         $order_id = "";
         $order_id = base64_encode(serialize($arr['new_order']));
-        $body = "<form action='/merchant/admin-regular/operation-hours/check-orders/".$arr['hour_id']."' method='GET'>";
+        $body = "<form action='/admin-regular/operation-hours/".$arr['org_id']."/check-orders/".$arr['hour_id']."' method='GET'>";
         $body .= "<input type='hidden' name='order_id' value='".$order_id."'>";
         $body .= "<input type='hidden' name='day' value='".$arr['day']."'>";
         $body .= "<input type='hidden' name='status' value='".$arr['status']."'>";
@@ -193,7 +251,7 @@ class OperationHourController extends Controller
         return $body;
     }
 
-    public function editSameDateOrders(Request $request, $hour_id)
+    public function editSameDateOrders(Request $request, $org_id, $hour_id)
     {
         # Unserialize variable of array
         $order_id = unserialize(base64_decode($request->order_id));
@@ -248,7 +306,7 @@ class OperationHourController extends Controller
         {   
             # Get order pickup date day and convert to integer
             $day_pickup_date = Carbon::parse($row->pickup_date)->format('l');
-            $day_int_pickup = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($day_pickup_date);
+            $day_int_pickup = RegularMerchantController::getDayIntegerByDayName($day_pickup_date);
 
             # If it is the same day as order pickup_date and the day of selected day the admin want to update
             # And if the status is OPEN
@@ -314,7 +372,7 @@ class OperationHourController extends Controller
         $msg = '';
         $validation_response = null;
         $day_date_time = Carbon::parse($arr['requested_pickup_date'])->format('l');
-        $pickup_day = app('App\Http\Controllers\CooperativeController')->getDayIntegerByDayName($day_date_time);
+        $pickup_day = RegularMerchantController::getDayIntegerByDayName($day_date_time);
         
         // If updated day same as the day of pickup date
         if($arr['updated_day'] == $pickup_day) {
@@ -355,7 +413,7 @@ class OperationHourController extends Controller
         ]);
         
         if($update_hour) {
-            return redirect('/merchant/operation-hours')->with('success', 'Waktu Operasi Berjaya Dikemaskini');
+            return redirect('/admin-regular/operation-hours')->with('success', 'Waktu Operasi Berjaya Dikemaskini');
         } else {
             return back()->with('error', 'Waktu Operasi Tidak Berjaya Dikemaskini');
         }

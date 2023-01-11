@@ -17,9 +17,9 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Dashboard Peniaga</h4>
+            <h4 class="font-size-18">Organisasi</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Dashboard Peniaga >> Kemaskini Peniaga</li>
+                <li class="breadcrumb-item active">Organisasi >> Kemaskini Organisasi</li>
             </ol>
         </div>
     </div>
@@ -94,6 +94,7 @@
                         @endif
                     </div>
                     
+                    @if (Auth::user()->hasRole('Superadmin'))
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
@@ -106,15 +107,15 @@
                             </div>
                         </div>
 
-                        {{-- <div class="col">
+                        <div class="col">
                             <div class="form-group">
                                 <label>Seller Id</label>
                                 <input type="text" name="seller_id" class="form-control" placeholder="Seller Id Organisasi"
                                 value="{{ $org->seller_id }}" data-parsley-required-message="Sila masukkan seller id organisasi" required>
                             </div>
-                        </div> --}}
+                        </div>
                     </div>
-                    
+                    @endif
 
                     <div class="row">
                         <div class="col">
@@ -168,7 +169,7 @@
 
                     <div class="form-group mb-0">
                         <div class="text-right">
-                            <a href="{{ route('admin-reg.home') }}" type="button" class="btn btn-light mr-2">Kembali</a>
+                            <a href="{{ route('organization.index') }}" type="button" class="btn btn-light mr-2">Kembali</a>
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
                                 Simpan
                             </button>

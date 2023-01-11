@@ -73,6 +73,7 @@ Route::group(['prefix' => 'organization'], function () {
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
     Route::get('testRepeater', 'OrganizationController@testRepeater');
     Route::post('parent-koop', 'OrganizationController@fetchAvailableParentKoop')->name('organization.fetchAvailableParentKoop');
+    Route::get('/edit-merchant/{id}', 'Merchant\AdminRegular\DashboardController@edit')->name('admin-reg.edit-merchant'); // edit for merchant
 });
 
 Route::group(['prefix' => 'teacher'], function () {
@@ -208,10 +209,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
     });
 });
 
-Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => 'Merchant'], function() {
-    Route::group(['prefix' => 'regular', 'namespace' => 'Regular'], function() {
+Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
+    Route::group(['prefix' => 'merchant', 'namespace' => 'Regular'], function() {
         // Index
-        Route::get('', 'LandingPageController@index')->name('merchant.regular.index');
+        Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
         Route::get('fetch-merchant', 'LandingPageController@test_index')->name('merchant.fetch-merchant');
         // Orders
         Route::get('all-orders', 'HistoryController@index')->name('merchant.all-orders');
@@ -221,17 +222,16 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
         Route::get('get-order-history', 'HistoryController@getOrderHistory')->name('merchant.get-order-history');
         Route::get('{order_id}/order-details', 'HistoryController@showOrderDetail')->name('merchant.order-detail');
         // Menu
-        Route::get('{id}', 'OrderController@index')->name('merchant.regular.show');
-        Route::post('fetch-item', 'OrderController@fetchItem')->name('merchant.regular.fetch-item');
-        Route::post('store-item', 'OrderController@storeItemInCart')->name('merchant.regular.store-item');
-        // Cart
-        Route::get('{id}/cart', 'OrderController@showCart')->name('merchant.regular.cart');
-        Route::delete('destroy-item', 'OrderController@destroyItemInCart')->name('merchant.regular.destroy-item');
-        Route::post('fetch-disabled-dates', 'OrderController@fetchDisabledDates')->name('merchant.regular.disabled-dates');
-        Route::post('fetch-hours', 'OrderController@fetchOperationHours')->name('merchant.regular.fetch-hours');
-        Route::post('{org_id}/cart/{order_id}/payment', 'OrderController@store')->name('merchant.regular.store-order');
-        // Payment
-        // Route::get('{org_id}/cart/{order_id}/payment', 'OrderController@showPayment')->name('merchant.regular.payment');
+        Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
+        Route::post('get-counter', 'OrderController@countItemsInCart')->name('merchant-reg.count-cart');
+        Route::post('fetch-item', 'OrderController@fetchItem')->name('merchant-reg.fetch-item');
+        Route::post('store-item', 'OrderController@storeItemInCart')->name('merchant-reg.store-item');
+        // Cart & Pay
+        Route::get('{id}/cart', 'OrderController@showCart')->name('merchant-reg.cart');
+        Route::delete('destroy-item', 'OrderController@destroyItemInCart')->name('merchant-reg.destroy-item');
+        Route::post('fetch-disabled-dates', 'OrderController@fetchDisabledDates')->name('merchant-reg.disabled-dates');
+        Route::post('fetch-hours', 'OrderController@fetchOperationHours')->name('merchant-reg.fetch-hours');
+        Route::post('{org_id}/cart/{order_id}/payment', 'OrderController@store')->name('merchant-reg.store-order');
     });
 
     Route::group(['prefix' => 'admin-regular', 'namespace' => 'AdminRegular'], function() {
@@ -241,35 +241,37 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'merchant', 'namespace' => '
         Route::get('get-total-order', 'DashboardController@getTotalOrder')->name('admin-reg.total-order');
         Route::get('get-total-income', 'DashboardController@getTotalIncome')->name('admin-reg.total-income');
         Route::get('get-all-transaction', 'DashboardController@getAllTransaction')->name('admin-reg.all-transaction');
-        Route::get('/home/edit', 'DashboardController@edit')->name('admin-reg.edit-merchant');
         Route::put('update-merchant', 'DashboardController@update')->name('admin-reg.update-merchant');
 
         # Operation hour Dashboard
         Route::get('/operation-hours', 'OperationHourController@index')->name('admin-reg.operation-hour');
+        Route::get('get-operation-hours', 'OperationHourController@getOperationHoursTable')->name('admin-reg.get-oh');
         Route::post('edit-hour', 'OperationHourController@edit')->name('admin-reg.edit-hour');
         Route::put('update-hour', 'OperationHourController@update')->name('admin-reg.update-hour');
-        Route::get('/operation-hours/check-orders/{hour_id}', 'OperationHourController@editSameDateOrders')->name('admin-reg.edit-same-order');
+        Route::get('/operation-hours/{id}/check-orders/{hour_id}', 'OperationHourController@editSameDateOrders')->name('admin-reg.edit-same-order');
         Route::post('change-pickup-date', 'OperationHourController@changeOrderPickupDate')->name('admin-reg.change-date');
         Route::put('new-update-hour', 'OperationHourController@updateNew')->name('admin-reg.new-update-hour');
         
         # Product Dashboard
-        Route::get('/product-group-list', 'ProductController@indexProductGroup')->name('admin-reg.product-group');
+        Route::get('/p-group-list', 'ProductController@indexProductGroup')->name('admin-reg.product-group');
+        Route::get('get-group', 'ProductController@getAllProductGroup')->name('admin-reg.get-group');
         Route::post('store-group', 'ProductController@storeProductGroup')->name('admin-reg.store-group');
-        Route::get('/product-group-list/{id}', 'ProductController@showProductItem')->name('admin-reg.product-item');
+        Route::get('/p-group-list/{id}', 'ProductController@showProductItem')->name('admin-reg.product-item');
         Route::put('update-group', 'ProductController@updateProductGroup')->name('admin-reg.update-group');
         Route::delete('destroy-group', 'ProductController@destroyProductGroup')->name('admin-reg.destroy-group');
         Route::post('store-item', 'ProductController@storeProductItem')->name('admin-reg.store-item');
         Route::get('destroy-body', 'ProductController@displayDestroyItemBody')->name('admin-reg.destroy-body');
         Route::delete('destroy-item', 'ProductController@destroyProductItem')->name('admin-reg.destroy-item');
-        Route::get('/product-group-list/{id}/{item}', 'ProductController@editProductItem')->name('admin-reg.edit-item');
+        Route::get('/p-group-list/{id}/edit/{item}', 'ProductController@editProductItem')->name('admin-reg.edit-item');
         Route::put('update-item', 'ProductController@updateProductItem')->name('admin-reg.update-item');
         
         # Order Dashboard
         Route::get('orders', 'OrderController@index')->name('admin-reg.orders');
         Route::get('all-orders', 'OrderController@getAllOrders')->name('admin-reg.all-orders');
+        Route::get('count-orders', 'OrderController@countTotalOrders')->name('admin-reg.count-orders');
         Route::post('picked-up-order','OrderController@orderPickedUp')->name('admin-reg.order-picked-up');
         Route::delete('destroy-order', 'OrderController@destroy')->name('admin-reg.destroy-order');
-        Route::get('orders/history', 'OrderController@showHistory')->name('admin-reg.history');
+        Route::get('orders/{id}/history', 'OrderController@showHistory')->name('admin-reg.history');
         Route::get('all-histories', 'OrderController@getAllHistories')->name('admin-reg.all-histories');
 
         # Order details

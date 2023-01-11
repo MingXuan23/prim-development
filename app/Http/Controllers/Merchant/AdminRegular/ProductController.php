@@ -12,21 +12,40 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\View;
 
 class ProductController extends Controller
 {
     public function indexProductGroup()
     {
-        $org_id = RegularMerchantController::getOrganizationId();
+        $merchant = RegularMerchantController::getAllMerchantOrganization();
 
+        return view('merchant.regular.admin.product.index', compact('merchant'));
+    }
+
+    public function getAllProductGroup(Request $request)
+    {
+        $link = '';
+        $org_id = $request->id;
         $group = ProductGroup::where('organization_id', $org_id)->get();
-
-        return view('merchant.regular.admin.product.index', compact('group'));
+        foreach($group as $row)
+        {
+            $link .= '<a href="'.route('admin-reg.product-item', $row->id).'" class="list-group-item list-group-item-action flex-column">
+            <div class="d-flex" >
+            <div class="justify-content-start align-self-center"><p class="h4 mb-0">'.$row->name.'</p>
+            </div>
+            <div class="arrow-icon ml-auto justify-content-end align-self-center mb-0">
+            <p class="h4 mb-0"><i class="fas fa-angle-right"></i></p>
+            </div>
+            </div>
+            </a>';
+        }
+        return response()->json(['response' => $link]);
     }
 
     public function storeProductGroup(Request $request)
     {
-        $org_id = RegularMerchantController::getOrganizationId();
+        $org_id = $request->id;
         # Insert Product Group Data
         $pg = ProductGroup::create([
             'name' => $request->name,
@@ -34,30 +53,23 @@ class ProductController extends Controller
         ]);
 
         if($pg) {
-            return back()->with('success', 'Jenis Produk Berjaya Direkodkan');
+            return response()->json(['message' => 'Berjaya Tambah Jenis Produk']);
         } else {
-            return back()->with('error', 'Error. Tidak berjaya');
+            return response()->json(['message' => 'ERROR']);
         }
     }
 
     public function showProductItem($id)
     {
-        $url_name = array();
         $group = ProductGroup::find($id);
         $item = ProductItem::where('product_group_id', $id)->get();
 
-        $org_id = RegularMerchantController::getOrganizationId();
-        $org_name = Organization::find($org_id)->nama;
-
-        foreach($item as $row){
-            $link = explode(" ", $row->name);
-            $str = implode("-", $link);
-            $url_name[$row->id] = $str;
-        }
+        // $org_id = RegularMerchantController::getOrganizationId();
+        $org_code = Organization::find($group->organization_id)->code;
         
-        $image_url = "merchant-image/product-item/".$org_name."/";
+        $image_url = "/merchant-image/product-item/".$org_code."/";
         
-        return view('merchant.regular.admin.product.show', compact('item', 'group', 'image_url', 'url_name'));
+        return view('merchant.regular.admin.product.show', compact('item', 'group', 'image_url'));
     }
 
     public function updateProductGroup(Request $request)
@@ -100,7 +112,7 @@ class ProductController extends Controller
         $delete_group = ProductGroup::find($request->group_id)->delete();
 
         if($delete_group) {
-            return redirect('/merchant/admin-regular/product-group-list')->with('success', 'Jenis Produk Berjaya Dibuang');
+            return redirect('/admin-regular/p-group-list')->with('success', 'Jenis Produk Berjaya Dibuang');
         } else {
             return back()->with('error', 'Error. Tidak berjaya');
         }
@@ -112,7 +124,7 @@ class ProductController extends Controller
             return back()->with('error', 'Item sudah wujud dalam kumpulan ini');
         }
         
-        $file_name = $this->storeProductItemImage($request->item_name, $request->org_id, $request->item_image);
+        $file_name = $this->storeProductItemImage($request->org_id, $request->item_image);
         
         $item = ProductItem::create([
             'name' => $request->item_name,
@@ -139,7 +151,7 @@ class ProductController extends Controller
     {
         $isSame = false;
         $item = DB::table('product_item as pi')->join('product_group as pg', 'pg.id', 'pi.product_group_id')
-        ->where('pg.organization_id', $org_id)->select('pi.name as name')->get();
+        ->where('pg.organization_id', $org_id)->where('pi.deleted_at', null)->select('pi.name as name')->get();
         
         foreach($item as $row)
         {
@@ -149,33 +161,34 @@ class ProductController extends Controller
         return $isSame;
     }
 
-    private function storeProductItemImage($item_name, $org_id, $item_image)
+    private function storeProductItemImage($org_id, $item_image)
     {
-        $link = explode(" ", $item_name);
-        $str = implode("-", $link);
+        $date = implode('_', explode('-',Carbon::now()->toDateString()));
+        $time = implode('', explode(':',Carbon::now()->toTimeString()));
+        
+        $str = $date.'_'.$time.'_'.rand();
+        
         $file_name = NULL;
-
-        $org_name = DB::table('organizations')->where('id', $org_id)->first()->nama;
         
         if (!is_null($item_image)) {
+            $org_code = Organization::find($org_id)->code;
+            
             $extension = $item_image->extension();
-            $storagePath  = $item_image->move(public_path('merchant-image/product-item/'.$org_name), $str.'.'.$extension);
+            $storagePath  = $item_image->move(public_path('merchant-image/product-item/'.$org_code), $str.'.'.$extension);
             $file_name = basename($storagePath);
         }
 
         return $file_name;
     }
 
-    public function editProductItem(Request $request, $id, $item_url)
+    public function editProductItem(Request $request, $g_id, $i_id)
     {
-        $link = explode("-", $item_url);
-        $item_name = implode(" ", $link);
 
-        $item = ProductItem::where('product_group_id', $id)->where('name', $item_name)->first();
-        $group = ProductGroup::find($id);
-        $org_name = Organization::find($group->organization_id)->nama;
+        $item = ProductItem::find($i_id);
+        $group = ProductGroup::find($g_id);
+        $org_code = Organization::find($group->organization_id)->code;
 
-        $image_url = "merchant-image/product-item/".$org_name."/";
+        $image_url = "merchant-image/product-item/".$org_code."/";
 
         return view('merchant.regular.admin.product.edit', compact('item', 'image_url', 'group'));
     }
@@ -188,16 +201,15 @@ class ProductController extends Controller
             return back()->with('error', $alert);
         }
         
+        $item_old_image = ProductItem::find($request->id)->image;
+
         $image_arr = array(
-            'id' => $request->id,
-            'name' => $request->item_name,
             'img' => $request->item_image,
             'img_url' => $request->image_url,
+            'existing_img' => $item_old_image
         );
-
-        $item_old_image = ProductItem::find($request->id)->image;
         
-        $file_name = $this->updateProductItemImage($image_arr, $item_old_image);
+        $file_name = $this->updateProductItemImage($image_arr);
 
         ProductItem::where('id', $request->id)->update([
             'name' => $request->item_name,
@@ -223,28 +235,30 @@ class ProductController extends Controller
         return back()->with('success', 'Berjaya dikemaskini');
     }
 
-    public function updateProductItemImage($image_arr, $existing_image)
+    public function updateProductItemImage($image_arr)
     {
         $file_name = NULL;
 
         // If item image exists
-        if(!is_null($existing_image))
+        if(!is_null($image_arr['existing_img']))
         {
-            $file_name = $existing_image;
+            $file_name = $image_arr['existing_img'];
         }
         
         // If the admin want to change the image
         if (!is_null($image_arr['img'])) {
-            $link = explode(" ", $image_arr['img']->getClientOriginalName().'='.$image_arr['name']);
-            $str = implode("-", $link);
+            $date = implode('_', explode('-',Carbon::now()->toDateString()));
+            $time = implode('', explode(':',Carbon::now()->toTimeString()));
+            
+            $str = $date.'_'.$time.'_'.rand();
+            
             // get existing image
-            $file = public_path($image_arr['img_url'].$existing_image);
+            $file = public_path($image_arr['img_url'].$image_arr['existing_img']);
 
             // if the existing image is exist then delete
             if(File::exists($file))
             {
                 File::delete($file);
-                // Storage::disk('public')->delete($image_arr['img_url'].$existing_image);
             }
             
             // store new image

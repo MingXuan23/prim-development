@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Merchant\Regular;
 
-use App\User;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Merchant\RegularMerchantController;
-use App\Mail\MerchantOrderReceipt;
 use App\Models\Organization;
 use App\Models\OrganizationHours;
 use App\Models\PgngOrder;
-use App\Models\Transaction;
 use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use Carbon\CarbonPeriod;
@@ -17,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -33,7 +29,7 @@ class OrderController extends Controller
             ['day', $day],
             ['organizations.id', $id]
         ])
-        ->select('organizations.id as id', 'nama', 'address', 'postcode', 'state', 'city', 'fixed_charges',
+        ->select('organizations.id as id', 'code', 'nama', 'address', 'postcode', 'state', 'city', 'fixed_charges',
         'day', 'open_hour', 'close_hour', 'status')
         ->first();
 
@@ -62,18 +58,14 @@ class OrderController extends Controller
         ->orderBy('pi.name')  
         ->get();
 
-        $cart_counter = $this->countItemsInCart($id);
-
         $price = array();
-        $image_url = array();
 
         foreach($product_item as $row)
         {
             $price[$row->id] = number_format((double)(($row->price * $row->selling_quantity)), 2, '.', '');
-            $image_url[$row->id] = $row->image;
         }
 
-        return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price', 'image_url', 'cart_counter'));
+        return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price'));
     }
 
     public function fetchItem(Request $request)
@@ -119,15 +111,16 @@ class OrderController extends Controller
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);
     }
 
-    private function countItemsInCart($org_id)
+    public function countItemsInCart(Request $request)
     {
+        $order = null;
         $count_order = 0;
-        $order = DB::table('pgng_orders')->where('user_id', Auth::id())->where('organization_id', $org_id)->where('status', 'In cart')->select('id')->first();
+        $order = DB::table('pgng_orders')->where('user_id', Auth::id())->where('organization_id', $request->org_id)->where('status', 'In cart')->select('id')->first();
         if($order) {
             $count_order = DB::table('product_order')->where('pgng_order_id', $order->id)->count();
         }
 
-        return $count_order;
+        return response()->json(['counter' => $count_order]);
     }
 
     public function storeItemInCart(Request $request)
@@ -239,6 +232,8 @@ class OrderController extends Controller
 
     public function showCart($org_id)
     {
+        $pickup_date = null;
+        $pickup_time = null;
         $fixed_charges = null;
         $price = array();
         $cart_item = array(); // empty if cart is empty
@@ -248,9 +243,12 @@ class OrderController extends Controller
             ['status', 'In cart'],
             ['organization_id', $org_id],
             ['user_id', $user_id],
-        ])->select('id', 'total_price', 'organization_id as org_id')->first();
+        ])->select('id', 'order_type', 'pickup_date', 'total_price', 'note', 'organization_id as org_id')->first();
         
         if($cart) {
+            $pickup_date = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('m/d/Y') : '';
+            $pickup_time = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('H:i') : ''; 
+
             $cart_item = DB::table('product_order as po')
                 ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
                 ->where('po.pgng_order_id', $cart->id)
@@ -265,7 +263,15 @@ class OrderController extends Controller
             }
         }
 
-        return view('merchant.regular.cart', compact('org_id', 'cart', 'cart_item', 'fixed_charges', 'price'));
+        $response = (object)[
+            'org_id' => $org_id,
+            'pickup_date' => $pickup_date,
+            'pickup_time' => $pickup_time,
+            'fixed_charges' => $fixed_charges,
+            'price' => $price,
+        ];
+
+        return view('merchant.regular.cart', compact('response', 'cart', 'cart_item'));
     }
 
     public function destroyItemInCart(Request $request)
@@ -356,6 +362,7 @@ class OrderController extends Controller
         $isToday = RegularMerchantController::compareDateWithToday($date);
 
         $current_time = Carbon::now()->format('G:i');
+        // If current time is greater than closing time of organization and it is today dates then it will close
         if($current_time > $close_hour_f && $isToday) { // 12 > 11
             $isOpen = false;
             $body = '<p>Tutup pada masa ini</p>';
@@ -363,6 +370,7 @@ class OrderController extends Controller
             $isOpen = true;
             if($isToday) {
                 $temp_open_hour = Carbon::parse($op_hour->open_hour)->format('G:i');
+                // If current time is greater than opening time of the organization then the user will be able to choose current time until closing time
                 if($current_time >= $temp_open_hour) { // 00 >= 8
                     $open_hour_f = $current_time;
                     $body = '<p>Waktu Buka dari Sekarang - '.$close_hour.'</p>';
@@ -392,17 +400,12 @@ class OrderController extends Controller
             $note = $request->note;
             $order_type = $request->order_type;
 
-            $isToday = RegularMerchantController::compareDateWithToday($pickup_date);
-
-            if($isToday) {
-                $current_time = Carbon::now()->format('G:i');
-                if(Carbon::parse($pickup_time)->lt($current_time)) { // 11 < 12
-                    return back()->with('error', 'Sila pilih masa yang sesuai');
-                }
+            if($this->validateRequestedPickupDate($pickup_date, $pickup_time, $org_id) == false) {
+                return back()->with('error', 'Sila pilih masa yang sesuai');
             }
             
             if($order_type == 'Pick-Up') {
-                $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('h:i:s');
+                $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('H:i:s');
 
                 DB::table('pgng_orders')->where('id', $order_id)->update([
                     'updated_at' => Carbon::now(),
@@ -417,7 +420,7 @@ class OrderController extends Controller
             $cart_item = array(); // empty if cart is empty
 
             $cart = DB::table('pgng_orders')
-            ->where('id', $order_id)->select('id', 'pickup_date', 'total_price')->first();
+            ->where('id', $order_id)->select('id', 'pickup_date', 'note', 'total_price')->first();
             
             $cart_item = DB::table('product_order as po')
                 ->join('product_item as pi', 'po.product_item_id', 'pi.id')
@@ -425,7 +428,7 @@ class OrderController extends Controller
                 ->select('po.id', 'po.quantity', 'po.selling_quantity', 'pi.name', 'pi.price')
                 ->get();
 
-            $pickup_date_f = Carbon::parse($cart->pickup_date)->format('d-m-y H:i A');
+            $pickup_date_f = Carbon::parse($cart->pickup_date)->format('d-m-y h:i A');
 
             foreach($cart_item as $row)
             {
@@ -434,6 +437,7 @@ class OrderController extends Controller
             }
 
             $response = (object)[
+                'note' => $cart->note,
                 'pickup_date' => $pickup_date_f,
                 'price' => $price,
                 'total_price' => $total_price,
@@ -444,6 +448,36 @@ class OrderController extends Controller
         } catch (\Throwable $th) {
             return $this->sendError($th->getMessage(), 500);
         }
+    }
+
+    private function validateRequestedPickupDate($pickup_date, $pickup_time, $org_id)
+    {
+        $isAvailable = true;
+
+        $isToday = RegularMerchantController::compareDateWithToday($pickup_date);
+        $day = RegularMerchantController::getDayIntegerByDayName(Carbon::parse($pickup_date)->format('l'));
+
+        $hour = OrganizationHours::where('organization_id', $org_id)->where('day', $day)->first();
+
+        if($isToday) {
+            $current_time = Carbon::now()->format('G:i');
+            // If the pickup time is less than the current time then return error
+            if(Carbon::parse($pickup_time)->lt($current_time)) { // 11 < 12
+                $isAvailable = false;
+            }
+        }
+
+        if($hour->status == 0)
+        {
+            $isAvailable = false;
+        } else {
+            $pickup_time = Carbon::parse($pickup_time)->format('H:i:s');
+            if(($hour->open_hour <= $pickup_time && $hour->close_hour >= $pickup_time) == false) {
+                $isAvailable = false;
+            }
+        }
+
+        return $isAvailable;
     }
 
     public static function getFixedCharges($org_id)

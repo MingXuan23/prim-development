@@ -20,10 +20,10 @@ class MerchantSeeder extends Seeder
     {
         // $this->delete_merchant();
         
-        // $this->add_role();
+        $this->add_role();
         // $this->add_merchant();
         // $this->add_product();
-        $this->testing();
+        // $this->testing();
     }
 
     private function delete_merchant()

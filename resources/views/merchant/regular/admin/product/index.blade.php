@@ -1,6 +1,7 @@
 @extends('layouts.master')
 
 @section('css')
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 
 <style>
 </style>
@@ -9,13 +10,28 @@
 
 @section('content')
 
+<div style="padding-top: 12px" class="row">
+    <div class="col-md-12 ">
+        <div class=" align-items-center">
+            <div class="form-group card-title">
+                <select name="org" id="org_dropdown" class="form-control col-md-12">
+                    <option value="">Pilih Organisasi</option>
+                    @foreach($merchant as $row)
+                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row align-items-center">
     <div class="col">
         <div class="page-title-box">
             <h4 class="font-size-18">Urus Produk</h4>
         </div>
     </div>
-    <div class="d-flex justify-content-end mr-3">
+    <div class="add-btn d-flex justify-content-end mr-3">
         <button id="add-product-group" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Jenis Produk</button>
     </div>
 </div>
@@ -33,26 +49,10 @@
                 <p>{{ Session::get('error') }}</p>
             </div>
             @endif
-            <div class="list-group">
-                @forelse($group as $row)
-                <a href="{{ route('admin-reg.product-item', $row->id) }}" class="list-group-item list-group-item-action flex-column">
-                    <div class="d-flex" >
-                        
-                        <div class="justify-content-start align-self-center">
-                            <p class="h4 mb-0">{{ $row->name }}</p>
-                        </div>
-                        
-                        <div class="arrow-icon ml-auto justify-content-end align-self-center mb-0">
-                            <p class="h4 mb-0"><i class="fas fa-angle-right"></i></p>
-                        </div>
-                    </div>
-                </a>
-                @empty
-                <div class="row justify-content-center align-items-center">
-                    <i>Tiada Jenis Produk</i>
-                </div>
-                @endforelse
-            </div>
+            <div class="alert alert-success msg"></div>
+
+            <div class="list-group"></div>
+            
         </div>
       </div>
     </div>
@@ -66,22 +66,20 @@
                 <h4 class="modal-title">Tambah Jenis Produk</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form action="{{ route('admin-reg.store-group') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="alert" id="popup" style="display: none"></div>
-                    <div class="form-group required">
-                        <label class="col">Nama Kategori</label>
-                        <div class="col">
-                            <input class="form-control" type="text" placeholder="Categori" name="name" id="name" required>
-                        </div>
-                    </div>
+            @csrf
+            <div class="modal-body">
+                <div class="alert" id="popup" style="display: none"></div>
+                <div class="form-group required">
+                    <label>Nama Jenis Produk</label>
+                    
+                    <input class="form-control" type="text" placeholder="Jenis Produk" name="name" id="name" required>
+                    
                 </div>
-                <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
-                    <button type="submit" id="add_product_group" class="btn btn-primary">Tambah</button>
-                </div>
-            </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
+                <button type="submit" class="btn btn-primary add-pg">Tambah</button>
+            </div>
         </div>
     </div>
 </div>
@@ -94,9 +92,55 @@
     $(document).ready(function() {
         $('.alert-success').delay(2000).fadeOut()
 
+        let orgId,
+            list = $('.list-group'), 
+            noGroup = '<div class="row justify-content-center align-items-center"><i>Tiada Jenis Produk</i></div>'
+            btnAdd = $('#add-product-group'),
+            errMsg = $('.msg'),
+            dropdownLength = $('#org_dropdown').children('option').length
+
+        errMsg.hide()
+        btnAdd.hide()
+        list.append(noGroup)
+
+        if(dropdownLength > 1) {
+            $('#org_dropdown option')[1].selected = true
+            orgId = $('#org_dropdown option')[1].value
+            fetch_data(orgId)
+        }
+
+        $('#org_dropdown').change(function() {
+            orgId = $("#org_dropdown option:selected").val()
+            $('#org_id').val(orgId)
+            fetch_data(orgId)
+        })
+
+        function fetch_data(orgId = '')
+        {
+            $.ajax({
+                type: 'GET',
+                url: '{{ route("admin-reg.get-group") }}',
+                data: {id: orgId},
+                success:function(result){
+                    if(orgId == '') {
+                        list.empty().append(noGroup)
+                        btnAdd.hide()
+                    } else if(result.response == '') {
+                        list.empty().append(noGroup)
+                        btnAdd.show()
+                    } else {
+                        $('.list-group').empty().append(result.response)
+                        btnAdd.show()
+                    }
+                },
+                error:function(result){
+                    console.log(result.responseText)
+                }
+            })
+        }
+
         $('#add-product-group').click(function() {
-            $('#popup').hide()
-            $('#popup').empty()
+            $('#popup').hide().empty()
             $('#addProductGroupModal').modal('show')
         })
 
@@ -106,14 +150,28 @@
             }
         })
 
-        $('#add_product_group').click(function() {
+        $(document).on('click', '.add-pg', function(){
             var name = $('#name').val()
-
-            if(name == "")
-            {
-                $('#popup').addClass('alert-danger')
-                $('#popup').empty().append('Sila isi ruangan kosong')
-                $('#popup').show()
+            
+            if(name == "") {
+                $('#popup').addClass('alert-danger').empty().append('Sila isi ruangan kosong').show()
+            } else {             
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ route("admin-reg.store-group") }}',
+                    data: {id: orgId, name:name},
+                    success:function(result){
+                        fetch_data(orgId)
+                        $('#addProductGroupModal').modal('hide')
+                        $('.msg').empty().show().append(result.message)
+                    },
+                    error:function(result){
+                        console.log(result.responseText)
+                    },
+                    complete:function(){
+                        $('.msg').delay(2000).fadeOut()
+                    }
+                })
             }
         })
     })

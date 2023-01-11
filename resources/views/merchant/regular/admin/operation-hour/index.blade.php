@@ -1,10 +1,26 @@
 @extends('layouts.master')
 
 @section('css')
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+@include('layouts.datatable')
 
 @endsection
 
 @section('content')
+<div style="padding-top: 12px" class="row">
+    <div class="col-md-12 ">
+        <div class=" align-items-center">
+            <div class="form-group card-title">
+                <select name="org" id="org_dropdown" class="form-control col-md-12">
+                    <option value="">Pilih Organisasi</option>
+                    @foreach($merchant as $row)
+                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="row align-items-center">
     <div class="col-sm-6">
@@ -24,45 +40,21 @@
         </div>
         @endif
         <div class="table-responsive">
-            <table class="table table-striped" id="dataTable" width="30%" cellspacing="0">
-                <thead class="thead-dark">
-                    <tr>
-                        <th style="width: 10%" class="text-center">Hari</th>
-                        <th style="width: 10%" class="text-center">Buka/Tutup</th>
-                        <th style="width: 20%" class="text-center">Waktu Buka</th>
-                        <th style="width: 20%" class="text-center">Waktu Tutup</th>
-                        <th style="width: 10%" class="text-center">Action</th>
-                    </tr>
-                </thead>
-                
-                <tbody>
-                    @foreach($hour as $row)
-                    <tr>
-                        <td class="text-center align-middle">{{ $day_name[$row->day] }}</td>
-                        <td class="text-center align-middle">
-                            {!! ($row->status == 1) 
-                            ? "<span class='badge rounded-pill bg-success text-white p-2'>Buka</span>"
-                            : "<span class='badge rounded-pill bg-danger text-white p-2'>Tutup</span>" !!}
-                        </td>
-                        <td class="text-center align-middle">
-                            {!! ($row->status == 1) 
-                            ? date_format(date_create($row->open_hour), "h:i A")
-                            : "" !!}    
-                        </td>
-                        <td class="text-center align-middle">
-                            {!! ($row->status == 1) 
-                            ? date_format(date_create($row->close_hour), "h:i A")
-                            : "" !!}
-                        </td>
-                        <td class="text-center align-middle">
-                            <button data-hour-id="{{ $row->id }}" class="edit-time-btn btn btn-primary"><i class="fas fa-pencil-alt"></i></button>
-                        </td>
-                    </tr>
-                    @endforeach
-                    <tr>
-                        <td colspan="5" class="text-center"><i>Sebarang perubahan boleh menyebabkan pesanan perlu dikemaskini.</i></td>
-                    </tr>
-                </tbody>
+            <table class="table table-striped" id="hourTable" width="100%" cellspacing="0">
+            <thead class="thead-dark">
+                <tr>
+                    <th style="width: 10%" class="text-center">Hari</th>
+                    <th style="width: 10%" class="text-center">Buka/Tutup</th>
+                    <th style="width: 20%" class="text-center">Waktu Buka</th>
+                    <th style="width: 20%" class="text-center">Waktu Tutup</th>
+                    <th style="width: 10%" class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-center"><i>Sebarang perubahan boleh menyebabkan pesanan perlu dikemaskini.</i></td>
+                </tr>
+            </tfoot>
             </table>
         </div>
     </div>
@@ -125,7 +117,30 @@
     $(document).ready(function() {
         $('#session').delay(2000).fadeOut()
 
-        var hour_id, status, arr_order_id
+        let hour_id, orgId,
+            openHour = $('#open_hour'),
+            closeHour = $('#close_hour'),
+            alertDanger = $('.alert-danger'), 
+            status = $('.status'), 
+            dayName = $('.day-name'),
+            dropdownLength = $('#org_dropdown').children('option').length
+        
+        if(dropdownLength > 1) {
+            $('#org_dropdown option')[1].selected = true
+            orgId = $('#org_dropdown option')[1].value
+            fetch_data(orgId)
+        }
+
+        $('#org_dropdown').change(function() {
+            orgId = $("#org_dropdown option:selected").val()
+            if(orgId != ''){
+                $('#hourTable').DataTable().destroy()
+                fetch_data(orgId)
+            }else {
+                $('#hourTable').DataTable().destroy()
+                fetch_data()
+            }
+        })
 
         $.ajaxSetup({
             headers: {
@@ -133,7 +148,63 @@
             }
         });
 
-        $('.edit-time-btn').click(function() {
+        function fetch_data(orgId = '') {
+            hourTable = $('#hourTable').DataTable({
+                "searching": false,
+                "bLengthChange": false,
+                "bPaginate": false,
+                "info": false,
+                "orderable": false,
+                "ordering": false,
+                processing: true,
+                serverSide: true,
+                "language": {
+                    "zeroRecords": "Sila Pilih Organisasi"
+                },
+                ajax: {
+                    url: "{{ route('admin-reg.get-oh') }}",
+                    data: {
+                        id:orgId,
+                    },
+                    type: 'GET',
+                },
+                'columnDefs': [{
+                    "targets": [0, 1, 2, 3, 4], // your case first column
+                    "className": "align-middle text-center", 
+                },],
+                columns: [{
+                    data: "day",
+                    name: 'day',
+                    orderable: false,
+                    searchable: false,
+                }, {
+                    data: "status",
+                    name: 'status',
+                    orderable: false,
+                    searchable: false,
+                }, {
+                    data: "open_time",
+                    name: 'open_time',
+                    orderable: false,
+                    searchable: false,
+                }, {
+                    data: "close_time",
+                    name: 'close_time',
+                    orderable: false,
+                    searchable: false,
+                },{
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                },]
+            });
+        }
+
+        // $(document).on('click', '.btn-done-pickup', function(){
+            
+        $(document).on('click', '.edit-time-btn', function(){
+            console.log('test')
             hour_id = $(this).attr('data-hour-id')
 
             $.ajax({
@@ -141,31 +212,28 @@
                 method: "POST",
                 data: {hour_id:hour_id},
                 beforeSend:function() {
-                    $('#editOperationHourModal').modal('show')
-                    $('#open_hour').val("")
-                    $('#close_hour').val("")
+                    dayName.empty()
                     $('.status option').removeAttr('selected')
-                    $('.status').prop('disabled', false)
-                    $('#open_hour').prop('disabled', true)
-                    $('#close_hour').prop('disabled', true)
-                    $('.alert-danger').hide()
+                    status.prop('disabled', false)
+                    openHour.val("").prop('disabled', true)
+                    closeHour.val("").prop('disabled', true)
+                    alertDanger.hide()
                     $('#btn-update-hour').prop('disabled', false)
                     $('.order-exists').empty()
                 },
                 success:function(result) {
-                    $('.day-name').empty().append(result.day_name[result.hour.day])
+                    dayName.append(result.day_name[result.hour.day])
                     if(result.hour.status == 1)
                     {
                         $('.status option[value='+result.hour.status+']').attr('selected', true)
-                        $('#open_hour').prop('disabled', false)
-                        $('#close_hour').prop('disabled', false)
-                        $('#open_hour').val(result.hour.open_hour)
-                        $('#close_hour').val(result.hour.close_hour)
+                        openHour.prop('disabled', false).val(result.hour.open_hour)
+                        closeHour.prop('disabled', false).val(result.hour.close_hour)
                     }
                     else
                     {
-                        $('.status').removeAttr('selected').filter('[value='+result.hour.status+']').attr('selected', true)
+                        status.removeAttr('selected').filter('[value='+result.hour.status+']').attr('selected', true)
                     }
+                    $('#editOperationHourModal').modal('show')
                 },
                 error:function(result) {
                     console.log(result.responseText)
@@ -174,56 +242,55 @@
             
         })
 
-        $('.status').change(function() {
-            status = $(this).children(':selected').val()
-            if(status == 1) {
-                $('#open_hour').prop('disabled', false)
-                $('#open_hour').val("")
-                $('#close_hour').val("")
+        status.change(function() {
+            statusVal = $(this).children(':selected').val()
+            if(statusVal == 1) {
+                openHour.prop('disabled', false).val("")
+                closeHour.val("")
             }
             else {
-                $('#open_hour').prop('disabled', true)
-                $('#close_hour').prop('disabled', true)
-                $('#open_hour').val("")
-                $('#close_hour').val("")
+                openHour.prop('disabled', true).val("")
+                closeHour.prop('disabled', true).val("")
             }
         })
 
-        $('#open_hour').change(function () {
+        openHour.change(function () {
             if($(this).val() != "") {
-                $('#close_hour').prop('disabled', false)
+                closeHour.prop('disabled', false)
             } else {
-                $('#close_hour').prop('disabled', true)
+                closeHour.prop('disabled', true)
             }
         })
 
         $('#btn-update-hour').click(function() {
-            var status = $('.status').children(':selected').val()
-            var open_hour = $('#open_hour').val()
-            var close_hour = $('#close_hour').val()
+            let statusVal = status.children(':selected').val()
+            let openHourVal = openHour.val()
+            let closeHourVal = closeHour.val()
 
             $.ajax({
                 url: "{{ route('admin-reg.update-hour') }}",
                 method: "PUT",
-                data: {hour_id:hour_id, status:status, open_hour:open_hour, close_hour:close_hour},
+                data: {hour_id:hour_id, status:statusVal, open_hour:openHourVal, close_hour:closeHourVal},
                 beforeSend:function() {
-                    $('.alert-danger').empty()
+                    alertDanger.empty()
                 },
                 success:function(result) {
                     if(result.response.status == "order-exist") {
-                        $('.alert-danger').show().append(result.response.alert)
+                        alertDanger.show().append(result.response.alert)
                         $('#btn-check-order').show()
                         $('#btn-update-hour').prop('disabled', true)
                         $('.order-exists').append(result.response.order)
-                        $('.status').prop('disabled', true)
-                        $('#open_hour').prop('disabled', true)
-                        $('#close_hour').prop('disabled', true)
+                        status.prop('disabled', true)
+                        openHour.prop('disabled', true)
+                        closeHour.prop('disabled', true)
                     }
                     else if(result.response.status == "invalid-time") {
-                        $('.alert-danger').show().append(result.response.alert)
+                        alertDanger.show().append(result.response.alert)
                     }
                     else if(result.response == "success") {
-                        location.reload()
+                        $('#hourTable').DataTable().destroy()
+                        fetch_data(orgId)
+                        $('#editOperationHourModal').modal('hide')
                     }
                 },
                 error:function(result) {
@@ -232,8 +299,8 @@
             })
         })
 
-        
     })
+    
 </script>
 
 @endsection

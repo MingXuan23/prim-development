@@ -11,7 +11,6 @@ use App\Http\Jajahan\Jajahan;
 use Illuminate\Http\Request;
 use App\Http\Requests\OrganizationRequest;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Yajra\DataTables\DataTables;
@@ -20,14 +19,17 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $org_name = DB::table('organizations')->where('id', RegularMerchantController::getOrganizationId())->select('nama')->first()->nama;
-        return view('merchant.regular.admin.dashboard.index', compact('org_name'));
+        $role_id = DB::table('organization_roles')->where('nama', 'Regular Merchant Admin')->first()->id;
+        $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
+        
+        $merchant = RegularMerchantController::getAllMerchantOrganization();
+        
+        return view('merchant.regular.admin.dashboard.index', compact('merchant'));
     }
 
-    public function edit()
+    public function edit($id)
     {
-        $org_id = RegularMerchantController::getOrganizationId();
-        $org = Organization::find($org_id);
+        $org = Organization::find($id);
         $states = Jajahan::negeri();
 
         return view('merchant.regular.admin.dashboard.edit', compact('org', 'states'));
@@ -35,20 +37,25 @@ class DashboardController extends Controller
 
     public function update(OrganizationRequest $request)
     {
+        if($this->orgIsExist($request->nama)) {
+            return back()->withInput()->with('error', 'Nama Organisasi Telah Diambil');
+        }
+
         Organization::where('id', $request->id)->update($request->validated());
 
         if (!is_null($request->organization_picture)) {
             $existing_picture = Organization::find($request->id)->organization_picture;
 
             $picture_name = $this->updateImage($request->organization_picture, $request->nama, $existing_picture);
-
+            
             Organization::where('id', $request->id)->update([
                 'organization_picture' => $picture_name
             ]);
         }
 
-        if($request->fixed_charges != "0.00") {
+        if(isset($request->seller_id)) {
             Organization::where('id', $request->id)->update([
+                'seller_id' => $request->seller_id,
                 'fixed_charges' => $request->fixed_charges
             ]);
         }
@@ -68,10 +75,8 @@ class DashboardController extends Controller
         
         // If the admin want to change the image
         if (!is_null($requested_image)) {
-            $date = implode('_', explode('-',Carbon::now()->toDateString()));
-            $time = implode('', explode(':',Carbon::now()->toTimeString()));
-            $name = implode("_", explode(" ", $org_name));
-            $str = $date.'_'.$time.'_'.$name;
+            $link = explode(" ", $org_name);
+            $str = implode("-", $link);
             // get existing image
             $file = public_path('/organization-picture/'.$existing_image);
 
@@ -90,9 +95,23 @@ class DashboardController extends Controller
         return $file_name;
     }
 
-    public function getLatestOrdersByNow()
+    private function orgIsExist($updated_org_name)
     {
-        $org_id = RegularMerchantController::getOrganizationId();
+        $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
+        $org = Organization::where('type_org', $type_org_id)->select('nama')->get();
+
+        foreach($org as $row) {
+            if($row->nama == $updated_org_name) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    public function getLatestOrdersByNow(Request $request)
+    {
+        $org_id = $request->id;
 
         $order = DB::table('pgng_orders as pu')
                 ->join('users as u', 'pu.user_id', 'u.id')
@@ -132,17 +151,20 @@ class DashboardController extends Controller
         }
     }
 
-    public function getAllTransaction()
+    public function getAllTransaction(Request $request)
     {
+        $org_id = $request->id;
         try {
             $transac = DB::table('pgng_orders as pu')
                     ->join('users as u', 'pu.user_id', 'u.id')
-                    ->where('organization_id', RegularMerchantController::getOrganizationId())
+                    ->where('organization_id', $org_id)
                     ->whereIn('status', ['Paid', 'Picked-Up'])
                     ->select('u.name', 'pu.pickup_date', 'pu.total_price')
                     ->get();
+
+            $org_name = Organization::find($org_id)->nama;
             
-            return response()->json(['transac' => $transac]);
+            return response()->json(['transac' => $transac, 'org_name' => $org_name]);
         } catch (\Throwable $th) {
             return $this->sendError($th->getMessage(), 500);
         }
@@ -151,11 +173,12 @@ class DashboardController extends Controller
     public function getTotalOrder(Request $request)
     {
         $duration = $request->duration;
+        $org_id = $request->id;
 
         if ($duration == "day") {
             try {
                 $order = DB::table('pgng_orders')
-                ->where('organization_id', RegularMerchantController::getOrganizationId())
+                ->where('organization_id', $org_id)
                 ->whereBetween('pickup_date', [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->count();
@@ -167,7 +190,7 @@ class DashboardController extends Controller
         } elseif ($duration == "week") {
             try {
                 $order = DB::table('pgng_orders')
-                ->where('organization_id', RegularMerchantController::getOrganizationId())
+                ->where('organization_id', $org_id)
                 ->whereBetween('pickup_date', [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->count();
@@ -179,7 +202,7 @@ class DashboardController extends Controller
         } elseif ($duration == "month") {
             try {
                 $order = DB::table('pgng_orders')
-                ->where('organization_id', RegularMerchantController::getOrganizationId())
+                ->where('organization_id', $org_id)
                 ->whereBetween('pickup_date', [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->count();
@@ -194,16 +217,17 @@ class DashboardController extends Controller
     public function getTotalIncome(Request $request)
     {
         $duration = $request->duration;
+        $org_id = $request->id;
         
         if ($duration == "day") {
             try {
                 $income = DB::table('pgng_orders')
-                ->where('organization_id', RegularMerchantController::getOrganizationId())
+                ->where('organization_id', $org_id)
                 ->whereBetween('pickup_date', [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->sum('total_price');
 
-                $income = number_format($income, 2, '.', '');
+                $income = number_format($income, 2);
                 
                 return response()->json(['income' => $income]);
             } catch (\Throwable $th) {
@@ -212,12 +236,12 @@ class DashboardController extends Controller
         } elseif ($duration == "week") {
             try {
                 $income = DB::table('pgng_orders')
-                ->where('organization_id', RegularMerchantController::getOrganizationId())
+                ->where('organization_id', $org_id)
                 ->whereBetween('pickup_date', [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->sum('total_price');
 
-                $income = number_format($income, 2, '.', '');
+                $income = number_format($income, 2);
                 
                 return response()->json(['income' => $income]);
             } catch (\Throwable $th) {
@@ -226,12 +250,12 @@ class DashboardController extends Controller
         } elseif ($duration == "month") {
             try {
                 $income = DB::table('pgng_orders')
-                ->where('organization_id', RegularMerchantController::getOrganizationId())
+                ->where('organization_id', $org_id)
                 ->whereBetween('pickup_date', [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])
                 ->whereIn('status', ['Paid', 'Picked-Up'])
                 ->sum('total_price');
 
-                $income = number_format($income, 2, '.', '');
+                $income = number_format($income, 2);
                 
                 return response()->json(['income' => $income]);
             } catch (\Throwable $th) {

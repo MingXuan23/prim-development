@@ -2,6 +2,7 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 @include('layouts.datatable')
 @endsection
 
@@ -15,23 +16,28 @@
     </div>
 </div>
 
+<input type="hidden" name="org_id" id="org_id" value="{{ $org->id }}">
+
 <div class="card card-primary card-body">
   <div class="row">
       <div class="col">
-          <div class="form-group">
-              <label>Pesanan Berdasarkan Hari</label>
-              <select class="form-control" data-parsley-required-message="Sila pilih hari" id="order_day" required>
-                  <option value="" selected>Semua Pesanan</option>
-                  <option value="1">Isnin</option>
-                  <option value="2">Selasa</option>
-                  <option value="3">Rabu</option>
-                  <option value="4">Khamis</option>
-                  <option value="5">Jumaat</option>
-                  <option value="6">Sabtu</option>
-                  <option value="0">Ahad</option>
-              </select>
-          </div>
+        <div class="form-group">
+            <label>Tapis</label>
+            <select class="form-control" data-parsley-required-message="Pilih Jenis Tapisan" id="filter-order" required>
+                <option value="all" selected>Semua Pesanan</option>
+                <option value="today">Pesanan Harini</option>
+                <option value="week">Pesanan Minggu ini</option>
+                <option value="month">Pesanan Bulan ini</option>
+                <option value="date">Pilih Tarikh</option>
+            </select>
+        </div>
       </div>
+      <div class="col date-filter" hidden>
+        <div class="form-group">
+            <label>Tarikh</label>
+            <input type="text" class="form-control" name="date" id="datepicker"  placeholder="Pilih tarikh" readonly>
+        </div>
+    </div>
   </div>
 </div>
 
@@ -41,7 +47,7 @@
     <div class="card-body">
       
       <div class="table-responsive">
-        <table class="table table-striped table-bordered" id="orderTable" width="100%" cellspacing="0">
+        <table class="table table-striped" id="orderTable" width="100%" cellspacing="0">
           <thead>
             <tr>
               <th style="width: 2%">No.</th>
@@ -63,9 +69,11 @@
 
 <script>
   $(document).ready(function() {
-    fetch_data()
+    let orgId = $('#org_id').val()
 
-    function fetch_data(order_day = '') {
+    fetch_data(orgId)
+
+    function fetch_data(orgId = '', filterType = '', date = '') {
         orderTable = $('#orderTable').DataTable({
             pageLength: 5,
             lengthMenu: [[5, 15, 30, -1], [5, 15, 30, "Semua"]],
@@ -74,7 +82,9 @@
             ajax: {
                 url: "{{ route('admin-reg.all-histories') }}",
                 data: {
-                    order_day: order_day,
+                    id:orgId,
+                    filterType: filterType,
+                    date: date
                 },
                 type: 'GET',
 
@@ -124,10 +134,22 @@
         });
     }
 
-    $('#order_day').change(function() {
-        var filter = $(this).children(':selected').val()
-        $('#orderTable').DataTable().destroy()
-        fetch_data(filter)
+    $("#datepicker").datepicker()
+
+    $('#filter-order').change(function() {
+        let filterVal = $(this).children(':selected').val()
+        if(filterVal == 'date') {
+            $('.date-filter').attr('hidden', false)
+            $('#datepicker').change(function() {
+                let date = $('#datepicker').val()
+                $('#orderTable').DataTable().destroy()
+                fetch_data(orgId, filterVal, date)
+            })
+        } else {
+            $('.date-filter').attr('hidden', true)
+            $('#orderTable').DataTable().destroy()
+            fetch_data(orgId, filterVal)
+        }
     })
   })
   

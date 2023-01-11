@@ -77,7 +77,7 @@
 <div class="row align-items-center">
   <div class="col-sm-6">
       <div class="page-title-box">
-          <h4 class="font-size-18"><a href="{{ route('merchant.regular.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
+          <h4 class="font-size-18"><a href="{{ route('merchant-reg.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
       </div>
   </div>
 </div>
@@ -89,9 +89,11 @@
       <div class="card-header text-white" id="has-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
-          <a href="{{ route('merchant.regular.cart', $merchant->id) }}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i>{!! $cart_counter != 0 ? "<span class='notification'>".$cart_counter."</span>" : '' !!}</a>
+          <a href="{{ route('merchant-reg.cart', $merchant->id) }}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
         </div>
         
+        <input type="hidden" name="hidden-org-id" id="hidden-org-id" value="{{ $merchant->id }}">
+
         <p><i class="fas fa-map-marker-alt mr-2"></i> {{ $merchant->address }}, {{ $merchant->city }}, {{ $merchant->state }}</p>
 
         {{-- <div class="d-flex">
@@ -119,7 +121,7 @@
         
         <div class="flash-message"></div>
 
-        @foreach($product_group as $group)
+        @forelse($product_group as $group)
           <div class="d-flex justify-content-start" id="{{ $group->name }}">
             <h3 class="mb-4 ml-2">{{ $group->name }}</h3>
           </div>
@@ -135,7 +137,7 @@
                           @if($item->image == null)
                           <img class="img-fluid img-size default-img" src="{{ URL('images/koperasi/default-item.png')}}">
                           @else
-                          <img class="img-fluid img-size" src="{{ URL('merchant-image/product-item/'.$merchant->nama.'/'.$image_url[$item->id])}}">
+                          <img class="img-fluid img-size" src="{{ URL('merchant-image/product-item/'.$merchant->code.'/'.$item->image)}}">
                           @endif
                         </div>
                       </div>
@@ -171,8 +173,11 @@
               </div>
             @endif
           @endforeach
-        
-        @endforeach
+          @empty
+              <div class="d-flex justify-content-center">
+                <i>Tiada Produk Buat Masa Sekarang</i>
+              </div>
+        @endforelse
     </div>
   </div>
 </div>
@@ -206,7 +211,7 @@
 
 <script>
   $(document).ready(function(){
-    var item_id, org_id;
+    let item_id, org_id;
     
     $.ajaxSetup({
       headers: {
@@ -214,26 +219,29 @@
       }
     });
 
+    notificationCounter($('#hidden-org-id').val())
+
     $('.btn-item-modal').click(function(e) {
       e.preventDefault()
-      $('.modal-title').empty()
-      $('.modal-body').empty()
+      let modalTitle = $('.modal-title'), modalBody = $('.modal-body')
+      modalTitle.empty()
+      modalBody.empty()
       item_id = $(this).attr('data-item-id')
       org_id = $(this).attr('data-org-id')
       
       $.ajax({
-        url: "{{ route('merchant.regular.fetch-item') }}",
+        url: "{{ route('merchant-reg.fetch-item') }}",
         method: "POST",
         data: {i_id:item_id, o_id:org_id},
         beforeSend:function() {
           $('#addToCartModal').modal('show')
-          $('.modal-body').append("<div class='text-center'><img src='{{ URL('images/koperasi/loading-ajax.gif')}}' style='width:40px;height:40px;'></div>")
+          modalBody.append("<div class='text-center'><img src='{{ URL('images/koperasi/loading-ajax.gif')}}' style='width:40px;height:40px;'></div>")
         },
         success:function(result)
         {
-          $('.modal-body').empty()
-          $('.modal-title').append(result.item.name)
-          $('.modal-body').append(result.body)
+          modalBody.empty()
+          modalTitle.append(result.item.name)
+          modalBody.append(result.body)
           
           quantityExceedHandler($("input[name='quantity_input']"), result.quantity)
         },
@@ -245,10 +253,10 @@
     })
 
     $('.cart-add-btn').click(function(){
-      var quantity = $("input[name='quantity_input']").val()
+      let quantity = $("input[name='quantity_input']").val()
 
       $.ajax({
-        url: "{{ route('merchant.regular.store-item') }}",
+        url: "{{ route('merchant-reg.store-item') }}",
         method: "POST",
         data: {
           i_id:item_id,
@@ -256,13 +264,12 @@
           qty:quantity,
         },
         beforeSend: function() {
-          $('.cart-add-btn').css('display', 'none')
+          $(this).css('display', 'none')
           $('.loading').show()
         },
         success:function(result)
         { 
-          console.log(result)
-          $('.cart-add-btn').show()
+          $(this).show()
           $('.loading').hide()
           $('div.flash-message').empty()
           
@@ -274,6 +281,9 @@
             $('div.flash-message').show()
             $('div.flash-message').append(message)
             $('div.flash-message').delay(3000).fadeOut()
+
+            notificationCounter(org_id)
+
             $("html, body").animate({ scrollTop: 0 }, "slow");
           }
           else
@@ -297,6 +307,30 @@
         }
       })
     })
+
+    function notificationCounter(org_id)
+    {
+      let noty = $('.notification')
+      $.ajax({
+        url: "{{ route('merchant-reg.count-cart') }}",
+        method: "POST",
+        data: {org_id:org_id},
+        beforeSend:function(){
+          noty.empty()
+        },
+        success:function(result){
+          if(result.counter != 0) {
+            noty.attr('hidden', false)
+            noty.append(result.counter)
+          } else {
+            noty.attr('hidden', true)
+          }
+        },
+        error:function(result){
+          console.log(result.responseText)
+        }
+      })
+    }
 
     function quantityExceedHandler(i_Quantity, maxQuantity)
     {

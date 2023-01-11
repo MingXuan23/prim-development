@@ -2,6 +2,7 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 @include('layouts.datatable')
 
 <style>
@@ -11,6 +12,20 @@
 @endsection
 
 @section('content')
+<div style="padding-top: 12px" class="row">
+    <div class="col-md-12 ">
+        <div class=" align-items-center">
+            <div class="form-group card-title">
+                <select name="org" id="org_dropdown" class="form-control col-md-12">
+                    <option value="">Pilih Organisasi</option>
+                    @foreach($merchant as $row)
+                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="row align-items-center">
     <div class="col">
@@ -19,7 +34,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-end mr-3">
-        <a href="{{ route('admin-reg.history') }}" class="btn btn-primary">Sejarah Pesanan</a>
+        <a href="" class="btn btn-primary btn-history">Sejarah Pesanan</a>
     </div>
 </div>
 
@@ -27,17 +42,20 @@
     <div class="row">
         <div class="col">
             <div class="form-group">
-                <label>Pesanan Berdasarkan Hari</label>
-                <select class="form-control" data-parsley-required-message="Sila pilih hari" id="order_day" required>
-                    <option value="" selected>Semua Pesanan</option>
-                    <option value="1">Isnin</option>
-                    <option value="2">Selasa</option>
-                    <option value="3">Rabu</option>
-                    <option value="4">Khamis</option>
-                    <option value="5">Jumaat</option>
-                    <option value="6">Sabtu</option>
-                    <option value="0">Ahad</option>
+                <label>Tapis</label>
+                <select class="form-control" data-parsley-required-message="Pilih Jenis Tapisan" id="filter-order" required>
+                    <option value="all" selected>Semua Pesanan (0)</option>
+                    <option value="today">Pesanan Harini (0)</option>
+                    <option value="week">Pesanan Minggu ini (0)</option>
+                    <option value="month">Pesanan Bulan ini (0)</option>
+                    <option value="date">Pilih Tarikh</option>
                 </select>
+            </div>
+        </div>
+        <div class="col date-filter" hidden>
+            <div class="form-group">
+                <label>Tarikh</label>
+                <input type="text" class="form-control" name="date" id="datepicker"  placeholder="Pilih tarikh" readonly>
             </div>
         </div>
     </div>
@@ -101,9 +119,13 @@
 
 @section('script')
 
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
 <script>
     $(document).ready(function() {
-        var orderTable;
+        
+
+        let orderTable, orgId, route, dropdownLength = $('#org_dropdown').children('option').length;
 
         $.ajaxSetup({
             headers: {
@@ -111,9 +133,41 @@
             }
         })
 
-        fetch_data()
+        let btnHistory = $('.btn-history')
+        btnHistory.hide()
 
-        function fetch_data(order_day = '') {
+        if(dropdownLength > 1) {
+            $('#org_dropdown option')[1].selected = true
+            orgId = $('#org_dropdown option')[1].value
+            btnHistory.show()
+            btnHistory.attr('href', '')
+            route = "/admin-regular/orders/"+orgId+"/history"
+            btnHistory.attr('href', route)
+            $('#orderTable').DataTable().destroy()
+            fetch_data(orgId)
+            countTotalOrders(orgId)
+        }
+
+        $('#org_dropdown').change(function() {
+            orgId = $("#org_dropdown option:selected").val()
+            if(orgId != ''){
+                btnHistory.show()
+                btnHistory.attr('href', '')
+                route = "/admin-regular/orders/"+orgId+"/history"
+                btnHistory.attr('href', route)
+                $('#orderTable').DataTable().destroy()
+                fetch_data(orgId)
+                countTotalOrders(orgId)
+            }else {
+                btnHistory.hide()
+                $('#orderTable').DataTable().destroy()
+                fetch_data()
+                countTotalOrders()
+            }
+            
+        })
+        
+        function fetch_data(orgId = '',filterType = '', date = '') {
             orderTable = $('#orderTable').DataTable({
                 pageLength: 5,
                 lengthMenu: [[5, 15, 30, -1], [5, 15, 30, "Semua"]],
@@ -122,7 +176,9 @@
                 ajax: {
                     url: "{{ route('admin-reg.all-orders') }}",
                     data: {
-                        order_day: order_day,
+                        id:orgId,
+                        filterType: filterType,
+                        date: date
                     },
                     type: 'GET',
 
@@ -180,11 +236,47 @@
             });
         }
 
-        $('#order_day').change(function() {
-            var filter = $(this).children(':selected').val()
-            $('#orderTable').DataTable().destroy()
-            fetch_data(filter)
+        function countTotalOrders(orgId = '')
+        {
+            $.ajax({
+                url: "{{ route('admin-reg.count-orders') }}",
+                method: "GET",
+                data: {id:orgId},
+                success:function(result) {
+                    $('#filter-order').children('option[value=all]').text("Semua Pesanan ("+result.response.all+")")
+                    $('#filter-order').children('option[value=today]').text("Pesanan Harini ("+result.response.today+")")
+                    $('#filter-order').children('option[value=week]').text("Pesanan Minggu Ini ("+result.response.week+")")
+                    $('#filter-order').children('option[value=month]').text("Pesanan Bulan Ini ("+result.response.month+")")
+                },
+                error:function(result) {
+                    console.log(result.responseText)
+                },
+            })
+        }
+
+        $("#datepicker").datepicker()
+
+        $('#filter-order').change(function() {
+            let filterVal = $(this).children(':selected').val()
+            if(filterVal == 'date') {
+                $('.date-filter').attr('hidden', false)
+                $('#datepicker').change(function() {
+                    let date = $('#datepicker').val()
+                    $('#orderTable').DataTable().destroy()
+                    fetch_data(orgId,filterVal, date)
+                })
+            } else {
+                $('.date-filter').attr('hidden', true)
+                $('#orderTable').DataTable().destroy()
+                fetch_data(orgId, filterVal)
+            }
         })
+
+        // $('#order_day').change(function() {
+        //     var filter = $(this).children(':selected').val()
+        //     $('#orderTable').DataTable().destroy()
+        //     fetch_data(filter)
+        // })
 
         var btn = "<button type='button' data-dismiss='modal' class='btn btn-light'>Kembali</button>"
         var order_id
@@ -230,6 +322,7 @@
                     complete:function() {
                         // $('.loading').hide()
                         $('#confirmationModal').modal('hide')
+                        countTotalOrders(orgId)
                     },
                 })
             })
@@ -256,6 +349,7 @@
                     },
                     complete:function() {
                         $('#confirmationModal').modal('hide')
+                        countTotalOrders(orgId)
                     },
                 })
             })
