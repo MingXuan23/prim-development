@@ -170,6 +170,25 @@
           <div class="card-body p-4">
             <div class="row">
               <div class="col">
+              <div class="form-group">
+                                <label>Pilih Bank</label>
+                                <select name="bankid" id="bankid" class="form-control"
+                                    data-parsley-required-message="Sila pilih bank" required>
+                                    <option value="">Pilih bank</option>
+                                </select>
+
+                            </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+
+        <div class="card mb-4 border">
+          <div class="card-body p-4">
+            <div class="row">
+              <div class="col">
                 <div class="form-group required">
                   <label class="col">Nota kepada Koperasi</label>
                   <div class="col">
@@ -214,6 +233,33 @@
         // console.log($('#week_status').val());
     });
   });
+
+  function checkBank() {
+        var t = jQuery('#bankid').val();
+        if (t === '' || t === null) {
+            alert('Please select a bank');
+            return false;
+        }
+    }
+
+    $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: "/fpx/getBankList",
+        success: function(data) {
+            jQuery.each(data.data, function(key, value){
+                arr.push(key);
+            });
+            for(var i = 0; i < arr.length; i++){
+                arr.sort();
+                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
+            }
+
+        },
+        error: function (data) {
+            // console.log(data);
+        }
+    });
 </script>
 
 @endsection
