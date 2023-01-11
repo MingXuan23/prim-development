@@ -99,11 +99,11 @@
 
       @if(count($cart_item) != 0 || $cart)
       <form action="{{ route('fpxIndex') }}" method="POST">
+      <input type="hidden" name="desc" id="desc" value="Koperasi">
+      <input type="hidden" name="cartId" id="cartId" value="{{ $cart->id }}">
       @else
       @endif
         @csrf
-        <input type="hidden" name="desc" id="desc" value="Koperasi">
-        <input type="hidden" name="cartId" id="cartId" value="{{ $cart->id }}">
         <div class="card mb-4 border">
           <div class="card-body p-4">
 

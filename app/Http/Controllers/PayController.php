@@ -851,7 +851,7 @@ class PayController extends AppBaseController
 
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
                     $item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                    ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
                     ->where('po.pgng_order_id', $order->id)
                     ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
                     ->get();
