@@ -105,6 +105,10 @@
                                     <th>Tarikh dan Masa Masuk</th>
                                 @else
                                     <th>Alasan</th>
+                                    <th>Status</th>
+                                    <th>Tarikh dan Masa Keluar</th>
+                                    <th>Tarikh dan Masa Sampai</th>
+                                    <th>Tarikh dan Masa Masuk</th>
                                 @endif
                                 <th>Tindakan</th>
                             </tr>
@@ -406,6 +410,26 @@
                     },{
                         data: "reason",
                         name: 'reason',
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: "result",
+                        name: 'result',
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: "out_date_time",
+                        name: 'out_date_time',
+                        orderable: false,
+                        searchable: false
+                    }, {
+                        data: 'arrive_date_time',
+                        name: 'arrive_date_time',
+                        orderable: false,
+                        searchable: false
+                    },{
+                        data: 'in_date_time',
+                        name: 'in_date_time',
                         orderable: false,
                         searchable: false
                     },{

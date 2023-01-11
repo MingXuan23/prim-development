@@ -2338,7 +2338,7 @@ class DormController extends Controller
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
-                            ['so.status', 0],
+                            // ['so.status', 0],
                             // ['so.apply_date_time', '>=', now()->toDateString()],
                         ])
                         ->select(
@@ -2768,7 +2768,16 @@ class DormController extends Controller
 
         // if (strtoupper($outingcat[0]->catname) == $categoryReal[2] && isset($outingcat[0]->dorm_id)) {
         if (isset($outingcat[0]->dorm_id)) {
-            if (strtotime($intime) > strtotime($outingcat[0]->time_limit) || $intime->toDateString() > $outingcat[0]->apply_date_time) {
+            if(isset($outingcat[0]->time_limit))
+            {
+                if (strtotime($intime) > strtotime($outingcat[0]->time_limit))
+                {
+                    $blacklist = 1;
+                }
+            }
+
+            if ($intime->toDateString() > $outingcat[0]->apply_date_time)
+            {
                 $blacklist = 1;
             }
         } 
