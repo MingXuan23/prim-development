@@ -540,6 +540,7 @@ class DormController extends Controller
             ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
             ->join('classifications', 'classifications.id', '=', 'so.classification_id')
             ->where([
+                ['so.status',1],
                 ['ou.organization_id',  $request->organPDF],
             ])
             ->whereBetween('so.apply_date_time', [$request->pdf_from, $request->pdf_to])
@@ -1333,7 +1334,7 @@ class DormController extends Controller
         //
         // dd($id);
         $this->validate($request, [
-            'name'        =>  'required|unique:dorms',
+            'name'        =>  'required|unique:dorms,name,'.$id,
             'capacity'    =>  'required',
             'organization'      =>  'required',
             //'name', 'accommodate_no', 'student_inside_no'
@@ -1677,7 +1678,7 @@ class DormController extends Controller
                     ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
                     ->join('classifications', 'classifications.id', '=', 'so.classification_id')
                     ->where([
-                        // ['ou.organization_id', $oid],
+                        ['so.status', 1],
                         ['classifications.organization_id',  $oid],
                     ])
                     ->whereBetween('so.apply_date_time', [$start_date, $end_date])
@@ -1688,15 +1689,15 @@ class DormController extends Controller
 
                 $table = Datatables::of($data);
 
-                $table->addColumn('action', function ($row) {
-                    $token = csrf_token();
-                    $btn = '<div class="d-flex justify-content-center">';
-                    // $btn = $btn . '<a href="" class="btn btn-primary m-1">Edit</a>';
-                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
-                    return $btn;
-                });
+                // $table->addColumn('action', function ($row) {
+                //     $token = csrf_token();
+                //     $btn = '<div class="d-flex justify-content-center">';
+                //     // $btn = $btn . '<a href="" class="btn btn-primary m-1">Edit</a>';
+                //     // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                //     return $btn;
+                // });
 
-                $table->rawColumns(['action']);
+                // $table->rawColumns(['action']);
                 return $table->make(true);
             }
         }
@@ -1870,9 +1871,11 @@ class DormController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
-                    $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary reportBtn m-1">Report</a>';
+                    if($row->status==1)
+                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
+                    else
+                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button>';
+                    $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary reportBtn m-1">Report</a></div>';
                     return $btn;
                 });
 
@@ -1926,9 +1929,11 @@ class DormController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
-                    $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary reportBtn m-1">Report</a>';
+                    if($row->status == 1)
+                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
+                    else
+                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button>';
+                    $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary reportBtn m-1">Report</a></div>';
                     return $btn;
                 });
 
@@ -1982,8 +1987,10 @@ class DormController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
+                    if($row->status == 1)
+                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger unblockBtn m-1">Unblock</button>';
+                    else
+                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger blockBtn m-1">Block</button></div>';
                     $btn = $btn . '<a href="' . route('dorm.reportPerStudent', $row->id) . '" class="btn btn-primary reportBtn m-1">Report</a>';
                     return $btn;
                 });

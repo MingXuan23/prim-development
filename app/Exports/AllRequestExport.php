@@ -33,6 +33,7 @@ class AllRequestExport implements FromCollection, ShouldAutoSize, WithHeadings
         ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
         ->join('classifications', 'classifications.id', '=', 'so.classification_id')
         ->where([
+            ['so.status',1],
             ['classifications.organization_id',  $this->organId],
         ])
         ->whereBetween('so.apply_date_time', [$this->from, $this->to])
