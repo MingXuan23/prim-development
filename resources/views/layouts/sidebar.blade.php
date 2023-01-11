@@ -357,7 +357,7 @@
             </li>
             @endrole --> --}}
 
-            {{-- @role('Superadmin|Penjaga') <!--haziq nye-->
+            @role('Superadmin|Penjaga') <!--haziq nye-->
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>
