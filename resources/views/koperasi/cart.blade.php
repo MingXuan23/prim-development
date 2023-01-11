@@ -98,11 +98,12 @@
       </div>
 
       @if(count($cart_item) != 0 || $cart)
-      <form action="{{ route('koperasi.update', $cart->id) }}" method="POST">
+      <form action="{{ route('fpxIndex') }}" method="POST">
       @else
       @endif
         @csrf
-        @method('PUT')
+        <input type="hidden" name="desc" id="desc" value="Koperasi">
+        <input type="hidden" name="cartId" id="cartId" value="{{ $cart->id }}">
         <div class="card mb-4 border">
           <div class="card-body p-4">
 
@@ -218,29 +219,41 @@
   </div>
 </div>
 
-
-
 @endsection
 
+
 @section('script')
+<script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 
 <script>
-  $(document).ready(function(){
+    $(document).ready(function () {
+        $(".input-mask").inputmask();
+        $('.phone_no').mask('01000000000');
+        $('.form-validation').parsley();
+    });
+    
     $('.alert').delay(2000).fadeOut();
 
     $('#pick_up_date').on('change', function() {
         $('#week_status').val(this.value);
         // console.log($('#week_status').val());
     });
-  });
 
-  function checkBank() {
+    function checkBank() {
         var t = jQuery('#bankid').val();
         if (t === '' || t === null) {
             alert('Please select a bank');
             return false;
         }
     }
+    
+    $(document).ready(function() {
+	    $('.form-validation').parsley();
+    });
+
+    var arr = [];
 
     $.ajax({
         type: 'GET',
@@ -261,5 +274,4 @@
         }
     });
 </script>
-
 @endsection
