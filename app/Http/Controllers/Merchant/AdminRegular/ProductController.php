@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use Yajra\DataTables\DataTables;
 
 class ProductController extends Controller
 {
@@ -70,6 +71,90 @@ class ProductController extends Controller
         $image_url = "/merchant-image/product-item/".$org_code."/";
         
         return view('merchant.regular.admin.product.show', compact('item', 'group', 'image_url'));
+    }
+
+    public function getAllProductItem(Request $request)
+    {
+        $g_id = $request->id;
+
+        $item = ProductItem::where('product_group_id', $g_id)->get();
+
+        if(request()->ajax()) 
+        { 
+            $table = Datatables::of($item);
+
+            $table->editColumn('desc', function ($row) {
+                if($row->desc != null) { $desc = $row->desc; }
+                else { $desc = 'Tiada Deskripsi'; }
+                
+                return $desc;
+            });
+
+            $table->editColumn('image', function ($row) {
+                $group = ProductGroup::find($row->product_group_id);
+                $org_code = Organization::find($group->organization_id)->code;
+                $image_url = "/merchant-image/product-item/".$org_code."/";
+
+                if($row->image != null){
+                    $img = '<img class="rounded img-fluid bg-dark" id="img-size" src="'.$image_url.$row->image.'">';
+                } else {
+                    $img = '<img class="rounded img-fluid bg-dark" id="img-size" src="'.url('images/koperasi/default-item.png').'">';
+                }
+                return $img;
+            });
+
+            $table->editColumn('inventory', function ($row) {
+                $type = $row->type == 'have inventory' ? $row->quantitiy_available : 'Tiada Inventori';
+                
+                $inv = '<ul class="list-group"><li class="list-group-item d-flex justify-content-between align-items-center">';
+                $inv .= 'Inventori<span class="badge badge-primary badge-pill">'.$type;
+                $inv .= '</span></li><li class="list-group-item d-flex justify-content-between align-items-center">';
+                $inv .= 'Kuantiti Dijual<span class="badge badge-primary badge-pill">'.$row->selling_quantity;
+                $inv .= '</span></li><li class="list-group-item d-flex justify-content-between align-items-center">';
+                $inv .= 'Kata Nama Kuantiti<span class="badge badge-primary badge-pill">'.$row->collective_noun;
+                $inv .= '</span></li></ul>';
+                return $inv;
+            });
+
+            $table->editColumn('price', function ($row) {
+                $price_unit = number_format($row->price, 2);
+                $overall_price = number_format($row->price * $row->selling_quantity, 2);
+
+                $price = '<ul class="list-group"><li class="list-group-item d-flex justify-content-between align-items-center">';
+                $price .= 'Seunit<span class="badge badge-primary badge-pill">'.$price_unit;
+                $price .= '</span></li><li class="list-group-item d-flex justify-content-between align-items-center">';
+                $price .= 'Setiap Kuantiti<span class="badge badge-primary badge-pill">'.$overall_price;
+                $price .= '</span></li></ul>';
+                return $price;
+            });
+
+            $table->editColumn('status', function ($row) {
+                if ($row->status == 1) {
+                    $label = "<span class='badge rounded-pill bg-success text-white p-2'>Aktif</span>";
+                    return $label;
+                } else {
+                    $label = "<span class='badge rounded-pill bg-danger text-white p-2'>Tidak Aktif</span>";
+                    return $label;
+                }
+            });
+
+            $table->editColumn('action', function ($row) {
+                $org_code = DB::table('product_group as pg')
+                ->join('organizations as o', 'pg.organization_id', 'o.id')
+                ->where('pg.id', $row->product_group_id)
+                ->select('o.code')
+                ->first()->code;
+                $image_url = "/merchant-image/product-item/".$org_code."/";
+
+                $btn = '<a href="'.route('admin-reg.edit-item', ['id' => $row->product_group_id, 'item' => $row->id]).'" class="edit-item-modal btn btn-primary m-1"><i class="fas fa-pencil-alt"></i></a>';
+                $btn .= '<button data-item-id="'.$row->id.'" data-image-url="'.$image_url.'" class="delete-item-modal btn btn-danger m-1"><i class="fas fa-trash-alt"></i></button>';
+                return $btn;
+            });
+
+            $table->rawColumns(['image', 'inventory', 'price', 'status', 'action']);
+
+            return $table->make(true);
+        }
     }
 
     public function updateProductGroup(Request $request)

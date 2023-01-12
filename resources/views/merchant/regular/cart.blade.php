@@ -5,7 +5,7 @@
 <link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 {{-- <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet"> --}}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 @include('layouts.datatable')
 
 <style>
@@ -52,8 +52,10 @@
             </div>
           @endif
 
+          <input type="hidden" name="cart_id" id="cart_id" value="@if($cart){{ $cart->id }}@endif">
+
           <div class="table-responsive">
-            <table class="table table-borderless" width="100%" cellspacing="0">
+            <table class="table table-borderless responsive" id="cartTable" width="100%" cellspacing="0">
                 <thead class="thead-dark">
                     <tr class="text-center">
                       <th style="width: 25%">Nama</th>
@@ -63,24 +65,6 @@
                       <th style="width: 15%">Buang</th>
                     </tr>
                 </thead>
-                
-                <tbody>
-                  @forelse($cart_item as $row)
-                    <tr class="text-center">
-                      <td class="align-middle">{{ $row->name }}</td>
-                      <td class="align-middle">{{ $row->quantity }}</td>
-                      <td class="align-middle">{{ $row->selling_quantity * $row->quantity }}</td>
-                      <td class="align-middle">{{ $response->price[$row->id] }}</td>
-                      <td class="align-middle">
-                          <button type="button" data-cart-order-id="{{ $row->id }}" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>
-                      </td>
-                    </tr>
-                  @empty
-                    <tr>
-                      <td colspan="5" class="text-center"><i>Tiada Item Buat Masa Sekarang.</i></td>
-                    </tr>
-                  @endforelse
-                </tbody>
             </table>
           </div>
 
@@ -219,6 +203,7 @@
   $(document).ready(function(){
     let org_id = $('input#org_id').val()
     let init_order_type = $('#hidden_order_type').val()
+    let cId = $('input#cart_id').val()
     
     if(init_order_type == 'Pick-Up'){
       $('.pickup-date-div').removeAttr('hidden')
@@ -227,12 +212,73 @@
       $('.pickup-date-div').attr('hidden', true)
       $('.pickup-time-div').attr('hidden', true)
     }
-    
+
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
+
+    fetch_data(cId)
+
+    function fetch_data(cId = '') {
+        cartTable = $('#cartTable').DataTable({
+            "searching": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "info": false,
+            "orderable": false,
+            "ordering": false,
+            processing: true,
+            serverSide: true,
+            "language": {
+                "zeroRecords": "Tiada Item Buat Masa Sekarang."
+            },
+            ajax: {
+                url: "{{ route('merchant-reg.get-all-items') }}",
+                data: {
+                    id:cId,
+                    type:'cart',
+                    "_token": "{{ csrf_token() }}",
+                },
+                type: 'GET',
+            },
+            'columnDefs': [{
+                "targets": [0, 1, 2, 3, 4], // your case first column
+                "className": "align-middle text-center", 
+            },
+            { "responsivePriority": 1, "targets": 0 },
+            { "responsivePriority": 2, "targets": 2 },
+            { "responsivePriority": 3, "targets": 4 },
+            ],
+            columns: [{
+                data: "name",
+                name: 'name',
+                orderable: false,
+                searchable: false,
+            }, {
+                data: "quantity",
+                name: 'quantity',
+                orderable: false,
+                searchable: false,
+            }, {
+                data: "full_quantity",
+                name: 'full_quantity',
+                orderable: false,
+                searchable: false,
+            },{
+                data: 'price',
+                name: 'price',
+                orderable: false,
+                searchable: false,
+            },{
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false,
+            },]
+        });
+    }
 
     $('#order_type').change(function() {
       let type_val = $(this).children(':selected').val()
@@ -256,7 +302,7 @@
         $.ajax({
           url: '{{ route("merchant-reg.fetch-hours") }}',
           method: 'POST',
-          data: {org_id:org_id, date:date_val},
+          data: {org_id:org_id, date:date_val, "_token": "{{ csrf_token() }}",},
           beforeSend:function() {
             timeRange.empty()
           },
@@ -282,16 +328,16 @@
     
     let order_cart_id = null
 
-    $('.delete-item').click(function() {
+    $(document).on('click', '.delete-item', function(){
       order_cart_id = $(this).attr('data-cart-order-id')
       $('#deleteConfirmModal').modal('show')
     })
 
-    $('#delete_confirm_item').click(function() {
+    $(document).on('click', '#delete_confirm_item', function(){
       $.ajax({
         url: "{{ route('merchant-reg.destroy-item') }}",
         method: "DELETE",
-        data: {cart_id:order_cart_id},
+        data: {cart_id:order_cart_id, "_token": "{{ csrf_token() }}",},
         beforeSend:function() {
           $('.loading').show()
           $(this).hide()
@@ -315,7 +361,7 @@
       $.ajax({
         url: '{{ route("merchant-reg.disabled-dates") }}',
         method: 'post',
-        data: {org_id:org_id},
+        data: {org_id:org_id, "_token": "{{ csrf_token() }}",},
         success:function(result) {
           $.each(result.dates, function(index, value) {
             dates.push(value)

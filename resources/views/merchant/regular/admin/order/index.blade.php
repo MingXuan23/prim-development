@@ -79,7 +79,7 @@
         <div class="flash-message"></div>
 
         <div class="table-responsive">
-            <table class="table table-striped table-bordered" id="orderTable" width="100%" cellspacing="0">
+            <table class="table table-striped table-bordered dt-responsive wrap" id="orderTable" width="100%" cellspacing="0">
     
             <thead>
                 <tr>

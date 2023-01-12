@@ -2,6 +2,7 @@
 
 @section('css')
 
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 @include('layouts.datatable')
 
 <style>
@@ -49,7 +50,7 @@
           @endif
 
           <div class="table-responsive">
-            <table class="table table-borderless" width="100%" cellspacing="0">
+            <table class="table table-borderless responsive" id="cartTable" width="100%" cellspacing="0">
                 <thead class="thead-dark">
                     <tr class="text-center">
                       <th style="width: 25%">Nama</th>
@@ -60,17 +61,6 @@
                     </tr>
                 </thead>
                 
-                <tbody>
-                  @foreach($cart_item as $row)
-                    <tr class="text-center">
-                      <td class="align-middle">{{ $row->name }}</td>
-                      <td class="align-middle">{{ $row->quantity }}</td>
-                      <td class="align-middle">{{ $row->selling_quantity * $row->quantity }}</td>
-                      <td class="align-middle">{{ $response->price[$row->id] }}</td>
-                      <td class="align-middle">{{ $response->total_price[$row->id] }}</td>
-                    </tr>
-                  @endforeach
-                </tbody>
             </table>
           </div>
 
@@ -123,7 +113,7 @@
         {{-- <input type="hidden" name="amount" id="total_price" value="{{ $cart->total_price }}"> --}}
         <input type="hidden" name="amount" id="total_price" value="2.00">
         <input type="hidden" name="desc" id="desc" value="Merchant">
-        <input type="hidden" name="order_id" value="{{ $cart->id }}">
+        <input type="hidden" name="order_id" id="order_id" value="{{ $cart->id }}">
         
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
@@ -149,6 +139,69 @@
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
+
+    let cId = $('input#order_id').val()
+    
+    fetch_data(cId)
+
+    function fetch_data(cId = '') {
+        cartTable = $('#cartTable').DataTable({
+            "searching": false,
+            "bLengthChange": false,
+            "bPaginate": false,
+            "info": false,
+            "orderable": false,
+            "ordering": false,
+            processing: true,
+            serverSide: true,
+            "language": {
+                "zeroRecords": "Tiada Item Buat Masa Sekarang."
+            },
+            ajax: {
+                url: "{{ route('merchant-reg.get-all-items') }}",
+                data: {
+                    id:cId,
+                    type:'pay',
+                    "_token": "{{ csrf_token() }}",
+                },
+                type: 'GET',
+            },
+            'columnDefs': [{
+                "targets": [0, 1, 2, 3, 4], // your case first column
+                "className": "align-middle text-center", 
+            },
+            { "responsivePriority": 1, "targets": 0 },
+            { "responsivePriority": 2, "targets": 2 },
+            { "responsivePriority": 3, "targets": 4 },
+            ],
+            columns: [{
+                data: "name",
+                name: 'name',
+                orderable: false,
+                searchable: false,
+            }, {
+                data: "quantity",
+                name: 'quantity',
+                orderable: false,
+                searchable: false,
+            }, {
+                data: "full_quantity",
+                name: 'full_quantity',
+                orderable: false,
+                searchable: false,
+            },{
+                data: 'price',
+                name: 'price',
+                orderable: false,
+                searchable: false,
+            },{
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false,
+            },]
+        });
+      }
 
     var arr = [];
     

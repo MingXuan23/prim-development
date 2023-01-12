@@ -40,7 +40,7 @@
         </div>
         @endif
         <div class="table-responsive">
-            <table class="table table-striped" id="hourTable" width="100%" cellspacing="0">
+            <table class="table table-striped dt-responsive wrap" id="hourTable" width="100%" cellspacing="0">
             <thead class="thead-dark">
                 <tr>
                     <th style="width: 10%" class="text-center">Hari</th>
@@ -171,7 +171,11 @@
                 'columnDefs': [{
                     "targets": [0, 1, 2, 3, 4], // your case first column
                     "className": "align-middle text-center", 
-                },],
+                },
+                { "responsivePriority": 1, "targets": 0 },
+                { "responsivePriority": 2, "targets": 1 },
+                { "responsivePriority": 3, "targets": 4 },
+                ],
                 columns: [{
                     data: "day",
                     name: 'day',
@@ -204,7 +208,7 @@
         // $(document).on('click', '.btn-done-pickup', function(){
             
         $(document).on('click', '.edit-time-btn', function(){
-            console.log('test')
+            
             hour_id = $(this).attr('data-hour-id')
 
             $.ajax({

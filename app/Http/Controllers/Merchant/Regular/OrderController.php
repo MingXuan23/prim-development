@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\DataTables;
 
 class OrderController extends Controller
 {
@@ -235,8 +236,6 @@ class OrderController extends Controller
         $pickup_date = null;
         $pickup_time = null;
         $fixed_charges = null;
-        $price = array();
-        $cart_item = array(); // empty if cart is empty
         $user_id = Auth::id();
 
         $cart = DB::table('pgng_orders')->where([
@@ -248,19 +247,8 @@ class OrderController extends Controller
         if($cart) {
             $pickup_date = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('m/d/Y') : '';
             $pickup_time = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('H:i') : ''; 
-
-            $cart_item = DB::table('product_order as po')
-                ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
-                ->where('po.pgng_order_id', $cart->id)
-                ->select('po.id', 'po.quantity', 'po.selling_quantity', 'pi.name', 'pi.price')
-                ->get();
             
             $fixed_charges = $this->getFixedCharges($cart->org_id);
-
-            foreach($cart_item as $row)
-            {
-                $price[$row->id] = number_format((double)(($row->price * $row->selling_quantity)), 2, '.', '');
-            }
         }
 
         $response = (object)[
@@ -268,10 +256,49 @@ class OrderController extends Controller
             'pickup_date' => $pickup_date,
             'pickup_time' => $pickup_time,
             'fixed_charges' => $fixed_charges,
-            'price' => $price,
         ];
 
-        return view('merchant.regular.cart', compact('response', 'cart', 'cart_item'));
+        return view('merchant.regular.cart', compact('response', 'cart'));
+    }
+
+    public function getAllItemsInCart(Request $request)
+    {
+        $c_id = $request->id;
+        
+        $cart_item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                ->where('po.pgng_order_id', $c_id)
+                ->select('po.id', 'pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                ->get();
+
+        if(request()->ajax()) 
+        { 
+            $table = Datatables::of($cart_item);
+
+            $table->editColumn('full_quantity', function ($row) {
+                return $row->quantity * $row->selling_quantity;
+            });
+
+            $table->editColumn('price', function ($row) {
+                return number_format((double)(($row->price * $row->selling_quantity)), 2);
+            });
+
+            $table->editColumn('action', function ($row) {
+                $type = request()->get('type');
+                if($type == 'cart'){
+                    $label = '<button type="button" data-cart-order-id="'.$row->id.'" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>';
+                } else {
+                    $label = number_format((double)(($row->price * $row->selling_quantity) * $row->quantity), 2);
+                }
+                
+                return $label;
+            });
+
+            $table->rawColumns(['full_quantity', 'price', 'action']);
+
+            return $table->make(true);
+        }
+
     }
 
     public function destroyItemInCart(Request $request)
@@ -394,60 +421,39 @@ class OrderController extends Controller
 
     public function store(Request $request, $org_id, $order_id)
     {
-        try{
-            $pickup_date = $request->pickup_date;
-            $pickup_time = $request->pickup_time;
-            $note = $request->note;
-            $order_type = $request->order_type;
-
-            if($this->validateRequestedPickupDate($pickup_date, $pickup_time, $org_id) == false) {
-                return back()->with('error', 'Sila pilih masa yang sesuai');
-            }
-            
-            if($order_type == 'Pick-Up') {
-                $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('H:i:s');
-
-                DB::table('pgng_orders')->where('id', $order_id)->update([
-                    'updated_at' => Carbon::now(),
-                    'order_type' => $order_type,
-                    'pickup_date' => $pickup_datetime,
-                    'note' => $note,
-                ]);
-            }
-
-            $price = array();
-            $total_price = array();
-            $cart_item = array(); // empty if cart is empty
-
-            $cart = DB::table('pgng_orders')
-            ->where('id', $order_id)->select('id', 'pickup_date', 'note', 'total_price')->first();
-            
-            $cart_item = DB::table('product_order as po')
-                ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                ->where('po.pgng_order_id', $order_id)
-                ->select('po.id', 'po.quantity', 'po.selling_quantity', 'pi.name', 'pi.price')
-                ->get();
-
-            $pickup_date_f = Carbon::parse($cart->pickup_date)->format('d-m-y h:i A');
-
-            foreach($cart_item as $row)
-            {
-                $price[$row->id] = number_format((double)(($row->price * $row->selling_quantity)), 2, '.', '');
-                $total_price[$row->id] = number_format((double)(($row->price * $row->selling_quantity) * $row->quantity), 2, '.', '');
-            }
-
-            $response = (object)[
-                'note' => $cart->note,
-                'pickup_date' => $pickup_date_f,
-                'price' => $price,
-                'total_price' => $total_price,
-                'amount' => number_format((double)$cart->total_price, 2, '.', '')
-            ];
-            
-            return view('merchant.regular.pay', compact('cart', 'cart_item', 'response'));
-        } catch (\Throwable $th) {
-            return $this->sendError($th->getMessage(), 500);
+        $pickup_date = $request->pickup_date;
+        $pickup_time = $request->pickup_time;
+        $note = $request->note;
+        $order_type = $request->order_type;
+        
+        if($this->validateRequestedPickupDate($pickup_date, $pickup_time, $org_id) == false) {
+            return back()->with('error', 'Sila pilih masa yang sesuai');
         }
+        
+        if($order_type == 'Pick-Up') {
+            $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('H:i:s');
+
+            DB::table('pgng_orders')->where('id', $order_id)->update([
+                'updated_at' => Carbon::now(),
+                'order_type' => $order_type,
+                'pickup_date' => $pickup_datetime,
+                'note' => $note,
+            ]);
+        }
+
+        $cart = DB::table('pgng_orders')
+        ->where('id', $order_id)->select('id', 'pickup_date', 'note', 'total_price')->first();
+
+        $pickup_date_f = Carbon::parse($cart->pickup_date)->format('d-m-y h:i A');
+
+        $response = (object)[
+            'note' => $cart->note,
+            'pickup_date' => $pickup_date_f,
+            'amount' => number_format((double)$cart->total_price, 2),
+        ];
+            
+        return view('merchant.regular.pay', compact('cart', 'response'));
+        
     }
 
     private function validateRequestedPickupDate($pickup_date, $pickup_time, $org_id)

@@ -216,6 +216,8 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         // Index
         Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
         Route::get('fetch-merchant', 'LandingPageController@test_index')->name('merchant.fetch-merchant');
+        // Get all cart
+        Route::get('get-all-cart-items', 'OrderController@getAllItemsInCart')->name('merchant-reg.get-all-items');
         // Orders
         Route::get('all-orders', 'HistoryController@index')->name('merchant.all-orders');
         Route::get('get-all-orders', 'HistoryController@getAllOrder')->name('merchant.get-all-orders');
@@ -259,6 +261,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('get-group', 'ProductController@getAllProductGroup')->name('admin-reg.get-group');
         Route::post('store-group', 'ProductController@storeProductGroup')->name('admin-reg.store-group');
         Route::get('/p-group-list/{id}', 'ProductController@showProductItem')->name('admin-reg.product-item');
+        Route::get('get-product-item', 'ProductController@getAllProductItem')->name('admin-reg.get-pi');
         Route::put('update-group', 'ProductController@updateProductGroup')->name('admin-reg.update-group');
         Route::delete('destroy-group', 'ProductController@destroyProductGroup')->name('admin-reg.destroy-group');
         Route::post('store-item', 'ProductController@storeProductItem')->name('admin-reg.store-item');

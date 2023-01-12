@@ -95,8 +95,8 @@
 
             <div class = "vertical"></div>
 
-            <div class="col-9 justify-content-center">
-                <div class="row">
+            <div class="col-lg-9">
+                <div class="row d-flex">
                     <div class="col-md-8">
                         <div class="form-group">
                             <label>Nama</label>

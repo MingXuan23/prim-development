@@ -3,6 +3,8 @@
 @section('css')
 
 <link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+@include('layouts.datatable')
 
 <style>
 #img-size
@@ -48,11 +50,13 @@ input:required:invalid {
             <h4 class="font-size-18"><a href="{{ route('admin-reg.product-group') }}" class="text-muted">Urus Produk</a> <i class="fas fa-angle-right"></i> {{ $group->name }}</h4>
         </div>
     </div>
-    <div class="d-flex justify-content-between mr-3">
+    <div class="col d-flex flex-row-reverse mr-3">
         <button id="delete-product-group-modal" class="btn btn-danger m-1"><i class="fas fa-trash-alt"></i> Jenis Produk</button>
         <button id="edit-product-group" class="btn btn-primary m-1"><i class="fas fa-pencil-alt"></i> Jenis Produk</button>
     </div>
 </div>
+
+<input type="hidden" name="group_id" id="group_id" value="{{ $group->id }}">
 
 <div class="card">
     <div class="card-body">
@@ -70,11 +74,11 @@ input:required:invalid {
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-striped responsive" id="productTable" width="100%" >
                 
                 <thead class="thead-dark">
                     <tr>
-                        <th style="width:1%" scope="col">No.</th>
+                        <th style="width:1%">No.</th>
                         <th style="width:12%" class="text-center">Gambar</th>
                         <th style="width:10%">Nama</th>
                         <th style="width:12%">Deskripsi</th>
@@ -84,66 +88,6 @@ input:required:invalid {
                         <th style="width:10%" class="text-center">Action</th>
                     </tr>
                 </thead>
-                
-                <tbody>
-                    @forelse($item as $row)
-                    <tr>
-                        <td class="align-middle" scope="row"><b>{{ $loop->iteration }}</b></td>
-                        <td class="align-middle text-center">
-                            <img class="rounded img-fluid bg-dark" id="img-size" src="
-                            @if($row->image == null)
-                            {{ URL('images/koperasi/default-item.png') }}
-                            @else
-                            {{ URL($image_url.$row->image) }}
-                            @endif
-                            ">
-                        </td>
-                        <td class="align-middle">{{ $row->name }}</td>
-                        <td class="align-middle desc">{!! $row->desc ?: "<i>Tiada Deskripsi</i>" !!}</td>
-                        <td class="align-middle text-center">
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Inventori
-                                  <span class="badge badge-primary badge-pill">{!! $row->type == "have inventory" ? $row->quantity_available : "Tiada Inventori" !!}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Kuantiti Dijual
-                                  <span class="badge badge-primary badge-pill">{{ $row->selling_quantity }}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Kata Nama Kuantiti
-                                  <span class="badge badge-primary badge-pill">{{ $row->collective_noun }}</span>
-                                </li>
-                              </ul>
-                        </td>
-                        <td class="align-middle text-center">
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Seunit
-                                  <span class="badge badge-primary badge-pill">{{ number_format($row->price, 2) }}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Setiap Kuantiti
-                                  <span class="badge badge-primary badge-pill">{{ number_format($row->price * $row->selling_quantity, 2) }}</span>
-                                </li>
-                              </ul>
-                        </td>
-                        <td class="text-center align-middle">
-                            {!! ($row->status == 1) 
-                                ? "<span class='badge rounded-pill bg-success text-white p-2'>Aktif</span>"
-                                : "<span class='badge rounded-pill bg-danger text-white p-2'>Tidak Aktif</span>" !!}
-                        </td>
-                        <td class="align-middle text-center">
-                            <a href="{{ route('admin-reg.edit-item', ['id' => $group->id, 'item' => $row->id]) }}" class="edit-item-modal btn btn-primary m-1"><i class="fas fa-pencil-alt"></i></a>
-                            <button data-item-id="{{ $row->id }}" data-image-url="{{ $image_url }}" class="delete-item-modal btn btn-danger m-1"><i class="fas fa-trash-alt"></i></button>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="9" class="text-center"><i>Tiada Item Buat Masa Sekarang.</i></td>
-                    </tr>
-                    @endforelse
-                </tbody>
             </table>
         </div>
     </div>
@@ -355,6 +299,10 @@ input:required:invalid {
         $('.alert-success').delay(2000).fadeOut()
         $('.alert-danger').delay(3000).fadeOut()
 
+        let gId = $('#group_id').val()
+
+        fetch_data(gId)
+
         $(".custom-file-input").on("change", function() {
             var idxDot = this.value.lastIndexOf(".") + 1
             var extFile = this.value.substr(idxDot, this.value.length).toLowerCase()
@@ -372,6 +320,79 @@ input:required:invalid {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         })
+
+        function fetch_data(gId = '') {
+            productTable = $('#productTable').DataTable({
+                "searching": false,
+                "bLengthChange": false,
+                "bPaginate": false,
+                "info": false,
+                "orderable": false,
+                "ordering": false,
+                processing: true,
+                serverSide: true,
+                "language": {
+                    "zeroRecords": "Tiada Item Buat Masa Sekarang."
+                },
+                ajax: {
+                    url: "{{ route('admin-reg.get-pi') }}",
+                    data: {
+                        id:gId,
+                    },
+                    type: 'GET',
+                },
+                'columnDefs': [{
+                    "targets": [0, 1, 2, 3, 4, 5, 6, 7], // your case first column
+                    "className": "align-middle text-center", 
+                },
+                { "responsivePriority": 1, "targets": 2 },
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function (data, type, row, meta) {
+                        let i = meta.row + meta.settings._iDisplayStart + 1;
+                        return  "<b>"+i+"</b>"
+                    }
+                },{
+                    data: "image",
+                    name: 'image',
+                    orderable: false,
+                    searchable: false,
+                }, {
+                    data: "name",
+                    name: 'name',
+                    orderable: false,
+                    searchable: false,
+                }, {
+                    data: "desc",
+                    name: 'desc',
+                    orderable: false,
+                    searchable: false,
+                }, {
+                    data: "inventory",
+                    name: 'inventory',
+                    orderable: false,
+                    searchable: false,
+                },{
+                    data: 'price',
+                    name: 'price',
+                    orderable: false,
+                    searchable: false,
+                },{
+                    data: 'status',
+                    name: 'status',
+                    orderable: false,
+                    searchable: false,
+                },{
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                },]
+            });
+        }
 
         $('#edit-product-group').click(function() {
             $('#editProductGroupModal').modal('show')
@@ -436,7 +457,7 @@ input:required:invalid {
 
         var item_id, image_url
         
-        $('.delete-item-modal').click(function() {
+        $(document).on('click', '.delete-item-modal', function(){
             item_id = $(this).attr('data-item-id')
             image_url = $(this).attr('data-image-url')
             
@@ -457,8 +478,8 @@ input:required:invalid {
             })
             
         })
-
-        $('.delete-item-btn').click(function() {
+        
+        $(document).on('click', '.delete-item-btn', function(){
             $.ajax({
                 url: "{{ route('admin-reg.destroy-item') }}",
                 method: "DELETE",

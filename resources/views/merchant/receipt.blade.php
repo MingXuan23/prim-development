@@ -156,7 +156,7 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-            window.location = '/merchant/regular'; 
+            window.location = '/merchant'; 
         }
     },1000);
 </script>
