@@ -2147,6 +2147,7 @@ class DormController extends Controller
         ->where([
             ['co.organization_id', $oid],
             ['cs.status', 1],
+            ['cs.dorm_id',null]
         ])
         ->select('students.nama', 'students.id')
         ->distinct()
