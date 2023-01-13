@@ -57,6 +57,8 @@
         <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Restoran</span>
         @elseif($list->status == 'Cancel by user')
         <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Anda</span>
+        @elseif($list->status == 'Pending' || $list->status == 'Failed')
+        <span class="badge rounded-pill bg-danger text-white">Transaksi Tidak Berjaya</span>
         @elseif($list->status == 'Picked-Up')
         <span class="badge rounded-pill bg-success text-white">Berjaya Diambil</span>
         @endif
@@ -131,12 +133,20 @@
                 <td>{{ $total_price[$row->id] }}</td>
               </tr>
             @endforeach
-              <tr>
-                <td class="noborder"></td>
-                <td class="noborder"></td>
-                <td class="table-dark noborder">Jumlah Keseluruhan</td>
-                <td class="table-dark noborder">RM {{ $total_order_price }}</td>
-              </tr>
+            @if($list->fixed_charges != null OR $list->fixed_charges != 0.00)
+            <tr>
+              <td class="noborder"></td>
+              <td class="noborder"></td>
+              <td class="table-dark noborder">Cas Organisasi</td>
+              <td class="table-dark noborder">RM {{ $list->fixed_charges }}</td>
+            </tr>
+            @endif
+            <tr>
+              <td class="noborder"></td>
+              <td class="noborder"></td>
+              <td class="table-dark noborder">Jumlah Keseluruhan</td>
+              <td class="table-dark noborder">RM {{ $total_order_price }}</td>
+            </tr>
           </tbody>
       </table>
     </div>

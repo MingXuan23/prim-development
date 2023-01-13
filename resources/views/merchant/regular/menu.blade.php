@@ -18,13 +18,12 @@
   box-shadow: 11px 10px 20px 8px rgba(0,0,0,0.10);
 }
 
-.img-size
+#img-size
 {
-  max-width: 100%;
-  height: auto;
+  /* max-width: 100%; */
+  height: 100px;
   width: 100px;
-  border-radius: 10px;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .default-img {
@@ -130,14 +129,14 @@
             @if($item->product_group_id == $group->id)
               <div class="row">
                 <div class="col">
-                  <div class="card border p-2" id="shadow-bg">
+                  <div class="card  p-2" id="shadow-bg">
                     <div class="d-flex">
                       <div class="d-flex justify-content-center align-items-start">
                         <div>
                           @if($item->image == null)
-                          <img class="img-fluid img-size default-img" src="{{ URL('images/koperasi/default-item.png')}}">
+                          <img class="img-fluid default-img" id="img-size"  src="{{ URL('images/koperasi/default-item.png')}}">
                           @else
-                          <img class="img-fluid img-size" src="{{ URL('merchant-image/product-item/'.$merchant->code.'/'.$item->image)}}">
+                          <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$merchant->code.'/'.$item->image)}}">
                           @endif
                         </div>
                       </div>

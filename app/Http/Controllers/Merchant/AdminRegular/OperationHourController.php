@@ -381,7 +381,7 @@ class OperationHourController extends Controller
                 $msg = "Tidak boleh tarikh hari yang sama";
                 $validation_response = response()->json(['status' => 'error', 'message' => $msg]); 
             }
-    
+            
             // the day is open
             if($arr['day_status'] == 1) {
                 $pickup_time = Carbon::parse($arr['requested_pickup_date'])->toTimeString();

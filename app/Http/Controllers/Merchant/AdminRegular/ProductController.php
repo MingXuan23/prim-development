@@ -104,7 +104,7 @@ class ProductController extends Controller
             });
 
             $table->editColumn('inventory', function ($row) {
-                $type = $row->type == 'have inventory' ? $row->quantitiy_available : 'Tiada Inventori';
+                $type = $row->type == 'have inventory' ? $row->quantity_available : 'Tiada Inventori';
                 
                 $inv = '<ul class="list-group"><li class="list-group-item d-flex justify-content-between align-items-center">';
                 $inv .= 'Inventori<span class="badge badge-primary badge-pill">'.$type;

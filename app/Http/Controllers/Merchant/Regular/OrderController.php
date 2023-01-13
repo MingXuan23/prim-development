@@ -37,7 +37,7 @@ class OrderController extends Controller
         $product_group = DB::table('product_group as pg')
         ->join('product_item as pi', 'pi.product_group_id', 'pg.id')
         ->where([
-            ['pi.status', 1],
+            // ['pi.status', 1],
             ['pg.organization_id', $id],
             ['pg.deleted_at', NULL],
             ['pi.deleted_at', NULL],
@@ -49,7 +49,7 @@ class OrderController extends Controller
         $product_item = DB::table('product_item as pi')
         ->join('product_group as pg', 'pg.id', 'pi.product_group_id')
         ->where([
-            ['pi.status', 1],
+            // ['pi.status', 1],
             ['pg.organization_id', $id],
             ['pg.deleted_at', NULL],
             ['pi.deleted_at', NULL],
@@ -478,6 +478,7 @@ class OrderController extends Controller
             $isAvailable = false;
         } else {
             $pickup_time = Carbon::parse($pickup_time)->format('H:i:s');
+            // 10:00 <= 10:01 AND 22:00 >= 10:01
             if(($hour->open_hour <= $pickup_time && $hour->close_hour >= $pickup_time) == false) {
                 $isAvailable = false;
             }

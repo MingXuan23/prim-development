@@ -56,7 +56,7 @@
         <div class="flash-message"></div>
 
         <div class="table-responsive">
-            <table class="table table-striped" id="orderTable" width="100%" cellspacing="0">
+            <table class="table table-striped responsive" id="orderTable" width="100%" cellspacing="0">
     
             <thead>
                 <tr>

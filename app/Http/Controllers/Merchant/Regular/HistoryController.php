@@ -162,9 +162,9 @@ class HistoryController extends Controller
                 ->join('organizations as o', 'o.id', 'pu.organization_id')
                 ->where('pu.id', $order_id)
                 ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
-                        'o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state')
+                        'o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state', 'o.fixed_charges')
                 ->first();
-
+        
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
         $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
         $total_order_price = number_format($list->total_price, 2, '.', '');
@@ -181,8 +181,8 @@ class HistoryController extends Controller
         
         foreach($item as $row)
         {
-            $price[$row->id] = number_format($row->price, 2, '.', '');
-            $total_price[$row->id] = number_format(doubleval($row->price * ($row->quantity * $row->selling_quantity)), 2, '.', ''); // calculate total for each item in cart
+            $price[$row->id] = number_format($row->price, 2);
+            $total_price[$row->id] = number_format(doubleval($row->price * ($row->quantity * $row->selling_quantity)), 2); // calculate total for each item in cart
         }
 
         return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price'));
