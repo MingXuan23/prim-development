@@ -129,6 +129,11 @@ class OrderController extends Controller
         $msg = '';
         $user_id = Auth::id();
         $new_total_price = 0;
+
+        if($request->qty == null) {
+            $msg = "Sila masukkan nilai.";
+            return response()->json(['alert' => $msg]);
+        }
         
         $item = ProductItem::where('id', $request->i_id)
         ->select('type', 'quantity_available as qty', 'selling_quantity as unit_qty', 'price')
@@ -440,7 +445,7 @@ class OrderController extends Controller
                 'note' => $note,
             ]);
         }
-
+        
         $cart = DB::table('pgng_orders')
         ->where('id', $order_id)->select('id', 'pickup_date', 'note', 'total_price')->first();
 

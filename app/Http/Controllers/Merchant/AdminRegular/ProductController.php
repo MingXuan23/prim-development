@@ -369,11 +369,19 @@ class ProductController extends Controller
             $isSame = (strtolower($row->name) == strtolower($request->item_name)) ? true : false;
         }
 
-        if(($request->inventory == "no inventory" && empty($request->item_name) && empty($request->item_price) && empty($request->selling_quantity) && empty($request->collective_noun)) ||
-         ($request->inventory == "have inventory" && empty($request->item_name) && empty($request->item_price) && empty($request->item_quantity) && empty($request->selling_quantity) && empty($request->collective_noun)))
-        {
+        if($request->inventory == "have inventory" && $request->item_quantity == '' ){
+            $alert .= " Inventori Tidak Boleh Kosong.";
+        }
+
+        if($request->item_name == '' || $request->item_price == '' || $request->collective_noun == '' || $request->selling_quantity == '') {
             $alert .= " Sila isi tempat kosong yang diperlukan.";
         }
+
+        // if(($request->inventory == "no inventory" && empty($request->item_name) && empty($request->item_price) && empty($request->selling_quantity) && empty($request->collective_noun)) ||
+        //  ($request->inventory == "have inventory" && empty($request->item_name) && empty($request->item_price) && empty($request->item_quantity) && empty($request->selling_quantity) && empty($request->collective_noun)))
+        // {
+        //     $alert .= " Sila isi tempat kosong yang diperlukan.";
+        // }
 
         if($isSame && $request->item_name != $old_name) {
             $alert .= " Terdapat item dengan nama yang sama dalam organisasi anda";

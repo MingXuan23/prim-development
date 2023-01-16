@@ -161,7 +161,7 @@
                   <div class="col">
                       <div class="form-group">
                           <label>Kuantiti Inventori</label>
-                          <input type="number" name="item_quantity" value="{{ $item->quantity_available }}" min="1" step="1" class="form-control">
+                          <input type="number" name="item_quantity" value="{{ $item->quantity_available }}" min="1" step="1" oninput="this.value = Math.round(this.value);" class="form-control">
                       </div>
                   </div>
                 </div>
@@ -169,7 +169,7 @@
                 <div class="row mb-4">
                   <div class="col">
                     <label class="control-label">Kuantiti Yang Dijual</label>
-                    <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" value="{{ $item->selling_quantity }}" required>
+                    <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" oninput="this.value = Math.round(this.value);" value="{{ $item->selling_quantity }}" required>
                   </div>
                   <div class="col">
                       <label class="control-label">Kata Nama Kuantiti</label>

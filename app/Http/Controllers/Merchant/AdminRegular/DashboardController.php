@@ -18,10 +18,7 @@ use Yajra\DataTables\DataTables;
 class DashboardController extends Controller
 {
     public function index()
-    {
-        $role_id = DB::table('organization_roles')->where('nama', 'Regular Merchant Admin')->first()->id;
-        $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
-        
+    {   
         $merchant = RegularMerchantController::getAllMerchantOrganization();
         
         return view('merchant.regular.admin.dashboard.index', compact('merchant'));
@@ -161,7 +158,7 @@ class DashboardController extends Controller
                     ->whereIn('status', ['Paid', 'Picked-Up'])
                     ->select('u.name', 'pu.pickup_date', 'pu.total_price')
                     ->get();
-
+            
             $org_name = Organization::find($org_id)->nama;
             
             return response()->json(['transac' => $transac, 'org_name' => $org_name]);

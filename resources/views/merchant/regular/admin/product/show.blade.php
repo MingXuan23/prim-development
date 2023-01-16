@@ -243,7 +243,7 @@ input:required:invalid {
                         <div class="col">
                             <div class="form-group required">
                                 <label class="control-label">Kuantiti Yang Ingin Dijual</label>
-                                <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" value="1" required>
+                                <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" value="1" oninput="this.value = Math.round(this.value);" required>
                             </div>
                         </div>
                     </div>

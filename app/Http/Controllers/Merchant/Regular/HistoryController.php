@@ -100,7 +100,7 @@ class HistoryController extends Controller
     {
         $total_price[] = 0;
         $pickup_date[] = 0;
-        $status = ['Cancel by user', 'Cancel by merchant', 'Delivered', 'Picked-Up'];
+        $status = ['Failed', 'Pending', 'Cancel by user', 'Cancel by merchant', 'Delivered', 'Picked-Up'];
         $filter_type = $request->filterType;
         $date = $request->date;
         
@@ -167,7 +167,7 @@ class HistoryController extends Controller
         
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
         $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
-        $total_order_price = number_format($list->total_price, 2, '.', '');
+        $total_order_price = number_format($list->total_price, 2);
 
         // get all product based on order
         $item = DB::table('product_order as po')

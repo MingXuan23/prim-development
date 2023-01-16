@@ -105,6 +105,15 @@ class OperationHourController extends Controller
         // Open
         if($status == 1)
         {
+            if($open_hour == '' || $close_hour == ''){
+                $alert = "Sila isi waktu yang kosong";
+                $response = array(
+                    'alert' => $alert,
+                    'status' => 'invalid-time'
+                );
+                return response()->json(['response' => $response]);
+            }
+
             if($open_hour >= $close_hour)
             {
                 $alert = "Waktu premis tutup mestilah tidak kurang daripada waktu pembukaan";
@@ -373,6 +382,11 @@ class OperationHourController extends Controller
         $validation_response = null;
         $day_date_time = Carbon::parse($arr['requested_pickup_date'])->format('l');
         $pickup_day = RegularMerchantController::getDayIntegerByDayName($day_date_time);
+
+        if($arr['requested_pickup_date'] == ''){
+            $msg = "Sila isi tarikh dan masa pengambilan baru.";
+            $validation_response = response()->json(['status' => 'error', 'message' => $msg]); 
+        }
         
         // If updated day same as the day of pickup date
         if($arr['updated_day'] == $pickup_day) {
