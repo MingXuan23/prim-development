@@ -67,6 +67,27 @@
   background: red;
   color: white;
 }
+
+#quantity-danger{
+  display: none;
+}
+
+.center-danger{
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 12px;
+
+  background-color: rgba(248, 215, 218, 1);
+  border-color: rgba(220, 53, 69, 1);
+  color: rgba(114, 28, 36,1);
+
+  text-align: center;
+}
 </style>
 
 @endsection
@@ -134,7 +155,7 @@
                       <div class="d-flex justify-content-center align-items-start">
                         <div>
                           @if($item->image == null)
-                          <img class="img-fluid default-img" id="img-size"  src="{{ URL('images/koperasi/default-item.png')}}">
+                          <img class="rounded img-fluid default-img" id="img-size"  src="{{ URL('images/koperasi/default-item.png')}}">
                           @else
                           <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$merchant->code.'/'.$item->image)}}">
                           @endif
@@ -212,6 +233,7 @@
   $(document).ready(function(){
     let item_id, org_id;
     
+
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -350,6 +372,7 @@
             if (event.cancelable) event.preventDefault();
             tmp = false;
             $(this).val(this.value.slice(0, -1))
+            $('#quantity-danger').addClass('center-danger').show()
             return tmp;
           }
           else
@@ -364,6 +387,8 @@
         }
       });
     }
+
+
 
     $('.alert-success').delay(2000).fadeOut()
     $('.alert-danger').delay(4000).fadeOut()

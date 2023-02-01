@@ -271,6 +271,12 @@
                             <span>Pesanan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('admin-reg.report') }}" class=" waves-effect">
+                            <i class="ti-stats-up"></i>
+                            <span>Laporan</span>
+                        </a>
+                    </li>
                 </ul>  
             </li>
             @endrole
@@ -307,7 +313,7 @@
             </li>
             @endrole 
             
-            {{-- <li>
+            <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
                     <span>Peniaga</span>
@@ -326,7 +332,7 @@
                         </a>
                     </li>
                 </ul>  
-            </li> --}}
+            </li>
 
             {{-- <!-- @role('Superadmin|Penjaga') -syah punye
             <li>

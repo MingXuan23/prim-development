@@ -109,7 +109,7 @@ class DashboardController extends Controller
     public function getLatestOrdersByNow(Request $request)
     {
         $org_id = $request->id;
-
+        
         $order = DB::table('pgng_orders as pu')
                 ->join('users as u', 'pu.user_id', 'u.id')
                 ->whereIn('status', ["Paid"])

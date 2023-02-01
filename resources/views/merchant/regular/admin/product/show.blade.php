@@ -74,7 +74,7 @@ input:required:invalid {
         </div>
 
         <div class="table-responsive">
-            <table class="table table-striped responsive" id="productTable" width="100%" >
+            <table class="table table-hover responsive" id="productTable" width="100%" >
                 
                 <thead class="thead-dark">
                     <tr>
@@ -162,7 +162,7 @@ input:required:invalid {
                     <div class="row justify-content-center align-items-center">
                         <div class="col">
                             <div class="form-group required">
-                                <label class="control-label">Nama Item</label>
+                                <label class="control-label">Nama</label>
                                 <input class="form-control" type="text" placeholder="Nama Item" name="item_name" id="item_name" required>
                             </div>
                             
@@ -170,7 +170,7 @@ input:required:invalid {
 
                         <div class="col" style="margin-bottom: 8px">
                             <div class="form-group custom-file">
-                                <label class="custom-file-label" for="item_image">Gambar Item</label>
+                                <label class="custom-file-label" for="item_image">Gambar</label>
                                 <input class="custom-file-input" type="file" name="item_image" id="item_image" accept=".jpg,.jpeg,.png">
                             </div>
                         </div>
@@ -179,7 +179,7 @@ input:required:invalid {
                     <div class="row">
                         <div class="col">
                             <div class="form-group">
-                                <label class="control-label">Deskripsi Item</label>
+                                <label class="control-label">Deskripsi</label>
                                 <input class="form-control" type="text" placeholder="Deskripsi" name="item_desc" id="item_desc">
                             </div>
                         </div>
@@ -236,13 +236,13 @@ input:required:invalid {
                     <div class="row">
                         <div class="col">
                             <div class="form-group required">
-                                <label class="control-label">Kata Nama Kuantiti</label>
+                                <label class="control-label">Nama Unit</label>
                                 <input class="form-control" type="text" placeholder="Kata Nama Kuantiti" name="collective_noun" id="collective_noun" value="Unit" required>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group required">
-                                <label class="control-label">Kuantiti Yang Ingin Dijual</label>
+                                <label class="control-label">Pakej</label>
                                 <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" value="1" oninput="this.value = Math.round(this.value);" required>
                             </div>
                         </div>
@@ -251,7 +251,7 @@ input:required:invalid {
                     <div class="row">
                         <div class="col">
                             <div class="form-group required">
-                                <label class="control-label">Harga (RM)</label>
+                                <label class="control-label">Harga Per Unit (RM)</label>
                                 <input class="form-control" type="number" placeholder="Harga" name="item_price" id="item_price" min="0.01" step="any" pattern="^\d*(\.\d{1,2})?$" required>
                             </div>
                         </div>

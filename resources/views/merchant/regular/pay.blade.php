@@ -55,8 +55,8 @@
                     <tr class="text-center">
                       <th style="width: 25%">Nama</th>
                       <th style="width: 15%">Kuantiti</th>
-                      <th style="width: 25%">Kuantiti Penuh</th>
-                      <th style="width: 20%">Harga Satu Unit (RM)</th>
+                      <th style="width: 25%">Pakej</th>
+                      <th style="width: 20%">Harga Per Unit (RM)</th>
                       <th style="width: 15%">Jumlah (RM)</th>
                     </tr>
                 </thead>

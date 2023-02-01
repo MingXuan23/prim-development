@@ -60,8 +60,8 @@
                     <tr class="text-center">
                       <th style="width: 25%">Nama</th>
                       <th style="width: 15%">Kuantiti</th>
-                      <th style="width: 25%">Kuantiti Penuh</th>
-                      <th style="width: 20%">Harga Satu Unit (RM)</th>
+                      <th style="width: 25%">Pakej</th>
+                      <th style="width: 20%">Harga Per Unit (RM)</th>
                       <th style="width: 15%">Buang</th>
                     </tr>
                 </thead>
@@ -72,94 +72,103 @@
       </div>
 
       @if($cart)
-        <div class="card mb-4 border">
-          <div class="card-body p-4">
-            <div class="table-responsive">
-              <table class="table table-borderless mb-0">
-                  <tbody>
-                    <tr>
-                      <th class="text-muted" scope="row">Jumlah Kasar:</th>
-                      <td class="lead">RM {{ number_format((double)($cart->total_price - $response->fixed_charges), 2, '.', '') }}</td>
-                    </tr>
-                    @if($response->fixed_charges != null)<tr>
-                      <th class="text-muted" scope="row">Cas Servis:</th>
-                      <td class="lead">RM {{ number_format((double)$response->fixed_charges, 2, '.', '') }}</td>
-                    </tr>@endif
-                    <tr>
-                      <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
-                      <td class="lead">RM {{ number_format((double)$cart->total_price, 2, '.', '') }}</td>
-                    </tr>
-                  </tbody> 
-              </table>
+      <div class="row">
+        <div class="col">
+          <div class="card mb-4 border">
+            <div class="card-body p-4">
+              <div class="table-responsive">
+                <table class="table table-borderless mb-0">
+                    <tbody>
+                      <tr>
+                        <th class="text-muted" scope="row">Jumlah Pesanan:</th>
+                        <td class="lead">RM {{ number_format((double)($cart->total_price - $response->fixed_charges), 2, '.', '') }}</td>
+                      </tr>
+                      @if($response->fixed_charges != null)<tr>
+                        <th class="text-muted" scope="row">Cas Servis:</th>
+                        <td class="lead">RM {{ number_format((double)$response->fixed_charges, 2, '.', '') }}</td>
+                      </tr>@endif
+                      <tr>
+                        <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
+                        <td class="lead">RM {{ number_format((double)$cart->total_price, 2, '.', '') }}</td>
+                      </tr>
+                    </tbody> 
+                </table>
+              </div>
             </div>
           </div>
         </div>
         
-      <form action="{{ route('merchant-reg.store-order', ['org_id' => $cart->org_id, 'order_id' => $cart->id]) }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="card mb-4 border">
-          <div class="card-body p-4">
-
-            <div class="row">
-              <div class="col">
-                <div class="form-group required">
-                  <label>Jenis Pesanan</label>
-                  <select class="form-control" data-parsley-required-message="Sila pilih jenis pesanan" id="order_type" required>
-                    <option value="" @if($cart->order_type == null) selected @endif>Pilih Jenis Pesanan</option>
-                    {{-- <option value="Delivery">Penghantaran</option> --}}
-                    <option value="Pick-Up" @if($cart->order_type == 'Pick-Up') selected @endif>Ambil Sendiri</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              
-              <input type="hidden" id="org_id" value="{{ $cart->org_id }}">
-
-              <div class="col pickup-date-div" hidden>
-                <div class="form-group required">
-                  <label>Tarikh Pengambilan</label>
-                  <input type="text" value="{{ $response->pickup_date }}" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
-                </div>
-              </div>
-
-              <div class="col pickup-time-div" hidden>
-                <div class="form-group required">
-                  <label>Masa Pengambilan</label>
-                  <div class="timepicker-section">
-                    <input type="time" value="{{ $response->pickup_time }}" class="form-control" name="pickup_time" id="timepicker" required>
-                    <p class="time-range"></p>
+        <div class="col">
+          <form action="{{ route('merchant-reg.store-order', ['org_id' => $cart->org_id, 'order_id' => $cart->id]) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="card mb-4 border">
+              <div class="card-body p-4">
+    
+                {{--<div class="row">
+                  <div class="col">
+                    <div class="form-group required">
+                      <label>Jenis Pesanan</label>
+                      <select class="form-control" data-parsley-required-message="Sila pilih jenis pesanan" id="order_type" required>
+                        <option value="" @if($cart->order_type == null) selected @endif>Pilih Jenis Pesanan</option>
+                        <option value="Delivery">Penghantaran</option>
+                        <option value="Pick-Up" @if($cart->order_type == 'Pick-Up') selected @endif>Ambil Sendiri</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
+                </div> --}}
+                  
+                  <input type="hidden" id="org_id" value="{{ $cart->org_id }}">
+                  
+                  <div class="row">
+                    <div class="col pickup-date-div">
+                      <div class="form-group required">
+                        <label>Tarikh Pengambilan</label>
+                        <input type="text" value="{{ $response->pickup_date }}" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="col pickup-time-div" hidden>
+                      <div class="form-group required">
+                        <label>Masa Pengambilan</label>
+                        <div class="timepicker-section">
+                          <input type="time" value="{{ $response->pickup_time }}" class="form-control" name="pickup_time" id="timepicker" required>
+                          <p class="time-range"></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+    
               </div>
             </div>
-
-          </div>
         </div>
+      </div>
 
-        <div class="card mb-4 border">
-          <div class="card-body p-4">
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label>Nota kepada Peniaga</label>
-                  <textarea class="form-control" name="note" placeholder="Optional">{{ $cart->note }}</textarea>
-                </div>
+      <div class="card mb-4 border">
+        <div class="card-body p-4">
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label>Nota kepada Peniaga</label>
+                <textarea class="form-control" name="note" placeholder="Optional">{{ $cart->note }}</textarea>
               </div>
             </div>
           </div>
         </div>
-        
-        <input type="hidden" name="order_type" id="hidden_order_type" value="{{ $cart->order_type }}">
-        
-        <div class="row mb-2">
-          <div class="col d-flex justify-content-end">
-            <a href="{{ route('merchant-reg.show', $cart->org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
-            <button type="submit" class="btn-lg btn-primary">Teruskan</button>
-          </div>
+      </div>
+            
+      <input type="hidden" name="order_type" id="hidden_order_type" value="Pick-Up">
+            
+      <div class="row mb-2">
+        <div class="col d-flex justify-content-end">
+          <a href="{{ route('merchant-reg.show', $cart->org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
+          <button type="submit" class="btn-lg btn-primary">Teruskan</button>
         </div>
-      </form>
+      </div>
+      
+    </form>
+        
       @else
       <div class="d-flex justify-content-center">
         <a href="{{ route('merchant-reg.show', $response->org_id) }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
@@ -202,16 +211,9 @@
 <script>
   $(document).ready(function(){
     let org_id = $('input#org_id').val()
-    let init_order_type = $('#hidden_order_type').val()
     let cId = $('input#cart_id').val()
-    
-    if(init_order_type == 'Pick-Up'){
-      $('.pickup-date-div').removeAttr('hidden')
-      dateOnChange()
-    } else {
-      $('.pickup-date-div').attr('hidden', true)
-      $('.pickup-time-div').attr('hidden', true)
-    }
+
+    dateOnChange()
 
     $.ajaxSetup({
       headers: {
@@ -280,16 +282,16 @@
         });
     }
 
-    $('#order_type').change(function() {
-      let type_val = $(this).children(':selected').val()
-      $('#hidden_order_type').val(type_val)
-      if(type_val == 'Pick-Up') {
-        $('.pickup-date-div').removeAttr('hidden')
-      } else {
-        $('.pickup-date-div').attr('hidden', true)
-        $('.pickup-time-div').attr('hidden', true)
-      }
-    })
+    // $('#order_type').change(function() {
+    //   let type_val = $(this).children(':selected').val()
+    //   $('#hidden_order_type').val(type_val)
+    //   if(type_val == 'Pick-Up') {
+    //     $('.pickup-date-div').removeAttr('hidden')
+    //   } else {
+    //     $('.pickup-date-div').attr('hidden', true)
+    //     $('.pickup-time-div').attr('hidden', true)
+    //   }
+    // })
 
     $('#datepicker').change(function() {
       dateOnChange()
@@ -297,7 +299,8 @@
 
     function dateOnChange() {
       let date_val = $('#datepicker').val(), timePicker = $('#timepicker'), timeRange = $('.time-range')
-      if(date_val != null) {
+      console.log(date_val)
+      if(date_val != '') {
         $('.pickup-time-div').removeAttr('hidden')
         $.ajax({
           url: '{{ route("merchant-reg.fetch-hours") }}',

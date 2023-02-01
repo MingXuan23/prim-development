@@ -40,21 +40,21 @@ class HistoryController extends Controller
                 }
             });
 
-            $table->addColumn('action', function ($row) {
-                $btn = '<div class="d-flex justify-content-center align-items-center">';
-                $btn = $btn.'<button type="button" class="btn-cancel-order btn btn-danger" data-order-id="'.$row->id.'">';
-                $btn = $btn.'<i class="fas fa-trash-alt"></i></button></div>';
+            // $table->addColumn('action', function ($row) {
+            //     $btn = '<div class="d-flex justify-content-center align-items-center">';
+            //     $btn = $btn.'<button type="button" class="btn-cancel-order btn btn-danger" data-order-id="'.$row->id.'">';
+            //     $btn = $btn.'<i class="fas fa-trash-alt"></i></button></div>';
 
-                return $btn;
-            });
+            //     return $btn;
+            // });
 
-            $table->editColumn('note', function ($row) {
-                if($row->note != null) {
-                    return $row->note;
-                } else {
-                    return "<i>Tiada Nota</i>";
-                }
-            });
+            // $table->editColumn('note', function ($row) {
+            //     if($row->note != null) {
+            //         return $row->note;
+            //     } else {
+            //         return "<i>Tiada Nota</i>";
+            //     }
+            // });
 
             $table->editColumn('total_price', function ($row) {
                 $total_price = number_format($row->total_price, 2, '.', '');
@@ -67,7 +67,7 @@ class HistoryController extends Controller
                 return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
             });
 
-            $table->rawColumns(['note', 'total_price', 'status', 'action']);
+            $table->rawColumns(['total_price', 'status']);
 
             return $table->make(true);
         }

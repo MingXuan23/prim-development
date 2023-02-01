@@ -18,26 +18,6 @@
     </div>
 </div>
 
-{{-- <div class="card card-primary card-body">
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <label>Pesanan Berdasarkan Hari</label>
-                <select class="form-control" data-parsley-required-message="Sila pilih hari" id="order_day" required>
-                    <option value="" selected>Semua Pesanan</option>
-                    <option value="1">Isnin</option>
-                    <option value="2">Selasa</option>
-                    <option value="3">Rabu</option>
-                    <option value="4">Khamis</option>
-                    <option value="5">Jumaat</option>
-                    <option value="6">Sabtu</option>
-                    <option value="0">Ahad</option>
-                </select>
-            </div>
-        </div>
-    </div>
-</div> --}}
-
 <div class="card mb-3">
     <div class="card-header">
       <i class="ti-email mr-2"></i>Pesanan Anda</div>
@@ -64,10 +44,9 @@
                 <th style="width: 15%">Peniaga</th>
                 <th style="width: 10%">No Telefon</th>
                 <th style="width: 10%">Tarikh</th>
-                <th style="width: 15%">Nota</th>
+                {{-- <th style="width: 15%">Nota</th> --}}
                 <th style="width: 10%">Jumlah (RM)</th>
                 <th style="width: 10%" class="text-center">Status</th>
-                <th style="width: 15%" class="text-center">Action</th>
                 </tr>
             </thead>
             </table>
@@ -133,7 +112,7 @@
                     "search": "Cari:",
                 },
                 'columnDefs': [{
-                    "targets": [0, 1, 2, 3, 4, 5, 7], // your case first column
+                    "targets": [0, 1, 2, 3, 4, 5], // your case first column
                     "className": "align-middle",
                 },],
                 columns: [{
@@ -152,10 +131,10 @@
                 }, {
                     data: "pickup_date",
                     name: 'pickup_date',
-                }, {
+                }, /*{
                     data: "note",
                     name: 'note',
-                }, {
+                },*/ {
                     data: 'total_price',
                     name: 'total_price',
                 }, {
@@ -164,12 +143,7 @@
                     orderable: false,
                     searchable: false,
                     "className": "align-middle text-center",
-                }, {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false,
-                },],
+                }],
             });
         }
 

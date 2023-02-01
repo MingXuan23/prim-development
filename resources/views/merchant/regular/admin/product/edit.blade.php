@@ -105,7 +105,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>Harga (RM)</label>
+                            <label>Harga Per Unit (RM)</label>
                             <input type="number" name="item_price" id="item_price" value="{{ number_format($item->price, 2) }}" min="0.01" step="0.01" pattern="^\d*(\.\d{1,2})?$" class="form-control" required>
                         </div>
                     </div>
@@ -168,11 +168,11 @@
 
                 <div class="row mb-4">
                   <div class="col">
-                    <label class="control-label">Kuantiti Yang Dijual</label>
+                    <label class="control-label">Pakej</label>
                     <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" oninput="this.value = Math.round(this.value);" value="{{ $item->selling_quantity }}" required>
                   </div>
                   <div class="col">
-                      <label class="control-label">Kata Nama Kuantiti</label>
+                      <label class="control-label">Nama Unit</label>
                       <input class="form-control" type="text" placeholder="Kata Nama Kuantiti" name="collective_noun" id="collective_noun" value="{{ $item->collective_noun }}" required>
                   </div>
                 </div>

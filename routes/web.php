@@ -279,6 +279,15 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('all-orders/{id}/history', 'OrderController@showHistory')->name('admin-reg.history');
         Route::get('all-histories', 'OrderController@getAllHistories')->name('admin-reg.all-histories');
 
+        # Report Dashboard
+        Route::get('/sales-report', 'ReportController@index')->name('admin-reg.report');
+        Route::get('get-report', 'ReportController@getReport')->name('admin-reg.get-report');
+        Route::get('get-group-table', 'ReportController@getProductGroupTable')->name('admin-reg.group-table');
+        
+        Route::get('/sales-report/{g_id?}', 'ReportController@showProductItemReport')->name('admin-reg.item-report');
+        Route::get('get-item-report', 'ReportController@getProductItemReport')->name('admin-reg.get-item-report');
+        Route::get('get-item-table', 'ReportController@getProductItemTable')->name('admin-reg.item-table');
+
         # Order details
         Route::get('order-details/{order_id}', 'OrderController@showList')->name('admin-reg.order-detail');
     });

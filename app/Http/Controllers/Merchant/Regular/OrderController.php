@@ -101,12 +101,14 @@ class OrderController extends Controller
         } else if($item->type == 'no inventory') {
             $max_quantity = 999;
         }
-
+        
         if(!$order) {
             $modal .= '<input id="quantity_input" type="text" value="1" name="quantity_input">';
+            $modal .= '<div id="quantity-danger">Kuantiti Melebihi Inventori</div>';
         } else {
             $modal .= '<input id="quantity_input" type="text" value="'.$order->qty.'" name="quantity_input">';
-            $modal .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->qty.' X '.$order->unit_qty.' Unit</i></div>';
+            $modal .= '<div id="quantity-danger">Kuantiti Melebihi Inventori</div>';
+            $modal .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->qty * $order->unit_qty.' Unit</i></div>';
         }
 
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);

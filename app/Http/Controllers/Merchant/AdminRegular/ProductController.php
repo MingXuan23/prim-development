@@ -12,7 +12,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\View;
 use Yajra\DataTables\DataTables;
 
 class ProductController extends Controller
@@ -107,12 +106,14 @@ class ProductController extends Controller
                 $type = $row->type == 'have inventory' ? $row->quantity_available : 'Tiada Inventori';
                 
                 $inv = '<ul class="list-group"><li class="list-group-item d-flex justify-content-between align-items-center">';
-                $inv .= 'Inventori<span class="badge badge-primary badge-pill">'.$type;
-                $inv .= '</span></li><li class="list-group-item d-flex justify-content-between align-items-center">';
-                $inv .= 'Kuantiti Dijual<span class="badge badge-primary badge-pill">'.$row->selling_quantity;
-                $inv .= '</span></li><li class="list-group-item d-flex justify-content-between align-items-center">';
-                $inv .= 'Kata Nama Kuantiti<span class="badge badge-primary badge-pill">'.$row->collective_noun;
-                $inv .= '</span></li></ul>';
+                $inv .= 'Inventori<span class="badge badge-primary badge-pill">'.$type.'</span></li>';
+                if($row->selling_quantity > 1){
+                    $inv .= '<li class="list-group-item d-flex justify-content-between align-items-center">';
+                    $inv .= 'Pakej<span class="badge badge-primary badge-pill">'.$row->selling_quantity.'</span></li>';
+                }
+                $inv .= '<li class="list-group-item d-flex justify-content-between align-items-center">';
+                $inv .= 'Nama Unit<span class="badge badge-primary badge-pill">'.$row->collective_noun.'</span>';
+                $inv .= '</li></ul>';
                 return $inv;
             });
 
@@ -121,10 +122,12 @@ class ProductController extends Controller
                 $overall_price = number_format($row->price * $row->selling_quantity, 2);
 
                 $price = '<ul class="list-group"><li class="list-group-item d-flex justify-content-between align-items-center">';
-                $price .= 'Seunit<span class="badge badge-primary badge-pill">'.$price_unit;
-                $price .= '</span></li><li class="list-group-item d-flex justify-content-between align-items-center">';
-                $price .= 'Setiap Kuantiti<span class="badge badge-primary badge-pill">'.$overall_price;
-                $price .= '</span></li></ul>';
+                $price .= 'Unit<span class="badge badge-primary badge-pill">'.$price_unit.'</span></li>';
+                if($row->selling_quantity > 1){
+                    $price .= '<li class="list-group-item d-flex justify-content-between align-items-center">';
+                    $price .= 'Pakej<span class="badge badge-primary badge-pill">'.$overall_price.'</span></li>';
+                }
+                $price .= '</ul>';
                 return $price;
             });
 
