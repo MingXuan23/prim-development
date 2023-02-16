@@ -322,6 +322,11 @@ class DonationController extends Controller
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
 
+        $str = preg_replace('/[^A-Za-z0-9. -]/', '', $str);
+
+        // Replace sequences of spaces with hyphen
+        $str = preg_replace('/  */', '-', $str);
+
         $start_date = Carbon::createFromFormat(config('app.date_format'), $request->date_started)->format('Y-m-d');
         $end_date = Carbon::createFromFormat(config('app.date_format'), $request->date_end)->format('Y-m-d');
 
@@ -382,6 +387,11 @@ class DonationController extends Controller
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
 
+        $str = preg_replace('/[^A-Za-z0-9. -]/', '', $str);
+
+        // Replace sequences of spaces with hyphen
+        $str = preg_replace('/  */', '-', $str);
+        
         $start_date = Carbon::createFromFormat(config('app.date_format'), $request->date_started)->format('Y-m-d');
         $end_date = Carbon::createFromFormat(config('app.date_format'), $request->date_end)->format('Y-m-d');
 
@@ -394,11 +404,11 @@ class DonationController extends Controller
             // Delete existing image before update with new image;
             $donation = $this->donation->getDonationById($id);
 
-            if (config('app.env') == 'staging' ||config('app.env') == 'production' )
+            /* if (config('app.env') == 'staging' ||config('app.env') == 'production' )
             {
                 $destination = public_path('donation-poster') . '/' . $donation->donation_poster;
                 unlink($destination);
-            }
+            } */
 
             $storagePath  = $request->donation_poster->storeAs('public/donation-poster', 'donation-poster-'.time().'.jpg');
             $file_name = basename($storagePath);
@@ -415,7 +425,7 @@ class DonationController extends Controller
                 'url'                 => $str,
                 'donation_poster'     => $file_name,
                 'donation_type'       => $request->donation_type,
-                'lhdn_reference_code' => $request->lhdn_reference_code
+                'description'         => $request->description,
             ]);
 
         return redirect('/donation')->with('success', 'Derma Telah Berjaya Dikemaskini');
