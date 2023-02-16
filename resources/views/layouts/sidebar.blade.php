@@ -149,7 +149,7 @@
 
                         @endrole
 
-                        @role('Superadmin|Pentadbir|Admin|Guru|Warden|Penjaga|Guard')
+                        @role('Superadmin')
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="fas fa-book"></i>
@@ -240,7 +240,7 @@
                         </li>
                         @endrole
 
-                        @role('Superadmin|Pentadbir|Guru|Warden|Guard')
+                        @role('Superadmin')
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="fas fa-hotel"></i>
