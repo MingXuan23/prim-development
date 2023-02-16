@@ -424,6 +424,7 @@ Route::group(['prefix' => 'sekolah'], function () {
     Route::get('dorm/destroyDorm/{id}', 'DormController@destroyDorm')->name('dorm.destroyDorm');
     Route::get('dorm/getDormDataTable', 'DormController@getDormDataTable')->name('dorm.getDormDataTable');
     Route::get('dorm/clearDorm/{id}', 'DormController@clearDorm')->name('dorm.clearDorm');
+    Route::get('dorm/outDorm/{id}', 'DormController@outDorm')->name('dorm.outDorm');
 
     //studentlist
     Route::get('dorm/indexStudentlist', 'DormController@indexStudentlist')->name('dorm.indexStudentlist');

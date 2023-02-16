@@ -1430,7 +1430,23 @@ class DormController extends Controller
         if ($result) {
             DB::table('dorms')->where('id', $id)->update(['student_inside_no' => 0]);
 
-            Session::flash('success', 'Dorm Berjaya Dikosongkan');
+            Session::flash('success', 'Asrama Berjaya Dikosongkan');
+            return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
+        } else {
+            Session::flash('error', 'Asrama Gagal Dikosongkan');
+            return View::make('layouts/flash-messages');
+            //return response()->json(['resultdata' => $result, 'string' => $strirng]);
+        }
+    }
+
+    public function outDorm($id)
+    {
+        //
+        $result = DB::table('class_student')->where('dorm_id', $id)->update(['outing_status' => 1]);
+
+        if ($result) {
+            Session::flash('success', 'Pelajar Dalam Asrama Telah Keluar');
             return View::make('layouts/flash-messages');
             //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         } else {
@@ -1647,9 +1663,11 @@ class DormController extends Controller
                 //try
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" data-toggle="modal" data-target="#modelId3" class="btn btn-primary m-1 importBtn">Import</button>';
 
-                $btn = $btn . '<a href="' . route('dorm.editDorm', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                $btn = $btn . '<a href="' . route('dorm.editDorm', $row->id) . '" class="btn btn-primary m-1">Ubah</a>';
                 $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 destroyDorm">Buang</button>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 clearDorm">Clear</button></div>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 clearDorm">Kosong</button>';
+                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1 outDorm">Keluar</button></div>';
+
                 return $btn;
             });
 
@@ -2147,6 +2165,7 @@ class DormController extends Controller
         ->where([
             ['co.organization_id', $oid],
             ['cs.status', 1],
+            ['cs.dorm_id',null]
         ])
         ->select('students.nama', 'students.id')
         ->distinct()
