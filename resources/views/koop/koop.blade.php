@@ -28,7 +28,7 @@
 
 .fill
 {
-    background: ;
+   
     width:100%;
     height:100%;
 }
@@ -116,8 +116,8 @@
                                 </div>
                             </div>
 </div>
-
 @endforeach
+
 <h2>Product Item</h4>
 <br>
 <div class="row">
@@ -152,25 +152,19 @@
                 <p class="card-text">{{$product->desc}}</p>
                 @endif
                 <p class="card-text">RM{{ number_format((double)$product->price, 2, '.', '') }}</p>
-                @if($product->status == 0) 
-                
-                @else
-                <!-- <a href="" class=" btn btn-primary waves-effect waves-light">
-                <i class="fas fa-cart-plus"></i> Add to Cart</a> -->
+
                 <form action="{{ route('koperasi.store') }}" method="POST">
-                    @csrf          
+                    @csrf       
                     <div class="text-left">
-                            @if($product->status != 0)
+                            @if($product->status != 0)  
                             <input type="number" name="item_quantity" value="1" min="1" step="1" class="form-group-sm" style="width:20%; height:70%" required>
                             <input type="hidden" id="item_id" name="item_id" value="{{ $product->id }}">
                             <input type="hidden" id="org_id" name="org_id" value="{{ $sekolah->id }}">
-                            
-                            <button type="submit" class="btn btn-primary waves-effect waves-light">Tambah</button>
+                            <button type="submit" class="btn btn-primary waves-effect waves-light">Kemaskini cart</button>
                             @else
-                            {{-- <p class="btn btn-primary waves-effect waves-light">Tambah</p> --}}
                             @endif
                     </div>
-                @endif
+                </form>
                 
             </div>
         </div>

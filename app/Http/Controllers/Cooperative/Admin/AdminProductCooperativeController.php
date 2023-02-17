@@ -11,21 +11,80 @@ class AdminProductCooperativeController extends Controller
 {
     public function indexAdmin( )
     {
+        $role_id = DB::table('roles')->where('name', 'Koop Admin')->first()->id;
         $userID = Auth::id();
         $koperasi = DB::table('organizations as o')
                     ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
                     ->where('ou.user_id', $userID)
-                    ->where('ou.role_id', 1239)
+                    ->where('ou.role_id', $role_id)
                     ->first();
 
         $product = DB::table('product_item as p')
                     ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
                     ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
-                    ->select('p.*')
+                    ->select('p.*','pg.name as type_name')
                     ->where('ou.user_id', $userID)
                     ->get();
         return view('koperasi-admin.index', compact('koperasi'))
         ->with('product',$product);
+    }
+
+    public function productMenu()
+    {
+        $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
+        $userID = Auth::id();
+        $koperasi = DB::table('organizations as o')
+        ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+        ->where('ou.user_id', $userID)
+        ->where('ou.role_id', $role_id)
+        ->first();
+
+        $group = DB::table('product_group as pg')
+        ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
+        ->where('ou.role_id', $role_id)
+        ->select('pg.*')
+        ->get();
+        
+        return view('koperasi-admin.productmenu', compact('koperasi'),compact('group'));
+    }
+
+    public function deleteType(Int $id)
+    {
+        $delete = DB::table('product_group')->where('id',$id)->delete();
+        return redirect('koperasi/produkmenu')->with('success','Produk type berjaya dipadam');
+    }
+
+    public function createType()
+    {
+        $userID = Auth::id();
+        $org = DB::table('organizations as o')
+        ->join('organization_user as os', 'o.id', 'os.organization_id')
+        ->where('os.user_id', $userID)
+        ->select('o.id')
+        ->first();
+
+        $type = DB::table('product_group as p')
+        ->where('p.organization_id',$org->id)
+        ->get();
+
+        return view('koperasi-admin.addtype',compact('type'));
+    }
+
+    public function storeType(Request $request)
+    {
+        $userID = Auth::id();
+        $org = DB::table('organizations as o')
+                ->join('organization_user as os', 'o.id', 'os.organization_id')
+                ->where('os.user_id', $userID)
+                ->select('o.id')
+                ->first();
+
+       $add = DB::table('product_group') -> insert([
+        'name' => $request->input('name'), 
+        'organization_id' =>$org->id,
+       ]);
+
+       return redirect('koperasi/produkmenu')->with('success','Produk type berjaya ditambah.');
     }
 
     public function createProduct()

@@ -926,6 +926,7 @@ class CooperativeController extends Controller
         ->where('p.organization_id',$id)
         ->get();
 
+
         
         $todayDate = Carbon::now()->format('l');
 

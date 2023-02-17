@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\File;
 use App\Http\Jajahan\Jajahan;
 use App\Models\OrganizationHours;
 use App\Models\Donation;
@@ -202,6 +203,12 @@ class OrganizationController extends Controller
 
     public function destroy($id)
     {
+        $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
+        
+        if(Organization::find($id)->type_org == $type_org_id){
+            $this->destroyAllImages($id);
+        }
+
         $result = Organization::find($id)->delete();
 
         if ($result) {
@@ -216,14 +223,22 @@ class OrganizationController extends Controller
     public function getOrganizationDatatable()
     {
         $organizationList = $this->getOrganizationByUserId();
-
+        
         if (request()->ajax()) {
             return datatables()->of($organizationList)
                 ->addColumn('action', function ($row) {
-                    $token = csrf_token();
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('organization.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    $type = TypeOrganization::find($row->type_org);
+                    if($type->nama != 'Peniaga Barang Umum') {
+                        $token = csrf_token();
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<a href="' . route('organization.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    } else {
+                        $token = csrf_token();
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<a href="' . route('admin-reg.edit-merchant', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    }
                     return $btn;
                 })
                 ->make(true);
@@ -232,7 +247,12 @@ class OrganizationController extends Controller
 
     public static function getOrganizationByUserId()
     {
+        $role_id = [];
         $userId = Auth::id();
+        $roles = DB::table('organization_roles')->whereIn('nama', ['Admin', 'Regular Merchant Admin'])->get();
+
+        foreach($roles as $row) { $role_id[] = $row->id; }
+
         if (Auth::user()->hasRole('Superadmin')) {
             return Organization::all();
         } else {
@@ -242,7 +262,8 @@ class OrganizationController extends Controller
             ->select("o.*")
             ->distinct()
             ->where('ou.user_id', $userId)
-            ->whereIn('ou.role_id', [2, 1239])
+            ->whereIn('ou.role_id', $role_id)
+            ->where('o.deleted_at', null)
             ->get();
         }
         
@@ -405,5 +426,40 @@ class OrganizationController extends Controller
                 }
             }
         }
+    }
+
+    private function destroyAllImages($org_id)
+    {
+        $org = Organization::find($org_id);
+
+        // get existing image
+        $file = public_path('/organization-picture/'.$org->organization_picture);
+        
+        // if the existing image is exist then delete
+        if(File::exists($file))
+        {
+            File::delete($file);
+        }
+
+        $groups = DB::table('product_group')->where('organization_id', $org_id)->get();
+
+        foreach($groups as $group)
+        {
+            $item = DB::table('product_item')->where('product_group_id', $group->id)->select('image')->get();
+            foreach($item as $row)
+            {
+                if($row->image != NULL)
+                {
+                    $file = public_path("merchant-image/product-item/".$org->code."/".$row->image);
+                    $exists = File::exists($file);
+                    
+                    if($exists)
+                    {
+                        File::delete($file);
+                    }
+                }
+            }
+        }
+        
     }
 }

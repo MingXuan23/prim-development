@@ -4,6 +4,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Organization;
 use App\Models\OrganizationHours;
 use App\Models\OrganizationRole;
+use App\Models\PgngOrder;
 use App\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -18,10 +19,11 @@ class MerchantSeeder extends Seeder
     public function run()
     {
         // $this->delete_merchant();
-
-        // $this->add_role();
-        $this->add_merchant();
-        $this->add_product();
+        
+        $this->add_role();
+        // $this->add_merchant();
+        // $this->add_product();
+        // $this->testing();
     }
 
     private function delete_merchant()
@@ -337,6 +339,48 @@ class MerchantSeeder extends Seeder
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
                 'product_group_id' => '30'
+            ),
+        ));
+    }
+
+    public function testing()
+    {
+        PgngOrder::insert(array(
+            array(
+                'id' => 100,
+                'order_type' => 'Pick-Up',
+                'pickup_date' => '2022-12-24 11:00:00',
+                'total_price' => 2.00,
+                'status' => 'Paid',
+                'user_id' => 8,
+                'organization_id' => 12
+            ),
+            array(
+                'id' => 101,
+                'order_type' => 'Pick-Up',
+                'pickup_date' => '2022-12-31 21:00:00',
+                'total_price' => 3.00,
+                'status' => 'Paid',
+                'user_id' => 9,
+                'organization_id' => 12
+            ),
+            array(
+                'id' => 102,
+                'order_type' => 'Pick-Up',
+                'pickup_date' => '2022-12-24 14:00:00',
+                'total_price' => 4.00,
+                'status' => 'Paid',
+                'user_id' => 10,
+                'organization_id' => 12
+            ),
+            array(
+                'id' => 103,
+                'order_type' => 'Pick-Up',
+                'pickup_date' => '2022-12-31 19:00:00',
+                'total_price' => 5.00,
+                'status' => 'Paid',
+                'user_id' => 11,
+                'organization_id' => 12
             ),
         ));
     }

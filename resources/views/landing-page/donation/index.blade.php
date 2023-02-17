@@ -49,6 +49,7 @@
                     <li class="current-menu-item"><a href="#">Utama</a></li>
                     <li><a href="#team">Info</a></li>
                     <li><a href="#organization">Organisasi</a></li>
+                    <li><a href="#ourteam">Kerjasama</a></li>
                     <li><a href="#contact">Hubungi Kami</a></li>
                 </ul>
             </div>
@@ -408,7 +409,7 @@
     <!--====== TESTIMONIAL PART ENDS ======-->
 
     <!-- team member area start -->
-    <section class="team-member-area" id="team">
+    <section class="team-member-area" id="ourteam">
 
         <div class="bg-shape-3 fa-rotate-180" style="top: 0px !important;right:0px;">
             <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width:45%">

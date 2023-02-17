@@ -2,6 +2,7 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 @include('layouts.datatable')
 @endsection
 
@@ -15,13 +16,33 @@
     </div>
 </div>
 
+<div class="card card-primary card-body">
+    <div class="row">
+        <div class="col">
+          <div class="form-group">
+              <label>Tapis</label>
+              <select class="form-control" data-parsley-required-message="Pilih Jenis Tapisan" id="filter-order" required>
+                  <option value="all" selected>Semua Pesanan</option>
+                  <option value="date">Pilih Tarikh</option>
+              </select>
+          </div>
+        </div>
+        <div class="col date-filter" hidden>
+          <div class="form-group">
+              <label>Tarikh</label>
+              <input type="text" class="form-control" name="date" id="datepicker"  placeholder="Pilih tarikh" readonly>
+          </div>
+      </div>
+    </div>
+  </div>
+
 <div class="card mb-3">
     <div class="card-header">
       <i class="ti-email mr-2"></i>Sejarah Pesanan</div>
     <div class="card-body">
       
       <div class="table-responsive">
-        <table class="table table-striped table-bordered" id="orderTable" width="100%" cellspacing="0">
+        <table class="table table-striped responsive" id="orderTable" width="100%" cellspacing="0">
           <thead>
             <tr>
               <th style="width: 2%">No.</th>
@@ -45,7 +66,7 @@
   $(document).ready(function() {
     fetch_data()
 
-    function fetch_data() {
+    function fetch_data(filterType = '', date = '') {
         orderTable = $('#orderTable').DataTable({
             pageLength: 5,
             lengthMenu: [[5, 15, 30, -1], [5, 15, 30, "Semua"]],
@@ -53,7 +74,10 @@
             serverSide: true,
             ajax: {
                 url: "{{ route('merchant.get-order-history') }}",
-                data: {},
+                data: {
+                    filterType: filterType,
+                    date: date
+                },
                 type: 'GET',
             },
             language : {
@@ -100,6 +124,24 @@
             },]
         });
     }
+
+    $("#datepicker").datepicker()
+
+    $('#filter-order').change(function() {
+        let filterVal = $(this).children(':selected').val()
+        if(filterVal == 'date') {
+            $('.date-filter').attr('hidden', false)
+            $('#datepicker').change(function() {
+                let date = $('#datepicker').val()
+                $('#orderTable').DataTable().destroy()
+                fetch_data(filterVal, date)
+            })
+        } else {
+            $('.date-filter').attr('hidden', true)
+            $('#orderTable').DataTable().destroy()
+            fetch_data(filterVal)
+        }
+    })
   })
   
 </script>
