@@ -581,31 +581,21 @@ class DormController extends Controller
             ->get();
         }
 
-        // $start = date('Y-m-d', strtotime(DB::table('outings')
-        //     ->where([
-        //         ['outings.organization_id', $organization[0]->id],
-        //         ['outings.end_date_time', '>', now()],
-        //     ])
-        //     ->orderBy("outings.end_date_time")
-        //     ->value("outings.end_date_time as end_date_time")));
+        // $start = DB::table('outings')
+        // ->where([
+        //     ['outings.organization_id', $organization[0]->id],
+        //     ['outings.end_date_time', '>=', date("Y-m-d")],
+        // ])
+        // ->value('outings.start_date_time');
 
-        // $end = date('Y-m-d', strtotime(DB::table('outings')
-        //     ->where([
-        //         ['outings.organization_id', $organization[0]->id],
-        //         ['outings.end_date_time', '>', now()],
-        //     ])
-        //     ->orderBy("outings.end_date_time")
-        //     ->value("outings.end_date_time as end_date_time")));
+        // $end = DB::table('outings')
+        // ->where([
+        //     ['outings.organization_id', $organization[0]->id],
+        //     ['outings.end_date_time', '>=', date("Y-m-d")],
+        // ])
+        // ->value('outings.end_date_time');
 
-        $start = DB::table('outings')
-        ->where('outings.organization_id', $organization[0]->id)
-        ->value('outings.start_date_time');
-
-        $end = DB::table('outings')
-        ->where('outings.organization_id', $organization[0]->id)
-        ->value('outings.end_date_time');
-
-        return view('dorm.create', compact('organization', 'start', 'end'));
+        return view('dorm.create', compact('organization'));
     }
 
     public function createOuting()
@@ -2219,21 +2209,6 @@ class DormController extends Controller
                     ->where('classifications.organization_id', $oid)
                     ->get();
 
-        // $start = date('Y-m-d', strtotime(DB::table('outings')
-        //     ->where([
-        //         ['outings.organization_id', $oid],
-        //         ['outings.end_date_time', '>', now()],
-        //     ])
-        //     ->orderBy("outings.start_date_time")
-        //     ->value("outings.start_date_time as start_date_time")));
-
-        // $end = date('Y-m-d', strtotime(DB::table('outings')
-        //     ->where([
-        //         ['outings.organization_id', $oid],
-        //         ['outings.end_date_time', '>', now()],
-        //     ])
-        //     ->orderBy("outings.end_date_time")
-        //     ->value("outings.end_date_time as end_date_time")));
         $start = DB::table('outings')
         ->where([
             ['outings.organization_id', $oid],
@@ -2253,45 +2228,29 @@ class DormController extends Controller
         if(count($studentouting) > 0){
             foreach($studentouting as $stdouting){
                 foreach($category as $key => $cat){
-                    if(strtoupper($stdouting->catname) == strtoupper($cat->name) && $stdouting->total >= $cat->limit){
-                        unset($category[$key]);
+                    if($dormid == null){
+                        if(strtoupper($cat->name) != $categoryReal[0]){
+                            unset($category[$key]);
+                        }
                     }
-                    dd($category[$key]);
+                    else{
+                        if(strtoupper($stdouting->fake_name) == strtoupper($cat->fake_name) && $cat->limit > 0 && $stdouting->total >= $cat->limit){ 
+                            unset($category[$key]);
+                        }
+                    }
                 }
             }
         }
-
-        // outing history exist
-        // if(count($studentouting) > 0){
-        //     foreach($studentouting as $studentouting){
-        //         for($i=0, $max=count($category); $i<$max; $i++){
-        //             if($dormid != null){
-        //                 if($category[$i]->limit > 0){
-        //                     if(strtoupper($category[$i]->name) == strtoupper($studentouting->catname) && $studentouting->total >= $category[$i]->limit){
-        //                         unset($category[$i]);
-        //                     }  
-        //                 }
-        //             }
-        //             // student didn't live in dorm
-        //             else{
-        //                 if(strtoupper($category[$i]->name) != $categoryReal[0]){
-        //                     unset($category[$i]);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        // // no outing history
-        // else{
-        //     // student didn't live in dorm
-        //     if($dormid == null){
-        //         for($i=0, $max=count($category); $i<$max; $i++){
-        //             if(strtoupper($category[$i]->name) != $categoryReal[0]){
-        //                 unset($category[$i]);
-        //             }
-        //         }
-        //     }
-        // }
+        else{
+            if($dormid == null){
+                foreach($category as $key => $cat)
+                {
+                    if(strtoupper($cat->name) != $categoryReal[0]){
+                        unset($category[$key]);
+                    }
+                }
+            }
+        }
         return response()->json(['success' => $category, 'start' => $start, 'end' => $end, 'studentouting' => $studentouting]);
     }
     
