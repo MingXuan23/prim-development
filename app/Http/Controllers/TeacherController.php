@@ -249,7 +249,6 @@ class TeacherController extends Controller
                 ->where('users.telno', '=', $request->get('telno'))
                 ->first();
 
-            dd($newteacher);
         }
 
         //if the user create warden
