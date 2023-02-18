@@ -23,7 +23,7 @@ class PerananExport implements FromCollection, ShouldAutoSize, WithHeadings
     public function collection()
     {
 
-        $perananArray = [7, 8];
+        $perananArray = [13, 14];
         // dd($this->organId);
         $listteachers = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')

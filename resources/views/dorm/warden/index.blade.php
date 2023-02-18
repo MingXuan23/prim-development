@@ -45,8 +45,8 @@
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Import Guard</a>
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
                 <a style="margin: 19px; float: right;" href="{{ route('teacher.peranancreate') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Peranan</a>
-                @endif
-                @if($roles == "Warden" || $roles = "Guru" || $roles == "Guard")
+                {{-- @endif --}}
+                @elseif($roles == "Warden" || $roles = "Guru" || $roles == "Guard")
                 <a style="margin: 19px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
                 @endif
             </div>
