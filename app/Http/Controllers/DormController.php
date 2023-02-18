@@ -581,22 +581,29 @@ class DormController extends Controller
             ->get();
         }
 
-        $start = date('Y-m-d', strtotime(DB::table('outings')
-            ->where([
-                ['outings.organization_id', $organization[0]->id],
-                ['outings.end_date_time', '>', now()],
-            ])
-            ->orderBy("outings.end_date_time")
-            ->value("outings.end_date_time as end_date_time")));
+        // $start = date('Y-m-d', strtotime(DB::table('outings')
+        //     ->where([
+        //         ['outings.organization_id', $organization[0]->id],
+        //         ['outings.end_date_time', '>', now()],
+        //     ])
+        //     ->orderBy("outings.end_date_time")
+        //     ->value("outings.end_date_time as end_date_time")));
 
-        $end = date('Y-m-d', strtotime(DB::table('outings')
-            ->where([
-                ['outings.organization_id', $organization[0]->id],
-                ['outings.end_date_time', '>', now()],
-            ])
-            ->orderBy("outings.end_date_time")
-            ->value("outings.end_date_time as end_date_time")));
+        // $end = date('Y-m-d', strtotime(DB::table('outings')
+        //     ->where([
+        //         ['outings.organization_id', $organization[0]->id],
+        //         ['outings.end_date_time', '>', now()],
+        //     ])
+        //     ->orderBy("outings.end_date_time")
+        //     ->value("outings.end_date_time as end_date_time")));
 
+        $start = DB::table('outings')
+        ->where('outings.organization_id', $organization[0]->id)
+        ->value('outings.start_date_time');
+
+        $end = DB::table('outings')
+        ->where('outings.organization_id', $organization[0]->id)
+        ->value('outings.end_date_time');
 
         return view('dorm.create', compact('organization', 'start', 'end'));
     }
@@ -1527,7 +1534,7 @@ class DormController extends Controller
             // user role pentadbir 
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->whereIn('organization_user.role_id', [4, 5, 6, 7, 8]);
+                    $query->whereIn('organization_user.role_id', [4, 5, 6, 13, 14]);
                 });
             })->get();
         }
@@ -1541,7 +1548,7 @@ class DormController extends Controller
         else{
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
-                    $query->whereIn('organization_user.role_id', [2, 4, 5, 7, 8]);
+                    $query->whereIn('organization_user.role_id', [2, 4, 5, 13, 14]);
                 });
             })
             ->select('organizations.id as id', 'organizations.nama')
@@ -2212,21 +2219,36 @@ class DormController extends Controller
                     ->where('classifications.organization_id', $oid)
                     ->get();
 
-        $start = date('Y-m-d', strtotime(DB::table('outings')
-            ->where([
-                ['outings.organization_id', $oid],
-                ['outings.end_date_time', '>', now()],
-            ])
-            ->orderBy("outings.start_date_time")
-            ->value("outings.start_date_time as start_date_time")));
+        // $start = date('Y-m-d', strtotime(DB::table('outings')
+        //     ->where([
+        //         ['outings.organization_id', $oid],
+        //         ['outings.end_date_time', '>', now()],
+        //     ])
+        //     ->orderBy("outings.start_date_time")
+        //     ->value("outings.start_date_time as start_date_time")));
 
-        $end = date('Y-m-d', strtotime(DB::table('outings')
-            ->where([
-                ['outings.organization_id', $oid],
-                ['outings.end_date_time', '>', now()],
-            ])
-            ->orderBy("outings.end_date_time")
-            ->value("outings.end_date_time as end_date_time")));
+        // $end = date('Y-m-d', strtotime(DB::table('outings')
+        //     ->where([
+        //         ['outings.organization_id', $oid],
+        //         ['outings.end_date_time', '>', now()],
+        //     ])
+        //     ->orderBy("outings.end_date_time")
+        //     ->value("outings.end_date_time as end_date_time")));
+        $start = DB::table('outings')
+        ->where([
+            ['outings.organization_id', $oid],
+            ['outings.end_date_time', '>=', date("Y-m-d")],
+        ])
+        ->orderBy("outings.start_date_time")
+        ->value('outings.start_date_time');
+
+        $end = DB::table('outings')
+        ->where([
+            ['outings.organization_id', $oid],
+            ['outings.end_date_time', '>=', date("Y-m-d")],
+        ])
+        ->orderBy("outings.end_date_time")
+        ->value('outings.end_date_time');
 
         // outing history exist
         if(count($studentouting) > 0){
@@ -2308,7 +2330,7 @@ class DormController extends Controller
 
                 }
                 //approved or kecemasan && havent expired
-                else if ($rid == 8) {
+                else if ($rid == 14) {
                     $data = $data
                         ->where([
                             ['ou.organization_id', $oid],
@@ -2420,7 +2442,7 @@ class DormController extends Controller
                             $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger deleteBtn m-1">Buang</button></div>';
                         }
                         //user is guard and outing category is balik kecemasan
-                        if (($this->roles == 8 && strtoupper($row->catname) == $categoryReal[0]) ||  $this->roles == 1) {
+                        if (($this->roles == 14 && strtoupper($row->catname) == $categoryReal[0]) ||  $this->roles == 1) {
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time == now()->toDateString()) {
                                 $btn = $btn . '<a href="' . route('dorm.updateOutTime', $id) . '" class="btn btn-primary m-1">Keluar</a>';
                             }
@@ -2428,7 +2450,7 @@ class DormController extends Controller
                         //user is warden, teacher, HEM
                         if (
                             $this->roles == 1 || $this->roles == 4 ||  $this->roles == 2
-                            || $this->roles == 5 || $this->roles == 7
+                            || $this->roles == 5 || $this->roles == 13
                         ) {
                             //user choose outings and is inside blacklist
                             if (strtoupper($row->catname) == $categoryReal[2] && $row->blacklist == 1) {
@@ -2446,7 +2468,7 @@ class DormController extends Controller
                                 $btn = $btn . '<a href="' . route('dorm.updateArriveTime', $id) . '" class="btn btn-primary m-1">Sampai</a>';
                             }
                         }
-                        if ($this->roles == 8 ||  $this->roles == 1) {
+                        if ($this->roles == 14 ||  $this->roles == 1) {
 
                             if ($row->out_date_time == NULL && $row->in_date_time == NULL && $row->arrive_date_time == NULL && $row->apply_date_time >= now()->toDateString()) {
 
@@ -2499,7 +2521,7 @@ class DormController extends Controller
             $getOrganization = DB::table('users')
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
                 ->where('users.id', '=', Auth::user()->id)
-                ->whereIn('organization_user.role_id', [4, 7])
+                ->whereIn('organization_user.role_id', [4, 13])
                 ->value('organization_user.organization_id');
 
             $getTelno = DB::table('student_outing')
@@ -2586,7 +2608,7 @@ class DormController extends Controller
             $getOrganization = DB::table('users')
                 ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
                 ->where('users.id', '=', Auth::user()->id)
-                ->whereIn('organization_user.role_id', [4, 7])
+                ->whereIn('organization_user.role_id', [4, 13])
                 ->value('organization_user.organization_id');
 
             $getTelno = DB::table('student_outing')

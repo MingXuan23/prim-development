@@ -149,7 +149,7 @@
 
                         @endrole
 
-                        @role('Superadmin')
+                        @role('Superadmin|Admin|Pentadbir|Guru|Penjaga|Warden|Guard')
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="fas fa-book"></i>
@@ -190,16 +190,14 @@
                                 </li>
                                 @endrole
 
-                                @role('Guru')
+                                <!-- @role('Guru')
                                 <li>
-                                    <!-- need to change to index later -->
                                     <a href="{{ route('dorm.indexRequest', 5) }}" class=" waves-effect">
                                         <i class="fas fa-chalkboard-teacher"></i>
-                                        <!-- <span>Permintaan(Guru)</span> -->
                                         <span>Paparan Guru</span>
                                     </a>
                                 </li>
-                                @endrole
+                                @endrole -->
 
                                 @role('Penjaga')
                                 <li>
@@ -215,7 +213,7 @@
                                 @role('Warden')
                                 <li>
                                     <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.indexRequest', 7) }}" class=" waves-effect">
+                                    <a href="{{ route('dorm.indexRequest', 13) }}" class=" waves-effect">
                                         <!-- <i class="fas fa-book"></i>
                                             <span>Semak Permintaan</span> -->
                                         <!-- <i class="fas fa-id-card"></i> -->
@@ -228,7 +226,7 @@
                                 @role('Guard')
                                 <li>
                                     <!-- need to change to index later -->
-                                    <a href="{{ route('dorm.indexRequest', 8) }}" class=" waves-effect">
+                                    <a href="{{ route('dorm.indexRequest', 14) }}" class=" waves-effect">
                                         <!-- <i class="fas fa-book"></i>
                                             <span>Permintaan</span> -->
                                         <i class="fas fa-user-shield"></i>
@@ -240,7 +238,7 @@
                         </li>
                         @endrole
 
-                        @role('Superadmin')
+                        @role('Superadmin|Pentadbir|Guru|Warden|Guard')
                         <li>
                             <a href="javascript: void(0);" class="has-arrow waves-effect">
                                 <i class="fas fa-hotel"></i>

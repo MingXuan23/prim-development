@@ -55,7 +55,7 @@
                 <a style="margin: 19px; float: right;" href="{{ route('dorm.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Permintaan</a>
                 @endif
 
-                @if($roles == 7 || $roles == 1)
+                @if($roles == 13 || $roles == 1)
                     @if($checkin == 1)
                     <a style="margin: 19px; float: right;" href="{{ route('dorm.updateCheckIn', $checkNum)}}" class="btn btn-primary"> <i class="fas fa-minus"></i> Daftar Keluar</a>
                     @else
@@ -214,7 +214,7 @@
                     columns: [{
                         "data": null,
                         searchable: false,
-                        "sortable": false,
+                        "sortable": true,
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
@@ -231,7 +231,7 @@
                     }, {
                         data: "apply_date_time",
                         name: 'apply_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     }, {
                         data: "fake_name",
@@ -246,17 +246,17 @@
                     },{
                         data: "out_date_time",
                         name: 'out_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     }, {
                         data: 'arrive_date_time',
                         name: 'arrive_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     },{
                         data: 'in_date_time',
                         name: 'in_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     },{
                         data: 'action',
@@ -296,7 +296,7 @@
                     columns: [{
                         "data": null,
                         searchable: false,
-                        "sortable": false,
+                        "sortable": true,
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
@@ -313,7 +313,7 @@
                     }, {
                         data: "apply_date_time",
                         name: 'apply_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     }, {
                         data: "fake_name",
@@ -333,17 +333,17 @@
                     },{
                         data: "out_date_time",
                         name: 'out_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     }, {
                         data: 'arrive_date_time',
                         name: 'arrive_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     },{
                         data: 'in_date_time',
                         name: 'in_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     },{
                         data: 'action',
@@ -383,7 +383,7 @@
                     columns: [{
                         "data": null,
                         searchable: false,
-                        "sortable": false,
+                        "sortable": true,
                         render: function(data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
@@ -400,7 +400,7 @@
                     }, {
                         data: "apply_date_time",
                         name: 'apply_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     }, {
                         data: "fake_name",
@@ -420,17 +420,17 @@
                     },{
                         data: "out_date_time",
                         name: 'out_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     }, {
                         data: 'arrive_date_time',
                         name: 'arrive_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     },{
                         data: 'in_date_time',
                         name: 'in_date_time',
-                        orderable: false,
+                        orderable: true,
                         searchable: false
                     },{
                         data: 'action',
