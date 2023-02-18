@@ -49,14 +49,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="control-label required">Tarikh dan Masa Keluar</label>
-                        <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="datetime-local"
+                        <label class="control-label required">Tarikh Keluar</label>
+                        <input onclick="this.showPicker()" class="form-control" id="start_date" name="start_date" type="date"
                                 placeholder="Pilih Tarikh Keluar">
                     </div>
 
                     <div class="form-group">
-                        <label class="control-label required">Tarikh dan Masa Masuk</label>
-                        <input onclick="this.showPicker()" class="form-control" id="end_date" name="end_date" type="datetime-local"
+                        <label class="control-label required">Tarikh Masuk</label>
+                        <input onclick="this.showPicker()" class="form-control" id="end_date" name="end_date" type="date"
                                 placeholder="Pilih Tarikh Masuk">
                     </div>
 
@@ -91,8 +91,9 @@
 
         var today = new Date();
         today.setSeconds(0, 0);
-        var now = today.toISOString().replace(/:00.000Z/, "");
-
+        // var now = today.toISOString().replace(/:00.000Z/, "");
+        var now = today.toDateString();
+        console.log(now);
         start_date.min = now;
     });
 

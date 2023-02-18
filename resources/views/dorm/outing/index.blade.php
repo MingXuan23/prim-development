@@ -74,8 +74,8 @@
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
-                                <th>Tarikh dan Masa Keluar</th>
-                                <th>Tarikh dan Masa Masuk</th>
+                                <th>Tarikh Keluar</th>
+                                <th>Tarikh Masuk</th>
                                 <th>Details</th>
                             </tr>
                         </thead>

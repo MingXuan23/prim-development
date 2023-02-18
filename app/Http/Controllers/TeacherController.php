@@ -248,6 +248,8 @@ class TeacherController extends Controller
                 ->where('users.email', '=', $request->get('email'))
                 ->where('users.telno', '=', $request->get('telno'))
                 ->first();
+
+            dd($newteacher);
         }
 
         //if the user create warden
@@ -260,11 +262,12 @@ class TeacherController extends Controller
                     ]
                 );
 
+
             // warden active when first time login then will change status
             DB::table('organization_user')->insert([
                 'organization_id'   => $request->get('organization'),
                 'user_id'           => $newteacher->id,
-                'role_id'           => 7,
+                'role_id'           => 13,
                 'start_date'        => now(),
                 'status'            => 0,
             ]);
@@ -272,7 +275,7 @@ class TeacherController extends Controller
             $user = User::find($newteacher->id);
 
             // role warden
-            $rolename = OrganizationRole::find(7);
+            $rolename = OrganizationRole::find(13);
             $user->assignRole($rolename->nama);
 
             return redirect('/teacher/peranan')->with('success', 'New warden has been added successfully');
@@ -291,7 +294,7 @@ class TeacherController extends Controller
             DB::table('organization_user')->insert([
                 'organization_id'   => $request->get('organization'),
                 'user_id'           => $newteacher->id,
-                'role_id'           => 8,
+                'role_id'           => 14,
                 'start_date'        => now(),
                 'status'            => 0,
             ]);
@@ -299,7 +302,7 @@ class TeacherController extends Controller
             $user = User::find($newteacher->id);
 
             // role guru
-            $rolename = OrganizationRole::find(8);
+            $rolename = OrganizationRole::find(14);
             // dd($rolename);
 
             $user->assignRole($rolename->nama);
@@ -492,8 +495,7 @@ class TeacherController extends Controller
     //for warden and guard use
     public function peranandestroy($id)
     {
-
-        $arrayPeranan = [7, 8];
+        $arrayPeranan = [13, 14];
         $result = DB::table('users')
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
             ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
@@ -587,7 +589,7 @@ class TeacherController extends Controller
 
             if ($oid != '' && !is_null($hasOrganizaton)) {
 
-                $arrayPeranan = [7, 8];
+                $arrayPeranan = [13, 14];
                 $data = DB::table('organizations')
                     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
                     ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
@@ -625,7 +627,7 @@ class TeacherController extends Controller
             // user role pentadbir 
             //micole try
             return Organization::whereHas('user', function ($query) use ($userId) {
-                $query->where('user_id', $userId)->whereIn('role_id', [4, 5, 7, 8]);
+                $query->where('user_id', $userId)->whereIn('role_id', [4, 5, 13, 14]);
             })->get();
         }
     }
