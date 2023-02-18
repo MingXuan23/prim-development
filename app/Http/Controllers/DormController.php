@@ -2250,37 +2250,48 @@ class DormController extends Controller
         ->orderBy("outings.end_date_time")
         ->value('outings.end_date_time');
 
-        // outing history exist
         if(count($studentouting) > 0){
-            foreach($studentouting as $studentouting){
-                for($i=0, $max=count($category); $i<$max; $i++){
-                    if($dormid != null){
-                        if($category[$i]->limit > 0){
-                            if(strtoupper($category[$i]->name) == strtoupper($studentouting->catname) && $studentouting->total >= $category[$i]->limit){
-                                unset($category[$i]);
-                            }  
-                        }
+            foreach($studentouting as $stdouting){
+                foreach($category as $key => $cat){
+                    if(strtoupper($stdouting->catname) == strtoupper($cat->name) && $stdouting->total >= $cat->limit){
+                        unset($category[$key]);
                     }
-                    // student didn't live in dorm
-                    else{
-                        if(strtoupper($category[$i]->name) != $categoryReal[0]){
-                            unset($category[$i]);
-                        }
-                    }
+                    dd($category[$key]);
                 }
             }
         }
-        // no outing history
-        else{
-            // student didn't live in dorm
-            if($dormid == null){
-                for($i=0, $max=count($category); $i<$max; $i++){
-                    if(strtoupper($category[$i]->name) != $categoryReal[0]){
-                        unset($category[$i]);
-                    }
-                }
-            }
-        }
+
+        // outing history exist
+        // if(count($studentouting) > 0){
+        //     foreach($studentouting as $studentouting){
+        //         for($i=0, $max=count($category); $i<$max; $i++){
+        //             if($dormid != null){
+        //                 if($category[$i]->limit > 0){
+        //                     if(strtoupper($category[$i]->name) == strtoupper($studentouting->catname) && $studentouting->total >= $category[$i]->limit){
+        //                         unset($category[$i]);
+        //                     }  
+        //                 }
+        //             }
+        //             // student didn't live in dorm
+        //             else{
+        //                 if(strtoupper($category[$i]->name) != $categoryReal[0]){
+        //                     unset($category[$i]);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        // // no outing history
+        // else{
+        //     // student didn't live in dorm
+        //     if($dormid == null){
+        //         for($i=0, $max=count($category); $i<$max; $i++){
+        //             if(strtoupper($category[$i]->name) != $categoryReal[0]){
+        //                 unset($category[$i]);
+        //             }
+        //         }
+        //     }
+        // }
         return response()->json(['success' => $category, 'start' => $start, 'end' => $end, 'studentouting' => $studentouting]);
     }
     
