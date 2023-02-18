@@ -49,14 +49,11 @@
         <div class="card">
             {{-- <div class="card-header">List Of Applications</div> --}}
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
-                        class="fas fa-plus"></i> Import</a>
-                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
-                class="fas fa-plus"></i> Export</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
+                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
                 <!-- <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a> -->
-                <a style="margin: 19px; float: right;" href="{{ route('teacher.create') }}" class="btn btn-primary"> <i
-                        class="fas fa-plus"></i> Tambah Guru</a>
+                <a style="margin: 19px; float: right;" href="{{ route('teacher.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Guru</a>
             </div>
 
             <div class="card-body">
@@ -76,9 +73,10 @@
                 </div>
                 @endif
 
+                <div class="flash-message"></div>
+
                 <div class="table-responsive">
-                    <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th> No. </th>
@@ -107,8 +105,7 @@
                         Adakah anda pasti?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
-                            name="delete">Padam</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
                         <button type="button" data-dismiss="modal" class="btn">Batal</button>
                     </div>
                 </div>
@@ -116,8 +113,7 @@
         </div>
         {{-- end confirmation delete modal --}}
 
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
+        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -134,7 +130,7 @@
                                 <label>Organisasi</label>
                                 <select name="organ" id="organ" class="form-control">
                                     @foreach($organization as $row)
-                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -148,8 +144,7 @@
         </div>
 
         <!-- Modal -->
-        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
+        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -166,7 +161,7 @@
                                 <label>Organisasi</label>
                                 <select name="organ" id="organ" class="form-control">
                                     @foreach($organization as $row)
-                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -198,121 +193,121 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
-
+-=
 <script>
     $(document).ready(function() {
-  
+
         var teacherTable;
-  
-        if($("#organization").val() != ""){
+
+        if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
             fetch_data($("#organization").val());
         }
 
         function fetch_data(oid = '') {
             teacherTable = $('#teacherTable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('teacher.getTeacherDatatable') }}",
-                        data: {
-                            oid: oid,
-                            hasOrganization: true
-                        },
-                        type: 'GET',
-  
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('teacher.getTeacherDatatable') }}",
+                    data: {
+                        oid: oid,
+                        hasOrganization: true
                     },
-                    'columnDefs': [{
-                        "targets": [0], // your case first column
-                        "className": "text-center",
-                        "width": "2%"
-                    },{
-                        "targets": [3,4,5,6], // your case first column
-                        "className": "text-center",
-                    },],
-                    order: [
-                        [1, 'asc']
-                    ],
-                    columns: [{
-                        "data": null,
-                        searchable: false,
-                        "sortable": false,
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        }
-                    }, {
-                        data: "name",
-                        name: 'name'
-                    }, {
-                        data: "username",
-                        name: 'username'
-                    }, {
-                        data: "email",
-                        name: 'email'
-                    }, {
-                        data: "telno",
-                        name: 'telno'
-                    }, {
-                        data: 'status',
-                        name: 'status',
-                        orderable: false,
-                        searchable: false
-                    }, {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },]
+                    type: 'GET',
+
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [3, 4, 5, 6], // your case first column
+                    "className": "text-center",
+                }, ],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "name",
+                    name: 'name'
+                }, {
+                    data: "username",
+                    name: 'username'
+                }, {
+                    data: "email",
+                    name: 'email'
+                }, {
+                    data: "telno",
+                    name: 'telno'
+                }, {
+                    data: 'status',
+                    name: 'status',
+                    orderable: false,
+                    searchable: false
+                }, {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }, ]
             });
         }
-  
+
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('#teacherTable').DataTable().destroy();
             // console.log(organizationid);
             fetch_data(organizationid);
         });
-  
+
         // csrf token for ajax
         $.ajaxSetup({
-                headers: {
+            headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-  
+
         var teacher_id;
-  
-        $(document).on('click', '.btn-danger', function(){
+
+        $(document).on('click', '.btn-danger', function() {
             teacher_id = $(this).attr('id');
             $('#deleteConfirmationModal').modal('show');
         });
-  
+
         $('#delete').click(function() {
-              $.ajax({
-                  type: 'POST',
-                  dataType: 'html',
-                  data: {
-                      "_token": "{{ csrf_token() }}",
-                      _method: 'DELETE'
-                  },
-                  url: "/teacher/" + teacher_id,
-                  success: function(data) {
-                      setTimeout(function() {
-                          $('#confirmModal').modal('hide');
-                      }, 2000);
-  
-                      $('div.flash-message').html(data);
-  
-                      teacherTable.ajax.reload();
-                  },
-                  error: function (data) {
-                      $('div.flash-message').html(data);
-                  }
-              })
-          });
-          
-          $('.alert').delay(3000).fadeOut();
-  
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    _method: 'DELETE'
+                },
+                url: "/teacher/" + teacher_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+
+                    $('div.flash-message').html(data);
+
+                    teacherTable.ajax.reload();
+                },
+                error: function(data) {
+                    $('div.flash-message').html(data);
+                }
+            })
+        });
+
+        $('.alert').delay(3000).fadeOut();
+
     });
 </script>
 @endsection

@@ -46,6 +46,16 @@ class OrganizationRolesTableSeeder extends Seeder
                 "id" => 3,
                 "nama" => "Jaim",
             ),
+            6 =>
+            array(
+                "id" => 7,
+                "nama" => "Warden",
+            ),
+            7 =>
+            array(
+                "id" => 8,
+                "nama" => "Guard",
+            ),
         ));
     }
 }

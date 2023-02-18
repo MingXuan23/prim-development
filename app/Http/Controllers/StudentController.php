@@ -31,8 +31,7 @@ class StudentController extends Controller
         $userId = Auth::id();
         $organization = $this->getOrganizationByUserId();
 
-        if(Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir'))
-        {
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')) {
             $listclass = DB::table('classes')
                 ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                 ->select('classes.id as id', 'classes.nama', 'classes.levelid')
@@ -42,9 +41,7 @@ class StudentController extends Controller
                 ])
                 ->orderBy('classes.nama')
                 ->get();
-        }
-        else
-        {
+        } else {
             $listclass = DB::table('class_organization')
                 ->leftJoin('classes', 'class_organization.class_id', '=', 'classes.id')
                 ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
@@ -86,10 +83,10 @@ class StudentController extends Controller
         $namaFile   = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
         $public_path = $_SERVER['DOCUMENT_ROOT'];
-        
+
         $etx = $file->getClientOriginalExtension();
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
-        if (! in_array($etx, $formats)) {
+        if (!in_array($etx, $formats)) {
 
             return redirect('/student')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
@@ -158,9 +155,8 @@ class StudentController extends Controller
                             ->first();
             
             // dd($newparent);
-            
-            if(empty($newparent))
-            {
+
+            if (empty($newparent)) {
                 $this->validate($request, [
                     'parent_phone'      =>  'required|unique:users,telno',
                 ]);
@@ -181,16 +177,15 @@ class StudentController extends Controller
                 ]);
                 $newparent->save();
             }
-           
+
             // add parent role
             $parentRole = DB::table('organization_user')
-                        ->where('user_id', $newparent->id)
-                        ->where('organization_id', $co->oid)
-                        ->where('role_id', 6)
-                        ->first();
+                ->where('user_id', $newparent->id)
+                ->where('organization_id', $co->oid)
+                ->where('role_id', 6)
+                ->first();
 
-            if(empty($parentRole))
-            {
+            if (empty($parentRole)) {
                 DB::table('organization_user')->insert([
                     'organization_id'   => $co->oid,
                     'user_id'           => $newparent->id,
@@ -198,9 +193,8 @@ class StudentController extends Controller
                     'start_date'        => now(),
                     'status'            => 1,
                 ]);
-            }   
-        }
-        else { 
+            }
+        } else {
             $newparent = DB::table('users')
                         ->where('telno', '=', "{$request->get('parent_phone')}")
                         ->first();
@@ -208,17 +202,17 @@ class StudentController extends Controller
 
 
         $ou = DB::table('organization_user')
-                ->where('user_id', $newparent->id)
-                ->where('organization_id', $co->oid)
-                ->where('role_id', 6)
-                ->first();
-
+            ->where('user_id', $newparent->id)
+            ->where('organization_id', $co->oid)
+            ->where('role_id', 6)
+            ->first();
+        // dd($newparent->id);
         $user = User::find($newparent->id);
 
         // role parent
         $rolename = OrganizationRole::find(6);
         $user->assignRole($rolename->nama);
-        
+
         $student = new Student([
             'nama'          =>  $request->get('name'),
             // 'icno'          =>  $request->get('icno'),
@@ -227,7 +221,7 @@ class StudentController extends Controller
         ]);
 
         $student->save();
-// 
+        // 
         DB::table('class_student')->insert([
             'organclass_id'   => $co->id,
             'student_id'      => $student->id,
@@ -236,8 +230,8 @@ class StudentController extends Controller
         ]);
 
         $classStu = DB::table('class_student')
-                ->where('student_id', $student->id)
-                ->first();
+            ->where('student_id', $student->id)
+            ->first();
 
         DB::table('organization_user_student')->insert([
             'organization_user_id'  => $ou->id,
@@ -257,21 +251,19 @@ class StudentController extends Controller
         // check fee for new in student
         // check category A fee
         $ifExitsCateA = DB::table('fees_new')
-                        ->where('category', 'Kategory A')
-                        ->where('organization_id', $co->oid)
-                        ->where('status', 1)
-                        ->get();
-        
-        $ifExitsCateBC = DB::table('fees_new')
-                        ->whereIn('category', ['Kategory B', 'Kategory C'])
-                        ->where('organization_id', $co->oid)
-                        ->where('status', 1)
-                        ->get();
+            ->where('category', 'Kategory A')
+            ->where('organization_id', $co->oid)
+            ->where('status', 1)
+            ->get();
 
-        if(!$ifExitsCateA->isEmpty() && count($ifExits) == 0)
-        {
-            foreach($ifExitsCateA as $kateA)
-            {
+        $ifExitsCateBC = DB::table('fees_new')
+            ->whereIn('category', ['Kategory B', 'Kategory C'])
+            ->where('organization_id', $co->oid)
+            ->where('status', 1)
+            ->get();
+
+        if (!$ifExitsCateA->isEmpty() && count($ifExits) == 0) {
+            foreach ($ifExitsCateA as $kateA) {
                 DB::table('fees_new_organization_user')->insert([
                     'status'                    => 'Debt',
                     'fees_new_id'               =>  $kateA->id,
@@ -281,32 +273,24 @@ class StudentController extends Controller
             }
         }
 
-        if(!$ifExitsCateBC->isEmpty())
-        {
-            foreach($ifExitsCateBC as $kateBC)
-            {
+        if (!$ifExitsCateBC->isEmpty()) {
+            foreach ($ifExitsCateBC as $kateBC) {
                 $target = json_decode($kateBC->target);
 
-                if(isset($target->gender))
-                {
-                    if($target->gender != $request->get('gender'))
-                    {
+                if (isset($target->gender)) {
+                    if ($target->gender != $request->get('gender')) {
                         continue;
                     }
                 }
-                
-                if($target->data == "All_Level" || $target->data == $class->levelid)
-                {
+
+                if ($target->data == "All_Level" || $target->data == $class->levelid) {
                     DB::table('student_fees_new')->insert([
                         'status'            => 'Debt',
                         'fees_id'           =>  $kateBC->id,
                         'class_student_id'  =>  $classStu->id
                     ]);
-                }
-                else if(is_array($target->data))
-                {
-                    if(in_array($class->id, $target->data))
-                    {
+                } else if (is_array($target->data)) {
+                    if (in_array($class->id, $target->data)) {
                         DB::table('student_fees_new')->insert([
                             'status'            => 'Debt',
                             'fees_id'           =>  $kateBC->id,
@@ -314,7 +298,6 @@ class StudentController extends Controller
                         ]);
                     }
                 }
-
             }
         }
 
@@ -359,7 +342,7 @@ class StudentController extends Controller
 
         $this->validate($request, [
             'name'          =>  'required',
-            'icno'          =>  'required',
+            //'icno'          =>  'required',
             'classes'       =>  'required',
         ]);
 
@@ -379,7 +362,7 @@ class StudentController extends Controller
             ->update(
                 [
                     'students.nama' => $request->get('name'),
-                    'students.icno' => $request->get('icno'),
+                    //'students.icno' => $request->get('icno'),
                     'students.gender' => $request->get('gender'),
                     'students.email' => $request->get('email'),
                     'class_student.organclass_id'    => $getOrganizationClass->id,
@@ -422,6 +405,7 @@ class StudentController extends Controller
 
         if (request()->ajax()) {
             // $oid = $request->oid;
+
             $classid = $request->classid;
 
             $hasOrganizaton = $request->hasOrganization;
@@ -468,8 +452,6 @@ class StudentController extends Controller
                 $table->rawColumns(['status', 'action']);
                 return $table->make(true);
             }
-
-            // dd($data->oid);
         }
     }
 
@@ -495,8 +477,7 @@ class StudentController extends Controller
         $userId = Auth::id();
         $oid = $request->get('oid');
 
-        if(Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir'))
-        {
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')) {
             $list = DB::table('classes')
                 ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                 ->select('classes.id as cid', 'classes.nama as cname')
@@ -506,9 +487,7 @@ class StudentController extends Controller
                 ])
                 ->orderBy('classes.nama')
                 ->get();
-        }
-        else
-        {
+        } else {
             $list = DB::table('class_organization')
                 ->leftJoin('classes', 'class_organization.class_id', '=', 'classes.id')
                 ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
@@ -577,6 +556,7 @@ class StudentController extends Controller
                         return $btn;
                     }
                 });
+
 
 
                 $table->rawColumns(['gender', 'status']);

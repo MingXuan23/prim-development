@@ -21,8 +21,33 @@
 <div class="row">
 
     <div class="col-md-12">
+        <div class="card card-primary">
+            {{csrf_field()}}
+            <div class="card-body">
+
+                <div class="form-group">
+                    <label>Nama Organisasi</label>
+                    <select name="organization" id="organization" class="form-control">
+                        <option value="" selected disabled>Pilih Organisasi</option>
+                        @foreach($organization as $row)
+                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div id="dkelas" class="form-group">
+                    <label> Kelas</label>
+                    <select name="classes" id="classes" class="form-control">
+                        <option value="" disabled selected>Pilih Kelas</option>
+
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
         <div class="card">
-            {{-- <div class="card-header">List Of Applications</div> --}}
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
                         class="fas fa-plus"></i> Import</a>
@@ -36,27 +61,7 @@
             </div>
 
             <div class="card-body">
-                {{csrf_field()}}
-                <div class="card-body">
 
-                    <div class="form-group">
-                        <label>Nama Organisasi</label>
-                        <select name="organization" id="organization" class="form-control">
-                            <option value="" selected disabled>Pilih Organisasi</option>
-                            @foreach($organization as $row)
-                            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div id="dkelas" class="form-group">
-                        <label> Kelas</label>
-                        <select name="classes" id="classes" class="form-control">
-                            <option value="" disabled selected>Pilih Kelas</option>
-
-                        </select>
-                    </div>
-                </div>
                 @if(count($errors) > 0)
                 <div class="alert alert-danger">
                     <ul>
@@ -192,6 +197,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 @endsection

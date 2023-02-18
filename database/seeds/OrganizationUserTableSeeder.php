@@ -49,6 +49,30 @@ class OrganizationUserTableSeeder extends Seeder
                 "organization_id" => 2,
                 "role_id" => 1
             ),
+            // below is warden from school 1
+            5 =>
+            array(
+                "id" => 6,
+                "user_id" => 8,
+                "organization_id" => 4,
+                "role_id" => 7
+            ),
+            //below is teacher 1 from school 1
+            6 =>
+            array(
+                "id" => 7,
+                "user_id" => 6,
+                "organization_id" => 4,
+                "role_id" => 5
+            ),
+            //below is parent 1 from school 1
+            7 =>
+            array(
+                "id" => 8,
+                "user_id" => 7,
+                "organization_id" => 4,
+                "role_id" => 6
+            ),
         ));
     }
 }

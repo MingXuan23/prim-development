@@ -82,6 +82,74 @@ class UsersTableSeeder extends Seeder
                 "created_at" => "2020-06-07 10:48:33",
                 "updated_at" => "2020-06-07 10:52:01"
             ),
+            4 =>
+            array(
+                "id" => 5,
+                "email" => app()->environment('local') ? 'siowzheyi@gmail.com' : 'siowzheyi@gmail.com',
+                "password" => app()->environment('local') ? \Hash::make("Prim123@") : \Hash::make("Prim123@"),
+                "name" => "Siow Zhe Yi",
+                "username" => "siowzheyi",
+                "icno" => "020325-05-0654",
+                "state" => "Selangor",
+                "postcode" => "45600",
+                "telno" => "0102388325",
+                "address" => "Batu 8, Kampung Ijok",
+                "email_verified_at" => "2020-06-07 18:52:01",
+                "remember_token" => "",
+                "created_at" => "2020-06-07 10:48:33",
+                "updated_at" => "2020-06-07 10:52:01"
+            ),
+            5 =>
+            array(
+                "id" => 6,
+                "email" => app()->environment('local') ? 'teacher1@gmail.com' : 'teacher1@gmail.com',
+                "password" => app()->environment('local') ? \Hash::make("Prim123@") : \Hash::make("Prim123@"),
+                "name" => "teacher 1",
+                "username" => "teacher1",
+                "icno" => "963256-05-0654",
+                "state" => "Selangor",
+                "postcode" => "45600",
+                "telno" => "0101234567",
+                "address" => "Batu 8, Kampung Ijok",
+                "email_verified_at" => "2020-06-07 18:52:01",
+                "remember_token" => "",
+                "created_at" => "2020-06-07 10:48:33",
+                "updated_at" => "2020-06-07 10:52:01"
+            ),
+            6 =>
+            array(
+                "id" => 7,
+                "email" => app()->environment('local') ? 'parentstudent1@gmail.com' : 'parentstudent1@gmail.com',
+                "password" => app()->environment('local') ? \Hash::make("Prim123@") : \Hash::make("Prim123@"),
+                "name" => "parent 1",
+                "username" => "parentstudent1",
+                "icno" => "963256-05-0654",
+                "state" => "Selangor",
+                "postcode" => "45600",
+                "telno" => "0106594357",
+                "address" => "Batu 8, Kampung Ijok",
+                "email_verified_at" => "2020-06-07 18:52:01",
+                "remember_token" => "",
+                "created_at" => "2020-06-07 10:48:33",
+                "updated_at" => "2020-06-07 10:52:01"
+            ),
+            7 =>
+            array(
+                "id" => 8,
+                "email" => app()->environment('local') ? 'warden1@gmail.com' : 'warden1@gmail.com',
+                "password" => app()->environment('local') ? \Hash::make("Prim123@") : \Hash::make("Prim123@"),
+                "name" => "warden 1",
+                "username" => "warden1",
+                "icno" => "963256-05-0654",
+                "state" => "Selangor",
+                "postcode" => "45600",
+                "telno" => "0106594357",
+                "address" => "Batu 8, Kampung Ijok",
+                "email_verified_at" => "2020-06-07 18:52:01",
+                "remember_token" => "",
+                "created_at" => "2020-06-07 10:48:33",
+                "updated_at" => "2020-06-07 10:52:01"
+            ),
         ));
     }
 }

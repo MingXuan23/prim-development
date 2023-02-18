@@ -152,7 +152,7 @@ class OrganizationController extends Controller
         // after launch remove where
         // $type_org = TypeOrganization::where('id', 4)->orWhere('id', 5)->get();
         // $type_org = TypeOrganization::whereNotIn('id', array(1, 2, 3))->get();
-        
+
         // check if organizations doesnt belong to the user
         if (!Auth::user()->hasRole('Superadmin')) {
             $user = Auth::user();
@@ -190,8 +190,7 @@ class OrganizationController extends Controller
     {
         Organization::where('id', $id)->update($request->validated());
 
-        if(isset($request->seller_id))
-        {
+        if (isset($request->seller_id)) {
             Organization::where('id', $id)->update([
                 'seller_id'         => $request->seller_id,
                 'fixed_charges'      =>  $request->fixed_charges,
@@ -256,7 +255,7 @@ class OrganizationController extends Controller
         if (Auth::user()->hasRole('Superadmin')) {
             return Organization::all();
         } else {
-        $userId = Auth::id();
+            $userId = Auth::id();
             return DB::table('organizations as o')
             ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
             ->select("o.*")

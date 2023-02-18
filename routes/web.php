@@ -13,6 +13,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+
 Auth::routes();
 // Auth::routes(['register' => false]);
 
@@ -78,6 +79,13 @@ Route::group(['prefix' => 'organization'], function () {
 
 Route::group(['prefix' => 'teacher'], function () {
     Route::get('list', 'TeacherController@getTeacherDatatable')->name('teacher.getTeacherDatatable');
+    Route::get('listperanan', 'TeacherController@getPerananDatatable')->name('teacher.getPerananDatatable');
+    Route::get('peranan', 'TeacherController@perananindex')->name('teacher.perananindex');
+    Route::get('storeperanan', 'TeacherController@perananstore')->name('teacher.perananstore');
+    Route::get('createperanan', 'TeacherController@peranancreate')->name('teacher.peranancreate');
+    Route::get('editperanan/{id}', 'TeacherController@perananedit')->name('teacher.perananedit');
+    Route::post('updateperanan/{id}', 'TeacherController@perananupdate')->name('teacher.perananupdate');
+    Route::post('destroyperanan/{id}', 'TeacherController@peranandestroy')->name('teacher.peranandestroy');
 });
 
 Route::group(['prefix' => 'class'], function () {
@@ -130,7 +138,7 @@ Route::group(['prefix' => 'fees'], function () {
 
     Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
     Route::get('/list-receipt', 'FeesController@getFeesReceiptDataTable')->name('fees.getFeesReceiptDataTable');
-    
+
     Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 
@@ -312,6 +320,7 @@ Route::group(['middleware' => ['auth']], function () {
         'activity'           => 'ActivityController',
         'session'            => 'SessionController',
         'profile'            => 'ProfileController',
+        'dorm'               => 'DormController',
         'koperasi'           => 'Cooperative\User\UserCooperativeController',
     ]);
 });
@@ -337,7 +346,11 @@ Route::get('feesparentdev', 'FeesController@devpay')->name('feesparentdev');
 Route::post('receiptdev', 'FeesController@devreceipt')->name('receiptdev');
 
 Route::post('/exportteacher', 'TeacherController@teacherexport')->name('exportteacher');
+Route::post('/exportperanan', 'TeacherController@perananexport')->name('exportperanan');
 Route::post('/importteacher', 'TeacherController@teacherimport')->name('importteacher');
+Route::post('/importwarden', 'TeacherController@wardenimport')->name('importwarden');
+Route::post('/importguard', 'TeacherController@guardimport')->name('importguard');
+
 
 Route::post('/exportclass', 'ClassController@classexport')->name('exportclass');
 Route::post('/importclass', 'ClassController@classimport')->name('importclass');
@@ -346,6 +359,26 @@ Route::post('/exportstudent', 'StudentController@studentexport')->name('exportst
 Route::post('/importstudent', 'StudentController@studentimport')->name('importstudent');
 
 Route::post('/importparent', 'ParentController@parentImport')->name('importparent');
+
+Route::post('/exportouting', 'DormController@outingexport')->name('exportouting');
+
+Route::post('/exportresident', 'DormController@residentexport')->name('exportresident');
+
+//dorm management import and export
+Route::post('/exportdorm', 'DormController@dormexport')->name('exportdorm');
+Route::post('/importdorm', 'DormController@dormimport')->name('importdorm');
+Route::post('/importresident', 'DormController@residentimport')->name('importresident');
+
+//studentlist export
+Route::post('/exportallstudentlist', 'DormController@allstudentlistexport')->name('exportallstudentlist');
+Route::post('/exportdormstudentlist', 'DormController@dormstudentlistexport')->name('exportdormstudentlist');
+
+//report export
+Route::post('/exportallcategory', 'DormController@allcategoryexport')->name('exportallcategory');
+Route::post('/exportcategory', 'DormController@categoryexport')->name('exportcategory');
+Route::post('/exportallrequest', 'DormController@allrequestexport')->name('exportallrequest');
+
+
 
 Route::get('chat-user', 'MessageController@chatUser')->name('chat-user');
 Route::get('chat-page/{friendId}', 'MessageController@chatPage')->name('chat-page');
@@ -397,9 +430,88 @@ Route::group(['prefix' => 'polimas'], function () {
     });
 });
 
-/* 
+
 Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
     Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
     Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
     Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
-}); */
+});
+
+Route::resource('dorm', 'DormController');
+Route::group(['prefix' => 'sekolah'], function () {
+    // application
+    Route::get('dorm/indexRequest/{id}', 'DormController@indexRequest')->name('dorm.indexRequest');
+    Route::get('dorm/getStudentOutingDatatable', 'DormController@getStudentOutingDatatable')->name('dorm.getStudentOutingDatatable');
+    Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
+    Route::get('dorm/updateInTime/{id}', 'DormController@updateInTime')->name('dorm.updateInTime');
+    Route::get('dorm/updateArriveTime/{id}', 'DormController@updateArriveTime')->name('dorm.updateArriveTime');
+    Route::get('dorm/updateApprove/{id}', 'DormController@updateApprove')->name('dorm.updateApprove');
+    Route::get('dorm/updateTolak/{id}', 'DormController@updateTolak')->name('dorm.updateTolak');
+    Route::get('dorm/updateCheckIn/{id}', 'DormController@updateCheckIn')->name('dorm.updateCheckIn');
+    Route::get('dorm/updateBlacklist/{id}', 'DormController@updateBlacklist')->name('dorm.updateBlacklist');
+    Route::get('dorm/fetchCategory', "DormController@fetchCategory")->name('dorm.fetchCategory');
+    Route::get('dorm/fetchStudent', "DormController@fetchStudent")->name('dorm.fetchStudent');
+    Route::get('dorm/fetchRole', "DormController@fetchRole")->name('dorm.fetchRole');
+
+    // outing
+    Route::get('dorm/storeOuting', 'DormController@storeOuting')->name('dorm.storeOuting');
+    Route::get('dorm/indexOuting', 'DormController@indexOuting')->name('dorm.indexOuting');
+    Route::get('dorm/createOuting', 'DormController@createOuting')->name('dorm.createOuting');
+    Route::get('dorm/editOuting/{id}', 'DormController@editOuting')->name('dorm.editOuting');
+    Route::post('dorm/updateOuting/{id}', 'DormController@updateOuting')->name('dorm.updateOuting');
+    Route::post('dorm/destroyOuting/{id}', 'DormController@destroyOuting')->name('dorm.destroyOuting');
+    Route::get('dorm/getOutingsDatatable', 'DormController@getOutingsDatatable')->name('dorm.getOutingsDatatable');
+
+    // student-dorm (resident)
+    Route::get('dorm/createResident', 'DormController@createResident')->name('dorm.createResident');
+    Route::get('dorm/indexResident/{id}', 'DormController@indexResident')->name('dorm.indexResident');
+    Route::get('dorm/storeResident', 'DormController@storeResident')->name('dorm.storeResident');
+    Route::get('dorm/editResident/{id}', 'DormController@editResident')->name('dorm.editResident');
+    Route::get('dorm/updateResident/{id}', 'DormController@updateResident')->name('dorm.updateResident');
+    Route::post('dorm/destroyResident/{id}', 'DormController@destroyResident')->name('dorm.destroyResident');
+    Route::post('dorm/fetchDorm', 'DormController@fetchDorm')->name('dorm.fetchDorm');
+    Route::post('dorm/schoolStudent', 'DormController@schoolStudent')->name('dorm.schoolStudent');
+    Route::get('dorm/getResidentsDatatable', 'DormController@getResidentsDatatable')->name('dorm.getResidentsDatatable');
+
+    //dorm management
+    Route::get('dorm/createDorm', 'DormController@createDorm')->name('dorm.createDorm');
+    Route::get('dorm/indexDorm', 'DormController@indexDorm')->name('dorm.indexDorm');
+    Route::get('dorm/storeDorm', 'DormController@storeDorm')->name('dorm.storeDorm');
+    Route::get('dorm/updateDorm/{id}', 'DormController@updateDorm')->name('dorm.updateDorm');
+    Route::get('dorm/editDorm/{id}', 'DormController@editDorm')->name('dorm.editDorm');
+    Route::get('dorm/destroyDorm/{id}', 'DormController@destroyDorm')->name('dorm.destroyDorm');
+    Route::get('dorm/getDormDataTable', 'DormController@getDormDataTable')->name('dorm.getDormDataTable');
+    Route::get('dorm/clearDorm/{id}', 'DormController@clearDorm')->name('dorm.clearDorm');
+    Route::get('dorm/outDorm/{id}', 'DormController@outDorm')->name('dorm.outDorm');
+
+    //studentlist
+    Route::get('dorm/indexStudentlist', 'DormController@indexStudentlist')->name('dorm.indexStudentlist');
+    //     for all student
+    Route::get('dorm/getAllStudentlistDatatable', 'DormController@getAllStudentlistDatatable')->name('dorm.getAllStudentlistDatatable');
+    Route::get('dorm/getBlacklistStudentlistDatatable', 'DormController@getBlacklistStudentlistDatatable')->name('dorm.getBlacklistStudentlistDatatable');
+    //     for particular dorm student
+    Route::get('dorm/getDormStudentlistDatatable', 'DormController@getDormStudentlistDatatable')->name('dorm.getDormStudentlistDatatable');
+    Route::get('dorm/getDormBlacklistStudentlistDatatable', 'DormController@getDormBlacklistStudentlistDatatable')->name('dorm.getDormBlacklistStudentlistDatatable');
+    Route::post('dorm/blockStudent/{id}/{blockStatus}', 'DormController@blockStudent')->name('dorm.blockStudent');
+
+    //report
+    Route::get('dorm/reportPerStudent/{id}', 'DormController@reportPerStudent')->name('dorm.reportPerStudent');
+    Route::get('dorm/getReportDatatable/{id}', 'DormController@getReportDatatable')->name('dorm.getReportDatatable');
+    Route::get('dorm/getStudentOutingByCategory', 'DormController@getStudentOutingByCategory')->name('dorm.getStudentOutingByCategory');
+    Route::get('dorm/indexReportAll', 'DormController@indexReportAll')->name('dorm.indexReportAll');
+    Route::get('dorm/resetOutingLimit', 'DormController@resetOutingLimit')->name('dorm.resetOutingLimit');
+    Route::get('dorm/printcategory', 'DormController@printcategory')->name('dorm.printcategory');
+    Route::get('dorm/printall', 'DormController@printall')->name('dorm.printall');
+    Route::get('dorm/printallrequest', 'DormController@printallrequest')->name('dorm.printallrequest');
+
+
+
+    //reason outing
+    Route::get('dorm/getReasonOutingDatatable', 'DormController@getReasonOutingDatatable')->name('dorm.getReasonOutingDatatable');
+    Route::get('dorm/indexReasonOuting', 'DormController@indexReasonOuting')->name('dorm.indexReasonOuting');
+    Route::get('dorm/editOutingReason/{id}', 'DormController@editOutingReason')->name('dorm.editOutingReason');
+    Route::get('dorm/destroyReasonOuting/{id}', 'DormController@destroyReasonOuting')->name('dorm.destroyReasonOuting');
+    Route::get('dorm/createReasonOuting', 'DormController@createReasonOuting')->name('dorm.createReasonOuting');
+    Route::get('dorm/storeReasonOuting', 'DormController@storeReasonOuting')->name('dorm.storeReasonOuting');
+    Route::get('dorm/updateReasonOuting/{id}', 'DormController@updateReasonOuting')->name('dorm.updateReasonOuting');
+});

@@ -46,7 +46,7 @@ class TeacherExport implements FromCollection, ShouldAutoSize, WithHeadings
         return [
             'Nama',
             'No. kp',
-            'email',
+            'Email',
             'No. Tel Bimbit'
         ];
     }
