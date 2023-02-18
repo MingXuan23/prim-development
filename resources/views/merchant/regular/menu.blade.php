@@ -20,12 +20,14 @@
 
 #img-size
 {
-  max-width: 100%;
-  height: auto;
+  /* max-width: 100%; */
+  height: 100px;
   width: 100px;
-  border-radius: 14px;
-  object-fit: contain;
-  background-color:rgb(61, 61, 61)
+  object-fit: cover;
+}
+
+.default-img {
+  background-color:rgb(61, 61, 61);
 }
 
 .nav-link{
@@ -51,6 +53,41 @@
   height: 35px;
   display:none;
 }
+
+.cart-btn {
+  position: relative;
+}
+
+.cart-btn .notification {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  padding: 5px 10px;
+  border-radius: 50%;
+  background: red;
+  color: white;
+}
+
+#quantity-danger{
+  display: none;
+}
+
+.center-danger{
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 12px;
+
+  background-color: rgba(248, 215, 218, 1);
+  border-color: rgba(220, 53, 69, 1);
+  color: rgba(114, 28, 36,1);
+
+  text-align: center;
+}
 </style>
 
 @endsection
@@ -60,7 +97,7 @@
 <div class="row align-items-center">
   <div class="col-sm-6">
       <div class="page-title-box">
-          <h4 class="font-size-18"><a href="{{ route('merchant.regular.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
+          <h4 class="font-size-18"><a href="{{ route('merchant-reg.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
       </div>
   </div>
 </div>
@@ -72,9 +109,11 @@
       <div class="card-header text-white" id="has-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
-          <a href="{{ route('merchant.regular.cart', $merchant->id) }}"><i class="mdi mdi-cart fa-3x"></i></a>
+          <a href="{{ route('merchant-reg.cart', $merchant->id) }}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
         </div>
         
+        <input type="hidden" name="hidden-org-id" id="hidden-org-id" value="{{ $merchant->id }}">
+
         <p><i class="fas fa-map-marker-alt mr-2"></i> {{ $merchant->address }}, {{ $merchant->city }}, {{ $merchant->state }}</p>
 
         {{-- <div class="d-flex">
@@ -102,20 +141,24 @@
         
         <div class="flash-message"></div>
 
-        @foreach($product_group as $group)
+        @forelse($product_group as $group)
           <div class="d-flex justify-content-start" id="{{ $group->name }}">
             <h3 class="mb-4 ml-2">{{ $group->name }}</h3>
           </div>
-
+          
           @foreach($product_item as $item)
             @if($item->product_group_id == $group->id)
               <div class="row">
                 <div class="col">
-                  <div class="card border p-2" id="shadow-bg">
+                  <div class="card  p-2" id="shadow-bg">
                     <div class="d-flex">
                       <div class="d-flex justify-content-center align-items-start">
                         <div>
-                          <img class="img-fluid" id="img-size" src="{{ URL('images/koperasi/default-item.png')}}">
+                          @if($item->image == null)
+                          <img class="rounded img-fluid default-img" id="img-size"  src="{{ URL('images/koperasi/default-item.png')}}">
+                          @else
+                          <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$merchant->code.'/'.$item->image)}}">
+                          @endif
                         </div>
                       </div>
                       <div class="col">
@@ -150,8 +193,11 @@
               </div>
             @endif
           @endforeach
-        
-        @endforeach
+          @empty
+              <div class="d-flex justify-content-center">
+                <i>Tiada Produk Buat Masa Sekarang</i>
+              </div>
+        @endforelse
     </div>
   </div>
 </div>
@@ -185,34 +231,38 @@
 
 <script>
   $(document).ready(function(){
-    var item_id, org_id;
+    let item_id, org_id;
     
+
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
 
+    notificationCounter($('#hidden-org-id').val())
+
     $('.btn-item-modal').click(function(e) {
       e.preventDefault()
-      $('.modal-title').empty()
-      $('.modal-body').empty()
+      let modalTitle = $('.modal-title'), modalBody = $('.modal-body')
+      modalTitle.empty()
+      modalBody.empty()
       item_id = $(this).attr('data-item-id')
       org_id = $(this).attr('data-org-id')
       
       $.ajax({
-        url: "{{ route('merchant.regular.fetch-item') }}",
+        url: "{{ route('merchant-reg.fetch-item') }}",
         method: "POST",
         data: {i_id:item_id, o_id:org_id},
         beforeSend:function() {
           $('#addToCartModal').modal('show')
-          $('.modal-body').append("<div class='text-center'><img src='{{ URL('images/koperasi/loading-ajax.gif')}}' style='width:40px;height:40px;'></div>")
+          modalBody.append("<div class='text-center'><img src='{{ URL('images/koperasi/loading-ajax.gif')}}' style='width:40px;height:40px;'></div>")
         },
         success:function(result)
         {
-          $('.modal-body').empty()
-          $('.modal-title').append(result.item.name)
-          $('.modal-body').append(result.body)
+          modalBody.empty()
+          modalTitle.append(result.item.name)
+          modalBody.append(result.body)
           
           quantityExceedHandler($("input[name='quantity_input']"), result.quantity)
         },
@@ -224,10 +274,10 @@
     })
 
     $('.cart-add-btn').click(function(){
-      var quantity = $("input[name='quantity_input']").val()
+      let quantity = $("input[name='quantity_input']").val()
 
       $.ajax({
-        url: "{{ route('merchant.regular.store-item') }}",
+        url: "{{ route('merchant-reg.store-item') }}",
         method: "POST",
         data: {
           i_id:item_id,
@@ -235,13 +285,12 @@
           qty:quantity,
         },
         beforeSend: function() {
-          $('.cart-add-btn').css('display', 'none')
+          $(this).css('display', 'none')
           $('.loading').show()
         },
         success:function(result)
         { 
-          console.log(result)
-          $('.cart-add-btn').show()
+          $(this).show()
           $('.loading').hide()
           $('div.flash-message').empty()
           
@@ -253,6 +302,9 @@
             $('div.flash-message').show()
             $('div.flash-message').append(message)
             $('div.flash-message').delay(3000).fadeOut()
+
+            notificationCounter(org_id)
+
             $("html, body").animate({ scrollTop: 0 }, "slow");
           }
           else
@@ -277,6 +329,30 @@
       })
     })
 
+    function notificationCounter(org_id)
+    {
+      let noty = $('.notification')
+      $.ajax({
+        url: "{{ route('merchant-reg.count-cart') }}",
+        method: "POST",
+        data: {org_id:org_id},
+        beforeSend:function(){
+          noty.empty()
+        },
+        success:function(result){
+          if(result.counter != 0) {
+            noty.attr('hidden', false)
+            noty.append(result.counter)
+          } else {
+            noty.attr('hidden', true)
+          }
+        },
+        error:function(result){
+          console.log(result.responseText)
+        }
+      })
+    }
+
     function quantityExceedHandler(i_Quantity, maxQuantity)
     {
       i_Quantity.TouchSpin({
@@ -296,6 +372,7 @@
             if (event.cancelable) event.preventDefault();
             tmp = false;
             $(this).val(this.value.slice(0, -1))
+            $('#quantity-danger').addClass('center-danger').show()
             return tmp;
           }
           else
@@ -310,6 +387,8 @@
         }
       });
     }
+
+
 
     $('.alert-success').delay(2000).fadeOut()
     $('.alert-danger').delay(4000).fadeOut()

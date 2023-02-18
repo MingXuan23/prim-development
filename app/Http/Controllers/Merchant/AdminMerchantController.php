@@ -1006,7 +1006,7 @@ class AdminMerchantController extends Controller
         }
     }
     /* END ORDER SECTION */
-
+    
     public function destroyOrder(Request $request)
     {
         $id = $request->o_id;

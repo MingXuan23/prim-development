@@ -452,39 +452,12 @@ class PayController extends AppBaseController
         }
         else if($request->desc == 'Merchant')
         {
-            $pickup_date = $request->pickup_date;
-            $pickup_time = $request->pickup_time;
-            $note = $request->note;
             $gng_order_id = $request->order_id;
-            $order_type = $request->order_type;
 
-            $today = Carbon::now();
-            $date_f = Carbon::parse($pickup_date);
-            
-            if($today->format('d-m-Y') == $date_f->format('d-m-Y')) {
-                $isToday = true;
-            } else {
-                $isToday = false;
-            }
-            
-            if($isToday) {
-                $current_time = Carbon::now()->format('G:i');
-                if(Carbon::parse($pickup_time)->lt($current_time)) { // 11 < 12
-                    return back()->with('error', 'Sila pilih masa yang sesuai');
-                }
-            }
-            
-            if($order_type == 'Pick-Up') {
-                $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('h:i:s');
-
-                DB::table('pgng_orders')->where('id', $gng_order_id)->update([
-                    'updated_at' => Carbon::now(),
-                    'order_type' => $order_type,
-                    'pickup_date' => $pickup_datetime,
-                    'note' => $note,
-                    'status' => 'Pending'
-                ]);
-            }
+            DB::table('pgng_orders')->where('id', $gng_order_id)->update([
+                'updated_at' => Carbon::now(),
+                'status' => 'Pending'
+            ]);
 
             $gng_order = DB::table('pgng_orders')
             ->where('id', $gng_order_id)
@@ -499,7 +472,25 @@ class PayController extends AppBaseController
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            $fpx_sellerOrderNo  = "FOPRIM" . date('YmdHis') . rand(10000, 99999);
+            $fpx_sellerOrderNo  = "MUPRIM" . date('YmdHis') . rand(10000, 99999);
+
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerId       = config('app.env') == 'production' ? $ficts_seller_id : "SE00013841";
+        }
+        else if($request->desc == 'Koperasi')
+        {
+            $cart = PgngOrder::find($request->cartId);
+
+            $request->amount = $cart->total_price;
+            $ficts_seller_id = "SE00054277";
+
+            $user = User::find($cart->user_id);
+            $organization = Organization::find($cart->organization_id);
+            $fpx_buyerEmail      = $user->email;
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "KOPPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $ficts_seller_id : "SE00013841";
@@ -595,7 +586,18 @@ class PayController extends AppBaseController
                 $result = DB::table('pgng_orders')
                 ->where('id', $gng_order_id)
                 ->update([
-                    'status' => 'Paid',
+                    'transaction_id' => $transaction->id
+                ]);
+            }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'K')
+            {
+                $daySelect = (int)$request->week_status;     
+                $pickUp = Carbon::now()->next($daySelect)->toDateString();
+                $result = DB::table('pgng_orders')
+                ->where('id', $request->cartId)
+                ->update([
+                    'pickup_date' => $pickUp,
+                    'note' => $request->note,
                     'transaction_id' => $transaction->id
                 ]);
             }
@@ -813,15 +815,45 @@ class PayController extends AppBaseController
                     $transaction->transac_no = $request->fpx_fpxTxnId;
                     $transaction->status = "Success";
                     $transaction->save();
+                    
+                    PgngOrder::where('transaction_id', $transaction->id)->update([
+                        'status' => 'Paid'
+                    ]);
 
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
                     $item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                    ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
                     ->where('po.pgng_order_id', $order->id)
                     ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
                     ->get();
                     $organization = Organization::find($order->organization_id);
                     $user = User::find($order->user_id);
+                    
+                    Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+                    
+                    return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+
+                    break;
+
+                case 'Koperasi':
+                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction->status = "Success";
+                    $transaction->save();
+
+                    $order = PgngOrder::where('transaction_id', $transaction->id)->first();
+                    
+                    PgngOrder::where('transaction_id', $transaction->id)->first()->update([
+                        'status' => 2
+                    ]);
+                    $organization = Organization::find($order->organization_id);
+                    $user = User::find($order->user_id);
+                    
+                    $item = DB::table('product_order as po')
+                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                    ->where('po.pgng_order_id', $order->id)
+                    ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                    ->get();
                     
                     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
                     

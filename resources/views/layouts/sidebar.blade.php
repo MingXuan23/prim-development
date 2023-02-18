@@ -399,7 +399,7 @@
             @endrole
             
 
-            {{-- @role('Regular Merchant Admin')
+            @role('Regular Merchant Admin')
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-account-edit"></i>
@@ -407,7 +407,7 @@
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.home') }}" class=" waves-effect">
                             <i class="ti-home"></i>
                             <span>Dashboard</span>
                         </a>
@@ -419,22 +419,28 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.product-group') }}" class=" waves-effect">
                             <i class="ti-package"></i>
                             <span>Urus Produk</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class=" waves-effect">
+                        <a href="{{ route('admin-reg.orders') }}" class=" waves-effect">
                             <i class="ti-email"></i>
                             <span>Pesanan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('admin-reg.report') }}" class=" waves-effect">
+                            <i class="ti-stats-up"></i>
+                            <span>Laporan</span>
+                        </a>
+                    </li>
                 </ul>  
             </li>
-            @endrole --}}
+            @endrole
 
-            {{-- @role('Superadmin|Koop Admin')
+             @role('Superadmin|Koop Admin')
             <li>
             <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fas fa-file-invoice-dollar"></i>
@@ -443,7 +449,7 @@
 
             <ul class="sub-menu mm-collapse" aria-expanded="false">
                 <li>
-                    <a href="{{ route('koperasi.indexAdmin') }}" class=" waves-effect">
+                    <a href="{{ route('koperasi.productMenu') }}" class=" waves-effect">
                     <i class="typcn typcn-pencil"></i>
                     <span>Produk</span>
                     </a>
@@ -464,16 +470,16 @@
                 </li>
             </ul>
             </li>
-            @endrole --}}
+            @endrole 
             
-            {{-- <li>
+            <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
                     <span>Peniaga</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                        <a href="{{ route('merchant.regular.index') }}" class=" waves-effect">
+                        <a href="{{ route('merchant-reg.index') }}" class=" waves-effect">
                             <i class="ti-bookmark-alt"></i>
                             <span>Semua Peniaga</span>
                         </a>
@@ -485,7 +491,7 @@
                         </a>
                     </li>
                 </ul>  
-            </li> --}}
+            </li>
 
             {{-- <!-- @role('Superadmin|Penjaga') -syah punye
             <li>
@@ -516,7 +522,7 @@
             </li>
             @endrole --> --}}
 
-            {{-- @role('Superadmin|Penjaga') <!--haziq nye-->
+            @role('Superadmin|Penjaga') <!--haziq nye-->
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>
@@ -543,7 +549,7 @@
                     </li>
                 </ul>
             </li>
-            @endrole --}}
+            @endrole 
 
             {{-- @role('Superadmin|Pentadbir|Guru')
                 <li>
