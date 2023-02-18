@@ -15,8 +15,8 @@ class CreateOutingsTable extends Migration
     {
         Schema::create('outings', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('start_date_time');
-            $table->dateTime('end_date_time');
+            $table->date('start_date_time');
+            $table->date('end_date_time');
             $table->bigInteger('organization_id')->unsigned();
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
