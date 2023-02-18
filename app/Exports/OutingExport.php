@@ -36,8 +36,8 @@ class OutingExport implements FromCollection, WithHeadings, ShouldAutoSize
     public function headings(): array
     {
         return [
-            'Tarikh dan Masa Keluar',
-            'Tarikh dan Masa Masuk'
+            'Tarikh Keluar',
+            'Tarikh Masuk'
         ];
     }
 }

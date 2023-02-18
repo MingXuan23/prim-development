@@ -63,11 +63,11 @@ class ResidentExport implements FromCollection, WithHeadings, ShouldAutoSize
     public function headings(): array
     {
         return [
-            'Student Name',
-            'Class Name',
-            'Outing Status',
+            'Nama Pelajar',
+            'Kelas',
+            'Status Keluar',
             'Blacklist',
-            'Dorm Name',
+            'Nama Asrama',
         ];
     }
 }

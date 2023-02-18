@@ -16,11 +16,17 @@
     @include('layouts.head')
 
     <style>
+        body{
+            background-color: white; 
+            color: #020a1c;
+        }
         .table td,
         .table th {
             padding: .3rem !important;
-            border: 1px solid black !important;
+            border: 1px solid lavender !important;
             border-collapse: collapse !important;
+            color: #1f2126;
+            /* background-color: white */
         }
     </style>
 </head>
@@ -32,13 +38,20 @@
                 <div class="card mb-1">
                     <div class="card-body py-5">
                         <div class="row">
-                            <div class="col-12 pt-3">
+                            <div class="col-lg-2 col-sm-12 p-0">
+                                <center>
+                                    <img src="{{ URL::asset('/organization-picture/'.$details->organization_picture) }}" height="80"
+                                        alt="" />
+                                </center>
+                            </div>
+                            <!-- <div class="col-12 pt-3"> -->
+                            <div class="col-lg-8 col-sm-12 p-0">
 
                                 <h4 style="text-align: center">{{$details->schoolName}}</h4>
-                                <h5 style="text-align: center">{{$details->schoolAddress}}, {{$details->schoolPostcode}} {{$details->schoolState}}</h5>
+                                <p style="text-align: center">{{$details->schoolAddress}}, {{$details->schoolPostcode}} {{$details->schoolState}}</p>
                                 <br>
                                 <br>
-                                <span> Laporan Bilangan Permintaan Berdasarkan Sebab </span>
+                                <span> Laporan Bilangan Permintaan Keluar Berdasarkan Kategori </span>
 
                                 <br>
                                 <br>

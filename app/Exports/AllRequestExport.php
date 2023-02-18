@@ -49,7 +49,7 @@ class AllRequestExport implements FromCollection, ShouldAutoSize, WithHeadings
     {
         return 
         [
-            ['Laporan Permintaan Pelajar pada ' . $this->from .' hingga '. $this->to],
+            ['Laporan Permintaan Keluar Pelajar pada ' . $this->from .' hingga '. $this->to],
             ['Kategori',
             'Bilangan Permintaan',],
         ];

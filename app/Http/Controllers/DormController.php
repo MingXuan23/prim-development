@@ -524,6 +524,7 @@ class DormController extends Controller
             ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
             ->where('class_organization.organization_id', '=', $request->organPDF)
             ->select(
+                'organizations.organization_picture',
                 'organizations.nama as schoolName',
                 'organizations.address as schoolAddress',
                 'organizations.postcode as schoolPostcode',
@@ -547,10 +548,13 @@ class DormController extends Controller
             ->select('classifications.Fake_name as catname', DB::raw('count("so.id") as total'))
             ->groupBy('classifications.name')
             ->get();
+        
+        $start = $request->pdf_from;
+        $end = $request->pdf_to;
 
-        $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details'));
-
-        return $pdf->download('Report.pdf');
+        // return view('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
+        $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
+        return $pdf->download('Laporan Permintaan Keluar.pdf');
     }
 
     /**
@@ -581,7 +585,7 @@ class DormController extends Controller
             ->get();
         }
 
-        // $start = DB::table('outings')
+        // $start = DB::table('outings')n view
         // ->where([
         //     ['outings.organization_id', $organization[0]->id],
         //     ['outings.end_date_time', '>=', date("Y-m-d")],

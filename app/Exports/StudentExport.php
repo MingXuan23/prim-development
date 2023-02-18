@@ -57,7 +57,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
         return [
             'Nama',
             'Jantina',
-            'email',
+            'Email',
             'Nama Penjaga',
             'No. Tel Bimbit Penjaga',
         ];
