@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnToOrganizationUser extends Migration
+class AddCheckInStatusToOrganizationUser extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,9 @@ class AddColumnToOrganizationUser extends Migration
      */
     public function up()
     {
-        Schema::table('organization_user', function (Blueprint $table) {
-            $table->string('fees_status')->nullable();
+        Schema::table('status_to_organization_user', function (Blueprint $table) {
+            //
+            $table->integer('check_in_status')->nullable();
         });
     }
 
@@ -25,7 +26,7 @@ class AddColumnToOrganizationUser extends Migration
      */
     public function down()
     {
-        Schema::table('organization_user', function (Blueprint $table) {
+        Schema::table('status_to_organization_user', function (Blueprint $table) {
             //
         });
     }
