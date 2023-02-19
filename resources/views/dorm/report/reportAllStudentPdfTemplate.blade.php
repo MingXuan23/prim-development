@@ -17,16 +17,12 @@
 
     <style>
         body{
-            background-color: white; 
-            color: #020a1c;
+            color:black;
         }
         .table td,
         .table th {
             padding: .3rem !important;
-            border: 1px solid lavender !important;
-            border-collapse: collapse !important;
-            color: #1f2126;
-            /* background-color: white */
+            color: black;
         }
     </style>
 </head>
@@ -39,42 +35,57 @@
                     <div class="card-body py-5">
                         <div class="row">
                             <div class="col-lg-2 col-sm-12 p-0">
+                                
+                            </div>
+                            <div class="col-lg-8 col-sm-12 p-0">
                                 <center>
                                     <img src="{{ URL::asset('/organization-picture/'.$details->organization_picture) }}" height="80"
                                         alt="" />
                                 </center>
-                            </div>
-                            <!-- <div class="col-12 pt-3"> -->
-                            <div class="col-lg-8 col-sm-12 p-0">
-
-                                <h4 style="text-align: center">{{$details->schoolName}}</h4>
-                                <p style="text-align: center">{{$details->schoolAddress}}, {{$details->schoolPostcode}} {{$details->schoolState}}</p>
+                                <br>
+                                <h4 style="text-align: center">{{ $details->schoolName }}</h4>
+                                <p style="text-align: center">{{ $details->schoolAddress }},
+                                    <br />
+                                    {{ $details->schoolPostcode }} {{ $details->schoolState }}
+                                </p>
                                 <br>
                                 <br>
-                                <span> Laporan Bilangan Permintaan Keluar Berdasarkan Kategori </span>
-
-                                <br>
-                                <br>
-                                <table class="table table-bordered table-striped" style=" width:100%">
+                                <div class="pt-2 pb-2">
+                                    Laporan Permintaan Keluar Berdasarkan Kategori Pada {{$start}} Hingga {{$end}}
+                                </div>
+                                <table class="table table-bordered table-striped" style="">
                                     <tr style="text-align: center">
-                                        <th style="width:3%"> No. </th>
-                                        <th>Kategori</th>
-                                        <th>Bilangan Permintaan</th>
+                                        <th style="width:3%">No.</th>
+                                        <th style="width:10%">Kategori</th>
+                                        <th style="width:20%">Kuantiti</th>
                                     </tr>
                                     @foreach ($data as $item)
                                     <tr>
                                         <td style="text-align: center"> {{ $loop->iteration }}.</td>
-                                        <td>
-                                            <div class="pl-2"> {{ $item->catname }} </div>
-                                        </td>
+                                        <td style="text-align: center">{{ $item->catname }}</td>
                                         <td style="text-align: center">{{ $item->total }}</td>
-
                                     </tr>
                                     @endforeach
 
+                                    <tr>
+                                        <td colspan="2" style="text-align:center"><b>Jumlah</b> </td>
+                                        <td style="text-align:center">
+                                            <b>{{ number_format($data->sum('total'))  }}</b>
+                                        </td>
+                                    </tr>
 
                                 </table>
-
+                                <div class="col-12 pt-5 text-center">
+                                    <button id="print" class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px"
+                                        onclick="demoprint();">
+                                        <span class="mdi mdi-file-pdf"> Print </span>
+                                    </button>
+                                    <a href="{{ URL::previous() }}">
+                                        <button id="kembali" class="btn btn-danger p-2 w-10 mx-2" style="font-size:18px;">
+                                            <span class="mdi mdi-chevron-left-circle"> Kembali</span>
+                                        </button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -83,5 +94,11 @@
         </div>
     </div>
 </body>
-
+<script>
+    function demoprint(){
+        document.getElementById("print").style.display = "none";
+        document.getElementById("kembali").style.display = "none";
+        window.print();
+    }
+</script>
 </html>

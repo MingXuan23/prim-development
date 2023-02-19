@@ -440,6 +440,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
 Route::resource('dorm', 'DormController');
 Route::group(['prefix' => 'sekolah'], function () {
     // application
+    Route::get('dorm/superadmin', 'DormController@indexSuperadmin')->name('dorm.superadmin');
+    Route::get('dorm/pentadbir', 'DormController@indexPentadbir')->name('dorm.pentadbir');
+    Route::get('dorm/penjaga', 'DormController@indexParent')->name('dorm.parent');
+    Route::get('dorm/warden', 'DormController@indexWarden')->name('dorm.warden');
+    Route::get('dorm/guard', 'DormController@indexGuard')->name('dorm.guard');
     Route::get('dorm/indexRequest/{id}', 'DormController@indexRequest')->name('dorm.indexRequest');
     Route::get('dorm/getStudentOutingDatatable', 'DormController@getStudentOutingDatatable')->name('dorm.getStudentOutingDatatable');
     Route::get('dorm/updateOutTime/{id}', 'DormController@updateOutTime')->name('dorm.updateOutTime');
@@ -503,8 +508,6 @@ Route::group(['prefix' => 'sekolah'], function () {
     Route::get('dorm/printcategory', 'DormController@printcategory')->name('dorm.printcategory');
     Route::get('dorm/printall', 'DormController@printall')->name('dorm.printall');
     Route::get('dorm/printallrequest', 'DormController@printallrequest')->name('dorm.printallrequest');
-
-
 
     //reason outing
     Route::get('dorm/getReasonOutingDatatable', 'DormController@getReasonOutingDatatable')->name('dorm.getReasonOutingDatatable');

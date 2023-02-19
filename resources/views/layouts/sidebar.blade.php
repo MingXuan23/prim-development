@@ -149,8 +149,8 @@
 
                         @endrole
 
-                        @if(Auth::id() == 5529 || Auth::id() == 5527 || Auth::id() == 5528)
-                            @role('Superadmin|Admin|Pentadbir|Penjaga|Warden|Guard')
+                        @if(Auth::id() == 5529 || Auth::id() == 5527 || Auth::id() == 5528 || Auth::user()->hasRole('Warden') || Auth::user()->hasRole('Guard'))
+                            @role('Superadmin|Pentadbir|Penjaga|Warden|Guard')
                             <li>
                                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                                     <i class="fas fa-book"></i>
@@ -160,52 +160,26 @@
                                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                                     @role('Superadmin')
                                     <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 1) }}" class=" waves-effect">
+                                        <a href="{{ route('dorm.superadmin') }}" class=" waves-effect">
                                             <i class="fas fa-search"></i>
-                                            <span>Superadmin View</span>
-                                        </a>
-                                    </li>
-                                    @endrole
-
-                                    @role('Admin')
-                                    <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 2) }}" class=" waves-effect">
-                                            <!-- <i class="fas fa-user-friends"></i> -->
-                                            <i class="fas fa-user-cog"></i>
-
-                                            <span>Paparan Admin</span>
+                                            <span>Paparan Superadmin</span>
                                         </a>
                                     </li>
                                     @endrole
 
                                     @role('Pentadbir')
                                     <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 4) }}" class=" waves-effect">
-                                            <!-- <i class="fas fa-list"></i> -->
+                                        <a href="{{ route('dorm.pentadbir') }}" class=" waves-effect">
                                             <i class="fas fa-user-cog"></i>
                                             <span>Paparan Pentadbir</span>
                                         </a>
                                     </li>
                                     @endrole
 
-                                    <!-- @role('Guru')
-                                    <li>
-                                        <a href="{{ route('dorm.indexRequest', 5) }}" class=" waves-effect">
-                                            <i class="fas fa-chalkboard-teacher"></i>
-                                            <span>Paparan Guru</span>
-                                        </a>
-                                    </li>
-                                    @endrole -->
-
                                     @role('Penjaga')
                                     <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 6) }}" class=" waves-effect">
+                                        <a href="{{ route('dorm.parent') }}" class=" waves-effect">
                                             <i class="fas fa-user-friends"></i>
-                                            <!-- <span>Permintaan Anak</span> -->
                                             <span>Paparan Penjaga</span>
                                         </a>
                                     </li>
@@ -213,11 +187,7 @@
 
                                     @role('Warden')
                                     <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 13) }}" class=" waves-effect">
-                                            <!-- <i class="fas fa-book"></i>
-                                                <span>Semak Permintaan</span> -->
-                                            <!-- <i class="fas fa-id-card"></i> -->
+                                        <a href="{{ route('dorm.warden') }}" class=" waves-effect">
                                             <i class="fas fa-user-lock"></i>
                                             <span>Paparan Warden</span>
                                         </a>
@@ -226,10 +196,7 @@
 
                                     @role('Guard')
                                     <li>
-                                        <!-- need to change to index later -->
-                                        <a href="{{ route('dorm.indexRequest', 14) }}" class=" waves-effect">
-                                            <!-- <i class="fas fa-book"></i>
-                                                <span>Permintaan</span> -->
+                                        <a href="{{ route('dorm.guard') }}" class=" waves-effect">
                                             <i class="fas fa-user-shield"></i>
                                             <span>Paparan Guard</span>
                                         </a>

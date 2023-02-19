@@ -60,8 +60,25 @@ class DormController extends Controller
     //
     //
     //index functions
+    public function indexSuperadmin(){
+        return $this->indexRequest(1);
+    }
+    public function indexPentadbir(){
+        return $this->indexRequest(4);
+    }
+    public function indexParent(){
+        return $this->indexRequest(6);
+    }
+    public function indexWarden(){
+        return $this->indexRequest(13);
+    }
+    public function indexGuard(){
+        return $this->indexRequest(14);
+    }
+
     public function indexRequest($id)
     {
+        $roles = $id;
         if(Auth::user()->hasRole('Superadmin')){
             $organization = Organization::all();
         }
@@ -70,13 +87,11 @@ class DormController extends Controller
             ->join('organization_user as ou', 'ou.organization_id', '=', 'organizations.id')
             ->where([
                 ['ou.user_id', Auth::user()->id],
-                ['ou.role_id', $id]
+                ['ou.role_id', $roles]
             ])
             ->select('organizations.id as id', 'organizations.nama')
             ->get();
         }
-
-        $roles = $id;
 
         if(count($organization) > 0)
         {
@@ -116,7 +131,6 @@ class DormController extends Controller
         }
 
         return view('errors.404');
-        
     }
 
     public function indexReportAll()
@@ -516,23 +530,18 @@ class DormController extends Controller
             'pdf_to'        =>  'required',
         ]);
 
-        $details = DB::table('class_student')
-            ->join('students', 'students.id', '=', 'class_student.student_id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
-            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
-            ->where('class_organization.organization_id', '=', $request->organPDF)
+        $details = DB::table('organizations')
+            ->where('id', $request->organPDF)
             ->select(
-                'organizations.organization_picture',
                 'organizations.nama as schoolName',
                 'organizations.address as schoolAddress',
                 'organizations.postcode as schoolPostcode',
                 'organizations.state as schoolState',
+                'organizations.organization_picture',
             )
             ->first();
 
-        // dd($details->studentName);
+        // dd($details);
         $data = DB::table('students')
             ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
             ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
@@ -541,20 +550,20 @@ class DormController extends Controller
             ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
             ->join('classifications', 'classifications.id', '=', 'so.classification_id')
             ->where([
-                ['so.status',1],
+                ['so.status', '>', 0],
                 ['ou.organization_id',  $request->organPDF],
             ])
             ->whereBetween('so.apply_date_time', [$request->pdf_from, $request->pdf_to])
-            ->select('classifications.Fake_name as catname', DB::raw('count("so.id") as total'))
-            ->groupBy('classifications.name')
+            ->select('classifications.fake_name as catname', DB::raw('count("so.id") as total'))
+            ->groupBy('classifications.fake_name')
             ->get();
         
         $start = $request->pdf_from;
         $end = $request->pdf_to;
 
-        // return view('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
-        $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
-        return $pdf->download('Laporan Permintaan Keluar.pdf');
+        return view('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
+        // $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
+        // return $pdf->download('Laporan Permintaan Keluar.pdf');
     }
 
     /**
@@ -584,20 +593,6 @@ class DormController extends Controller
             ->distinct()
             ->get();
         }
-
-        // $start = DB::table('outings')n view
-        // ->where([
-        //     ['outings.organization_id', $organization[0]->id],
-        //     ['outings.end_date_time', '>=', date("Y-m-d")],
-        // ])
-        // ->value('outings.start_date_time');
-
-        // $end = DB::table('outings')
-        // ->where([
-        //     ['outings.organization_id', $organization[0]->id],
-        //     ['outings.end_date_time', '>=', date("Y-m-d")],
-        // ])
-        // ->value('outings.end_date_time');
 
         return view('dorm.create', compact('organization'));
     }
@@ -703,7 +698,7 @@ class DormController extends Controller
                 ->where('outings.organization_id', $request->get('organization'))
                 ->where([
                     // ['outings.start_date_time', '>=', $request->get('start_date')],
-                    ['outings.end_date_time', '>', $request->get('start_date')],
+                    ['outings.end_date_time', '>=', $request->get('start_date')],
                 ])
                 ->value('outings.id');
 
@@ -764,9 +759,10 @@ class DormController extends Controller
                 // do nothing 1st
             }
 
-            return redirect('/sekolah/dorm/indexRequest/6')->with('success', 'New application has been added successfully');
+            // return redirect('/sekolah/dorm/indexRequest/6')->with('success', 'New application has been added successfully');
+            return redirect('/sekolah/dorm/penjaga')->with('success', 'Permohonan telah dicatatkan');
         } else {
-            return redirect('/sekolah/dorm/indexRequest/6')->withErrors('Failed to submit application');
+            return redirect('/sekolah/dorm/penjaga')->withErrors('Permohonan tidak dicatatkan');
         }
     }
 
@@ -1194,9 +1190,10 @@ class DormController extends Controller
                     'updated_at'        => now(),
                 ]);
 
-            return redirect('/sekolah/dorm/indexRequest/6')->with('success', 'The application has been updated');
+            // return redirect('/sekolah/dorm/indexRequest/6')->with('success', 'The application has been updated');
+            return redirect('/sekolah/dorm/penjaga')->with('success', 'The application has been updated');
         } else {
-            return redirect('/sekolah/dorm/indexRequest/6')->withErrors('Information not matched');
+            return redirect('/sekolah/dorm/penjaga')->withErrors('Information not matched');
         }
     }
 
@@ -1697,12 +1694,12 @@ class DormController extends Controller
                     ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
                     ->join('classifications', 'classifications.id', '=', 'so.classification_id')
                     ->where([
-                        ['so.status', 1],
+                        ['so.status', '>', 0],
                         ['classifications.organization_id',  $oid],
                     ])
                     ->whereBetween('so.apply_date_time', [$start_date, $end_date])
                     ->select('so.id', 'classifications.fake_name as catname', DB::raw('count("so.id") as total'))
-                    ->groupBy('classifications.name')
+                    ->groupBy('classifications.fake_name')
                     ->distinct()
                     ->get();
 
@@ -2472,17 +2469,14 @@ class DormController extends Controller
     {
         // [0]roleid [1]studentoutingid
         $id = explode(" ", $id);
-        if (
-            Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') ||
-            Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Warden')
-        ) {
+        if ($id[0] == 1 || $id[0] == 4 || $id[0] == 13) {
             $studentouting = DB::table('student_outing')
                 ->where('student_outing.id', $id[1])
                 ->update([
                     'student_outing.status' => 1,
                     'student_outing.warden_id' => Auth::user()->id,
                 ]);
-        } elseif (Auth::user()->hasRole('Guard')) {
+        } elseif ($id[0] == 14) {
             $studentouting = DB::table('student_outing')
                 ->where('student_outing.id', $id[1])
                 ->update([
@@ -2557,9 +2551,28 @@ class DormController extends Controller
             } else {
                 // do nothing 1st
             }
-            return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Permintaan pelajar telah disahkan');
-        } else
-            return redirect('/sekolah/dorm/indexRequest/'.$id[0])->withErrors('Kemaskini data tidak berjaya');
+
+            if($id[0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->with('success', 'Permintaan pelajar telah disahkan');
+            elseif($id[0] == 4)
+                return redirect('/sekolah/dorm/pentadbir')->with('success', 'Permintaan pelajar telah disahkan');
+            elseif($id[0] == 13)
+                return redirect('/sekolah/dorm/warden')->with('success', 'Permintaan pelajar telah disahkan');    
+            elseif($id[0] == 14)
+                return redirect('/sekolah/dorm/guard')->with('success', 'Permintaan pelajar telah disahkan');    
+        } 
+        else
+        {
+            if($id[0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->withErrors('Kemaskini data tidak berjaya');
+            elseif($id[0] == 4)
+                return redirect('/sekolah/dorm/pentadbir')->withErrors('Kemaskini data tidak berjaya');
+            elseif($id[0] == 13)
+                return redirect('/sekolah/dorm/warden')->withErrors('Kemaskini data tidak berjaya'); 
+            elseif($id[0] == 14)
+                return redirect('/sekolah/dorm/guard')->withErrors('Kemaskini data tidak berjaya'); 
+        }
+        // return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Permintaan pelajar telah disahkan');
     }
 
     public function updateTolak($id)
@@ -2645,9 +2658,25 @@ class DormController extends Controller
                 // do nothing 1st
                 // dd("gg");
             }
-            return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Permintaan pelajar ditolak');
-        } else
-            return redirect('/sekolah/dorm/indexRequest/'.$id[0])->withErrors('Kemaskini data tidak berjaya');
+
+            if($id[0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->with('success', 'Permintaan pelajar ditolak');
+            elseif($id[0] == 4)
+                return redirect('/sekolah/dorm/pentadbir')->with('success', 'Permintaan pelajar ditolak');
+            elseif($id[0] == 13)
+                return redirect('/sekolah/dorm/warden')->with('success', 'Permintaan pelajar ditolak');   
+        } 
+        else
+        {
+            if($id[0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->withErrors('Kemaskini data tidak berjaya');
+            elseif($id[0] == 4)
+                return redirect('/sekolah/dorm/pentadbir')->withErrors('Kemaskini data tidak berjaya');
+            elseif($id[0] == 13)
+                return redirect('/sekolah/dorm/warden')->withErrors('Kemaskini data tidak berjaya');
+        }
+        // return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Permintaan pelajar ditolak');
+        // return redirect('/sekolah/dorm/indexRequest')->with('success', 'Permintaan pelajar ditolak');
     }
 
     public function updateOutTime($id)
@@ -2669,7 +2698,7 @@ class DormController extends Controller
             ->value('cs.outing_limit');
 
         if (strtoupper($catname) == $categoryReal[0]) {
-            DB::table('student_outing')
+            $result = DB::table('student_outing')
                 ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
                 ->where([
                     ['student_outing.id', $id[1]],
@@ -2681,7 +2710,7 @@ class DormController extends Controller
                     'student_outing.guard_id' => Auth::user()->id,
                 ]);
         } else if (strtoupper($catname) == $categoryReal[1]) {
-            DB::table('student_outing')
+            $result = DB::table('student_outing')
                 ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
                 ->where([
                     ['student_outing.id', $id[1]],
@@ -2694,7 +2723,7 @@ class DormController extends Controller
                     'student_outing.guard_id' => Auth::user()->id,
                 ]);
         } else {
-            DB::table('student_outing')
+            $result = DB::table('student_outing')
                 ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
                 ->where([
                     ['student_outing.id', $id[1]],
@@ -2707,7 +2736,8 @@ class DormController extends Controller
                 ]);
         }
 
-        $query = DB::table('student_outing')
+        if($result){
+            $query = DB::table('student_outing')
             ->join('class_student as cs', 'cs.id', '=', 'student_outing.class_student_id')
             ->join('students', 'students.id', '=', 'cs.student_id')
             ->where([
@@ -2715,61 +2745,73 @@ class DormController extends Controller
                 ['student_outing.status', 1],
             ]);
 
-        $telno = $query
-            ->value('students.parent_tel');
+            $telno = $query
+                ->value('students.parent_tel');
 
-        $oid = $query->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
-            ->value('classifications.organization_id');
+            $oid = $query->join('classifications', 'classifications.id', '=', 'student_outing.classification_id')
+                ->value('classifications.organization_id');
 
-        $arrayRecipientEmail = DB::table('users')
-            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            // ->where('organization_user.role_id', '=', 6)
-            // ->orWhere('organization_user.role_id', '=', 4)
-            // ->orWhere('organization_user.check_in_status', '=', 1)
-            ->where([
-                ['organization_user.organization_id', '=', $oid],
-                ['organization_user.check_in_status', '=', 1],
-            ])
-            ->orWhere([
-                ['organization_user.role_id', '=', 4],
-                ['organization_user.organization_id', '=', $oid],
-            ])
-            ->orWhere([
-                ['organization_user.organization_id', '=', $oid],
-                ['users.telno', '=', $telno],
-            ])
-            ->select('users.email')
-            ->distinct()
-            ->get();
+            $arrayRecipientEmail = DB::table('users')
+                ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                // ->where('organization_user.role_id', '=', 6)
+                // ->orWhere('organization_user.role_id', '=', 4)
+                // ->orWhere('organization_user.check_in_status', '=', 1)
+                ->where([
+                    ['organization_user.organization_id', '=', $oid],
+                    ['organization_user.check_in_status', '=', 1],
+                ])
+                ->orWhere([
+                    ['organization_user.role_id', '=', 4],
+                    ['organization_user.organization_id', '=', $oid],
+                ])
+                ->orWhere([
+                    ['organization_user.organization_id', '=', $oid],
+                    ['users.telno', '=', $telno],
+                ])
+                ->select('users.email')
+                ->distinct()
+                ->get();
 
-        // dd($arrayRecipientEmail);
+            // dd($arrayRecipientEmail);
 
-        if (isset($arrayRecipientEmail)) {
-            foreach ($arrayRecipientEmail as $email) {
-                // dd("here inside foreach");
-                // Mail::to($email)->send(new NotifyMail());
-                $student = DB::table('student_outing')
-                    ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
-                    ->join('students', 'students.id', '=', 'class_student.student_id')
-                    ->where('student_outing.id', $id[1])
-                    ->value('students.nama');
+            if (isset($arrayRecipientEmail)) {
+                foreach ($arrayRecipientEmail as $email) {
+                    // dd("here inside foreach");
+                    // Mail::to($email)->send(new NotifyMail());
+                    $student = DB::table('student_outing')
+                        ->join('class_student', 'class_student.id', '=', 'student_outing.class_student_id')
+                        ->join('students', 'students.id', '=', 'class_student.student_id')
+                        ->where('student_outing.id', $id[1])
+                        ->value('students.nama');
 
-                Mail::to($email)->send(new NotifyOut($student));
+                    Mail::to($email)->send(new NotifyOut($student));
 
 
-                if (Mail::failures()) {
-                    // dd("fail");
-                    return response()->Fail('Sorry! Please try again latter');
-                } else {
-                    // return response()->success('Great! Successfully send in your mail');
-                    // dd("successs", $email);
+                    if (Mail::failures()) {
+                        // dd("fail");
+                        return response()->Fail('Sorry! Please try again latter');
+                    } else {
+                        // return response()->success('Great! Successfully send in your mail');
+                        // dd("successs", $email);
+                    }
                 }
+            } else {
+                // do nothing 1st
+                // dd("gg");
             }
-        } else {
-            // do nothing 1st
-            // dd("gg");
+
+            if($id[0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->with('success', 'Tarikh dan masa keluar telah dicatatkan');
+            elseif($id[0] == 14)
+                return redirect('/sekolah/dorm/guard')->with('success', 'Tarikh dan masa keluar telah dicatatkan');
         }
-        return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Tarikh dan masa keluar telah dicatatkan');
+
+        if($id[0] == 1)
+            return redirect('/sekolah/dorm/superadmin')->withErrors('Kemaskini data tidak berjaya');
+        elseif($id[0] == 14)
+            return redirect('/sekolah/dorm/guard')->withErrors('Kemaskini data tidak berjaya');
+        // return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Tarikh dan masa keluar telah dicatatkan');
+        // return redirect('/sekolah/dorm/indexRequest')->with('success', 'Tarikh dan masa keluar telah dicatatkan');
     }
 
     public function updateInTime($id)
@@ -2876,9 +2918,19 @@ class DormController extends Controller
             } else {
                 // do nothing 1st
             }
+
+            if($id[0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->with('success', 'Tarikh dan masa masuk telah dicatatkan');    
+            elseif($id[0] == 14)
+                return redirect('/sekolah/dorm/guard')->with('success', 'Tarikh dan masa masuk telah dicatatkan');
         }
 
-        return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Tarikh dan masa masuk telah dicatatkan');
+        if($id[0] == 1)
+            return redirect('/sekolah/dorm/superadmin')->withErrors('Kemaskini data tidak berjaya');
+        elseif($id[0] == 14)
+            return redirect('/sekolah/dorm/guard')->withErrors('Kemaskini data tidak berjaya');
+        // return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Tarikh dan masa masuk telah dicatatkan');
+        // return redirect('/sekolah/dorm/indexRequest/'.$id[0])->withErrors('Kemaskini data tidak berjaya');
     }
 
     public function updateArriveTime($id)
@@ -2934,10 +2986,20 @@ class DormController extends Controller
             } else {
                 // do nothing 1st
             }
+            // return redirect('/sekolah/dorm/indexRequest')->with('success', 'Tarikh dan masa sampai destinasi telah dicatatkan');
+            // return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Tarikh dan masa sampai destinasi telah dicatatkan');
+            if($id[0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->with('success', 'Tarikh dan masa sampai telah dicatatkan');
+            elseif($id[0] == 6)
+                return redirect('/sekolah/dorm/penjaga')->with('success', 'Tarikh dan masa sampai telah dicatatkan');
         }
 
-
-        return redirect('/sekolah/dorm/indexRequest/'.$id[0])->with('success', 'Tarikh dan masa sampai destinasi telah dicatatkan');
+        if($id[0] == 1)
+            return redirect('/sekolah/dorm/superadmin')->withErrors('Kemaskini data tidak berjaya');
+        elseif($id[0] == 6)
+            return redirect('/sekolah/dorm/penjaga')->withErrors('Kemaskini data tidak berjaya');
+        // return redirect('/sekolah/dorm/indexRequest/'.$id[0])->withErrors('Maklumat tidak berjaya dicatatkan');
+        // 
     }
 
     public function updateBlacklist($id)
@@ -2992,6 +3054,7 @@ class DormController extends Controller
                 ->where([
                     ['ou.organization_id', $organization[0]->id],
                     ['ou.user_id', Auth::user()->id],
+                    ['ou.role_id', 13],
                 ])
                 ->update([
                     'ou.check_in_status' => 0,
@@ -3002,6 +3065,7 @@ class DormController extends Controller
                 ->where([
                     ['ou.organization_id', $organization[0]->id],
                     ['ou.user_id', Auth::user()->id],
+                    ['ou.role_id', 13],
                 ])
                 ->update([
                     'ou.check_in_status' => 1,
@@ -3010,11 +3074,22 @@ class DormController extends Controller
 
         
         if($result){
-            return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0][0])->with('success', 'Data is successfully updated');
+            // return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0][0])->with('success', 'Data is successfully updated');
+            if((int)$rolesCheckIn[0][0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->with('success', 'Kemaskini data telah berjaya');
+            elseif((int)$rolesCheckIn[0][0] == 13)
+                return redirect('/sekolah/dorm/warden')->with('success', 'Kemaskini data telah berjaya');
         }
         else{
-            return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0][0]);
+            if((int)$rolesCheckIn[0][0] == 1)
+                return redirect('/sekolah/dorm/superadmin')->withErrors('Kemaskini data tidak berjaya');
+            elseif((int)$rolesCheckIn[0][0] == 13)
+                return redirect('/sekolah/dorm/warden')->withErrors('Kemaskini data tidak berjaya');
+            
         }
+            // return redirect('/sekolah/dorm/indexRequest/'.(int)$rolesCheckIn[0][0]);
+            // return redirect('/sekolah/dorm/indexRequest');
+        
     }
 
     public function resetOutingLimit(Request $request)

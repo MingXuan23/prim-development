@@ -22,7 +22,7 @@
 
             {{csrf_field()}}
             <div class="card-body">
-
+                <input id="roles" value= "{{$roles}}" hidden>
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <select name="organization" id="organization" class="form-control">
@@ -82,7 +82,7 @@
                 @endif
 
                 <div class="flash-message"></div>
-                <input id="roles" value= "{{$roles}}" hidden>
+                
                 <div class="table-responsive">
                     <table id="requestTable" class="table table-bordered table-striped dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
