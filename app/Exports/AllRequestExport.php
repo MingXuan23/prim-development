@@ -33,12 +33,12 @@ class AllRequestExport implements FromCollection, ShouldAutoSize, WithHeadings
         ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
         ->join('classifications', 'classifications.id', '=', 'so.classification_id')
         ->where([
-            ['so.status',1],
+            ['so.status', '>', 0],
             ['classifications.organization_id',  $this->organId],
         ])
         ->whereBetween('so.apply_date_time', [$this->from, $this->to])
         ->select('classifications.fake_name as catname', DB::raw('count("so.id") as total'))
-        ->groupBy('classifications.name')
+        ->groupBy('classifications.fake_name')
         ->get();
 
         // dd($studentlist);

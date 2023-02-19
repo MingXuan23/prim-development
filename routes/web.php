@@ -503,9 +503,7 @@ Route::group(['prefix' => 'sekolah'], function () {
     Route::get('dorm/printcategory', 'DormController@printcategory')->name('dorm.printcategory');
     Route::get('dorm/printall', 'DormController@printall')->name('dorm.printall');
     Route::get('dorm/printallrequest', 'DormController@printallrequest')->name('dorm.printallrequest');
-
-
-
+    
     //reason outing
     Route::get('dorm/getReasonOutingDatatable', 'DormController@getReasonOutingDatatable')->name('dorm.getReasonOutingDatatable');
     Route::get('dorm/indexReasonOuting', 'DormController@indexReasonOuting')->name('dorm.indexReasonOuting');

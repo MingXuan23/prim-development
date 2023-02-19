@@ -516,23 +516,18 @@ class DormController extends Controller
             'pdf_to'        =>  'required',
         ]);
 
-        $details = DB::table('class_student')
-            ->join('students', 'students.id', '=', 'class_student.student_id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
-            ->join('dorms', 'dorms.id', '=', 'class_student.dorm_id')
-            ->where('class_organization.organization_id', '=', $request->organPDF)
+        $details = DB::table('organizations')
+            ->where('id', $request->organPDF)
             ->select(
-                'organizations.organization_picture',
                 'organizations.nama as schoolName',
                 'organizations.address as schoolAddress',
                 'organizations.postcode as schoolPostcode',
                 'organizations.state as schoolState',
+                'organizations.organization_picture',
             )
             ->first();
 
-        // dd($details->studentName);
+        // dd($details);
         $data = DB::table('students')
             ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
             ->join('student_outing as so', 'so.class_student_id', '=', 'cs.id')
@@ -541,20 +536,20 @@ class DormController extends Controller
             ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
             ->join('classifications', 'classifications.id', '=', 'so.classification_id')
             ->where([
-                ['so.status',1],
+                ['so.status', '>', 0],
                 ['ou.organization_id',  $request->organPDF],
             ])
             ->whereBetween('so.apply_date_time', [$request->pdf_from, $request->pdf_to])
-            ->select('classifications.Fake_name as catname', DB::raw('count("so.id") as total'))
-            ->groupBy('classifications.name')
+            ->select('classifications.fake_name as catname', DB::raw('count("so.id") as total'))
+            ->groupBy('classifications.fake_name')
             ->get();
         
         $start = $request->pdf_from;
         $end = $request->pdf_to;
 
-        // return view('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
-        $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
-        return $pdf->download('Laporan Permintaan Keluar.pdf');
+        return view('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
+        // $pdf = PDF::loadView('dorm.report.reportAllStudentPdfTemplate', compact('data', 'details', 'start', 'end'));
+        // return $pdf->download('Laporan Permintaan Keluar.pdf');
     }
 
     /**
@@ -1697,12 +1692,12 @@ class DormController extends Controller
                     ->join('organization_roles as or', 'or.id', '=', 'ou.role_id')
                     ->join('classifications', 'classifications.id', '=', 'so.classification_id')
                     ->where([
-                        ['so.status', 1],
+                        ['so.status', '>', 0],
                         ['classifications.organization_id',  $oid],
                     ])
                     ->whereBetween('so.apply_date_time', [$start_date, $end_date])
                     ->select('so.id', 'classifications.fake_name as catname', DB::raw('count("so.id") as total'))
-                    ->groupBy('classifications.name')
+                    ->groupBy('classifications.fake_name')
                     ->distinct()
                     ->get();
 
