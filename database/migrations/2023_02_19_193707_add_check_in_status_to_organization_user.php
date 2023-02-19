@@ -13,7 +13,7 @@ class AddCheckInStatusToOrganizationUser extends Migration
      */
     public function up()
     {
-        Schema::table('status_to_organization_user', function (Blueprint $table) {
+        Schema::table('organization_user', function (Blueprint $table) {
             //
             $table->integer('check_in_status')->nullable();
         });
@@ -26,7 +26,7 @@ class AddCheckInStatusToOrganizationUser extends Migration
      */
     public function down()
     {
-        Schema::table('status_to_organization_user', function (Blueprint $table) {
+        Schema::table('organization_user', function (Blueprint $table) {
             //
         });
     }
