@@ -16,9 +16,13 @@
     @include('layouts.head')
 
     <style>
+        body{
+            color:black;
+        }
         .table td,
         .table th {
             padding: .3rem !important;
+            color: black;
         }
     </style>
 </head>
@@ -34,7 +38,7 @@
                                 
                             </div>
                             <div class="col-lg-8 col-sm-12 p-0">
-                                <center style="border:1px solid">
+                                <center>
                                     <img src="{{ URL::asset('/organization-picture/'.$details->organization_picture) }}" height="80"
                                         alt="" />
                                 </center>
@@ -72,12 +76,12 @@
 
                                 </table>
                                 <div class="col-12 pt-5 text-center">
-                                    <button class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px"
-                                        onclick="window.print();">
+                                    <button id="print" class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px"
+                                        onclick="demoprint();">
                                         <span class="mdi mdi-file-pdf"> Print </span>
                                     </button>
                                     <a href="{{ URL::previous() }}">
-                                        <button class="btn btn-danger p-2 w-10 mx-2" style="font-size:18px;">
+                                        <button id="kembali" class="btn btn-danger p-2 w-10 mx-2" style="font-size:18px;">
                                             <span class="mdi mdi-chevron-left-circle"> Kembali</span>
                                         </button>
                                     </a>
@@ -90,4 +94,11 @@
         </div>
     </div>
 </body>
+<script>
+    function demoprint(){
+        document.getElementById("print").style.display = "none";
+        document.getElementById("kembali").style.display = "none";
+        window.print();
+    }
+</script>
 </html>
