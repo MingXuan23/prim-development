@@ -56,5 +56,9 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::post('/updateStatusToDelivering', 'OrderController@updateStatusToDelivering');
         Route::post('/updateStatusToDelivered', 'OrderController@updateStatusToDelivered');
     });
-     
+
+    //route for mobile order
+    Route::group(['prefix' => 'yuran'], function (){
+        Route::post('login', 'MobileAPI\YuranController@login');
+    });
 });
