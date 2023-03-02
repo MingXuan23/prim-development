@@ -60,5 +60,10 @@ Route::group(['prefix' => 'mobile'], function () {
     //route for mobile order
     Route::group(['prefix' => 'yuran'], function (){
         Route::post('login', 'MobileAPI\YuranController@login');
+        Route::get('getOrganizationByUserId', 'MobileAPI\YuranController@getOrganizationByUserId');
+        Route::post('getReceiptByOid', 'MobileAPI\YuranController@getReceiptByOid');
+        Route::post('getUserInfo', 'MobileAPI\YuranController@getUserInfo');
+
+        Route::post('getYuran', 'MobileAPI\YuranController@getYuranByParentIdAndOrganId');
     });
 });
