@@ -58,7 +58,6 @@ class YuranController extends Controller
                 $user = User::where('email', $username)->first();
                 if ($user->hasRole('Penjaga'))
                 {
-                    dd($user->id);
                     return response($user->id, 200);
                 }
             }
