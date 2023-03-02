@@ -92,7 +92,7 @@
                 <div class="form-group">
                     <label for="sel1">Sila Pilih Bank:</label>
 
-                <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('api.fpxIndex') }}" enctype="multipart/form-data">
 
                     <select name="bankid" id="bankid" class="form-control">
                         <option value="">Pilih bank</option>
