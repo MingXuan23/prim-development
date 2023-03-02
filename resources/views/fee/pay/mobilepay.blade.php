@@ -162,6 +162,7 @@
                 @foreach ($get_fees_by_parent as $get_fees_by_parents)
 
                 <input type="hidden" name="parent_fees_id[]" value="{{ $get_fees_by_parents->id }}">
+                <input type="hidden" name="user_id" value="{{ $user_id }}">
 
                 @endforeach
                 @endif
