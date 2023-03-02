@@ -162,7 +162,6 @@
                 @foreach ($get_fees_by_parent as $get_fees_by_parents)
 
                 <input type="hidden" name="parent_fees_id[]" value="{{ $get_fees_by_parents->id }}">
-                <input type="hidden" name="user_id" value="{{ $user_id }}">
 
                 @endforeach
                 @endif
@@ -185,6 +184,7 @@
                 <input type="hidden" name="amount" id="amount" value={{ $i + $getorganization->fixed_charges }}>
                 <input type="hidden" name="o_id" id="o_id" value="{{ $getorganization->id }}">
                 <input type="hidden" name="desc" id="desc" value="School_Fees">
+                <input type="hidden" name="user_id" value="{{ $user_id }}">
                 <div class="float-right">
                     <input type="checkbox" id="TC" name="TC" onchange="
                         if (this.checked)
