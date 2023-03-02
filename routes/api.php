@@ -65,5 +65,6 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::post('getUserInfo', 'MobileAPI\YuranController@getUserInfo');
 
         Route::post('getYuran', 'MobileAPI\YuranController@getYuranByParentIdAndOrganId');
+        Route::post('yuranTransaction', 'PayController@pay');
     });
 });
