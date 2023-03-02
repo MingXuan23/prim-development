@@ -33,21 +33,25 @@
             $i =0 ;
             @endphp
             <div class="card-text p-4">
-                @foreach($getstudent as $row)
-                <h4 class=" mb-3" style="text-align: center">{{$row->studentname}}</h4>
 
+
+                <h4 class=" mb-3" style="text-align: center">
+                    {{ $getfees_category_A ? $getorganization->nama :  ""}}</h4>
+
+                @if ($getfees_category_A)
+
+                @foreach($getfees_category_A as $row2)
                 <hr>
-                @foreach($getfees->where('id', $row->feeid) as $row2)
-
-                <h4 class=" mb-3">--{{$row2->nama}}--</h4>
+                <h4 class=" mb-3 mt-3">--{{ $row2->category }}--</h4>
 
                 <div class="row">
 
-                    @foreach($getdetails->where('feeid', $row->feeid) as $row3)
+
+                    @foreach($getfees_category_A_byparent as $row3)
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <h4>{{ $loop->iteration }}.{{ $row3->dnama }}</h4>
+                                <h4>{{ $loop->iteration }}. {{ $row3->name }}</h4>
                             </div>
                             <div class="col-12">
                                 <h5 class="mt-0" style="color:#8699ad">
@@ -62,15 +66,68 @@
                         @endphp
                         <h4 class="float-right">RM {{ number_format($row3->quantity*$row3->price, 2) }} </h4>
                     </div>
-
                     @endforeach
+                </div>
+                @endforeach
+
+                @foreach ($get_fees_by_parent as $get_fees_by_parents)
+
+                    <input type="hidden" name="parent_fees_id[]" value="{{ $get_fees_by_parents->id }}">
+
+                @endforeach
+
+                @endif
 
 
+                @if ($getstudent)
+
+                <hr>
+
+                @foreach($getstudent as $row)
+                <h4 class=" mb-3" style="text-align: center">{{$row->studentname}}</h4>
+
+                <hr>
+                @foreach($getfees->where('studentid', $row->studentid) as $row2)
+
+                <h4 class=" mb-3 mt-3">--{{ $row2->category }}--</h4>
+
+                <div class="row">
+
+                    @foreach($getfees_bystudent->where('studentid', $row->studentid)->where('category', $row2->category)
+                    as $row3)
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4>{{ $loop->iteration }}. {{ $row3->name }}</h4>
+                            </div>
+                            <div class="col-12">
+                                <h5 class="mt-0" style="color:#8699ad">
+                                    Kuantiti x{{ $row3->quantity }}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        @php
+                        $i += $row3->quantity*$row3->price ;
+                        @endphp
+                        <h4 class="float-right">RM {{ number_format($row3->quantity*$row3->price, 2) }} </h4>
+                    </div>
+                    @endforeach
 
                 </div>
                 @endforeach
                 <hr>
                 @endforeach
+
+                @foreach ($getstudentfees as $studentfees)
+
+                <input type="hidden" name="student_fees_id[]" value="{{ $studentfees->id }}">
+
+                @endforeach
+
+                @endif
+
                 <div class="row mb-4">
                     <div class="col-6">
                         <h5 class=" mb-3">Caj yang dikenakan </h5>
@@ -89,24 +146,35 @@
                                 {{ number_format($i + $getorganization->fixed_charges, 2) }}</span> </h4>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="sel1">Sila Pilih Bank:</label>
 
                 <form method="POST" action="{{ route('api.fpxIndex') }}" enctype="multipart/form-data">
-
-                    <select name="bankid" id="bankid" class="form-control">
+                <div class="form-group">
+                    <label for="sel1">Sila Pilih Bank:</label>
+                    <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
                         <option value="">Pilih bank</option>
-                        @foreach ($bank_list as $key=>$value)
-                        <option value="{{ $value['key'] }}">{{ $value['nama'] }}</option>
+                        @foreach ($banklists as $key => $value)
+                        <option value="{{ $value['code'] }}">{{ $value['nama'] }}</option>
                         @endforeach
                     </select>
                 </div>
 
-                @foreach ($getstudentfees as $studentfees)
+                @if ($getfees_category_A)
+                @foreach ($get_fees_by_parent as $get_fees_by_parents)
 
-                <input type="hidden" name="student_fees_id[]" value="{{ $studentfees->student_fees_id }}">
+                <input type="hidden" name="parent_fees_id[]" value="{{ $get_fees_by_parents->id }}">
 
                 @endforeach
+                @endif
+
+                @if ($getstudent)
+                @foreach ($getstudentfees as $studentfees)
+
+                <input type="hidden" name="student_fees_id[]" value="{{ $studentfees->id }}">
+
+                @endforeach
+                @endif
+
+
                 <ul>
                     <li>
                         <p>Minimum Transaction is RM1 and Maximum Transaction is RM30,000.</p>
@@ -114,7 +182,7 @@
                 </ul>
                 {{ csrf_field() }}
                 <input type="hidden" name="amount" id="amount" value={{ $i + $getorganization->fixed_charges }}>
-                {{-- <input type="hidden" name="o_id" id="o_id" value="{{ 1 }}"> --}}
+                <input type="hidden" name="o_id" id="o_id" value="{{ $getorganization->id }}">
                 <input type="hidden" name="desc" id="desc" value="School_Fees">
                 <div class="float-right">
                     <input type="checkbox" id="TC" name="TC" onchange="
@@ -127,18 +195,13 @@
                             the FPX Terms And Condition.</a></label>
                 </div>
                 <button id="bayarBtn" class="btn btn-primary float-right mt-3 w-100 p-2" style="font-size:18px"
-                    type="submit" onclick="return checkBank();" disabled>Teruskan
-                    Pembayaran</button>
-
+                    type="submit" onclick="return checkBank();" disabled>Teruskan Pembayaran</button>
                 </form>
             </div>
 
         </div>
 
     </div>
-    <script>
-
-    </script>
 </body>
 
 </html>
