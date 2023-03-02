@@ -283,7 +283,10 @@ class PayController extends AppBaseController
 
             // dd($getorganization->seller_id);
         }
-        return view('fee.pay.pay', compact('getstudent', 'getorganization', 'getfees', 'getfees_bystudent', 'getstudentfees', 'getfees_category_A', 'getfees_category_A_byparent', 'get_fees_by_parent'))->render();
+
+        $banklists = FPXController::getStaticBankList();
+
+        return view('fee.pay.pay', compact('getstudent', 'getorganization', 'getfees', 'getfees_bystudent', 'getstudentfees', 'getfees_category_A', 'getfees_category_A_byparent', 'get_fees_by_parent', 'banklists'))->render();
     }
 
     public function billIndex()
