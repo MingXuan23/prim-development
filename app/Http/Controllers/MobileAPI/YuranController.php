@@ -171,7 +171,7 @@ class YuranController extends Controller
 
     public function pay(Request $request)
     {
-
+        $user_id = $request->user_id;
         $getorganization_category       = "";
         $getfees_category_A             = "";
         $getfees_category_A_byparent    = "";

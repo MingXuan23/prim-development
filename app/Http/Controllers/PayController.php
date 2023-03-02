@@ -428,7 +428,7 @@ class PayController extends AppBaseController
         } 
         else if ($request->desc == 'School_Fees')
         {
-            $user = User::find(Auth::id());
+            $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
             $organization = Organization::find($request->o_id);
             
             $fpx_buyerEmail      = $user->email;
