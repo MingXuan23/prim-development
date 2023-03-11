@@ -315,30 +315,16 @@ class ParentController extends Controller
             return Organization::all();
         } else {
             // user role parent
-            // $organizations = DB::table('organizations')
-            //                     ->where('type_org', '=', '1')
-            //                     ->orWhere('type_org', '=', '2')
-            //                     ->orWhere('type_org', '=', '3')
-            //                     ->get();
-            // dd($organizations);
+            $organizations = Organization::whereHas('user', function ($query) use ($userId) {
+                    $query->where('user_id', $userId)->Where(function ($query) {
+                        $query->where('organization_user.role_id', '=', 2)
+                        ->Orwhere('organization_user.role_id', '=', 4)
+                        ->Orwhere('organization_user.role_id', '=', 5)
+                        ->Orwhere('organization_user.role_id', '=', 6);
+                    });
+                })->get();
 
-            //dd($userId);
-            $organizations = DB::table('organization_user as ou')
-                ->leftJoin('organizations as o', 'ou.organization_id', '=', 'o.id')
-                ->select('o.*')
-                ->distinct()
-                ->where('ou.user_id', '=', $userId)
-                ->whereBetween('o.type_org', [1, 3])
-                ->get();
-            // dd($organizations);
             return $organizations;
-
-            // return Organization::whereHas('user', function ($query) use ($userId) {
-            //     $query->where('user_id', $userId)->Where(function ($query) {
-            //         $query->where('organization_user.role_id', '=', 4)
-            //             ->Orwhere('organization_user.role_id', '=', 5);
-            //     });
-            // })->get();
         }
     }
 

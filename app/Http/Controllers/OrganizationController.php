@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\File;
 use App\Http\Jajahan\Jajahan;
 use App\Models\OrganizationHours;
 use App\Models\Donation;
+use Illuminate\Support\Facades\Validator;
 use App\Models\OrganizationRole;
 use View;
 
@@ -39,39 +40,20 @@ class OrganizationController extends Controller
 
     public function fetchAvailableParentKoop(Request $request)
     {
-        $state = $request->get('negeri');
-        $allSchool = Organization::whereIn('type_org', [1, 2, 3])->get();
-        $allKoop = Organization::where('type_org', 1039)->get();
-
-        $isNotParent = array();
-        foreach($allSchool as $school)
-        {
-            if(count($allKoop) != 0)
-            {
-                foreach($allKoop as $koop)
-                {
-                    if($school->id != $koop->parent_org)
-                    {
-                        $isNotParent[] += (int)$school->id;
-                    }
-                }
-            }
-            else
-            {
-                $isNotParent[] += (int)$school->id;
-            }
-        }
-
-        $parent_org = Organization::whereIn('id', $isNotParent)
-                    ->where('state', $state)
-                    ->select('id', 'nama')
-                    ->get();
+        $parent_org = Organization::whereIn('type_org', [1, 2, 3])->get();
 
         return response()->json(['success' => $parent_org]);
     }
 
     public function store(OrganizationRequest $request)
     {
+        if ($request->type_org == 10)
+        {
+            Validator::make($request->all(), [
+                'parent_org' => "required"
+            ]);
+        }
+
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
         // dd($request->organization_picture);
@@ -94,6 +76,7 @@ class OrganizationController extends Controller
 
         $organization = Organization::create($request->validated() + [
             'organization_picture' => $file_name,
+            'parent_org'           => $request->parent_org
         ]);
 
         $type_org = TypeOrganization::find($request->type_org);
@@ -116,11 +99,29 @@ class OrganizationController extends Controller
         // Koperasi
         if ($type_org->nama == "Koperasi") {
             Organization::where('id', $organization->id)->update(['parent_org' => $request->parent_org]);
-            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
-            //$organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 1239]);
+            // $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
+            $organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
             $user->assignRole($role->nama);
 
             $this->insertOrganizationHours($organization->id);
+
+            // connect parent to shcool service
+            $parents = DB::table('organization_user')
+                ->where('organization_id', $organization->parent_org)
+                ->where('role_id', 6)
+                ->where('status', 1)
+                ->get();
+
+            foreach($parents as $parent)
+            {
+                DB::table('organization_user')
+                    ->insert([
+                        'organization_id' => $organization->id,
+                        'user_id'         => $parent->user_id,
+                        'role_id'         => $parent->role_id,
+                        'status'          => 1
+                    ]);
+            }
         }
 
         // Schedule Merchant
@@ -295,6 +296,9 @@ class OrganizationController extends Controller
             $code = 'PBJ' . str_pad($id, 5, '0', STR_PAD_LEFT);
         } elseif ($typeOrg == "Peniaga Barang Umum") { // Regular Merchant
             $code = 'PBU' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        }
+        elseif ($typeOrg == "PIBG Sekolah") { // Schedule Merchant
+            $code = 'PIBG' . str_pad($id, 5, '0', STR_PAD_LEFT);
         }
 
         return $code;
