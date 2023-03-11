@@ -218,6 +218,13 @@ class FeesController extends AppBaseController
         $oid    = $request->get('oid');
         $year   = $request->get('year');
 
+        $organization = Organization::find($oid);
+        
+        if ($organization->parent_org != null)
+        {
+            $oid = $organization->parent_org;
+        }
+
         // dd($year);
 
         $list = DB::table('organizations')
@@ -772,6 +779,14 @@ class FeesController extends AppBaseController
         // dd($request->get('level'));
         $level = $request->get('level');
         $oid = $request->get('oid');
+        
+        $organization = Organization::find($oid);
+        
+        if ($organization->parent_org != null)
+        {
+            $oid = $organization->parent_org;
+        }
+
         if ($level == "1") {
             $list = DB::table('organizations')
                 ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
