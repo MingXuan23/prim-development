@@ -195,7 +195,7 @@ class PayController extends AppBaseController
                 ->get();
 
             $getorganization  = DB::table('organizations')
-                ->where('id', $getfees_bystudent[1]->organization_id)
+                ->where('id', $getfees_bystudent[0]->organization_id)
                 ->first();
 
             // ************************* get student_fees_id from array *******************************
