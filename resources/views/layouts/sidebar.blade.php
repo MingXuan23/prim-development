@@ -276,10 +276,7 @@
                 </li>
                 @endrole
 
-
-
-
-                @role('Superadmin|Pentadbir|Guru|Penjaga')
+                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin')
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -303,7 +300,7 @@
                 </li> --}}
                 @endrole
 
-                @role('Superadmin|Pentadbir')
+                @role('Superadmin|Pentadbir|Koop Admin')
                 <li>
                     <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
                         <i class="fas fa-list-ul"></i>
@@ -312,7 +309,7 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru|Koop Admin')
                 <li>
                     <a href="{{ route('fees.category.report') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -328,7 +325,7 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru|Penjaga')
+                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin')
 
                 <li>
                     <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
@@ -338,7 +335,7 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir')
+                @role('Superadmin|Pentadbir|Koop Admin')
                 <li>
                     <a href="{{ route('fees.A') }}" class=" waves-effect" aria-expanded="true">
                         <i class="fas fa-user-cog"></i>
