@@ -883,13 +883,15 @@ class FeesController extends AppBaseController
 
     public function allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category)
     {
+        $organization = Organization::find($oid);
+
         if ($gender) {
             $list = DB::table('class_organization')
                 ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->join('students', 'students.id', '=', 'class_student.student_id')
                 ->select('class_student.id as class_student_id')
-                ->where('class_organization.organization_id', $oid)
+                ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.levelid', $level)
                 ->where('classes.status', "1")
                 ->where('students.gender', $gender)
@@ -903,7 +905,7 @@ class FeesController extends AppBaseController
                 ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->select('class_student.id as class_student_id')
-                ->where('class_organization.organization_id', $oid)
+                ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.levelid', $level)
                 ->where('classes.status', "1")
                 ->get();
@@ -952,6 +954,7 @@ class FeesController extends AppBaseController
     public function allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category)
     {
         // get list class checked from checkbox
+        $organization = Organization::find($oid);
 
         $list = DB::table('classes')
             ->where('status', "1")
@@ -969,7 +972,7 @@ class FeesController extends AppBaseController
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->join('students', 'students.id', '=', 'class_student.student_id')
                 ->select('class_student.id as class_student_id')
-                ->where('class_organization.organization_id', $oid)
+                ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.status', "1")
                 ->where('students.gender', $gender)
                 ->whereIn('classes.id', $class)
@@ -983,7 +986,7 @@ class FeesController extends AppBaseController
                 ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->select('class_student.id as class_student_id')
-                ->where('class_organization.organization_id', $oid)
+                ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.status', "1")
                 ->whereIn('classes.id', $class)
                 ->get();
