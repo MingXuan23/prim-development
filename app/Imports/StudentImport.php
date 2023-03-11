@@ -188,7 +188,6 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             ->where('id', $student->id)
             ->update(['parent_tel' => $newparent->telno]);
         
-
         // check fee for new in student
         // check category A fee
         $ifExitsCateA = DB::table('fees_new')
@@ -250,6 +249,83 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                     }
                 }
 
+            }
+        }
+
+        $child_organs = DB::table('organizations')
+                    ->where('parent_org', $co->oid)
+                    ->get();
+
+        foreach ($child_organs as $child_organ) {
+
+            $organ_user_id = DB::table('organization_user')->insertGetId([
+                'organization_id'   => $child_organ->id,
+                'user_id'           => $newparent->id,
+                'role_id'           => 6,
+                'start_date'        => now(),
+                'status'            => 1,
+            ]);
+
+            $ifExitsCateA = DB::table('fees_new')
+                        ->where('category', 'Kategory A')
+                        ->where('organization_id', $child_organ->id)
+                        ->where('status', 1)
+                        ->get();
+        
+            $ifExitsCateBC = DB::table('fees_new')
+                    ->whereIn('category', ['Kategory B', 'Kategory C'])
+                    ->where('organization_id', $child_organ->id)
+                    ->where('status', 1)
+                    ->get();
+            
+            if(!$ifExitsCateA->isEmpty() && count($ifExits) == 0)
+            {
+                foreach($ifExitsCateA as $kateA)
+                {
+                    DB::table('fees_new_organization_user')->insert([
+                        'status'                    => 'Debt',
+                        'fees_new_id'               =>  $kateA->id,
+                        'organization_user_id'      =>  $organ_user_id,
+                        'transaction_id'            => NULL
+                    ]);
+                }
+            }
+
+            if(!$ifExitsCateBC->isEmpty())
+            {
+                foreach($ifExitsCateBC as $kateBC)
+                {
+                    $target = json_decode($kateBC->target);
+
+                    if(isset($target->gender))
+                    {
+                        if($target->gender != $gender)
+                        {
+                            continue;
+                        }
+                    }
+                    
+                    if($target->data == "All_Level" || $target->data == $class->levelid)
+                    {
+                        DB::table('student_fees_new')->insert([
+                            'status'            => 'Debt',
+                            'fees_id'           =>  $kateBC->id,
+                            'class_student_id'  =>  $classStu->id
+                        ]);
+                    }
+                    else if(is_array($target->data))
+                    {
+                        if(in_array($class->id, $target->data))
+                        {
+                            DB::table('student_fees_new')->insert([
+                                'status'            => 'Debt',
+                                'fees_id'           =>  $kateBC->id,
+                                'class_student_id'  =>  $classStu->id
+                            ]);
+                        }
+                    }
+
+                }
             }
         }
     }
