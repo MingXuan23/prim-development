@@ -325,7 +325,7 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru|Penjaga')
+                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin')
 
                 <li>
                     <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
