@@ -36,7 +36,7 @@
 
 
                 <h4 class=" mb-3" style="text-align: center">
-                    {{ $getfees_category_A ? $getorganization->nama :  ""}}</h4>
+                    {{ $getorganization->nama }}</h4>
 
                 @if ($getfees_category_A)
 
