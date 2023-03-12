@@ -552,14 +552,14 @@ class StudentController extends Controller
     public function fetchClass(Request $request)
     {
         $userId = Auth::id();
-        $oid = $request->get('oid');
+        $organ = Organization::find($request->get('oid'));
 
-        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir')) {
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin')) {
             $list = DB::table('classes')
                 ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                 ->select('classes.id as cid', 'classes.nama as cname')
                 ->where([
-                    ['class_organization.organization_id', $oid],
+                    ['class_organization.organization_id', ($organ->parent_org != null ? $organ->parent_org : $organ->id)],
                     ['classes.status', 1]
                 ])
                 ->orderBy('classes.nama')
@@ -570,7 +570,7 @@ class StudentController extends Controller
                 ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
                 ->select('classes.id as cid', 'classes.nama as cname')
                 ->where([
-                    ['class_organization.organization_id', $oid],
+                    ['class_organization.organization_id', $organ->id],
                     ['classes.status', 1],
                     ['organization_user.user_id', $userId]
                 ])
