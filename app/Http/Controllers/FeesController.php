@@ -1213,15 +1213,17 @@ class FeesController extends AppBaseController
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->get();
             }
-            else{
+            else
+            {
                 $listHisotry = DB::table('transactions as t')
                     ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
                     ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
                     ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
                     ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
                     ->where('t.description', "like", 'YS%')
                     ->where('t.status', 'success')
-                    ->where('co.organization_id', $request->oid)
+                    ->where('fn.organization_id', $request->oid)
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
                     ->get();
@@ -1237,16 +1239,17 @@ class FeesController extends AppBaseController
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->get();
             }
-            else if(Auth::user()->hasRole('Pentadbir'))
+            else if(Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin'))
             {
                 $listHisotry = DB::table('transactions as t')
                     ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
                     ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
                     ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
                     ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
                     ->where('t.description', "like", 'YS%')
                     ->where('t.status', 'success')
-                    ->where('co.organization_id', $request->oid)
+                    ->where('fn.organization_id', $request->oid)
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
                     ->get();
@@ -1259,30 +1262,33 @@ class FeesController extends AppBaseController
                     ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
                     ->join('class_organization as co', 'co.id', 'cs.organclass_id')
                     ->join('organization_user', 'co.organ_user_id', 'organization_user.id')
+                    ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
                     ->where('t.description', "like", 'YS%')
                     ->where('t.status', 'success')
                     ->where('organization_user.user_id', Auth::id())
-                    ->where('co.organization_id', $request->oid)
+                    ->where('fn.organization_id', $request->oid)
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
                     ->get();
             }
-            else{
+            else
+            {
                 $listHisotry = DB::table('transactions as t')
                     ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
                     ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
                     ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
                     ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
                     ->where('t.user_id', Auth::id())
                     ->where('t.description', "like", 'YS%')
                     ->where('t.status', 'success')
-                    ->where('co.organization_id', $request->oid)
+                    ->where('fn.organization_id', $request->oid)
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
                     ->get();
             }
         }
-        
+
         if (request()->ajax()) {
             return datatables()->of($listHisotry)
                 ->editColumn('amount', function ($data) {
