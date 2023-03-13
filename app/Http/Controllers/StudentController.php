@@ -198,6 +198,25 @@ class StudentController extends Controller
             $newparent = DB::table('users')
                         ->where('telno', '=', "{$request->get('parent_phone')}")
                         ->first();
+
+            $parentRole = DB::table('organization_user')
+                ->where('user_id', $newparent->id)
+                ->where('organization_id', $co->oid)
+                ->where('role_id', 6)
+                ->first();
+                
+            // dd($parentRole);
+
+            if(empty($parentRole))
+            {
+                DB::table('organization_user')->insert([
+                    'organization_id'   => $co->oid,
+                    'user_id'           => $newparent->id,
+                    'role_id'           => 6,
+                    'start_date'        => now(),
+                    'status'            => 1,
+                ]);
+            } 
         }
 
 
