@@ -50,12 +50,18 @@
                                     </tr>
                                     <tr>
                                         <td>No Resit</td>
-                                        <td style="width: 50px">:</td>
+                                        <td style="width: 20px">:</td>
                                         <td>{{ $get_transaction->description }}</td>
                                     </tr>
                                     <tr>
+                                        <td>No Transaksi FPX</td>
+                                        <td>:</td>
+
+                                        <td>{{ $get_transaction->transac_no }}</td>
+                                    </tr>
+                                    <tr>
                                         <td>Tarikh</td>
-                                        <td style="width: 50px">:</td>
+                                        <td>:</td>
                                         <td>{{ $get_transaction->datetime_created->format('j M Y H:i:s A')}}</td>
                                     </tr>
                                 </table>
