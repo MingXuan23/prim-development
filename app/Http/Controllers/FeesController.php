@@ -182,13 +182,38 @@ class FeesController extends AppBaseController
         } elseif (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Koop Admin')) {
 
             // user role pentadbir n guru
-            return Organization::whereHas('user', function ($query) use ($userId) {
+            /* $temp_organs= Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
                     $query->where('organization_user.role_id', '=', 4)
                         ->Orwhere('organization_user.role_id', '=', 5)
                         ->Orwhere('organization_user.role_id', '=', 12);
                 });
-            })->get();
+            })->get(); */
+
+            $organs = DB::table('organizations as o')
+                ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+                ->select('o.*')
+                ->where('ou.user_id', $userId)
+                ->whereIn('ou.role_id', [4, 5 ,12])
+                ->get();
+
+            $organizations = [];
+
+            foreach ($organs as $organ)
+            {
+                array_push($organizations, $organ);
+                $organ_children = DB::table('organizations')->where('parent_org', $organ->id)->get();
+
+                if ($organ != null)
+                {
+                    foreach ($organ_children as $organ_child)
+                    {
+                        array_push($organizations, $organ_child);
+                    }
+                }
+            }
+
+            return $organizations;
         } else {
             // user role ibu bapa
             return Organization::whereHas('user', function ($query) use ($userId) {
@@ -1342,7 +1367,7 @@ class FeesController extends AppBaseController
                 ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
                 ->select('classes.id as cid', 'classes.nama as cname')
                 ->where([
-                    ['class_organization.organization_id', $organ->id],
+                    ['class_organization.organization_id', $organ->parent_org != null ?  $organ->parent_org :  $organ->id],
                     ['classes.status', 1],
                     ['organization_user.user_id', Auth::id()]
                 ])

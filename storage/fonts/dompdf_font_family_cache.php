@@ -79,26 +79,26 @@ return array (
     'normal' => $rootDir . '/lib/fonts/DejaVuSerif',
   ),
   'material design icons' => array(
-    'normal' => $fontDir . '/material_design_icons_normal_0471f7d2e9a43899a442bb142ed10149',
+    'normal' => $fontDir . '/material_design_icons_normal_5bab27a37ff8b966ac7420966b483f74',
   ),
   'ionicons' => array(
-    'normal' => $fontDir . '/ionicons_normal_2be06d1f73a3cb768a8c49b59e40ff29',
+    'normal' => $fontDir . '/ionicons_normal_e6a3c2c74e22e818cea53b8a7152cb52',
   ),
   'font awesome 5 brands' => array(
-    'normal' => $fontDir . '/font_awesome_5_brands_normal_da446445140b2f54be678dd53fe9bafb',
+    'normal' => $fontDir . '/font_awesome_5_brands_normal_78cd8cfdcda3b712c0728daf4228e1db',
   ),
   'font awesome 5 free' => array(
-    'normal' => $fontDir . '/font_awesome_5_free_normal_3256104b0bbd9f47eaa3f18d7f7c4e6d',
-    '900' => $fontDir . '/font_awesome_5_free_900_519bae2d5e0586021938e7b0de23ceac',
+    'normal' => $fontDir . '/font_awesome_5_free_normal_e0f1b98a3938341459691490615ff1ac',
+    '900' => $fontDir . '/font_awesome_5_free_900_7d16e5e499ce43b412239a205b62abc0',
   ),
   'dripicons-v2' => array(
-    'normal' => $fontDir . '/dripicons_v2_normal_f7cea7da21e7bc9e2012b3c4ed307f47',
+    'normal' => $fontDir . '/dripicons_v2_normal_0f591d46c599133d91805978d5fa4ee0',
   ),
   'themify' => array(
-    'normal' => $fontDir . '/themify_normal_bc0630008432a44dd8cc012ce89b207e',
+    'normal' => $fontDir . '/themify_normal_6dbb1f14968181692cfa68fe439739b2',
   ),
   'typicons' => array(
-    'normal' => $fontDir . '/typicons_normal_6d7ca969b07231f396dcbd0a78183a1b',
+    'normal' => $fontDir . '/typicons_normal_a199da1b381fff60be4090d2e538d5e2',
   ),
 );
 }; ?>
