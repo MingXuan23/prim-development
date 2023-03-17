@@ -589,7 +589,7 @@ class StudentController extends Controller
                 ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
                 ->select('classes.id as cid', 'classes.nama as cname')
                 ->where([
-                    ['class_organization.organization_id', $organ->id],
+                    ['class_organization.organization_id', ($organ->parent_org != null ? $organ->parent_org : $organ->id)],
                     ['classes.status', 1],
                     ['organization_user.user_id', $userId]
                 ])

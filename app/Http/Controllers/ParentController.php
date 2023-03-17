@@ -315,14 +315,37 @@ class ParentController extends Controller
             return Organization::all();
         } else {
             // user role parent
-            $organizations = Organization::whereHas('user', function ($query) use ($userId) {
+            /* $organizations = Organization::whereHas('user', function ($query) use ($userId) {
                     $query->where('user_id', $userId)->Where(function ($query) {
                         $query->where('organization_user.role_id', '=', 2)
                         ->Orwhere('organization_user.role_id', '=', 4)
                         ->Orwhere('organization_user.role_id', '=', 5)
                         ->Orwhere('organization_user.role_id', '=', 6);
                     });
-                })->get();
+                })->get(); */
+
+            $organs = DB::table('organizations as o')
+                ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+                ->select('o.*')
+                ->where('ou.user_id', $userId)
+                ->whereIn('ou.role_id', [4, 5, 6, 12])
+                ->get();
+
+            $organizations = [];
+
+            foreach ($organs as $organ)
+            {
+                array_push($organizations, $organ);
+                $organ_children = DB::table('organizations')->where('parent_org', $organ->id)->get();
+
+                if ($organ != null)
+                {
+                    foreach ($organ_children as $organ_child)
+                    {
+                        array_push($organizations, $organ_child);
+                    }
+                }
+            }
 
             return $organizations;
         }
