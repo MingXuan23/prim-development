@@ -1444,11 +1444,11 @@ class DormController extends Controller
         $result = DB::table('class_student')->where('dorm_id', $id)->update(['outing_status' => 1]);
 
         if ($result) {
-            Session::flash('success', 'Pelajar Dalam Asrama Telah Keluar');
+            Session::flash('success', 'Semua Pelajar Dalam Asrama Telah Keluar');
             return View::make('layouts/flash-messages');
             //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         } else {
-            Session::flash('error', 'Dorm Gagal Dikosongkan');
+            Session::flash('error', 'Semua Pelajar Dalam Asrama Gagal Keluar');
             return View::make('layouts/flash-messages');
             //return response()->json(['resultdata' => $result, 'string' => $strirng]);
         }
