@@ -120,6 +120,24 @@
             </div>
         </div>
 
+              <!-- Out dorm confirmation delete modal -->
+              <div id="deleteConfirmationModal1" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Keluarkan Pelajar dari Asrama</h4>
+                        </div>
+                        <div class="modal-body">
+                            Adakah anda pasti?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete2" name="delete2">Keluar</button>
+                            <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         <!-- export dorm modal-->
         <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -337,6 +355,11 @@
             $('#deleteConfirmationModal1').modal('show');
         });
 
+        $(document).on('click', '.outDorm', function() {
+            dorm_id = $(this).attr('id');
+            $('#deleteConfirmationModal2').modal('show');
+        });
+
         $('#delete').click(function() {
             $.ajax({
                 type: 'POST',
@@ -373,6 +396,33 @@
                     _method: 'GET'
                 },
                 url: "/sekolah/dorm/clearDorm/" + dorm_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+                    console.log('it works');
+
+                    $('div.flash-message').html(data);
+
+                    dormTable.ajax.reload();
+                },
+                error: function(data) {
+                    $('div.flash-message').html(data);
+                    console.log("it doesn't Works");
+
+                }
+            })
+        });
+
+        $('#delete2').click(function() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    _method: 'GET'
+                },
+                url: "/sekolah/dorm/outDorm/" + dorm_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
