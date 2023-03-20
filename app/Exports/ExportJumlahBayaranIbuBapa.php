@@ -10,9 +10,10 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, WithHeadings
 {
-    public function __construct($kelas)
+    public function __construct($kelas, $oid)
     {
         $this->kelas = $kelas;
+        $this->oid = $oid;
     }
     /**
     * @return \Illuminate\Support\Collection
@@ -40,7 +41,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->distinct()
                 ->where('t.user_id', $data->userId)
                 ->where('t.status', 'Success')
-                ->where('fn.organization_id', $data->oid)
+                ->where('fn.organization_id', $this->oid)
                 ->select('t.*')
                 ->get();
 
@@ -51,7 +52,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->leftJoin('fees_new as fn', 'fn.id', 'sfn.fees_id')
                 ->distinct()
                 ->where('t.user_id', $data->userId)
-                ->where('fn.organization_id', $data->oid)
+                ->where('fn.organization_id', $this->oid)
                 ->where('t.status', 'Success')
                 ->select('t.*')
                 ->get();
