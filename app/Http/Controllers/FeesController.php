@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Psy\Command\WhereamiCommand;
 use Yajra\DataTables\DataTables;
 use App\Exports\ExportYuranStatus;
+use App\Exports\ExportJumlahBayaranIbuBapa;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -1492,5 +1493,14 @@ class FeesController extends AppBaseController
             ->first();
 
         return Excel::download(new ExportYuranStatus($yuran), $yuran->name . '.xlsx');
+    }
+
+    public function ExportJumlahBayaranIbuBapa(Request $request)
+    {
+        $kelas = DB::table('classes')
+            ->where('id', $request->yuranExport1)
+            ->first();
+
+        return Excel::download(new ExportJumlahBayaranIbuBapa($kelas), $kelas->nama . '.xlsx');
     }
 }
