@@ -10,9 +10,10 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, WithHeadings
 {
-    public function __construct($kelas)
+    public function __construct($kelas, $oid)
     {
         $this->kelas = $kelas;
+        $this->oid = $oid;
     }
     /**
     * @return \Illuminate\Support\Collection
@@ -34,15 +35,51 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
         
         foreach ($datas as $key => $data) {
 
-            $totalTran = DB::table('transactions as t')
+            $tranA = DB::table('transactions as t')
                 ->leftJoin('fees_new_organization_user as fou', 't.id', 'fou.transaction_id')
-                ->leftJoin('fees_transactions_new as ftn', 't.id', 'ftn.transactions_id')
+                ->leftJoin('fees_new as fn', 'fn.id', 'fou.fees_new_id')
                 ->distinct()
                 ->where('t.user_id', $data->userId)
                 ->where('t.status', 'Success')
-                ->sum('t.amount');
+                ->where('fn.organization_id', $this->oid)
+                ->select('t.*')
+                ->get();
 
-            $data->totalAmount = $totalTran == 0 ? 'RM 0.00' : 'RM ' . number_format($totalTran, 2, '.', '');
+                
+            $tranBC = DB::table('transactions as t')
+                ->leftJoin('fees_transactions_new as ftn', 't.id', 'ftn.transactions_id')
+                ->leftJoin('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
+                ->leftJoin('fees_new as fn', 'fn.id', 'sfn.fees_id')
+                ->distinct()
+                ->where('t.user_id', $data->userId)
+                ->where('fn.organization_id', $this->oid)
+                ->where('t.status', 'Success')
+                ->select('t.*')
+                ->get();
+                
+            $combined = $tranA->concat($tranBC);
+            $unique = $combined->unique('id');
+
+            $amount = 0.00;
+            $fpxno = '';
+            
+            foreach ($unique as $key => $tran)
+            {
+                $amount = $amount + $tran->amount;
+                
+                if ($key == 0)
+                {
+                    $fpxno = $fpxno . $tran->transac_no;
+                }
+
+                if($key != count($unique) - 1)
+                {
+                    $fpxno = $fpxno . ', ';
+                }
+            }
+
+            $data->amount = $amount == 0.00 ? 'RM 0.00' : 'RM ' . number_format($amount, 2, '.', '');
+            $data->fpxno = $fpxno == '' ? $fpxno : '`' . $fpxno;
 
             unset($data->userId);
             unset($data->sid);
@@ -59,7 +96,8 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
             'Kelas',
             'Jantina',
             'Nama Penjaga',
-            'Jumlah Pembayaran Penjaga'
+            'Jumlah Pembayaran Penjaga',
+            'No Transaksi FPX'
         ];
     }
 }
