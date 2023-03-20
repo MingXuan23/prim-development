@@ -1501,6 +1501,6 @@ class FeesController extends AppBaseController
             ->where('id', $request->yuranExport1)
             ->first();
 
-        return Excel::download(new ExportJumlahBayaranIbuBapa($kelas), $kelas->nama . '.xlsx');
+        return Excel::download(new ExportJumlahBayaranIbuBapa($kelas, $request->organExport1), $kelas->nama . '.xlsx');
     }
 }
