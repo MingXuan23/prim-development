@@ -65,6 +65,7 @@
             </div>
 
             <div class="col-md-12">
+                <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary"  data-toggle="modal" data-target="#modalJumlahBayaran"><i class="fas fa-plus"></i> Export Jumlah Bayaran Ibu/Bapa</a>
                 <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-success"  data-toggle="modal" data-target="#modalByYuran"><i class="fas fa-plus"></i> Export Yuran</a>
             </div>
 
@@ -127,6 +128,43 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalJumlahBayaran" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Export Jumlah Bayaran Ibu/Bapa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form action="{{ route('exportJumlahBayaranIbuBapa') }}" method="post">
+                <div class="modal-body">
+                    {{ csrf_field() }}
+                    <div class="form-group">
+                        <label>Organisasi</label>
+                        <select name="organExport1" id="organExport1" class="form-control">
+                            <option value="" disabled selected>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Name Yuran</label>
+                        <select name="yuranExport1" id="yuranExport1" class="form-control">
+
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 
@@ -165,13 +203,19 @@
             var _token            = $('input[name="_token"]').val();
             fetchClass(organizationid, '#yuranExport');
         });
+
+        $('#organExport1').change(function() {
+            var organizationid    = $("#organExport1").val();
+            var _token            = $('input[name="_token"]').val();
+            fetch_data(organizationid, '#yuranExport1');
+        });
         
         if($("#organization").val() == ""){
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetch_data($("#organization").val());
+            fetch_data($("#organization").val(), '#classes');
         }
 
-        function fetch_data(oid = ''){ 
+        function fetch_data(oid = '', classId = ''){ 
             var _token = $('input[name="_token"]').val();
                 $.ajax({
                     url:"{{ route('fees.fetchClassForCateYuran') }}",
@@ -180,10 +224,10 @@
                             _token:_token },
                     success:function(result)
                     {
-                        $('#classes').empty();
-                        $("#classes").append("<option value='0'> Pilih Kelas</option>");    
+                        $(classId).empty();
+                        $(classId).append("<option value='0'> Pilih Kelas</option>");    
                         jQuery.each(result.success, function(key, value){
-                            $("#classes").append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
+                            $(classId).append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
                         });
                     }   
                 })    
@@ -220,7 +264,7 @@
         $('#organization').change(function(){
             if($(this).val() != '')
             {
-                fetch_data($("#organization").val());
+                fetch_data($("#organization").val(), "#classes");
             }
         });
         
