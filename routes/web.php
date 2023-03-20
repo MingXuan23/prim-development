@@ -386,6 +386,7 @@ Route::get('get-file/{filename}', 'MessageController@getFile')->name('get-file')
 Route::post('send-message', 'MessageController@sendMessage')->name('send-message');
 
 Route::post('/exportAllYuranStatus', 'FeesController@ExportAllYuranStatus')->name('exportAllYuranStatus');
+Route::post('/exportJumlahBayaranIbuBapa', 'FeesController@ExportJumlahBayaranIbuBapa')->name('exportJumlahBayaranIbuBapa');
 
 
 Route::group(['prefix' => 'notification'], function () {
