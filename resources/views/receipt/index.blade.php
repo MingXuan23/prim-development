@@ -241,7 +241,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
     setInterval(function(){
         count--;
         document.getElementById('time').innerHTML = count;
-        if (count == 0) {
+        if (count <= 0) {
             window.location = '/derma'; 
         }
     },1000);
