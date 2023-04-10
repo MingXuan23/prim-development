@@ -262,7 +262,7 @@ class FeesController extends AppBaseController
             ->where('classes.status', 1)
             ->orderBy('classes.nama')
             ->get();
-
+        dd($list);
         return response()->json(['success' => $list]);
     }
 
@@ -1166,7 +1166,8 @@ class FeesController extends AppBaseController
             ->where('organization_user.status', 1)
             ->where('fees_new_organization_user.status', 'Debt')
             ->get();
-
+        //dd($list,$organizations,$getfees,$getfees_bystudent,$getfees_category_A,$getfees_category_A_byparent);
+ 
         return view('fee.pay.index', compact('list', 'organizations', 'getfees', 'getfees_bystudent', 'getfees_category_A', 'getfees_category_A_byparent'));
     }
 
