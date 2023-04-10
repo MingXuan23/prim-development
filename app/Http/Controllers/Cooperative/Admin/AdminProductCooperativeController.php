@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductItem;
+use Yajra\DataTables\DataTables;
 
 
 class AdminProductCooperativeController extends Controller
@@ -61,17 +62,46 @@ class AdminProductCooperativeController extends Controller
         return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product'));
     }
 
-    public function getProductList(){
-        $userID=Auth::id();
-        $products = ProductItem::join('product_group as pg', 'pg.id', '=', 'product_item.product_group_id')
-        ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
-        ->select('product_item.*', 'pg.name as type_name')
-        ->where('ou.user_id', $userID)
-        ->distinct('ou.user.id')
-        ->get(); 
-        
-        
-        return response()->json(['status' => 'success','data'=>$products]);
+    public function getProductList(Request $request){
+       dd($request);
+        if (request()->ajax()){
+            $userID=Auth::id();
+            $product = DB::table('product_item as p')
+            ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
+            ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
+            ->select('p.*','pg.name as type_name')
+            ->where('ou.user_id', $userID)
+            ->distinct('ou.user_id')
+            ->get();
+            
+        $table = Datatables::of($product);
+
+                $table->addColumn('status', function ($row) {
+                    if ($row->status == '1') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('action', function ($row) {
+                    $token = csrf_token();
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    //$btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    return $btn;
+                });
+
+                $table->rawColumns(['status', 'action']);
+                
+                return $table->make(true);
+        }
     }
 
     public function deleteType(Int $id)

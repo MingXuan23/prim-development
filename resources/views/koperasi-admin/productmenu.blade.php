@@ -1,7 +1,6 @@
 @extends('layouts.master')
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 @include('layouts.datatable')
@@ -91,8 +90,8 @@
               </tr>
             </thead>
             <tbody id="productTableBody">
-        <!-- Table rows will be dynamically generated here -->
-        </tbody>
+
+            </tbody>
             <!-- @foreach($product as $item)
                                     <tr class ="table-row">
                                         <td> <input type="checkbox" class="product-checkbox" value ="{{$item->id}}" name="ids[]"></td>
@@ -134,6 +133,7 @@
 @section('script')
 <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
+
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
 <script>
@@ -214,41 +214,73 @@ $.ajax({
 
 function loadProducts() {
   
- var dataTable = $('#productTable');//.DataTable({
-    // "lengthMenu": [10, 25, 50, 100],
-    // "pageLength": 25,
-    // "order": [3, 'asc'],
-    // "columnDefs": [{
-    //   "targets": [0],
-    //   "className": "text-center",
-    //   "width": "2%"
-    // }, {
-    //   "targets": [3, 4, 5, 6],
-    //   "className": "text-center"
-    // }, {
-    //   "targets": [2],
-    //   "orderable": true
-    // },],
-    // "language": {
-    //   "paginate": {
-    //     "previous": "<",
-    //     "next": ">"
-    //   },
-    //   "search": "",
-    //   "searchPlaceholder": "Search..."
-    // }
-  //});
-
-  // Re-draw the table on input change
-  /*$('#productTable_length').on('change', 'select', function () {
-    dataTable.page.len($(this).val()).draw();
-  });
-
-  // Apply search on input change
-  $('#productTable_filter').on('keyup', 'input[type="search"]', function () {
-    dataTable.search($(this).val()).draw();
-  });*/
-
+  /*var productTable = $('#productTable').DataTable({
+                  processing: true,
+                  serverSide: true,
+                  ajax: {
+                      url: "{{ route('koperasi.getProductList') }}",
+                      type: 'GET',
+                    
+                  },
+                  'columnDefs': [{
+                      "targets": [0], // your case first column
+                      "className": "text-center",
+                      "width": "2%"
+                  },{
+                      "targets": [3,4,5,6], // your case first column
+                      "className": "text-center",
+                  },],
+                  order: [
+                      [1, 'asc']
+                  ],
+                  columns: [{
+                      "data": null,
+                      searchable: false,
+                      "sortable": false,
+                      render: function (data, type, row, meta) {
+                          return meta.row + meta.settings._iDisplayStart + 1;
+                      }
+                  }, {
+                      data: "name",
+                      name: 'name',
+                      "width": "20%"
+                  }, {
+                      data: "desc",
+                      name: 'description',
+                      "width": "30%"
+                  }, {
+                      data: "type",
+                      name: 'Type',
+                      "className": "text-center",
+                      "width": "10%"
+                  }, {
+                      data: "quantity_avaible",
+                      name: 'Quantity',
+                      "className": "text-center",
+                      "width": "10%"
+                  }, 
+                  {
+                      data: "price",
+                      name: 'Price',
+                      "className": "text-center",
+                      "width": "10%"
+                  },{
+                      data: 'status',
+                      name: 'status',
+                      orderable: false,
+                      searchable: false,
+                      "className": "text-center",
+                  }, {
+                      data: 'action',
+                      name: 'action',
+                      orderable: false,
+                      searchable: false,
+                      "className": "text-center",
+                      "width": "20%"
+                  },]
+          });
+          
+    */
   var productTable = $("#productTableBody");
   var productArray = @json($product);
   $.each(productArray, function(index, product) {
@@ -290,7 +322,7 @@ $(document).ready(function() {
           $('#deleteConfirmationModal').modal('show');
       });
 
-('.alert').delay(3000).fadeOut();
+//('.alert').delay(3000).fadeOut();
 
 });
 
