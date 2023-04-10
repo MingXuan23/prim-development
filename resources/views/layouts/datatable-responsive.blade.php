@@ -1,0 +1,2 @@
+<link href="{{ URL::asset('assets/libs/datatables-responsive/responsive.bootstrap.min.css') }}" rel="stylesheet">
+<script src="{{ URL::asset('assets/libs/datatables-responsive/dataTables.responsive.min.js') }}" defer></script>
