@@ -199,9 +199,13 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
     Route::group(['namespace' => 'Admin'], function() {
         Route::get('/produkmenu','AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
         Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
+        Route::post('/produkmenu/deleteSelectedProducts','AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
+        Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
 
         Route::get('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
         Route::post('/produktype','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
+        Route::post('/produktype/update','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
+        Route::get('/produktype/edit/{id}','AdminProductCooperativeController@editType')->name('koperasi.editType');
 
         Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
         Route::get('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
@@ -210,12 +214,15 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::post('/produk/update/{id}','AdminProductCooperativeController@updateProduct')->name('koperasi.updateProduct');
         Route::get('/produk/delete/{id}','AdminProductCooperativeController@deleteProduct')->name('koperasi.deleteProduct');
 
+
         Route::get('/openingHours','AdminOpeningHoursCooperativeController@indexOpening')->name('koperasi.indexOpening');
         Route::post('/openingHours','AdminOpeningHoursCooperativeController@storeOpening')->name('koperasi.storeOpening');
 
         Route::get('/Confirm','AdminOrderCooperativeController@indexConfirm')->name('koperasi.indexConfirm');
         Route::get('/Confirm/update/{id}','AdminOrderCooperativeController@storeConfirm')->name('koperasi.storeConfirm');
         Route::get('/Confirm/delete/{id}','AdminOrderCooperativeController@notConfirm')->name('koperasi.notConfirm');
+
+        Route::get('/returnProdukMenu/{page}','AdminProductCooperativeController@returnProdukMenu')->name('koperasi.return');
     });
 });
 

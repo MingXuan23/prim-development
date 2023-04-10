@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\ProductItem;
+
 
 class AdminProductCooperativeController extends Controller
 {
@@ -24,11 +26,12 @@ class AdminProductCooperativeController extends Controller
                     ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
                     ->select('p.*','pg.name as type_name')
                     ->where('ou.user_id', $userID)
+                    ->distinct('ou.user.id')
                     ->get();
         return view('koperasi-admin.index', compact('koperasi'))
         ->with('product',$product);
     }
-
+    
     public function productMenu()
     {
         $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
@@ -39,19 +42,58 @@ class AdminProductCooperativeController extends Controller
         ->where('ou.role_id', $role_id)
         ->first();
 
+        $product = DB::table('product_item as p')
+        ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
+        ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
+        ->select('p.*','pg.name as type_name')
+        ->where('ou.user_id', $userID)
+        ->distinct('ou.user.id')
+        ->get();
+
         $group = DB::table('product_group as pg')
         ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
-        ->where('ou.role_id', $role_id)
+        ->where('ou.user_id', $userID)
         ->select('pg.*')
+        ->distinct('pg.id')
         ->get();
+        //dd($group,$koperasi);
         
-        return view('koperasi-admin.productmenu', compact('koperasi'),compact('group'));
+        return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product'));
+    }
+
+    public function getProductList(){
+        $userID=Auth::id();
+        $products = ProductItem::join('product_group as pg', 'pg.id', '=', 'product_item.product_group_id')
+        ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
+        ->select('product_item.*', 'pg.name as type_name')
+        ->where('ou.user_id', $userID)
+        ->distinct('ou.user.id')
+        ->get(); 
+        
+        
+        return response()->json(['status' => 'success','data'=>$products]);
     }
 
     public function deleteType(Int $id)
     {
         $delete = DB::table('product_group')->where('id',$id)->delete();
-        return redirect('koperasi/produkmenu')->with('success','Produk type berjaya dipadam');
+        return redirect('koperasi/produktype')->with('success','Produk type berjaya dipadam');
+    }
+
+    public function editType(Int $id)
+    {
+        $edit = DB::table('product_group')->where('id',$id)->first();
+
+        return view('koperasi.editType')->with('edit',$edit);
+    }
+
+    public function updateType(Int $id)
+    {    
+
+        $update = DB::table('product_group')->where('id',$id)->update([
+            'name' => $request->nama          
+        ]);
+        return redirect('koperasi/produktype')->with('success','Produk type berjaya diubah');
     }
 
     public function createType()
@@ -63,11 +105,20 @@ class AdminProductCooperativeController extends Controller
         ->select('o.id')
         ->first();
 
+        /*
         $type = DB::table('product_group as p')
         ->where('p.organization_id',$org->id)
+        ->get();*/ //mingxuan :not sure what is it but i just comment it
+
+        $group = DB::table('product_group as pg')
+        ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
+        ->where('ou.user_id', $userID)
+        ->where ('ou.organization_id',$org->id)
+        ->select('pg.*')
+        ->distinct('pg.id')
         ->get();
 
-        return view('koperasi-admin.addtype',compact('type'));
+        return view('koperasi-admin.addtype',compact('group'));
     }
 
     public function storeType(Request $request)
@@ -84,7 +135,7 @@ class AdminProductCooperativeController extends Controller
         'organization_id' =>$org->id,
        ]);
 
-       return redirect('koperasi/produkmenu')->with('success','Produk type berjaya ditambah.');
+       return redirect('koperasi/produktype')->with('success','Produk type berjaya ditambah.');
     }
 
     public function createProduct()
@@ -99,7 +150,10 @@ class AdminProductCooperativeController extends Controller
         $type = DB::table('product_group as p')
         ->where('p.organization_id',$org->id)
         ->get();
-
+        if(count($type)==0)
+        {
+            return redirect('koperasi/produkmenu')->with('success','Sila tambah produk type dahulu'); //use success session only
+        }
         return view('koperasi-admin.add',compact('type'));
     }
 
@@ -147,7 +201,7 @@ class AdminProductCooperativeController extends Controller
     //        $add->image =$request->file('image')->getClientOriginalName();
     //        $add -> upsert(['image' => $request->input('image')]);
     //    }
-       return redirect('koperasi/admin')->with('success','Product created successfully.');
+       return redirect('koperasi/produkmenu')->with('success','Product created successfully.');
     }
 
     public function editProduct(Int $id)
@@ -204,14 +258,43 @@ class AdminProductCooperativeController extends Controller
         {
             DB::table('product_item')->where('id',$id)->update(['status'=> 0]);
         }
-        return redirect('koperasi/admin')->with('success','Product updated successfully.');
+        return redirect('koperasi/produkmenu')->with('success','Product updated successfully.');
     }
 
 
-    public function deleteProduct(Int $id)
+    public function deleteProduct($id)
     {
-        $delete = DB::table('product_item')->where('id',$id)->delete();
-        return redirect('koperasi/admin')->with('success','Product deleted successfully.');
 
+        $delete = DB::table('product_item')->where('id',$id)->delete();
+        return redirect('koperasi/produkmenu')->with('success','Product deleted successfully.');
+    }
+
+    public function deleteSelectedProducts(Request $request)
+    {
+        $itemArray = $request->input('itemArray');
+        foreach($itemArray as $id)
+        {
+            $delete = DB::table('product_item')->where('id',$id)->delete();
+        }
+    // perform any necessary operations on $itemArray
+
+    return response()->json(['status' => 'success']);
+        
+
+    }
+
+    public function returnProdukMenu($page)
+    {
+        $returnInformation="";
+        switch($page)
+        {
+            case 1:
+                $returnInformation="Cancel creating a product.";
+                break;
+            case 2:
+                $returnInformation="Cancel editing a product.";
+                break;
+        }
+        return redirect('koperasi/produkmenu')->with('success',$returnInformation);
     }
 }

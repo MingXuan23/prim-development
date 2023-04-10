@@ -218,7 +218,7 @@ class UserCooperativeController extends Controller
                     ->select('o.id', 'o.nama', 'o.telno', 'o.address', 'o.city', 'o.postcode', 'o.state', 'o.parent_org',
                             'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
                     ->first();
-
+        dd($koperasi,$id);
         $org = Organization::where('id', $koperasi->parent_org)->select('nama')->first();
         
         $product_item = DB::table('product_item as pi')
