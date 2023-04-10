@@ -22,6 +22,7 @@ class AdminOpeningHoursCooperativeController extends Controller
         $hour = DB::table('organization_hours as o')
                 ->join('organization_user as ou','o.organization_id','=','ou.organization_id')
                 ->select('o.*')
+                ->distinct('o.id')
                 ->where('ou.user_id', $userID)
                 ->get();
 

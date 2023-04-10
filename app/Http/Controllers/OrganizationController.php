@@ -56,7 +56,7 @@ class OrganizationController extends Controller
 
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
-        // dd($request->organization_picture);
+        //dd($request);
         
         $file_name = '';
 
@@ -274,33 +274,52 @@ class OrganizationController extends Controller
         return view('organization.index');
     }
 
-    public function generateOrganizationCode($typeOrg, $id)
+    public function generateOrganizationCode($typeOrg, $id) //have changed from if else to switch
     {
-        if ($typeOrg == "SK /SJK") {
-            $code = 'SK' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "SRA /SRAI") {
-            $code = 'SA' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "SMK /SMJK") {
-            $code = 'SM' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "Masjid") {
-            $code = 'MS' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "NGO") {
-            $code = 'NGO' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "Rumah Anak Yatim") {
-            $code = 'RAY' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "Pusat Tahfiz") {
-            $code = 'PT' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "Koperasi") { // Koperasi
-            $code = 'KP' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "Peniaga Barang Berjadual") { // Schedule Merchant
-            $code = 'PBJ' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        } elseif ($typeOrg == "Peniaga Barang Umum") { // Regular Merchant
-            $code = 'PBU' . str_pad($id, 5, '0', STR_PAD_LEFT);
+        $prefix="";
+        switch($typeOrg)
+        {
+            case "SK /SJK":
+                $prefix='SK';
+                break;
+            case "SRA /SRAI":
+                $prefix='SA';
+                break;
+            case "SK /SJK":
+                $prefix='SK';
+                break;
+            case "SRA /SRAI":
+                $prefix='SA';
+                break;
+            case"SMK /SMJK":
+                $prefix='SM';
+                break;
+            case "Masjid":
+                $prefix='MS';
+                break;
+             case "NGO":
+                $prefix='NGO';
+                break;
+            case "Rumah Anak Yatim":
+                $prefix='RAY';
+                break;
+            case "Pusat Tahfiz":
+                $prefix='PT';
+                break;
+            case "Koperasi":
+                $prefix='KP';
+                break;
+            case"Peniaga Barang Berjadual":
+                $prefix='PBJ';
+                break;
+            case "Peniaga Barang Umum":
+                $prefix='PBU';
+                break;                 
+            case "PIBG Sekolah":
+                $prefix='PIBG';
+                break;
         }
-        elseif ($typeOrg == "PIBG Sekolah") { // Schedule Merchant
-            $code = 'PIBG' . str_pad($id, 5, '0', STR_PAD_LEFT);
-        }
-
+       $code=$prefix.str_pad($id, 5, '0', STR_PAD_LEFT);
         return $code;
     }
 

@@ -21,7 +21,7 @@
 
       <form action="{{ route('koperasi.updateProduct', $edit->id , $test->id) }}" method="POST" enctype="multipart/form-data">
         {!! csrf_field() !!}
-        <label>* wajib diisi</label></br>
+       
         <label>* Nama</label></br>
         <input type="text" name="nama" id="nama" class="form-control" placeholder="Masukkan Nama Produk"  value="{{$edit->name}}" required></br>
         <label>Penerangan</label></br>
@@ -60,6 +60,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">Simpan</button>
+        <a  href="{{route('koperasi.return',2)}}" class="btn btn-danger">Return</a>
     </form>
   
   </div>

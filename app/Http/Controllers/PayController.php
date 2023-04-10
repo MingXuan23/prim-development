@@ -109,7 +109,7 @@ class PayController extends AppBaseController
 
         $getstudent         = "";
         $getorganization    = "";
-        $getfees            = "";
+        //$getfees            = "";
         $getfees_bystudent  = "";
         $getstudentfees     = "";
 
@@ -150,7 +150,7 @@ class PayController extends AppBaseController
 
             // dd($student_fees);
 
-            $res_student = array_unique($studentid);
+            $res_student = array_unique($studentid);//result
             $res_fee     = array_unique($feesid);
 
             // ************************* get student from array student id *******************************
@@ -176,7 +176,7 @@ class PayController extends AppBaseController
 
             // ************************* get fees from array fees id *******************************
 
-
+            /*
             $getfees = DB::table('students')
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
                 ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
@@ -185,6 +185,7 @@ class PayController extends AppBaseController
                 ->distinct()
                 ->whereIn('student_fees_new.id', $student_fees)
                 ->get();
+            */ //duplicate code 
 
             $getfees_bystudent     = DB::table('students')
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -398,7 +399,8 @@ class PayController extends AppBaseController
     {
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
-        
+        $user=null;
+        $prefixCode="";
         if ($request->desc == 'Donation') {
             $user = User::find(Auth::id());
             $organization = $this->organization->getOrganizationByDonationId($request->d_id);
