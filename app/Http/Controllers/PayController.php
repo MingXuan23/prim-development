@@ -162,7 +162,7 @@ class PayController extends AppBaseController
 
             // ************************* get organization from array student id *******************************
 
-            /* $getstudent2  = DB::table('students')
+             $getstudent2  = DB::table('students')
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
                 ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
                 ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
@@ -172,11 +172,11 @@ class PayController extends AppBaseController
 
             $getorganization  = DB::table('organizations')
                 ->where('id', $getstudent2->organizationid)
-                ->first(); */
+                ->first(); 
 
             // ************************* get fees from array fees id *******************************
 
-            /*
+            
             $getfees = DB::table('students')
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
                 ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
@@ -185,7 +185,7 @@ class PayController extends AppBaseController
                 ->distinct()
                 ->whereIn('student_fees_new.id', $student_fees)
                 ->get();
-            */ //duplicate code 
+             //duplicate code 
 
             $getfees_bystudent     = DB::table('students')
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
