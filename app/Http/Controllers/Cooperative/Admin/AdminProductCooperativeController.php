@@ -63,7 +63,7 @@ class AdminProductCooperativeController extends Controller
     }
 
     public function getProductList(Request $request){
-       dd($request);
+       
         if (request()->ajax()){
             $userID=Auth::id();
             $product = DB::table('product_item as p')
@@ -93,7 +93,7 @@ class AdminProductCooperativeController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<a href="' . route('koperasi.editProduct', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                     //$btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
                 });
@@ -102,6 +102,23 @@ class AdminProductCooperativeController extends Controller
                 
                 return $table->make(true);
         }
+    }
+
+    public function getProductNumOfGroup(Request $request){
+        
+        $userID = Auth::id();
+        
+        $productNum = DB::table('product_item as p')
+        ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
+        ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
+        ->select('count(p.id) as productCount')
+        ->where('ou.user_id', $userID)
+        ->where('pg.id',$request->groupId)
+        ->distinct('ou.user.id')
+        ->first();
+
+        return response()->json(['status' => 'success','productNum' => $productNum]);
+        
     }
 
     public function deleteType(Int $id)
@@ -114,14 +131,14 @@ class AdminProductCooperativeController extends Controller
     {
         $edit = DB::table('product_group')->where('id',$id)->first();
 
-        return view('koperasi.editType')->with('edit',$edit);
+        return view('koperasi-admin.editType')->with('edit',$edit);
     }
 
-    public function updateType(Int $id)
+    public function updateType(Int $id,Request $request)
     {    
-
+      
         $update = DB::table('product_group')->where('id',$id)->update([
-            'name' => $request->nama          
+            'name' => $request->name          
         ]);
         return redirect('koperasi/produktype')->with('success','Produk type berjaya diubah');
     }
@@ -132,6 +149,7 @@ class AdminProductCooperativeController extends Controller
         $org = DB::table('organizations as o')
         ->join('organization_user as os', 'o.id', 'os.organization_id')
         ->where('os.user_id', $userID)
+        ->where('o.type_org',10)
         ->select('o.id')
         ->first();
 
@@ -157,6 +175,7 @@ class AdminProductCooperativeController extends Controller
         $org = DB::table('organizations as o')
                 ->join('organization_user as os', 'o.id', 'os.organization_id')
                 ->where('os.user_id', $userID)
+                ->where('o.type_org',10)
                 ->select('o.id')
                 ->first();
 
@@ -174,6 +193,7 @@ class AdminProductCooperativeController extends Controller
         $org = DB::table('organizations as o')
         ->join('organization_user as os', 'o.id', 'os.organization_id')
         ->where('os.user_id', $userID)
+        ->where('o.type_org',10)
         ->select('o.id')
         ->first();
 
@@ -241,10 +261,9 @@ class AdminProductCooperativeController extends Controller
         $org = DB::table('organizations as o')
         ->join('organization_user as os', 'o.id', 'os.organization_id')
         ->where('os.user_id', $userID)
+        ->where('o.type_org',10)
         ->select('o.id')
         ->first();
-
-  
 
         $edit = DB::table('product_item')->where('id',$id)->first();
 
@@ -270,6 +289,7 @@ class AdminProductCooperativeController extends Controller
         $org = DB::table('organizations as o')
         ->join('organization_user as os', 'o.id', 'os.organization_id')
         ->where('os.user_id', $userID)
+        ->where('o.type_org',10)
         ->select('o.id')
         ->first();
       
@@ -324,6 +344,13 @@ class AdminProductCooperativeController extends Controller
             case 2:
                 $returnInformation="Cancel editing a product.";
                 break;
+            case 3:
+                $returnInformation="Cancel adding a product type.";
+                break;
+            case 4:
+                $returnInformation="Cancel editing a product type.";
+                break;
+
         }
         return redirect('koperasi/produkmenu')->with('success',$returnInformation);
     }

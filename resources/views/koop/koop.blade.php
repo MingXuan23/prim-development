@@ -121,7 +121,9 @@
 <h2>Product Item</h4>
 <br>
 <div class="row">
-@foreach($product as $product)
+
+@foreach($products as $product)
+
 <div class="col-md-6 col-lg-6 col-xl-3">
         
         <!-- Simple card -->

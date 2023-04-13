@@ -1,8 +1,8 @@
 @extends('layouts.master')
 @section('css')
-<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
-<meta name="csrf-token" content="{{ csrf_token() }}">
 
+<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 @include('layouts.datatable')
 
 @endsection
@@ -89,34 +89,6 @@
                 <th> Action </th>
               </tr>
             </thead>
-            <tbody id="productTableBody">
-
-            </tbody>
-            <!-- @foreach($product as $item)
-                                    <tr class ="table-row">
-                                        <td> <input type="checkbox" class="product-checkbox" value ="{{$item->id}}" name="ids[]"></td>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $item->name }}</td>
-                                        <td>{{ $item->desc }}</td>
-                                        <td>
-                                          <img src="{{ URL('koperasi-item/'.$item->image)  }}" width="80px">
-                                        </td>
-                                        <td>{{ $item->quantity_available }}</td>
-                                        <td>{{ number_format($item->price,2)}}</td>
-                                        <td>
-                                         @if($item->status == 0) 
-                                         <div class="d-flex justify-content-center"><span class="badge badge-danger">not aivalable</span></div>
-                                         @else
-                                         <div class="d-flex justify-content-center"><span class="badge badge-success">aivalable</span></div>
-                                         @endif
-                                        </td>
-                                        <td>{{$item->type_name}}</td>
-                                        <td>
-                                         <a href ="{{ route('koperasi.editProduct',$item->id) }}"> <button type="button" data-dismiss="modal" class="btn btn-primary" id="edit" name="edit">Edit</button></a>
-                                           
-                                        </td>
-                                    </tr>
-                                @endforeach -->
           </table>     
           
           <div class="mt-3">
@@ -131,90 +103,14 @@
 </div>
 
 @section('script')
-<script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
-<script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
 
-<script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
 <script>
-  loadProducts();
-  const checkboxes = document.querySelectorAll('.product-checkbox');
-const deleteBtn = document.getElementById('delete-btn');
-const selectBtn=document.getElementById('select-btn')
-$.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-if(checkboxes.length==0)
-{
-  selectBtn.style.display='none';
-}
-checkboxes.forEach(checkbox => {
-  checkbox.addEventListener('click', () => {
-    // Check if at least one checkbox is checked
-    if(checkboxes.length==document.querySelectorAll('.product-checkbox:checked').length) {
-      selectBtn.innerHTML = "Deselect All";
-      deleteBtn.style.display = 'inline';
-    }
-    else if (document.querySelectorAll('.product-checkbox:checked').length > 0) {
-      deleteBtn.style.display = 'inline';
-    }
-    else {
-      deleteBtn.style.display = 'none';
-      selectBtn.innerHTML = "Select All";
-    }
-  });
-});
-
-
-
-function selectAll()
-{
-  if (selectBtn.innerHTML === "Deselect All") {
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = false;
-    });
-    selectBtn.innerHTML = "Select All";
-    deleteBtn.style.display = 'none';
-  } else {
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = true;
-      
-    });
-    selectBtn.innerHTML = "Deselect All";
-    deleteBtn.style.display = 'inline';
-  
-  }
- 
-}
-
-function selectedItems() {
-
-let itemArray = [];
-const selectedCheckBox = document.querySelectorAll('.product-checkbox:checked');
-selectedCheckBox.forEach((checkbox) => {
-  itemArray.push(checkbox.value);
-});
-$.ajax({
-    url: '{{route("koperasi.deleteSelectedProducts")}}',
-    type: 'POST',
-    data: { itemArray: itemArray },
-    success: function(response) {
-      console.log('Success:', response);
-      location.reload();
-    },
-    error: function(xhr, status, error) {
-      alert(error);
-    }
-  });
-}
-
 
 function loadProducts() {
   
-  /*var productTable = $('#productTable').DataTable({
+  console.log("TABLE run");
+  var productTable = $('#productTable').DataTable({
                   processing: true,
                   serverSide: true,
                   ajax: {
@@ -231,9 +127,19 @@ function loadProducts() {
                       "className": "text-center",
                   },],
                   order: [
-                      [1, 'asc']
+                      [2, 'asc']
                   ],
                   columns: [{
+                    "data":null,
+                     "sortable":false,
+                     searchable:false,
+                     "className": "text-center",
+                     render: function (data, type, row, meta) {
+                      
+                      return '<input type="checkbox" class="product-checkbox" value ="' + data.id + '">';    
+                    }          
+                  }
+                  ,{
                       "data": null,
                       searchable: false,
                       "sortable": false,
@@ -243,19 +149,22 @@ function loadProducts() {
                   }, {
                       data: "name",
                       name: 'name',
-                      "width": "20%"
+                      "width": "30%"
                   }, {
                       data: "desc",
                       name: 'description',
                       "width": "30%"
+                  },{
+                      data: "image",
+                      name: "image",
+                      searchable: false,
+                      sortable: false,
+                      render: function(data, type, row, meta) {
+                          return '<img src="/koperasi-item/' + row.image + '" style="max-width:100px;">';
+    }
                   }, {
-                      data: "type",
-                      name: 'Type',
-                      "className": "text-center",
-                      "width": "10%"
-                  }, {
-                      data: "quantity_avaible",
-                      name: 'Quantity',
+                      data: "quantity_available",
+                      name: 'quantity',
                       "className": "text-center",
                       "width": "10%"
                   }, 
@@ -271,60 +180,140 @@ function loadProducts() {
                       searchable: false,
                       "className": "text-center",
                   }, {
+                      data: "type_name",
+                      name: 'Type',
+                      "className": "text-center",
+                      "width": "10%"
+                  }, {
                       data: 'action',
                       name: 'action',
                       orderable: false,
                       searchable: false,
                       "className": "text-center",
                       "width": "20%"
-                  },]
+                  }]
+                  ,drawCallback: function() {
+                    // Call your second function here
+                    
+                    initialise();
+                  }
           });
-          
-    */
-  var productTable = $("#productTableBody");
-  var productArray = @json($product);
-  $.each(productArray, function(index, product) {
-  var row = $("<tr>").addClass("table-row");
-  row.append($("<td>").append($("<input>").attr({
-    type: "checkbox",
-    class: "product-checkbox",
-    value: product.id,
-    name: "ids[]"
-  })));
-  row.append($("<td>").text(index + 1));
-  row.append($("<td>").text(product.name));
-  row.append($("<td>").text(product.desc));
-  row.append($("<td>").append($("<img>").attr({
-    src: "{{ URL('koperasi-item') }}/" + product.image,
-    width: "80px"
-  })));
-  row.append($("<td>").text(product.quantity_available));
-  row.append($("<td>").text(product.price.toFixed(2)));
-  var status = product.status == 0 ? "not available" : "available";
-  row.append($("<td>").append($("<div>").addClass("d-flex justify-content-center").append($("<span>").addClass("badge badge-" + (product.status == 0 ? "danger" : "success")).text(status))));
-  row.append($("<td>").text(product.type_name));
-  row.append($("<td>").append($("<a>").attr("href", "{{ route('koperasi.editProduct', ':id') }}".replace(":id", product.id)).append($("<button>").attr({
-    type: "button",
-    "data-dismiss": "modal",
-    class: "btn btn-primary",
-    id: "edit",
-    name: "edit"
-  }).text("Edit"))));
-  productTable.append(row);    
-});
+          console.log("table end");
+         
 }
 
 
+//to use ajax
+$.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
 
+
+
+function initialise()
+{
+  console.log("checkbox run");
+//if no data inside table
+const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+const deleteBtn = document.getElementById('delete-btn');
+const selectBtn =document.getElementById('select-btn');
+if(checkboxes.length==0)
+{
+  console.log(checkboxes.length);
+    selectBtn.style.display='none';
+}
+
+//add click listener to each checkbox
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener('click', () => {
+    //if all checkbox is selected
+    if(checkboxes.length==document.querySelectorAll('.product-checkbox:checked').length) {
+      selectBtn.innerHTML = "Deselect All";
+      deleteBtn.style.display = 'inline';
+    }//at least one checkbox is selected
+    else if (document.querySelectorAll('.product-checkbox:checked').length > 0) {
+      deleteBtn.style.display = 'inline';
+    }//no checkbox is selected
+    else {
+      deleteBtn.style.display = 'none';
+      selectBtn.innerHTML = "Select All";
+    }
+  });
+});
+console.log("checkbox end");
+}
 
 $(document).ready(function() {
+
+ loadProducts();
+ //initialise(checkboxes);
+  
   $(document).on('click', '.btn-danger', function(){
           $('#deleteConfirmationModal').modal('show');
       });
-
-//('.alert').delay(3000).fadeOut();
+ 
+$('.alert').delay(3000).fadeOut();
+    
 
 });
+
+
+//selectall
+function selectAll()
+{
+  const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  const deleteBtn = document.getElementById('delete-btn');
+const selectBtn =document.getElementById('select-btn');
+  if (selectBtn.innerHTML === "Deselect All") {
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = false;
+    });
+    selectBtn.innerHTML = "Select All";
+    deleteBtn.style.display = 'none';
+  } else {
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = true;
+      
+    });
+    selectBtn.innerHTML = "Deselect All";
+    deleteBtn.style.display = 'inline';
+  
+  }
+  
+ 
+}
+
+function selectedItems() {
+
+let itemArray = [];
+const refreshTable =document.getElementById('productTable');
+const selectedCheckBox = document.querySelectorAll('.product-checkbox:checked');
+const deleteBtn = document.getElementById('delete-btn');
+const selectBtn =document.getElementById('select-btn');
+const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+var table=$('#productTable').DataTable();
+selectedCheckBox.forEach((checkbox) => {
+  itemArray.push(checkbox.value);
+});
+//all selected checkbox is here
+$.ajax({
+    url: '{{route("koperasi.deleteSelectedProducts")}}',
+    type: 'POST',
+    data: { itemArray: itemArray },
+    success: function(response) {
+      console.log('Success:', response);
+      $('#delete-btn').hide();
+      table.ajax.reload(); //refresh the page to reload the data
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
+    }
+  });
+}
+
+
 
 
 </script>

@@ -36,12 +36,13 @@
         </div>
         @endif
 
-      <form action="{{route('koperasi.updateType')}}" method="POST" enctype="multipart/form-data">
+      <form action="{{route('koperasi.updateType',$edit->id)}}" method="POST" enctype="multipart/form-data">
         {!! csrf_field() !!}
         <label>* Nama Produk</label></br>
         <input type="text" name="name" id="name" class="form-control" placeholder="Masukkan Nama Produk"  value="{{$edit->name}}" required></br>
-
+        <input type="hidden" name="id" id="id" class="form-control" value="{{$edit->id}}">
         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">Simpan</button>
+        <a  href="{{route('koperasi.return',4)}}" class="btn btn-danger">Return</a>
     </form>
   
   </div>

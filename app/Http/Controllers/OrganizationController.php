@@ -78,7 +78,7 @@ class OrganizationController extends Controller
             'organization_picture' => $file_name,
             'parent_org'           => $request->parent_org
         ]);
-
+        //dd($request->parent_org);
         $type_org = TypeOrganization::find($request->type_org);
 
         Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($type_org->nama , $organization->id)]);
@@ -106,6 +106,7 @@ class OrganizationController extends Controller
             $this->insertOrganizationHours($organization->id);
 
             // connect parent to shcool service
+            /*
             $parents = DB::table('organization_user')
                 ->where('organization_id', $organization->parent_org)
                 ->where('role_id', 6)
@@ -121,7 +122,7 @@ class OrganizationController extends Controller
                         'role_id'         => $parent->role_id,
                         'status'          => 1
                     ]);
-            }
+            }*/
         }
 
         // Schedule Merchant

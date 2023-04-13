@@ -30,7 +30,7 @@
         <input type="number" name="price" id="price" value="" step="any"
         class="form-control" placeholder="0.00" required  min="0"></br>
         <label>* Kuantiti</label></br>
-        <input type="number" name="quantity" id="quantity" class="form-control" placeholder="Masukkan bilangan kuantiti Produk"  value="" required></br>
+        <input type="number" name="quantity" id="quantity" class="form-control" placeholder="Masukkan bilangan kuantiti Produk"  value="" required min="0"></br>
         <label>* Jenis Produk</label></br>
 
         <div class="col">

@@ -201,10 +201,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
         Route::post('/produkmenu/deleteSelectedProducts','AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
         Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
+        Route::post('/produktype/getProductNumOfGroup','AdminProductCooperativeController@getProductNumOfGroup')->name('koperasi.getProductNumOfGroup');
 
         Route::get('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
         Route::post('/produktype','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
-        Route::post('/produktype/update','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
+        Route::post('/produktype/update/{id}','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
         Route::get('/produktype/edit/{id}','AdminProductCooperativeController@editType')->name('koperasi.editType');
 
         Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');

@@ -47,6 +47,7 @@ class PayController extends AppBaseController
         $feesid     = $request->id;
         $getfees    = DB::table('fees')->where('id', $feesid)->first();
 
+        //get category
         $getcat = DB::table('fees')
             ->join('fees_details', 'fees_details.fees_id', '=', 'fees.id')
             ->join('details', 'details.id', '=', 'fees_details.details_id')

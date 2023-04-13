@@ -629,9 +629,9 @@ class UserCooperativeController extends Controller
         ->where('id',$id)
         ->get();
 
-        $product = DB::table('product_group as p')
-         ->join('product_item as pg','p.id','pg.product_group_id')
-         ->where('p.organization_id',$id)
+        $products = DB::table('product_group as pg')
+         ->join('product_item as p','pg.id','p.product_group_id')
+         ->where('pg.organization_id',$id)
         ->get();
 
         
@@ -650,10 +650,10 @@ class UserCooperativeController extends Controller
         $k_open_hour = date('h:i A', strtotime($koperasi->open_hour));
         
         $k_close_hour = date('h:i A', strtotime($koperasi->close_hour));
-
+        //dd($products);
         return view('koop.koop')
         ->with('sekolah',$sekolah)
-        ->with('product',$product)
+        ->with('products',$products)
         ->with('koperasi',$koperasi)
         ->with('k_open_hour', $k_open_hour)
         ->with('k_close_hour', $k_close_hour);

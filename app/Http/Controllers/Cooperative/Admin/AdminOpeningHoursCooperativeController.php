@@ -19,11 +19,13 @@ class AdminOpeningHoursCooperativeController extends Controller
                     ->where('ou.role_id', $role_id)
                     ->first();
 
-        $hour = DB::table('organization_hours as o')
-                ->join('organization_user as ou','o.organization_id','=','ou.organization_id')
-                ->select('o.*')
+        $hour = DB::table('organization_hours as oh')
+                ->join('organization_user as ou','oh.organization_id','=','ou.organization_id')
+                ->join('organizations as o', 'o.id', '=', 'ou.organization_id')
+                ->select('oh.*')
                 ->distinct('o.id')
                 ->where('ou.user_id', $userID)
+                ->where('o.type_org',10)
                 ->get();
 
 
@@ -38,6 +40,7 @@ class AdminOpeningHoursCooperativeController extends Controller
         $org = DB::table('organizations as o')
                 ->join('organization_user as os', 'o.id', 'os.organization_id')
                 ->where('os.user_id', $userID)
+                ->where('o.type_org',10)
                 ->select('o.id')
                 ->first();
 
