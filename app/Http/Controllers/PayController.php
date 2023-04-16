@@ -540,6 +540,7 @@ class PayController extends AppBaseController
         $transaction->user_id       = $user ? $user->id : null;
         $transaction->username      = strtoupper($fpx_buyerName);
         $transaction->fpx_checksum  = $fpx_checkSum;
+        $transaction->username      = $request->bankid;
 
         $list_student_fees_id   = $getstudentfees;
         $list_parent_fees_id    = $getparentfees;
