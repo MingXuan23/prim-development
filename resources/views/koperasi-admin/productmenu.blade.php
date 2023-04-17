@@ -151,7 +151,7 @@ function loadProducts() {
                       name: 'name',
                       "width": "30%"
                   }, {
-                      data: "desc",
+                      data: "desctext",
                       name: 'description',
                       "width": "30%"
                   },{

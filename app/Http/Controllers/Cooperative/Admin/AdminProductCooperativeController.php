@@ -8,6 +8,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\ProductItem;
 use Yajra\DataTables\DataTables;
+use App\Models\Organization;
+
+use Carbon\Carbon;
+use App\Models\Fee;
+use App\Models\Fee_New;
+use App\Models\Category;
+use App\Models\ClassModel;
+use Psy\Command\WhereamiCommand;
+
+use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Session;
+use App\Http\Controllers\AppBaseController;
+use Symfony\Component\VarDumper\Cloner\Data;
 
 
 class AdminProductCooperativeController extends Controller
@@ -71,10 +85,24 @@ class AdminProductCooperativeController extends Controller
             ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
             ->select('p.*','pg.name as type_name')
             ->where('ou.user_id', $userID)
+            ->whereNull('p.deleted_at')
             ->distinct('ou.user_id')
             ->get();
             
         $table = Datatables::of($product);
+                $table->addColumn('desctext', function ($row) {
+                    $target=json_decode($row->target);
+                    $desctext='<div class="d-flex" >';
+                    $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun '.$target->data[0];
+                   
+                    for($i=1;$i<count($target->data);$i++)
+                    {
+                        $desctext=$desctext. ',Tahun '.$target->data[$i];
+                    }
+                    $desctext=$desctext.'<br>'.$row->desc.'</span></div>';
+                    
+                    return $desctext;
+                });
 
                 $table->addColumn('status', function ($row) {
                     if ($row->status == '1') {
@@ -89,6 +117,7 @@ class AdminProductCooperativeController extends Controller
                         return $btn;
                     }
                 });
+                
 
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
@@ -98,7 +127,7 @@ class AdminProductCooperativeController extends Controller
                     return $btn;
                 });
 
-                $table->rawColumns(['status', 'action']);
+                $table->rawColumns(['status', 'action','desctext']);
                 
                 return $table->make(true);
         }
@@ -123,7 +152,13 @@ class AdminProductCooperativeController extends Controller
 
     public function deleteType(Int $id)
     {
-        $delete = DB::table('product_group')->where('id',$id)->delete();
+        $delete = DB::table('product_group')->where('id',$id)->update([
+            'deleted_at' => now(),   
+        ]);
+        $removeType = DB::table('product_item')->where('id',$id)->update([
+            'deleted_at'=>now(),
+            'status'=>0,
+        ]);
         return redirect('koperasi/produktype')->with('success','Produk type berjaya dipadam');
     }
 
@@ -138,7 +173,8 @@ class AdminProductCooperativeController extends Controller
     {    
       
         $update = DB::table('product_group')->where('id',$id)->update([
-            'name' => $request->name          
+            'name' => $request->name,  
+            'updated_at'=>now()        
         ]);
         return redirect('koperasi/produktype')->with('success','Produk type berjaya diubah');
     }
@@ -182,6 +218,8 @@ class AdminProductCooperativeController extends Controller
        $add = DB::table('product_group') -> insert([
         'name' => $request->input('name'), 
         'organization_id' =>$org->id,
+        'created_at'=>now(),
+        'updated_at'=>now(),
        ]);
 
        return redirect('koperasi/produktype')->with('success','Produk type berjaya ditambah.');
@@ -231,7 +269,12 @@ class AdminProductCooperativeController extends Controller
                 ->where('os.user_id', $userID)
                 ->select('o.id')
                 ->first();
-
+        if($request->cb_year){
+            $data = array(
+                'data' =>$request->cb_year
+            );
+            $target = json_encode($data);
+        }
 
        $add = DB::table('product_item') -> insert([
         'name' => $request->input('nama'),
@@ -240,6 +283,9 @@ class AdminProductCooperativeController extends Controller
         'quantity_available' => $request->input('quantity'),
         'price' => $request->input('price'),
         'status'=> $request->input('status'),
+        'target'=>$target,
+        'created_at' => now(),
+        'updated_at' => now(),
         'product_group_id' => $request->input('type'),   
        ]);
 
@@ -286,12 +332,12 @@ class AdminProductCooperativeController extends Controller
     public function updateProduct(Request $request,Int $id)
     {
         $userID = Auth::id();
-        $org = DB::table('organizations as o')
-        ->join('organization_user as os', 'o.id', 'os.organization_id')
-        ->where('os.user_id', $userID)
-        ->where('o.type_org',10)
-        ->select('o.id')
-        ->first();
+        // $org = DB::table('organizations as o')
+        // ->join('organization_user as os', 'o.id', 'os.organization_id')
+        // ->where('os.user_id', $userID)
+        // ->where('o.type_org',10)
+        // ->select('o.id')
+        // ->first();
       
         $update = DB::table('product_item')->where('id',$id)->update([
             'name' => $request->nama,
@@ -301,8 +347,7 @@ class AdminProductCooperativeController extends Controller
             'price' => $request->price,
             'status'=> $request->status,
             'product_group_id' => $request->type,
-            
-          
+            'updated_at' => now()
         ]);
         if($request->quantity ==0)
         {
@@ -314,8 +359,10 @@ class AdminProductCooperativeController extends Controller
 
     public function deleteProduct($id)
     {
-
-        $delete = DB::table('product_item')->where('id',$id)->delete();
+        $delete = DB::table('product_item')->where('id',$id)->update([
+            'deleted_at' => now(),   
+            'status'=>0     
+        ]);
         return redirect('koperasi/produkmenu')->with('success','Product deleted successfully.');
     }
 
@@ -324,7 +371,10 @@ class AdminProductCooperativeController extends Controller
         $itemArray = $request->input('itemArray');
         foreach($itemArray as $id)
         {
-            $delete = DB::table('product_item')->where('id',$id)->delete();
+            $delete = DB::table('product_item')->where('id',$id)->update([
+                'deleted_at' => now(),   
+                'status'=>0     
+            ]);
         }
     // perform any necessary operations on $itemArray
 
@@ -353,5 +403,43 @@ class AdminProductCooperativeController extends Controller
 
         }
         return redirect('koperasi/produkmenu')->with('success',$returnInformation);
+    }
+
+    public function fetchClassyear(){
+        
+        
+        $userID = Auth::id();
+        $oid = DB::table('organizations as o')
+                ->join('organization_user as os', 'o.id', 'os.organization_id')
+                ->where('os.user_id', $userID)
+                ->where('o.type_org',10)
+                ->select('o.parent_org')
+                ->first();
+        
+        $organization = Organization::find($oid->parent_org);
+
+        if ($organization->parent_org != null)
+        {
+            $oid = $organization->parent_org;
+        }
+        
+
+        $list = DB::table('organizations')
+        ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
+        ->where('organizations.id', $oid->parent_org)
+        ->first();
+
+        $class_organization = DB::table('classes')
+            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+            ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
+            ->distinct()
+            ->where('classes.status', 1)
+            ->where('class_organization.organization_id', $oid->parent_org)
+            ->get();
+
+         //dd($class_organization);
+         
+        return response()->json(['data' => $list, 'datayear' => $class_organization]);
+        
     }
 }

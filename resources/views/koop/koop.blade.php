@@ -173,5 +173,51 @@
 
     </div><!-- end col -->
 @endforeach
+
+<!--to show the product with the tingkatan category-->
+foreach($getstudent as $row)
+                <h4 class=" mb-3" style="text-align: center">{{$row->studentname}}</h4>
+
+                <hr>
+                @foreach($getfees->where('studentid', $row->studentid) as $row2)
+
+                <h4 class=" mb-3 mt-3">--{{ $row2->category }}--</h4>
+
+                <div class="row">
+
+                    @foreach($getfees_bystudent->where('studentid', $row->studentid)->where('category', $row2->category)
+                    as $row3)
+                    <div class="col-6">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4>{{ $loop->iteration }}. {{ $row3->name }}</h4>
+                            </div>
+                            <div class="col-12">
+                                <h5 class="mt-0" style="color:#8699ad">
+                                    Kuantiti x{{ $row3->quantity }}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        @php
+                        $i += $row3->quantity*$row3->price ;
+                        @endphp
+                        <h4 class="float-right">RM {{ number_format($row3->quantity*$row3->price, 2) }} </h4>
+                    </div>
+                    @endforeach
+
+                </div>
+                @endforeach
+                <hr>
+                @endforeach
+
+                @foreach ($getstudentfees as $studentfees)
+
+                <input type="hidden" name="student_fees_id[]" value="{{ $studentfees->id }}">
+
+                @endforeach
+
+                @endif
 </div>
 @endsection

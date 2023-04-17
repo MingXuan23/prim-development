@@ -224,6 +224,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/Confirm/delete/{id}','AdminOrderCooperativeController@notConfirm')->name('koperasi.notConfirm');
 
         Route::get('/returnProdukMenu/{page}','AdminProductCooperativeController@returnProdukMenu')->name('koperasi.return');
+        Route::get('/fetchClassyear','AdminProductCooperativeController@fetchClassyear')->name('koperasi.fetchClassYear');
     });
 });
 
