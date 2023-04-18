@@ -329,7 +329,11 @@ class FPXController extends AppBaseController
         $fpx_msgToken = "01";
         $fpx_sellerExId = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
         $fpx_sellerExOrderNo = $transaction->nama;
-        $fpx_sellerTxnTime = strtotime($transaction->datetime_created);;
+
+        $date_time_string = $transaction->datetime_created;
+        $date_time = date_create_from_format('Y-m-d H:i:s', $date_time_string);
+
+        $fpx_sellerTxnTime = $date_time->format('YmdHis');
         $fpx_sellerOrderNo = $transaction->description;
         $fpx_productDesc = explode("_", $transaction->nama)[0];
 
