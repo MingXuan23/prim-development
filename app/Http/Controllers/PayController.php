@@ -530,7 +530,9 @@ class PayController extends AppBaseController
         $transaction->nama          = $fpx_sellerExOrderNo;
         $transaction->description   = $fpx_sellerOrderNo;
         $transaction->transac_no    = NULL;
-        $transaction->datetime_created = now();
+        // convert time to Y-m-d H:i:s format
+        $date_time = date_create_from_format('YmdHis', $fpx_sellerTxnTime);
+        $transaction->datetime_created = $date_time->format('Y-m-d H:i:s');
         $transaction->amount        = $fpx_txnAmount;
         $transaction->status        = 'Pending';
         $transaction->email         = $fpx_buyerEmail;
