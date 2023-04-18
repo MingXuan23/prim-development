@@ -445,15 +445,11 @@ class FPXController extends AppBaseController
                 $token = strtok("&");
             }
 
-            $fpx_debitAuthCode = reset($response_value);
-            //Response Checksum Calculation String
-            $data = $response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankId']."|".$response_value['fpx_buyerIban']."|".$response_value['fpx_buyerId']."|".$response_value['fpx_buyerName']."|".$response_value['fpx_creditAuthCode']."|".$response_value['fpx_creditAuthNo']."|".$fpx_debitAuthCode."|".$response_value['fpx_debitAuthNo']."|".$response_value['fpx_fpxTxnId']."|".$response_value['fpx_fpxTxnTime']."|".$response_value['fpx_makerName']."|".$response_value['fpx_msgToken']."|".$response_value['fpx_msgType']."|".$response_value['fpx_sellerExId']."|".$response_value['fpx_sellerExOrderNo']."|".$response_value['fpx_sellerId']."|".$response_value['fpx_sellerOrderNo']."|".$response_value['fpx_sellerTxnTime']."|".$response_value['fpx_txnAmount']."|".$response_value['fpx_txnCurrency'];
-            // dd($data);
+            return $response_value['fpx_debitAuthCode'];
         } 
         catch (\Throwable $th) {
             echo 'Error :', ($th->getMessage());
+            return null;
         }
-
-        return $fpx_debitAuthCode;
     }
 }
