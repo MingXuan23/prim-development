@@ -48,10 +48,10 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
     public function model(array $row)
     {
         if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_tel_bimbit_penjaga'])){
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+            // throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
-
-        $phone = trim((string)$row['no_tel_bimbit_penjaga']);
+        else{
+            $phone = trim((string)$row['no_tel_bimbit_penjaga']);
 
         if(!$this->startsWith($phone,"+60") && !$this->startsWith($phone,"60")){
             if(strlen($phone) == 10) {
