@@ -34,11 +34,6 @@ class TransactionStatusUpdate extends Command
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
     public function handle()
     {
         $transactions = DB::table('transactions')
