@@ -350,7 +350,7 @@ class FPXController extends AppBaseController
         }
         else if ($fpx_productDesc == "School")
         {
-
+            
         }
 
         $fpx_sellerId = $organ->seller_id;
@@ -368,10 +368,7 @@ class FPXController extends AppBaseController
         $fpx_makerName = "";
         $fpx_version = "6.0";
 
-        // dd($fpx_checkSum);
         $data = $fpx_buyerAccNo . "|" . $fpx_buyerBankBranch . "|" . $fpx_buyerBankId . "|" . $fpx_buyerEmail . "|" . $fpx_buyerIban . "|" . $fpx_buyerId . "|" . $fpx_buyerName . "|" . $fpx_makerName . "|" . $fpx_msgToken . "|" . $fpx_msgType . "|" . $fpx_productDesc . "|" . $fpx_sellerBankCode . "|" . $fpx_sellerExId . "|" . $fpx_sellerExOrderNo . "|" . $fpx_sellerId . "|" . $fpx_sellerOrderNo . "|" . $fpx_sellerTxnTime . "|" . $fpx_txnAmount . "|" . $fpx_txnCurrency . "|" . $fpx_version;
-        // $data=$fpx_buyerBankBranch."|".$fpx_buyerBankId."|".$fpx_buyerIban."|".$fpx_buyerId."|".$fpx_buyerName."|".$fpx_creditAuthCode."|".$fpx_creditAuthNo."|".$fpx_debitAuthCode."|".$fpx_debitAuthNo."|".$fpx_fpxTxnId."|".$fpx_fpxTxnTime."|".$fpx_makerName."|".$fpx_msgToken."|".$fpx_msgType."|".$fpx_sellerExId."|".$fpx_sellerExOrderNo."|".$fpx_sellerId."|".$fpx_sellerOrderNo."|".$fpx_sellerTxnTime."|".$fpx_txnAmount."|".$fpx_txnCurrency;
-
         $priv_key = getenv('FPX_KEY');
         $pkeyid = openssl_get_privatekey($priv_key, null);
         openssl_sign($data, $binary_signature, $pkeyid, OPENSSL_ALGO_SHA1);
@@ -430,8 +427,6 @@ class FPXController extends AppBaseController
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             //execute post
             $result = curl_exec($ch);
-            //echo "RESULT";
-            //echo $result;
 
             //close connection
             curl_close($ch);
@@ -439,9 +434,9 @@ class FPXController extends AppBaseController
             $token = strtok($result, "&");
             while ($token !== false)
             {
-                list($key1,$value1)=explode("=", $token);
-                $value1=urldecode($value1);
-                $response_value[$key1]=$value1;
+                list($key1,$value1) = explode("=", $token);
+                $value1 = urldecode($value1);
+                $response_value[$key1] = $value1;
                 $token = strtok("&");
             }
 
@@ -449,7 +444,6 @@ class FPXController extends AppBaseController
         } 
         catch (\Throwable $th) {
             echo 'Error :', ($th->getMessage());
-            return null;
         }
     }
 }
