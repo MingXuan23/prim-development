@@ -350,7 +350,23 @@ class FPXController extends AppBaseController
         }
         else if ($fpx_productDesc == "School")
         {
-            
+            $organ = DB::table('organizations as o')
+                    ->leftJoin('fees_new as fn', 'o.id', 'fn.organization_id')
+                    ->leftJoin('fees_new_organization_user as fou', 'fou.fees_new_id', 'fn.id')
+                    ->where('fou.transaction_id', $transaction->id)
+                    ->select('o.seller_id')
+                    ->first();
+
+                if ($organ == null)
+                {
+                    $organ = DB::table('organizations as o')
+                        ->leftJoin('fees_new as fn', 'o.id', 'fn.organization_id')
+                        ->leftJoin('student_fees_new as sfn', 'sfn.fees_id', 'fn.id')
+                        ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', 'sfn.id')
+                        ->where('ftn.transactions_id', $transaction->id)
+                        ->select('o.seller_id')
+                        ->first();
+                }
         }
 
         $fpx_sellerId = $organ->seller_id;
