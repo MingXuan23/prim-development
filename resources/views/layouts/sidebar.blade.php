@@ -309,7 +309,7 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru')
+                @role('Superadmin|Pentadbir|Guru|Koop Admin')
                 <li>
                     <a href="{{ route('fees.category.report') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
@@ -325,7 +325,7 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru|Penjaga')
+                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin')
 
                 <li>
                     <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
