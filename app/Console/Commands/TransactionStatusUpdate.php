@@ -293,7 +293,6 @@ class TransactionStatusUpdate extends Command
                 echo 'Error :', ($th->getMessage());
             }
         }
-
-        $this->info('transactionstatus:cron Command Run Successfully !');
+        \Log::info("Update Transaction Command Run Successfully!");
     }
 }
