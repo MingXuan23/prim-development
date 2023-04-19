@@ -30,23 +30,29 @@ class DormImport implements ToModel, WithHeadingRow
         //     throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         // }
 
-        if (!isset($row['nama_asrama']))
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing nama asrama"]);
-        else if (!isset($row['kapasiti']))
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing kapasiti"]);
-        else if (!isset($row['bilangan_pelajar_dalam']))
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing bilangan_pelajar_dalam"]);
+        // if (!isset($row['nama_asrama']))
+        //     throw ValidationException::withMessages(["error" => "Invalid headers or missing nama asrama"]);
+        // else if (!isset($row['kapasiti']))
+        //     throw ValidationException::withMessages(["error" => "Invalid headers or missing kapasiti"]);
+        // // else if (!isset($row['bilangan_pelajar_dalam']))
+        //     throw ValidationException::withMessages(["error" => "Invalid headers or missing bilangan_pelajar_dalam"]);
 
 
 
 
         //dd($this->organ);
 
-        DB::table('dorms')->insert([
-            'name'      => $row['nama_asrama'],
-            'organization_id' => $this->organ,
-            'accommodate_no'   => $row['kapasiti'],
-            'student_inside_no'    => 0,
-        ]);
+        if(isset($row['nama_asrama']) && isset($row['kapasiti']))
+        {
+            $result = DB::table('dorms')->insert([
+                'name'      => $row['nama_asrama'],
+                'organization_id' => $this->organ,
+                'accommodate_no'   => $row['kapasiti'],
+                'student_inside_no'    => 0,
+            ]);
+            // dd($row['nama_asrama']$result);
+        }
+
+   
     }
 }

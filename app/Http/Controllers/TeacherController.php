@@ -116,6 +116,7 @@ class TeacherController extends Controller
 
             return redirect('/teacher/peranan')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
+        // dd(new GuardImport($request->organ));
 
         Excel::import(new GuardImport($request->organ), public_path('/uploads/excel/' . $namaFile));
 
@@ -482,6 +483,8 @@ class TeacherController extends Controller
                 ]
             );
 
+            
+
         if ($result) {
             Session::flash('success', 'Guru Berjaya Dipadam');
             return View::make('layouts/flash-messages');
@@ -492,22 +495,40 @@ class TeacherController extends Controller
     }
 
     //for warden and guard use
-    public function peranandestroy($id)
+    public function peranandestroy($id,$role_id)
     {
-        $arrayPeranan = [13, 14];
-        $result = DB::table('users')
-            ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-            ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
-            ->where('users.id', $id)
-            ->whereIn('organization_user.role_id', $arrayPeranan)
-            ->update(
-                [
-                    'organization_user.status' => 0,
-                ]
-            );
+        // $role_id = $request->get('role_id');
+        // $arrayPeranan = [13, 14];
+
+        // $result = DB::table('users')
+        //     ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+        //     ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
+        //     ->where('users.id', $id)
+        //     ->whereIn('organization_user.role_id', $arrayPeranan)
+        //     ->update(
+        //         [
+        //             'organization_user.status' => 0,
+        //         ]
+        //     );
+        // dd(1);
+
+        $result = DB::table('organization_user')
+
+        // ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+        // ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
+        ->where('user_id', $id)
+        ->where('role_id', $role_id)
+        ->delete();
+
+        // $result = DB::table('organization_user')::find($result->id);
+        // ->delete();
+
+            // dd($result);
 
         if ($result) {
             Session::flash('success', 'Peranan Berjaya Dipadam');
+            // Session::flash('success', 'role_id: '.json_encode($result));
+
             return View::make('layouts/flash-messages');
         } else {
             Session::flash('error', 'Peranan Gagal Dipadam');
@@ -593,7 +614,7 @@ class TeacherController extends Controller
                     ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
                     ->join('organization_roles', 'organization_roles.id', '=', 'organization_user.role_id')
                     ->join('users', 'users.id', '=', 'organization_user.user_id')
-                    ->select('organizations.id as oid', 'organization_user.id as ou_id', 'organization_user.status as status', 'organization_roles.nama as roleName', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
+                    ->select('organizations.id as oid', 'organization_user.id as ou_id','organization_user.role_id as role_id', 'organization_user.status as status', 'organization_roles.nama as roleName', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
                     ->where('organizations.id', $oid)
                     ->whereIn('organization_user.role_id', $arrayPeranan)
                     ->orderBy('roleName');
@@ -601,11 +622,26 @@ class TeacherController extends Controller
 
             $table = Datatables::of($data);
 
+            
+            // $table->addColumn('status', function ($row) {
+            //     if ($row->status == '1') {
+            //         $btn = '<div class="d-flex justify-content-center">';
+            //         $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+
+            //         return $btn;
+            //     } else {
+            //         $btn = '<div class="d-flex justify-content-center">';
+            //         $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+
+            //         return $btn;
+            //     }
+            // });
+
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
                 $btn = $btn . '<a href="' . route('teacher.perananedit', $row->ou_id) . '" class="btn btn-primary m-1">Edit</a>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                $btn = $btn . '<button id="' . $row->id . '" data-role="'.$row->role_id.'" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });
 

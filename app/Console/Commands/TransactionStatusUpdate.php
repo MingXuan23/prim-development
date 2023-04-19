@@ -33,7 +33,7 @@ class TransactionStatusUpdate extends Command
     {
         parent::__construct();
     }
-
+    
     public function handle()
     {
         $transactions = DB::table('transactions')

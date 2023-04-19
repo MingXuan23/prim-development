@@ -31,6 +31,7 @@ class AllStudentlistExport implements FromCollection, ShouldAutoSize, WithHeadin
             ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'co.class_id')
             ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as blacklist')
+            ->selectRaw("(CASE WHEN (blacklist = 1) THEN 'Blacklisted' ELSE 'Not Blacklisted' END) as blacklist")
             ->where([
                 //['organization.id', $this->organId],
                 ['dorms.organization_id', $this->organId],
@@ -39,8 +40,7 @@ class AllStudentlistExport implements FromCollection, ShouldAutoSize, WithHeadin
             ->orderBy('students.nama')
             ->get();
 
-        // dd($studentlist);
-
+           
         return $studentlist;
     }
 

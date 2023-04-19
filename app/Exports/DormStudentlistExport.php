@@ -32,6 +32,8 @@ class DormStudentlistExport implements FromCollection, ShouldAutoSize, WithHeadi
             ->join('class_organization as co', 'co.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'co.class_id')
             ->select('students.nama as studentName', 'classes.nama as className', 'dorms.name as dormName', 'class_student.blacklist as blacklist')
+            ->selectRaw("(CASE WHEN (blacklist = 1) THEN 'Blacklisted' ELSE 'Not Blacklisted' END) as blacklist")
+
             ->where([
                 ['class_student.dorm_id', $this->dorm],
                 ['dorms.organization_id', $this->organId],

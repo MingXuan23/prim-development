@@ -80,6 +80,7 @@
                                 <th>Peranan</th>
                                 <th>Email</th>
                                 <th>Nombor Telefon</th>
+                                {{-- <th>Status</th> --}}
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -252,7 +253,7 @@
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [1, 2, 3, 4, 5], // your case first column
+                    "targets": [1, 2, 3, 4, 5,6], // your case first column
                     "className": "text-center",
                 }, ],
                 order: [
@@ -314,26 +315,33 @@
         });
 
         var teacher_id;
+        var role_id;
 
         $(document).on('click', '.btn-danger', function() {
             teacher_id = $(this).attr('id');
+            role_id = $(this).attr('data-role');
+            // console.log(role_id);
+            // console.log(this);
             $('#deleteConfirmationModal').modal('show');
         });
 
         $('#delete').click(function() {
+            // console.log('role_id: '.role_id);
             $.ajax({
                 type: 'POST',
                 dataType: 'html',
                 data: {
                     "_token": "{{ csrf_token() }}",
+                    // role_id : role_id
                     //_method: 'DELETE'
                 },
-                url: "/teacher/destroyperanan/" + teacher_id,
+                url: "/teacher/destroyperanan/" + teacher_id + "/" + role_id,
                 success: function(data) {
                     setTimeout(function() {
                         $('#confirmModal').modal('hide');
                     }, 2000);
-                    // console.log("it Works");
+                    console.log("it Works");
+                    console.log('success and : '.role_id);
 
                     $('div.flash-message').html(data);
 
@@ -341,6 +349,9 @@
                 },
                 error: function(data) {
                     $('div.flash-message').html(data);
+                    console.log('fail and : '.role_id);
+                    console.log("it fail");
+
                 }
             })
         });
