@@ -85,7 +85,7 @@ Route::group(['prefix' => 'teacher'], function () {
     Route::get('createperanan', 'TeacherController@peranancreate')->name('teacher.peranancreate');
     Route::get('editperanan/{id}', 'TeacherController@perananedit')->name('teacher.perananedit');
     Route::post('updateperanan/{id}', 'TeacherController@perananupdate')->name('teacher.perananupdate');
-    Route::post('destroyperanan/{id}', 'TeacherController@peranandestroy')->name('teacher.peranandestroy');
+    Route::post('destroyperanan/{id}/{role_id}', 'TeacherController@peranandestroy')->name('teacher.peranandestroy');
 });
 
 Route::group(['prefix' => 'class'], function () {

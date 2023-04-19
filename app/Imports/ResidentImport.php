@@ -32,23 +32,23 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
     public function rules(): array
     {
         return [
-            'name' => [
-                'required'
-                //Rule::unique('students', 'icno')
-            ],
-            'email' => [
-                'required'
-            ],
-            // 'nama_penjaga' => [
+            // 'name' => [
+            //     'required'
+            //     //Rule::unique('students', 'icno')
+            // ],
+            // 'email' => [
             //     'required'
             // ],
-            'no_tel_bimbit_penjaga' => [
-                'required'
-                //Rule::unique('users', 'telno')
-            ],
-            'class' => [
-                'required'
-            ],
+            // // 'nama_penjaga' => [
+            // //     'required'
+            // // ],
+            // 'no_tel_bimbit_penjaga' => [
+            //     'required'
+            //     //Rule::unique('users', 'telno')
+            // ],
+            // 'class' => [
+            //     'required'
+            // ],
         ];
     }
 
@@ -66,14 +66,17 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
     public function model(array $row)
     {
 
-        if (!isset($row['name']))
-            throw ValidationException::withMessages(["error" => "missing name"]);
-        else if (!isset($row['no_tel_bimbit_penjaga']))
-            throw ValidationException::withMessages(["error" => "missing no_tel_bimbit_penjaga"]);
-        else if (!isset($row['class']))
-            throw ValidationException::withMessages(["error" => "missing class"]);
+        // if (!isset($row['name']))
+        //     throw ValidationException::withMessages(["error" => "missing name"]);
+        // else if (!isset($row['no_tel_bimbit_penjaga']))
+        //     throw ValidationException::withMessages(["error" => "missing no_tel_bimbit_penjaga"]);
+        // else if (!isset($row['class']))
+        //     throw ValidationException::withMessages(["error" => "missing class"]);
 
-        //validate phone number
+        if(isset($row['name']) && isset($row['no_tel_bimbit_penjaga']) && isset($row['class']))
+        {
+
+            //validate phone number
         $phone = trim((string)$row['no_tel_bimbit_penjaga']);
 
         if (!$this->startsWith($phone, "+60") && !$this->startsWith($phone, "60")) {
@@ -137,7 +140,7 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->select('students.id')
             ->where('students.nama', $row['name'])
-            ->where('students.email', $row['email'])
+            // ->where('students.email', $row['email'])
             ->where('students.parent_tel', '=', "{$phone}")
             ->whereNull('class_student.dorm_id')
             ->value('students.id');
@@ -184,6 +187,8 @@ class ResidentImport implements ToModel, WithValidation, WithHeadingRow
                 }
             }
         }
+        }
+        
     }
 
     public function startsWith($string, $startString)
