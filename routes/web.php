@@ -192,8 +192,12 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         // Koop_Shop
         Route::get('/koop','UserCooperativeController@indexKoop')->name('koperasi.indexKoop');
         Route::get('/koop/{id}','UserCooperativeController@koopShop')->name('koperasi.koopShop');
+        Route::post('/koop/productsListByGroup','UserCooperativeController@productsListByGroup')->name('koperasi.productsListByGroup');
         Route::get('/koop/store/{id}','UserCooperativeController@storeKoop')->name('koperasi.storeKoop');
         Route::get('/koop/{id}/cart','UserCooperativeController@koopCart')->name('koperasi.koopCart');
+        Route::post('/koop/{id}/fetchItemToModel','UserCooperativeController@fetchItemToModel')->name('koperasi.fetchItemToModel');
+        Route::post('/koop/storeInCart','UserCooperativeController@storeInCart')->name('koperasi.storeInCart');
+        
     });
 
     Route::group(['namespace' => 'Admin'], function() {

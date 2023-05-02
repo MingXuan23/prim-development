@@ -92,14 +92,24 @@ class AdminProductCooperativeController extends Controller
         $table = Datatables::of($product);
                 $table->addColumn('desctext', function ($row) {
                     $target=json_decode($row->target);
-                    $desctext='<div class="d-flex" >';
+                    $desctext='<div class="d-flex" >';//add tag to the description string
+
+                    //if the target is array 
+                    if(is_array($target->data)){
                     $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun '.$target->data[0];
-                   
-                    for($i=1;$i<count($target->data);$i++)
-                    {
-                        $desctext=$desctext. ',Tahun '.$target->data[$i];
+                    //add text
+                        for($i=1;$i<count($target->data);$i++)
+                        {
+                            $desctext=$desctext. ',Tahun '.$target->data[$i];
+                            //add other tahun if exist
+                        }
+                    }//else the target is not array,the target is to all tahun
+                    else{
+                        $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun Semua. ';
                     }
                     $desctext=$desctext.'<br>'.$row->desc.'</span></div>';
+                    //add description to the string
+
                     
                     return $desctext;
                 });
@@ -273,9 +283,12 @@ class AdminProductCooperativeController extends Controller
             $data = array(
                 'data' =>$request->cb_year
             );
-            $target = json_encode($data);
+            
         }
-
+        else{
+            $data=['data' => 'All'];
+        }
+        $target = json_encode($data);
        $add = DB::table('product_item') -> insert([
         'name' => $request->input('nama'),
         'desc' => $request->input('description'),
@@ -437,9 +450,17 @@ class AdminProductCooperativeController extends Controller
             ->where('class_organization.organization_id', $oid->parent_org)
             ->get();
 
+        $class=DB::table('classes')
+        ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+        ->select('classes.id','classes.nama')
+        ->distinct()
+        ->where('classes.status', 1)
+        ->where('class_organization.organization_id', $oid->parent_org)
+        ->get();
+
          //dd($class_organization);
          
-        return response()->json(['data' => $list, 'datayear' => $class_organization]);
+        return response()->json(['data' => $list, 'datayear' => $class_organization,'classes'=>$class]);
         
     }
 }
