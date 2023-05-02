@@ -237,6 +237,14 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         // Index
         Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
         Route::get('fetch-merchant', 'LandingPageController@test_index')->name('merchant.fetch-merchant');
+        //Product
+        Route::get('/product', 'ProductController@index')->name('merchant-product.index');
+        Route::get('/product/{id}', 'ProductController@show')->name('merchant-product.show');
+        Route::get('/cart','ProductController@showAllCart')->name('merchant.all-cart');//to show all products in cart
+        Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
+        Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
+        // Checkout
+        Route::get('/checkout', 'ProductController@checkOut')->name('merchant.checkout');
         // Get all cart
         Route::get('get-all-cart-items', 'OrderController@getAllItemsInCart')->name('merchant-reg.get-all-items');
         // Orders

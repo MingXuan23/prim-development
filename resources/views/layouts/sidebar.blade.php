@@ -442,6 +442,13 @@
                     <span>Peniaga</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    
+                    <li>
+                        <a href="{{ route('merchant-product.index') }}" class=" waves-effect">
+                            <i class="ti-bag"></i>
+                            <span>Produk</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="{{ route('merchant-reg.index') }}" class=" waves-effect">
                             <i class="ti-bookmark-alt"></i>
