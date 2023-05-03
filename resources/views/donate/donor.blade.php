@@ -70,6 +70,7 @@
                                 <th> No. </th>
                                 <th> Nama Penderma </th>
                                 <th> No Transaksi </th>
+                                <th>FPX id</th>
                                 <th> Email </th>
                                 <th> No Telefon </th>
                                 <th> Tarikh Derma </th>
@@ -125,7 +126,7 @@
 
             },
             'columnDefs': [{
-                "targets": [2, 3, 4, 5, 6],
+                "targets": [2, 3, 4, 5, 6,7],
                 "className": "text-center",
                 "width": "2%"
             },{
@@ -151,6 +152,10 @@
             {
                 data: "description",
                 name: 'description'
+            },
+            {
+                data: "transac_no",
+                name: 'transac_no'
             }, {
                 data: "email",
                 name: 'email',

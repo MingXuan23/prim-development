@@ -195,6 +195,7 @@ class FeesController extends AppBaseController
                 ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
                 ->select('o.*')
                 ->where('ou.user_id', $userId)
+                ->whereNull('o.deleted_at')
                 ->whereIn('ou.role_id', [4, 5 ,12])
                 ->get();
 
@@ -1111,6 +1112,7 @@ class FeesController extends AppBaseController
             ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
+            ->whereNull('organizations.deleted_at')
             ->orderBy('organizations.nama')
             ->get();
 

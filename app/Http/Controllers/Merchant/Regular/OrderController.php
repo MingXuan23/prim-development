@@ -230,10 +230,10 @@ class OrderController extends Controller
                 'pgng_order_id' => $new_order_id
             ]);
         }
-
-        if($item->type == 'have inventory') {
-            $msg = $this->updateQuantityAvailable($request->i_id, $new_stock_qty);
-        }
+        //no need to update product item quantity when the item just in cart
+        // if($item->type == 'have inventory') {
+        //     $msg = $this->updateQuantityAvailable($request->i_id, $new_stock_qty);
+        // }
         
         return response()->json(['success' => 'Item Berjaya Direkodkan', 'alert' => $msg]);
     }
@@ -319,25 +319,25 @@ class OrderController extends Controller
         ->select('id', 'type', 'quantity_available as qty')
         ->first();
         
-        if($product_item->type == 'have inventory') {
-            $new_quantity = intval($product_item->qty + ($cart_item->qty * $cart_item->unit_qty)); // increment quantity
-            /* If previous product item is being unavailable because of added item in cart,
-            after the item deleted, the quantity in product_item will increment back and
-            the item will be available */
-            if($product_item->qty == 0)
-            {
-                ProductItem::where('id', $product_item->id)->update([
-                    'quantity_available' => $new_quantity,
-                    'status' => 1,
-                ]);
-            }
-            else
-            {
-                ProductItem::where('id', $product_item->id)->update([
-                    'quantity_available' => $new_quantity,
-                ]);
-            }
-        }
+        // if($product_item->type == 'have inventory') {
+        //     $new_quantity = intval($product_item->qty + ($cart_item->qty * $cart_item->unit_qty)); // increment quantity
+        //     /* If previous product item is being unavailable because of added item in cart,
+        //     after the item deleted, the quantity in product_item will increment back and
+        //     the item will be available */
+        //     if($product_item->qty == 0)
+        //     {
+        //         ProductItem::where('id', $product_item->id)->update([
+        //             'quantity_available' => $new_quantity,
+        //             'status' => 1,
+        //         ]);
+        //     }
+        //     else
+        //     {
+        //         ProductItem::where('id', $product_item->id)->update([
+        //             'quantity_available' => $new_quantity,
+        //         ]);
+        //     }
+        // }
         
         ProductOrder::where('id', $cart_id)->forceDelete();
         

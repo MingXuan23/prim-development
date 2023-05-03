@@ -72,26 +72,26 @@ class UserCooperativeController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function storeInCart(Request $request)
     {
         $userID = Auth::id();
 
-        $item = ProductItem::where('id', $request->item_id)->first();
-
+        $item = ProductItem::where('id', $request->i_id)->first();
         // Check if quantity request is less or equal to quantity available
-        if($request->item_quantity <= $item->quantity_available) // if true
+        if($request->qty <= $item->quantity_available) // if true
         {
+            //dd($request);
             $order = PgngOrder::where([
                 ['user_id', $userID],
                 ['status', 1],
-                ['organization_id', $request->org_id]
+                ['organization_id', $request->o_id]
             ])->first();
             
             // Check if order already exists
             if($order) // order exists
             {
                 $cartExist = ProductOrder::where([
-                    ['product_item_id', $request->item_id],
+                    ['product_item_id', $request->i_id],
                     ['pgng_order_id', $order->id],
                 ])->first();
                 
@@ -104,33 +104,33 @@ class UserCooperativeController extends Controller
                 // If same item exists in cart
                 if($cartExist) // if exists (update)
                 {
-                    if($request->item_quantity > $cartExist->quantity) // request quant more than existing quant
+                    if($request->qty > $cartExist->quantity) // request quant more than existing quant
                     {
-                        $newQuantity = intval($item->quantity_available - ($request->item_quantity - $cartExist->quantity)); // decrement stock
+                        $newQuantity = intval($item->quantity_available - ($request->qty - $cartExist->quantity)); // decrement stock
                     }
-                    else if($request->item_quantity < $cartExist->quantity) // request quant less than existing quant
+                    else if($request->qty < $cartExist->quantity) // request quant less than existing quant
                     {
-                        $newQuantity = intval($item->quantity_available + ($cartExist->quantity- $request->item_quantity)); // increment stock
+                        $newQuantity = intval($item->quantity_available + ($cartExist->quantity- $request->qty)); // increment stock
                     }
-                    else if($request->item_quantity == $cartExist->quantity) // request quant equal existing quant
+                    else if($request->qty == $cartExist->quantity) // request quant equal existing quant
                     {
                         $newQuantity = intval((int)$item->quantity_available + 0); // stock not change
                     }
 
                     ProductOrder::where('id', $cartExist->id)->update([
-                        'quantity' => $request->item_quantity
+                        'quantity' => $request->qty
                     ]);
                 }
                 else // if not exists (insert)
                 {
                     ProductOrder::create([
-                        'quantity' => $request->item_quantity,
+                        'quantity' => $request->qty,
                         'status' => 1,
-                        'product_item_id' => $request->item_id,
+                        'product_item_id' => $request->i_id,
                         'pgng_order_id' => $order->id
                     ]);
 
-                    $newQuantity = intval((int)$item->quantity_available - (int)$request->item_quantity);
+                    $newQuantity = intval((int)$item->quantity_available - (int)$request->qty);
                 }
 
 
@@ -150,7 +150,7 @@ class UserCooperativeController extends Controller
                 PgngOrder::where([
                     ['user_id', $userID],
                     ['status', 1],
-                    ['organization_id', $request->org_id]
+                    ['organization_id', $request->o_id]
                 ])
                 ->update([
                     'total_price' => $newTotalPrice
@@ -158,22 +158,22 @@ class UserCooperativeController extends Controller
             }
             else // order did not exists
             {
-                $totalPrice = $item->price * (int)$request->item_quantity;
+                $totalPrice = $item->price * (int)$request->qty;
 
-                $newQuantity = intval((int)$item->quantity_available - (int)$request->item_quantity);
+                $newQuantity = intval((int)$item->quantity_available - (int)$request->qty);
 
                 $newOrder = PgngOrder::create([
                     'method_status' => 1,
                     'total_price' => $totalPrice,
                     'status' => 1,
                     'user_id' => $userID,
-                    'organization_id' => $request->org_id
+                    'organization_id' => $request->o_id
                 ]);
 
                 ProductOrder::create([
-                    'quantity' => $request->item_quantity,
+                    'quantity' => $request->qty,
                     'status' => 1,
-                    'product_item_id' => $request->item_id,
+                    'product_item_id' => $request->i_id,
                     'pgng_order_id' => $newOrder->id
                 ]);
             }
@@ -181,11 +181,11 @@ class UserCooperativeController extends Controller
             // check if quantity is 0 after add to cart
             if($newQuantity != 0) // if not 0
             {
-                ProductItem::where('id', $request->item_id)->update(['quantity_available' => $newQuantity]);
+                ProductItem::where('id', $request->i_id)->update(['quantity_available' => $newQuantity]);
             }
             else // if 0 (change item status)
             {
-                ProductItem::where('id', $request->item_id)
+                ProductItem::where('id', $request->i_id)
                 ->update(['quantity_available' => $newQuantity, 'status' => 0]);
             }
             
@@ -624,17 +624,17 @@ class UserCooperativeController extends Controller
     public function koopShop(Int $id)
     {
         $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
-        $sekolah = DB::table('organizations')
+        $Sekolah = DB::table('organizations')
         ->where('type_org',$role_id)
         ->where('id',$id)
         ->get();
 
-        $product = DB::table('product_group as p')
-         ->join('product_item as pg','p.id','pg.product_group_id')
-         ->where('p.organization_id',$id)
-        ->get();
+        $products = DB::table('product_group as pg')
+         ->join('product_item as p','pg.id','p.product_group_id')
+         ->select('p.*','pg.id as groupId','pg.name as groupName')
+         ->where('pg.organization_id',$id) 
+        ->get();                 
 
-        
         $todayDate = Carbon::now()->format('l');
 
         $day = $this->getDayIntegerByDayName($todayDate);
@@ -647,16 +647,32 @@ class UserCooperativeController extends Controller
                 'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
         ->first();
 
+        $childrenByParent = DB::table('users')
+        ->join('organization_user as ou', 'ou.user_id', '=', 'users.id')
+        ->join('organization_user_student as ous','ou.id','=','ous.organization_user_id')
+        ->join('students as s','s.id','=','ous.student_id')
+        ->join('class_student as cs','cs.student_id','=','s.id')
+        ->join('class_organization as co','co.id','=','cs.organclass_id')
+        ->join('classes as c','c.id','=','co.class_id')
+        ->select('s.*','users.id as parentId','users.name as parentName', 'ou.organization_id','c.nama as className')
+        ->where('ou.organization_id', $koperasi->parent_org)
+        ->where('ou.role_id', 6)
+        ->where('ou.status', 1)
+        ->orderBy('c.nama')
+        ->get();
+
+        //dd($childrenOfParent);
         $k_open_hour = date('h:i A', strtotime($koperasi->open_hour));
         
         $k_close_hour = date('h:i A', strtotime($koperasi->close_hour));
-
+        //dd($products);
         return view('koop.koop')
-        ->with('sekolah',$sekolah)
-        ->with('product',$product)
+        ->with('Sekolah',$Sekolah)
+        ->with('products',$products)
         ->with('koperasi',$koperasi)
         ->with('k_open_hour', $k_open_hour)
-        ->with('k_close_hour', $k_close_hour);
+        ->with('k_close_hour', $k_close_hour)
+        ->with('childrenByParent',$childrenByParent);
     }
 
     public function storeKoop()
@@ -705,5 +721,121 @@ class UserCooperativeController extends Controller
         else if($date == "Saturday") { $day = 6; }
         else if($date == "Sunday") { $day = 0; }
         return $day;
+    }
+
+    public function productsListByGroup(Request $request)
+    {
+        $id=$request->kooperasiId;
+        $oid=Organization::where('id', $id)->select('parent_org')->first();
+        
+        //filter by Tahun
+        $selectedTarget=$request->selectedGroup;
+
+        $classExist=DB::table('classes')
+        ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+        ->where('classes.status', 1)
+        ->where('classes.nama',$selectedTarget )
+        ->where('class_organization.organization_id', $oid)
+        ->first();
+
+        if($classExist){
+            $products = DB::table('product_group as pg')
+            ->join('product_item as p','pg.id','p.product_group_id')
+            ->select('p.*','pg.id as groupId','pg.name as groupName')
+            ->where('pg.organization_id',$id) 
+            ->whereJsonContains('p.target->data', $Tahun)
+            ->whereNull('p.deleted_at')
+            ->whereNull('pg.deleted_at')
+           ->get();  
+        }
+        else if (strpos($selectedTarget, "Tahun") !== false){
+            $Tahun = str_replace("Tahun", "", $request->selectedGroup);
+            $products = DB::table('product_group as pg')
+            ->join('product_item as p','pg.id','p.product_group_id')
+            ->select('p.*','pg.id as groupId','pg.name as groupName')
+            ->where('pg.organization_id',$id) 
+            ->whereJsonContains('p.target->data', $Tahun)
+            ->whereNull('p.deleted_at')
+            ->whereNull('pg.deleted_at')
+           ->get();  
+        }
+        //get all product for All tahun (no specification of Tahun)
+        else if($request->selectedGroup=="GeneralItem")
+        {
+            $products = DB::table('product_group as pg')
+            ->join('product_item as p','pg.id','p.product_group_id')
+            ->select('p.*','pg.id as groupId','pg.name as groupName')
+            ->where('pg.organization_id',$id)
+            ->whereJsonContains('p.target->data', 'All')
+            ->whereNull('p.deleted_at')
+            ->whereNull('pg.deleted_at')
+           ->get();  
+        }
+        else if($request->selectedGroup=="AllItem")
+        {
+            $products = DB::table('product_group as pg')
+            ->join('product_item as p','pg.id','p.product_group_id')
+            ->select('p.*','pg.id as groupId','pg.name as groupName')
+            ->where('pg.organization_id',$id)
+            ->whereNull('p.deleted_at')
+            ->whereNull('pg.deleted_at')
+            //->whereJsonContains('p.target->data', 'ALL')
+           ->get();  
+        }
+        //by category
+        else{
+            $products = DB::table('product_group as pg')
+            ->join('product_item as p','pg.id','p.product_group_id')
+            ->select('p.*','pg.id as groupId','pg.name as groupName')
+            ->where('pg.organization_id',$id) 
+            ->where('p.product_group_id',$request->selectedGroup)
+            ->whereNull('p.deleted_at')
+            ->whereNull('pg.deleted_at')
+           ->get();  
+        }
+        //return response()->json(['status' => "success"]);
+        return response()->json(['products' => $products]);
+    }
+
+    public function fetchItemToModel(Request $request)
+    {
+        $i_id = $request->get('i_id');
+        $o_id = $request->get('o_id');
+        $user_id = Auth::id();
+        $modal = '';
+        
+        $item = ProductItem::where('id', $i_id)
+        ->select('id', 'type', 'name', 'price', 'quantity_available as qty', 'selling_quantity as unit_qty')
+        ->first();
+
+        $order = DB::table('product_order as po')->join('pgng_orders as pu', 'pu.id', 'po.pgng_order_id')
+        ->where([
+            ['pu.user_id', $user_id],
+            ['pu.organization_id', $o_id],
+            ['po.product_item_id', $i_id],
+            ['pu.status', 'In cart'],
+        ])
+        ->select('quantity as qty', 'selling_quantity as unit_qty')
+        ->first();
+        
+        if($order) { // Order exists in cart
+            $max_quantity = $item->qty + ($order->qty);
+        } else {
+            $max_quantity = $item->qty;
+        }
+        
+        $modal .= '<div class="row justify-content-center"><i>Kuantiti Inventori : '.$item->qty.'</i></div>';
+
+        
+        if(!$order) {
+            $modal .= '<input id="quantity_input" type="text" value="1" name="quantity_input">';
+            $modal .= '<div id="quantity-danger">Kuantiti Melebihi Inventori</div>';
+        } else {
+            $modal .= '<input id="quantity_input" type="text" value="'.$order->qty.'" name="quantity_input">';
+            $modal .= '<div id="quantity-danger">Kuantiti Melebihi Inventori</div>';
+            $modal .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->qty * $order->unit_qty.' Unit</i></div>';
+        }
+
+        return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);
     }
 }

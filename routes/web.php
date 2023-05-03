@@ -192,8 +192,12 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         // Koop_Shop
         Route::get('/koop','UserCooperativeController@indexKoop')->name('koperasi.indexKoop');
         Route::get('/koop/{id}','UserCooperativeController@koopShop')->name('koperasi.koopShop');
+        Route::post('/koop/productsListByGroup','UserCooperativeController@productsListByGroup')->name('koperasi.productsListByGroup');
         Route::get('/koop/store/{id}','UserCooperativeController@storeKoop')->name('koperasi.storeKoop');
         Route::get('/koop/{id}/cart','UserCooperativeController@koopCart')->name('koperasi.koopCart');
+        Route::post('/koop/{id}/fetchItemToModel','UserCooperativeController@fetchItemToModel')->name('koperasi.fetchItemToModel');
+        Route::post('/koop/storeInCart','UserCooperativeController@storeInCart')->name('koperasi.storeInCart');
+        
     });
 
     Route::group(['namespace' => 'Admin'], function() {
@@ -201,10 +205,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
         Route::post('/produkmenu/deleteSelectedProducts','AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
         Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
+        Route::post('/produktype/getProductNumOfGroup','AdminProductCooperativeController@getProductNumOfGroup')->name('koperasi.getProductNumOfGroup');
 
         Route::get('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
         Route::post('/produktype','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
-        Route::post('/produktype/update','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
+        Route::post('/produktype/update/{id}','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
         Route::get('/produktype/edit/{id}','AdminProductCooperativeController@editType')->name('koperasi.editType');
 
         Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
@@ -223,6 +228,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/Confirm/delete/{id}','AdminOrderCooperativeController@notConfirm')->name('koperasi.notConfirm');
 
         Route::get('/returnProdukMenu/{page}','AdminProductCooperativeController@returnProdukMenu')->name('koperasi.return');
+        Route::get('/fetchClassyear','AdminProductCooperativeController@fetchClassyear')->name('koperasi.fetchClassYear');
     });
 });
 
@@ -231,6 +237,14 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         // Index
         Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
         Route::get('fetch-merchant', 'LandingPageController@test_index')->name('merchant.fetch-merchant');
+        //Product
+        Route::get('/product', 'ProductController@index')->name('merchant-product.index');
+        Route::get('/product/{id}', 'ProductController@show')->name('merchant-product.show');
+        Route::get('/cart','ProductController@showAllCart')->name('merchant.all-cart');//to show all products in cart
+        Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
+        Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
+        // Checkout
+        Route::get('/checkout', 'ProductController@checkOut')->name('merchant.checkout');
         // Get all cart
         Route::get('get-all-cart-items', 'OrderController@getAllItemsInCart')->name('merchant-reg.get-all-items');
         // Orders
