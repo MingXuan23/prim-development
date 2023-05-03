@@ -67,7 +67,7 @@
                 font-size: 16px;
                 color: var(--secondary-bc);
                 text-align: right;
-                padding: 10px;
+                padding: 10px;   
             }
     </style>
 @endsection
