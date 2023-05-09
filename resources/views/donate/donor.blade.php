@@ -61,7 +61,18 @@
                 @endif
 
                 <input hidden type="text" id="don" name="don" class="form-control" value="{{ $donation->id }}">
-
+                <div class="card-body">
+                    <div class="input-daterange input-group" id="date">
+                        <input type="text" id="startDate" class="form-control" name="startDate" placeholder="Tarikh Awal" autocomplete="off" 
+                        data-parsley-required-message="Sila masukkan tarikh awal"
+                        data-parsley-errors-container=".errorMessage"  onchange="fetchDataTableDonor()"/>
+                        <input type="text" id="endDate" class="form-control" name="endDate" placeholder="Tarikh Akhir" autocomplete="off"
+                        data-parsley-required-message="Sila masukkan tarikh akhir"
+                        data-parsley-errors-container=".errorMessage"  onchange="fetchDataTableDonor()"/>
+                    </div>
+                    <div class="errorMessage"></div>
+                    <div class="errorMessage"></div>
+                </div>
                 <div class="table-responsive">
                     <table id="donorTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -100,81 +111,130 @@
 <script src="{{ URL::asset('assets/libs/datatables.net-buttons/js/buttons.html5.min.js') }} "></script>
 <script src="{{ URL::asset('assets/libs/datatables.net-buttons/js/buttons.print.min.js') }} "></script>
 <script src="{{ URL::asset('assets/libs/datatables.net-buttons/js/buttons.colVis.min.js') }} "></script>
+<script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script>
 
 <!-- Responsive examples -->
 <script src="{{ URL::asset('assets/libs/datatables.net-responsive/js/dataTables.responsive.min.js') }} "></script>
 <script src="{{ URL::asset('assets/libs/datatables.net-responsive-bs4/js/responsive.bootstrap4.min.js') }} "></script>
 
+
 <script>
    $(document).ready(function() {
 
-        let donateid = $('#don').val();
+        fetchDataTableDonor();
 
-        let donor_table = $('#donorTable').DataTable({
-            // processing: true,
-            // serverSide: true,
-            lengthChange: false,
-            dom: 'Bfrtip',
-            buttons:  [ { extend: 'excel', text: 'Excel', exportOptions: { modifier: {  page:   'all', }}},
-                        { extend: 'pdf', text: 'PDF', orientation: 'landscape',exportOptions: { modifier: { page:   'all', }}} ],
-            ajax: {
-                url: "{{ route('donate.donor_datatable') }}",
-                data: {
-                    id: donateid,
-                },
-                type: 'GET',
-
-            },
-            'columnDefs': [{
-                "targets": [2, 3, 4, 5, 6,7],
-                "className": "text-center",
-                "width": "2%"
-            },{
-                "targets": [0],
-                "className": "text-center",
-                "width": "2%"
-            },
-            {
-                "targets": [1],
-                "width": "2%"
-            }],
-            columns: [{
-                "data": null,
-                searchable: false,
-                "sortable": false,
-                render: function(data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
-            }, {
-                data: "username",
-                name: 'username'
-            },
-            {
-                data: "description",
-                name: 'description'
-            },
-            {
-                data: "transac_no",
-                name: 'transac_no'
-            }, {
-                data: "email",
-                name: 'email',
-                orderable: false
-            }, {
-                data: "telno",
-                name: 'telno',
-                orderable: false
-            }, {
-                data: "datetime_created",
-                name: 'datetime_created',
-                // orderable: false,
-                // searchable: false
-            }, {
-                data: 'amount',
-                name: 'amount',
-            }, ]
+        $('#date').datepicker({
+            toggleActive: true,
+            format: 'dd-mm-yyyy',
+            orientation: 'bottom'
         });
-
     });
+
+    function fetchDataTableDonor(){
+        
+        let sDate=$("#startDate").val();
+        let eDate=$("#endDate").val();
+        //value will pass to controller
+        let start = null;
+        let end = null;
+        //value just for validation
+
+        if (sDate === "") {
+            sDate = null;
+        }else{
+            var parts = sDate.split("-");
+            start=new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+
+        if (eDate === "") {
+            eDate = null;
+        }
+        else{
+            var parts = eDate.split("-");
+            end=new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+        if(start!=null &&end!=null&& start>end){
+            alert("The end date cannot earlier than start date ");
+            $("#endDate").val("");
+            end=null;
+        }
+        //console.log(sDate +" "+eDate);
+        else{
+            let donateid = $('#don').val();
+
+            if ($.fn.DataTable.isDataTable('#donorTable')) {
+                $('#donorTable').DataTable().destroy();
+            }
+
+
+            let donor_table = $('#donorTable').DataTable({
+                processing: true,
+                serverSide: true,
+                //lengthChange: false,
+                dom: 'Bfrtip',
+                buttons:  [ { extend: 'excel', text: 'Excel', exportOptions: { modifier: {  page:   'all', }}},
+                            { extend: 'pdf', text: 'PDF', orientation: 'landscape',exportOptions: { modifier: { page:   'all', }}} ],
+                ajax: {
+                    url: "{{ route('donate.donor_datatable') }}",
+                    data: {
+                        id: donateid,
+                        startDate:sDate,
+                        endDate:eDate
+                    },
+                    type: 'GET',
+
+                },
+                'columnDefs': [{
+                    "targets": [2, 3, 4, 5, 6,7],
+                    "className": "text-center",
+                    "width": "2%"
+                },{
+                    "targets": [0],
+                    "className": "text-center",
+                    "width": "2%"
+                },
+                {
+                    "targets": [1],
+                    "width": "2%"
+                }],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "username",
+                    name: 'username'
+                },
+                {
+                    data: "description",
+                    name: 'description'
+                },
+                {
+                    data: "transac_no",
+                    name: 'transac_no'
+                }, {
+                    data: "email",
+                    name: 'email',
+                    orderable: false
+                }, {
+                    data: "telno",
+                    name: 'telno',
+                    orderable: false
+                }, {
+                    data: "datetime_created",
+                    name: 'datetime_created',
+                    // orderable: false,
+                    // searchable: false
+                }, {
+                    data: 'amount',
+                    name: 'amount',
+                }, ]
+            });
+        }
+        
+    }
 </script>
 @endsection
