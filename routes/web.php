@@ -243,8 +243,9 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('/cart','ProductController@showAllCart')->name('merchant.all-cart');//to show all products in cart
         Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
+        Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
         // Checkout
-        Route::get('/checkout', 'ProductController@checkOut')->name('merchant.checkout');
+        Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
         // Get all cart
         Route::get('get-all-cart-items', 'OrderController@getAllItemsInCart')->name('merchant-reg.get-all-items');
         // Orders

@@ -60,7 +60,10 @@
                 text-align: center;
                 padding: 10px;
                 font-size: 16px;
-                color: rgb(0, 0, 0);
+                color: #5b626b;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
             }
             .product-price{
                 font-weight: bold;

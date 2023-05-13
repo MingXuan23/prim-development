@@ -145,7 +145,8 @@ class OrderController extends Controller
         ->where([
             ['user_id', $user_id],
             ['status', 'In cart'],
-            ['organization_id', $request->o_id]
+            ['organization_id', $request->o_id],
+            ['deleted_at',NULL]
         ])->select('id')->first();
             
         // Check if quantity request is less or equal to quantity available
@@ -339,7 +340,10 @@ class OrderController extends Controller
         //     }
         // }
         
-        ProductOrder::where('id', $cart_id)->forceDelete();
+        //ProductOrder::where('id', $cart_id)->forceDelete();
+        ProductOrder::where('id', $cart_id)->update([
+            'deleted_at' => Carbon::now()
+        ]);
         
         $total_price = $this->calculateTotalPrice($cart_item->o_id);
 
@@ -349,7 +353,10 @@ class OrderController extends Controller
                 'total_price' => $total_price
             ]);
         } else {
-            DB::table('pgng_orders')->where('id', $cart_item->o_id)->delete();
+            //DB::table('pgng_orders')->where('id', $cart_item->o_id)->delete();
+            DB::table('pgng_orders')->where('id', $cart_item->o_id)->update([
+                'deleted_at' => Carbon::now()
+            ]);
         }
     }
 
@@ -545,20 +552,27 @@ class OrderController extends Controller
         $new_total_price = null;
 
         $cart_item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                    ->where('po.pgng_order_id', $order_id)
-                    ->select('po.quantity as qty', 'pi.price', 'pi.selling_quantity as unit_qty')
-                    ->get();
-
-        $org_id = PgngOrder::where('id', $order_id)->select('organization_id as org_id')->first()->org_id;
-        $fixed_charges = $this->getFixedCharges($org_id);
+            ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+            ->where([
+                ['po.pgng_order_id' , $order_id],
+                ['po.deleted_at', NULL],
+                ['pi.deleted_at', NULL]
+            ])
+            ->select('po.quantity as qty', 'pi.price', 'pi.selling_quantity as unit_qty')
+            ->get();
+        
+        $order = PgngOrder::find($order_id);
+        
+        if ($order) {
+            $org_id = $order->organization_id;
+            $fixed_charges = $this->getFixedCharges($org_id);
             
-        if(count($cart_item) != 0) {
-            foreach($cart_item as $row)
-            {
-                $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
+            if (count($cart_item) != 0) {
+                foreach ($cart_item as $row) {
+                    $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
+                }
+                $new_total_price += $fixed_charges;
             }
-            $new_total_price += $fixed_charges;
         }
         
         return $new_total_price;

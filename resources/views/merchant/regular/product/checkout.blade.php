@@ -10,7 +10,7 @@
                 --primary-bc: #ffffff;
                 --secondary-bc: rgb(2, 122, 129);
                 --hover-color:rgb(6, 225, 237);
-                --primary-color:#2b2b2b;
+                --primary-color:#5b626b;
                 --transition: all 0.3s linear;
             }
             .main-content{
@@ -96,7 +96,8 @@
     <div class="form-container">
         <section class="gng-section" hidden> 
             <h3>Produk Dipesan</h3>
-            <table class="table table-borderless responsive" style="text-align: center">
+
+            {{-- <table class="table table-borderless responsive" style="text-align: center">
                 <thead class="thead-dark">
                 <tr style="background-color">
                     <th></th>
@@ -116,11 +117,11 @@
                             @if($organization->nama == $product->nama)
                                 <tr class="shop-order-details">
                                         {{-- @if($product->image == null) --}}
-                                        <td><img class="img-fluid mx-auto d-block product-image" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}"></td>
+                                        {{-- <td><img class="img-fluid mx-auto d-block product-image" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}"></td> --}}
                                         {{-- @else
                                         <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}">
                                         @endif --}}
-                                        <td>{{$product->name}}</td>
+                                        {{-- <td>{{$product->name}}</td>
                                         <td>RM{{$product->price}}</td>
                                         <td>{{$product->quantity}}</td>
                                         <td class="order-total-price hide">
@@ -141,7 +142,7 @@
                             <input type="hidden" name="order_type" id="hidden_order_type" value="Pick-Up">
                             <td>
                                 <label>Mesej:</label>
-                                <textarea class="form-control" name="note" placeholder="Optional(Tinggalkan mesej kepada penjual)" spellcheck="false" rows="1" cols="50"></textarea>
+                                <textarea class="form-control" name="note" placeholder="Optional(Tinggalkan mesej kepada penjual)" spellcheck="false" rows="2" cols="40"></textarea>
                             </td>
                             <td class="pickup-date form-group required">
                                     <label>Tarikh Pengambilan</label>
@@ -157,8 +158,8 @@
             @endforeach
         </table> 
             <div class="order-summary">
-                <h3>Jumlah Bayaran: RM{{$totalPrice}}</h3>
-            </div>
+                <h3>Jumlah Bayaran: RM{{$cartTotalPrice}}</h3>
+            </div> --}}
         </section>
         <section class="delivery-section" hidden>
             <h5>delivery</h5>
@@ -175,48 +176,49 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+        })    
             const orgs_id = document.querySelectorAll('#org_id');
-            const datePickers = document.querySelectorAll('input[name = "pickup_date"]');
-            //add event listener to each of the date pickers
-            $.each(datePickers, function(index, datePicker){
-                //console.log(datePicker);
-                var currentIndex = index;
-                $.ajax({
-                    url: '{{ route("merchant-reg.disabled-dates") }}',
-                    method: 'post',
-                    data: {
-                        org_id:orgs_id[index].value, 
-                        "_token": "{{ csrf_token() }}",
-                    },
-                    success:function(result) {
-                        var dates = [];
-                        $.each(result.dates, function(index, value) {
-                            dates.push(value)
-                        });
-                        $(datePicker).datepicker({
-                            minDate: 1,
-                            maxDate: '+2m',
-                            dateFormat: 'mm/dd/yy',
-                            dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
-                            beforeShowDay: function(date) {
-                                for (var i = 0; i < dates.length; i++) {
-                                    if (new Date(dates[i]).toString() == date.toString()) {
-                                    // if the date is equal with disabled dates(dates),then return false  
-                                    return [false];
-                                    }
-                                }
-                                return [true];
-                            },
-                            onSelect: function(dateText) {
-                                dateOnChange(this);
-                            }
-                        });
-                    },
-                    error:function(result) {
-                        console.log(result.responseText)
-                    }
-                }) 
-            })
+            // const datePickers = document.querySelectorAll('input[name = "pickup_date"]');
+            // //add event listener to each of the date pickers
+            // $.each(datePickers, function(index, datePicker){
+            //     //console.log(datePicker);
+            //     var currentIndex = index;
+            //     $.ajax({
+            //         url: '{{ route("merchant-reg.disabled-dates") }}',
+            //         method: 'post',
+            //         data: {
+            //             org_id:orgs_id[index].value, 
+            //             "_token": "{{ csrf_token() }}",
+            //         },
+            //         success:function(result) {
+            //             var dates = [];
+            //             $.each(result.dates, function(index, value) {
+            //                 dates.push(value)
+            //             });
+            //             $(datePicker).datepicker({
+            //                 minDate: 1,
+            //                 maxDate: '+2m',
+            //                 dateFormat: 'mm/dd/yy',
+            //                 dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
+            //                 beforeShowDay: function(date) {
+            //                     for (var i = 0; i < dates.length; i++) {
+            //                         if (new Date(dates[i]).toString() == date.toString()) {
+            //                         // if the date is equal with disabled dates(dates),then return false  
+            //                         return [false];
+            //                         }
+            //                     }
+            //                     return [true];
+            //                 },
+            //                 onSelect: function(dateText) {
+            //                     dateOnChange(this);
+            //                 }
+            //             });
+            //         },
+            //         error:function(result) {
+            //             console.log(result.responseText)
+            //         }
+            //     }) 
+            // })
             // $.each(datePickers, function(index, datePicker){
             //     $(datePicker).on('change', function(e) {
             //                 console.log(e);
@@ -224,39 +226,39 @@
             //     });
             // })
 
-            function dateOnChange(currentTarget) {
-                    let currentDatePicker = currentTarget;
-                    let date_val = $(currentDatePicker).val(), timePicker = $(currentDatePicker).parent().next().children('input[name = "pickup_time"]'), timeRange = timePicker.next();
-                    let org_id = $(currentDatePicker).attr('data-org-id');
-                    if(date_val != '') {
-                        timePicker.removeAttr('hidden')
-                        $.ajax({
-                            url: '{{ route("merchant-reg.fetch-hours") }}',
-                            method: 'POST',
-                            data: {org_id:org_id, date:date_val, "_token": "{{ csrf_token() }}",},
-                            beforeSend:function() {
-                                timeRange.empty()
-                            },
-                            success:function(result) {
-                                if(result.hour.open) {
-                                    timePicker.prop('disabled', false)
-                                    timePicker.attr('min', result.hour.min)
-                                    timePicker.attr('max', result.hour.max)
-                                    timeRange.append(result.hour.body)
-                                } else {
-                                    timePicker.prop('disabled', true)
-                                    timeRange.append(result.hour.body)
-                                }
-                            },
-                            error:function(result) {
-                                console.log(result.responseText)
-                            }
-                        })
-                    } else {
-                        timePicker.attr('hidden', true)
-                    }
-                }
-        })
+        //     function dateOnChange(currentTarget) {
+        //             let currentDatePicker = currentTarget;
+        //             let date_val = $(currentDatePicker).val(), timePicker = $(currentDatePicker).parent().next().children('input[name = "pickup_time"]'), timeRange = timePicker.next();
+        //             let org_id = $(currentDatePicker).attr('data-org-id');
+        //             if(date_val != '') {
+        //                 timePicker.removeAttr('hidden')
+        //                 $.ajax({
+        //                     url: '{{ route("merchant-reg.fetch-hours") }}',
+        //                     method: 'POST',
+        //                     data: {org_id:org_id, date:date_val, "_token": "{{ csrf_token() }}",},
+        //                     beforeSend:function() {
+        //                         timeRange.empty()
+        //                     },
+        //                     success:function(result) {
+        //                         if(result.hour.open) {
+        //                             timePicker.prop('disabled', false)
+        //                             timePicker.attr('min', result.hour.min)
+        //                             timePicker.attr('max', result.hour.max)
+        //                             timeRange.append(result.hour.body)
+        //                         } else {
+        //                             timePicker.prop('disabled', true)
+        //                             timeRange.append(result.hour.body)
+        //                         }
+        //                     },
+        //                     error:function(result) {
+        //                         console.log(result.responseText)
+        //                     }
+        //                 })
+        //             } else {
+        //                 timePicker.attr('hidden', true)
+        //             }
+        //         }
+        // })
         
         function selectThis(element,  option){
             $orderOption = $(element);

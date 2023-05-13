@@ -10,7 +10,7 @@
                 --primary-bc: #ffffff;
                 --secondary-bc: rgb(2, 122, 129);
                 --hover-color:rgb(6, 225, 237);
-                --primary-color:#2b2b2b;
+                --primary-color:#5b626b;
                 --transition: all 0.3s linear;
             }
             .main-content{
@@ -123,7 +123,7 @@
             .quantity-input{
                 text-align: center;
                 width: 50px;
-                border: 0.15em solid rgb(0, 0, 0);
+                border: 0.15em solid #5b626b;
             }
             
             /* to remove the arrow up and down for input type number */
@@ -133,7 +133,7 @@
             }
             .fancy {
                 background-color: transparent;
-                border: 2px solid #000;
+                border: 2px solid #5b626b;
                 border-radius: 0;
                 box-sizing: border-box;
                 color: #fff;
@@ -159,7 +159,7 @@
                 content: " ";
                 width: 1.5625rem;
                 height: 2px;
-                background: black;
+                background: #5b626b;
                 top: 50%;
                 left: 1.5em;
                 position: absolute;
@@ -177,7 +177,7 @@
                 transition: all 0.3s ease-in-out;
                 text-transform: uppercase;
                 text-decoration: none;
-                color: black;
+                color: #5b626b;
             }
 
             .fancy .top-key {
@@ -212,7 +212,7 @@
 
             .fancy:hover {
                 color: white;
-                background: black;
+                background: #333547;
             }
 
             .fancy:hover::before {
@@ -249,7 +249,7 @@
                 margin-left:20px;
             }
             .product-merchant-right a{ 
-                border: 2px solid #2b2b2b;
+                border: 2px solid #5b626b;
                font-weight: bold;
             } 
             .product-merchant-right a:hover{
@@ -302,13 +302,13 @@
                 <div class="product-details-content">
                     <p>{{$product->desc}}</p>
                 </div>
-                <div class="product-details-title mt-0" >
+                {{-- <div class="product-details-title mt-0" >
                     <h4>Review</h3>
                     <i class="fas fa-angle-down arrow-icon"></i>
                 </div>
                 <div class="product-details-content">
                     <p>Reviews</p>
-                </div>
+                </div> --}}
             </div>
         </section>
         <section class="right-container">
@@ -369,13 +369,13 @@
                     url: "{{ route('merchant.load-cart-counter') }}",
                     method: "GET",
                     beforeSend:function(){
-                        noty.empty()
+                        //noty.empty()
                     },
                     success:function(result){
                     if(result.counter != 0) {
-                        noty.attr('hidden', false)
                         noty.append(result.counter)
-                    } else {
+                        noty.attr('hidden', false)
+                    }else {
                         noty.attr('hidden', true)
                     }
                     },
