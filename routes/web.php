@@ -180,7 +180,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
 Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
     Route::group(['namespace' => 'User'], function() {
         // Koop School
-        Route::delete('/{org_id}/edit/{id}', 'UserCooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
+        Route::delete('/{org_id}/edit', 'UserCooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
         Route::post('/koperasi/fetchKoop', 'UserCooperativeController@fetchKoop')->name('koperasi.fetchKoop');
         Route::get('/order', 'UserCooperativeController@indexOrder')->name('koperasi.order');
         Route::get('/order/fetchDay', 'UserCooperativeController@fetchAvailableDay')->name('koperasi.fetchDay');

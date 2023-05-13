@@ -107,10 +107,52 @@
             else
             {
               $.each(result.success, function(key, value){
-                $('#koop').append("<p>"+value.nama+"</p>");
+                console.log(value);
+                let htmlText='<div class="row">' +
+                    '<div class="col-12">' +
+                        '<h4 class="my-3"></h4>' +
+                        '<div class="card-group">' +
+                            '<div class="card mb-4">' ;
+                if(value.organization_picture==null){
+                  let imageUrl = "{{ URL('images/koperasi/default-item.png') }}";
+                    htmlText+='<div class="col-lg-4">' +
+                                    '<div class="card text-white bg-dark">' +
+                                        '<div class="card-body">' +
+                                        '<blockquote class="card-blockquote mb-0">' +
+                                        '<img class="card-img-top img-fluid" src="'+imageUrl+'" alt="Card image cap">' +
+                                            '</blockquote>' +
+                                            '</div>' +
+                                    '</div>' +
+                                '</div>';
+                }else{
+                    let imageUrl = "{{ URL::asset('/organization-picture/') }}" +"/"+ value.organization_picture;
+                    console.log(imageUrl);
+                    htmlText+='<img class="card-img-top img-fluid" src="'+imageUrl+'" alt="Card image cap" style="height: 300px;">' ;
+                }
+                htmlText+='<div class="card-body">' +
+                                    '<h4 class="card-title">'+value.nama+'</h4>';
+                htmlText+='<p class="card-text">' +
+                              '<small class="text-muted"><i class="fas fa-map-marker-alt mr-2"></i>'+ value.address+','+ value.city+','+value.state+'</small>' ;
+                     htmlText+='<small>' +
+                          '<div class="d-flex">';
+                        if(value.status!=0){
+                          var k_open_hour = new Date('value.open_hour').toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                          var k_close_hour = new Date('value.close_hour').toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+
+                          htmlText+='<p class="mr-4"><b>Waktu Buka</b></p>' +
+                                                    '<p>Hari ini' +k_open_hour +'-'+k_close_hour +'</p>' ;
+                        }else{
+                          htmlText+='<p><b>Tutup pada hari ini</b></p>' ;
+                        }
+                          htmlText+= '</div>' +
+                                        '</small>' +
+                                    '</p>';
+                                
+                    
+                //$('#koop').append(htmlText);
                 var url = '{{ route("koperasi.koopShop", ":id") }}';
                 url = url.replace(':id', value.id);
-                $('#koop').append("<a href='"+url+"') }}' class='btn btn-success waves-effect waves-light'>Pesan</a>");
+                $('#koop').append(htmlText+"<a href='"+url+"') }}' class='btn btn-success waves-effect waves-light'>Pesan</a></div></div></div></div></div>");
               })
             } 
           },

@@ -116,9 +116,9 @@ function loadProducts() {
                   ajax: {
                       url: "{{ route('koperasi.getProductList') }}",
                       type: 'GET',
-                    
                   },
                   'columnDefs': [{
+                    
                       "targets": [0], // your case first column
                       "className": "text-center",
                       "width": "2%"
@@ -192,6 +192,7 @@ function loadProducts() {
                       "className": "text-center",
                       "width": "20%"
                   }]
+                  
                   ,drawCallback: function() {
                     // Call your second function here
                     
