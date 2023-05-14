@@ -347,7 +347,7 @@ input::-webkit-inner-spin-button {
                     $('.alert-success').empty()
                 },
                 success:function(result) {
-                  console.log(result.item);
+                  //console.log(result.item);
                     $('.loading').hide()
                     $(this).show()
                     location.reload()

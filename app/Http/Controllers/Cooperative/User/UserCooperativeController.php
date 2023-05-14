@@ -361,24 +361,24 @@ class UserCooperativeController extends Controller
         //return response()->json(['item' => ]);
         $product_item_quantity = $product_item->first();
 
-        // $newQuantity = intval($product_item_quantity->quantity_available + $item->quantity); // increment quantity
+        $newQuantity = intval($product_item_quantity->quantity_available + $item->quantity); // increment quantity
 
-        // /* If previous product item is being unavailable because of added item in cart,
-        //    after the item deleted, the quantity in product_item will increment back and
-        //    the item will be available */
-        // if($product_item_quantity->quantity_available == 0)
-        // {
-        //     $product_item->update([
-        //         'quantity_available' => $newQuantity,
-        //         'status' => 1,
-        //     ]);
-        // }
-        // else
-        // {
-        //     $product_item->update([
-        //         'quantity_available' => $newQuantity,
-        //     ]);
-        // }
+        /* If previous product item is being unavailable because of added item in cart,
+           after the item deleted, the quantity in product_item will increment back and
+           the item will be available */
+        if($product_item_quantity->quantity_available == 0)
+        {
+            $product_item->update([
+                'quantity_available' => $newQuantity,
+                'status' => 1,
+            ]);
+        }
+        else
+        {
+            $product_item->update([
+                'quantity_available' => $newQuantity,
+            ]);
+        }
         
         
 
@@ -424,8 +424,8 @@ class UserCooperativeController extends Controller
             ])->forceDelete();
         }
         
-        return response()->json(['item' => $allCartItem]);
-        return back()->with('success', 'Item Berjaya Dibuang');
+        return response()->json(['item' => $allCartItem])->with('success', 'Item Berjaya Dibuang');
+        //return back()->with('success', 'Item Berjaya Dibuang');
     }
 
     /**

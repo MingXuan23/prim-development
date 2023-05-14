@@ -119,23 +119,21 @@ class ProductController extends Controller
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)
             {
-<<<<<<< Updated upstream
                if($row->unit_qty==null ||$row->unit_qty==0){
                     $new_total_price += doubleval($row->price * $row->qty );
                }
                else{
                     $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
                }
-          }       
-=======
-                $new_total_price += doubleval($row->price * $row->qty);
-            }
->>>>>>> Stashed changes
-            $new_total_price += $fixed_charges;
+            }          
+          
         }
-        
-        return $new_total_price;
+        $new_total_price += $fixed_charges;
+         return $new_total_price;
     }
+        
+       
+    
     //for updating a cart 
     public function updateCart(Request $request){
      // to update quantity in ProductOrder
