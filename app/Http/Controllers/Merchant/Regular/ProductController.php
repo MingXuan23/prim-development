@@ -112,12 +112,17 @@ class ProductController extends Controller
                     ->get();
 
         $fixed_charges = $charge;
-            
+     
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)
             {
-                $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
-            }
+               if($row->unit_qty==null ||$row->unit_qty==0){
+                    $new_total_price += doubleval($row->price * $row->qty );
+               }
+               else{
+                    $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
+               }
+          }       
             $new_total_price += $fixed_charges;
         }
         

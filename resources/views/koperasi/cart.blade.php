@@ -3,7 +3,7 @@
 @section('css')
 
 @include('layouts.datatable')
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
 <style>
   .noborder{
     border: none!important;
@@ -16,6 +16,36 @@
   object-fit: cover;
 }
 
+.quantity-container{
+    
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.quantity-container button{
+    border: none;
+    background-color: transparent;
+}
+.quantity-container i{
+    font-size: 24px;
+}
+.quantity-input-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.quantity-input{
+    text-align: center;
+    width: 50px;
+    border: 0.15em solid rgb(0, 0, 0);
+}
+
+/* to remove the arrow up and down for input type number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    display: none;
+}
 </style>
 
 @endsection
@@ -54,10 +84,10 @@
                 <thead>
                     <tr class="text-center">
                       <th style="width: 20%">Gambar</th>
-                      <th style="width: 30%">Nama Item</th>
+                      <th style="width: 40%">Nama Item</th>
+                      <!-- <th style="width: 10%">Kuantiti</th> -->
+                      <th style="width: 20%">Harga Satu Unit (RM)</th>
                       <th style="width: 20%">Kuantiti</th>
-                      <th style="width: 30%">Harga Satu Unit (RM)</th>
-                      <th style="width: 10%">Action</th>
                     </tr>
                 </thead>
                 
@@ -74,14 +104,22 @@
                           @endif
                       </td>
                       <td class="align-middle">{{ $row->name }}</td>
-                      <td class="align-middle">{{ $row->quantity }}</td>
+                      <!-- <td class="align-middle">{{ $row->quantity }}</td> -->
                       <td class="align-middle">{{ number_format($row->price, 2, '.', '') }}</td>
                       <td class="align-middle">
-                        <form action="{{ route('koperasi.destroyItemCart', ['org_id' => $id, 'id' => $row->id]) }}" method="POST">
+                        <!-- <form action="{{ route('koperasi.destroyItemCart', ['org_id' => $id, 'id' => $row->productOrderId]) }}" method="POST">
                           @csrf
                           @method('delete')
                           <button type="submit" class="btn btn-danger">Buang</button>
-                        </form>
+                        </form> -->
+                        <div class  = "quantity-container" >
+                                    <div class="quantity-input-container" data-product-order-id="{{$row->productOrderId}}"  data-pgng-order-id="{{$row->pgngId}}">
+                                        <button id="button-minus"><i class="bi bi-dash-square"></i></button>
+                                        <input type="number" class="quantity-input" name = "quantity-input" value="{{$row->quantity}}" min="1" required>
+                                        <button id="button-plus" ><i class="bi bi-plus-square"></i></button>
+                                        <h6 data-qty-available="{{$row->quantity_available}}" id="quantity-available">{{$row->quantity_available}} barang dalam stock</h6>
+                                    </div>
+                        </div>
                       </td>
                     </tr>
                   @endforeach
@@ -114,9 +152,9 @@
                       <tr>
                           <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
                           @if($cart)
-                          <td class="lead">RM {{ number_format($cart->total_price, 2, '.', '') }}</td>
+                          <td class="lead" id="totalPrice">RM {{ number_format($cart->total_price, 2, '.', '') }}</td>
                           @else
-                          <td class="lead">RM 0.00</td>
+                          <td class="lead" id="totalPrice">RM 0.00</td>
                           @endif
                       </tr>
                   </tbody>
@@ -218,7 +256,25 @@
     </div>
   </div>
 </div>
-
+{{-- Delete Confirmation Modal --}}
+    <div id="deleteConfirmModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h4 class="modal-title"><i class="fas fa-info-circle"></i>  Buang Item</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                Anda pasti mahu buang item ini?
+                </div>
+                <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-light">Tidak</button>
+                <button type="button" data-dismiss="modal" class="btn btn-danger" id="delete_confirm_item">Buang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- end Delete Confirmation Modal --}}
 @endsection
 
 
@@ -229,6 +285,11 @@
 
 <script>
     $(document).ready(function () {
+      $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+        });
         $(".input-mask").inputmask();
         $('.phone_no').mask('01000000000');
         $('.form-validation').parsley();
@@ -273,5 +334,141 @@
             // console.log(data);
         }
     });
+    let order_cart_id = null;//update when the user minus until zero at minus button
+    let productOrderInCartId=null;
+    $(document).on('click', '#delete_confirm_item', function(){
+            $.ajax({
+                url: "{{ route('koperasi.destroyItemCart', ['org_id' => $id]) }}",
+                method: "DELETE",
+                data: {cart_id:order_cart_id,productOrderInCartId:productOrderInCartId},
+                beforeSend:function() {
+                    $('.loading').show()
+                    $(this).hide()
+                    $('.alert-success').empty()
+                },
+                success:function(result) {
+                  console.log(result.item);
+                    $('.loading').hide()
+                    $(this).show()
+                    location.reload()
+                },
+                error:function(result) {
+                    console.log(result.responseText)
+                }
+            })
+        });
+
+    const plusButtons = document.querySelectorAll("#button-plus");
+    const minusButtons = document.querySelectorAll("#button-minus");
+    // add click event to plus and minus buttons
+    plusButtons.forEach(function(plusButton){
+        plusButton.addEventListener("click",function(){
+            let inputQuantity = parseInt(this.previousElementSibling.value);
+            console.log("now qty"+inputQuantity);
+            let qtyAvailable = parseInt(this.nextElementSibling.getAttribute("data-qty-available"));
+            let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+            let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+            //console.log(inputQuantity+" "+qtyAvailable+" "+productOrderId+" "+pgngOrderId);
+
+            if(inputQuantity < qtyAvailable){
+                inputQuantity++;
+                this.previousElementSibling.value = inputQuantity;
+                console.log(this,inputQuantity,productOrderId,pgngOrderId);
+                updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
+            }
+        })
+    });
+    minusButtons.forEach(function(minusButton){
+        minusButton.addEventListener("click",function(){
+            let inputQuantity = parseInt(this.nextElementSibling.value);
+            let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
+            let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+            let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+            // console.log(this.parentElement,inputQuantity);
+            console.log(pgngOrderId,productOrderId);
+            if(inputQuantity >= 1){
+               if(inputQuantity==1){
+                order_cart_id =pgngOrderId;
+                productOrderInCartId=productOrderId;//update this so that can pass to delte model
+                $('#deleteConfirmModal').modal('show');
+               }
+               else{
+                inputQuantity--;
+                this.nextElementSibling.value = inputQuantity;
+                console.log(this,inputQuantity,productOrderId,pgngOrderId);
+                updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
+               }
+                
+            }
+        })
+    }) ;
+
+        
+
+    $("input[name='quantity-input']").off('keypress').on('keypress', function(e) {
+    let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
+    let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+    let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+    
+
+    if (isNaN(parseInt(e.key))) {
+        // prevent input if key pressed is not a number
+        e.preventDefault();
+        //console.log( $(this).val());
+        
+    } else {
+      
+        const currentValue = parseInt($(this).val());
+        const newValue = parseInt($(this).val() + e.key);
+        console.log(newValue);
+        if (newValue < 1) {
+            // if the new value is less than 1, set it to 1
+            e.preventDefault();
+            $(this).val('');
+            $(this).val(1);
+            updateInputQuantity(this, 1, productOrderId, pgngOrderId);
+        } else if (newValue > qtyAvailable) {
+            // if the new value is greater than qtyAvailable, set it to qtyAvailable
+            e.preventDefault();
+            $(this).val('');
+            $(this).val(qtyAvailable);
+            updateInputQuantity(this, qtyAvailable, productOrderId, pgngOrderId);
+        } else {
+            // otherwise, update the input value with the new value
+            console.log(newValue);
+            updateInputQuantity(this, newValue, productOrderId, pgngOrderId);
+        }
+    }
+});
+    function updateInputQuantity(plusButton,inputQuantity,productOrderId,pgngOrderId){
+            $.ajax({
+                url: "{{route('merchant.update-cart')}}",
+                method: "PUT",
+                dataType: 'json',
+                data: {
+                    qty: inputQuantity,
+                    productOrderId: productOrderId,
+                    pgngOrderId: pgngOrderId,
+                },
+                beforeSend: function() {
+                        $('.loading').show();
+                },
+                success: function(result){
+                        $('.loading').hide();
+                        $parent = $(plusButton).parent().parent().parent();
+                        $alertMessage = $parent.children('.alert-message');
+                        var message = "<div class='success alert-success' style='padding: 5px;'>"+result.success+"</div>"
+                        $alertMessage.append(message);
+                        $alertMessage.delay(1000).fadeOut()
+                        
+                        $totalPrice = $('#totalPrice');
+                        console.log(result.totalPrice);
+                        $totalPrice.html("RM "+result.totalPrice);
+
+                },
+                // error:function(result) {
+                //     console.log(result.responseText)
+                // }
+           })};
 </script>
 @endsection

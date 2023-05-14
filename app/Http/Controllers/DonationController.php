@@ -162,6 +162,23 @@ class DonationController extends Controller
     {
         $donor = $this->transaction->getDonorByDonationId($request->id);
 
+
+       
+        if (isset($request->startDate) && isset($request->endDate))
+        {
+            $startDate = date('Y-m-d', strtotime($request->startDate));
+            $endDate = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
+            $donor = $donor->whereBetween('datetime_created', [$startDate, $endDate]);
+            
+            // if($request->startDate==$request->endDate)
+            //     $donor = $donor->where('datetime_created', '>=', $startDate);   
+            // else
+            //     $donor = $donor->whereBetween('datetime_created', [$startDate, $endDate]);
+            // ->orderBy('transactions.datetime_created', 'desc');
+            
+        }
+        
+         
         if (request()->ajax()) {
             return datatables()->of($donor)
                 ->editColumn('amount', function ($data) {
