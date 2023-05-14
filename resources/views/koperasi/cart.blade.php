@@ -403,7 +403,28 @@ input::-webkit-inner-spin-button {
         })
     }) ;
 
-        
+    $("input[type='number']").on('keyup', function(e) {
+      var input =this;
+      let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+      let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+
+      if ( $(this).val()===''){
+        setTimeout(function() {
+          if($(input).val()===''){
+            input.value=1;
+            updateInputQuantity(input, 1, productOrderId, pgngOrderId);
+            console.log("success");
+          }  
+        }, 2000);      
+    }
+    else if ($(this).val()==='0'){
+      $(this).val(1);
+      updateInputQuantity(this, 1, productOrderId, pgngOrderId);
+    }
+      
+      // Rest of your code goes here
+      // ...
+    });
 
     $("input[name='quantity-input']").off('keypress').on('keypress', function(e) {
     let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
