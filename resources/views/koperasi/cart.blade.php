@@ -84,10 +84,10 @@ input::-webkit-inner-spin-button {
                 <thead>
                     <tr class="text-center">
                       <th style="width: 20%">Gambar</th>
-                      <th style="width: 30%">Nama Item</th>
-                      <th style="width: 10%">Kuantiti</th>
+                      <th style="width: 40%">Nama Item</th>
+                      <!-- <th style="width: 10%">Kuantiti</th> -->
                       <th style="width: 20%">Harga Satu Unit (RM)</th>
-                      <th style="width: 20%">Action</th>
+                      <th style="width: 20%">Kuantiti</th>
                     </tr>
                 </thead>
                 
@@ -104,7 +104,7 @@ input::-webkit-inner-spin-button {
                           @endif
                       </td>
                       <td class="align-middle">{{ $row->name }}</td>
-                      <td class="align-middle">{{ $row->quantity }}</td>
+                      <!-- <td class="align-middle">{{ $row->quantity }}</td> -->
                       <td class="align-middle">{{ number_format($row->price, 2, '.', '') }}</td>
                       <td class="align-middle">
                         <!-- <form action="{{ route('koperasi.destroyItemCart', ['org_id' => $id, 'id' => $row->productOrderId]) }}" method="POST">
@@ -115,9 +115,9 @@ input::-webkit-inner-spin-button {
                         <div class  = "quantity-container" >
                                     <div class="quantity-input-container" data-product-order-id="{{$row->productOrderId}}"  data-pgng-order-id="{{$row->pgngId}}">
                                         <button id="button-minus"><i class="bi bi-dash-square"></i></button>
-                                        <input type="number" class="quantity-input" name = "quantity-input" value="{{$row->quantity}}" min="1">
+                                        <input type="number" class="quantity-input" name = "quantity-input" value="{{$row->quantity}}" min="1" required>
                                         <button id="button-plus" ><i class="bi bi-plus-square"></i></button>
-                                        <h6 data-qty-available="{{$row->quantity_available}}" id="quantity-available">{{$row->quantity_available}} barang lagi</h6>
+                                        <h6 data-qty-available="{{$row->quantity_available}}" id="quantity-available">{{$row->quantity_available}} barang dalam stock</h6>
                                     </div>
                         </div>
                       </td>
@@ -335,17 +335,19 @@ input::-webkit-inner-spin-button {
         }
     });
     let order_cart_id = null;//update when the user minus until zero at minus button
+    let productOrderInCartId=null;
     $(document).on('click', '#delete_confirm_item', function(){
             $.ajax({
                 url: "{{ route('koperasi.destroyItemCart', ['org_id' => $id]) }}",
                 method: "DELETE",
-                data: {cart_id:order_cart_id, "_token": "{{ csrf_token() }}",},
+                data: {cart_id:order_cart_id,productOrderInCartId:productOrderInCartId},
                 beforeSend:function() {
                     $('.loading').show()
                     $(this).hide()
                     $('.alert-success').empty()
                 },
                 success:function(result) {
+                  console.log(result.item);
                     $('.loading').hide()
                     $(this).show()
                     location.reload()
@@ -362,6 +364,7 @@ input::-webkit-inner-spin-button {
     plusButtons.forEach(function(plusButton){
         plusButton.addEventListener("click",function(){
             let inputQuantity = parseInt(this.previousElementSibling.value);
+            console.log("now qty"+inputQuantity);
             let qtyAvailable = parseInt(this.nextElementSibling.getAttribute("data-qty-available"));
             let productOrderId = this.parentElement.getAttribute("data-product-order-id");
             let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
@@ -385,7 +388,8 @@ input::-webkit-inner-spin-button {
             console.log(pgngOrderId,productOrderId);
             if(inputQuantity >= 1){
                if(inputQuantity==1){
-                order_cart_id =pgngOrderId; //update this so that can pass to delte model
+                order_cart_id =pgngOrderId;
+                productOrderInCartId=productOrderId;//update this so that can pass to delte model
                 $('#deleteConfirmModal').modal('show');
                }
                else{
@@ -399,6 +403,43 @@ input::-webkit-inner-spin-button {
         })
     }) ;
 
+        
+
+    $("input[name='quantity-input']").off('keypress').on('keypress', function(e) {
+    let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
+    let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+    let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+    
+
+    if (isNaN(parseInt(e.key))) {
+        // prevent input if key pressed is not a number
+        e.preventDefault();
+        //console.log( $(this).val());
+        
+    } else {
+      
+        const currentValue = parseInt($(this).val());
+        const newValue = parseInt($(this).val() + e.key);
+        console.log(newValue);
+        if (newValue < 1) {
+            // if the new value is less than 1, set it to 1
+            e.preventDefault();
+            $(this).val('');
+            $(this).val(1);
+            updateInputQuantity(this, 1, productOrderId, pgngOrderId);
+        } else if (newValue > qtyAvailable) {
+            // if the new value is greater than qtyAvailable, set it to qtyAvailable
+            e.preventDefault();
+            $(this).val('');
+            $(this).val(qtyAvailable);
+            updateInputQuantity(this, qtyAvailable, productOrderId, pgngOrderId);
+        } else {
+            // otherwise, update the input value with the new value
+            console.log(newValue);
+            updateInputQuantity(this, newValue, productOrderId, pgngOrderId);
+        }
+    }
+});
     function updateInputQuantity(plusButton,inputQuantity,productOrderId,pgngOrderId){
             $.ajax({
                 url: "{{route('merchant.update-cart')}}",

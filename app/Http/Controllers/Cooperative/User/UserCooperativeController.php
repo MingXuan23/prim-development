@@ -147,6 +147,10 @@ class UserCooperativeController extends Controller
                     $newTotalPrice += doubleval($row->price * $row->quantity);
                 }
 
+                $charge = DB::table('organizations')
+                        ->find($request->o_id)
+                        ->fixed_charges;
+                $newTotalPrice+=doubleval($charge);
                 PgngOrder::where([
                     ['user_id', $userID],
                     ['status', 1],
@@ -158,7 +162,11 @@ class UserCooperativeController extends Controller
             }
             else // order did not exists
             {
-                $totalPrice = $item->price * (int)$request->qty;
+                $charge = DB::table('organizations')
+                        ->find($request->o_id)
+                        ->fixed_charges;
+                    
+                $totalPrice = $item->price * (int)$request->qty+doubleval($charge);
 
                 $newQuantity = intval((int)$item->quantity_available - (int)$request->qty);
 
@@ -178,16 +186,16 @@ class UserCooperativeController extends Controller
                 ]);
             }
 
-            // check if quantity is 0 after add to cart
-            if($newQuantity != 0) // if not 0
-            {
-                ProductItem::where('id', $request->i_id)->update(['quantity_available' => $newQuantity]);
-            }
-            else // if 0 (change item status)
-            {
-                ProductItem::where('id', $request->i_id)
-                ->update(['quantity_available' => $newQuantity, 'status' => 0]);
-            }
+            // // check if quantity is 0 after add to cart
+            // if($newQuantity != 0) // if not 0
+            // {
+            //     ProductItem::where('id', $request->i_id)->update(['quantity_available' => $newQuantity]);
+            // }
+            // else // if 0 (change item status)
+            // {
+            //     ProductItem::where('id', $request->i_id)
+            //     ->update(['quantity_available' => $newQuantity, 'status' => 0]);
+            // }
             
             return back()->with('success', 'Item Berjaya Dikemaskini!');
         }
@@ -338,48 +346,54 @@ class UserCooperativeController extends Controller
     public function destroyItemCart($org_id, Request $request)
     {
         $userID = Auth::id();
-        $id=$request->cart_id;
+        $id=$request->cart_id; //pgng order id
+        $productOrderId=$request->productOrderInCartId;
         // $cart_item = ProductOrder::where('pgng_order_id', $id);
-        $cart_item = ProductOrder::where('pgng_order_id', $id);
+        $cart_item = ProductOrder::where([['pgng_order_id', $id],['id',$productOrderId]]);
 
-        $item = $cart_item->first();
-
+        
+        $item=$cart_item->first();
+        
+        //dd($item);
         // $product_item = ProductOrder::where('product_item_id', $item->product_item_id);
-        $product_item = ProductItem::where('id', $item->product_item_id);
-
+        
+        $product_item = $item->product_item;
+        //return response()->json(['item' => ]);
         $product_item_quantity = $product_item->first();
 
-        $newQuantity = intval($product_item_quantity->quantity_available + $item->quantity); // increment quantity
+        // $newQuantity = intval($product_item_quantity->quantity_available + $item->quantity); // increment quantity
 
-        /* If previous product item is being unavailable because of added item in cart,
-           after the item deleted, the quantity in product_item will increment back and
-           the item will be available */
-        if($product_item_quantity->quantity_available == 0)
-        {
-            $product_item->update([
-                'quantity_available' => $newQuantity,
-                'status' => 1,
-            ]);
-        }
-        else
-        {
-            $product_item->update([
-                'quantity_available' => $newQuantity,
-            ]);
-        }
+        // /* If previous product item is being unavailable because of added item in cart,
+        //    after the item deleted, the quantity in product_item will increment back and
+        //    the item will be available */
+        // if($product_item_quantity->quantity_available == 0)
+        // {
+        //     $product_item->update([
+        //         'quantity_available' => $newQuantity,
+        //         'status' => 1,
+        //     ]);
+        // }
+        // else
+        // {
+        //     $product_item->update([
+        //         'quantity_available' => $newQuantity,
+        //     ]);
+        // }
+        
+        
 
         $cart_item->forceDelete();
-
+        
         $allCartItem = DB::table('product_order as po')
                         ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
                         ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
-                        ->where('pg.id', $item->pgng_order_id)
+                        ->where('pg.id', $id)
                         ->where('pg.status', 1)
                         ->select('po.quantity', 'pi.price')
                         ->get();
         
         // If cart is not empty
-        if(count($allCartItem) != 0)
+        if(count($allCartItem) > 0)
         {
 
             $newTotalPrice = 0;
@@ -389,6 +403,11 @@ class UserCooperativeController extends Controller
             {
                 $newTotalPrice += doubleval($row->price * $row->quantity);
             }
+
+            $charge = DB::table('organizations')
+                ->find($org_id)
+                ->fixed_charges;
+            $newTotalPrice += doubleval($charge);
 
             PgngOrder::where([
                 ['user_id', $userID],
@@ -405,7 +424,7 @@ class UserCooperativeController extends Controller
             ])->forceDelete();
         }
         
-
+        return response()->json(['item' => $allCartItem]);
         return back()->with('success', 'Item Berjaya Dibuang');
     }
 

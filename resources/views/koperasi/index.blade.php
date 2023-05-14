@@ -127,7 +127,7 @@
                 }else{
                     let imageUrl = "{{ URL::asset('/organization-picture/') }}" +"/"+ value.organization_picture;
                     console.log(imageUrl);
-                    htmlText+='<img class="card-img-top img-fluid" src="'+imageUrl+'" alt="Card image cap" style="height: 300px;">' ;
+                    htmlText+='<img class="card-img-top img-fluid" src="'+imageUrl+'" alt="Card image cap" style="height: 200px;">' ;
                 }
                 htmlText+='<div class="card-body">' +
                                     '<h4 class="card-title">'+value.nama+'</h4>';
