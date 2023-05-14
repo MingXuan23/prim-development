@@ -191,7 +191,7 @@
                       <div class="col">
                         <div class="d-flex align-items-start flex-column h-100" >
                           <div>
-                            <h4 class="mt-2">{{ $item->name }} <span class="badge badge-light">{{ $item->selling_quantity }} {{ $item->collective_noun }}</span>
+                            <h4 class="mt-2">{{ $item->name }} <span class="badge badge-light"> {{ $item->collective_noun }}</span>
                               @if($item->status != 1) <label class="text-danger">Kehabisan Stok</label> @endif
                             </h4> 
                           </div>

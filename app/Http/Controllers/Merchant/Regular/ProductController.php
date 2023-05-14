@@ -50,7 +50,7 @@ class ProductController extends Controller
                ['product_item.id',$id]
           ])
           ->where('org.deleted_at',NULL)
-          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','selling_quantity','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'district','city','organization_picture')//need to use DB::raw because both table have same column name
+          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'district','city','organization_picture')//need to use DB::raw because both table have same column name
           ->first(); //first() to get a single row
           $product->price = number_format($product->price,2);
           return view('merchant.regular.product.show',compact('product'));
@@ -119,14 +119,8 @@ class ProductController extends Controller
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)
             {
-               if($row->unit_qty==null ||$row->unit_qty==0){
                     $new_total_price += doubleval($row->price * $row->qty );
-               }
-               else{
-                    $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
-               }
             }          
-          
         }
         $new_total_price += $fixed_charges;
          return $new_total_price;
@@ -343,7 +337,7 @@ class ProductController extends Controller
                     ['po.pgng_order_id', $c_id],
                     ['po.deleted_at',NULL]
                 ])
-                ->select('po.id', 'pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                ->select('po.id', 'pi.name', 'po.quantity', 'pi.price')
                 ->get();
 
         if(request()->ajax()) 

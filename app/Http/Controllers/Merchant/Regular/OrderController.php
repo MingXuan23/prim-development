@@ -54,7 +54,7 @@ class OrderController extends Controller
             ['pg.deleted_at', NULL],
             ['pi.deleted_at', NULL],
         ])
-        ->select('pi.id', 'pi.name', 'pi.desc', 'pi.price', 'pi.selling_quantity', 'pi.collective_noun', 'pi.image', 'pi.status', 'pi.product_group_id')
+        ->select('pi.id', 'pi.name', 'pi.desc', 'pi.price', 'pi.collective_noun', 'pi.image', 'pi.status', 'pi.product_group_id')
         ->orderBy('pi.product_group_id', 'asc')
         ->orderBy('pi.name')  
         ->get();
@@ -63,7 +63,7 @@ class OrderController extends Controller
 
         foreach($product_item as $row)
         {
-            $price[$row->id] = number_format((double)(($row->price * $row->selling_quantity)), 2, '.', '');
+            $price[$row->id] = number_format((double)($row->price), 2, '.', '');
         }
 
         return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price'));
@@ -138,7 +138,7 @@ class OrderController extends Controller
         }
         
         $item = ProductItem::where('id', $request->i_id)
-        ->select('type', 'quantity_available as qty', 'selling_quantity as unit_qty', 'price')
+        ->select('type', 'quantity_available as qty', 'price')
         ->first();
 
         $order = DB::table('pgng_orders')
@@ -193,7 +193,6 @@ class OrderController extends Controller
                 
                 ProductOrder::create([
                     'quantity' => $request->qty,
-                    'selling_quantity' => $item->unit_qty,
                     'product_item_id' => $request->i_id,
                     'pgng_order_id' => $order->id
                 ]);
@@ -225,7 +224,6 @@ class OrderController extends Controller
 
             ProductOrder::create([
                 'quantity' => $request->qty,
-                'selling_quantity' => $item->unit_qty,
                 'product_item_id' => $request->i_id,
                 'pgng_order_id' => $new_order_id
             ]);
@@ -279,7 +277,7 @@ class OrderController extends Controller
                     ['po.pgng_order_id', $c_id],
                     ['po.deleted_at',NULL]
                 ])
-                ->select('po.id', 'pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                ->select('po.id', 'pi.name', 'po.quantity', 'pi.price')
                 ->get();
 
         if(request()->ajax()) 
@@ -291,7 +289,7 @@ class OrderController extends Controller
             // });
 
             $table->editColumn('price', function ($row) {
-                return number_format((double)(($row->price * $row->selling_quantity)), 2);
+                return number_format((double)(($row->price * $row->quantity)), 2);
             });
 
             $table->editColumn('action', function ($row) {
@@ -299,9 +297,8 @@ class OrderController extends Controller
                 if($type == 'cart'){
                     $label = '<button type="button" data-cart-order-id="'.$row->id.'" class="delete-item btn btn-danger"><i class="fas fa-trash-alt"></i></button>';
                 } else {
-                    $label = number_format((double)(($row->price * $row->selling_quantity) * $row->quantity), 2);
+                    $label = number_format((double)($row->price  * $row->quantity), 2);
                 }
-                
                 return $label;
             });
 
