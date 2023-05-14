@@ -19,7 +19,7 @@
             /* css */
             .cart-btn {
                 color:var(--secondary-bc);
-                right: 5px;
+                right: 10px;
                 position: fixed;
                 transition-property: transform;
                 transition-timing-function: ease;
@@ -369,12 +369,12 @@
                     url: "{{ route('merchant.load-cart-counter') }}",
                     method: "GET",
                     beforeSend:function(){
-                        //noty.empty()
+                        noty.empty()
                     },
                     success:function(result){
                     if(result.counter != 0) {
-                        noty.append(result.counter)
                         noty.attr('hidden', false)
+                        noty.append(result.counter)
                     }else {
                         noty.attr('hidden', true)
                     }
@@ -433,6 +433,7 @@
             //for add to cart section
             let item_id = $(".add-to-cart").attr("data-item-id");
             let org_id = $(".add-to-cart").attr("data-org-id");
+            
             $(".add-to-cart a").click(()=>{
                 $.ajax({
                     url: "{{route('merchant-reg.store-item')}}",

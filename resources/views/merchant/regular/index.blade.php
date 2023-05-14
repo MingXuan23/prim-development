@@ -9,8 +9,20 @@
   height: 100px;
   object-fit: cover;
 }
+/* .list-group{
+  display: flex;
+  flex-direction: row!important;
+  flex-wrap: wrap!important;
+ justify-content: space-evenly;
+ 
+}
+.list-group a{
+  width: 40%;
+  margin: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.125)!important;
+} */
 
-@media screen and (max-width: 768px) { 
+@media screen and (max-width: 850px) { 
   #img-size
   {
     width: 50px;
@@ -92,13 +104,13 @@
           @endforeach --}}
           @forelse($merchants->chunk(3) as $merchant)
             @foreach($merchant as $row)
-              <a href="{{ route('merchant-reg.show', $row->id) }}" class="order_modal list-group-item list-group-item-action flex-column">
-                <div class="d-flex" >
-                    <img class="rounded img-fluid bg-dark" id="img-size" src="
-                    {!! $row->organization_picture != null ? 
+              <a href="{{ route('merchant-reg.show', $row->id) }}" class="order_modal list-group-item list-group-item-action">
+                <div class="d-flex">
+                    <img class="rounded img-fluid bg-dark" id="img-size" src="{{URL("images/koperasi/default-item.png")}}">
+                    {{-- {!! $row->organization_picture != null ? 
                       URL('organization-picture/'.$row->organization_picture) : 
                       URL('images/koperasi/default-item.png')
-                    !!}">
+                    !!}"> --}}
                     <div class="flex-column ml-2">
                         <h4 class="merchant_name">
                           {!! $row->nama !!}
@@ -150,7 +162,7 @@
       </div>
     </div>
   </div>
-</div>
+{{-- </div> --}}
 
 {{-- Merchant Closed Modal --}}
 {{-- <div id="merchantClosedModal" class="modal fade" role="dialog">

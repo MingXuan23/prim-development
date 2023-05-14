@@ -19,6 +19,9 @@
             .carts-counter{
                 font: 20px "Roboto" ;
             }
+            .carts-counter b{
+                color: var(--secondary-bc);
+            }
             .product-container{
                 border: 2px solid var(--primary-color);
                 padding: 0.5em;
@@ -89,6 +92,7 @@
                 position: absolute;
                 right: 0;
                 bottom: 0;
+                color: var(--secondary-bc)
             }
             .hide{
                 display: none!important;
@@ -269,7 +273,7 @@
                                     @if($product->quantity_available > 0)
                                         <div class="product-details">    
                                             <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
-                                            <h5>RM{{$product->price}}/Unit</h5>
+                                            <h5 style="color: rgb(2, 122, 129);">RM{{$product->price}}/Unit</h5>
                                             <div class  = "quantity-container" >
                                                 <div class="quantity-input-container" data-product-order-id="{{$product->id}}"  data-pgng-order-id="{{$product->pgng_order_id}}">
                                                     <button id="button-minus"><i class="bi bi-dash-square"></i></button>
@@ -474,10 +478,6 @@
                 let productOrderId = this.parentElement.getAttribute("data-product-order-id");
                 let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
                 const currentValue = parseInt($(this).val());
-                if (e.key === "Backspace" || e.key === "Delete" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
-                    // allow navigation and deletion keys
-                    return;
-                }
                 if (isNaN(currentValue)) {
                     // if the current value is not a number, reset it to 1
                     $(this).val(1);
@@ -495,7 +495,25 @@
                 }
             });
     });
-    
+    $("input[type='number']").on('keyup', function(e) {
+      var input =this;
+      let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+      let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+
+        if ( $(this).val()===''){
+            setTimeout(function() {
+            if($(input).val()===''){
+                input.value=1;
+                updateInputQuantity(input, 1, productOrderId, pgngOrderId);
+                console.log("success");
+            }  
+            }, 2000);      
+        }
+        else if ($(this).val()==='0'){
+        $(this).val(1);
+        updateInputQuantity(this, 1, productOrderId, pgngOrderId);
+        }
+    });
     function updateInputQuantity(plusButton,inputQuantity,productOrderId,pgngOrderId){
             $.ajax({
                 url: "{{route('merchant.update-cart')}}",

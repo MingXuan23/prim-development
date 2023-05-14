@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Merchant\Regular;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Organization;
 use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use App\Models\PgngOrder;
+use Yajra\DataTables\DataTables;//for datatable
 
 class ProductController extends Controller
 {
@@ -30,7 +32,8 @@ class ProductController extends Controller
        ])
        ->select('product_item.name','product_item.id','price','image','org.code')
        ->inRandomOrder()//randomize the row
-       ->get();//get() to get multiple rows and put in into a collection
+       //->get();//get() to get multiple rows and put in into a collection
+       ->paginate(10);
        foreach($products as $product){
             $product->price = number_format($product->price,2);
        }
@@ -70,7 +73,7 @@ class ProductController extends Controller
           ->where([
                ['org.deleted_at',NULL]
           ])
-          ->select('product_order.id','quantity','product_order.selling_quantity','product_item_id','pgng_order_id',
+          ->select('product_order.id','quantity','product_item_id','pgng_order_id',
           'pi.name','quantity_available','price',
           'org.nama','organization_picture',
           'po.total_price')
@@ -108,7 +111,7 @@ class ProductController extends Controller
                          ['pi.deleted_at',NULL],
                          ['po.deleted_at',NULL]
                     ])
-                    ->select('po.quantity as qty', 'pi.price', 'pi.selling_quantity as unit_qty')
+                    ->select('po.quantity as qty', 'pi.price')
                     ->get();
 
         $fixed_charges = $charge;
@@ -116,6 +119,7 @@ class ProductController extends Controller
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)
             {
+<<<<<<< Updated upstream
                if($row->unit_qty==null ||$row->unit_qty==0){
                     $new_total_price += doubleval($row->price * $row->qty );
                }
@@ -123,6 +127,10 @@ class ProductController extends Controller
                     $new_total_price += doubleval($row->price * ($row->qty * $row->unit_qty));
                }
           }       
+=======
+                $new_total_price += doubleval($row->price * $row->qty);
+            }
+>>>>>>> Stashed changes
             $new_total_price += $fixed_charges;
         }
         
@@ -133,7 +141,8 @@ class ProductController extends Controller
      // to update quantity in ProductOrder
          ProductOrder::find($request->productOrderId)
          ->update([
-               'quantity'=> $request->qty
+               'quantity'=> $request->qty,
+               'updated_at' => Carbon::now(),
          ]);
      //find the price for a single quantity
          $productItemId = ProductOrder::find($request->productOrderId)
@@ -154,7 +163,8 @@ class ProductController extends Controller
          DB::table('pgng_orders')
          ->where('id', $request->pgngOrderId)
          ->update([
-               'total_price' => $totalPrice
+               'total_price' => $totalPrice,
+               'updated_at' => Carbon::now(),
          ]);
          $totalPrice = number_format($totalPrice, 2);
           return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice]);
@@ -299,6 +309,7 @@ class ProductController extends Controller
             ['status', 'In cart'],
             ['organization_id', $org_id],
             ['user_id', $user_id],
+            ['deleted_at',NULL]
         ])->select('id', 'order_type', 'pickup_date', 'total_price', 'note', 'organization_id as org_id')->first();
         
         if($cart) {
@@ -315,7 +326,7 @@ class ProductController extends Controller
             'fixed_charges' => $fixed_charges,
         ];
 
-     return view('merchant.regular.product.checkout');
+     return view('merchant.regular.product.checkout', compact('response', 'cart'));
    }
    public static function getFixedCharges($org_id)
     {
@@ -323,6 +334,33 @@ class ProductController extends Controller
         $fixed_charges = $fixed_charges != null ? $fixed_charges : 0;
 
         return $fixed_charges;
+    }
+    public function getCheckoutItems(Request $request)
+    {
+        $c_id = $request->id;
+        
+        $cart_item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                ->where([
+                    ['po.pgng_order_id', $c_id],
+                    ['po.deleted_at',NULL]
+                ])
+                ->select('po.id', 'pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                ->get();
+
+        if(request()->ajax()) 
+        { 
+            $table = Datatables::of($cart_item);
+
+            $table->editColumn('price', function ($row) {
+                return number_format(($row->price), 2);
+            });
+            $table->editColumn('sub_total', function ($row) {
+               return number_format((double)(($row->price * $row->quantity)), 2);
+           });
+            return $table->make(true);
+        }
+
     }
 //    public function store(Request $request, $org_id, $order_id)
 //     {
