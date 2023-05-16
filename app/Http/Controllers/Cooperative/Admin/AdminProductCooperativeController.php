@@ -10,6 +10,7 @@ use App\Models\ProductItem;
 use Yajra\DataTables\DataTables;
 use App\Models\Organization;
 use App\Imports\ProductTypeImport;
+use App\Imports\ProductImport;
 
 use Carbon\Carbon;
 use App\Models\Fee;
@@ -72,42 +73,12 @@ class AdminProductCooperativeController extends Controller
         $group = DB::table('product_group as pg')
         ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
         ->where('ou.user_id', $userID)
+        ->where('pg.organization_id',$koperasi->organization_id)
+        ->whereNull('pg.deleted_at')
         ->select('pg.*')
         ->distinct('pg.id')
         ->get();
-        //dd($group,$koperasi);
-
-        // $target=json_decode($product[7]->target);
         
-        // $desctext='<div class="d-flex" >';
-        //     if($target!=null && is_array($target->data)){
-        //         if (strpos($target->data[0], "T") !== false){
-        //             $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun '.$target->data[0][1];
-        //             for($i=1;$i<count($target->data);$i++)
-        //             {
-        //                 $desctext=$desctext. ',Tahun '.$target->data[$i][1];
-        //                 //add other tahun if exist
-        //             }
-        //             dd($desctext);
-        //         }else{
-        //             $desctext=$desctext. '<span style="text-align: left;">Kepada Kelas '. $this->getClassNameById($target->data[0]);
-
-        //             for($i=1;$i<count($target->data);$i++)
-        //             {
-        //                 $desctext=$desctext. $this->getClassNameById($target->data[$i]);
-        //                 //add other tahun if exist
-        //             }
-        //             dd($desctext);
-        //         }
-        //     //add text
-                
-        //     }//else the target is not array,the target is to all tahun
-        //     else{
-        //         $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun Semua. ';
-        //     }
-        //     $desctext=$desctext.'<br>'.'</span></div>';
-        //     //add description to the string
-     
         return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product'));
     }
 
@@ -259,8 +230,10 @@ class AdminProductCooperativeController extends Controller
         ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
         ->where('ou.user_id', $userID)
         ->where ('ou.organization_id',$org->id)
+        ->whereNull('pg.deleted_at')
         ->select('pg.*')
         ->distinct('pg.id')
+        ->orderBY('pg.name')
         ->get();
 
         return view('koperasi-admin.addtype',compact('group','org'));
@@ -563,13 +536,49 @@ class AdminProductCooperativeController extends Controller
         
         if (!in_array($etx, $formats)) {
 
-            return redirect('/produktype')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+            return redirect('koperasi/produktype')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
         
         Excel::import(new ProductTypeImport($request->organ), public_path('/uploads/excel/' . $namaFile));
-
-        return redirect('/produktype')->with('success', 'Product type have been added successfully');
+        
+        return redirect('koperasi/produktype')->with('success', 'Product type have been added successfully');
         
     
+    }
+
+    public function importproduct(Request $request){
+         
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+        
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        
+        if (!in_array($etx, $formats)) {
+
+            return redirect('koperasi/produktype')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+        if($request->cb_year){
+            if($request->classCheckBoxEmpty==="true"){
+                $data = array(
+                    'data' =>$request->cb_class
+                );
+            }
+            else{
+                $data = array(
+                    'data' =>$request->cb_year
+                );
+            }
+            
+            
+        }
+        else{
+            $data=['data' => 'All'];
+        }
+        $target = json_encode($data);
+        Excel::import(new ProductImport($request->type,$target,$request->organ), public_path('/uploads/excel/' . $namaFile));
+        
+        return redirect('koperasi/produkmenu')->with('success', 'Product type have been added successfully');
     }
 }

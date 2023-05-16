@@ -87,7 +87,7 @@
                     @php
                     $groupId=0;
                     @endphp
-                  <a href="{{ route('koperasi.deleteType',$groupId)}}" style="display:inline"><button class="btn btn-primary mr-1">Padam</button>
+                  <a href="#" style="display:inline"><button class="btn btn-primary mr-1">Padam</button>
                     <button type="button" data-dismiss="modal" class="btn">Batal</button></a>
                   </div>
                 </div>
@@ -187,6 +187,9 @@ function getProductNum(groupId)
           }
       }
       $("#modal-body-content").html(htmlText);
+      let deleteUrl = '{{ route("koperasi.deleteType", ":groupId") }}';
+      deleteUrl = deleteUrl.replace(':groupId', groupId);
+      $("#deleteConfirmationModal a").attr('href', deleteUrl);
       
     },
     error: function(xhr, status, error) {

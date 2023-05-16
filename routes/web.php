@@ -213,6 +213,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::post('/produktype/update/{id}','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
         Route::get('/produktype/edit/{id}','AdminProductCooperativeController@editType')->name('koperasi.editType');
         Route::post('/importproducttype', 'AdminProductCooperativeController@importproducttype')->name('importproducttype');
+        Route::post('/importproduct', 'AdminProductCooperativeController@importproduct')->name('importproduct');
 
         Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
         Route::get('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
