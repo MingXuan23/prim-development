@@ -24,7 +24,8 @@ class ProductController extends Controller
        ->where([
             ['pg.deleted_at',NULL],
             ['product_item.deleted_at',NULL],
-            ['product_item.quantity_available' ,'>', 0]//only get those products that haven't sold out yet
+            ['product_item.status', 1],
+            ['product_item.quantity_available' ,'>', 0],//only get those products that haven't sold out yet
        ])
        ->where([
             ['org.deleted_at',NULL],
@@ -33,7 +34,7 @@ class ProductController extends Controller
        ->select('product_item.name','product_item.id','price','image','org.code')
        ->inRandomOrder()//randomize the row
        //->get();//get() to get multiple rows and put in into a collection
-       ->paginate(10);
+       ->paginate(12);
        foreach($products as $product){
             $product->price = number_format($product->price,2);
        }
@@ -50,7 +51,7 @@ class ProductController extends Controller
                ['product_item.id',$id]
           ])
           ->where('org.deleted_at',NULL)
-          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'district','city','organization_picture')//need to use DB::raw because both table have same column name
+          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'district','city','organization_picture','code')//need to use DB::raw because both table have same column name
           ->first(); //first() to get a single row
           $product->price = number_format($product->price,2);
           return view('merchant.regular.product.show',compact('product'));
@@ -74,8 +75,8 @@ class ProductController extends Controller
                ['org.deleted_at',NULL]
           ])
           ->select('product_order.id','quantity','product_item_id','pgng_order_id',
-          'pi.name','quantity_available','price',
-          'org.nama','organization_picture',
+          'pi.name','quantity_available','price','collective_noun','pi.status','pi.image',
+          'org.nama','organization_picture','code',
           'po.total_price')
           ->orderBy('product_order.id','desc')
           ->get();
@@ -99,7 +100,7 @@ class ProductController extends Controller
 
           return view('merchant.regular.product.productsCart',compact('productInCart','organizations'));
     } 
-    private function calculateTotalPrice($order_id,$charge) 
+    public function calculateTotalPrice($order_id,$charge) 
     {
         $new_total_price = null;
 
@@ -108,6 +109,8 @@ class ProductController extends Controller
                     ->where([
                          ['po.pgng_order_id', $order_id],
                          ['pi.quantity_available','>',0],
+                         ['pi.type','have inventory'],
+                         ['pi.status',1],
                          ['pi.deleted_at',NULL],
                          ['po.deleted_at',NULL]
                     ])
@@ -335,7 +338,10 @@ class ProductController extends Controller
                 ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                 ->where([
                     ['po.pgng_order_id', $c_id],
-                    ['po.deleted_at',NULL]
+                    ['po.deleted_at',NULL],
+                    ['pi.quantity_available','>',0],
+                    ['pi.type','have inventory'],
+                    ['pi.status',1],
                 ])
                 ->select('po.id', 'pi.name', 'po.quantity', 'pi.price')
                 ->get();

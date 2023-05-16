@@ -6,6 +6,16 @@
 @include('layouts.datatable')
 
 <style>
+:root {
+    --primary-bc: #ffffff;
+    --secondary-bc: rgb(2, 122, 129);
+    --hover-color:rgb(6, 225, 237);
+    --primary-color:#5b626b;
+    --transition: all 0.3s linear;
+}
+.main-content{
+    color: var(--primary-color);
+}
 .noborder{
   border: none!important;
 }
@@ -65,6 +75,13 @@
   .submit-btn:hover .hover-underline-animation:after {
       transform: scaleX(1);
       transform-origin: bottom left;
+  }
+  .form-control{
+      border: 2px solid #5b626b6c!important;
+  }
+  .form-control:focus{
+      outline: none;
+      border: 2px solid #5b626b!important;
   }
 </style>
 
@@ -158,8 +175,14 @@
         
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
-            <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
-            <button type="submit" class="btn-lg btn-primary">Bayar</button>
+            <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b">KEMBALI</a>
+            {{-- <button type="submit" class="btn-lg btn-primary">Bayar</button> --}}
+            <button class="submit-btn" type="submit">
+              <span class="hover-underline-animation">Bayar</span>
+              <svg viewBox="0 0 46 16" height="10" width="30" xmlns="http://www.w3.org/2000/svg" id="arrow-horizontal">
+                  <path transform="translate(30)" d="M8,0,6.545,1.455l5.506,5.506H-30V9.039H12.052L6.545,14.545,8,16l8-8Z" data-name="Path 10" id="Path_10"></path>
+              </svg>
+          </button>
           </div>
         </div>
       </form>

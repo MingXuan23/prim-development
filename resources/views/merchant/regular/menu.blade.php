@@ -12,7 +12,7 @@
 }
 .cart-btn {
     z-index: 2;
-    color:var(--secondary-bc);
+    color:rgb(48, 213, 222);
     right: 4%;
     position: fixed;
     transition-property: transform;
@@ -115,6 +115,19 @@
 
   text-align: center;
 }
+.item-description{
+  text-align:justify;
+  white-space:pre-wrap;
+  max-height: 100px!important;
+  overflow-y: auto!important;
+
+}
+#shop-bg-img{
+  background-image: url(/merchant-image/shop-background-image.jpg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover; 
+}
 </style>
 
 @endsection
@@ -133,7 +146,7 @@
   <div class="col-12">
     <div class="card border border-dark">
       
-      <div class="card-header text-white" id="has-bg-img">
+      <div class="card-header text-white" id="shop-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
           <a href="{{route('merchant.all-cart')}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
@@ -196,7 +209,7 @@
                             </h4> 
                           </div>
                           <div>
-                            <p class="card-text"><i>{{ $item->desc }}</i></p>
+                            <p class="card-text item-description"><i>{{ $item->desc }}</i></p>
                           </div>
                           <div class="mt-auto d-flex justify-content-between align-items-center w-100">
                             <div class="">
