@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ProductItem;
 use Yajra\DataTables\DataTables;
 use App\Models\Organization;
+use App\Imports\ProductTypeImport;
 
 use Carbon\Carbon;
 use App\Models\Fee;
@@ -75,19 +76,60 @@ class AdminProductCooperativeController extends Controller
         ->distinct('pg.id')
         ->get();
         //dd($group,$koperasi);
+
+        // $target=json_decode($product[7]->target);
         
+        // $desctext='<div class="d-flex" >';
+        //     if($target!=null && is_array($target->data)){
+        //         if (strpos($target->data[0], "T") !== false){
+        //             $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun '.$target->data[0][1];
+        //             for($i=1;$i<count($target->data);$i++)
+        //             {
+        //                 $desctext=$desctext. ',Tahun '.$target->data[$i][1];
+        //                 //add other tahun if exist
+        //             }
+        //             dd($desctext);
+        //         }else{
+        //             $desctext=$desctext. '<span style="text-align: left;">Kepada Kelas '. $this->getClassNameById($target->data[0]);
+
+        //             for($i=1;$i<count($target->data);$i++)
+        //             {
+        //                 $desctext=$desctext. $this->getClassNameById($target->data[$i]);
+        //                 //add other tahun if exist
+        //             }
+        //             dd($desctext);
+        //         }
+        //     //add text
+                
+        //     }//else the target is not array,the target is to all tahun
+        //     else{
+        //         $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun Semua. ';
+        //     }
+        //     $desctext=$desctext.'<br>'.'</span></div>';
+        //     //add description to the string
+     
         return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product'));
     }
 
     public function getProductList(Request $request){
        
         if (request()->ajax()){
-            $userID=Auth::id();
+
+            $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
+            $userID = Auth::id();
+            $koperasi = DB::table('organizations as o')
+            ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+            ->where('ou.user_id', $userID)
+            ->where('ou.role_id', $role_id)
+            ->select('o.id as koperasiID')
+            ->first();
+
             $product = DB::table('product_item as p')
             ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
             ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
             ->select('p.*','pg.name as type_name')
             ->where('ou.user_id', $userID)
+            ->where('pg.organization_id',$koperasi->koperasiID)
             ->whereNull('p.deleted_at')
             ->distinct('ou.user_id')
             ->get();
@@ -96,16 +138,26 @@ class AdminProductCooperativeController extends Controller
                 $table->addColumn('desctext', function ($row) {
                     $target=json_decode($row->target);
                     $desctext='<div class="d-flex" >';//add tag to the description string
-
                     //if the target is array 
-                    if(is_array($target->data)){
-                    $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun '.$target->data[0];
-                    //add text
-                        for($i=1;$i<count($target->data);$i++)
-                        {
-                            $desctext=$desctext. ',Tahun '.$target->data[$i];
-                            //add other tahun if exist
+                    if($target!=null && is_array($target->data)){
+                        if (strpos($target->data[0], "T") !== false){
+                            $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun '.$target->data[0][1];
+                            for($i=1;$i<count($target->data);$i++)
+                            {
+                                $desctext=$desctext. ',Tahun '.$target->data[$i][1];
+                                //add other tahun if exist
+                            }
+                        }else{
+                            $desctext=$desctext. '<span style="text-align: left;">Kepada Kelas '.$this->getClassNameById($target->data[0]);
+
+                            for($i=1;$i<count($target->data);$i++)
+                            {
+                                $desctext=$desctext.$this->getClassNameById($target->data[$i]);
+                                //add other tahun if exist
+                            }
                         }
+                    //add text
+                        
                     }//else the target is not array,the target is to all tahun
                     else{
                         $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun Semua. ';
@@ -148,18 +200,14 @@ class AdminProductCooperativeController extends Controller
 
     public function getProductNumOfGroup(Request $request){
         
-        $userID = Auth::id();
-        
         $productNum = DB::table('product_item as p')
         ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
-        ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
-        ->select('count(p.id) as productCount')
-        ->where('ou.user_id', $userID)
+        ->select('p.name')
         ->where('pg.id',$request->groupId)
-        ->distinct('ou.user.id')
-        ->first();
+        ->distinct('p.id')
+        ->get();
 
-        return response()->json(['status' => 'success','productNum' => $productNum]);
+        return response()->json(['productNum' => $productNum]);
         
     }
 
@@ -215,7 +263,7 @@ class AdminProductCooperativeController extends Controller
         ->distinct('pg.id')
         ->get();
 
-        return view('koperasi-admin.addtype',compact('group'));
+        return view('koperasi-admin.addtype',compact('group','org'));
     }
 
     public function storeType(Request $request)
@@ -262,7 +310,6 @@ class AdminProductCooperativeController extends Controller
     {
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
-        // dd($request->organization_picture);
         
         $file_name = '';
 
@@ -283,9 +330,17 @@ class AdminProductCooperativeController extends Controller
                 ->select('o.id')
                 ->first();
         if($request->cb_year){
-            $data = array(
-                'data' =>$request->cb_year
-            );
+            if($request->classCheckBoxEmpty==="true"){
+                $data = array(
+                    'data' =>$request->cb_class
+                );
+            }
+            else{
+                $data = array(
+                    'data' =>$request->cb_year
+                );
+            }
+            
             
         }
         else{
@@ -355,6 +410,23 @@ class AdminProductCooperativeController extends Controller
         // ->select('o.id')
         // ->first();
       
+        if($request->cb_year){
+            if($request->classCheckBoxEmpty==="true"){
+                $data = array(
+                    'data' =>$request->cb_class
+                );
+            }
+            else{
+                $data = array(
+                    'data' =>$request->cb_year
+                );
+            }           
+        }
+        else{
+            $data=['data' => 'All'];
+        }
+        $target = json_encode($data);
+        
         $update = DB::table('product_item')->where('id',$id)->update([
             'name' => $request->nama,
             'desc' => $request->description,
@@ -362,6 +434,7 @@ class AdminProductCooperativeController extends Controller
             'quantity_available' => $request->quantity,
             'price' => $request->price,
             'status'=> $request->status,
+            'target'=>$target,
             'product_group_id' => $request->type,
             'updated_at' => now()
         ]);
@@ -465,5 +538,38 @@ class AdminProductCooperativeController extends Controller
          
         return response()->json(['data' => $list, 'datayear' => $class_organization,'classes'=>$class]);
         
+    }
+
+    public function getClassNameById($id){
+        $class = DB::table('classes as c')
+        ->where('c.id',$id)
+        ->select('c.nama as classname')
+        ->first();
+        if ($class) {
+            return $class->classname;
+        }
+    
+        return "";       
+    }
+
+    public function importproducttype(Request $request){
+        
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+        
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        
+        if (!in_array($etx, $formats)) {
+
+            return redirect('/produktype')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+        
+        Excel::import(new ProductTypeImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+
+        return redirect('/produktype')->with('success', 'Product type have been added successfully');
+        
+    
     }
 }

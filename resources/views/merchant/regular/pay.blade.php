@@ -22,7 +22,50 @@
   height: 35px;
   display:none;
 }
-
+/* for submit button */
+.submit-btn {
+      border: none;
+      background: none;
+  }
+  .submit-btn span {
+      color:var(--primary-color);
+      padding-bottom: 7px;
+      font-family: Roboto, sans-serif;
+      font-size: 17.5px;
+      padding-right: 15px;
+      text-transform: uppercase;
+  }
+  .submit-btn svg {
+      transform: translateX(-8px);
+      transition: all 0.3s ease;
+  }
+  .submit-btn:hover svg {
+      transform: translateX(0);
+  }
+  .submit-btn:active svg {
+      transform: scale(0.9);
+  }
+  .hover-underline-animation {
+      position: relative;
+      color:var(--primary-color);
+      padding-bottom: 20px;
+  }
+  .hover-underline-animation:after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      transform: scaleX(0);
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--primary-color);
+      transform-origin: bottom right;
+      transition: transform 0.25s ease-out;
+  }
+  .submit-btn:hover .hover-underline-animation:after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+  }
 </style>
 
 @endsection
@@ -53,17 +96,15 @@
             <table class="table table-borderless responsive" id="cartTable" width="100%" cellspacing="0">
                 <thead class="thead-dark">
                     <tr class="text-center">
-                      <th style="width: 25%">Nama</th>
+                      <th style="width: 35%">Nama</th>
                       <th style="width: 15%">Kuantiti</th>
-                      <th style="width: 25%">Pakej</th>
-                      <th style="width: 20%">Harga Per Unit (RM)</th>
-                      <th style="width: 15%">Jumlah (RM)</th>
+                      <th style="width: 25%">Harga Per Unit (RM)</th>
+                      <th style="width: 25%">Jumlah (RM)</th>
                     </tr>
                 </thead>
                 
             </table>
           </div>
-
         </div>
       </div>
 
@@ -167,12 +208,11 @@
                 type: 'GET',
             },
             'columnDefs': [{
-                "targets": [0, 1, 2, 3, 4], // your case first column
+                "targets": [0, 1, 2, 3], // your case first column
                 "className": "align-middle text-center", 
             },
             { "responsivePriority": 1, "targets": 0 },
             { "responsivePriority": 2, "targets": 2 },
-            { "responsivePriority": 3, "targets": 4 },
             ],
             columns: [{
                 data: "name",
@@ -185,11 +225,6 @@
                 orderable: false,
                 searchable: false,
             }, {
-                data: "full_quantity",
-                name: 'full_quantity',
-                orderable: false,
-                searchable: false,
-            },{
                 data: 'price',
                 name: 'price',
                 orderable: false,

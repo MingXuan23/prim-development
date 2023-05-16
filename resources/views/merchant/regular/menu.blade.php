@@ -5,7 +5,34 @@
 {{-- <script src="{{ URL('assets/libs/bootstrap-touchspin-master/src/jquery.bootstrap-touchspin.css')}}"></script> --}}
 
 <style>
-
+:root {
+    --primary-bc: #ffffff;
+    --secondary-bc: rgb(2, 122, 129);
+    --hover-color:rgb(6, 225, 237);
+}
+.cart-btn {
+    z-index: 2;
+    color:var(--secondary-bc);
+    right: 4%;
+    position: fixed;
+    transition-property: transform;
+    transition-timing-function: ease;
+    transition-duration: 0.3s;
+    /* position: relative; */
+}
+.cart-btn .notification {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    padding: 5px 10px;
+    border-radius: 50%;
+    background: red;
+    color: white;
+}
+.cart-btn:hover{
+    color:var(--hover-color);
+    transform: translateX(-3px);
+}
 #has-bg-img{
   background-image: url("{{ URL('images/koperasi/Koperasi-default-background-2.jpg')}}");
   background-repeat: no-repeat;
@@ -54,7 +81,7 @@
   display:none;
 }
 
-.cart-btn {
+/* .cart-btn {
   position: relative;
 }
 
@@ -66,7 +93,7 @@
   border-radius: 50%;
   background: red;
   color: white;
-}
+} */
 
 #quantity-danger{
   display: none;
@@ -109,7 +136,7 @@
       <div class="card-header text-white" id="has-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
-          <a href="{{ route('merchant-reg.cart', $merchant->id) }}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
+          <a href="{{route('merchant.all-cart')}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
         </div>
         
         <input type="hidden" name="hidden-org-id" id="hidden-org-id" value="{{ $merchant->id }}">
@@ -164,7 +191,7 @@
                       <div class="col">
                         <div class="d-flex align-items-start flex-column h-100" >
                           <div>
-                            <h4 class="mt-2">{{ $item->name }} <span class="badge badge-light">{{ $item->selling_quantity }} {{ $item->collective_noun }}</span>
+                            <h4 class="mt-2">{{ $item->name }} <span class="badge badge-light"> {{ $item->collective_noun }}</span>
                               @if($item->status != 1) <label class="text-danger">Kehabisan Stok</label> @endif
                             </h4> 
                           </div>
@@ -239,8 +266,30 @@
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
+    notificationCounter();
 
-    notificationCounter($('#hidden-org-id').val())
+    function notificationCounter(){
+        let noty = $('.notification')
+        $.ajax({
+            url: "{{ route('merchant.load-cart-counter') }}",
+            method: "GET",
+            beforeSend:function(){
+                noty.empty()
+            },
+            success:function(result){
+            if(result.counter != 0) {
+                noty.attr('hidden', false)
+                noty.append(result.counter)
+            } else {
+                noty.attr('hidden', true)
+            }
+            },
+            error:function(result){
+                console.log(result.responseText)
+            }
+        })
+    }
+    //notificationCounter($('#hidden-org-id').val())
 
     $('.btn-item-modal').click(function(e) {
       e.preventDefault()
@@ -303,7 +352,8 @@
             $('div.flash-message').append(message)
             $('div.flash-message').delay(3000).fadeOut()
 
-            notificationCounter(org_id)
+            //notificationCounter(org_id)
+            notificationCounter();
 
             $("html, body").animate({ scrollTop: 0 }, "slow");
           }
@@ -329,29 +379,29 @@
       })
     })
 
-    function notificationCounter(org_id)
-    {
-      let noty = $('.notification')
-      $.ajax({
-        url: "{{ route('merchant-reg.count-cart') }}",
-        method: "POST",
-        data: {org_id:org_id},
-        beforeSend:function(){
-          noty.empty()
-        },
-        success:function(result){
-          if(result.counter != 0) {
-            noty.attr('hidden', false)
-            noty.append(result.counter)
-          } else {
-            noty.attr('hidden', true)
-          }
-        },
-        error:function(result){
-          console.log(result.responseText)
-        }
-      })
-    }
+    // function notificationCounter(org_id)
+    // {
+    //   let noty = $('.notification')
+    //   $.ajax({
+    //     url: "{{ route('merchant-reg.count-cart') }}",
+    //     method: "POST",
+    //     data: {org_id:org_id},
+    //     beforeSend:function(){
+    //       noty.empty()
+    //     },
+    //     success:function(result){
+    //       if(result.counter != 0) {
+    //         noty.attr('hidden', false)
+    //         noty.append(result.counter)
+    //       } else {
+    //         noty.attr('hidden', true)
+    //       }
+    //     },
+    //     error:function(result){
+    //       console.log(result.responseText)
+    //     }
+    //   })
+    // }
 
     function quantityExceedHandler(i_Quantity, maxQuantity)
     {

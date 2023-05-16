@@ -9,7 +9,8 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+//mingxuan comment
+// fei comments
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -180,7 +181,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
 Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
     Route::group(['namespace' => 'User'], function() {
         // Koop School
-        Route::delete('/{org_id}/edit/{id}', 'UserCooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
+        Route::delete('/{org_id}/edit', 'UserCooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
         Route::post('/koperasi/fetchKoop', 'UserCooperativeController@fetchKoop')->name('koperasi.fetchKoop');
         Route::get('/order', 'UserCooperativeController@indexOrder')->name('koperasi.order');
         Route::get('/order/fetchDay', 'UserCooperativeController@fetchAvailableDay')->name('koperasi.fetchDay');
@@ -211,6 +212,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::post('/produktype','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
         Route::post('/produktype/update/{id}','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
         Route::get('/produktype/edit/{id}','AdminProductCooperativeController@editType')->name('koperasi.editType');
+        Route::post('/importproducttype', 'AdminProductCooperativeController@importproducttype')->name('importproducttype');
 
         Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
         Route::get('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
@@ -243,8 +245,10 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('/cart','ProductController@showAllCart')->name('merchant.all-cart');//to show all products in cart
         Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
+        Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
         // Checkout
-        Route::get('/checkout', 'ProductController@checkOut')->name('merchant.checkout');
+        Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
+        Route::get('get-checkout-items', 'ProductController@getCheckoutItems')->name('merchant.get-checkout-items');
         // Get all cart
         Route::get('get-all-cart-items', 'OrderController@getAllItemsInCart')->name('merchant-reg.get-all-items');
         // Orders

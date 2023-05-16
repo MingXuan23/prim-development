@@ -52,7 +52,7 @@ class UserCooperativeController extends Controller
     {
         $sID = $request->get('sID');
         
-        $koop = Organization::where('parent_org', $sID)->select('id', 'nama')->get();
+        $koop = Organization::where('parent_org', $sID)->get();
 
         return response()->json(['success' => $koop]);
     }
@@ -147,6 +147,10 @@ class UserCooperativeController extends Controller
                     $newTotalPrice += doubleval($row->price * $row->quantity);
                 }
 
+                $charge = DB::table('organizations')
+                        ->find($request->o_id)
+                        ->fixed_charges;
+                $newTotalPrice+=doubleval($charge);
                 PgngOrder::where([
                     ['user_id', $userID],
                     ['status', 1],
@@ -158,7 +162,11 @@ class UserCooperativeController extends Controller
             }
             else // order did not exists
             {
-                $totalPrice = $item->price * (int)$request->qty;
+                $charge = DB::table('organizations')
+                        ->find($request->o_id)
+                        ->fixed_charges;
+                    
+                $totalPrice = $item->price * (int)$request->qty+doubleval($charge);
 
                 $newQuantity = intval((int)$item->quantity_available - (int)$request->qty);
 
@@ -178,16 +186,16 @@ class UserCooperativeController extends Controller
                 ]);
             }
 
-            // check if quantity is 0 after add to cart
-            if($newQuantity != 0) // if not 0
-            {
-                ProductItem::where('id', $request->i_id)->update(['quantity_available' => $newQuantity]);
-            }
-            else // if 0 (change item status)
-            {
-                ProductItem::where('id', $request->i_id)
-                ->update(['quantity_available' => $newQuantity, 'status' => 0]);
-            }
+            // // check if quantity is 0 after add to cart
+            // if($newQuantity != 0) // if not 0
+            // {
+            //     ProductItem::where('id', $request->i_id)->update(['quantity_available' => $newQuantity]);
+            // }
+            // else // if 0 (change item status)
+            // {
+            //     ProductItem::where('id', $request->i_id)
+            //     ->update(['quantity_available' => $newQuantity, 'status' => 0]);
+            // }
             
             return back()->with('success', 'Item Berjaya Dikemaskini!');
         }
@@ -272,7 +280,7 @@ class UserCooperativeController extends Controller
             ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
             ->where('pg.status', 1)
             ->where('po.pgng_order_id', $cart->id)
-            ->select('pg.id', 'po.quantity', 'pi.name', 'pi.price', 'pi.image')
+            ->select('pg.id as pgngId','po.id as productOrderId', 'po.quantity', 'pi.name', 'pi.price', 'pi.image','pi.quantity_available')
             ->get();
 
             // $tomorrowDate = Carbon::tomorrow()->format('Y-m-d');
@@ -335,18 +343,22 @@ class UserCooperativeController extends Controller
         return redirect('/koperasi/koop/'.$org->id)->with('success', 'Pesanan Anda Berjaya Direkod!');
     }
 
-    public function destroyItemCart($org_id, $id)
+    public function destroyItemCart($org_id, Request $request)
     {
         $userID = Auth::id();
-
+        $id=$request->cart_id; //pgng order id
+        $productOrderId=$request->productOrderInCartId;
         // $cart_item = ProductOrder::where('pgng_order_id', $id);
-        $cart_item = ProductOrder::where('pgng_order_id', $id);
+        $cart_item = ProductOrder::where([['pgng_order_id', $id],['id',$productOrderId]]);
 
-        $item = $cart_item->first();
-
+        
+        $item=$cart_item->first();
+        
+        //dd($item);
         // $product_item = ProductOrder::where('product_item_id', $item->product_item_id);
-        $product_item = ProductItem::where('id', $item->product_item_id);
-
+        
+        $product_item = $item->product_item;
+        //return response()->json(['item' => ]);
         $product_item_quantity = $product_item->first();
 
         $newQuantity = intval($product_item_quantity->quantity_available + $item->quantity); // increment quantity
@@ -367,19 +379,21 @@ class UserCooperativeController extends Controller
                 'quantity_available' => $newQuantity,
             ]);
         }
+        
+        
 
         $cart_item->forceDelete();
-
+        
         $allCartItem = DB::table('product_order as po')
                         ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
                         ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
-                        ->where('pg.id', $item->pgng_order_id)
+                        ->where('pg.id', $id)
                         ->where('pg.status', 1)
                         ->select('po.quantity', 'pi.price')
                         ->get();
         
         // If cart is not empty
-        if(count($allCartItem) != 0)
+        if(count($allCartItem) > 0)
         {
 
             $newTotalPrice = 0;
@@ -389,6 +403,11 @@ class UserCooperativeController extends Controller
             {
                 $newTotalPrice += doubleval($row->price * $row->quantity);
             }
+
+            $charge = DB::table('organizations')
+                ->find($org_id)
+                ->fixed_charges;
+            $newTotalPrice += doubleval($charge);
 
             PgngOrder::where([
                 ['user_id', $userID],
@@ -405,8 +424,8 @@ class UserCooperativeController extends Controller
             ])->forceDelete();
         }
         
-
-        return back()->with('success', 'Item Berjaya Dibuang');
+        return response()->json(['item' => $allCartItem])->with('success', 'Item Berjaya Dibuang');
+        //return back()->with('success', 'Item Berjaya Dibuang');
     }
 
     /**
@@ -627,7 +646,7 @@ class UserCooperativeController extends Controller
         $Sekolah = DB::table('organizations')
         ->where('type_org',$role_id)
         ->where('id',$id)
-        ->get();
+        ->first();
 
         $products = DB::table('product_group as pg')
          ->join('product_item as p','pg.id','p.product_group_id')
@@ -654,7 +673,7 @@ class UserCooperativeController extends Controller
         ->join('class_student as cs','cs.student_id','=','s.id')
         ->join('class_organization as co','co.id','=','cs.organclass_id')
         ->join('classes as c','c.id','=','co.class_id')
-        ->select('s.*','users.id as parentId','users.name as parentName', 'ou.organization_id','c.nama as className')
+        ->select('s.*','users.id as parentId','users.name as parentName', 'ou.organization_id','c.nama as className','c.id as classId')
         ->where('ou.organization_id', $koperasi->parent_org)
         ->where('ou.role_id', 6)
         ->where('ou.status', 1)
@@ -730,34 +749,57 @@ class UserCooperativeController extends Controller
         
         //filter by Tahun
         $selectedTarget=$request->selectedGroup;
+        $classId=0;
+        $year=0;
+        if($selectedTarget[0]==="C"){
+            $classId= substr($selectedTarget, 1);
+            $class = DB::table('classes as c')
+            ->where('c.id',$classId)
+            ->first();
+            
+            if($class){
+                $classId= substr($selectedTarget, 1);//remove char c which determine the class
+                $year=$class->nama[0];
+            }
+        }
 
-        $classExist=DB::table('classes')
-        ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
-        ->where('classes.status', 1)
-        ->where('classes.nama',$selectedTarget )
-        ->where('class_organization.organization_id', $oid)
-        ->first();
-
-        if($classExist){
+        if($classId!==0){
             $products = DB::table('product_group as pg')
             ->join('product_item as p','pg.id','p.product_group_id')
             ->select('p.*','pg.id as groupId','pg.name as groupName')
             ->where('pg.organization_id',$id) 
-            ->whereJsonContains('p.target->data', $Tahun)
+            ->where(function($query) use ($classId,$year){
+                $query->whereJsonContains('p.target->data', $classId)
+                      ->orWhereJsonContains('p.target->data', 'T'.$year);
+            })
             ->whereNull('p.deleted_at')
             ->whereNull('pg.deleted_at')
            ->get();  
         }
         else if (strpos($selectedTarget, "Tahun") !== false){
             $Tahun = str_replace("Tahun", "", $request->selectedGroup);
+            $Class = DB::table('classes as c')
+            ->where('c.nama', 'like', $Tahun . '%')
+            ->join('class_organization', 'class_organization.class_id', '=', 'c.id')
+            ->where('c.status', 1)
+            ->where('class_organization.organization_id', $oid->parent_org)
+            ->distinct()
+            ->pluck('c.id')
+            ->toArray();
+                      
             $products = DB::table('product_group as pg')
             ->join('product_item as p','pg.id','p.product_group_id')
             ->select('p.*','pg.id as groupId','pg.name as groupName')
-            ->where('pg.organization_id',$id) 
-            ->whereJsonContains('p.target->data', $Tahun)
+            ->where('pg.organization_id',$id)
+            ->where(function ($query) use ($Class,$Tahun) {
+                $query->whereJsonContains('p.target->data', "T".$Tahun);
+                foreach ($Class as $class) {
+                    $query->orWhereJsonContains('p.target->data', (string)$class);
+                }})     
             ->whereNull('p.deleted_at')
             ->whereNull('pg.deleted_at')
            ->get();  
+
         }
         //get all product for All tahun (no specification of Tahun)
         else if($request->selectedGroup=="GeneralItem")

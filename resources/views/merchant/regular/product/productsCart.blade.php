@@ -7,7 +7,7 @@
                 --primary-bc: #ffffff;
                 --secondary-bc: rgb(2, 122, 129);
                 --hover-color:rgb(6, 225, 237);
-                --primary-color:#2b2b2b;
+                --primary-color:#5b626b;
                 --transition: all 0.3s linear;
             }
             .main-content{
@@ -18,6 +18,9 @@
             }
             .carts-counter{
                 font: 20px "Roboto" ;
+            }
+            .carts-counter b{
+                color: var(--secondary-bc);
             }
             .product-container{
                 border: 2px solid var(--primary-color);
@@ -68,7 +71,7 @@
             .quantity-input{
                 text-align: center;
                 width: 50px;
-                border: 0.15em solid rgb(0, 0, 0);
+                border: 0.15em solid #333547;
             }
             
             /* to remove the arrow up and down for input type number */
@@ -89,13 +92,18 @@
                 position: absolute;
                 right: 0;
                 bottom: 0;
+                color: var(--secondary-bc)
             }
             .hide{
-                display: none;
+                display: none!important;
             }
             /* only show total once at the right bottom of the last product in cart */
-            .product-container .product:last-child .total-price{
-                display: block;
+            /* second last child */
+            .product-container .product:nth-last-child(2) .total-price{
+                display: block!important;
+            }
+            .product-container .checkout:last-child{
+                display: flex!important;
             }
             /* checkout section at the bottom */
             .checkout-container{
@@ -108,9 +116,14 @@
                 border-top:2px solid #ccc;
                 border-bottom:2px solid #ccc;
             }
+            .checkout{
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 0.5em;
+            }
             .fancy {
                 background-color: transparent;
-                border: 2px solid #000;
+                border: 2px solid #5b626b;
                 border-radius: 0;
                 box-sizing: border-box;
                 color: #fff;
@@ -136,7 +149,7 @@
                 content: " ";
                 width: 1.5625rem;
                 height: 2px;
-                background: black;
+                background: #5b626b;
                 top: 50%;
                 left: 1.5em;
                 position: absolute;
@@ -154,7 +167,7 @@
                 transition: all 0.3s ease-in-out;
                 text-transform: uppercase;
                 text-decoration: none;
-                color: black;
+                color: #5b626b;
             }
 
             .fancy .top-key {
@@ -189,7 +202,7 @@
 
             .fancy:hover {
                 color: white;
-                background: black;
+                background: #333547;
             }
 
             .fancy:hover::before {
@@ -223,10 +236,13 @@
                     text-align: end;
                 }
             }
-            @media only screen and (max-width:365px){
+            @media only screen and (max-width:600px){
                 .delete-btn i{
                     position: static;
 
+                }
+                .product-details{
+                    width: 100%;
                 }
             }
     </style>
@@ -245,35 +261,64 @@
             <div class="product-container">
                 @foreach($productInCart as $product)
                     @if($product->nama == $organization->nama)
-                        <div class="product" >
-                            <div class="product-image">
-                                <a href="{{route('merchant-product.show',$product->product_item_id)}}">{{-- @if($product->image == null) --}}
-                                <img class="img-fluid mx-auto d-block" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}">
-                                {{-- @else
-                                <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}">
-                                @endif --}}
-                                </a>
-                            </div>
-                            <div class="product-details">    
-                                <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
-                                <h5>RM{{$product->price}}/Unit</h5>
-                                <div class  = "quantity-container" >
-                                    <div class="quantity-input-container" data-product-order-id="{{$product->id}}"  data-pgng-order-id="{{$product->pgng_order_id}}">
-                                        <button id="button-minus"><i class="bi bi-dash-square"></i></button>
-                                        <input type="number" class="quantity-input" name = "quantity-input" value="{{$product->quantity}}" min="1">
-                                        <button id="button-plus" ><i class="bi bi-plus-square"></i></button>
-                                        <h6 data-qty-available="{{$product->quantity_available}}" id="quantity-available">{{$product->quantity_available}} barang lagi</h6>
-                                    </div>
+                            <div class="product" >
+                                <div class="product-image">
+                                    <a href="{{route('merchant-product.show',$product->product_item_id)}}">{{-- @if($product->image == null) --}}
+                                    <img class="img-fluid mx-auto d-block" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}">
+                                    {{-- @else
+                                    <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}">
+                                    @endif --}}
+                                    </a>
                                 </div>
-                                <h5 class="total-price hide">Total: RM{{$product->total_price}}</h5>
-                                <div class="alert-message">
-                                   {{-- alert message will be appended here --}}
+                                    @if($product->quantity_available > 0)
+                                        <div class="product-details">    
+                                            <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
+                                            <h5 style="color: rgb(2, 122, 129);">RM{{$product->price}}/Unit</h5>
+                                            <div class  = "quantity-container" >
+                                                <div class="quantity-input-container" data-product-order-id="{{$product->id}}"  data-pgng-order-id="{{$product->pgng_order_id}}">
+                                                    <button id="button-minus"><i class="bi bi-dash-square"></i></button>
+                                                    <input type="number" class="quantity-input" name = "quantity-input" value="{{$product->quantity}}" min="1">
+                                                    <button id="button-plus" ><i class="bi bi-plus-square"></i></button>
+                                                    <h6 data-qty-available="{{$product->quantity_available}}" id="quantity-available">{{$product->quantity_available}} barang lagi</h6>
+                                                </div>
+                                            </div>
+                                            <h5 class="total-price hide" data-pgng-order-id="{{$product->pgng_order_id}}" data-org-id="{{$organization->id}}">Total: RM{{$product->total_price}}</h5>
+                                            <div class="alert-message">
+                                            {{-- alert message will be appended here --}}
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="product-details" style="opacity: 0.3">    
+                                            <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
+                                            <h5>RM{{$product->price}}/Unit</h5>
+                                            <div class  = "quantity-container" >
+                                                <div class="quantity-input-container" data-product-order-id="{{$product->id}}"  data-pgng-order-id="{{$product->pgng_order_id}}">
+                                                    <button id="button-minus" disabled><i class="bi bi-dash-square"></i></button>
+                                                    <input type="number" class="quantity-input" name = "quantity-input" value="{{$product->quantity}}" min="1" disabled>
+                                                    <button id="button-plus" disabled><i class="bi bi-plus-square"></i></button>
+                                                    <h6>Kehabisan Stok</h6>
+                                                </div>
+                                            </div>
+                                            <h5 class="total-price hide" data-pgng-order-id="{{$product->pgng_order_id}}" data-org-id="{{$organization->id}}">Total: RM{{$product->total_price}}</h5>
+                                            <div class="alert-message">
+                                            {{-- alert message will be appended here --}}
+                                            </div>
+                                        </div>    
+                                    @endif    
+                                <div class="delete-btn">
+                                    <i class="delete bi bi-x-lg" data-cart-order-id="{{$product->id}}"></i>
                                 </div>
                             </div>
-                            <div class="delete-btn">
-                                <i class="delete bi bi-x-lg" data-cart-order-id="{{$product->id}}"></i>
-                            </div>
-                        </div>
+                            @if($product->quantity_available > 0)
+                                <div class="checkout hide" >
+                                    <a class="fancy" href="{{ route('merchant.checkout', $organization->id) }}">
+                                        <span class="top-key"></span>
+                                        <span class="text">Semak Keluar</span>
+                                        <span class="bottom-key-1"></span>
+                                        <span class="bottom-key-2"></span>
+                                    </a>
+                                </div>
+                            @endif    
                     @endif
                 @endforeach
             </div>
@@ -283,7 +328,7 @@
                 <h3>Marilah Membeli-belah Bersama Kami</h3>
             </div>
     @endforelse
-        @if(count($productInCart)> 0) 
+        {{-- @if(count($productInCart)> 0) 
         <div class="checkout-container">
             <div class="checkout-infos">
                 <h3 class="carts-counter"></h3>
@@ -298,7 +343,7 @@
             </div>
         </div>
             
-        @endif
+        @endif --}}
     {{-- Delete Confirmation Modal --}}
     <div id="deleteConfirmModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
@@ -328,9 +373,9 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
         });
-            //call this function to add item counter to the cart button
-            notificationCounter();
-
+             loadValidTotalPrice();
+             //call this function to add item counter to the cart button
+             notificationCounter();
         function notificationCounter(){
             let noty = $('.carts-counter')
             $.ajax({
@@ -351,13 +396,29 @@
                 }
             })
         }
-           
+        // in order to get total price of products that are available to buy
+        function loadValidTotalPrice() {
+            $(".total-price").each(function (index, totalPrice) {
+                $.ajax({
+                    url: "{{route('merchant.get-actual-total-price')}}",
+                    method: "GET",
+                    data: {
+                        pgng_order_id: $(totalPrice).attr('data-pgng-order-id'),
+                        org_id: $(totalPrice).attr('data-org-id'),
+                    },
+                    success: function (result) {
+                        $(totalPrice).html("Total: RM"+result.totalPrice);
+                    }
+                });
+            });
+        }
+
         let order_cart_id = null
         $(document).on('click', '.delete', function(){
-            order_cart_id = $(this).attr('data-cart-order-id');console.log(order_cart_id);
+            order_cart_id = $(this).attr('data-cart-order-id');
             $('#deleteConfirmModal').modal('show')
         })
-
+        // for delete product in cart
         $(document).on('click', '#delete_confirm_item', function(){
             $.ajax({
                 url: "{{ route('merchant-reg.destroy-item') }}",
@@ -378,7 +439,6 @@
                 }
             })
         })
-    });
     const plusButtons = document.querySelectorAll("#button-plus");
     const minusButtons = document.querySelectorAll("#button-minus");
     // add click event to plus and minus buttons
@@ -394,6 +454,7 @@
                 inputQuantity++;
                 this.previousElementSibling.value = inputQuantity;
                 updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
+                notificationCounter();
             }
         })
     })
@@ -407,6 +468,7 @@
                 inputQuantity--;
                 this.nextElementSibling.value = inputQuantity;
                 updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
+                notificationCounter();
             }
         })
     }) 
@@ -416,10 +478,6 @@
                 let productOrderId = this.parentElement.getAttribute("data-product-order-id");
                 let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
                 const currentValue = parseInt($(this).val());
-                if (e.key === "Backspace" || e.key === "Delete" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
-                    // allow navigation and deletion keys
-                    return;
-                }
                 if (isNaN(currentValue)) {
                     // if the current value is not a number, reset it to 1
                     $(this).val(1);
@@ -433,8 +491,29 @@
                     $(this).val(qtyAvailable);
                 }else{
                     updateInputQuantity(this, newValue,productOrderId,pgngOrderId);
+                    notificationCounter();
                 }
             });
+    });
+    $("input[type='number']").on('keyup', function(e) {
+      var input =this;
+      let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+      let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+
+        if ( $(this).val()===''){
+            setTimeout(function() {
+            if($(input).val()===''){
+                input.value=1;
+                updateInputQuantity(input, 1, productOrderId, pgngOrderId);
+                console.log("success");
+            }  
+            }, 2000);      
+        }
+        else if ($(this).val()==='0'){
+        $(this).val(1);
+        updateInputQuantity(this, 1, productOrderId, pgngOrderId);
+        }
+    });
     function updateInputQuantity(plusButton,inputQuantity,productOrderId,pgngOrderId){
             $.ajax({
                 url: "{{route('merchant.update-cart')}}",
@@ -457,9 +536,7 @@
                         $alertMessage.delay(1000).fadeOut()
                         
                         $totalPrice = $parent.parent().parent().children().children('.product-details').children('.total-price');
-                        console.log($totalPrice);
                         $totalPrice.html("Total: RM"+result.totalPrice);
-
                 },
                 // error:function(result) {
                 //     console.log(result.responseText)
