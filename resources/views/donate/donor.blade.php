@@ -168,12 +168,33 @@
 
 
             let donor_table = $('#donorTable').DataTable({
-                processing: true,
-                serverSide: true,
-                //lengthChange: false,
+                //processing: true,
+                //serverSide: true,
+                //this two must comment so that can download full page of pdf and excel
+                lengthChange: false,
                 dom: 'Bfrtip',
-                buttons:  [ { extend: 'excel', text: 'Excel', exportOptions: { modifier: {  page:   'all', }}},
-                            { extend: 'pdf', text: 'PDF', orientation: 'landscape',exportOptions: { modifier: { page:   'all', }}} ],
+                buttons:  [
+                    { 
+                        extend: 'excel',
+                        text: 'Excel',
+                        exportOptions: {
+                            modifier: {
+                                page: 'all'
+                            }
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'PDF',
+                        orientation: 'landscape',
+                        exportOptions: {
+                            modifier: {
+                                page: 'all'
+                            }
+                        }
+                    }
+                ],
+                            
                 ajax: {
                     url: "{{ route('donate.donor_datatable') }}",
                     data: {

@@ -263,7 +263,7 @@ class FeesController extends AppBaseController
             ->where('classes.status', 1)
             ->orderBy('classes.nama')
             ->get();
-        dd($list);
+
         return response()->json(['success' => $list]);
     }
 

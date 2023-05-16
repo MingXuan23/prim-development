@@ -1,5 +1,34 @@
 @extends('layouts.master')
 @section('css')
+<style>
+   @media (max-width: 767px) {
+  #buttonGroup {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  #buttonGroup h4 {
+    flex-basis: 100%;
+    margin-bottom: 10px;
+  }
+
+  #buttonGroup span {
+    flex-basis: 100%;
+    margin-bottom: 10px;
+
+  }
+  
+  #buttonGroup a {
+    flex-basis: 100%;
+    width: 100%
+    
+  }
+}
+
+
+</style>
 
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
@@ -42,14 +71,27 @@
     <div class="card-body">
       {{-- <div class="card-header">List Of Applications</div> --}}
      
-      <div>
+      <div id="buttonGroup">
       <h4>Manage Product and Product Type</h4>
-        <span style="margin-right: 15px;">
-        <a  href="{{route('koperasi.createProduct')}}" class="btn btn-primary"> <i
-            class="fas fa-plus" ></i> Tambah produk</a></span>
-      <span > 
+      <span style="margin-right: 15px;">
         <a  href="{{route('koperasi.addtype')}}" class="btn btn-primary"> <i
             class="fas fa-plus"></i> Tambah jenis produk</a></span>
+            
+        
+     
+            @if(count($group)>0)
+            <span style="margin-right: 15px;"> 
+                <a  href="{{route('koperasi.createProduct')}}" class="btn btn-primary"> <i
+                    class="fas fa-plus" ></i> Tambah produk</a></span>
+                    <span style="margin-right: 15px;"> 
+                    <a  href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1" style="float:right;" > <i
+                    class="fas fa-plus" ></i> Import produk</a></span>
+              
+            @else
+            <span class="font-size-18"> 
+               Anda perlu tambah jenis produk dahulu</span>
+            @endif
+
       </div>
 <br><br>
 {{-- confirmation delete modal --}}

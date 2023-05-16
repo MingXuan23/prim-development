@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\ProductItem;
 use Yajra\DataTables\DataTables;
 use App\Models\Organization;
+use App\Imports\ProductTypeImport;
 
 use Carbon\Carbon;
 use App\Models\Fee;
@@ -199,18 +200,14 @@ class AdminProductCooperativeController extends Controller
 
     public function getProductNumOfGroup(Request $request){
         
-        $userID = Auth::id();
-        
         $productNum = DB::table('product_item as p')
         ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
-        ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
-        ->select('count(p.id) as productCount')
-        ->where('ou.user_id', $userID)
+        ->select('p.name')
         ->where('pg.id',$request->groupId)
-        ->distinct('ou.user.id')
-        ->first();
+        ->distinct('p.id')
+        ->get();
 
-        return response()->json(['status' => 'success','productNum' => $productNum]);
+        return response()->json(['productNum' => $productNum]);
         
     }
 
@@ -266,7 +263,7 @@ class AdminProductCooperativeController extends Controller
         ->distinct('pg.id')
         ->get();
 
-        return view('koperasi-admin.addtype',compact('group'));
+        return view('koperasi-admin.addtype',compact('group','org'));
     }
 
     public function storeType(Request $request)
@@ -413,6 +410,23 @@ class AdminProductCooperativeController extends Controller
         // ->select('o.id')
         // ->first();
       
+        if($request->cb_year){
+            if($request->classCheckBoxEmpty==="true"){
+                $data = array(
+                    'data' =>$request->cb_class
+                );
+            }
+            else{
+                $data = array(
+                    'data' =>$request->cb_year
+                );
+            }           
+        }
+        else{
+            $data=['data' => 'All'];
+        }
+        $target = json_encode($data);
+        
         $update = DB::table('product_item')->where('id',$id)->update([
             'name' => $request->nama,
             'desc' => $request->description,
@@ -420,6 +434,7 @@ class AdminProductCooperativeController extends Controller
             'quantity_available' => $request->quantity,
             'price' => $request->price,
             'status'=> $request->status,
+            'target'=>$target,
             'product_group_id' => $request->type,
             'updated_at' => now()
         ]);
@@ -535,5 +550,26 @@ class AdminProductCooperativeController extends Controller
         }
     
         return "";       
+    }
+
+    public function importproducttype(Request $request){
+        
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+        
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        
+        if (!in_array($etx, $formats)) {
+
+            return redirect('/produktype')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+        
+        Excel::import(new ProductTypeImport($request->organ), public_path('/uploads/excel/' . $namaFile));
+
+        return redirect('/produktype')->with('success', 'Product type have been added successfully');
+        
+    
     }
 }

@@ -26,6 +26,7 @@ class AdminOpeningHoursCooperativeController extends Controller
                 ->distinct('o.id')
                 ->where('ou.user_id', $userID)
                 ->where('o.type_org',10)
+                ->where('o.id',$koperasi->organization_id)
                 ->get();
 
 

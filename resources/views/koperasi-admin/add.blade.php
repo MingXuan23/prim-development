@@ -240,7 +240,7 @@ function checkByClassOrByYear(){
            
             //console.log();
             console.log($('#classCheckBoxEmpty').val());
-            alert(classCheckBox[0].value + " "+ selectedCheckBox.length+" "+ classCheckBox.length);
+            
         }
     });
 }
