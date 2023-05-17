@@ -58,7 +58,7 @@ class ProductTypeImport implements ToModel, WithHeadingRow, WithValidation
         $ifExits = DB::table('product_group as pg')
                    ->where('pg.organization_id','=',$this->organId)
                     // ->where('u.icno', '=', "{$row['no_kp']}")
-                    ->where('pg.name', '=', "{$row['name']}")
+                    ->where('pg.name', '=', trim($row['name']))
                     ->whereNull('pg.deleted_at')
                     ->get();
         

@@ -137,7 +137,7 @@
                     <form action="{{ route('importproducttype') }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
-                            {{ csrf_field() }}
+                            {{ csrf_field() }} 
 
                             <div class="form-group">
                                 <input type="file" name="file" required>
@@ -160,6 +160,7 @@
 
 
 <script>
+  //to use ajax
 $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

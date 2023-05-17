@@ -102,22 +102,25 @@ class ProductController extends Controller
     } 
     public function calculateTotalPrice($order_id,$charge) 
     {
-        $new_total_price = null;
+        $new_total_price = 0;
 
         $cart_item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                     ->where([
                          ['po.pgng_order_id', $order_id],
                          ['pi.quantity_available','>',0],
-                         ['pi.type','have inventory'],
                          ['pi.status',1],
                          ['pi.deleted_at',NULL],
                          ['po.deleted_at',NULL]
                     ])
+                    ->where(function($query) {
+                        $query->where('pi.type', 'have inventory')
+                        ->orWhere('pi.type',"");
+                    })
                     ->select('po.quantity as qty', 'pi.price')
                     ->get();
 
-        $fixed_charges = $charge;
+        $fixed_charges = $charge;   
      
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)

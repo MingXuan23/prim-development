@@ -104,22 +104,22 @@ class UserCooperativeController extends Controller
                 // If same item exists in cart
                 if($cartExist) // if exists (update)
                 {
-                    if($request->qty > $cartExist->quantity) // request quant more than existing quant
-                    {
-                        $newQuantity = intval($item->quantity_available - ($request->qty - $cartExist->quantity)); // decrement stock
-                    }
-                    else if($request->qty < $cartExist->quantity) // request quant less than existing quant
-                    {
-                        $newQuantity = intval($item->quantity_available + ($cartExist->quantity- $request->qty)); // increment stock
-                    }
-                    else if($request->qty == $cartExist->quantity) // request quant equal existing quant
-                    {
-                        $newQuantity = intval((int)$item->quantity_available + 0); // stock not change
-                    }
+                    // if($request->qty > $cartExist->quantity) // request quant more than existing quant
+                    // {
+                    //     $newQuantity = intval($item->quantity_available - ($request->qty - $cartExist->quantity)); // decrement stock
+                    // }
+                    // else if($request->qty < $cartExist->quantity) // request quant less than existing quant
+                    // {
+                    //     $newQuantity = intval($item->quantity_available + ($cartExist->quantity- $request->qty)); // increment stock
+                    // }
+                    // else if($request->qty == $cartExist->quantity) // request quant equal existing quant
+                    // {
+                    //     $newQuantity = intval((int)$item->quantity_available + 0); // stock not change
+                    // }
 
                     ProductOrder::where('id', $cartExist->id)->update([
                         'quantity' => $request->qty
-                    ]);
+                    ]);//change the quantity in cart
                 }
                 else // if not exists (insert)
                 {
@@ -128,7 +128,7 @@ class UserCooperativeController extends Controller
                         'status' => 1,
                         'product_item_id' => $request->i_id,
                         'pgng_order_id' => $order->id
-                    ]);
+                    ]);//create new order
 
                     $newQuantity = intval((int)$item->quantity_available - (int)$request->qty);
                 }
@@ -213,7 +213,7 @@ class UserCooperativeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id)// strange to use??
     {
         $todayDate = Carbon::now()->format('l');
 
@@ -226,7 +226,7 @@ class UserCooperativeController extends Controller
                     ->select('o.id', 'o.nama', 'o.telno', 'o.address', 'o.city', 'o.postcode', 'o.state', 'o.parent_org',
                             'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
                     ->first();
-        dd($koperasi,$id);
+
         $org = Organization::where('id', $koperasi->parent_org)->select('nama')->first();
         
         $product_item = DB::table('product_item as pi')
@@ -256,7 +256,7 @@ class UserCooperativeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id) // user see their cart here
     {
         $cart_item = array(); // empty if cart is empty
         $user_id = Auth::id();
@@ -268,23 +268,83 @@ class UserCooperativeController extends Controller
         ])->first();
         
         if($cart)
-        {
+        {   
+
             // $cart_item = DB::table('product_order as po')
             //         ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
             //         ->where('po.status', 1)
             //         ->where('po.pgng_order_id', $cart->id)
             //         ->select('po.id', 'po.quantity', 'pi.name', 'pi.price', 'pi.image')
             //         ->get();
+            $before_cart_item = DB::table('product_order as po')
+            ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+            ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
+            ->where('pg.status', 1)
+            ->where('po.pgng_order_id', $cart->id)
+            ->select('pg.id as pgngId','po.id as productOrderId','pi.id as itemId', 'po.quantity', 'pi.name', 'pi.price', 'pi.image','pi.quantity_available','pi.status')
+            ->get();
+
+            $org_id=DB::table('product_item as pi')
+            ->join('product_group as pg','pg.id','=','pi.product_group_id')
+            ->where('pi.id',$before_cart_item->first()->itemId)
+            ->select('pg.organization_id')
+            ->first()
+            ->organization_id;
+            
+            $charge = DB::table('organizations')
+            ->find($org_id)
+            ->fixed_charges;
+
+
+            
+            $updateMessage="";
+            foreach($before_cart_item as $item){
+                if($item->quantity_available===0 || $item->status===0){
+                    $this->destroyProductOrder($item->productOrderId,$item->pgngId);
+                    $updateMessage=$updateMessage.$item->name." was removed because not enough stock\n";
+                }else if($item->quantity >$item->quantity_available){
+                    ProductOrder::where([
+                        ['id', $item->productOrderId],
+                    ])->update(['quantity' => $item->quantity_available]);
+
+                    $userID=Auth::id();
+                    
+
+                    $newTotalPrice = 0;
+                    // Recalculate total
+                    $allCartItem = DB::table('product_order as po')
+                        ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+                        ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
+                        ->where('pg.id', $item->productOrderId)
+                        ->where('pg.status', 1)
+                        ->select('po.quantity', 'pi.price')
+                        ->get();
+
+                    foreach($allCartItem as $row)
+                    {
+                        $newTotalPrice += doubleval($row->price * $row->quantity);
+                    }
+                        
+                    $newTotalPrice += doubleval($charge);
+
+                    PgngOrder::where([
+                        ['user_id', $userID],
+                        ['status', 1],
+                        ['organization_id', $org_id],
+                    ])->update(['total_price' => $newTotalPrice]);
+                    $updateMessage=$updateMessage.$item->name." was updated because not enough stock\n";
+                }
+            }
+            // $tomorrowDate = Carbon::tomorrow()->format('Y-m-d');
+
+            //after validation
             $cart_item = DB::table('product_order as po')
             ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
             ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
             ->where('pg.status', 1)
             ->where('po.pgng_order_id', $cart->id)
-            ->select('pg.id as pgngId','po.id as productOrderId', 'po.quantity', 'pi.name', 'pi.price', 'pi.image','pi.quantity_available')
+            ->select('pg.id as pgngId','po.id as productOrderId', 'po.quantity', 'pi.name', 'pi.price', 'pi.image','pi.quantity_available','pi.status')
             ->get();
-
-            // $tomorrowDate = Carbon::tomorrow()->format('Y-m-d');
-
             $allDay = OrganizationHours::where([
                 ['organization_id', $id],
                 ['status', 1],
@@ -303,7 +363,14 @@ class UserCooperativeController extends Controller
                 
                 $isPast = $this->getDayStatus($day, $row->day, $isPast, $key);
             }
-            return view('koperasi.cart', compact('cart', 'cart_item', 'allDay', 'isPast' ,'id'));
+
+            $cart = PgngOrder::where([
+                ['status', 1],
+                ['organization_id', $id],
+                ['user_id', $user_id],
+            ])->first();
+
+            return view('koperasi.cart', compact('cart', 'cart_item', 'allDay', 'isPast' ,'id','updateMessage','charge'));
         }
         else
         {
@@ -343,7 +410,7 @@ class UserCooperativeController extends Controller
         return redirect('/koperasi/koop/'.$org->id)->with('success', 'Pesanan Anda Berjaya Direkod!');
     }
 
-    public function destroyItemCart($org_id, Request $request)
+    public function destroyItemCart($org_id, Request $request) //remove a row in a cart when the quantity is set to 0
     {
         $userID = Auth::id();
         $id=$request->cart_id; //pgng order id
@@ -352,36 +419,59 @@ class UserCooperativeController extends Controller
         $cart_item = ProductOrder::where([['pgng_order_id', $id],['id',$productOrderId]]);
 
         
-        $item=$cart_item->first();
+        // $item=$cart_item->first();
         
-        //dd($item);
-        // $product_item = ProductOrder::where('product_item_id', $item->product_item_id);
+        // //dd($item);
+        // // $product_item = ProductOrder::where('product_item_id', $item->product_item_id);
         
-        $product_item = $item->product_item;
-        //return response()->json(['item' => ]);
-        $product_item_quantity = $product_item->first();
+        // $product_item = $item->product_item;
+        // //return response()->json(['item' => ]);
+        // $product_item_quantity = $product_item->first();
 
-        $newQuantity = intval($product_item_quantity->quantity_available + $item->quantity); // increment quantity
+        // $newQuantity = intval($product_item_quantity->quantity_available + $item->quantity); // increment quantity
 
         /* If previous product item is being unavailable because of added item in cart,
            after the item deleted, the quantity in product_item will increment back and
            the item will be available */
-        if($product_item_quantity->quantity_available == 0)
-        {
-            $product_item->update([
-                'quantity_available' => $newQuantity,
-                'status' => 1,
-            ]);
-        }
-        else
-        {
-            $product_item->update([
-                'quantity_available' => $newQuantity,
-            ]);
-        }
+        // if($product_item_quantity->quantity_available == 0)
+        // {
+        //     $product_item->update([
+        //         'quantity_available' => $newQuantity,
+        //         'status' => 1,
+        //     ]);
+        // }
+        // else
+        // {
+        //     $product_item->update([
+        //         'quantity_available' => $newQuantity,
+        //     ]);
+        // }
         
         
+        $this->destroyProductOrder($cart_item->id,$id);
+        
+        
+        return response()->json(['item' => $allCartItem])->with('success', 'Item Berjaya Dibuang');
+        //return back()->with('success', 'Item Berjaya Dibuang');
+    }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+    public function destroyProductOrder($poId, $id){
+        $userID = Auth::id();
+        $cart_item=ProductOrder::where([['pgng_order_id', $id],['id',$poId]]);
+
+        $org_id=DB::table('product_item as pi')
+        ->join('product_group as pg','pg.id','=','pi.product_group_id')
+        ->where('pi.id',$cart_item->first()->product_item_id)
+        ->select('pg.organization_id')
+        ->first()
+        ->organization_id;
         $cart_item->forceDelete();
         
         $allCartItem = DB::table('product_order as po')
@@ -404,6 +494,7 @@ class UserCooperativeController extends Controller
                 $newTotalPrice += doubleval($row->price * $row->quantity);
             }
 
+            
             $charge = DB::table('organizations')
                 ->find($org_id)
                 ->fixed_charges;
@@ -423,17 +514,8 @@ class UserCooperativeController extends Controller
                 ['organization_id', $org_id],
             ])->forceDelete();
         }
-        
-        return response()->json(['item' => $allCartItem])->with('success', 'Item Berjaya Dibuang');
-        //return back()->with('success', 'Item Berjaya Dibuang');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         
@@ -652,6 +734,8 @@ class UserCooperativeController extends Controller
          ->join('product_item as p','pg.id','p.product_group_id')
          ->select('p.*','pg.id as groupId','pg.name as groupName')
          ->where('pg.organization_id',$id) 
+         ->whereNull('p.deleted_at')
+         ->whereNull('pg.deleted_at')
         ->get();                 
 
         $todayDate = Carbon::now()->format('l');
@@ -847,7 +931,7 @@ class UserCooperativeController extends Controller
         $modal = '';
         
         $item = ProductItem::where('id', $i_id)
-        ->select('id', 'type', 'name', 'price', 'quantity_available as qty', 'selling_quantity as unit_qty')
+        ->select('id', 'type', 'name', 'price', 'quantity_available as qty')
         ->first();
 
         $order = DB::table('product_order as po')->join('pgng_orders as pu', 'pu.id', 'po.pgng_order_id')
@@ -857,7 +941,7 @@ class UserCooperativeController extends Controller
             ['po.product_item_id', $i_id],
             ['pu.status', 'In cart'],
         ])
-        ->select('quantity as qty', 'selling_quantity as unit_qty')
+        ->select('quantity as qty')
         ->first();
         
         if($order) { // Order exists in cart
@@ -875,7 +959,7 @@ class UserCooperativeController extends Controller
         } else {
             $modal .= '<input id="quantity_input" type="text" value="'.$order->qty.'" name="quantity_input">';
             $modal .= '<div id="quantity-danger">Kuantiti Melebihi Inventori</div>';
-            $modal .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->qty * $order->unit_qty.' Unit</i></div>';
+            $modal .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->qty .'</i></div>';
         }
 
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);

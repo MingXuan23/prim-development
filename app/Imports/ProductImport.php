@@ -26,11 +26,12 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation
      * @return \Illuminate\Database\Eloquent\Model|null
      */
 
-    public function __construct($groupId,$target,$organ)
+    public function __construct($groupId,$target,$organ,$inventory)
     {
         $this->groupId = $groupId;
         $this->target=$target;   
         $this->organId=$organ;
+        $this->inventory=$inventory;
               
     }
 
@@ -66,7 +67,7 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation
         if(!isset($row['name'])||!isset($row['quantity'])||!isset($row['price'])){
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
-        if(!is_int($row['quantity'])||is_float($row['price'])){
+        if (!is_int($row['quantity']) || !is_numeric($row['price']) || $row['price'] <=0||$row['quantity'] <=0 || !preg_match('/^\d+(\.\d{1,2})?$/', $row['price'])) {
             throw ValidationException::withMessages(["error" => "Invalid format of quantity or price"]);
         }
 
@@ -75,24 +76,42 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation
                     ->leftJoin('product_group as pg','pg.id','=','p.product_group_id')
                    ->where('pg.organization_id','=',$this->organId)
                     // ->where('u.icno', '=', "{$row['no_kp']}")
-                    ->where('p.name', '=', "{$row['name']}")
-                    ->whereNull('pg.deleted_at')
+                    ->where('p.name', '=', trim($row['name']))
+                    ->whereNull('p.deleted_at')
                     ->get();
-        
+ 
         if(count($ifExits) == 0) // if not product type with same name
         { 
-            $newProduct = new ProductItem([
-                //
-                'name'      => $row['name'],
-                'quantity_available'=>$row['quantity'],
-                'price' => $row['price'],
-                'created_at'     => now(),
-                'updated_at'     => now(),
-                'target'         =>$this->target,
-                'product_group_id' => $this->groupId,
-                'status'           =>1,
-            ]);
-            $newProduct->save();
+            if($this->inventory ===null)
+            {
+                $newProduct = new ProductItem([
+                    //
+                    'name'      => $row['name'],
+                    'quantity_available'=>$row['quantity'],
+                    'price' => $row['price'],
+                    'created_at'     => now(),
+                    'updated_at'     => now(),
+                    'target'         =>$this->target,
+                    'product_group_id' => $this->groupId,
+                    'status'           =>1,
+                ]);
+                $newProduct->save();
+            }
+            else{
+                $newProduct = new ProductItem([
+                    //
+                    'name'      => $row['name'],
+                    'quantity_available'=>$row['quantity'],
+                    'price' => $row['price'],
+                    'created_at'     => now(),
+                    'updated_at'     => now(),
+                    'type'         =>"have inventory",
+                    'product_group_id' => $this->groupId,
+                    'status'           =>1,
+                ]);
+                $newProduct->save();
+            }
+            
         }          
         else
         {

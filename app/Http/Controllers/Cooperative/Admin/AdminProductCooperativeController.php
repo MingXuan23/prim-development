@@ -67,6 +67,7 @@ class AdminProductCooperativeController extends Controller
         ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
         ->select('p.*','pg.name as type_name')
         ->where('ou.user_id', $userID)
+        ->whereNull('p.deleted_at')
         ->distinct('ou.user.id')
         ->get();
 
@@ -82,7 +83,7 @@ class AdminProductCooperativeController extends Controller
         return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product'));
     }
 
-    public function getProductList(Request $request){
+    public function getProductList(Request $request){ //ajax request to show product in product menu
        
         if (request()->ajax()){
 
@@ -123,7 +124,7 @@ class AdminProductCooperativeController extends Controller
 
                             for($i=1;$i<count($target->data);$i++)
                             {
-                                $desctext=$desctext.$this->getClassNameById($target->data[$i]);
+                                $desctext=$desctext.", ".$this->getClassNameById($target->data[$i]);
                                 //add other tahun if exist
                             }
                         }
@@ -133,7 +134,7 @@ class AdminProductCooperativeController extends Controller
                     else{
                         $desctext=$desctext. '<span style="text-align: left;">Kepada Tahun Semua. ';
                     }
-                    $desctext=$desctext.'<br>'.$row->desc.'</span></div>';
+                    $desctext=$desctext.'<hr>'.$row->desc.'</span></div>';
                     //add description to the string
 
                     
@@ -163,18 +164,19 @@ class AdminProductCooperativeController extends Controller
                     return $btn;
                 });
 
-                $table->rawColumns(['status', 'action','desctext']);
+                $table->rawColumns(['status', 'action','desctext']); //to let these 3 become html code ,not string
                 
-                return $table->make(true);
+                return $table->make(true);//return datatable
         }
     }
 
-    public function getProductNumOfGroup(Request $request){
+    public function getProductNumOfGroup(Request $request){ //get product number when admin is deleting a type
         
         $productNum = DB::table('product_item as p')
         ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
         ->select('p.name')
         ->where('pg.id',$request->groupId)
+        ->whereNull('p.deleted_at')
         ->distinct('p.id')
         ->get();
 
@@ -182,12 +184,12 @@ class AdminProductCooperativeController extends Controller
         
     }
 
-    public function deleteType(Int $id)
+    public function deleteType(Int $id) //deleted_at to soft delete ,dont remove directly from db
     {
         $delete = DB::table('product_group')->where('id',$id)->update([
             'deleted_at' => now(),   
         ]);
-        $removeType = DB::table('product_item')->where('id',$id)->update([
+        $removeType = DB::table('product_item')->where('product_group_id',$id)->update([
             'deleted_at'=>now(),
             'status'=>0,
         ]);
@@ -239,7 +241,7 @@ class AdminProductCooperativeController extends Controller
         return view('koperasi-admin.addtype',compact('group','org'));
     }
 
-    public function storeType(Request $request)
+    public function storeType(Request $request) //insert type in database
     {
         $userID = Auth::id();
         $org = DB::table('organizations as o')
@@ -259,7 +261,7 @@ class AdminProductCooperativeController extends Controller
        return redirect('koperasi/produktype')->with('success','Produk type berjaya ditambah.');
     }
 
-    public function createProduct()
+    public function createProduct() //show add product view
     {
         $userID = Auth::id();
         $org = DB::table('organizations as o')
@@ -271,6 +273,7 @@ class AdminProductCooperativeController extends Controller
 
         $type = DB::table('product_group as p')
         ->where('p.organization_id',$org->id)
+        ->whereNull('p.deleted_at')
         ->get();
         if(count($type)==0)
         {
@@ -279,7 +282,7 @@ class AdminProductCooperativeController extends Controller
         return view('koperasi-admin.add',compact('type'));
     }
 
-    public function storeProduct(Request $request)
+    public function storeProduct(Request $request) //insert item in database
     {
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
@@ -344,7 +347,7 @@ class AdminProductCooperativeController extends Controller
        return redirect('koperasi/produkmenu')->with('success','Product created successfully.');
     }
 
-    public function editProduct(Int $id)
+    public function editProduct(Int $id)// show edit view
     {    
         $userID = Auth::id();
 
@@ -366,6 +369,7 @@ class AdminProductCooperativeController extends Controller
 
         $type = DB::table('product_group as p')
                 ->where('p.organization_id',$org->id)
+                ->whereNull('p.deleted_at')
                 ->get();
   
         return view('koperasi-admin.edit',compact('type'),compact('test'))
@@ -373,7 +377,7 @@ class AdminProductCooperativeController extends Controller
         ->with('edit',$edit);
     }
 
-    public function updateProduct(Request $request,Int $id)
+    public function updateProduct(Request $request,Int $id)//update product in database
     {
         $userID = Auth::id();
         // $org = DB::table('organizations as o')
@@ -463,7 +467,7 @@ class AdminProductCooperativeController extends Controller
                 $returnInformation="Cancel editing a product type.";
                 break;
 
-        }
+        }//manage return message
         return redirect('koperasi/produkmenu')->with('success',$returnInformation);
     }
 
@@ -576,8 +580,8 @@ class AdminProductCooperativeController extends Controller
         else{
             $data=['data' => 'All'];
         }
-        $target = json_encode($data);
-        Excel::import(new ProductImport($request->type,$target,$request->organ), public_path('/uploads/excel/' . $namaFile));
+        $target = json_encode($data);//to make json
+        Excel::import(new ProductImport($request->type,$target,$request->organ,null), public_path('/uploads/excel/' . $namaFile));
         
         return redirect('koperasi/produkmenu')->with('success', 'Product type have been added successfully');
     }

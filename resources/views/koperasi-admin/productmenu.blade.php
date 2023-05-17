@@ -75,7 +75,7 @@
       <h4>Manage Product and Product Type</h4>
       <span style="margin-right: 15px;">
         <a  href="{{route('koperasi.addtype')}}" class="btn btn-primary"> <i
-            class="fas fa-plus"></i> Tambah jenis produk</a></span>
+            class="fas fa-plus"></i> Urus jenis produk</a></span>
             
         
      
@@ -190,6 +190,8 @@
                         
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary" onclick="checkByClassOrByYear()">Import</button>
+                                <!-- to check is any class checkbox is unchecked -->
+
                             </div>
                         </div>
 
@@ -357,6 +359,7 @@ $(document).ready(function() {
  
 $('.alert').delay(3000).fadeOut();
 initialiseTargetCheckBox();
+//to use modal import 
 
 
 });
@@ -520,6 +523,7 @@ $('#year').change(function(){
 
 });
 }
+
 function checkYearCheckBox(){
     const checkboxes = document.querySelectorAll('.yearCheckbox');
     const selectedCheckBox=document.querySelectorAll('.yearCheckbox:checked');
