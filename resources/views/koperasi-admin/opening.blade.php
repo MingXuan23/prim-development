@@ -3,7 +3,18 @@
 @section('css')
 
 @include('layouts.datatable');
+<style>
+  .scroll-indicator {
+  display: none; /* Hide the alert by default */
+}
 
+@media (max-width: 500px) {
+  /* Show the alert on screens smaller than or equal to 768px (mobile) */
+  .scroll-indicator {
+    display: block;
+  }
+}
+</style>
 @endsection
 
 @section('content')
@@ -42,7 +53,8 @@
 
         <form method="POST" action="{{route('koperasi.storeOpening')}}" class="form-validation">
           {{csrf_field()}}
-
+          <p class="scroll-indicator">Scroll > >></p>
+        <div class="table-responsive">
           <table id="openingTable" class="table table-bordered table-striped dt-responsive wrap"
           style="border-collapse: collapse; border-spacing: 0; width: 100%;">
 
@@ -121,7 +133,7 @@
             </tbody>
 
           </table>
-
+          </div>
           <div class="form-group mb-0">
             <div class="text-right">
 
