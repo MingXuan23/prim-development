@@ -160,7 +160,7 @@ input::-webkit-inner-spin-button {
                 
                   <tbody>
                   <tr>
-                      <th class="text-muted" scope="row" style="font-size:16px">Jumlah Harga Produck:</th>
+                      <th class="text-muted" scope="row" style="font-size:16px">Jumlah Harga Produk:</th>
                           @if($cart)
                           <td class="lead" id="total">RM {{ number_format($cart->total_price-$charge, 2, '.', '')}}</td>
                           @else
@@ -272,7 +272,7 @@ input::-webkit-inner-spin-button {
           <div class="col d-flex justify-content-end">
             <a href="{{ route('koperasi.koopShop', $id) }}" type="button" class="btn btn-light mr-2">Kembali</a>
             @if($cart)
-              <button type="submit" class="btn btn-primary">Bayar</button>
+              <button type="submit" class="btn btn-primary" >Bayar</button>
             @endif
           </div>
         </div>
@@ -507,7 +507,10 @@ input::-webkit-inner-spin-button {
                         var message = "<div class='success alert-success' style='padding: 5px;'>"+result.success+"</div>"
                         $alertMessage.append(message);
                         $alertMessage.delay(1000).fadeOut()
-                        
+
+
+                        $totalBeforeCharge=result.totalPrice -{{$charge}};
+                        $('#total').html("RM "+$totalBeforeCharge.toFixed(2));
                         $totalPrice = $('#totalPrice');
                         console.log(result.totalPrice);
                         $totalPrice.html("RM "+result.totalPrice);
@@ -526,36 +529,42 @@ input::-webkit-inner-spin-button {
       alert("Some items in cart have not sufficient quantity in stock now");
       location.reload();
     }
+    else{
+      console.log("no err");
+    }
   };
 
-  function cartChanged() {
-    let productOrderId = $('.quantity-input-container').data("data-product-order-id");
-    let pgngOrderId = $('.quantity-input-container').data("data-pgng-order-id");
-    let insufficientQuantity=true;
-    $.ajax({
-                url: "{{route('koperasi.checkCart')}}",
-                method: "GET",
-                data: {
-                    productOrderId: productOrderId,
-                    pgngOrderId: pgngOrderId,
-                },
-            success: function(data) {
-                if(data.insufficientQuantity==1)
-                {
-                  insufficientQuantity= true;
-                } // 1 mean insufficient quantity
-                else if(data.insufficientQuantity==0){
-                  insufficientQuantity= false;
-                }
-                
-            },
-            error: function (data) {
-                // console.log(data);
-                insufficientQuantity= true;
+  async function cartChanged() {
+    let pgngOrderId = {{$cart->id}};
+    let insufficientQuantity = true;
+
+    try {
+        const response = await $.ajax({
+            url: "{{route('koperasi.checkCart')}}",
+            method: "POST",
+            data: {
+                pgngOrderId: pgngOrderId,
             }
         });
-    
+
+        if (response.insufficientQuantity == 1) {
+            console.log("insufficient");
+            insufficientQuantity = true;
+        } else if (response.insufficientQuantity == 0) {
+            console.log(response.insufficientQuantity);
+            insufficientQuantity = false;
+        }
+
+        console.log("both not");
+    } catch (error) {
+        console.error(error);
+        // Handle the error if needed
+    }
+
+    // Code after the AJAX call
+    console.log(insufficientQuantity);
     return insufficientQuantity;
-  };
+}
+
 </script>
 @endsection

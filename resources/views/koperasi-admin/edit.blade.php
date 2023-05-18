@@ -52,11 +52,14 @@
                                 </select>
                             </div>
                             <label>Tahun</label>
-        <div class="col">
-           
-            <select name="year" id="year" class="form-control">
-                <option value="All" selected>Semua Tahun</option>
+        <div class="col ">
+           <div class="form-group required">
+           <select name="year" id="year" class="form-control">
+                <option value="Default" selected>Default</option>
+                <option value="All" >Semua Tahun</option>
             </select>
+           </div>
+            
             <div class="cbhide">
 
             </div>

@@ -401,7 +401,6 @@ class AdminProductCooperativeController extends Controller
         // ->where('o.type_org',10)
         // ->select('o.id')
         // ->first();
-      
         if($request->cb_year){
             if($request->classCheckBoxEmpty==="true"){
                 $data = array(
@@ -414,11 +413,15 @@ class AdminProductCooperativeController extends Controller
                 );
             }           
         }
+        else if ($request->year==="Default"){
+            $data=json_decode(DB::table('product_item')->where('id',$id)->first()->target);
+            
+        }
         else{
             $data=['data' => 'All'];
         }
         $target = json_encode($data);
-        
+
         $update = DB::table('product_item')->where('id',$id)->update([
             'name' => $request->nama,
             'desc' => $request->description,

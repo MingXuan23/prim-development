@@ -259,17 +259,16 @@ class UserCooperativeController extends Controller
     
     // to check quantity before user check out to pay
     public function checkCart(Request $request){
-        if(request()->ajax()){
+       
             $id=$request->pgngOrderId;
             $cart_item = array(); // empty if cart is empty
             $user_id = Auth::id();
 
             $cart = PgngOrder::where([
                 ['status', 1],
-                ['organization_id', $id],
+                ['id', $id],
                 ['user_id', $user_id],
             ])->first();
-        
             if($cart)
             {   
                 $before_cart_item = DB::table('product_order as po')
@@ -289,7 +288,7 @@ class UserCooperativeController extends Controller
                 }
                 return response()->json(['insufficientQuantity' => 0]);
             }
-        }
+            return response()->json(['insufficientQuantity' => 1]);
     }
 
     public function edit($id) // user see their cart here
@@ -351,7 +350,7 @@ class UserCooperativeController extends Controller
                     $allCartItem = DB::table('product_order as po')
                         ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
                         ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
-                        ->where('pg.id', $item->productOrderId)
+                        ->where('pg.id', $item->pgngId)
                         ->where('pg.status', 1)
                         ->select('po.quantity', 'pi.price')
                         ->get();
