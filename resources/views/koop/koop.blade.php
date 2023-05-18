@@ -253,52 +253,7 @@
                         </select>
                     </div>
                     <div id="product-container">
-                    <!-- @foreach($products as $item)
-                    <div class="row">
-                        <div class="col">
-                        <div class="card  p-2" >
-                            <div class="d-flex">
-                            <div class="d-flex justify-content-center align-items-start">
-                                <div>
-                                @if($item->image == null)
-                                <img class="rounded img-fluid default-img" id="img-size"  src="{{ URL('images/koperasi/default-item.png')}}">
-                                @else
-                                <img class="rounded img-fluid " id="img-size" src="{{ URL('/koperasi-item/'.$item->image)}}">
-                                @endif
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex align-items-start flex-column h-100" >
-                                <div>
-                                    <h4 class="mt-2">{{ $item->name }} <span class="badge badge-light">{{ $item->selling_quantity }} {{ $item->collective_noun }}</span>
-                                    @if($item->status != 1) <label class="text-danger">Kehabisan Stok</label> @endif
-                                    </h4> 
-                                </div>
-                                <div>
-                                    <p class="card-text"><i>{{ $item->desc }}</i></p>
-                                </div>
-                                <div class="mt-auto d-flex justify-content-between align-items-center w-100">
-                                    <div class="">
-                                    <p class="card-text"><b>RM</b> {{ $item->price }}</p>
-                                    </div>
-                                    <div class="ml-auto">
-                                    @csrf
-                                    @if($item->status != 0)
-                                    <div class="button-cart-section">
-                                        <button type="button" class="btn btn-success btn-item-modal" data-item-id="{{ $item->id }}" ><i class="mdi mdi-cart"></i></button>
-                                    </div>
-                                    @endif
-                                    </div>
-                                    
-                                </div>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                    
-                    @endforeach -->
+                
                         </div>
                     </div>
                 </div>
@@ -356,7 +311,8 @@ $(document).ready(function(){
                                 //     "<label for='cb_year' style='margin-right: 22px;' class='form-check-label'> <input class='yearCheckbox' data-parsley-required-message='Sila pilih tahun' data-parsley-errors-container='.errorMessageCB' type='checkbox' id='cb_year' name='cb_year[]' value='" +
                                 //     value.year + "'/> " +"Tahun " +value.year + " </label><br> <div class='errorMessageCB'></div>");
                                 //     $(".cbhide").hide();
-                            });  
+                            }); 
+                            updateOption("category"); 
                         }                  
                     });
                     
@@ -367,10 +323,10 @@ $(document).ready(function(){
         const selectedGroup = document.querySelector('.childrenList:checked').value;
         if(selectedGroup!="AllItem" &&selectedGroup!="GeneralItem")
         {
-            updateOption("tahun");
+            updateOption("tahun");//display when children is selected
         }
         else{
-            updateOption("category")
+            updateOption("category");//display when general item or all item is selected
         }
 
         loadProductList(selectedGroup);
@@ -391,7 +347,7 @@ $(document).ready(function(){
 });
 
 function loadProductList(selectedGroup){
-    console.log(selectedGroup);
+    //console.log(selectedGroup);
     $.ajax({
             url: '{{route("koperasi.productsListByGroup")}}', // Replace with your Laravel route
             type: 'POST', // Replace with GET or POST depending on your route
@@ -405,7 +361,7 @@ function loadProductList(selectedGroup){
 
                 // Loop through the new products data and append HTML for each product to the container
                 if(response.products.length!=0){
-                    console.log("exist");
+                    //console.log("exist");
                     $.each(response.products, function(index, item) {
                     var html = '<div class="row ">';
                     html += '<div class="col" >';
@@ -485,7 +441,7 @@ function loadProductList(selectedGroup){
                     html += '</div>';
                     html += '</div>';
                     html += '</div>';
-                    console.log("run");
+                    //console.log("run");
                     $('#product-container').append(html);
 
                 }
@@ -514,7 +470,7 @@ function updateOption(option){
         tahun.show();
     }
     
-}
+}//display category by ProductGroup or by class
 
 function quantityExceedHandler(i_Quantity, maxQuantity)
 {
@@ -553,10 +509,10 @@ function quantityExceedHandler(i_Quantity, maxQuantity)
 
 function initialiseCartButton()
 {
-    console.log("runCart");
+    //console.log("runCart");
     //alert($('.btn-item-modal').length);
     $('.btn-item-modal').click(function(e) {
-        console.log("runCart2");
+        //console.log("runCart2");
       e.preventDefault();
       let modalTitle = $('.modal-title'), modalBody = $('.modal-body');
       modalTitle.empty();
@@ -589,7 +545,7 @@ function initialiseCartButton()
 
     $('.cart-add-btn').click(function(){
       let quantity = $("input[name='quantity_input']").val()
-        console.log(item_id+ " "+org_id+" "+quantity );
+        //console.log(item_id+ " "+org_id+" "+quantity );
       $.ajax({
         url: "{{ route('koperasi.storeInCart') }}",
         method: "POST",

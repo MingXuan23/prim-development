@@ -4,6 +4,23 @@
 <link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
 
 <style>
+    .btn-grey{
+        background-color: #5b626b!important;
+        border: 2px solid #5b626b!important;
+        color:#ffffff!important;
+    }
+    .btn-grey:hover{
+        background-color: #ffffff!important;
+        color:#5b626b!important;
+        border: 2px solid #5b626b!important;
+    }
+    .form-control{
+        border: 2px solid #5b626b6c!important;
+    }
+    .form-control:focus{
+        outline: none;
+        border: 2px solid #5b626b!important;
+    }
 </style>
 
 @endsection
@@ -32,7 +49,7 @@
         </div>
     </div>
     <div class="add-btn d-flex justify-content-end mr-3">
-        <button id="add-product-group" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Jenis Produk</button>
+        <button id="add-product-group" class="btn btn-grey"><i class="fas fa-plus-circle"></i> Jenis Produk</button>
     </div>
 </div>
 
@@ -77,8 +94,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
-                <button type="submit" class="btn btn-primary add-pg">Tambah</button>
+                <button type="button" data-dismiss="modal" class="btn btn-grey">Tutup</button>
+                <button type="submit" class="btn btn-grey add-pg">Tambah</button>
             </div>
         </div>
     </div>

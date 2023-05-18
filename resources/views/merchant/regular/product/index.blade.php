@@ -97,7 +97,7 @@
             .product-name{
                 text-align: center;
                 padding: 10px;
-                font-size: 16px;
+                font-size: 15px;
                 color: #5b626b;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -162,11 +162,11 @@
     @foreach ($products as $product)
             <a href="{{route('merchant-product.show',$product->id)}}" class="product-container" data-product-id="{{$product->id}}"> 
                 <div class="product-image">
-                {{-- @if($product->image == null) --}}
-                    <img class="img-fluid default-img" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}">
-                {{-- @else
-                <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}">
-                @endif --}}
+                    @if($product->image == null)
+                        <img class="img-fluid default-img" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}" alt="{{$product->name}}">
+                    @else
+                    <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
+                    @endif 
                 </div>
                 <div class="product-infos">
                     <div class="product-name">{{$product->name}}</div>

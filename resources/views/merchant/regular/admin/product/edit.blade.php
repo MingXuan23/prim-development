@@ -9,13 +9,48 @@
     height: 100px;
     object-fit: cover;
 }
-
 .vertical {
   border-left: 3px solid rgb(113, 113, 113);
   border-radius: 12px;
   height: auto;
 }
-
+.active{
+    background-color: #5b626b!important;
+    border: 2px solid #5b626b!important;
+    color:#ffffff!important;
+}
+.inactive{
+    background-color: #af1717!important;
+    border: 2px solid #af1717!important;
+    color:#ffffff!important;
+}
+.form-control{
+    border: 2px solid #5b626b6c!important;
+}
+.form-control:focus{
+    outline: none;
+    border: 2px solid #5b626b!important;
+}
+.btn-grey{
+    background-color: #5b626b!important;
+    border: 2px solid #5b626b!important;
+    color:#ffffff!important;
+}
+.btn-grey:hover{
+    background-color: #ffffff!important;
+    color:#5b626b!important;
+    border: 2px solid #5b626b!important;
+}
+.btn-red{
+    background-color: #af1717!important;
+    border: 2px solid #af1717!important;
+    color:#ffffff!important;
+}
+.btn-red:hover{
+    background-color: #ffffff!important;
+    color:#af1717!important;
+    border: 2px solid #af1717!important;
+}
 @media only screen and (max-width: 600px) {
   .vertical {
     display: none;
@@ -79,16 +114,16 @@
               <div class="row justify-content-center d-block m-3">
                   <h4>
                     {!! ($item->status == 1) 
-                      ? "<span class='badge rounded-pill bg-success text-white d-block p-2'>Status Aktif</span>"
-                      : "<span class='badge rounded-pill bg-danger text-white d-block p-2'>Status Tidak Aktif</span>" !!}
+                      ? "<span class='badge rounded-pill text-white d-block p-2 active'>Status Aktif</span>"
+                      : "<span class='badge rounded-pill text-white d-block p-2 inactive'>Status Tidak Aktif</span>" !!}
                   </h4>                
               </div>
 
               <div class="row justify-content-center d-block m-3">
                 <h4>
                   {!! ($item->type == "have inventory") 
-                    ? "<span class='badge rounded-pill bg-info text-white d-block p-2'>Ada Inventori</span>"
-                    : "<span class='badge rounded-pill bg-info text-white d-block p-2'>Tiada Inventori</span>" !!}
+                    ? "<span class='badge rounded-pill text-white d-block p-2 active'>Ada Inventori</span>"
+                    : "<span class='badge rounded-pill text-white d-block p-2' inactive>Tiada Inventori</span>" !!}
                 </h4>
               </div>
             </div>
@@ -106,7 +141,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Harga Per Unit (RM)</label>
-                            <input type="number" name="item_price" id="item_price" value="{{ number_format($item->price, 2) }}" min="0.01" step="0.01" pattern="^\d*(\.\d{1,2})?$" class="form-control" required>
+                            <input type="number" name="item_price" id="item_price" value="{{ $item->price, 2}}" min="0.01" step="0.01" pattern="^\d*(\.\d{1,2})?$" class="form-control" required>
                         </div>
                     </div>
                 </div>
@@ -114,7 +149,7 @@
                     <div class="col">
                         <div class="form-group">
                             <label>Deskripsi</label>
-                            <input type="text" name="item_desc" value="{{ $item->desc }}" class="form-control">
+                            <textarea name="item_desc" class="form-control" rows="6" cols="60">{{ $item->desc }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -124,15 +159,15 @@
                       <label class="col-form-label pt-0">Inventori</label>
                       <div class="col-sm-10">
                           <div class="form-check">
-                              <input class="form-check-input" type="radio" name="inventory" id="no_inventory" value="no inventory">
-                              <label class="form-check-label" for="no_inventory">
-                                  Tiada
-                              </label>
-                          </div>
-                          <div class="form-check">
                               <input class="form-check-input" type="radio" name="inventory" id="have_inventory" value="have inventory">
                               <label class="form-check-label" for="have_inventory">
                                   Ada
+                              </label>
+                          </div>
+                          <div class="form-check">
+                              <input class="form-check-input" type="radio" name="inventory" id="no_inventory" value="no inventory">
+                              <label class="form-check-label" for="no_inventory">
+                                  Tiada
                               </label>
                           </div>
                       </div>
@@ -167,10 +202,10 @@
                 </div>
 
                 <div class="row mb-4">
-                  <div class="col">
+                  {{-- <div class="col">
                     <label class="control-label">Pakej</label>
                     <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" oninput="this.value = Math.round(this.value);" value="{{ $item->selling_quantity }}" required>
-                  </div>
+                  </div> --}}
                   <div class="col">
                       <label class="control-label">Nama Unit</label>
                       <input class="form-control" type="text" placeholder="Kata Nama Kuantiti" name="collective_noun" id="collective_noun" value="{{ $item->collective_noun }}" required>
@@ -186,11 +221,11 @@
           <div class="text-right">
             <a type="button" 
               href="{{ route('admin-reg.product-item', $item->product_group_id) }}"
-              class="btn btn-secondary waves-effect waves-light mr-1">
+              class="btn btn-grey waves-effect waves-light mr-1">
               Kembali
             </a>
             <button type="submit" 
-              class="btn btn-primary waves-effect waves-light">
+              class="btn btn-grey waves-effect waves-light">
               Kemaskini
             </button>
           </div>

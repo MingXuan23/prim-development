@@ -16,15 +16,18 @@
   object-fit: cover;
 }
 
+
 .quantity-container{
     
     display: flex;
     flex-direction: row;
     align-items: center;
+    text-align:center;
 }
 .quantity-container button{
     border: none;
     background-color: transparent;
+    align-items: center;
 }
 .quantity-container i{
     font-size: 24px;
@@ -33,6 +36,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center; /* Add this line to center the elements horizontally */
     flex-wrap: wrap;
 }
 .quantity-input{
@@ -72,22 +76,28 @@ input::-webkit-inner-spin-button {
 
       <div class="card">
         <div class="card-body">
+        @if(isset($updateMessage)&&$updateMessage!="")
+          <div class="alert alert-danger">
+              {!! nl2br($updateMessage) !!}
+          </div>
+        @endif
 
           @if(Session::has('success'))
           <div class="alert alert-success">
             <p>{{ Session::get('success') }}</p>
           </div>
           @endif
+          
 
           <div class="table-responsive">
             <table class="table table-borderless" width="100%" cellspacing="0">
                 <thead>
                     <tr class="text-center">
-                      <th style="width: 20%">Gambar</th>
-                      <th style="width: 40%">Nama Item</th>
+                      <th style="width: 20%" class="d-none d-md-table-cell">Gambar</th>
+                      <th style="width: 25%">Nama Item</th>
                       <!-- <th style="width: 10%">Kuantiti</th> -->
-                      <th style="width: 20%">Harga Satu Unit (RM)</th>
-                      <th style="width: 20%">Kuantiti</th>
+                      <th style="width: 15%">Harga Satu Unit (RM)</th>
+                      <th style="width: 40%">Kuantiti</th>
                     </tr>
                 </thead>
                 
@@ -95,8 +105,8 @@ input::-webkit-inner-spin-button {
                   @if(count($cart_item) != 0 || $cart)
                   @foreach($cart_item as $row)
                     
-                    <tr class="text-center">
-                      <td>
+                    <tr class="text-center" >
+                      <td class="d-none d-md-table-cell">
                           @if($row->image == null)
                           <img src="{{ URL('images/koperasi/default-item.png')}}" class="rounded img-fluid" id="img-size" style="background-color: rgb(61, 61, 61)">
                           @else
@@ -112,9 +122,9 @@ input::-webkit-inner-spin-button {
                           @method('delete')
                           <button type="submit" class="btn btn-danger">Buang</button>
                         </form> -->
-                        <div class  = "quantity-container" >
-                                    <div class="quantity-input-container" data-product-order-id="{{$row->productOrderId}}"  data-pgng-order-id="{{$row->pgngId}}">
-                                        <button id="button-minus"><i class="bi bi-dash-square"></i></button>
+                        <div class = "quantity-container " >
+                                    <div class="quantity-input-container "style="width: 100%" data-product-order-id="{{$row->productOrderId}}"  data-pgng-order-id="{{$row->pgngId}}" >
+                                        <button id="button-minus" ><i class="bi bi-dash-square"></i></button>
                                         <input type="number" class="quantity-input" name = "quantity-input" value="{{$row->quantity}}" min="1" required>
                                         <button id="button-plus" ><i class="bi bi-plus-square"></i></button>
                                         <h6 data-qty-available="{{$row->quantity_available}}" id="quantity-available">{{$row->quantity_available}} barang dalam stock</h6>
@@ -136,7 +146,7 @@ input::-webkit-inner-spin-button {
       </div>
 
       @if(count($cart_item) != 0 || $cart)
-      <form action="{{ route('fpxIndex') }}" method="POST">
+      <form action="{{ route('fpxIndex') }}" method="POST" onsubmit="return validateCart(event)">
       <input type="hidden" name="desc" id="desc" value="Koperasi">
       <input type="hidden" name="cartId" id="cartId" value="{{ $cart->id }}">
       @else
@@ -149,8 +159,24 @@ input::-webkit-inner-spin-button {
               <table class="table table-borderless mb-0">
                 
                   <tbody>
+                  <tr>
+                      <th class="text-muted" scope="row" style="font-size:16px">Jumlah Harga Produck:</th>
+                          @if($cart)
+                          <td class="lead" id="total">RM {{ number_format($cart->total_price-$charge, 2, '.', '')}}</td>
+                          @else
+                          <td class="lead" id="total">RM 0.00</td>
+                          @endif
+                          </tr>
                       <tr>
-                          <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
+                      <th class="text-muted" scope="row" style="font-size:16px">Caj yang dikenakan:</th>
+                          @if($cart)
+                          <td class="lead" id="charge">RM {{ number_format($charge, 2, '.', '') }}</td>
+                          @else
+                          <td class="lead" id="charge">RM 0.00</td>
+                          @endif
+                          </tr>
+                          <tr>
+                        <th class="text-muted" scope="row" style="font-size:20px">Jumlah Keseluruhan:</th>
                           @if($cart)
                           <td class="lead" id="totalPrice">RM {{ number_format($cart->total_price, 2, '.', '') }}</td>
                           @else
@@ -295,7 +321,7 @@ input::-webkit-inner-spin-button {
         $('.form-validation').parsley();
     });
     
-    $('.alert').delay(2000).fadeOut();
+    $('.alert').delay(12000).fadeOut();
 
     $('#pick_up_date').on('change', function() {
         $('#week_status').val(this.value);
@@ -491,5 +517,45 @@ input::-webkit-inner-spin-button {
                 //     console.log(result.responseText)
                 // }
            })};
+
+    function validateCart(event) {
+    // Perform your validation logic here
+    // If the validation fails, prevent the form from submitting
+    if (cartChanged()) {
+      event.preventDefault();
+      alert("Some items in cart have not sufficient quantity in stock now");
+      location.reload();
+    }
+  };
+
+  function cartChanged() {
+    let productOrderId = $('.quantity-input-container').data("data-product-order-id");
+    let pgngOrderId = $('.quantity-input-container').data("data-pgng-order-id");
+    let insufficientQuantity=true;
+    $.ajax({
+                url: "{{route('koperasi.checkCart')}}",
+                method: "GET",
+                data: {
+                    productOrderId: productOrderId,
+                    pgngOrderId: pgngOrderId,
+                },
+            success: function(data) {
+                if(data.insufficientQuantity==1)
+                {
+                  insufficientQuantity= true;
+                } // 1 mean insufficient quantity
+                else if(data.insufficientQuantity==0){
+                  insufficientQuantity= false;
+                }
+                
+            },
+            error: function (data) {
+                // console.log(data);
+                insufficientQuantity= true;
+            }
+        });
+    
+    return insufficientQuantity;
+  };
 </script>
 @endsection

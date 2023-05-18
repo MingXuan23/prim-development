@@ -73,7 +73,11 @@
                 width: 50px;
                 border: 0.15em solid #333547;
             }
-            
+            .quantity-input-disabled{
+                text-align: center;
+                width: 50px;
+                border: 0.15em solid #333547;
+            }
             /* to remove the arrow up and down for input type number */
             input::-webkit-outer-spin-button,
             input::-webkit-inner-spin-button {
@@ -263,21 +267,22 @@
                     @if($product->nama == $organization->nama)
                             <div class="product" >
                                 <div class="product-image">
-                                    <a href="{{route('merchant-product.show',$product->product_item_id)}}">{{-- @if($product->image == null) --}}
-                                    <img class="img-fluid mx-auto d-block" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}">
-                                    {{-- @else
-                                    <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}">
-                                    @endif --}}
+                                    <a href="{{route('merchant-product.show',$product->product_item_id)}}">
+                                        @if($product->image == null)
+                                            <img class="img-fluid mx-auto d-block" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}" alt="{{$product->name}}">
+                                        @else
+                                            <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
+                                        @endif
                                     </a>
                                 </div>
-                                    @if($product->quantity_available > 0)
+                                    @if($product->quantity_available > 0 && $product->status == 1)
                                         <div class="product-details">    
                                             <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
-                                            <h5 style="color: rgb(2, 122, 129);">RM{{$product->price}}/Unit</h5>
+                                            <h5 style="color: rgb(2, 122, 129);">RM{{$product->price}}/{{$product->collective_noun}}</h5>
                                             <div class  = "quantity-container" >
                                                 <div class="quantity-input-container" data-product-order-id="{{$product->id}}"  data-pgng-order-id="{{$product->pgng_order_id}}">
                                                     <button id="button-minus"><i class="bi bi-dash-square"></i></button>
-                                                    <input type="number" class="quantity-input" name = "quantity-input" value="{{$product->quantity}}" min="1">
+                                                    <input type="number" class="quantity-input" name = "quantity-input" value="{{$product->quantity}}" min="1" max="{{$product->quantity_available}}" data-org-id="{{$organization->id}}">
                                                     <button id="button-plus" ><i class="bi bi-plus-square"></i></button>
                                                     <h6 data-qty-available="{{$product->quantity_available}}" id="quantity-available">{{$product->quantity_available}} barang lagi</h6>
                                                 </div>
@@ -287,6 +292,23 @@
                                             {{-- alert message will be appended here --}}
                                             </div>
                                         </div>
+                                    @elseif($product->status == 0)
+                                        <div class="product-details" style="opacity: 0.3">    
+                                            <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
+                                            <h5>RM{{$product->price}}/Unit</h5>
+                                            <div class  = "quantity-container" >
+                                                <div class="quantity-input-container" data-product-order-id="{{$product->id}}"  data-pgng-order-id="{{$product->pgng_order_id}}">
+                                                    <button id="button-minus" disabled><i class="bi bi-dash-square"></i></button>
+                                                    <input type="number" class="quantity-input-disabled" name = "quantity-input" value="{{$product->quantity}}" min="1" disabled>
+                                                    <button id="button-plus" disabled><i class="bi bi-plus-square"></i></button>
+                                                    <h6>Tidak Dijual Pada Masa Kini</h6>
+                                                </div>
+                                            </div>
+                                            <h5 class="total-price hide" data-pgng-order-id="{{$product->pgng_order_id}}" data-org-id="{{$organization->id}}">Total: RM{{$product->total_price}}</h5>
+                                            <div class="alert-message">
+                                            {{-- alert message will be appended here --}}
+                                            </div>
+                                        </div>        
                                     @else
                                         <div class="product-details" style="opacity: 0.3">    
                                             <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
@@ -294,7 +316,7 @@
                                             <div class  = "quantity-container" >
                                                 <div class="quantity-input-container" data-product-order-id="{{$product->id}}"  data-pgng-order-id="{{$product->pgng_order_id}}">
                                                     <button id="button-minus" disabled><i class="bi bi-dash-square"></i></button>
-                                                    <input type="number" class="quantity-input" name = "quantity-input" value="{{$product->quantity}}" min="1" disabled>
+                                                    <input type="number" class="quantity-input-disabled" name = "quantity-input" value="{{$product->quantity}}" min="1" disabled>
                                                     <button id="button-plus" disabled><i class="bi bi-plus-square"></i></button>
                                                     <h6>Kehabisan Stok</h6>
                                                 </div>
@@ -311,7 +333,8 @@
                             </div>
                             @if($product->quantity_available > 0)
                                 <div class="checkout hide" >
-                                    <a class="fancy" href="{{ route('merchant.checkout', $organization->id) }}">
+                                    {{-- <a class="fancy" href="{{ route('merchant.checkout', $organization->id) }}"> --}}
+                                    <a class="fancy checkout-button" href="#">
                                         <span class="top-key"></span>
                                         <span class="text">Semak Keluar</span>
                                         <span class="bottom-key-1"></span>
@@ -439,61 +462,61 @@
                 }
             })
         })
-    const plusButtons = document.querySelectorAll("#button-plus");
-    const minusButtons = document.querySelectorAll("#button-minus");
-    // add click event to plus and minus buttons
-    plusButtons.forEach(function(plusButton){
-        plusButton.addEventListener("click",function(){
-            let inputQuantity = parseInt(this.previousElementSibling.value);
-            let qtyAvailable = parseInt(this.nextElementSibling.getAttribute("data-qty-available"));
-            let productOrderId = this.parentElement.getAttribute("data-product-order-id");
-            let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
-            //console.log(inputQuantity+" "+qtyAvailable+" "+productOrderId+" "+pgngOrderId);
+        const plusButtons = document.querySelectorAll("#button-plus");
+        const minusButtons = document.querySelectorAll("#button-minus");
+        // add click event to plus and minus buttons
+        plusButtons.forEach(function(plusButton){
+            plusButton.addEventListener("click",function(){
+                let inputQuantity = parseInt(this.previousElementSibling.value);
+                let qtyAvailable = parseInt(this.nextElementSibling.getAttribute("data-qty-available"));
+                let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+                let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+                //console.log(inputQuantity+" "+qtyAvailable+" "+productOrderId+" "+pgngOrderId);
 
-            if(inputQuantity < qtyAvailable){
-                inputQuantity++;
-                this.previousElementSibling.value = inputQuantity;
-                updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
-                notificationCounter();
-            }
+                if(inputQuantity < qtyAvailable){
+                    inputQuantity++;
+                    this.previousElementSibling.value = inputQuantity;
+                    updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
+                    notificationCounter();
+                }
+            })
         })
-    })
-    minusButtons.forEach(function(minusButton){
-        minusButton.addEventListener("click",function(){
-            let inputQuantity = parseInt(this.nextElementSibling.value);
-            let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
-            let productOrderId = this.parentElement.getAttribute("data-product-order-id");
-            let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
-            if(inputQuantity > 1){
-                inputQuantity--;
-                this.nextElementSibling.value = inputQuantity;
-                updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
-                notificationCounter();
-            }
-        })
-    }) 
-    //when key in quantity when want to buy in the input field
-    $("input[name='quantity-input']").off('keypress').on('keypress',function(e){
+        minusButtons.forEach(function(minusButton){
+            minusButton.addEventListener("click",function(){
+                let inputQuantity = parseInt(this.nextElementSibling.value);
                 let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
                 let productOrderId = this.parentElement.getAttribute("data-product-order-id");
                 let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
-                const currentValue = parseInt($(this).val());
-                if (isNaN(currentValue)) {
-                    // if the current value is not a number, reset it to 1
-                    $(this).val(1);
-                }
-                const newValue = parseInt($(this).val() + e.key);
-                if (newValue < 1 || newValue > qtyAvailable) {
-                    // if the new value is out of bounds, prevent the default action
-                    e.preventDefault();
-                    console.log(newValue);
-                    // set the input value to the maximum allowed value
-                    $(this).val(qtyAvailable);
-                }else{
-                    updateInputQuantity(this, newValue,productOrderId,pgngOrderId);
+                if(inputQuantity > 1){
+                    inputQuantity--;
+                    this.nextElementSibling.value = inputQuantity;
+                    updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
                     notificationCounter();
                 }
-            });
+            })
+            }) 
+        //when key in quantity when want to buy in the input field
+        $("input[name='quantity-input']").off('keypress').on('keypress',function(e){
+                    let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
+                    let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+                    let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+                    const currentValue = parseInt($(this).val());
+                    if (isNaN(currentValue)) {
+                        // if the current value is not a number, reset it to 1
+                        $(this).val(1);
+                    }
+                    const newValue = parseInt($(this).val() + e.key);
+                    if (newValue < 1 || newValue > qtyAvailable) {
+                        // if the new value is out of bounds, prevent the default action
+                        e.preventDefault();
+                        console.log(newValue);
+                        // set the input value to the maximum allowed value
+                        $(this).val(qtyAvailable);
+                    }else{
+                        updateInputQuantity(this, newValue,productOrderId,pgngOrderId);
+                        notificationCounter();
+                    }
+                });
     });
     $("input[type='number']").on('keyup', function(e) {
       var input =this;
@@ -532,9 +555,11 @@
                         $parent = $(plusButton).parent().parent().parent();
                         $alertMessage = $parent.children('.alert-message');
                         var message = "<div class='success alert-success' style='padding: 5px;'>"+result.success+"</div>"
+                        $alertMessage.empty();
                         $alertMessage.append(message);
+                        $alertMessage.fadeIn();
                         $alertMessage.delay(1000).fadeOut()
-                        
+                            
                         $totalPrice = $parent.parent().parent().children().children('.product-details').children('.total-price');
                         $totalPrice.html("Total: RM"+result.totalPrice);
                 },
@@ -543,6 +568,47 @@
                 // }
            })
     }
+    // document.querySelectorAll('.checkout-button').addEventListener('click', function(event) {
+    //     var productContainer = $(this).parent();
+    //     console.log(productContainer);
+    //     var quantityInput = $('input');
+    //     var quantityValue = parseInt(quantityInput.value);
+
+    //     if (quantityValue > parseInt(quantityInput.max)) {
+    //         event.preventDefault(); // Prevent default action
+
+    //         // Optionally, display an error message or take any other desired action
+    //         alert('Value is greater than the maximum allowed.');
+    //     } else {
+    //         // Update the href attribute to navigate to the desired route
+    //         var checkoutLink = document.getElementById('checkout-link');
+    //         checkoutLink.href = "{{ route('merchant.checkout', $organization->id) }}";
+    //     }
+    // });
     
+    // for validation before proceed to checkout page 
+    $('.checkout-button').each(function (index,checkButton) {
+        $(checkButton).on('click', function (event) {
+            var productContainer = $(checkButton).parents('.product-container');
+            var quantityInputs = $(productContainer).find('.quantity-input');
+            $(quantityInputs).each(function(index,quantityInput){
+                var quantityValue = $(quantityInput).val();
+                if (quantityValue > parseInt($(quantityInput).attr('max'))) {
+                    event.preventDefault(); // Prevent default action
+                    // Optionally, display an error message or take any other desired action
+                    $alertMessage = $(quantityInput).parents('.quantity-container').siblings('.alert-message');
+                    var message = "<div class='success alert-danger' style='padding: 5px;'>Value is greater than the maximum allowed.</div>"
+                    $alertMessage.empty();
+                    $alertMessage.append(message);
+                    $alertMessage.fadeIn();
+                    $alertMessage.delay(1000).fadeOut()
+                } else {
+                    // Update the href attribute to navigate to the desired route
+                    var org_id = $(quantityInput).attr('data-org-id');
+                    checkButton.href = org_id + "/checkout";
+                }
+            });
+        });
+    })
     </script>
 @endsection

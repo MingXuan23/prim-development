@@ -13,11 +13,15 @@
                 --primary-color:#5b626b;
                 --transition: all 0.3s linear;
             }
+            body{
+                overflow: visible !important;
+            }
             .main-content{
                 color: var(--primary-color);
             }
             /* css */
             .cart-btn {
+                z-index: 999;
                 color:var(--secondary-bc);
                 right: 10px;
                 position: fixed;
@@ -46,6 +50,10 @@
                 box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
                 margin-bottom: 30px;
             }
+            .product-image{
+                display: flex;
+                justify-content: center;
+            }
             .product-image img{
                 object-fit: contain;
                 height: 450px; 
@@ -54,11 +62,9 @@
                 padding: 10px;
             }
             .right-container{
-               right:10px;
-               width:27%;
+               height: 100%!important;
                border-top:2px solid #ccc;
                border-bottom:2px solid #ccc;
-               position: fixed;
                display: flex;
                flex-direction: column;
                flex-wrap: wrap;
@@ -91,6 +97,8 @@
                 cursor: pointer;
             }
             .product-details-content{
+                text-align: justify;
+                white-space: pre-wrap;
                 overflow: hidden;
                 display: none;
                 height: auto;
@@ -262,17 +270,7 @@
             .btn:hover{
                     color:var(--primary-bc)!important;
             }
-            /* responsive */
-            @media screen and (max-width: 810px){
-                .left-container{
-                    width: 100%;
-                }
-                .right-container{
-                    position: static;
-                    width: 100%;
-                }
-                
-            }
+           
     </style>
 @endsection
 
@@ -285,14 +283,14 @@
         </div>
         <a href="{{route('merchant.all-cart')}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
     </div>
-
-        <section class="left-container">
+    <div class="row">
+        <section class="col-md-8 left-container">
             <div class="product-image"> 
-                {{-- @if($product->image == null) --}}
-                <img class="img-fluid mx-auto d-block" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}">
-                {{-- @else
-                <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}">
-                @endif --}}
+                @if($product->image == null)
+                    <img class="img-fluid mx-auto d-block" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}" alt="{{$product->name}}">
+                @else
+                    <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
+                @endif
             </div>
             <div class="product-details">
                 <div class="product-details-title">
@@ -311,12 +309,12 @@
                 </div> --}}
             </div>
         </section>
-        <section class="right-container">
+        <section class="col-md-4 right-container">
             <div>
                 <h2 class="product-name">{{$product->name}}</h2>
-                <h3 class="product-price">RM{{$product->price}}</h3>
+                <h3 class="product-price">RM{{$product->price}}/{{$product->collective_noun}}</h3>
             </div>
-            <div class  = "quantity-container">
+            <div class="quantity-container">
                 <h4>Kuantiti</h4>
                 <div class="quantity-input-container">
                     <button id="button-minus"><i class="bi bi-dash-square"></i></button>
@@ -347,7 +345,7 @@
                 
             </div>
         </section>
-        
+     </div>   
 @endsection
 
 @section('script')

@@ -77,7 +77,7 @@ class OrderController extends Controller
         $modal = '';
         
         $item = ProductItem::where('id', $i_id)
-        ->select('id', 'type', 'name', 'price', 'quantity_available as qty', 'selling_quantity as unit_qty')
+        ->select('id', 'type', 'name', 'price', 'quantity_available as qty')
         ->first();
 
         $order = DB::table('product_order as po')->join('pgng_orders as pu', 'pu.id', 'po.pgng_order_id')
@@ -87,14 +87,14 @@ class OrderController extends Controller
             ['po.product_item_id', $i_id],
             ['pu.status', 'In cart'],
         ])
-        ->select('quantity as qty', 'selling_quantity as unit_qty')
+        ->select('quantity as qty')
         ->first();
         
         if($item->type == 'have inventory') {
             if($order) { // Order exists in cart
-                $max_quantity = ($item->qty + ($order->qty * $order->unit_qty)); // (20 + (5 * 2)) = 
+                $max_quantity = ($item->qty + $order->qty); // (20 + (5 * 2)) = 
             } else {
-                $max_quantity = $item->qty / $item->unit_qty;
+                $max_quantity = $item->qty;
             }
             
             $modal .= '<div class="row justify-content-center"><i>Kuantiti Inventori : '.$item->qty.'</i></div>';
@@ -108,7 +108,7 @@ class OrderController extends Controller
         } else {
             $modal .= '<input id="quantity_input" type="text" value="'.$order->qty.'" name="quantity_input">';
             $modal .= '<div id="quantity-danger">Kuantiti Melebihi Inventori</div>';
-            $modal .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->qty * $order->unit_qty.' Unit</i></div>';
+            $modal .= '<div class="row justify-content-center"><i>Dalam Troli : '.$order->qty.' Unit</i></div>';
         }
 
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);
@@ -275,7 +275,10 @@ class OrderController extends Controller
                 ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                 ->where([
                     ['po.pgng_order_id', $c_id],
-                    ['po.deleted_at',NULL]
+                    ['po.deleted_at',NULL],
+                    ['pi.quantity_available','>',0],
+                    ['pi.type','have inventory'],
+                    ['pi.status',1],
                 ])
                 ->select('po.id', 'pi.name', 'po.quantity', 'pi.price')
                 ->get();
@@ -314,7 +317,7 @@ class OrderController extends Controller
         $cart_id = $request->cart_id;
         
         $cart_item = ProductOrder::where('id', $cart_id)
-        ->select('quantity as qty', 'selling_quantity as unit_qty', 'product_item_id as i_id', 'pgng_order_id as o_id')
+        ->select('quantity as qty', 'product_item_id as i_id', 'pgng_order_id as o_id')
         ->first();
         $product_item = ProductItem::where('id', $cart_item->i_id)
         ->select('id', 'type', 'quantity_available as qty')

@@ -75,7 +75,7 @@
       <h4>Manage Product and Product Type</h4>
       <span style="margin-right: 15px;">
         <a  href="{{route('koperasi.addtype')}}" class="btn btn-primary"> <i
-            class="fas fa-plus"></i> Tambah jenis produk</a></span>
+            class="fas fa-plus"></i> Urus jenis produk</a></span>
             
         
      
@@ -84,7 +84,7 @@
                 <a  href="{{route('koperasi.createProduct')}}" class="btn btn-primary"> <i
                     class="fas fa-plus" ></i> Tambah produk</a></span>
                     <span style="margin-right: 15px;"> 
-                    <a  href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1" style="float:right;" > <i
+                    <a  href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId" style="float:right;" > <i
                     class="fas fa-plus" ></i> Import produk</a></span>
               
             @else
@@ -143,7 +143,63 @@
 
         
 </div>
+{{--import modal--}}
+<div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import Product</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('importproduct') }}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
 
+                            {{ csrf_field() }}
+                            <label>* Jenis Produk</label></br>
+
+                            <div class="col">
+                                                <div class="form-group required">
+                                                    <select name="type" id="type" class="form-control"
+                                                        data-parsley-required-message="Sila masukkan jenis produk" required>
+                                                        @foreach($group as $row)
+                                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                            </div>
+
+                            <label>Tahun</label>
+                            <div class="col">
+                              
+                                <select name="year" id="year" class="form-control">
+                                    <option value="All" selected>Semua Tahun</option>
+                                </select>
+                                <div class="cbhide">
+
+                                </div>
+                            </div>
+                            <input type="hidden" name="classCheckBoxEmpty" id="classCheckBoxEmpty" value="false"> 
+                            <br>
+                            <div class="form-group">
+                                <input type="file" name="file" required>
+                            </div>
+                            
+                            <input type="hidden" name="organ" id="organ" value="{{$koperasi->organization_id}}">
+                        
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary" onclick="checkByClassOrByYear()">Import</button>
+                                <!-- to check is any class checkbox is unchecked -->
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>       
+{{--end import modal--}}
 @section('script')
 
 
@@ -151,7 +207,7 @@
 
 function loadProducts() {
   
-  console.log("TABLE run");
+  //console.log("TABLE run");
   var productTable = $('#productTable').DataTable({
                   processing: true,
                   serverSide: true,
@@ -190,12 +246,13 @@ function loadProducts() {
                       }
                   }, {
                       data: "name",
-                      name: 'name',
+                      name: 'name',      
                       "width": "30%"
                   }, {
                       data: "desctext",
                       name: 'description',
-                      "width": "30%"
+                      "width": "30%",
+                      searchable: true
                   },{
                       data: "image",
                       name: "image",
@@ -225,7 +282,8 @@ function loadProducts() {
                       data: "type_name",
                       name: 'Type',
                       "className": "text-center",
-                      "width": "10%"
+                      "width": "10%",
+                      searchable: true
                   }, {
                       data: 'action',
                       name: 'action',
@@ -237,11 +295,10 @@ function loadProducts() {
                   
                   ,drawCallback: function() {
                     // Call your second function here
-                    
                     initialise();
                   }
           });
-          console.log("table end");
+          //console.log("table end");
          
 }
 
@@ -257,14 +314,14 @@ $.ajaxSetup({
 
 function initialise()
 {
-  console.log("checkbox run");
+  //console.log("checkbox run");
 //if no data inside table
 const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 const deleteBtn = document.getElementById('delete-btn');
 const selectBtn =document.getElementById('select-btn');
 if(checkboxes.length==0)
 {
-  console.log(checkboxes.length);
+  //console.log(checkboxes.length);
     selectBtn.style.display='none';
 }
 
@@ -285,7 +342,10 @@ checkboxes.forEach(checkbox => {
     }
   });
 });
-console.log("checkbox end");
+//console.log("checkbox end");
+
+
+
 }
 
 $(document).ready(function() {
@@ -298,10 +358,12 @@ $(document).ready(function() {
       });
  
 $('.alert').delay(3000).fadeOut();
-    
-
+initialiseTargetCheckBox();
+//to use modal import 
+if ("{{ $reminderMessage }}" !== "") {
+    alert("{!! $reminderMessage !!}");
+  }
 });
-
 
 //selectall
 function selectAll()
@@ -356,8 +418,147 @@ $.ajax({
   });
 }
 
+function initialiseTargetCheckBox(){
+    $.ajax({
+        url: "{{ route('koperasi.fetchClassYear') }}",
+        method: "GET",
+        success: function(result) {
+                     jQuery.each(result.datayear, function(key, value) {
+                         $("#year").append("<option value='"+ value.year +"'> Tahun " + value.year + "</option>");
+                         let htmlContent="<div id='Tahun"+value.year+"' class='form-check-inline pb-3 pt-3'>";
+
+                         htmlContent+="<label for='form-check-label' style='margin-right: 22px;' class='form-check-label'>";
+                         htmlContent+="<input class='yearCheckbox' data-parsley-required-message='Sila pilih tahun' data-parsley-errors-container='.errorMessageCB' type='checkbox' id='cb_year' name='cb_year[]' value='T" +
+                             value.year + "'/> " +"Tahun " +value.year + "</label>";
+                         const filteredClass = result.classes.filter(c => c.nama.startsWith(value.year));
+                         //console.log(filteredClass);
+                         jQuery.each(filteredClass, function(key, value) {
+                             htmlContent+="<label for='form-check-label' style='margin-right: 22px;' class='form-check-label cb_class'> <input class='classCheckbox' data-parsley-required-message='Sila pilih tahun' data-parsley-errors-container='.errorMessageCB' type='checkbox' id='cb_class' name='cb_class[]' value='" +
+                                 value.id + "'/> " +value.nama + " </label>"
+                         //console.log(filteredClass)
+                         
+                     });  
+                     htmlContent+="</div><br>";
+                     $(".cbhide").append(htmlContent);
+                     $(".cbhide").hide();
+                     $('.cb_class').hide();
 
 
+                     $('.yearCheckbox').change(function(){
+                         const classDiv = $('#Tahun'+$(this).val().charAt(1));
+                         const classCheckBox = classDiv.find('input[type=checkbox]');
+                         const classDivComponent = classDiv.find('.cb_class');
+                         if($(this).is(':checked')){
+                             classCheckBox.prop('checked', true);
+                             classDivComponent.show();
+                         } else {
+                             classCheckBox.prop('checked', false);
+                             classDivComponent.hide();
+                             
+                         } 
+
+
+                     });
+
+                     $('.classCheckbox').change(function(){
+                         var DivId = $(this).closest('div').attr('id');
+                         const classDiv = $('#'+DivId);
+                         const classCheckBox = classDiv.find('input[type=checkbox]');
+                         const selectedCheckBox=classCheckBox.filter(':checked');
+
+                         if(selectedCheckBox.length==1){
+                             classDiv.find('input[type=checkbox]').prop('checked', false);
+                             checkYearCheckBox();
+                         }
+                         // console.log("Select:"+selectedCheckBox.length);
+                         // console.log("All :"+classCheckBox.length)
+                     });
+                                                 
+                     })
+                 }
+         });                  
+             
+   
+$('#year').change(function(){
+ const checkboxes = document.querySelectorAll('.yearCheckbox');
+ if($('#year').val()!="All")
+ {
+     $(".cbhide").show();   
+     checkboxes.forEach(checkbox => {
+         if(checkbox.value.charAt(1)==$('#year').val())
+         {
+             checkbox.checked=true;   
+             const classDiv = $('#Tahun'+$('#year').val());
+             classDiv.find('input[type=checkbox]').prop('checked', true);
+             classDiv.find('.cb_class').show();
+             
+                                     
+         }
+             
+         else{
+             checkbox.checked=false;
+             const classDiv = $('#Tahun'+checkbox.value.charAt(1));
+             classDiv.find('input[type=checkbox]').prop('checked', false);
+             classDiv.find('.cb_class').hide();
+         }
+             
+
+         checkbox.addEventListener('click', () => {      
+             checkYearCheckBox()
+         });
+     });
+ }
+ else{
+     $(".cbhide").hide();
+     checkboxes.forEach((checkbox) => {
+     checkbox.checked = false;
+     
+     });
+     const classDivComponent=$('.cb_class');
+     const classCheckBox = classDivComponent.find('input[type=checkbox]');
+     classCheckBox.prop('checked', false);
+     classDivComponent.hide();
+     
+ }
+
+});
+}
+
+function checkYearCheckBox(){
+    const checkboxes = document.querySelectorAll('.yearCheckbox');
+    const selectedCheckBox=document.querySelectorAll('.yearCheckbox:checked');
+
+    if(selectedCheckBox.length==checkboxes.length ||selectedCheckBox.length==0)
+    {
+        $(".cbhide").hide();
+        $("#year").val("All");
+        const classDivComponent=$('.cb_class');
+        const classCheckBox = classDivComponent.find('input[type=checkbox]');
+        classCheckBox.prop('checked', false);
+        classDivComponent.hide();
+    }
+}
+
+function checkByClassOrByYear(){
+    console.log("run")
+    const divCheckBox = document.querySelectorAll('.form-check-inline');
+    console.log(divCheckBox.length);
+    divCheckBox.forEach(singleDiv=>{
+        let classCheckBox = singleDiv.querySelectorAll('input[type=checkbox]');
+        let selectedCheckBox=Array.from(classCheckBox).filter(checkbox => checkbox.checked);
+        if(selectedCheckBox.length==0){
+            //do nothing
+            console.log("no selected");
+        }
+        else if(selectedCheckBox.length!=classCheckBox.length){
+            $('#classCheckBoxEmpty').val(true);
+           
+            //console.log();
+            console.log($('#classCheckBoxEmpty').val());
+            
+        }
+    });
+}
 
 </script>
 @endSection

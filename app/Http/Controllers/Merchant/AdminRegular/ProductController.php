@@ -7,6 +7,7 @@ use App\Models\Organization;
 use App\Models\ProductItem;
 use App\Models\ProductGroup;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Merchant\Regular\ProductController as RegularProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -106,37 +107,28 @@ class ProductController extends Controller
                 $type = $row->type == 'have inventory' ? $row->quantity_available : 'Tiada Inventori';
                 
                 $inv = '<ul class="list-group"><li class="list-group-item d-flex justify-content-between align-items-center">';
-                $inv .= 'Inventori<span class="badge badge-primary badge-pill">'.$type.'</span></li>';
-                if($row->selling_quantity > 1){
-                    $inv .= '<li class="list-group-item d-flex justify-content-between align-items-center">';
-                    $inv .= 'Pakej<span class="badge badge-primary badge-pill">'.$row->selling_quantity.'</span></li>';
-                }
+                $inv .= 'Kuantiti<span id="quantity" class="badge grey-badge badge-pill">'.$type.'</span></li>';
                 $inv .= '<li class="list-group-item d-flex justify-content-between align-items-center">';
-                $inv .= 'Nama Unit<span class="badge badge-primary badge-pill">'.$row->collective_noun.'</span>';
+                $inv .= 'Nama Unit<span class="badge grey-badge badge-pill">'.$row->collective_noun.'</span>';
                 $inv .= '</li></ul>';
                 return $inv;
             });
 
             $table->editColumn('price', function ($row) {
                 $price_unit = number_format($row->price, 2);
-                $overall_price = number_format($row->price * $row->selling_quantity, 2);
 
                 $price = '<ul class="list-group"><li class="list-group-item d-flex justify-content-between align-items-center">';
-                $price .= 'Unit<span class="badge badge-primary badge-pill">'.$price_unit.'</span></li>';
-                if($row->selling_quantity > 1){
-                    $price .= '<li class="list-group-item d-flex justify-content-between align-items-center">';
-                    $price .= 'Pakej<span class="badge badge-primary badge-pill">'.$overall_price.'</span></li>';
-                }
+                $price .= '<span class="badge grey-badge badge-pill">'.$price_unit.'</span>/Unit</li>';
                 $price .= '</ul>';
                 return $price;
             });
 
             $table->editColumn('status', function ($row) {
                 if ($row->status == 1) {
-                    $label = "<span class='badge rounded-pill bg-success text-white p-2'>Aktif</span>";
+                    $label = "<span class='badge rounded-pill text-white p-2 active'>Aktif</span>";
                     return $label;
                 } else {
-                    $label = "<span class='badge rounded-pill bg-danger text-white p-2'>Tidak Aktif</span>";
+                    $label = "<span class='badge rounded-pill text-white p-2 inactive'>Tidak Aktif</span>";
                     return $label;
                 }
             });
@@ -149,8 +141,8 @@ class ProductController extends Controller
                 ->first()->code;
                 $image_url = "/merchant-image/product-item/".$org_code."/";
 
-                $btn = '<a href="'.route('admin-reg.edit-item', ['id' => $row->product_group_id, 'item' => $row->id]).'" class="edit-item-modal btn btn-primary m-1"><i class="fas fa-pencil-alt"></i></a>';
-                $btn .= '<button data-item-id="'.$row->id.'" data-image-url="'.$image_url.'" class="delete-item-modal btn btn-danger m-1"><i class="fas fa-trash-alt"></i></button>';
+                $btn = '<a href="'.route('admin-reg.edit-item', ['id' => $row->product_group_id, 'item' => $row->id]).'" class="edit-item-modal btn btn-grey m-1"><i class="fas fa-pencil-alt"></i></a>';
+                $btn .= '<button data-item-id="'.$row->id.'" data-image-url="'.$image_url.'" class="delete-item-modal btn btn-red m-1"><i class="fas fa-trash-alt"></i></button>';
                 return $btn;
             });
 
@@ -219,7 +211,6 @@ class ProductController extends Controller
             'desc' => $request->item_desc,
             'type' => $request->inventory,
             'price' => $request->item_price,
-            'selling_quantity' => $request->selling_quantity,
             'collective_noun' => $request->collective_noun,
             'image' => $file_name,
             'status' => $request->status,
@@ -273,6 +264,7 @@ class ProductController extends Controller
     {
 
         $item = ProductItem::find($i_id);
+        $item->price = number_format($item->price,2,'.','');//pass '' to thousands separators
         $group = ProductGroup::find($g_id);
         $org_code = Organization::find($group->organization_id)->code;
 
@@ -304,12 +296,42 @@ class ProductController extends Controller
             'desc' => $request->item_desc,
             'type' => $request->inventory,
             'price' => number_format($request->item_price, 2, '.', ''),
-            'selling_quantity' => $request->selling_quantity,
             'collective_noun' => $request->collective_noun,
             'image' => $file_name,
             'status' => $request->status,
+            'updated_at' => Carbon::now(),
         ]);
+        // need to update total price inside PGNG_ORDERS
+        $existedOrders = DB::table('product_order')
+        ->join('product_item','product_item.id','product_order.product_item_id')
+        ->where([
+            ['product_order.deleted_at',NULL],
+            ['product_item.id',$request->id],
+        ])
+        ->join('pgng_orders','pgng_orders.id','product_order.pgng_order_id')
+        ->where('pgng_orders.deleted_at',NULL)
+        ->get();
+        $regularProductController = new RegularProductController();
 
+        if(count($existedOrders)!=0){
+            foreach($existedOrders as $row){
+                $pgng_order_id = $row->pgng_order_id;
+                $org_id = $row->organization_id;
+                $charge = Organization::find($org_id)
+                ->fixed_charges;
+
+                $totalPrice = $regularProductController->calculateTotalPrice($pgng_order_id, $charge);
+                // update total in PGNG_ORDERS
+                DB::table('pgng_orders')
+                ->where([
+                ['id', $pgng_order_id]
+                ])
+                ->update([
+                    'total_price' => $totalPrice
+                ]);
+            }
+        }
+            
         if($request->inventory == "have inventory") {
             ProductItem::where('id', $request->id)->update([
                 'quantity_available' => $request->item_quantity,
@@ -376,7 +398,7 @@ class ProductController extends Controller
             $alert .= " Inventori Tidak Boleh Kosong.";
         }
 
-        if($request->item_name == '' || $request->item_price == '' || $request->collective_noun == '' || $request->selling_quantity == '') {
+        if($request->item_name == '' || $request->item_price == '' || $request->collective_noun == '') {
             $alert .= " Sila isi tempat kosong yang diperlukan.";
         }
 

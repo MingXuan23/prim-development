@@ -24,7 +24,69 @@ input:required:invalid {
     border: 1px solid red;
     opacity: 1;
 }
-
+ul.pagination{
+    justify-content: flex-start!important;
+}
+nav .pagination{
+    margin-top:20px;
+    display: flex;
+    justify-content: center;
+}
+.page-item.active .page-link{
+    background-color:#5b626b!important;
+    border-color: #5b626b!important;
+    color:#ffffff!important;
+}
+.page-link {
+    color:#5b626b!important;
+}
+.active{
+    background-color: #5b626b!important;
+    border: 2px solid #5b626b!important;
+    color:#ffffff!important;
+}
+.inactive{
+    background-color: #af1717!important;
+    border: 2px solid #af1717!important;
+    color:#ffffff!important;
+}
+.grey-badge{
+    background-color: #5b626b!important;
+    color:#ffffff!important;
+}
+.form-control{
+    border: 2px solid #5b626b6c!important;
+}
+.form-control:focus{
+    outline: none;
+    border: 2px solid #5b626b!important;
+}
+.btn-grey{
+    background-color: #5b626b!important;
+    border: 2px solid #5b626b!important;
+    color:#ffffff!important;
+}
+.btn-grey:hover{
+    background-color: #ffffff!important;
+    color:#5b626b!important;
+    border: 2px solid #5b626b!important;
+}
+.btn-red{
+    background-color: #af1717!important;
+    border: 2px solid #af1717!important;
+    color:#ffffff!important;
+}
+.btn-red:hover{
+    background-color: #ffffff!important;
+    color:#af1717!important;
+    border: 2px solid #af1717!important;
+}
+.long-content  {
+   max-height: 200px!important;
+   overflow-y: auto!important;
+   white-space: pre-wrap;
+   text-align: justify;
+}
 @media screen and (max-width: 768px) { 
   #img-size
   {
@@ -51,8 +113,8 @@ input:required:invalid {
         </div>
     </div>
     <div class="col d-flex flex-row-reverse mr-3">
-        <button id="delete-product-group-modal" class="btn btn-danger m-1"><i class="fas fa-trash-alt"></i> Jenis Produk</button>
-        <button id="edit-product-group" class="btn btn-primary m-1"><i class="fas fa-pencil-alt"></i> Jenis Produk</button>
+        <button id="delete-product-group-modal" class="btn btn-red m-1"><i class="fas fa-trash-alt"></i> Jenis Produk</button>
+        <button id="edit-product-group" class="btn btn-grey m-1"><i class="fas fa-pencil-alt"></i> Jenis Produk</button>
     </div>
 </div>
 
@@ -70,7 +132,7 @@ input:required:invalid {
           </div>
         @endif
         <div class="d-flex justify-content-end mb-3">
-            <button id="add-product-item-modal" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Produk Item</button>
+            <button id="add-product-item-modal" class="btn btn-grey"><i class="fas fa-plus-circle"></i> Produk Item</button>
         </div>
 
         <div class="table-responsive">
@@ -79,12 +141,12 @@ input:required:invalid {
                 <thead class="thead-dark">
                     <tr>
                         <th style="width:1%">No.</th>
-                        <th style="width:12%" class="text-center">Gambar</th>
+                        <th style="width:10%" class="text-center">Gambar</th>
                         <th style="width:10%">Nama</th>
-                        <th style="width:12%">Deskripsi</th>
-                        <th style="width:12%" class="text-center">Inventori</th>
-                        <th style="width:12%" class="text-center">Harga (RM)</th>
-                        <th style="width:5%" class="text-center">Status</th>
+                        <th style="width:20%">Deskripsi</th>
+                        <th style="width:10%" class="text-center">Inventori</th>
+                        <th style="width:8%" class="text-center">Harga (RM)</th>
+                        <th style="width:3%" class="text-center">Status</th>
                         <th style="width:10%" class="text-center">Action</th>
                     </tr>
                 </thead>
@@ -114,8 +176,8 @@ input:required:invalid {
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" name="group_id" value="{{ $group->id }}">
-                    <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
-                    <button type="submit" id="update_group" class="btn btn-primary">Kemaskini</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-grey">Tutup</button>
+                    <button type="submit" id="update_group" class="btn btn-grey">Kemaskini</button>
                 </div>
             </form>
         </div>
@@ -139,8 +201,8 @@ input:required:invalid {
                     Adakah anda pasti mahu buang jenis produk ini? Semua produk item jenis produk <strong>{{ $group->name }}</strong> juga akan dibuang. 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
-                    <button type="submit" class="delete-group-btn btn btn-danger">Buang</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-grey">Tutup</button>
+                    <button type="submit" class="delete-group-btn btn btn-red">Buang</button>
                 </div>
             </form>
         </div>
@@ -163,7 +225,7 @@ input:required:invalid {
                         <div class="col">
                             <div class="form-group required">
                                 <label class="control-label">Nama</label>
-                                <input class="form-control" type="text" placeholder="Nama Item" name="item_name" id="item_name" required>
+                                <input class="form-control" type="text" placeholder="Nama Item" name="item_name" id="item_name" autocomplete="off" required>
                             </div>
                             
                         </div>
@@ -180,7 +242,7 @@ input:required:invalid {
                         <div class="col">
                             <div class="form-group">
                                 <label class="control-label">Deskripsi</label>
-                                <input class="form-control" type="text" placeholder="Deskripsi" name="item_desc" id="item_desc">
+                                <textarea class="form-control" rows="6" cols="60" placeholder="Deskripsi" name="item_desc" id="item_desc" autocomplete="off"></textarea>
                             </div>
                         </div>
                     </div>
@@ -190,15 +252,15 @@ input:required:invalid {
                             <label class="col-form-label pt-0">Inventori</label>
                             <div class="col-sm-10">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="inventory" id="no_inventory" value="no inventory" checked>
-                                    <label class="form-check-label" for="no_inventory">
-                                        Tiada
+                                    <input class="form-check-input" type="radio" name="inventory" id="have_inventory" value="have inventory"checked>
+                                    <label class="form-check-label" for="have_inventory">
+                                        Ada
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="inventory" id="have_inventory" value="have inventory">
-                                    <label class="form-check-label" for="have_inventory">
-                                        Ada
+                                    <input class="form-check-input" type="radio" name="inventory" id="no_inventory" value="no inventory">
+                                    <label class="form-check-label" for="no_inventory">
+                                        Tiada
                                     </label>
                                 </div>
                             </div>
@@ -237,15 +299,15 @@ input:required:invalid {
                         <div class="col">
                             <div class="form-group required">
                                 <label class="control-label">Nama Unit</label>
-                                <input class="form-control" type="text" placeholder="Kata Nama Kuantiti" name="collective_noun" id="collective_noun" value="Unit" required>
+                                <input class="form-control" type="text" placeholder="Kata Nama Kuantiti" name="collective_noun" id="collective_noun" value="Unit" autocomplete="off" required>
                             </div>
                         </div>
-                        <div class="col">
+                        {{-- <div class="col">
                             <div class="form-group required">
                                 <label class="control-label">Pakej</label>
                                 <input class="form-control" type="number" placeholder="Kuantiti" name="selling_quantity" id="selling_quantity" min="1" step="1" value="1" oninput="this.value = Math.round(this.value);" required>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                     
                     <div class="row">
@@ -260,8 +322,8 @@ input:required:invalid {
                     <input type="hidden" name="org_id" value="{{ $group->organization_id }}">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
-                    <button type="submit" id="add-item" class="btn btn-primary">Tambah</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-grey">Tutup</button>
+                    <button type="submit" id="add-item" class="btn btn-grey">Tambah</button>
                 </div>
             </form>
         </div>
@@ -281,8 +343,8 @@ input:required:invalid {
             
             </div>
             <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-light">Tutup</button>
-                <button type="button" class="delete-item-btn btn btn-danger">Buang</button>
+                <button type="button" data-dismiss="modal" class="btn btn-grey">Tutup</button>
+                <button type="button" class="delete-item-btn btn btn-red">Buang</button>
             </div>
             
         </div>
@@ -302,7 +364,6 @@ input:required:invalid {
         let gId = $('#group_id').val()
 
         fetch_data(gId)
-
         $(".custom-file-input").on("change", function() {
             var idxDot = this.value.lastIndexOf(".") + 1
             var extFile = this.value.substr(idxDot, this.value.length).toLowerCase()
@@ -323,12 +384,12 @@ input:required:invalid {
 
         function fetch_data(gId = '') {
             productTable = $('#productTable').DataTable({
-                "searching": false,
-                "bLengthChange": false,
-                "bPaginate": false,
+                "searching": true,
+                "bLengthChange": true,
+                "bPaginate": true,
                 "info": false,
                 "orderable": false,
-                "ordering": false,
+                "ordering": true,
                 processing: true,
                 serverSide: true,
                 "language": {
@@ -350,6 +411,7 @@ input:required:invalid {
                 columns: [{
                     "data": null,
                     searchable: false,
+                    orderable: false,
                     "sortable": false,
                     render: function (data, type, row, meta) {
                         let i = meta.row + meta.settings._iDisplayStart + 1;
@@ -363,34 +425,41 @@ input:required:invalid {
                 }, {
                     data: "name",
                     name: 'name',
-                    orderable: false,
-                    searchable: false,
+                    orderable: true,
+                    searchable: true,
                 }, {
                     data: "desc",
                     name: 'desc',
-                    orderable: false,
-                    searchable: false,
+                    orderable: true,
+                    searchable: true,
+                    render: function (data, type, row) {
+                        // Add a custom CSS class to the cell if the content is too long
+                        var cellClass = (data.length > 50) ? 'long-content' : '';
+                        return '<div class="' + cellClass + '">' + data + '</div>';
+                    }
                 }, {
                     data: "inventory",
                     name: 'inventory',
-                    orderable: false,
-                    searchable: false,
+                    orderable: true,
+                    searchable: true,
                 },{
                     data: 'price',
                     name: 'price',
-                    orderable: false,
-                    searchable: false,
+                    orderable: true,
+                    searchable: true,
                 },{
                     data: 'status',
                     name: 'status',
-                    orderable: false,
-                    searchable: false,
+                    orderable: true,
+                    searchable: true,
                 },{
                     data: 'action',
                     name: 'action',
                     orderable: false,
                     searchable: false,
-                },]
+                },],
+                "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ],
+                "pageLength": 10, // Number of items per page
             });
         }
 

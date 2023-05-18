@@ -116,7 +116,13 @@
                 transform: scaleX(1);
                 transform-origin: bottom left;
             }
-            
+            .form-control{
+                border: 2px solid #5b626b6c!important;
+            }
+            .form-control:focus{
+                outline: none;
+                border: 2px solid #5b626b!important;
+            }
     </style>
 @endsection
 

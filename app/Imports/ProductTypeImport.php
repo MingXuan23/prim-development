@@ -33,7 +33,7 @@ class ProductTypeImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'nama' => [
+            'name' => [
                 'required'
             ]
         ];
@@ -43,14 +43,14 @@ class ProductTypeImport implements ToModel, WithHeadingRow, WithValidation
     {
         return [
             // 'no_kp.unique' => 'Terdapat maklumat guru yang telah wujud',
-            'nama.required' => 'Nama perlu diisikan',
+            'name.required' => 'Nama perlu diisikan',
             
         ];
     }
 
     public function model(array $row)
     {
-        if(!isset($row['nama'])){
+        if(!isset($row['name'])){
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
 
@@ -58,14 +58,15 @@ class ProductTypeImport implements ToModel, WithHeadingRow, WithValidation
         $ifExits = DB::table('product_group as pg')
                    ->where('pg.organization_id','=',$this->organId)
                     // ->where('u.icno', '=', "{$row['no_kp']}")
-                    ->where('pg.name', '=', "{$row['nama']}")
+                    ->where('pg.name', '=', trim($row['name']))
+                    ->whereNull('pg.deleted_at')
                     ->get();
         
         if(count($ifExits) == 0) // if not product type with same name
         {
             $newProductType = new ProductGroup([
                 //
-                'name'      => $row['nama'],
+                'name'      => $row['name'],
                 'created_at'     => now(),
                 'updated_at'     => now(),
                 'organization_id' => $this->organId,

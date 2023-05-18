@@ -87,7 +87,7 @@
                     @php
                     $groupId=0;
                     @endphp
-                  <a href="{{ route('koperasi.deleteType',$groupId)}}" style="display:inline"><button class="btn btn-primary mr-1">Padam</button>
+                  <a href="#" style="display:inline"><button class="btn btn-primary mr-1">Padam</button>
                     <button type="button" data-dismiss="modal" class="btn">Batal</button></a>
                   </div>
                 </div>
@@ -137,7 +137,7 @@
                     <form action="{{ route('importproducttype') }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
-                            {{ csrf_field() }}
+                            {{ csrf_field() }} 
 
                             <div class="form-group">
                                 <input type="file" name="file" required>
@@ -160,6 +160,7 @@
 
 
 <script>
+  //to use ajax
 $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -187,6 +188,9 @@ function getProductNum(groupId)
           }
       }
       $("#modal-body-content").html(htmlText);
+      let deleteUrl = '{{ route("koperasi.deleteType", ":groupId") }}';
+      deleteUrl = deleteUrl.replace(':groupId', groupId);
+      $("#deleteConfirmationModal a").attr('href', deleteUrl);
       
     },
     error: function(xhr, status, error) {
