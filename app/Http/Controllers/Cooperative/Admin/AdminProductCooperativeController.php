@@ -80,7 +80,22 @@ class AdminProductCooperativeController extends Controller
         ->distinct('pg.id')
         ->get();
         
-        return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product'));
+        $hour = DB::table('organization_hours as oh')
+                ->join('organization_user as ou','oh.organization_id','=','ou.organization_id')
+                ->join('organizations as o', 'o.id', '=', 'ou.organization_id')
+                ->select('oh.*')
+                ->distinct('o.id')
+                ->where('ou.user_id', $userID)
+                ->where('o.type_org',10)
+                ->where('o.id',$koperasi->organization_id)
+                ->where('oh.status',1)
+                ->get();
+        $reminderMessage="";
+        if(count($hour)==0)
+        {
+            $reminderMessage="Anda belum kemas kini waktu operasi koperasi anda. Sila pergi 'Hari Dibuka' dekat 'Koop Admin' untuk mengemaskini maklumat.";
+        }
+        return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product','reminderMessage'));
     }
 
     public function getProductList(Request $request){ //ajax request to show product in product menu

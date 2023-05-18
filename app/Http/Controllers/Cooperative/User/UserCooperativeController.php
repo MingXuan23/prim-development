@@ -256,6 +256,42 @@ class UserCooperativeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    
+    // to check quantity before user check out to pay
+    public function checkCart(Request $request){
+        if(request()->ajax()){
+            $id=$request->pgngOrderId;
+            $cart_item = array(); // empty if cart is empty
+            $user_id = Auth::id();
+
+            $cart = PgngOrder::where([
+                ['status', 1],
+                ['organization_id', $id],
+                ['user_id', $user_id],
+            ])->first();
+        
+            if($cart)
+            {   
+                $before_cart_item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
+                ->join('pgng_orders as pg','po.pgng_order_id','=','pg.id')
+                ->where('pg.status', 1)
+                ->where('po.pgng_order_id', $cart->id)
+                ->select('pg.id as pgngId','po.id as productOrderId','pi.id as itemId', 'po.quantity', 'pi.name', 'pi.price', 'pi.image','pi.quantity_available','pi.status')
+                ->get();
+
+                foreach($before_cart_item as $item){
+                    if($item->quantity_available===0 || $item->status===0){
+                        return response()->json(['insufficientQuantity' => 1]);
+                    }else if($item->quantity >$item->quantity_available){
+                        return response()->json(['insufficientQuantity' => 1]);
+                    }
+                }
+                return response()->json(['insufficientQuantity' => 0]);
+            }
+        }
+    }
+
     public function edit($id) // user see their cart here
     {
         $cart_item = array(); // empty if cart is empty

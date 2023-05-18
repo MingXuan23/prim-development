@@ -606,31 +606,7 @@ class PayController extends AppBaseController
                     'note' => $request->note,
                     'transaction_id' => $transaction->id
                 ]);
-                $relatedProductOrder =DB::table('product_order')
-                ->where('pgng_order_id',$request->cartId)
-                ->select('product_item_id as itemId','quantity')
-                ->get();
-                foreach($relatedProductOrder as $item){
-                    $relatedItem=DB::table('product_item')
-                    ->where('id',$item)
-                    ->first();
-
-                    $newQuantity= intval($relatedItem->quantity_available - $item->quantity);
-                    if($newQuantity<=0){
-                        $relatedItem
-                        ->update([
-                            'quantity_available'=>0,
-                            'status'=>0
-                        ]);
-                    }
-                    else{
-                        $relatedItem
-                    ->update([
-                        'quantity_available'=>$newQuantity
-                    ]);
-                    }
-                    
-                }
+               
             }
             else {
                 $transaction->donation()->attach($id, ['payment_type_id' => 1]);
@@ -879,6 +855,32 @@ class PayController extends AppBaseController
                     ]);
                     $organization = Organization::find($order->organization_id);
                     $user = User::find($order->user_id);
+                    
+                    $relatedProductOrder =DB::table('product_order')
+                    ->where('pgng_order_id',$order->id)
+                    ->select('product_item_id as itemId','quantity')
+                    ->get();
+                    foreach($relatedProductOrder as $item){
+                        $relatedItem=DB::table('product_item')
+                        ->where('id',$item->itemId)
+                        ->first();
+    
+                        $newQuantity= intval($relatedItem->quantity_available - $item->quantity);
+                        if($newQuantity<=0){
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>0,
+                                'status'=>0
+                            ]);
+                        }
+                        else{
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>$newQuantity
+                        ]);
+                        }
+                        
+                    }
                     
                     $item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')

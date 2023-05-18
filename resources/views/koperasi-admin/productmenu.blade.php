@@ -360,10 +360,10 @@ $(document).ready(function() {
 $('.alert').delay(3000).fadeOut();
 initialiseTargetCheckBox();
 //to use modal import 
-
-
+if ("{{ $reminderMessage }}" !== "") {
+    alert("{!! $reminderMessage !!}");
+  }
 });
-
 
 //selectall
 function selectAll()

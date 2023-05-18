@@ -146,7 +146,7 @@ input::-webkit-inner-spin-button {
       </div>
 
       @if(count($cart_item) != 0 || $cart)
-      <form action="{{ route('fpxIndex') }}" method="POST">
+      <form action="{{ route('fpxIndex') }}" method="POST" onsubmit="return validateCart(event)">
       <input type="hidden" name="desc" id="desc" value="Koperasi">
       <input type="hidden" name="cartId" id="cartId" value="{{ $cart->id }}">
       @else
@@ -517,5 +517,45 @@ input::-webkit-inner-spin-button {
                 //     console.log(result.responseText)
                 // }
            })};
+
+    function validateCart(event) {
+    // Perform your validation logic here
+    // If the validation fails, prevent the form from submitting
+    if (cartChanged()) {
+      event.preventDefault();
+      alert("Some items in cart have not sufficient quantity in stock now");
+      location.reload();
+    }
+  };
+
+  function cartChanged() {
+    let productOrderId = $('.quantity-input-container').data("data-product-order-id");
+    let pgngOrderId = $('.quantity-input-container').data("data-pgng-order-id");
+    let insufficientQuantity=true;
+    $.ajax({
+                url: "{{route('koperasi.checkCart')}}",
+                method: "GET",
+                data: {
+                    productOrderId: productOrderId,
+                    pgngOrderId: pgngOrderId,
+                },
+            success: function(data) {
+                if(data.insufficientQuantity==1)
+                {
+                  insufficientQuantity= true;
+                } // 1 mean insufficient quantity
+                else if(data.insufficientQuantity==0){
+                  insufficientQuantity= false;
+                }
+                
+            },
+            error: function (data) {
+                // console.log(data);
+                insufficientQuantity= true;
+            }
+        });
+    
+    return insufficientQuantity;
+  };
 </script>
 @endsection
