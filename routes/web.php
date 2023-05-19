@@ -350,6 +350,7 @@ Route::group(['middleware' => ['auth']], function () {
         'profile'            => 'ProfileController',
         'dorm'               => 'DormController',
         'koperasi'           => 'Cooperative\User\UserCooperativeController',
+        'delivery'           => 'DeliveryController',
     ]);
 });
 
@@ -546,4 +547,9 @@ Route::group(['prefix' => 'sekolah'], function () {
     Route::get('dorm/createReasonOuting', 'DormController@createReasonOuting')->name('dorm.createReasonOuting');
     Route::get('dorm/storeReasonOuting', 'DormController@storeReasonOuting')->name('dorm.storeReasonOuting');
     Route::get('dorm/updateReasonOuting/{id}', 'DormController@updateReasonOuting')->name('dorm.updateReasonOuting');
+});
+
+Route::group(['prefix' => 'delivery'], function () {
+    Route::get('delivery/index', 'DeliveryController@index')->name('delivery.index');
+   //Route::get('')
 });
