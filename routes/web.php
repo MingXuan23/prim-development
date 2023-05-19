@@ -550,6 +550,6 @@ Route::group(['prefix' => 'sekolah'], function () {
 });
 
 Route::group(['prefix' => 'delivery'], function () {
-    Route::get('delivery/index', 'DeliveryController@index')->name('delivery.index');
+    Route::get('/index', 'DeliveryController@index')->name('delivery.parcelIndex');
    //Route::get('')
 });
