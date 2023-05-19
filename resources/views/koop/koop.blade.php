@@ -398,7 +398,7 @@ function loadProductList(selectedGroup){
                     html += '</div>';
                     html += '<div class="mt-auto d-flex justify-content-between align-items-center w-100">';
                     html += '<div class="">';
-                    html += '<p class="card-text"><b>RM</b> ' + item.price + '</p>';
+                    html += '<p class="card-text"><b>RM</b> ' + item.price.toFixed(2) + '</p>';
                     html += '</div>';
                     html += '<div class="ml-auto">';
 
