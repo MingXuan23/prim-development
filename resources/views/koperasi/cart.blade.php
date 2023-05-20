@@ -411,7 +411,7 @@ input::-webkit-inner-spin-button {
             let productOrderId = this.parentElement.getAttribute("data-product-order-id");
             let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
             // console.log(this.parentElement,inputQuantity);
-            console.log(pgngOrderId,productOrderId);
+            //console.log(pgngOrderId,productOrderId);
             if(inputQuantity >= 1){
                if(inputQuantity==1){
                 order_cart_id =pgngOrderId;
@@ -421,7 +421,7 @@ input::-webkit-inner-spin-button {
                else{
                 inputQuantity--;
                 this.nextElementSibling.value = inputQuantity;
-                console.log(this,inputQuantity,productOrderId,pgngOrderId);
+                //console.log(this,inputQuantity,productOrderId,pgngOrderId);
                 updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
                }
                 
@@ -509,7 +509,11 @@ input::-webkit-inner-spin-button {
                         $alertMessage.delay(1000).fadeOut()
 
 
-                        $totalBeforeCharge=result.totalPrice -{{$charge}};
+                        $totalBeforeCharge=result.totalPrice;
+                        @if (isset($charge))
+                            $totalBeforeCharge -= {{$charge}};
+                        @endif
+                         
                         $('#total').html("RM "+$totalBeforeCharge.toFixed(2));
                         $totalPrice = $('#totalPrice');
                         console.log(result.totalPrice);
@@ -524,47 +528,31 @@ input::-webkit-inner-spin-button {
     function validateCart(event) {
     // Perform your validation logic here
     // If the validation fails, prevent the form from submitting
-    if (cartChanged()) {
-      event.preventDefault();
-      alert("Some items in cart have not sufficient quantity in stock now");
-      location.reload();
-    }
-    else{
-      console.log("no err");
-    }
-  };
-
-  async function cartChanged() {
+    event.preventDefault();
+    @if (isset($cart))
     let pgngOrderId = {{$cart->id}};
-    let insufficientQuantity = true;
+    @endif
+    
 
-    try {
-        const response = await $.ajax({
+     $.ajax({
             url: "{{route('koperasi.checkCart')}}",
             method: "POST",
             data: {
                 pgngOrderId: pgngOrderId,
+            },
+            success:function (result){
+              if (parseInt(result.insufficientQuantity) === 1) {
+                event.preventDefault();
+                alert("Some items in cart have not sufficient quantity in stock now");
+                location.reload();
+            } else if (parseInt(result.insufficientQuantity) === 0) {
+                 console.log("no err");
+                 event.target.submit();
+            }
+            return false;
             }
         });
-
-        if (response.insufficientQuantity == 1) {
-            console.log("insufficient");
-            insufficientQuantity = true;
-        } else if (response.insufficientQuantity == 0) {
-            console.log(response.insufficientQuantity);
-            insufficientQuantity = false;
-        }
-
-        console.log("both not");
-    } catch (error) {
-        console.error(error);
-        // Handle the error if needed
-    }
-
-    // Code after the AJAX call
-    console.log(insufficientQuantity);
-    return insufficientQuantity;
-}
+  };
 
 </script>
 @endsection

@@ -329,7 +329,9 @@ class UserCooperativeController extends Controller
             $charge = DB::table('organizations')
             ->find($org_id)
             ->fixed_charges;
-
+            if($charge==null){
+                $charge=0;
+            }
 
             
             $updateMessage="";
