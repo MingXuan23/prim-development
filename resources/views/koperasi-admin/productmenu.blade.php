@@ -25,6 +25,9 @@
     width: 100%
     
   }
+  .card-body{
+    width:100%;
+  }
 }
 
 
@@ -46,8 +49,7 @@
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
     </div>
-  <div class="col-md-12">
-  <div class="card-body">
+
 
 @if(count($errors) > 0)
 <div class="alert alert-danger">
