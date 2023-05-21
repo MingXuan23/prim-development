@@ -568,23 +568,7 @@
                 // }
            })
     }
-    // document.querySelectorAll('.checkout-button').addEventListener('click', function(event) {
-    //     var productContainer = $(this).parent();
-    //     console.log(productContainer);
-    //     var quantityInput = $('input');
-    //     var quantityValue = parseInt(quantityInput.value);
-
-    //     if (quantityValue > parseInt(quantityInput.max)) {
-    //         event.preventDefault(); // Prevent default action
-
-    //         // Optionally, display an error message or take any other desired action
-    //         alert('Value is greater than the maximum allowed.');
-    //     } else {
-    //         // Update the href attribute to navigate to the desired route
-    //         var checkoutLink = document.getElementById('checkout-link');
-    //         checkoutLink.href = "{{ route('merchant.checkout', $organization->id) }}";
-    //     }
-    // });
+    
     
     // for validation before proceed to checkout page 
     $('.checkout-button').each(function (index,checkButton) {
@@ -612,3 +596,20 @@
     })
     </script>
 @endsection
+{{-- document.querySelectorAll('.checkout-button').addEventListener('click', function(event) {
+        var productContainer = $(this).parent();
+        console.log(productContainer);
+        var quantityInput = $('input');
+        var quantityValue = parseInt(quantityInput.value);
+
+       if (quantityValue > parseInt(quantityInput.max)) {
+            event.preventDefault(); // Prevent default action
+
+            // Optionally, display an error message or take any other desired action
+            alert('Value is greater than the maximum allowed.');
+    } else {
+            // Update the href attribute to navigate to the desired route
+            var checkoutLink = document.getElementById('checkout-link');
+         checkoutLink.href = "{{ route('merchant.checkout', dollarsignorganization->id) }}";
+        }
+ }); --}}
