@@ -94,7 +94,7 @@ class AdminProductCooperativeController extends Controller
         if(count($hour)==0)
         {
             $reminderMessage="Anda belum kemas kini waktu operasi koperasi anda. Sila pergi 'Hari Dibuka' dekat 'Koop Admin' untuk mengemaskini maklumat.";
-        }
+        }//najmi
         return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product','reminderMessage'));
     }
 
