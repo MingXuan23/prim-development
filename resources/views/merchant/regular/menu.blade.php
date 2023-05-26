@@ -80,7 +80,15 @@
   height: 35px;
   display:none;
 }
+.cart-add-btn{
+  background-color:#5b626b!important;
+  border: 2px solid #5b626b!important;
 
+}
+.cart-add-btn:hover{
+  background-color:#ffffff!important;
+  color:#5b626b!important;
+}
 /* .cart-btn {
   position: relative;
 }

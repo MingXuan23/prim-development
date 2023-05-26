@@ -86,6 +86,8 @@ class OrderController extends Controller
             ['pu.organization_id', $o_id],
             ['po.product_item_id', $i_id],
             ['pu.status', 'In cart'],
+            ['po.deleted_at',null],
+            ['pu.deleted_at',null],
         ])
         ->select('quantity as qty')
         ->first();

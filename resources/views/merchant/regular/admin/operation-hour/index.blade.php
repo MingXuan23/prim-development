@@ -3,7 +3,28 @@
 @section('css')
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 @include('layouts.datatable')
-
+<style>
+.active{
+    background-color: #5b626b!important;
+    border: 2px solid #5b626b!important;
+    color:#ffffff!important;
+}
+.inactive{
+    background-color: #af1717!important;
+    border: 2px solid #af1717!important;
+    color:#ffffff!important;
+}
+.btn-grey{
+    background-color: #5b626b!important;
+    border: 2px solid #5b626b!important;
+    color:#ffffff!important;
+}
+.btn-grey:hover{
+    background-color: #ffffff!important;
+    color:#5b626b!important;
+    border: 2px solid #5b626b!important;
+}
+ </style>   
 @endsection
 
 @section('content')

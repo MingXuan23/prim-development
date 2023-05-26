@@ -260,7 +260,9 @@
         
     @forelse ($organizations as $organization)
         <div>
-            <h3>{{$organization->nama}}</h3>
+            <a href="{{ route('merchant-reg.show', $organization->id) }}">
+                <h3 style="color:#5b626b">{{$organization->nama}}</h3>
+            </a>    
         </div>
             <div class="product-container">
                 @foreach($productInCart as $product)
@@ -496,47 +498,51 @@
             })
             }) 
         //when key in quantity when want to buy in the input field
-        $("input[name='quantity-input']").off('keypress').on('keypress',function(e){
-                    let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
+        $("input[name='quantity-input']").on('input',function(e){
+            let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
                     let productOrderId = this.parentElement.getAttribute("data-product-order-id");
                     let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
                     const currentValue = parseInt($(this).val());
-                    if (isNaN(currentValue)) {
-                        // if the current value is not a number, reset it to 1
-                        $(this).val(1);
-                    }
-                    const newValue = parseInt($(this).val() + e.key);
-                    if (newValue < 1 || newValue > qtyAvailable) {
+                    if ($(this).val() > qtyAvailable) {
                         // if the new value is out of bounds, prevent the default action
                         e.preventDefault();
-                        console.log(newValue);
                         // set the input value to the maximum allowed value
                         $(this).val(qtyAvailable);
-                    }else{
-                        updateInputQuantity(this, newValue,productOrderId,pgngOrderId);
+                        updateInputQuantity(this, $(this).val(),productOrderId,pgngOrderId);
+                        notificationCounter();
+
+                    }
+                    else if($(this).val() < 1){
+                        // if the new value is out of bounds, prevent the default action
+                        e.preventDefault();
+                        // set the input value to the maximum allowed value
+                        $(this).val(1);
+                    }
+                    else{
+                        updateInputQuantity(this, $(this).val(),productOrderId,pgngOrderId);
                         notificationCounter();
                     }
                 });
     });
-    $("input[type='number']").on('keyup', function(e) {
-      var input =this;
-      let productOrderId = this.parentElement.getAttribute("data-product-order-id");
-      let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
+    // $("input[type='number']").off('keyup').on('keyup', function(e) {
+    //   var input =this;
+    //   let productOrderId = this.parentElement.getAttribute("data-product-order-id");
+    //   let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
 
-        if ( $(this).val()===''){
-            setTimeout(function() {
-            if($(input).val()===''){
-                input.value=1;
-                updateInputQuantity(input, 1, productOrderId, pgngOrderId);
-                console.log("success");
-            }  
-            }, 2000);      
-        }
-        else if ($(this).val()==='0'){
-        $(this).val(1);
-        updateInputQuantity(this, 1, productOrderId, pgngOrderId);
-        }
-    });
+    //     if ( $(this).val()===''){
+    //         setTimeout(function() {
+    //         if($(input).val()===''){
+    //             input.value=1;
+    //             updateInputQuantity(input, 1, productOrderId, pgngOrderId);
+    //             console.log("success");
+    //         }  
+    //         }, 2000);      
+    //     }
+    //     else if ($(this).val()==='0'){
+    //     $(this).val(1);
+    //     updateInputQuantity(this, 1, productOrderId, pgngOrderId);
+    //     }
+    // });
     function updateInputQuantity(plusButton,inputQuantity,productOrderId,pgngOrderId){
             $.ajax({
                 url: "{{route('merchant.update-cart')}}",
@@ -557,7 +563,6 @@
                         var message = "<div class='success alert-success' style='padding: 5px;'>"+result.success+"</div>"
                         $alertMessage.empty();
                         $alertMessage.append(message);
-                        $alertMessage.fadeIn();
                         $alertMessage.delay(1000).fadeOut()
                             
                         $totalPrice = $parent.parent().parent().children().children('.product-details').children('.total-price');
