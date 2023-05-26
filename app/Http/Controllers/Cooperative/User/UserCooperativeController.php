@@ -451,9 +451,11 @@ class UserCooperativeController extends Controller
     {
         $userID = Auth::id();
         $id=$request->cart_id; //pgng order id
+        
         $productOrderId=$request->productOrderInCartId;
         // $cart_item = ProductOrder::where('pgng_order_id', $id);
-        $cart_item = ProductOrder::where([['pgng_order_id', $id],['id',$productOrderId]]);
+        $cart_item = ProductOrder::where([['pgng_order_id', $id],['id',$productOrderId]])->first();
+        
 
         
         // $item=$cart_item->first();
@@ -488,7 +490,7 @@ class UserCooperativeController extends Controller
         $this->destroyProductOrder($cart_item->id,$id);
         
         
-        return response()->json(['item' => $allCartItem])->with('success', 'Item Berjaya Dibuang');
+        return response()->json(['deleteId' => $productOrderId]);
         //return back()->with('success', 'Item Berjaya Dibuang');
     }
 
