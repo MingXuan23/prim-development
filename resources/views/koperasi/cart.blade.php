@@ -170,9 +170,9 @@ input::-webkit-inner-spin-button {
                       <tr>
                       <th class="text-muted" scope="row" style="font-size:16px">Caj yang dikenakan:</th>
                           @if($cart)
-                          <td class="lead" id="charge">RM {{ number_format($charge, 2, '.', '') }}</td>
+                          <td class="lead" id="charge" charge="{{$charge}}">RM {{ number_format($charge, 2, '.', '') }}</td>
                           @else
-                          <td class="lead" id="charge">RM 0.00</td>
+                          <td class="lead" id="charge" charge="0">RM 0.00</td>
                           @endif
                           </tr>
                           <tr>
@@ -363,6 +363,7 @@ input::-webkit-inner-spin-button {
     let order_cart_id = null;//update when the user minus until zero at minus button
     let productOrderInCartId=null;
     $(document).on('click', '#delete_confirm_item', function(){
+      console.log(order_cart_id);
             $.ajax({
                 url: "{{ route('koperasi.destroyItemCart', ['org_id' => $id]) }}",
                 method: "DELETE",
@@ -373,7 +374,7 @@ input::-webkit-inner-spin-button {
                     $('.alert-success').empty()
                 },
                 success:function(result) {
-                  //console.log(result.item);
+                  //console.log(result.data);
                     $('.loading').hide()
                     $(this).show()
                     location.reload()
@@ -399,7 +400,7 @@ input::-webkit-inner-spin-button {
             if(inputQuantity < qtyAvailable){
                 inputQuantity++;
                 this.previousElementSibling.value = inputQuantity;
-                console.log(this,inputQuantity,productOrderId,pgngOrderId);
+                //console.log(this,inputQuantity,productOrderId,pgngOrderId);
                 updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
             }
         })
@@ -452,40 +453,32 @@ input::-webkit-inner-spin-button {
       // ...
     });
 
-    $("input[name='quantity-input']").off('keypress').on('keypress', function(e) {
+    $("input[name='quantity-input']").on('input', function(e) {
     let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
     let productOrderId = this.parentElement.getAttribute("data-product-order-id");
     let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
     
-
-    if (isNaN(parseInt(e.key))) {
-        // prevent input if key pressed is not a number
+    //const currentValue = parseInt($(this).val());
+    const newValue = parseInt($(this).val());
+    //console.log(newValue);
+    if (newValue < 1) {
+        // if the new value is less than 1, set it to 1
         e.preventDefault();
-        //console.log( $(this).val());
-        
+        $(this).val('');
+        $(this).val(1);
+        updateInputQuantity(this, 1, productOrderId, pgngOrderId);
+    } else if (newValue > qtyAvailable) {
+        // if the new value is greater than qtyAvailable, set it to qtyAvailable
+        e.preventDefault();
+        $(this).val('');
+        $(this).val(qtyAvailable);
+        updateInputQuantity(this, qtyAvailable, productOrderId, pgngOrderId);
     } else {
-      
-        const currentValue = parseInt($(this).val());
-        const newValue = parseInt($(this).val() + e.key);
-        console.log(newValue);
-        if (newValue < 1) {
-            // if the new value is less than 1, set it to 1
-            e.preventDefault();
-            $(this).val('');
-            $(this).val(1);
-            updateInputQuantity(this, 1, productOrderId, pgngOrderId);
-        } else if (newValue > qtyAvailable) {
-            // if the new value is greater than qtyAvailable, set it to qtyAvailable
-            e.preventDefault();
-            $(this).val('');
-            $(this).val(qtyAvailable);
-            updateInputQuantity(this, qtyAvailable, productOrderId, pgngOrderId);
-        } else {
-            // otherwise, update the input value with the new value
-            console.log(newValue);
-            updateInputQuantity(this, newValue, productOrderId, pgngOrderId);
-        }
+        // otherwise, update the input value with the new value
+        //console.log(newValue);
+        updateInputQuantity(this, newValue, productOrderId, pgngOrderId);
     }
+    
 });
     function updateInputQuantity(plusButton,inputQuantity,productOrderId,pgngOrderId){
             $.ajax({
@@ -508,15 +501,13 @@ input::-webkit-inner-spin-button {
                         $alertMessage.append(message);
                         $alertMessage.delay(1000).fadeOut()
 
+                        let charge=parseFloat($("#charge").attr("charge"));
+                        totalBeforeCharge=parseFloat(result.totalPrice.replace(",", ""))-charge;//because data in database have comma ','
 
-                        $totalBeforeCharge=result.totalPrice;
-                        @if (isset($charge))
-                            $totalBeforeCharge -= {{$charge}};
-                        @endif
                          
-                        $('#total').html("RM "+$totalBeforeCharge.toFixed(2));
+                        $('#total').html("RM "+totalBeforeCharge.toFixed(2));
                         $totalPrice = $('#totalPrice');
-                        console.log(result.totalPrice);
+                        console.log(result.totalPrice+" "+totalBeforeCharge+" "+charge );
                         $totalPrice.html("RM "+result.totalPrice);
 
                 },

@@ -273,7 +273,14 @@ function loadProducts() {
                       data: "price",
                       name: 'Price',
                       "className": "text-center",
-                      "width": "10%"
+                      "width": "10%",
+                      render: function (data) {
+                        // Parse the value as a float and round it to 2 decimal places
+                        var formattedPrice = parseFloat(data).toFixed(2);
+
+                        
+                        return formattedPrice;
+                    }
                   },{
                       data: 'status',
                       name: 'status',

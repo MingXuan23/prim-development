@@ -41,10 +41,10 @@ class OperationHourController extends Controller
 
             $table->editColumn('status', function ($row) {
                 if ($row->status == 1) {
-                    $label = "<span class='badge rounded-pill bg-success text-white p-2'>Buka</span>";
+                    $label = "<span class='active badge rounded-pill p-2'>Buka</span>";
                     return $label;
                 } else {
-                    $label = "<span class='badge rounded-pill bg-danger text-white p-2'>Tutup</span>";
+                    $label = "<span class='inactive badge rounded-pill p-2'>Tutup</span>";
                     return $label;
                 }
             });
@@ -68,7 +68,7 @@ class OperationHourController extends Controller
             });
 
             $table->editColumn('action', function ($row) {
-                $btn = '<button data-hour-id="'.$row->id.'" class="edit-time-btn btn btn-primary"><i class="fas fa-pencil-alt"></i></button>';
+                $btn = '<button data-hour-id="'.$row->id.'" class="edit-time-btn btn btn-grey"><i class="fas fa-pencil-alt"></i></button>';
                 return $btn;
             });
 

@@ -55,7 +55,7 @@
     color: #fff;
 }
 .inputGroup input:checked ~ label:before {
-    transform: translate(-50%, -50%) scale3d(56, 56, 1);
+    transform: translate(-50%, -50%) scale3d(560, 56, 1);
     opacity: 1;
 }
 .inputGroup input:checked ~ label:after {

@@ -90,9 +90,13 @@
             .product-container:hover{
                 transform: translateY(-5px);
             }
+            .product-image{
+                height: 190px;
+            }
             .product-image img{
-                border-radius: 0.5rem;
                 object-fit: contain;
+                max-width: 100%;
+                width: auto;
             }
             .product-name{
                 text-align: center;
@@ -128,6 +132,9 @@
                     height:242px;
                     width: 150px;
                 }
+                .product-image{
+                    height: 150px;
+                }
             }
             @media screen and (max-width:550px){
                 .container{
@@ -143,6 +150,9 @@
                 }
                 .product-price{
                     font-size: 12px;
+                }
+                .product-image{
+                    height: 100px;
                 }
             }
     </style>
@@ -163,9 +173,9 @@
             <a href="{{route('merchant-product.show',$product->id)}}" class="product-container" data-product-id="{{$product->id}}"> 
                 <div class="product-image">
                     @if($product->image == null)
-                        <img class="img-fluid default-img" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}" alt="{{$product->name}}">
+                        <img class="default-img" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}" alt="{{$product->name}}">
                     @else
-                    <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
+                    <img class="rounded" id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
                     @endif 
                 </div>
                 <div class="product-infos">
