@@ -95,8 +95,7 @@
                                         <th style="width:3%">Bil.</th>
                                         <th>Item</th>
                                         <th style="width:10%">Kuantiti</th>
-                                        <th style="width:10%">Kuantiti Penuh</th>
-                                        <th style="width:20%">Amaun per item (RM)</th>
+
                                         <th style="width:20%">Amaun (RM)</th>
                                     </tr>
                                     @foreach ($item as $row)
@@ -106,16 +105,15 @@
                                             <div class="pl-2"> {{ $row->name }} </div>
                                         </td>
                                         <td style="text-align: center">{{ $row->quantity }}</td>
-                                        <td style="text-align: center">{{ $row->quantity * $row->selling_quantity }}</td>
+                                        
                                         <td style="text-align: center">
                                             {{  number_format((float)$row->price, 2, '.', '') }} </td>
-                                        <td style="text-align: center">
-                                            {{  number_format((float)$row->price * ($row->quantity * $row->selling_quantity), 2, '.', '')  }}</td>
+                                        
                                     </tr>
                                     @endforeach
                                     <tr>
                                         <td></td>
-                                        <td colspan="4" style="text-align:center"><b>Jumlah</b> </td>
+                                        <td colspan="2" style="text-align:center"><b>Jumlah</b> </td>
                                         <td style="text-align:center">
                                             <b>{{ number_format($transaction->amount, 2)  }}</b>
                                         </td>
@@ -156,7 +154,7 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-            window.location = '/merchant'; 
+            window.location = '/home'; 
         }
     },1000);
 </script>

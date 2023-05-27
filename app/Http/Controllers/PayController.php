@@ -856,19 +856,22 @@ class PayController extends AppBaseController
                     PgngOrder::where('transaction_id', $transaction->id)->first()->update([
                         'status' => 2
                     ]);
-                    $organization = Organization::find($order->organization_id);
-                    $user = User::find($order->user_id);
-                    
+                    $organization = Organization::where('id','=',$order->organization_id)->first();
+                    $user = User::where('id','=',$order->user_id)->first();
+
                     $relatedProductOrder =DB::table('product_order')
                     ->where('pgng_order_id',$order->id)
                     ->select('product_item_id as itemId','quantity')
                     ->get();
+
                     foreach($relatedProductOrder as $item){
                         $relatedItem=DB::table('product_item')
-                        ->where('id',$item->itemId)
-                        ->first();
-    
-                        $newQuantity= intval($relatedItem->quantity_available - $item->quantity);
+                        ->where('id',$item->itemId);
+                        
+                        $relatedItemQuantity=$relatedItem->first()->quantity_available;
+
+                        $newQuantity= intval($relatedItemQuantity - $item->quantity);
+                    
                         if($newQuantity<=0){
                             $relatedItem
                             ->update([
@@ -882,13 +885,13 @@ class PayController extends AppBaseController
                                 'quantity_available'=>$newQuantity
                         ]);
                         }
-                        
+                        //dd($relatedItem);
                     }
                     
                     $item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                     ->where('po.pgng_order_id', $order->id)
-                    ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                    ->select('pi.name', 'po.quantity', 'pi.price')
                     ->get();
                     
                     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));

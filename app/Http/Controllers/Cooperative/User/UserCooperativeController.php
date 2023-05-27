@@ -1,6 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Cooperative\User;
+use App\User;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\MerchantOrderReceipt;
 
 use App\Http\Controllers\Controller;
 use App\Models\PickUpOrder;
@@ -731,11 +735,9 @@ class UserCooperativeController extends Controller
         }
     }
 
-    public function destroyUserOrder($id)
+    public function destroyUserOrder($id)//not to used
     {
-        $queryKO = PgngOrder::find($id)->update(['status', 'Cancel by user']);
-        
-        $resultKO = PgngOrder::find($id)->delete();
+        $resultKO = PgngOrder::find($id)->update(['status', 'Cancel by user'],['deleted_at',now()]);
         
         $resultPO = ProductOrder::where('pgng_order_id', $id)->delete();
 
@@ -1003,4 +1005,54 @@ class UserCooperativeController extends Controller
 
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);
     }
+
+    //no need to un comment unless code
+    // public function testPay(){
+    //     $order = PgngOrder::where('transaction_id', 25853)->first();
+    //     $transaction = Transaction::where('id', '=', 25853)->first();           
+    //     PgngOrder::where('transaction_id', 25853)->first()->update([
+    //         'status' => 2
+    //     ]);
+    //     $organization = Organization::where('id','=',$order->organization_id)->first();
+    //     $user = User::where('id','=',$order->user_id)->first();
+
+    //     $relatedProductOrder =DB::table('product_order')
+    //     ->where('pgng_order_id',$order->id)
+    //     ->select('product_item_id as itemId','quantity')
+    //     ->get();
+
+    //     foreach($relatedProductOrder as $item){
+    //         $relatedItem=DB::table('product_item')
+    //         ->where('id',$item->itemId);
+            
+    //         $relatedItemQuantity=$relatedItem->first()->quantity_available;
+
+    //         $newQuantity= intval($relatedItemQuantity - $item->quantity);
+           
+    //         if($newQuantity<=0){
+    //             $relatedItem
+    //             ->update([
+    //                 'quantity_available'=>0,
+    //                 'status'=>0
+    //             ]);
+    //         }
+    //         else{
+    //             $relatedItem
+    //             ->update([
+    //                 'quantity_available'=>$newQuantity
+    //         ]);
+    //         }
+    //         //dd($relatedItem);
+    //     }
+        
+    //     $item = DB::table('product_order as po')
+    //     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+    //     ->where('po.pgng_order_id', $order->id)
+    //     ->select('pi.name', 'po.quantity', 'pi.price')
+    //     ->get();
+
+    //     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+        
+    //     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+    // }
 }
