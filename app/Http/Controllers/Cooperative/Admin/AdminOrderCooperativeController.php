@@ -19,12 +19,13 @@ class AdminOrderCooperativeController extends Controller
                     ->where('ou.role_id', $role_id)
                     ->first();
 
-        $customer = DB::table('pgng_orders as o')
-                    ->join('users as ou','o.user_id','=','ou.id')
-                    ->join('organization_user as op','o.organization_id','=','op.organization_id')
-                    ->where('op.user_id', $userID)
-                    ->select('o.*','ou.*','op.*','o.id as id','o.status as status')
-                    ->where('o.status', 2)
+        $customer = DB::table('pgng_orders as pg')
+                    ->join('users as u','pg.user_id','=','u.id')
+                    ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
+                    ->where('ou.user_id', $userID)
+                    ->where('pg.status', 2)
+                    ->groupBy('pg.id')
+                    ->select('pg.*','u.*','ou.*','pg.id as id','pg.status as status')
                     ->get();
 
         return view('koperasi-admin.confirm',compact('koperasi'),compact('customer'))->with('customer',$customer);

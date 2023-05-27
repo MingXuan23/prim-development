@@ -42,11 +42,11 @@
               @php($pickup = date_create($row->pickup_date))
               @csrf
                 <tr>
-                  <td class="align-middle">{{ $i }}.</td>
+                  <td class="align-middle">{{ $row->id }}.</td>
                   <td class="align-middle">{{ $row->koop_name }}</td>
                   <td class="align-middle">{{ $row->koop_telno }}</td>
-                  <td class="align-middle">{{ date_format($date,"M D Y, h:m:s A") }}</td>
-                  <td class="align-middle">{{ date_format($pickup,"D, M d Y") }}</td>
+                  <td class="align-middle">{{ date_format($date,"d M Y, h:m:s A") }}</td>
+                  <td class="align-middle">{{ date_format($pickup,"d M  Y") }}</td>
                   <td class="align-middle">
                     @if($row->note != null)
                     {{ $row->note }}
@@ -67,11 +67,11 @@
                   </td>
                   <td class="align-middle">
                     <div class="row d-block m-1">
-                      <button type="button" id="{{ $row->id }}" class="btn btn-warning btn-block">Pilih Hari Lain</button>
+                      <button type="button" id="{{ $row->id }}" class="btn btn-primary btn-block">Pilih Hari Lain</button>
                     </div>
-                    <div class="row d-block m-1">
+                    <!-- <div class="row d-block m-1">
                       <button type="button" id="{{ $row->id }}" class="btn btn-danger btn-block">Buang</button>
-                    </div>
+                    </div> -->
                   </td>
                 </tr>
               @php($i++)
@@ -163,7 +163,7 @@
       }
     });
 
-    $('.btn-warning').click(function(e) {
+    $('.btn-primary').click(function(e) {
       e.preventDefault();
       order_id = $(this).attr('id');
 

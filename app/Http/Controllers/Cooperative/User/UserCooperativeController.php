@@ -735,11 +735,9 @@ class UserCooperativeController extends Controller
         }
     }
 
-    public function destroyUserOrder($id)
+    public function destroyUserOrder($id)//not to used
     {
-        $queryKO = PgngOrder::find($id)->update(['status', 'Cancel by user']);
-        
-        $resultKO = PgngOrder::find($id)->delete();
+        $resultKO = PgngOrder::find($id)->update(['status', 'Cancel by user'],['deleted_at',now()]);
         
         $resultPO = ProductOrder::where('pgng_order_id', $id)->delete();
 
