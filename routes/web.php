@@ -199,6 +199,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::post('/koop/{id}/fetchItemToModel','UserCooperativeController@fetchItemToModel')->name('koperasi.fetchItemToModel');
         Route::post('/koop/storeInCart','UserCooperativeController@storeInCart')->name('koperasi.storeInCart');
         Route::post('/checkCart','UserCooperativeController@checkCart')->name('koperasi.checkCart');
+
+        //Route::get('/testPay','UserCooperativeController@testPay')->name('koperasi.testPay');
+        //created for test action after payment only
         
         
     });
