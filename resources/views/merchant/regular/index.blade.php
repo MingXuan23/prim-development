@@ -106,11 +106,12 @@
             @foreach($merchant as $row)
               <a href="{{ route('merchant-reg.show', $row->id) }}" class="order_modal list-group-item list-group-item-action">
                 <div class="d-flex">
-                    <img class="rounded img-fluid bg-dark" id="img-size" src="{{URL("images/koperasi/default-item.png")}}">
-                    {{-- {!! $row->organization_picture != null ? 
+                    {{-- <img class="rounded img-fluid bg-dark" id="img-size" src="{{URL("images/koperasi/default-item.png")}}"> --}}
+                    <img class="rounded img-fluid bg-dark" id="img-size" src="{!! $row->organization_picture != null ? 
                       URL('organization-picture/'.$row->organization_picture) : 
                       URL('images/koperasi/default-item.png')
-                    !!}"> --}}
+                    !!}">
+                    
                     <div class="flex-column ml-2">
                         <h4 class="merchant_name">
                           {!! $row->nama !!}

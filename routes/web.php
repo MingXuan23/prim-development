@@ -308,6 +308,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::delete('destroy-item', 'ProductController@destroyProductItem')->name('admin-reg.destroy-item');
         Route::get('/p-group-list/{id}/edit/{item}', 'ProductController@editProductItem')->name('admin-reg.edit-item');
         Route::put('update-item', 'ProductController@updateProductItem')->name('admin-reg.update-item');
+        Route::post('/importMerchantProduct', 'ProductController@importMerchantProduct')->name('importMerchantProduct');
         
         # Order Dashboard
         Route::get('orders', 'OrderController@index')->name('admin-reg.orders');

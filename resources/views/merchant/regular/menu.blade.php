@@ -131,7 +131,7 @@
 
 }
 #shop-bg-img{
-  background-image: url(/merchant-image/shop-background-image.jpg);
+  background-image: url("{{ URL('/merchant-image/shop-background-image.jpg')}}");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover; 

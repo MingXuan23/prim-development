@@ -91,7 +91,8 @@
                 transform: translateY(-5px);
             }
             .product-image{
-                height: 190px;
+                height: 190px!important;
+                width: 190px!important;
             }
             .product-image img{
                 object-fit: contain;
@@ -133,7 +134,8 @@
                     width: 150px;
                 }
                 .product-image{
-                    height: 150px;
+                    height: 150px!important;
+                    width: 150px!important;
                 }
             }
             @media screen and (max-width:550px){
@@ -152,7 +154,8 @@
                     font-size: 12px;
                 }
                 .product-image{
-                    height: 100px;
+                    height: 100px!important;
+                    width: 100px!important;
                 }
             }
     </style>
