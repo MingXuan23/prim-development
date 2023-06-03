@@ -252,7 +252,10 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
         Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
-        // Checkout
+        
+        Route::get('/testPay','ProductController@testPay')->name('merchant.testPay');
+         
+         // Checkout
         Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
         Route::get('get-checkout-items', 'ProductController@getCheckoutItems')->name('merchant.get-checkout-items');
         // Get all cart
@@ -275,6 +278,8 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::post('fetch-disabled-dates', 'OrderController@fetchDisabledDates')->name('merchant-reg.disabled-dates');
         Route::post('fetch-hours', 'OrderController@fetchOperationHours')->name('merchant-reg.fetch-hours');
         Route::post('{org_id}/cart/{order_id}/payment', 'OrderController@store')->name('merchant-reg.store-order');
+        
+       
     });
 
     Route::group(['prefix' => 'admin-regular', 'namespace' => 'AdminRegular'], function() {
