@@ -190,7 +190,6 @@
     </section>
     {{-- for pagination --}}
         {{$products->links()}}
-        <a href="{{route('merchant.testPay')}}" class="btn btn-primary">Test Pay</a>
 @endsection
 
 @section('script')
