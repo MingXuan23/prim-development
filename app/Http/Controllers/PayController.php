@@ -826,7 +826,7 @@ class PayController extends AppBaseController
                     $transaction->status = "Success";
                     $transaction->save();
                     
-                    PgngOrder::where('transaction_id', $transaction->id)->update([
+                    PgngOrder::where('transaction_id', $transaction->id)->first()->update([
                         'status' => 'Paid'
                     ]);
 
