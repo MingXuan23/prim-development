@@ -172,8 +172,12 @@ class HistoryController extends Controller
         // get all product based on order
         $item = DB::table('product_order as po')
                 ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                ->where('po.pgng_order_id', $order_id)
-                ->select('po.id', 'pi.name', 'pi.price', 'po.quantity', 'po.selling_quantity')
+                ->where([
+                    ['po.pgng_order_id', $order_id],
+                    ['po.deleted_at',NULL],
+                    ['pi.deleted_at',NULL],
+                ])
+                ->select('po.id', 'pi.name', 'pi.price', 'po.quantity')
                 ->get();
 
         $total_price[] = array();
@@ -182,7 +186,7 @@ class HistoryController extends Controller
         foreach($item as $row)
         {
             $price[$row->id] = number_format($row->price, 2);
-            $total_price[$row->id] = number_format(doubleval($row->price * ($row->quantity * $row->selling_quantity)), 2); // calculate total for each item in cart
+            $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2); // calculate total for each item in cart
         }
 
         return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price'));
