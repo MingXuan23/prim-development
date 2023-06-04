@@ -129,7 +129,7 @@
               <tr>
                 <td>{{ $row->name }}</td>
                 <td>{{ $price[$row->id] }}</td>
-                <td>{{ $row->quantity * $row->selling_quantity }}</td>
+                <td>{{ $row->quantity}}</td>
                 <td>{{ $total_price[$row->id] }}</td>
               </tr>
             @endforeach

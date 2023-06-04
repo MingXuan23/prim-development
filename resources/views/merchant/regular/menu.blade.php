@@ -131,7 +131,13 @@
 
 }
 #shop-bg-img{
-  background-image: url("{{ URL('/merchant-image/shop-background-image.jpg')}}");
+  /* background-image: url("{{ URL('/merchant-image/shop-background-image.jpg')}}"); */
+  background: linear-gradient(
+    180deg,
+    #5b626b 0%,
+    rgb(65, 65, 65) 47%,
+    rgb(66, 66, 66) 100%
+  );
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover; 

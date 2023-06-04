@@ -406,9 +406,6 @@
             $.ajax({
                 url: "{{ route('merchant.load-cart-counter') }}",
                 method: "GET",
-                beforeSend:function(){
-                    noty.empty()
-                },
                 success:function(result){
                 if(result.counter != 0) {
                     noty.html("Jumlah("+result.counter+" item)<b>RM"+result.total+"</b>");

@@ -831,15 +831,7 @@ class PayController extends AppBaseController
                     ]);
 
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
-                    $item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
-                    ->where([
-                        ['po.pgng_order_id', $order->id],
-                        ['po.deleted_at',NULL],
-                        ['pi.deleted_at',NULL],
-                    ])
-                    ->select('pi.name', 'po.quantity', 'pi.price')
-                    ->get();
+
                     $organization = Organization::find($order->organization_id);
                     $user = User::find($order->user_id);
                     
@@ -875,6 +867,15 @@ class PayController extends AppBaseController
                         }
                         
                     }
+                    $item = DB::table('product_order as po')
+                    ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
+                    ->where([
+                        ['po.pgng_order_id', $order->id],
+                        ['po.deleted_at',NULL],
+                        ['pi.deleted_at',NULL],
+                    ])
+                    ->select('pi.name', 'po.quantity', 'pi.price')
+                    ->get();
 
                     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
                     
