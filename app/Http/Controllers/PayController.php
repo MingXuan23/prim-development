@@ -499,7 +499,7 @@ class PayController extends AppBaseController
             $fpx_sellerOrderNo  = "KOPPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
-            $fpx_sellerId       = config('app.env') == 'production' ? $ficts_seller_id : "SE00013841";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         }
 
         $fpx_msgType        = "AR";
@@ -833,12 +833,49 @@ class PayController extends AppBaseController
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
                     $item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
-                    ->where('po.pgng_order_id', $order->id)
-                    ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                    ->where([
+                        ['po.pgng_order_id', $order->id],
+                        ['po.deleted_at',NULL],
+                        ['pi.deleted_at',NULL],
+                    ])
+                    ->select('pi.name', 'po.quantity', 'pi.price')
                     ->get();
                     $organization = Organization::find($order->organization_id);
                     $user = User::find($order->user_id);
                     
+                    $relatedProductOrder =DB::table('product_order')
+                    ->where([
+                        ['pgng_order_id',$order->id],
+                        ['deleted_at',NULL]
+                    ])
+                    ->select('product_item_id as itemId','quantity')
+                    ->get();
+            
+                    foreach($relatedProductOrder as $item){
+                        $relatedItem=DB::table('product_item')
+                        ->where('id',$item->itemId);
+                        
+                        $relatedItemQuantity=$relatedItem->first()->quantity_available;
+            
+                        $newQuantity= intval($relatedItemQuantity - $item->quantity);
+                       
+                        if($newQuantity<=0){
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>0,
+                                'type' => 'no inventory',
+                                'status'=>0
+                            ]);
+                        }
+                        else{
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>$newQuantity
+                        ]);
+                        }
+                        
+                    }
+
                     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
                     
                     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));

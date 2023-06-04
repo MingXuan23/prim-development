@@ -208,7 +208,7 @@
                   </div> --}}
                   <div class="col">
                       <label class="control-label">Nama Unit</label>
-                      <input class="form-control" type="text" placeholder="Kata Nama Kuantiti" name="collective_noun" id="collective_noun" value="{{ $item->collective_noun }}" required>
+                      <input class="form-control" type="text" placeholder="Contoh: Unit atau Kg" name="collective_noun" id="collective_noun" value="{{ $item->collective_noun }}" required>
                   </div>
                 </div>
             </div>

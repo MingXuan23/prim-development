@@ -11,6 +11,9 @@ use App\Models\Organization;
 use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use App\Models\PgngOrder;
+use App\Models\Transaction;
+
+
 use Yajra\DataTables\DataTables;//for datatable
 
 class ProductController extends Controller
@@ -363,6 +366,64 @@ class ProductController extends Controller
         }
 
     }
+    // public function testPay(){
+    //     $transaction = Transaction::where('id', '=', 66666)->first();
+        
+    //     PgngOrder::where('transaction_id', $transaction->id)->update([
+    //         'status' => 'Paid'
+    //     ]);
+
+    //     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
+    //     $item = DB::table('product_order as po')
+    //     ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
+    //     ->where([
+    //         ['po.pgng_order_id', $order->id],
+    //         ['po.deleted_at',NULL],
+    //         ['pi.deleted_at',NULL],
+    //     ])
+    //     ->select('pi.name', 'po.quantity', 'pi.price')
+    //     ->get();
+        
+    //     $organization = Organization::find($order->organization_id);
+    //     $user = DB::table('users')->find($order->user_id);
+        
+    //     $relatedProductOrder =DB::table('product_order')
+    //     ->where([
+    //         ['pgng_order_id',$order->id],
+    //         ['deleted_at',NULL]
+    //     ])
+    //     ->select('product_item_id as itemId','quantity')
+    //     ->get();
+
+    //     foreach($relatedProductOrder as $item){
+    //         $relatedItem=DB::table('product_item')
+    //         ->where('id',$item->itemId);
+            
+    //         $relatedItemQuantity=$relatedItem->first()->quantity_available;
+
+    //         $newQuantity= intval($relatedItemQuantity - $item->quantity);
+           
+    //         if($newQuantity<=0){
+    //             $relatedItem
+    //             ->update([
+    //                 'quantity_available'=>0,
+    //                 'type' => 'no inventory',
+    //                 'status'=>0
+    //             ]);
+    //         }
+    //         else{
+    //             $relatedItem
+    //             ->update([
+    //                 'quantity_available'=>$newQuantity
+    //         ]);
+    //         }
+            
+    //     }
+    //     dd($relatedProductOrder);
+    //     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+        
+    //     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+    // }
 //    public function store(Request $request, $org_id, $order_id)
 //     {
 //         $pickup_date = $request->pickup_date;
