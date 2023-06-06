@@ -364,6 +364,7 @@ Route::group(['middleware' => ['auth']], function () {
         'dorm'               => 'DormController',
         'koperasi'           => 'Cooperative\User\UserCooperativeController',
         'delivery'           => 'DeliveryController',
+        //'polimas'            =>'PolimasController',
     ]);
 });
 
@@ -460,9 +461,14 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
 
-Route::group(['prefix' => 'polimas'], function () {
-    // Route::get('/', 'PolimasController@indexLogin');
+
+Route::get('/{name}', 'PolimasController@indexLogin')->name('polimas.loginindex');
+
+Route::group(['prefix' => 'polimas'], function (){
+    // Define your routes here
+   
     Route::group(['middleware' => ['auth']], function () {
+       
         Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
         Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
         Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
@@ -472,7 +478,6 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
     });
 });
-
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
     Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
