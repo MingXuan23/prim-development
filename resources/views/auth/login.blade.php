@@ -33,7 +33,7 @@ Login
                                 @csrf
                                     <div class="form-group">
                                         <label for="username">Email / Nombor Telefon</label>
-                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" @if(old('email')) value="{{ old('email') }}" @else value="" @endif  id="username" placeholder="Masukkan Email ataupun Nombor Telefon" autocomplete="email" autofocus>
+                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" @if(old('email')) value="{{ old('email') }}" @else value="" @endif  id="username" placeholder="Masukkan Email/Nombor Telefon/Nombor IC" autocomplete="email" autofocus>
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>

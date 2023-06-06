@@ -891,9 +891,13 @@ class PayController extends AppBaseController
 
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
                     
-                    PgngOrder::where('transaction_id', $transaction->id)->first()->update([
-                        'status' => 2
-                    ]);
+
+                    $pgngOrder= PgngOrder::where('transaction_id', $transaction->id)->first();
+                    $pgngOrder->status=2;
+                    $pgngOrder->created_at=now();
+                    $pgngOrder->updated_at=now();
+                    $pgngOrder->save();
+                    
                     $organization = Organization::where('id','=',$order->organization_id)->first();
                     $user = User::where('id','=',$order->user_id)->first();
 

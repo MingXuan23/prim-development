@@ -1,7 +1,7 @@
 @extends('layouts.master-without-nav')
 
 @section('title')
-Polimas Login
+{{$title}} Login
 @endsection
 
 @section('body')
@@ -19,8 +19,9 @@ Polimas Login
                     <div class="card overflow-hidden">
                         <div class="bg-primary">
                             <div class="text-primary text-center p-4">
-                                <a href="https://www.polimas.edu.my/web/">
-                                    <img src="{{ URL::asset('assets/images/logo/polimas-logo.png') }}" height="60" alt="logo">
+                                <!-- <a href="https://www.polimas.edu.my/web/"> -->
+                                <a href="#">
+                                    <img src="{{ URL::asset('/organization-picture/'.$org->organization_picture) }}" height="60" alt="logo">
                                 </a>
                                 <h5 class="text-white font-size-20">Selamat Datang!</h5>
                                 <p class="text-white-50">Log Masuk ke PRIM</p>
@@ -33,7 +34,7 @@ Polimas Login
                                 @csrf
                                     <div class="form-group">
                                         <label for="username">Nombor IC / Nombor Telefon</label>
-                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" @if(old('email')) value="{{ old('email') }}" @else value="" @endif  id="username" placeholder="Masukkan Nombor IC ataupun Nombor Telefon" autocomplete="email" autofocus>
+                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" @if(old('email')) value="{{ old('email') }}" @else value="" @endif  id="username" placeholder="{{$placeholder}}" autocomplete="email" autofocus>
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>

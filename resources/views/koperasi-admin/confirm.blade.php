@@ -71,7 +71,7 @@
                 </td>
 
                 <td>
-                 {{$customer->updated_at}}
+                 {{$customer->orderTime}}
                 </td>
 
                 <td>
@@ -80,6 +80,7 @@
 
                 <td>
                 {{$customer->note}}
+                | <a href="{{ route('koperasi.viewPgngList', [$customer->id, $customer->customerID]) }}">Lihat Pesanan</a>
                 </td>
 
                 <td>

@@ -197,8 +197,11 @@
         let amount = new Array()
         
         for (var i=0; i < Object.keys(itemObject).length; i++) {
-            name[i] = itemObject[i].name;
-            amount[i] = itemObject[i].totalSales;               
+            if(itemObject[i].totalSales > 0){
+                name[i] = itemObject[i].name;
+                amount[i] = itemObject[i].totalSales;   
+            }
+             
         }
         
         var data = {
@@ -222,7 +225,7 @@
                 }
             }],
             ['screen and (min-width: 1024px)', {
-                labelOffset: 70,
+                labelOffset: 50,
                 chartPadding: 20
             }]
         ];

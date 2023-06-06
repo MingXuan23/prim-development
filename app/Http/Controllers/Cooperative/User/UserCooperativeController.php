@@ -626,7 +626,7 @@ class UserCooperativeController extends Controller
         $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $userID = Auth::id();
 
-        $query = DB::table('pgng_orders as ko')
+        $order = DB::table('pgng_orders as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                 ->whereIn('status', [3, 100, 200])
                 ->where('user_id', $userID)
@@ -636,16 +636,17 @@ class UserCooperativeController extends Controller
                 ->orderBy('ko.pickup_date', 'asc')
                 ->orderBy('ko.updated_at', 'desc');
 
-        $order = $query->paginate(5);
+        //$order = $query->paginate(5);
 
         return view('koperasi.history', compact('order'));
     }
 
-    public function indexList($id)
+    public function indexList($id,$customerID)
     {
-        $userID = Auth::id();
 
+        $userID = Auth::id();
         // Get Information about the order
+
         $list_detail = DB::table('pgng_orders as ko')
                         ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
                         ->where('ko.id', $id)
