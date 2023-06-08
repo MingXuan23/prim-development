@@ -35,6 +35,10 @@ class SchoolController extends Controller
                 $oid=141;
                 $title="Sains Muar";
                 break;
+            case "srab":
+                $oid=160;
+                $title="SRAB";
+                break;
              default:
                 return redirect('/login');
 
