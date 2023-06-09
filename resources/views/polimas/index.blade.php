@@ -21,10 +21,10 @@
                             <div class="text-primary text-center p-4">
                                 <!-- <a href="https://www.polimas.edu.my/web/"> -->
                                 <a href="#">
-                                    <img src="{{ URL::asset('/organization-picture/'.$org->organization_picture) }}" height="60" alt="logo">
+                                    <img src="{{ URL::asset('/organization-picture/'.$org) }}" height="60" alt="logo">
                                 </a>
                                 <h5 class="text-white font-size-20">Selamat Datang!</h5>
-                                <p class="text-white-50">Log Masuk ke PRIM</p>
+                                <p class="text-white-50">{{$loginText}}</p>
                             </div>
                         </div>
 
@@ -33,8 +33,8 @@
                             <form class="form-horizontal mt-4" method="POST" action="{{ route('login') }}">
                                 @csrf
                                     <div class="form-group">
-                                        <label for="username">Nombor IC / Nombor Telefon</label>
-                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" @if(old('email')) value="{{ old('email') }}" @else value="" @endif  id="username" placeholder="{{$placeholder}}" autocomplete="email" autofocus>
+                                        <label for="username">{{$placeholder}}</label>
+                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" @if(old('email')) value="{{ old('email') }}" @else value="" @endif  id="username" placeholder="Masukkan {{$placeholder}}" autocomplete="email" autofocus>
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -44,7 +44,7 @@
 
                                     <div class="form-group">
                                         <label for="userpassword">Kata Laluan</label>
-                                        <input type="password" name="password" class="form-control  @error('password') is-invalid @enderror" id="userpassword" value="" placeholder="Kata Laluan">
+                                        <input type="password" name="password" class="form-control  @error('password') is-invalid @enderror" id="userpassword" value="" placeholder="Masukkan Kata Laluan">
                                         @error('password')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
