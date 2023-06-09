@@ -66,6 +66,7 @@ class OrganizationController extends Controller
 
         if (!is_null($request->organization_picture)) {
             $extension = $request->organization_picture->extension();
+           
             $storagePath  = $request->organization_picture->storeAs('/public/organization-picture', $str . '.' . $extension);
             $file_name = basename($storagePath);
         }
@@ -191,6 +192,20 @@ class OrganizationController extends Controller
     public function update(OrganizationRequest $request, $id)
     {
         Organization::where('id', $id)->update($request->validated());
+        $file_name = '';
+        $link = explode(" ", $request->nama);
+        $str = implode("-", $link);
+        // dd($request->donation_type);
+        //dd($str);
+        if (!is_null($request->images)) {
+            $extension = $request->images->extension();
+            $storagePath  = $request->images->move(public_path('organization-picture'), $str . '.' . $extension);
+            $file_name = basename($storagePath);
+            //dd($storagePath,$file_name,$extension);
+            Organization::where('id', $id)->update([
+                'organization_picture'   => $file_name,
+            ]);
+        }
 
         if (isset($request->seller_id)) {
             Organization::where('id', $id)->update([

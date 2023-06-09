@@ -142,6 +142,13 @@
                         data-parsley-required-message="Sila masukkan alamat organisasi" required>{{ $org->address }}</textarea>
                     </div>
 
+                    <label>Gambar Logo</label>
+                        <div class="fallback">
+                        <img src="{{ URL::asset('/organization-picture/'.$org->organization_picture) }}" height="100" alt="logo">
+                        <input type="file" name="images" id="image"></br></br>
+                        </div>
+
+
                     <div class="form-group mb-0">
                         <div class="text-right">
                             <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
