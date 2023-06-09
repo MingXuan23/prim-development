@@ -462,28 +462,7 @@ Route::group(['prefix' => 'session'], function () {
 });
 
 
-Route::get('/{name}', 'PolimasController@indexLogin')->name('polimas.loginindex');
 
-Route::group(['prefix' => 'polimas'], function (){
-    // Define your routes here
-   
-    Route::group(['middleware' => ['auth']], function () {
-       
-        Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
-        Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
-        Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
-        Route::get('/student-list', 'PolimasController@getStudentDatatable')->name('polimas.student.getStudentDatatable');
-        Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
-        Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
-        Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
-    });
-});
-
-Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
-    Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
-    Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
-    Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
-});
 
 Route::resource('dorm', 'DormController');
 Route::group(['prefix' => 'sekolah'], function () {
@@ -570,4 +549,12 @@ Route::group(['prefix' => 'sekolah'], function () {
 Route::group(['prefix' => 'delivery'], function () {
     Route::get('/index', 'DeliveryController@index')->name('delivery.parcelIndex');
    //Route::get('')
+});
+
+Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
+    Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
+    Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
+    Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
 });

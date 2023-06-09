@@ -16,6 +16,39 @@ class SchoolController extends Controller
         return view('pentadbir.school.index', compact('school'));
     }
 
+    public function indexLogin($name)//use to customise login page of each school
+    {
+        $title="";
+        $placeholder="Masukkan Email/Nombor Telefon/Nombor IC";
+        switch($name)
+        {
+            case "lmm":
+                $oid=137;
+                $placeholder="Masukkan Email/Nombor IC";
+                $title="Lembaga Maktab Mahmud";
+                break;
+            case "polimas":
+                $oid =107;
+                $title="Polimas";
+                break;
+            case "samura":
+                $oid=141;
+                $title="Sains Muar";
+                break;
+            case "srab":
+                $oid=160;
+                $title="SRAB";
+                break;
+             default:
+                return redirect('/login');
+
+        }
+
+        $org=DB::table('organizations')->where('id',$oid)->first();
+        //dd($org);
+        return view('polimas.index',compact('org','placeholder','title'));
+    }
+
     public function create()
     {
         //
