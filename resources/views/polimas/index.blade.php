@@ -21,10 +21,10 @@
                             <div class="text-primary text-center p-4">
                                 <!-- <a href="https://www.polimas.edu.my/web/"> -->
                                 <a href="#">
-                                    <img src="{{ URL::asset('/organization-picture/'.$org->organization_picture) }}" height="60" alt="logo">
+                                    <img src="{{ URL::asset('/organization-picture/'.$org) }}" height="60" alt="logo">
                                 </a>
                                 <h5 class="text-white font-size-20">Selamat Datang!</h5>
-                                <p class="text-white-50">Log Masuk ke PRIM</p>
+                                <p class="text-white-50">{{$loginText}}</p>
                             </div>
                         </div>
 

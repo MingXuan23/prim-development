@@ -20,33 +20,38 @@ class SchoolController extends Controller
     {
         $title="";
         $placeholder="Masukkan Email/Nombor Telefon/Nombor IC";
+        $loginText="Log Masuk ke PRIM";
         switch($name)
         {
             case "lmm":
                 $oid=137;
                 $placeholder="Masukkan Email/Nombor IC";
                 $title="Lembaga Maktab Mahmud";
+                $loginText="Laman Web Untuk Bayar Yuran LMM";
                 break;
             case "polimas":
                 $oid =107;
                 $title="Polimas";
+                $loginText="Laman Web Untuk Bayar Yuran Polimas";
                 break;
             case "samura":
                 $oid=141;
                 $title="Sains Muar";
+                $loginText="Laman Web Untuk Bayar Yuran SAMURA";
                 break;
             case "srab":
                 $oid=160;
                 $title="SRAB";
+                $loginText="Laman Web Untuk Bayar Yuran SRAB MUAR";
                 break;
              default:
                 return redirect('/login');
 
         }
 
-        $org=DB::table('organizations')->where('id',$oid)->first();
+        $org=DB::table('organizations')->where('id',$oid)->first()->organization_picture;
         //dd($org);
-        return view('polimas.index',compact('org','placeholder','title'));
+        return view('polimas.index',compact('org','placeholder','title','loginText'));
     }
 
     public function create()
