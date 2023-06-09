@@ -19,28 +19,31 @@ class SchoolController extends Controller
     public function indexLogin($name)//use to customise login page of each school
     {
         $title="";
-        $placeholder="Masukkan Email/Nombor Telefon/Nombor IC";
+        $placeholder="Email/Nombor Telefon/Nombor IC";
         $loginText="Log Masuk ke PRIM";
         switch($name)
         {
             case "lmm":
                 $oid=137;
-                $placeholder="Masukkan Email/Nombor IC";
+                $placeholder="Email/Nombor IC";
                 $title="Lembaga Maktab Mahmud";
                 $loginText="Laman Web Untuk Bayar Yuran LMM";
                 break;
             case "polimas":
                 $oid =107;
+                $placeholder="Email/Nombor IC";
                 $title="Polimas";
                 $loginText="Laman Web Untuk Bayar Yuran Polimas";
                 break;
             case "samura":
                 $oid=141;
+                $placeholder="Email/Nombor IC";
                 $title="Sains Muar";
                 $loginText="Laman Web Untuk Bayar Yuran SAMURA";
                 break;
             case "srab":
                 $oid=160;
+                $placeholder="Email/Nombor IC";
                 $title="SRAB";
                 $loginText="Laman Web Untuk Bayar Yuran SRAB MUAR";
                 break;
