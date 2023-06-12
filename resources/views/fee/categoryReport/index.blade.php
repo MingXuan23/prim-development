@@ -138,7 +138,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('exportJumlahBayaranIbuBapa') }}" method="post">
+            <form action="{{ route('exportJumlahBayaranIbuBapa') }}" method="post" onsubmit="remindMessage()">
                 <div class="modal-body">
                     {{ csrf_field() }}
                     <div class="form-group">
@@ -157,7 +157,7 @@
                         </select>
                     </div>
                     <div class="modal-footer">
-                        <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                        <button id="buttonExport" type="submit" class="btn btn-primary" >Export</button>
                     </div>
                 </div>
             </form>
@@ -225,7 +225,7 @@
                     success:function(result)
                     {
                         $(classId).empty();
-                        $(classId).append("<option value='0'> Pilih Kelas</option>");    
+                        $(classId).append("<option value='0'> Semua Kelas</option>");    
                         jQuery.each(result.success, function(key, value){
                             $(classId).append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
                         });
@@ -326,5 +326,10 @@
 
         $('.alert').delay(3000).fadeOut();
     });
+
+    function remindMessage(){
+        if( $('#yuranExport1').val()==0)
+            alert("To download all data may take more time,dont refresh the page");
+    }
 </script>
 @endsection
