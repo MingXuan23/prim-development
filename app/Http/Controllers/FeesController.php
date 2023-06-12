@@ -1500,10 +1500,21 @@ class FeesController extends AppBaseController
 
     public function ExportJumlahBayaranIbuBapa(Request $request)
     {
-        $kelas = DB::table('classes')
-            ->where('id', $request->yuranExport1)
-            ->first();
+        $org=DB::table('organizations')
+        ->where('id',$request->organExport1)
+        ->first();
 
-        return Excel::download(new ExportJumlahBayaranIbuBapa($kelas, $request->organExport1), $kelas->nama . '.xlsx');
+       if($request->yuranExport1!=0){
+        $kelas= DB::table('classes')
+        ->where('id', $request->yuranExport1)
+        ->first();
+        $filename=$kelas->nama;
+       }else{
+        $filename=$org->nama;
+       }
+       
+        
+        $kelasId=$request->yuranExport1;
+        return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
     }
 }
