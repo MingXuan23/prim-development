@@ -270,7 +270,11 @@
             .btn:hover{
                     color:var(--primary-bc)!important;
             }
-           
+           @media only screen and (max-width:600px){
+             .google-map{
+                height:300px;
+             }
+           }
     </style>
 @endsection
 
@@ -300,13 +304,18 @@
                 <div class="product-details-content">
                     <p>{{$product->desc}}</p>
                 </div>
-                {{-- <div class="product-details-title mt-0" >
-                    <h4>Review</h3>
+                <div class="product-details-title mt-0" >
+                    <h4>Location</h3>
                     <i class="fas fa-angle-down arrow-icon"></i>
                 </div>
                 <div class="product-details-content">
-                    <p>Reviews</p>
-                </div> --}}
+                    <iframe
+                    width="100%"
+                    height="400"
+                    frameborder="0" style="border:0"
+                    src="https://www.google.com/maps?q={{ urlencode($address) }}&output=embed" class="google-map">
+                </iframe>
+                </div>
             </div>
         </section>
         <section class="col-md-4 right-container">

@@ -267,7 +267,7 @@
 
         </section>
         <section class="delivery-section" hidden>
-            <h5>delivery</h5>
+            <h5 style="text-align:center ;margin-top: 20px;">Under Construction</h5>
         </section>
     </div>
   @endsection

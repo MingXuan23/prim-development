@@ -81,7 +81,7 @@
                 width:190px;
                 height: 282px;
                 background-color: var(--primary-bc);
-                border-radius: 0.5rem;
+                border-radius: 0.5rem!important;
                 box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.19);
                 transition-property: transform;
                 transition-timing-function: ease;
@@ -97,7 +97,10 @@
             .product-image img{
                 object-fit: contain;
                 max-width: 100%;
-                width: auto;
+                max-height: 100%;
+                width: 190px;
+                height: 190px;
+                border-radius: 0.5rem!important;
             }
             .product-name{
                 text-align: center;
@@ -113,7 +116,7 @@
                 font-size: 16px;
                 color: var(--secondary-bc);
                 text-align: right;
-                padding: 10px;   
+                padding: 10px;  
             }
             nav .pagination{
                 margin-top:20px;
@@ -138,10 +141,12 @@
                     width: 150px!important;
                 }
             }
-            @media screen and (max-width:550px){
+            @media screen and (max-width:600px){
                 .container{
                     margin-left:0!important;
                     margin-right: 0!important;
+                    padding-left : 0!important;
+                    padding-right : 0!important;
                 }
                 .product-container{
                     height:180px;
@@ -178,7 +183,7 @@
                     @if($product->image == null)
                         <img class="default-img" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}" alt="{{$product->name}}">
                     @else
-                    <img class="rounded" id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
+                    <img id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
                     @endif 
                 </div>
                 <div class="product-infos">
