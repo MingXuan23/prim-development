@@ -267,6 +267,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         // Orders
         Route::get('all-orders', 'HistoryController@index')->name('merchant.all-orders');
         Route::get('get-all-orders', 'HistoryController@getAllOrder')->name('merchant.get-all-orders');
+        Route::post('picked-up-order','HistoryController@orderPickedUp')->name('merchant.order-picked-up');
         Route::delete('delete-order', 'HistoryController@deletePaidOrder')->name('merchant.delete-order');
         Route::get('all-orders/history', 'HistoryController@history')->name('merchant.order-history');
         Route::get('get-order-history', 'HistoryController@getOrderHistory')->name('merchant.get-order-history');

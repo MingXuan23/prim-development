@@ -2,6 +2,7 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 @include('layouts.datatable')
 @endsection
 
@@ -47,6 +48,7 @@
                 {{-- <th style="width: 15%">Nota</th> --}}
                 <th style="width: 10%">Jumlah (RM)</th>
                 <th style="width: 10%" class="text-center">Status</th>
+                <th style="width: 15%" class="text-center">Action</th>
                 </tr>
             </thead>
             </table>
@@ -74,7 +76,7 @@
 @endsection
 
 @section('script')
-
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <script>
     $(document).ready(function() {
         var orderTable;
@@ -143,6 +145,12 @@
                     orderable: false,
                     searchable: false,
                     "className": "align-middle text-center",
+                },{
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false,
+                    "className": "align-middle text-center",
                 }],
             });
         }
@@ -155,6 +163,39 @@
 
         let btn = "<button type='button' data-dismiss='modal' class='btn btn-light'>Kembali</button>"
         let order_id
+        $(document).on('click', '.btn-done-pickup', function(){
+            order_id = $(this).attr('data-order-id')
+            $('.modal-title').empty().append('Sahkan Pesanan')
+            $('.modal-body').empty().append('Pesanan Ini Sudah Diambil?')
+            $('.modal-footer').empty().append(btn + "<button type='button' id='confirm_order' class='btn btn-primary'>Ya</button>")
+            $('#confirmationModal').modal('show')
+            confirmOrder(order_id)
+        })
+        function confirmOrder(order_id)
+        {
+            $('#confirm_order').click(function() {
+                
+                $.ajax({
+                    url: "{{ route('merchant.order-picked-up') }}",
+                    method: "POST",
+                    data: {o_id:order_id},
+                    beforeSend:function() {
+                    },
+                    success:function(result) {
+                        $('div.flash-message').html(result)
+                        orderTable.ajax.reload()
+                    },
+                    error:function(result) {
+                        $('div.flash-message').html(result)
+                        console.log(result.responseText)
+                    },
+                    complete:function() {
+                        // $('.loading').hide()
+                        $('#confirmationModal').modal('hide')
+                    },
+                })
+            })
+        }
 
         $(document).on('click', '.btn-cancel-order', function(){
             order_id = $(this).attr('data-order-id')
@@ -177,7 +218,6 @@
                     },
                     success:function(result) {
                         $('div.flash-message').html(result)
-
                         orderTable.ajax.reload()
                     },
                     error:function(result) {

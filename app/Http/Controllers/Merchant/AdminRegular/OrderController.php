@@ -12,6 +12,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Auth;
+
 use Yajra\DataTables\DataTables;
 
 class OrderController extends Controller
@@ -138,7 +140,11 @@ class OrderController extends Controller
 
     public function orderPickedUp(Request $request)
     {
-        $update_order = PgngOrder::find($request->o_id)->update(['status' => 'Picked-Up']);
+        $update_order = PgngOrder::find($request->o_id)->update([
+            'status' => 'Picked-Up',
+            'confirm_picked_up_time' => Carbon::now(),
+            'confirm_by' => Auth::id(),
+        ]);
 
         if ($update_order) {
             Session::flash('success', 'Pesanan Berjaya Diambil');
@@ -235,12 +241,16 @@ class OrderController extends Controller
     {
         $id = $request->o_id;
 
-        $update_order = PgngOrder::find($id)->update(['status' => "Cancel by merchant"]);
-        $delete_order = PgngOrder::find($id)->delete();
+        $update_order = PgngOrder::find($id)->update([
+            'status' => "Cancel by merchant",
+            'deleted_at'=> Carbon::now(),
+        ]);
         
-        $cart = ProductOrder::where('pgng_order_id', $id)->delete();
+        $cart = ProductOrder::where('pgng_order_id', $id)->update([
+            'deleted_at'=> Carbon::now(),
+        ]);
         
-        if($update_order && $delete_order && $cart) {
+        if($update_order&& $cart) {
             Session::flash('success', 'Pesanan Berjaya Dibuang');
             return View::make('layouts/flash-messages');
         } else {
@@ -256,21 +266,23 @@ class OrderController extends Controller
                 ->join('users as u', 'u.id', '=', 'pu.user_id')
                 ->where('pu.id', $id)
                 ->where('pu.status', '!=' , 'In cart')
-                ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
+                ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status','pu.confirm_picked_up_time','pu.confirm_by',
                         'u.name', 'u.telno', 'u.email')
                 ->first();
 
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
         $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
         $total_order_price = number_format($list->total_price, 2, '.', '');
-
+        $confirm_picked_up_time = Carbon::parse($list->confirm_picked_up_time)->format('d/m/y H:i A');
+        $confirm_by = DB::table('users')
+        ->where('id',$list->confirm_by)
+        ->pluck('name')
+        ->first();
         // get all product based on order
         $item = DB::table('product_order as po')
                 ->join('product_item as pi', 'po.product_item_id', '=', 'pi.id')
                 ->where([
                     ['po.pgng_order_id', $id],
-                    ['po.deleted_at',NULL],
-                    ['pi.deleted_at',NULL],
                 ])
                 ->select('po.id', 'pi.name', 'pi.price', 'po.quantity')
                 ->get();
@@ -283,6 +295,6 @@ class OrderController extends Controller
             $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2, '.', ''); // calculate total for each item in cart
         }
 
-        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price'));
+        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by'));
     }
 }

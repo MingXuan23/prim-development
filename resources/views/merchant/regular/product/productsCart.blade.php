@@ -435,7 +435,11 @@
                         org_id: $(totalPrice).attr('data-org-id'),
                     },
                     success: function (result) {
-                        $(totalPrice).html("Jumlah: RM"+result.totalPrice + "(Servis Charge :RM" + result.fixed_charges +")" );
+                        if(result.fixed_charges > 0)
+                        $(totalPrice).html("Jumlah: RM"+result.totalPrice + "(Service Charge :RM" + result.fixed_charges +")" );
+                        else
+                        $(totalPrice).html("Jumlah: RM"+result.totalPrice);
+
                     }
                 });
             });
