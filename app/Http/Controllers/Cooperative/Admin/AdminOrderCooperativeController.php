@@ -94,8 +94,10 @@ class AdminOrderCooperativeController extends Controller
                     ->where('id',$id)
                     ->update([
                         'status' => 3 ,
+                        'confirm_picked_up_time'=>Now(),
+                        'confirm_by'=>$userID,
                     ]);
-         return redirect('koperasi/Confirm');
+         return redirect()->back();
     }
 
     public function notConfirm(Request $request,Int $id)

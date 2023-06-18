@@ -23,7 +23,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
     {
         //
         set_time_limit(300);
-        $datas=$this->getData();
+        $datas=$this->getData();//get data of all students and parents
         
         foreach ($datas as $key => $data) {
 
@@ -34,7 +34,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->where('t.user_id', $data->userId)
                 ->where('t.status', 'Success')
                 ->where('fn.organization_id', $this->oid)
-                ->select('t.*','fn.name as yuran')
+                ->select('t.*','fn.name as yuran','fn.totalAmount as yuranAmount')
                 ->get();
 
                 
@@ -47,32 +47,37 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->where('fn.organization_id', $this->oid)
                 ->where('t.status', 'Success')
                 ->select('t.*','fn.name as yuran','fn.totalAmount as yuranAmount')
-                ->get();
+                ->get();        
                 
             $combined = $tranA->concat($tranBC);
 
             $unique = $combined->unique('id');
 
             $amount = 0.00;
-            $fpxno = '';
-            $yuran='';
-       
-            foreach ($unique as $key => $tran)
+            $fpxno = implode(',', $unique->pluck('transac_no')->all());
+            $yuran = implode(",\n", $combined->pluck('yuran')->all());
+            //dd($unique);
+            //dd($combined);
+            foreach ($combined as $key => $tran)
             {
+               
                 $amount = $amount + $tran->yuranAmount;
                 
                 if ($key == 0)
                 {
-                    $fpxno = $fpxno . $tran->transac_no;
-                    $yuran=$yuran.$tran->yuran;
+                    //$fpxno = $fpxno . $tran->transac_no;
+                   
+                    //$yuran=$yuran.$tran->yuran;
                 }
-                else if($key != count($unique) - 1)
-                {
-                    $fpxno = $fpxno . ', '.$tran->transac_no;
-                    $yuran=$yuran.', '.$tran->yuran;
+                else
+                {  
+                
+                    //$fpxno = $fpxno . ', '.$tran->transac_no;
+                    //$yuran=$yuran.",\n".$tran->yuran;
                 }
+                
             }
-
+            //$yuran = str_replace("\n", "<br>", $yuran);
             $data->amount = $amount == 0.00 ? 'RM 0.00' : 'RM ' . number_format($amount, 2, '.', '');
             $data->fpxno = $fpxno == '' ? $fpxno : '`' . $fpxno;
             $data->yuran=$yuran ;
@@ -80,6 +85,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
             unset($data->userId);
             unset($data->sid);
             unset($data->oid);
+            
         }
 
         return $datas;
@@ -133,6 +139,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
             
         }
     }
+
     public function headings(): array
     {
         return [
