@@ -290,7 +290,7 @@ input[type="file"]{
                         
                     </div>
 
-                    <div class="row quantity-section" hidden>
+                    <div class="row quantity-section">
                         <div class="col">
                             <div class="form-group required">
                                 <label class="control-label">Kuantiti Dalam Inventori</label>

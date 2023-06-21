@@ -66,9 +66,13 @@
                     @endif
                   </td>
                   <td class="align-middle">
-                    <div class="row d-block m-1">
-                      <button type="button" id="{{ $row->id }}" class="btn btn-primary btn-block">Pilih Hari Lain</button>
-                    </div>
+                    
+                    <button style="margin-bottom:4px " type="button" id="{{ $row->id }}" class="btn btn-primary btn-block">Pilih Hari Lain</button>
+
+                    <a href="{{ route('koperasi.storeConfirm',$row->id) }}" style="display:inline">
+                    <button class="btn btn-success btn-block">Telah Diambil</button>
+                    </a>
+                    
                     <!-- <div class="row d-block m-1">
                       <button type="button" id="{{ $row->id }}" class="btn btn-danger btn-block">Buang</button>
                     </div> -->
@@ -84,11 +88,7 @@
           </tbody>
         </table>
       </div>
-      <div class="row mt-2 ">
-        <div class="col d-flex justify-content-end">
-          {{ $order->links() }}
-        </div>
-      </div>
+      
     </div>
     {{-- <div class="card-footer small text-muted"></div> --}}
 </div>

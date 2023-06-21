@@ -141,7 +141,7 @@
             orgId = $('#org_dropdown option')[1].value
             btnHistory.show()
             btnHistory.attr('href', '')
-            route = "/admin-regular/orders/"+orgId+"/history"
+            route = "/admin-regular/all-orders/"+orgId+"/history"
             btnHistory.attr('href', route)
             $('#orderTable').DataTable().destroy()
             fetch_data(orgId)

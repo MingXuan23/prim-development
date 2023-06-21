@@ -19,7 +19,7 @@ use Yajra\DataTables\DataTables;//for datatable
 class ProductController extends Controller
 {
     //product home page
-    public function index(){
+    public function index(Request $request){
         //get products of merchants (Peniaga Barang Umum)
        $products = ProductItem::
        join('product_group as pg','pg.id','product_group_id')
@@ -37,7 +37,7 @@ class ProductController extends Controller
        ->select('product_item.name','product_item.id','price','image','org.code')
        ->inRandomOrder()//randomize the row
        //->get();//get() to get multiple rows and put in into a collection
-       ->paginate(12);
+       ->paginate(20);
        foreach($products as $product){
             $product->price = number_format($product->price,2);
        }
@@ -54,10 +54,11 @@ class ProductController extends Controller
                ['product_item.id',$id]
           ])
           ->where('org.deleted_at',NULL)
-          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'district','city','organization_picture','code')//need to use DB::raw because both table have same column name
+          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'address','postcode','state','district','city','organization_picture','code')//need to use DB::raw because both table have same column name
           ->first(); //first() to get a single row
           $product->price = number_format($product->price,2);
-          return view('merchant.regular.product.show',compact('product'));
+          $address = $product->address.','.$product->city;
+          return view('merchant.regular.product.show',compact('product','address'));
     }
     public function showAllCart(){
           $user_id = Auth::id();
@@ -96,7 +97,7 @@ class ProductController extends Controller
                ['po.user_id',$user_id],
                ['po.status','In cart']
           ])
-          ->select('org.id','nama')
+          ->select('org.id','nama','fixed_charges')
           ->distinct('nama')
           ->orderBy('po.id','desc')
           ->get();
@@ -229,7 +230,7 @@ class ProductController extends Controller
                'total_price' => $totalPrice
          ]);
      $totalPrice = number_format($totalPrice, 2);
-     return response()->json(['totalPrice'=>$totalPrice]);
+     return response()->json(['totalPrice'=>$totalPrice,'fixed_charges'=>$charge]);
    }
 //    public function checkOut(){
 //           $user_id = Auth::id();

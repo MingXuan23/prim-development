@@ -29,22 +29,22 @@
         </thead>
 
         <tbody>
-          @php($i = 1)
-          @if(count($order) != 0)
+          
+          @if(isset($order))
             @foreach($order as $row)
             @php($date = date_create($row->updated_at))
             @php($pickup = date_create($row->pickup_date))
             <tr>
-              <td class="align-middle">{{ $i }}.</td>
+              <td class="align-middle">{{ $row->id }}.</td>
               <td class="align-middle">{{ $row->koop_name }}</td>
               <td class="align-middle">{{ $row->koop_telno }}</td>
               <td class="align-middle">{{ date_format($date,"M D Y, h:m:s A") }}</td>
               <td class="align-middle">{{ date_format($pickup,"D, M d Y") }}</td>
-              <td class="align-middle">
+              <td class="align-middle"> 
                 @if($row->note != null)
-                {{ $row->note }}
+                {{ $row->note }} |<i> Status dikemaskini oleh {{$row->confirmPerson}} pada {{$row->confirm_picked_up_time}}</i>
                 @else
-                <i>Tiada Nota</i>
+                <i>Status dikemaskini oleh {{$row->confirmPerson}} pada {{$row->confirm_picked_up_time}}</i>
                 @endif  
               </td>           
               <td class="align-middle">
@@ -59,7 +59,7 @@
                 @endif
               </td>
             </tr>
-            @php($i++)
+
             @endforeach
           @else
           <tr>
@@ -69,11 +69,7 @@
         </tbody>
       </table>
     </div>
-    <div class="row mt-2 ">
-      <div class="col d-flex justify-content-end">
-        {{ $order->links() }}
-      </div>
-    </div>
+    
   </div>
   <div class="card-footer small text-muted"></div>
 </div>

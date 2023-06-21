@@ -44,6 +44,12 @@
                 width: 200px;
                 height: 200px;
                 border-radius: 14px;
+            }
+            .product-image img{
+                max-width: 100%;
+                max-height: 100%;
+                width: 200px;
+                height: 200px;
                 object-fit: contain;
             }
             .product-details {
@@ -429,7 +435,11 @@
                         org_id: $(totalPrice).attr('data-org-id'),
                     },
                     success: function (result) {
-                        $(totalPrice).html("Total: RM"+result.totalPrice);
+                        if(result.fixed_charges > 0)
+                        $(totalPrice).html("Jumlah: RM"+result.totalPrice + "(Service Charge :RM" + result.fixed_charges +")" );
+                        else
+                        $(totalPrice).html("Jumlah: RM"+result.totalPrice);
+
                     }
                 });
             });

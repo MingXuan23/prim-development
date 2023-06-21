@@ -603,8 +603,8 @@ class UserCooperativeController extends Controller
             {
                 $isPast[$key] = 1;
             }
-
-            if($row->pickup_date == $key && $isPast[$row->pickup_date] == 1)
+            
+            if($isPast[$key]== 1)
             {
                 // Status changed to overdue
                 PgngOrder::where('pickup_date', $row->pickup_date)->update(['status' => 4]);
@@ -616,7 +616,7 @@ class UserCooperativeController extends Controller
             }
         }
 
-        $order = $query->paginate(5);
+        $order = $query->get();
 
         return view('koperasi.order', compact('order'));
     }
@@ -628,20 +628,23 @@ class UserCooperativeController extends Controller
 
         $order = DB::table('pgng_orders as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                ->join('users as u','u.id','ko.confirm_by')
                 ->whereIn('status', [3, 100, 200])
                 ->where('user_id', $userID)
                 ->where('o.type_org', $role_id)
-                ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno')
+                ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno','u.name as confirmPerson')
                 ->orderBy('ko.status', 'desc')
                 ->orderBy('ko.pickup_date', 'asc')
-                ->orderBy('ko.updated_at', 'desc');
+                ->orderBy('ko.updated_at', 'desc')
+                ->get();
+        //dd($order);
 
         //$order = $query->paginate(5);
 
         return view('koperasi.history', compact('order'));
     }
 
-    public function indexList($id,$customerID)
+    public function indexList($id)
     {
 
         $userID = Auth::id();
