@@ -390,6 +390,13 @@
                     <span>Pengesahan</span>
                     </a>
                 </li>
+
+                <li>
+                        <a href="{{ route('koperasi.adminHistory') }}" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Sejarah Koperasi</span>
+                        </a>
+                </li>
             </ul>
             </li>
             @endrole 

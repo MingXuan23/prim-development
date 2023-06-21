@@ -100,6 +100,35 @@ class AdminOrderCooperativeController extends Controller
          return redirect()->back();
     }
 
+    public function adminHistory(){
+        $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
+        $userID = Auth::id();
+
+        $koperasiList = DB::table('organizations as o')
+        ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+        ->where('ou.user_id', $userID)
+        ->where('ou.role_id', $role_id)
+        ->get();
+
+        $koperasi=$koperasiList->first();
+        //dd($koperasi->organization_id);
+        $order = DB::table('pgng_orders as ko')
+                ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                ->join('users as u','u.id','ko.confirm_by')
+                ->whereIn('status', [3, 100, 200])
+                ->where('o.id', $koperasi->organization_id)
+                ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno','u.name as confirmPerson')
+                ->orderBy('ko.status', 'desc')
+                ->orderBy('ko.pickup_date', 'asc')
+                ->orderBy('ko.updated_at', 'desc')
+                ->get();
+        //dd($order);
+
+        //$order = $query->paginate(5);
+        //dd($order);
+        return view('koperasi.history', compact('order'));
+    }
+
     public function notConfirm(Request $request,Int $id)
     {
         $userID = Auth::id();

@@ -240,6 +240,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/fetchClassyear','AdminProductCooperativeController@fetchClassyear')->name('koperasi.fetchClassYear');
 
         Route::get('/{id}/{customerID}/list', 'AdminOrderCooperativeController@viewPgngList')->name('koperasi.viewPgngList');
+        Route::get('/adminHistory', 'AdminOrderCooperativeController@adminHistory')->name('koperasi.adminHistory');
 
     });
 });
