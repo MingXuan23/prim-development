@@ -156,6 +156,7 @@
                         <form id="bayarform" class="form-validation" method="POST" action="{{ route('fpxIndex') }}"
                             enctype="multipart/form-data">
                             {{csrf_field()}}
+                            @if($specialSrabRequest==0)
                             <div class="form-group">
                                 <label>Nama</label>
                                 <input type="text" name="name" id="name" class="form-control text-left"
@@ -168,6 +169,20 @@
                                     placeholder="Email" value="{{ !empty($user) ? $user->email : '' }}"
                                     data-parsley-required-message="Sila masukkan email" required>
                             </div>
+                            @else
+                            <div class="form-group">
+                                <label>Nama Pelajar</label>
+                                <input type="text" name="name" id="name" class="form-control text-left"
+                                    placeholder="Nama Pelajar" value="{{ !empty($user) ? $user->name : '' }}"
+                                    data-parsley-required-message="Sila masukkan nama penuh" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Kelas</label>
+                                <input type="text" parsley-type="text" name="email" class="form-control text-left"
+                                    placeholder="Kelas" value="{{ !empty($user) ? $user->email : '' }}"
+                                    data-parsley-required-message="Sila masukkan email" required>
+                            </div>
+                            @endif
                             <div class="form-group">
                                 <label>No Telefon</label>
                                 <input type="text" name="telno" class="form-control phone_no text-left"
