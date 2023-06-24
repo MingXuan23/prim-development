@@ -160,7 +160,7 @@
                             <div class="form-group">
                                 <label>Nama</label>
                                 <input type="text" name="name" id="name" class="form-control text-left"
-                                    placeholder="Nama" value="{{ !empty($user) ? $user->name : '' }}"
+                                    placeholder="Nama Pelajar" value="{{ !empty($user) ? $user->name : '' }}"
                                     data-parsley-required-message="Sila masukkan nama penuh" required>
                             </div>
                             <div class="form-group">
@@ -169,20 +169,7 @@
                                     placeholder="Email" value="{{ !empty($user) ? $user->email : '' }}"
                                     data-parsley-required-message="Sila masukkan email" required>
                             </div>
-                            @else
-                            <div class="form-group">
-                                <label>Nama Pelajar</label>
-                                <input type="text" name="name" id="name" class="form-control text-left"
-                                    placeholder="Nama Pelajar" value="{{ !empty($user) ? $user->name : '' }}"
-                                    data-parsley-required-message="Sila masukkan nama penuh" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Kelas</label>
-                                <input type="text" parsley-type="text" name="email" class="form-control text-left"
-                                    placeholder="Kelas" value="{{ !empty($user) ? $user->email : '' }}"
-                                    data-parsley-required-message="Sila masukkan email" required>
-                            </div>
-                            @endif
+
                             <div class="form-group">
                                 <label>No Telefon</label>
                                 <input type="text" name="telno" class="form-control phone_no text-left"
@@ -190,6 +177,29 @@
                                     value="{{ !empty($user) ? substr($user->telno , 2) : '' }}"
                                     data-parsley-required-message="Sila masukkan no telefon" required>
                             </div>
+                            @else
+                            <div class="form-group">
+                                <label>Nama Pelajar</label>
+                                <input type="text" name="name" id="name" class="form-control text-left"
+                                    placeholder="Nama" value="{{ !empty($user) ? $user->name : '' }}"
+                                    data-parsley-required-message="Sila masukkan nama penuh pelajar" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Kelas</label>
+                                <input type="text" name="telno" class="form-control text-left"
+                                    placeholder="No Telefon"
+                                    value="{{ !empty($user) ? substr($user->telno , 2) : '' }}"
+                                    data-parsley-required-message="Sila masukkan kelas pelajar" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" parsley-type="email" name="email" class="form-control text-left"
+                                    placeholder="Email" value="{{ !empty($user) ? $user->email : '' }}"
+                                    data-parsley-required-message="Sila masukkan email" required>   
+                            </div>
+                            @endif
+                           
                             <div class="form-group">
                                 <label>Amaun</label>
                                 <input id="input-currency" class="form-control input-mask text-left"
