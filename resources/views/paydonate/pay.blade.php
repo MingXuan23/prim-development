@@ -179,17 +179,17 @@
                             </div>
                             @else
                             <div class="form-group">
-                                <label>Nama Pelajar</label>
+                                <label>Nama Murid</label>
                                 <input type="text" name="name" id="name" class="form-control text-left"
-                                    placeholder="Nama" value="{{ !empty($user) ? $user->name : '' }}"
-                                    data-parsley-required-message="Sila masukkan nama penuh pelajar" required>
+                                    placeholder="Nama murid" value="{{ !empty($user) ? $user->name : '' }}"
+                                    data-parsley-required-message="Sila masukkan nama penuh murid" required>
                             </div>
                             <div class="form-group">
                                 <label>Kelas</label>
                                 <input type="text" name="telno" class="form-control text-left"
                                     placeholder="Kelas Pelajar"
                                     value="{{ !empty($user) ? substr($user->telno , 2) : '' }}"
-                                    data-parsley-required-message="Sila masukkan kelas pelajar" required>
+                                    data-parsley-required-message="Sila masukkan kelas murid" required>
                             </div>
 
                             <div class="form-group">
