@@ -49,7 +49,7 @@
               </td>           
               <td class="align-middle">
                 {{ number_format($row->total_price, 2, '.', '') }} | 
-                <a href="{{ route('koperasi.list', $row->id) }}">Lihat Pesanan</a>
+                <a href="{{ route('koperasi.viewPgngList', [$row->id, $row->user_id]) }}">Lihat Pesanan</a>
               </td>
               <td>
                 @if($row->status == 3)
