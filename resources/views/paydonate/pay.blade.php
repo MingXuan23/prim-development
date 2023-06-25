@@ -187,7 +187,7 @@
                             <div class="form-group">
                                 <label>Kelas</label>
                                 <input type="text" name="telno" class="form-control text-left"
-                                    placeholder="Kelas Pelajar"
+                                    placeholder="Kelas murid"
                                     value="{{ !empty($user) ? substr($user->telno , 2) : '' }}"
                                     data-parsley-required-message="Sila masukkan kelas murid" required>
                             </div>
