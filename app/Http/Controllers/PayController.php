@@ -409,7 +409,7 @@ class PayController extends AppBaseController
             if(isset($request->email))
             {
                 $fpx_buyerEmail = $request->email;
-                $telno = "+6" . $request->telno;
+                $telno = $request->telno;
                 $fpx_buyerName = $request->name;
             }
             else
