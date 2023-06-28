@@ -409,7 +409,7 @@ class PayController extends AppBaseController
             if(isset($request->email))
             {
                 $fpx_buyerEmail = $request->email;
-                $telno = "+6" . $request->telno;
+                $telno = $request->telno;
                 $fpx_buyerName = $request->name;
             }
             else
@@ -481,7 +481,7 @@ class PayController extends AppBaseController
             $fpx_sellerOrderNo  = "MUPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
-            $fpx_sellerId       = config('app.env') == 'production' ? $ficts_seller_id : "SE00013841";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id: "SE00013841";
         }
         else if($request->desc == 'Koperasi')
         {

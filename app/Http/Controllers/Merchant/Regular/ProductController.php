@@ -27,6 +27,7 @@ class ProductController extends Controller
        ->where([
             ['pg.deleted_at',NULL],
             ['product_item.deleted_at',NULL],
+            ['product_item.type','have inventory'],
             ['product_item.status', 1],
             ['product_item.quantity_available' ,'>', 0],//only get those products that haven't sold out yet
        ])
