@@ -693,12 +693,13 @@ class PayController extends AppBaseController
                     Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
                     $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
 
-                    $list_student_fees_id = DB::table('student_fees_new')
+                    $list_student_fees_id_by_student = DB::table('student_fees_new')
                         ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
                         ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
                         ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
                         ->where('transactions.id', $transaction->id)
-                        ->get();
+                        ->get()
+                        ->groupBy('class_student_id');
 
                     $list_parent_fees_id  = DB::table('fees_new')
                         ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
@@ -711,36 +712,38 @@ class PayController extends AppBaseController
                         ->where('fees_new_organization_user.transaction_id', $transaction->id)
                         ->get();
 
+                   foreach($list_student_fees_id_by_student as $list_student_fees_id){
+                        for ($i = 0; $i < count($list_student_fees_id); $i++) {
+                            
+                            // ************************* update student fees status fees by transactions *************************
+                            $res  = DB::table('student_fees_new')
+                                ->where('id', $list_student_fees_id[$i]->student_fees_id)
+                                ->update(['status' => 'Paid']);
 
-                    for ($i = 0; $i < count($list_student_fees_id); $i++) {
+                            // ************************* check the student if have still debt *************************
+                            
+                            if ($i == count($list_student_fees_id) - 1)
+                            {
+                                $check_debt = DB::table('students')
+                                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                                    ->select('students.*')
+                                    ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
+                                    ->where('student_fees_new.status', 'Debt')
+                                    ->count();
+        
+        
+                                // ************************* update status fees for student if all fees completed paid*************************
+        
+                                if ($check_debt == 0) {
+                                    DB::table('class_student')
+                                        ->where('id', $list_student_fees_id[$i]->class_student_id)
+                                        ->update(['fees_status' => 'Completed']);
 
-                        // ************************* update student fees status fees by transactions *************************
-                        $res  = DB::table('student_fees_new')
-                            ->where('id', $list_student_fees_id[$i]->student_fees_id)
-                            ->update(['status' => 'Paid']);
-
-                        // ************************* check the student if have still debt *************************
-                        
-                        if ($i == count($list_student_fees_id) - 1)
-                        {
-                            $check_debt = DB::table('students')
-                                ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                                ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                                ->select('students.*')
-                                ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
-                                ->where('student_fees_new.status', 'Debt')
-                                ->count();
-    
-    
-                            // ************************* update status fees for student if all fees completed paid*************************
-    
-                            if ($check_debt == 0) {
-                                DB::table('class_student')
-                                    ->where('id', $list_student_fees_id[$i]->class_student_id)
-                                    ->update(['fees_status' => 'Completed']);
+                                }
                             }
                         }
-                    }
+                   }
 
                     for ($i = 0; $i < count($list_parent_fees_id); $i++) {
 
