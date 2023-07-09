@@ -135,9 +135,10 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->orderBy('s.nama')
                 ->get();
             }
-            return $datas;
+           
             
         }
+         return $datas;
     }
 
     public function headings(): array
