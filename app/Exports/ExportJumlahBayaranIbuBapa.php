@@ -21,7 +21,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
     */
     public function collection()
     {
-        //
+        //comment only
         set_time_limit(300);
         $datas=$this->getData();//get data of all students and parents
         
