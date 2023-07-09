@@ -24,7 +24,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
         //
         set_time_limit(300);
         $datas=$this->getData();//get data of all students and parents
-        
+        //dd($datas);
         foreach ($datas as $key => $data) {
 
             $tranA = DB::table('transactions as t')
@@ -135,9 +135,10 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->orderBy('s.nama')
                 ->get();
             }
-            return $datas;
+            
             
         }
+        return $datas;
     }
 
     public function headings(): array
