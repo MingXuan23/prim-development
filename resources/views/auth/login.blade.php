@@ -64,8 +64,11 @@ Login
                                     </div>
 
                                     <div class="form-group mt-2 mb-0 row">
-                                        <div class="col-12 mt-4">
+                                        <div class="col-6 mt-4">
                                             <a href="{{ route('password.request') }}"><i class="mdi mdi-lock"></i> 	Lupa Kata Laluan?</a>
+                                        </div>
+                                        <div class="col-6 mt-4" style="text-align:right;">
+                                            <a href="/register"><i class="mdi mdi-account-plus"></i>  Daftar Akaun</a>
                                         </div>
                                     </div>
                                 </form>
