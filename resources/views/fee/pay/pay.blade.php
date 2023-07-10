@@ -104,6 +104,9 @@
                                 <h5 class="mt-0" style="color:#8699ad">
                                     Kuantiti x{{ $row3->quantity }}
                                 </h5>
+                                <h5 class="mt-0" style="color:#8699ad">
+                                    {{ $row3->feedesc }}
+                                </h5>
                             </div>
                         </div>
                     </div>

@@ -192,10 +192,10 @@ class PayController extends AppBaseController
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
                 ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
                 ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-                ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category', 'students.id as studentid')
+                ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid')
                 ->whereIn('student_fees_new.id', $student_fees)
                 ->get();
-
+            
             $getorganization  = DB::table('organizations')
                 ->where('id', $getfees_bystudent[0]->organization_id)
                 ->first();
