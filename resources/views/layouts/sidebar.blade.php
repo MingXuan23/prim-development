@@ -548,12 +548,12 @@
             </li>
             @endrole --}}
 
-            <li>
+            {{-- <li>
                     <a href="{{route('delivery.index')}}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Parcel</span>
                     </a>
-                </li>
+                </li> --}}
 
             <!-- <li>
                     <a href="" class=" waves-effect">
