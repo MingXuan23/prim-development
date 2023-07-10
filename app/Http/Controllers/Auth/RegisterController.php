@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -76,5 +77,25 @@ class RegisterController extends Controller
             'remember_token'    => $data['_token'],
 
         ]);
+    }
+    // to redirect back to intended link even after revalidation
+    public function showRegistrationForm(Request $request)
+    {
+        if (!$request->session()->has('url.intended') && url()->previous() !== url()->current()) {
+            $request->session()->put('url.intended', url()->previous());
+        }
+
+        return view('auth.register');
+    }
+    // to redirect back to intended link
+    protected function registered(Request $request, $user)
+    {
+        if ($request->session()->has('url.intended')) {
+            $redirectUrl = $request->session()->get('url.intended');
+            $request->session()->forget('url.intended');
+            return redirect($redirectUrl);
+        }
+        
+        return redirect($this->redirectTo);
     }
 }

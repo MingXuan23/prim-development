@@ -447,7 +447,7 @@
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
-                    <span>Peniaga</span>
+                    <span>GetNGo</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     
