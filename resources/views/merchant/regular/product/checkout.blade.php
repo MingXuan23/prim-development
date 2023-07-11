@@ -457,7 +457,7 @@
 
         $("#datepicker").datepicker({
             minDate: 1,
-            maxDate: '+2d',
+            maxDate: '+1d',
             dateFormat: 'mm/dd/yy',
             dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
             beforeShowDay: editDays
