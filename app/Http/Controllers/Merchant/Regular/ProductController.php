@@ -36,8 +36,9 @@ class ProductController extends Controller
             ['org.type_org',9]
        ])
        ->select('product_item.name','product_item.id','price','image','org.code')
-       ->inRandomOrder()//randomize the row
+    //    ->inRandomOrder()//randomize the row
        //->get();//get() to get multiple rows and put in into a collection
+       ->orderBy('product_item.created_at','desc')
        ->paginate(20);
        foreach($products as $product){
             $product->price = number_format($product->price,2);
