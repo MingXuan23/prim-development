@@ -57,6 +57,9 @@
                                 <h5 class="mt-0" style="color:#8699ad">
                                     Kuantiti x{{ $row3->quantity }}
                                 </h5>
+                                <h5 class="mt-0" style="color:#8699ad">
+                                    {!! nl2br($row3->desc) !!}
+                                </h5>
                             </div>
                         </div>
                     </div>
