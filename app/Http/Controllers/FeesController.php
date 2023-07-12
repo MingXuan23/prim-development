@@ -1100,7 +1100,7 @@ class FeesController extends AppBaseController
         {
             array_push($list_dependent, $dependent->studentid);
         }
-
+        
         // ************************* get list organization by parent  *******************************
 
         $organizations = DB::table('organizations')
@@ -1131,7 +1131,7 @@ class FeesController extends AppBaseController
             ->whereIn('students.id', $list_dependent)
             ->where('student_fees_new.status', 'Debt')
             ->get();
-        
+
         $getfees_bystudent = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
