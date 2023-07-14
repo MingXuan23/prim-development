@@ -292,7 +292,7 @@
     var oid;
 
     $('#btn-byr').click(function () {
-      Swal.fire({
+        Swal.fire({
         title: "Adakah anda pasti?",
         text: "Jumlah yang perlu dibayar RM"+total,
         type: "warning",
