@@ -273,6 +273,7 @@ class PayController extends AppBaseController
                 ->where('organization_user.role_id', 6)
                 ->where('organization_user.status', 1)
                 ->whereIn('fees_new.id', $res_fee_A)
+                ->distinct()
                 ->get();
 
             $get_fees_by_parent   = DB::table('fees_new')
