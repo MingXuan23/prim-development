@@ -1167,7 +1167,7 @@ class FeesController extends AppBaseController
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
             ->where('fees_new_organization_user.status', 'Debt')
-            ->distinct('fees_new.id')
+            ->distinct()
             ->get();
         //dd($list,$organizations,$getfees,$getfees_bystudent,$getfees_category_A,$getfees_category_A_byparent);
         //dd($getfees_category_A_byparent);
