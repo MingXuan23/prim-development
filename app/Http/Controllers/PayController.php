@@ -110,7 +110,7 @@ class PayController extends AppBaseController
 
         $getstudent         = "";
         $getorganization    = "";
-        //$getfees            = "";
+        $getfees            = "";
         $getfees_bystudent  = "";
         $getstudentfees     = "";
 
