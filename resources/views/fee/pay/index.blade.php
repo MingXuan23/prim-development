@@ -292,7 +292,18 @@
     var oid;
 
     $('#btn-byr').click(function () {
-      Swal.fire({
+        $.ajax({
+                url: "{{ route('pay') }}",
+                data: { 
+                    id: myCheckboxes,
+                    category: myCheckboxes_categoryA
+                },
+                
+            })
+            .done(function(response){
+                document.write(response);
+            });
+        Swal.fire({
         title: "Adakah anda pasti?",
         text: "Jumlah yang perlu dibayar RM"+total,
         type: "warning",
