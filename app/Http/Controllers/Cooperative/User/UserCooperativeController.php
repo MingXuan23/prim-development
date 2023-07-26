@@ -217,7 +217,7 @@ class UserCooperativeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)// strange to use??
+    public function show(int $id)// strange to use??
     {
         $todayDate = Carbon::now()->format('l');
 
@@ -231,7 +231,7 @@ class UserCooperativeController extends Controller
                             'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
                     ->first();
 
-        $org = Organization::where('id', $koperasi->parent_org)->select('nama')->first();
+        $org = Organization::where('id', $koperasi->id)->select('nama')->first();
         
         $product_item = DB::table('product_item as pi')
                         ->join('product_group as pt', 'pi.product_group_id', '=', 'pt.id')
