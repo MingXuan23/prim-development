@@ -162,7 +162,7 @@
 
     <div class="row">
       <div class="col d-flex justify-content-end">
-        <a href="{{ url()->previous() }}" type="button" class="btn btn-light mr-2">Kembali</a>
+        <a href="{{ route('koperasi.returnFromList',[$previousUrl,$list_detail->id]) }}" type="button" class="btn btn-light mr-2">Kembali</a>
       </div>
     </div>
 
