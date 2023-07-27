@@ -109,7 +109,14 @@
         </p>
       </div>
     </div>
-
+    <div class="row">
+      <label class="col-sm-3 col-form-label ">FPX ID</label>
+      <div class="col-sm-7">
+        <p class="col col-form-label">
+          {{ $list_detail->fpxId }}
+        </p>
+      </div>
+    </div>
     <div class="row">
       <label class="col-sm-3 col-form-label ">Nota</label>
       <div class="col-sm-7">
@@ -153,6 +160,12 @@
               <tr>
                 <td class="noborder"></td>
                 <td class="noborder"></td>
+                <td class="table-dark noborder">Cas yang dikenakan</td>
+                <td class="table-dark noborder" id="chargeColumn"></td>
+              </tr>
+              <tr>
+                <td class="noborder"></td>
+                <td class="noborder"></td>
                 <td class="table-dark noborder">Jumlah Keseluruhan</td>
                 <td class="table-dark noborder">RM {{ number_format($list_detail->total_price, 2, '.', '') }}</td>
               </tr>
@@ -162,7 +175,7 @@
 
     <div class="row">
       <div class="col d-flex justify-content-end">
-        <a href="{{ url()->previous() }}" type="button" class="btn btn-light mr-2">Kembali</a>
+        <a href="{{ route('koperasi.returnFromList',[$previousUrl,$list_detail->id]) }}" type="button" class="btn btn-light mr-2">Kembali</a>
       </div>
     </div>
 
@@ -175,5 +188,14 @@
 
 @section('script')
 
+<script>
+  var totalPrice = @json($totalPrice);
 
+var totalPriceSum = Object.values(totalPrice).reduce((a, b) => a + b, 0);
+
+
+var totalAmount=@json($list_detail->total_price);
+var charge=totalAmount-totalPriceSum;
+$("#chargeColumn").text("RM " + charge.toFixed(2));
+</script>
 @endsection

@@ -47,16 +47,16 @@
 
 
 
-<h4 class="font-size-18">Tambah Produk Type</h4>
+<h4 class="font-size-18">Tambah Produk Type untuk {{$org->nama}}</h4>
 
 <div class="card">
   <div class="card-body">
         
       <form action="{{route('koperasi.storeType')}}" method="POST" enctype="multipart/form-data">
         {!! csrf_field() !!}
-        <label>* Nama Produk</label></br>
-        <input type="text" name="name" id="name" class="form-control" placeholder="Masukkan Nama Produk"  value="" required></br>
-
+        <label>* Jenis Nama Produk</label></br>
+        <input type="text" name="name" id="name" class="form-control" placeholder="Masukkan Nama Jenis Produk"  value="" required></br>
+        <input type="hidden" name="koopId" class="koperasi_id" value="{{$org->id}}">
         <div id="buttonGroup">
         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">Simpan</button>
        

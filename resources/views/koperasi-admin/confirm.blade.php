@@ -9,9 +9,21 @@
 @section('content')
 <div class="row">
   <div class="col-md-12">
-    <div class="page-title-box">
-    <h4 class="font-size-18">{{ $koperasi->nama }}</h4>
-      koperasi >> pengesahan
+      <div style="padding-top: 24px" class="row">
+        <div class="col-md-12 ">
+            <div class=" align-items-center">
+                <div class="form-group card-title">
+                    <select name="org" id="org_dropdown" class="form-control col-md-12">
+                        <option value="" selected disabled>Pilih Organisasi</option>
+                        @foreach($koperasiList as $row)
+                        <option value="{{ $row->organization_id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+  </div>
+      
       <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
@@ -41,7 +53,7 @@
         <div class="flash-message"></div>
 
         <div class="table-responsive">
-          <table id="donationTable" class="table table-bordered table-striped dt-responsive"
+          <table id="confirmTable" class="table table-bordered table-striped dt-responsive"
             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>
               <tr style="text-align:center">
@@ -56,63 +68,108 @@
               <th style="width: 15%">Action</th>
               </tr>
             </thead>
-            <tbody>
-            @foreach($customer as $customer)
-              <tr>
-
-
-              <td>{{ $loop->iteration }}</td>
-                <td>
-                  {{$customer->name}}
-                </td>
-                
-                <td>
-                {{$customer->telno}}
-                </td>
-
-                <td>
-                 {{$customer->orderTime}}
-                </td>
-
-                <td>
-                {{$customer->pickup_date}}
-                </td>
-
-                <td>
-                {{$customer->note}}
-                | <a href="{{ route('koperasi.viewPgngList', [$customer->id, $customer->customerID]) }}">Lihat Pesanan</a>
-                </td>
-
-                <td>
-                {{number_format($customer->total_price,2)}}
-                </td>
-
-                <td>
-                @if($customer->status == 2)
-                    <span class="badge rounded-pill bg-warning ">Sedang Diproses</span>
-                @elseif($customer->status == 4)
-                    <span class="badge rounded-pill bg-danger text-white">Tidak Diambil</span>
-                @elseif($customer->status == 1)
-                <span class="badge rounded-pill bg-warning ">In cart</span>
-                @else
-                <div class="d-flex justify-content-center"><span class="badge badge-success">Telah dibayar</span></div>
-                @endif
-                </td>
-
-                <td class="allign-middle">
-                <div class="">
-                <a href="{{ route('koperasi.storeConfirm',$customer->id) }}" style="display:inline">
-                <button style="margin: 4px" type="submit" class="btn btn-primary">Telah Diambil</button>
-                <a href="{{ route('koperasi.notConfirm',$customer->id) }}" style="display:inline">
-                <button style="margin: 4px" type="submit" class="btn btn-danger m1">Tidak Diambil</button>
-                </div>
-                </td>
-              </tr>
-            @endforeach
+            <tbody >
+          </tboby>
           </table>
         </div>
       </div>
     </div>
   </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+  $(document).ready(function(){
+    dropdownLength = $('#org_dropdown').children('option').length
+    if(dropdownLength > 1) {
+      var koopId = "{{ $koperasi->organization_id }}";
+      // Loop through each option in the dropdown
+      $('#org_dropdown option').each(function() {
+          // Check if the option value matches the organization ID
+          if ($(this).val() == koopId) {
+              // Set the selected attribute for the matching option
+              $(this).prop('selected', true);
+              // Set the value of the hidden input field
+              
+          }
+      });
+      fetchConfirmOrder();
+      orgId = $("#org_dropdown option:selected").val();
+      $('.koperasi_id').val(orgId);
+      }
+
+        $('#org_dropdown').change(function() {   
+         fetchConfirmOrder();
+    })
+  })
+
+ function fetchConfirmOrder(){
+  orgId = $("#org_dropdown option:selected").val();
+
+$.ajax({
+        type: 'GET',
+        url: '{{ route("koperasi.fetchConfirmTable")}}',
+        data: {
+            koopId:orgId
+        },
+        success:function(response){
+          loadConfirmTable(response.order);
+        }
+    });
+ }
+
+  function loadConfirmTable(orders){
+    const confirmTableBody = document.querySelector('#confirmTable tbody');
+    $("#confirmTable tbody").empty();
+    const statusLabels = {
+      2: '<span class="badge rounded-pill bg-warning">Sedang Diproses</span>',
+      4: '<span class="badge rounded-pill bg-danger text-white">Tidak Diambil</span>',
+      1: '<span class="badge rounded-pill bg-warning">In cart</span>',
+    };
+    if (orders.length > 0) {
+    orders.forEach((order) => {
+      //console.log(order)
+      const row = document.createElement('tr');
+      const descriptionCell = document.createElement('td');
+
+      const viewPgngListRoute = "{{ route('koperasi.viewPgngList', [':Id',':customerID']) }}";
+      const finalLink = viewPgngListRoute.replace(':Id', order.id).replace(':customerID', order.customerID);
+      descriptionCell.innerHTML = `
+          ${order.note ? order.note : ''} | <a href="${finalLink}">Lihat Pesanan</a>
+      `;
+      
+      const confirmLink="{{ route('koperasi.storeConfirm', ':pgngId') }}".replace(':pgngId',order.id);
+      const notconfirmLink="{{ route('koperasi.notConfirm', ':pgngId') }}".replace(':pgngId',order.id);
+      row.innerHTML = `
+        <td>${order.id}</td>
+        <td>${order.name}</td>
+        <td>${order.telno}</td>
+        <td>${order.orderTime}</td>
+        <td>${order.pickup_date}</td>
+        <td>${descriptionCell.innerHTML}</td>
+        <td>${order.total_price.toFixed(2)}</td>
+        <td>${statusLabels[order.status]}</td>
+        <td class="allign-middle">
+          <div>
+            <a href="${confirmLink}" style="margin: 4px" class="btn btn-primary">Telah Diambil</a>
+            <a href="${notconfirmLink}" style="margin: 4px" class="btn btn-danger m1">Tidak Diambil</a>
+          </div>
+        </td>
+      `;
+      
+      confirmTableBody.appendChild(row);
+    
+    
+    });
+  }
+  else {
+  // Display the message when there are no orders
+  document.querySelector('#confirmTable tbody').innerHTML = `
+    <tr>
+      <td colspan="9" class="text-center"><i>Tiada Rekod Pesanan.</i></td>
+    </tr>`;
+}
+  }
+</script>
 @endsection

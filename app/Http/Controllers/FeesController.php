@@ -1100,7 +1100,7 @@ class FeesController extends AppBaseController
         {
             array_push($list_dependent, $dependent->studentid);
         }
-
+        
         // ************************* get list organization by parent  *******************************
 
         $organizations = DB::table('organizations')
@@ -1131,7 +1131,7 @@ class FeesController extends AppBaseController
             ->whereIn('students.id', $list_dependent)
             ->where('student_fees_new.status', 'Debt')
             ->get();
-        
+       
         $getfees_bystudent = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
@@ -1156,7 +1156,7 @@ class FeesController extends AppBaseController
             ->where('organization_user.status', 1)
             ->where('fees_new_organization_user.status', 'Debt')
             ->get();
-
+            
         $getfees_category_A_byparent  = DB::table('fees_new')
             ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
@@ -1167,9 +1167,10 @@ class FeesController extends AppBaseController
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
             ->where('fees_new_organization_user.status', 'Debt')
+            ->distinct()
             ->get();
         //dd($list,$organizations,$getfees,$getfees_bystudent,$getfees_category_A,$getfees_category_A_byparent);
- 
+        //dd($getfees_category_A_byparent);
         return view('fee.pay.index', compact('list', 'organizations', 'getfees', 'getfees_bystudent', 'getfees_category_A', 'getfees_category_A_byparent'));
     }
 

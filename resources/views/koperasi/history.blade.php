@@ -8,6 +8,23 @@
 
 @section('content')
 
+<div class="col-md-12">
+@if($koperasiList!="")
+      <div style="padding-top: 24px" class="row">
+        <div class="col-md-12 ">
+            <div class=" align-items-center">
+                <div class="form-group card-title">
+                    <select name="org" id="org_dropdown" class="form-control col-md-12">
+                        <option value="" selected disabled>Pilih Organisasi</option>
+                        @foreach($koperasiList as $row)
+                        <option value="{{ $row->organization_id }}">{{ $row->nama }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
+  </div>
+  @endif
 <div class="card mb-3">
   <div class="card-header">
     <i class="ti-clipboard mr-2"></i>Sejarah Pesanan Anda</div>
@@ -28,7 +45,7 @@
           </tr>
         </thead>
 
-        <tbody>
+        <tbody id="historyTable">
           
           @if(isset($order))
             @foreach($order as $row)
@@ -77,5 +94,98 @@
 @endsection
 
 @section('script')
+<script>
+  $(document).ready(function(){
+    dropdownLength = $('#org_dropdown').children('option').length
+    var koopId = {{ $koperasi ? $koperasi->organization_id : 'null' }};
 
+    //run if koop admin page
+    if(dropdownLength > 1 && koopId !=='null') {
+      // Loop through each option in the dropdown
+        initialiseAdminHistory(koopId)
+      }
+
+      
+  })
+
+  function initialiseAdminHistory(koopId){
+    $('#org_dropdown option').each(function() {
+          // Check if the option value matches the organization ID
+          if ($(this).val() == koopId) {
+              // Set the selected attribute for the matching option
+              $(this).prop('selected', true);
+              // Set the value of the hidden input field
+              
+          }
+      });
+      fetchAdminHistory();
+      orgId = $("#org_dropdown option:selected").val();
+      $('.koperasi_id').val(orgId);
+      $('#org_dropdown').change(function() {   
+        fetchAdminHistory();
+    })
+  }
+  
+  function fetchAdminHistory(){
+
+    orgId = $("#org_dropdown option:selected").val();
+
+    $.ajax({
+            type: 'GET',
+            url: '{{ route("koperasi.fetchAdminHistory")}}',
+            data: {
+                koopId:orgId
+            },
+            success:function(response){
+              loadHistoryTable(response.order);
+            }
+        });
+  }
+
+
+  function loadHistoryTable(order){
+
+    if (order.length > 0) {
+  let tableBody = '';
+  order.forEach((row) => {
+    let date = new Date(row.updated_at);
+    let pickupDate = new Date(row.pickup_date);
+    let noteHtml = row.note
+      ? `${row.note} |<i> Status dikemaskini oleh ${row.confirmPerson} pada ${row.confirm_picked_up_time}</i>`
+      : `<i>Status dikemaskini oleh ${row.confirmPerson} pada ${row.confirm_picked_up_time}</i>`;
+      const viewPgngListRoute = "{{ route('koperasi.viewPgngList', [':Id',':customerID']) }}";
+      const finalLink = viewPgngListRoute.replace(':Id', row.id).replace(':customerID', row.customerID);
+      console.log(row);
+      pgngList = `<a href="${finalLink}">Lihat Pesanan</a>`;
+    tableBody += `
+      <tr>
+        <td class="align-middle">${row.id}.</td>
+        <td class="align-middle">${row.koop_name}</td>
+        <td class="align-middle">${row.koop_telno}</td>
+        <td class="align-middle">${date.toLocaleString('en-US')}</td>
+        <td class="align-middle">${pickupDate.toDateString()}</td>
+        <td class="align-middle">${noteHtml}</td>
+        <td class="align-middle">${row.total_price.toFixed(2)} | 
+          ${pgngList}
+        </td>
+        <td>${row.status === "3"
+          ? '<span class="badge rounded-pill bg-success text-white btn-block">Berjaya Diambil</span>'
+          : (row.status === "100" || row.status === "200")
+          ? '<span class="badge rounded-pill bg-danger text-white btn-block">Dibatalkan</span>'
+          : ''}
+        </td>
+      </tr>`;
+  });
+
+  // Append the table body to the table
+  document.getElementById('historyTable').innerHTML = tableBody;
+} else {
+  // Display the message when there are no orders
+  document.getElementById('historyTable').innerHTML = `
+    <tr>
+      <td colspan="8" class="text-center"><i>Tiada Sejarah Rekod Pesanan.</i></td>
+    </tr>`;
+}
+  }
+</script>
 @endsection

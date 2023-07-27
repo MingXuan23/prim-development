@@ -66,6 +66,7 @@
             </div>
         </div>
         <input type="hidden" name="classCheckBoxEmpty" id="classCheckBoxEmpty" value="false">
+        <input type="hidden" name="koopId" class="koperasi_id" value={{$koopId}}>
         <label>Status Produk</label></br>
       
         <div class="col">

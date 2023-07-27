@@ -209,30 +209,35 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
 
     Route::group(['namespace' => 'Admin'], function() {
         Route::get('/produkmenu','AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
+        Route::get('/fetchprodukmenu','AdminProductCooperativeController@changeProductMenuByOrgId')->name('koperasi.changeProductMenu');
         Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
         Route::post('/produkmenu/deleteSelectedProducts','AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
         Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
         Route::post('/produktype/getProductNumOfGroup','AdminProductCooperativeController@getProductNumOfGroup')->name('koperasi.getProductNumOfGroup');
 
-        Route::get('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
-        Route::post('/produktype','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
+        
+        Route::any('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
+        Route::post('/produktype/add','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
         Route::post('/produktype/update/{id}','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
         Route::get('/produktype/edit/{id}','AdminProductCooperativeController@editType')->name('koperasi.editType');
         Route::post('/importproducttype', 'AdminProductCooperativeController@importproducttype')->name('importproducttype');
         Route::post('/importproduct', 'AdminProductCooperativeController@importproduct')->name('importproduct');
 
         Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
-        Route::get('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
-        Route::post('/produk','AdminProductCooperativeController@storeProduct')->name('koperasi.storeProduct');
+        Route::post('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
+        Route::post('/storeproduk','AdminProductCooperativeController@storeProduct')->name('koperasi.storeProduct');
         Route::get('/produk/update/{id}','AdminProductCooperativeController@editProduct')->name('koperasi.editProduct');
         Route::post('/produk/update/{id}','AdminProductCooperativeController@updateProduct')->name('koperasi.updateProduct');
         Route::get('/produk/delete/{id}','AdminProductCooperativeController@deleteProduct')->name('koperasi.deleteProduct');
 
 
         Route::get('/openingHours','AdminOpeningHoursCooperativeController@indexOpening')->name('koperasi.indexOpening');
+        Route::get('/openingChangeKoperasi','AdminOpeningHoursCooperativeController@openingChangeKoperasi')->name('koperasi.openingChangeKoperasi');
         Route::post('/openingHours','AdminOpeningHoursCooperativeController@storeOpening')->name('koperasi.storeOpening');
 
         Route::get('/Confirm','AdminOrderCooperativeController@indexConfirm')->name('koperasi.indexConfirm');
+        Route::get('/fetchConfirmTable','AdminOrderCooperativeController@fetchConfirmTable')->name('koperasi.fetchConfirmTable');
+
         Route::get('/Confirm/update/{id}','AdminOrderCooperativeController@storeConfirm')->name('koperasi.storeConfirm');
         Route::get('/Confirm/delete/{id}','AdminOrderCooperativeController@notConfirm')->name('koperasi.notConfirm');
 
@@ -240,7 +245,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/fetchClassyear','AdminProductCooperativeController@fetchClassyear')->name('koperasi.fetchClassYear');
 
         Route::get('/{id}/{customerID}/list', 'AdminOrderCooperativeController@viewPgngList')->name('koperasi.viewPgngList');
+        Route::get('returnFromList/{url}/{koopId}', 'AdminOrderCooperativeController@returnFromList')->name('koperasi.returnFromList');
         Route::get('/adminHistory', 'AdminOrderCooperativeController@adminHistory')->name('koperasi.adminHistory');
+        Route::get('/fetchAdminHistory', 'AdminOrderCooperativeController@fetchAdminHistory')->name('koperasi.fetchAdminHistory');
+
 
     });
 });

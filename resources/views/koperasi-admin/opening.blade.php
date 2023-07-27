@@ -36,13 +36,21 @@
 @endif
 
 <div class="row align-items-center">
-  <div class="col-sm-6">
-      <div class="page-title-box">
-          <h4 class="font-size-18">{{ $koperasi->nama }}</h4>
-          <ol class="breadcrumb mb-0">
-              <!-- <li class="breadcrumb-item active">Restoran >> Kemas Kini Pembukaan</li> -->
-          </ol>
+  <div class="col-sm-12">
+  <div style="padding-top: 24px" class="row">
+      <div class="col-md-12 ">
+          <div class=" align-items-center">
+              <div class="form-group card-title">
+                  <select name="org" id="org_dropdown" class="form-control col-md-12">
+                      <option value="" selected disabled>Pilih Organisasi</option>
+                      @foreach($koperasiList as $row)
+                      <option value="{{ $row->organization_id }}">{{ $row->nama }}</option>
+                      @endforeach
+                  </select>
+              </div>
+          </div>
       </div>
+</div>
   </div>
 </div>
 
@@ -141,6 +149,7 @@
                     class="btn btn-secondary waves-effect waves-light mr-1">
                     Kembali
                 </a>
+                <input type="hidden" name="koopId" class="koperasi_id">
                 <button type="submit" class="btn btn-primary waves-effect waves-light mr-1" id="btnSubmit">
                     Simpan
                 </button>
@@ -172,46 +181,8 @@
             </tr>
           </thead>
 
-          <tbody>
-          @foreach($hour as $hour)
-          <tr>
-            <td> 
-            @if($hour->day ==1)
-            Isnin
-            @elseif($hour->day ==2)
-            Selasa
-            @elseif($hour->day ==3)
-            Rabu
-            @elseif($hour->day ==4)
-            Khamis
-            @elseif($hour->day ==5)
-            Jumaat           
-            @elseif($hour->day ==6)
-            Sabtu            
-            @elseif($hour->day ==0)
-            Ahad
-            @endif
-            </td>
+          <tbody id="hourTable">
 
-            <td>
-            @if($hour->status== 2 ) 
-            <div class="d-flex justify-content-center"><span class="badge badge-danger">tutup</span></div>
-            @elseif($hour->status== 1)
-            <div class="d-flex justify-content-center"><span class="badge badge-success">buka</span></div>
-            @endif
-            </td>
-            
-            <td>
-              {{$hour->open_hour}}
-            </td>
-            
-            <td>
-              {{$hour->close_hour}}
-            </td>
-
-          </tr>
-          @endforeach
-    
           </tbody>
 
         </table>
@@ -232,6 +203,65 @@
           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
   });
+
+  function loadHourTable(){
+    orgId = $("#org_dropdown option:selected").val();
+    $('.koperasi_id').val(orgId);
+    $.ajax({
+            type: 'GET',
+            url: '{{ route("koperasi.openingChangeKoperasi") }}',
+            data: {
+                koopId:orgId
+            },
+            success:function(response){
+              //console.log(response.hour)
+              
+              $('#hourTable').empty();
+              response.hour.forEach(function(hour) {
+                var row = document.createElement('tr');
+
+                var dayCell = document.createElement('td');
+                if (hour.day == 1) {
+                  dayCell.textContent = 'Isnin';
+                } else if (hour.day == 2) {
+                  dayCell.textContent = 'Selasa';
+                } else if (hour.day == 3) {
+                  dayCell.textContent = 'Rabu';
+                } else if (hour.day == 4) {
+                  dayCell.textContent = 'Khamis';
+                } else if (hour.day == 5) {
+                  dayCell.textContent = 'Jumaat';
+                } else if (hour.day == 6) {
+                  dayCell.textContent = 'Sabtu';
+                } else if (hour.day == 0) {
+                  dayCell.textContent = 'Ahad';
+                }
+                row.appendChild(dayCell);
+
+                var statusCell = document.createElement('td');
+                var statusBadge = document.createElement('div');
+                statusBadge.classList.add('d-flex', 'justify-content-center');
+                if (hour.status == 2) {
+                  statusBadge.innerHTML = '<span class="badge badge-danger">tutup</span>';
+                } else if (hour.status == 1) {
+                  statusBadge.innerHTML = '<span class="badge badge-success">buka</span>';
+                }
+                statusCell.appendChild(statusBadge);
+                row.appendChild(statusCell);
+
+                var openHourCell = document.createElement('td');
+                openHourCell.textContent = hour.open_hour;
+                row.appendChild(openHourCell);
+
+                var closeHourCell = document.createElement('td');
+                closeHourCell.textContent = hour.close_hour;
+                row.appendChild(closeHourCell);
+
+                $("#hourTable").append(row);
+              });
+            }
+        });
+  }
 
   $(document).ready(function () {
 
@@ -256,6 +286,21 @@
 
     $('.alert').delay(5000).fadeOut();
 
+    
+    $('#org_dropdown').change(function() {   
+       loadHourTable();
+    })
+
+    $('#org_dropdown option').each(function() {
+        // Check if the option value matches the organization ID
+        if ($(this).val() == {{$koperasi->organization_id}}) {
+            // Set the selected attribute for the matching option
+            $(this).prop('selected', true);
+            // Set the value of the hidden input field
+            
+        }
+    });
+    loadHourTable();
   });
 
 </script>
