@@ -151,9 +151,9 @@ class UserCooperativeController extends Controller
                     $newTotalPrice += doubleval($row->price * $row->quantity);
                 }
 
-                $charge = DB::table('organizations')
-                        ->find($request->o_id)
-                        ->fixed_charges;
+                $charge=$this->calCharge( $newTotalPrice,$request->o_id);
+
+                
                 $newTotalPrice+=doubleval($charge);
                 PgngOrder::where([
                     ['user_id', $userID],
@@ -166,12 +166,11 @@ class UserCooperativeController extends Controller
             }
             else // order did not exists
             {
-                $charge = DB::table('organizations')
-                        ->find($request->o_id)
-                        ->fixed_charges;
+               
                     
-                $totalPrice = $item->price * (int)$request->qty+doubleval($charge);
-
+                $totalPrice = $item->price * (int)$request->qty;
+                $charge=$this->calCharge( $totalPrice,$request->o_id);
+                $totalPrice+=doubleval($charge);
                 $newQuantity = intval((int)$item->quantity_available - (int)$request->qty);
 
                 $newOrder = PgngOrder::create([
@@ -328,15 +327,7 @@ class UserCooperativeController extends Controller
             ->where('pi.id',$before_cart_item->first()->itemId)
             ->select('pg.organization_id')
             ->first()
-            ->organization_id;
-            
-            $charge = DB::table('organizations')
-            ->find($org_id)
-            ->fixed_charges;
-            if($charge==null){
-                $charge=0;
-            }
-
+            ->organization_id;      
             
             $updateMessage="";
             foreach($before_cart_item as $item){
@@ -349,7 +340,6 @@ class UserCooperativeController extends Controller
                     ])->update(['quantity' => $item->quantity_available]);
 
                     $userID=Auth::id();
-                    
 
                     $newTotalPrice = 0;
                     // Recalculate total
@@ -365,7 +355,8 @@ class UserCooperativeController extends Controller
                     {
                         $newTotalPrice += doubleval($row->price * $row->quantity);
                     }
-                        
+                    
+                    $charge=$this->calCharge( $newTotalPrice,$org_id);    
                     $newTotalPrice += doubleval($charge);
 
                     PgngOrder::where([
@@ -386,6 +377,15 @@ class UserCooperativeController extends Controller
             ->where('po.pgng_order_id', $cart->id)
             ->select('pg.id as pgngId','po.id as productOrderId', 'po.quantity', 'pi.name', 'pi.price', 'pi.image','pi.quantity_available','pi.status')
             ->get();
+
+            $newTotalPrice=0;
+            foreach($cart_item as $row)
+            {
+                $newTotalPrice += doubleval($row->price * $row->quantity);
+            }
+            
+            $charge=$this->calCharge( $newTotalPrice,$org_id); 
+
             $allDay = OrganizationHours::where([
                 ['organization_id', $id],
                 ['status', 1],
@@ -410,7 +410,7 @@ class UserCooperativeController extends Controller
                 ['organization_id', $id],
                 ['user_id', $user_id],
             ])->first();
-
+            
             return view('koperasi.cart', compact('cart', 'cart_item', 'allDay', 'isPast' ,'id','updateMessage','charge'));
         }
         else
@@ -537,10 +537,9 @@ class UserCooperativeController extends Controller
                 $newTotalPrice += doubleval($row->price * $row->quantity);
             }
 
+            //dd($newTotalPrice);
+            $charge=$this->calCharge( $newTotalPrice,$org_id);
             
-            $charge = DB::table('organizations')
-                ->find($org_id)
-                ->fixed_charges;
             $newTotalPrice += doubleval($charge);
 
             PgngOrder::where([
@@ -640,8 +639,9 @@ class UserCooperativeController extends Controller
         //dd($order);
 
         //$order = $query->paginate(5);
-
-        return view('koperasi.history', compact('order'));
+        $koperasiList="";
+        $koperasi="";
+        return view('koperasi.history', compact('order','koperasiList','koperasi'));
     }
 
     public function indexList($id)
@@ -1009,7 +1009,30 @@ class UserCooperativeController extends Controller
 
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);
     }
+    
+    public function calCharge($total,$oid){
+        $findCharge = DB::table('organization_charges')
+                        ->where('organization_id', $oid)
+                        ->where('minimum_amount', '<=', $total)
+                        ->orderByDesc('minimum_amount')
+                        ->first();
+        if($findCharge==null)
+        {
+            $charge = DB::table('organizations')
+            ->find($oid)
+            ->fixed_charges;
+        }
+        else{
+            $charge=$findCharge->remaining_charges;
+        }
 
+        if($charge==null){
+            $charge=0;
+        }
+        //dd($findCharge,$total);
+        return $charge;
+
+    }
     //no need to un comment unless code
     // public function testPay(){
     //     $order = PgngOrder::where('transaction_id', 25853)->first();

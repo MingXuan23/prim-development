@@ -106,9 +106,9 @@ class ProductController extends Controller
 
           return view('merchant.regular.product.productsCart',compact('productInCart','organizations'));
     } 
-    public function calculateTotalPrice($order_id,$charge) 
+    public function calculateTotalPrice($order_id,$orgId) 
     {
-        $new_total_price = 0;
+        $total_price = 0; // total price without charges
 
         $cart_item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
@@ -126,20 +126,47 @@ class ProductController extends Controller
                     ->select('po.quantity as qty', 'pi.price')
                     ->get();
 
-        $fixed_charges = $charge;   
+          
      
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)
             {
-                    $new_total_price += doubleval($row->price * $row->qty );
+                    $total_price += doubleval($row->price * $row->qty );
             }          
         }
-        $new_total_price += $fixed_charges;
-         return $new_total_price;
+        $fixed_charges = $this->calCharge($total_price,$orgId);
+        
+        $new_total_price = $total_price+$fixed_charges;
+         return ['new_total_price'=>$new_total_price,
+                'charges'=>$fixed_charges,
+                'total_price'=>$total_price        
+        ];
     }
         
        
-    
+    public function calCharge($total,$oid){
+        $findCharge = DB::table('organization_charges')
+                        ->where('organization_id', $oid)
+                        ->where('minimum_amount', '<=', $total)
+                        ->orderByDesc('minimum_amount')
+                        ->first();
+        if($findCharge==null)
+        {
+            $charge = DB::table('organizations')
+            ->find($oid)
+            ->fixed_charges;
+        }
+        else{
+            $charge=$findCharge->remaining_charges;
+        }
+
+        if($charge==null){
+            $charge=0;
+        }
+
+        return $charge;
+
+    }
     //for updating a cart 
     public function updateCart(Request $request){
      // to update quantity in ProductOrder
@@ -159,11 +186,14 @@ class ProductController extends Controller
          ->find($request->pgngOrderId)
          ->organization_id;
 
-         $charge = DB::table('organizations')
-         ->find($organizationId)
-         ->fixed_charges;
+        //  $charge = DB::table('organizations')
+        //  ->find($organizationId)
+        //  ->fixed_charges;
      // to update total price in PGNGOrder
-         $totalPrice = $this->calculateTotalPrice($request->pgngOrderId, $charge);
+         $priceData = $this->calculateTotalPrice($request->pgngOrderId, $organizationId);
+         $totalPrice=$priceData['new_total_price'];
+         $charges=$priceData['charges'];
+         return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges]);
          DB::table('pgng_orders')
          ->where('id', $request->pgngOrderId)
          ->update([
@@ -171,7 +201,7 @@ class ProductController extends Controller
                'updated_at' => Carbon::now(),
          ]);
          $totalPrice = number_format($totalPrice, 2);
-          return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice]);
+         return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges]);
     }
     //to get the number of items in cart
    public function loadCartCounter(){
@@ -220,9 +250,11 @@ class ProductController extends Controller
    }
    public function getTotalPrice(Request $request ){
      $pgng_id = $request->pgng_order_id;
-     $charge = Organization::find($request->org_id)
-     ->fixed_charges;
-     $totalPrice = $this->calculateTotalPrice($pgng_id, $charge);
+    //  $charge = Organization::find($request->org_id)
+    //  ->fixed_charges;
+    $priceData = $this->calculateTotalPrice($request->pgngOrderId, $organizationId);
+    $totalPrice=$priceData['new_total_price'];
+    $charges=$priceData['charges'];
      // update total in PGNG_ORDERS
      DB::table('pgng_orders')
          ->where([

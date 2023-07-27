@@ -7,7 +7,9 @@
 @endsection
 
 @section('content')
+
 <div class="col-md-12">
+@if($koperasiList!="")
       <div style="padding-top: 24px" class="row">
         <div class="col-md-12 ">
             <div class=" align-items-center">
@@ -22,6 +24,7 @@
             </div>
         </div>
   </div>
+  @endif
 <div class="card mb-3">
   <div class="card-header">
     <i class="ti-clipboard mr-2"></i>Sejarah Pesanan Anda</div>
@@ -44,7 +47,7 @@
 
         <tbody id="historyTable">
           
-          <!-- @if(isset($order))
+          @if(isset($order))
             @foreach($order as $row)
             @php($date = date_create($row->updated_at))
             @php($pickup = date_create($row->pickup_date))
@@ -79,7 +82,7 @@
           <tr>
               <td colspan="8" class="text-center"><i>Tiada Sejarah Rekod Pesanan.</i></td>
           </tr>
-          @endif -->
+          @endif
         </tbody>
       </table>
     </div>
@@ -94,10 +97,19 @@
 <script>
   $(document).ready(function(){
     dropdownLength = $('#org_dropdown').children('option').length
-    if(dropdownLength > 1) {
-      var koopId = "{{ $koperasi->organization_id }}";
+    var koopId = {{ $koperasi ? $koperasi->organization_id : 'null' }};
+
+    //run if koop admin page
+    if(dropdownLength > 1 && koopId !=='null') {
       // Loop through each option in the dropdown
-      $('#org_dropdown option').each(function() {
+        initialiseAdminHistory(koopId)
+      }
+
+      
+  })
+
+  function initialiseAdminHistory(koopId){
+    $('#org_dropdown option').each(function() {
           // Check if the option value matches the organization ID
           if ($(this).val() == koopId) {
               // Set the selected attribute for the matching option
@@ -106,17 +118,15 @@
               
           }
       });
-      fetchHistory();
+      fetchAdminHistory();
       orgId = $("#org_dropdown option:selected").val();
       $('.koperasi_id').val(orgId);
-      }
-
-        $('#org_dropdown').change(function() {   
-          fetchHistory();
+      $('#org_dropdown').change(function() {   
+        fetchAdminHistory();
     })
-  })
-
-  function fetchHistory(){
+  }
+  
+  function fetchAdminHistory(){
 
     orgId = $("#org_dropdown option:selected").val();
 
@@ -131,6 +141,7 @@
             }
         });
   }
+
 
   function loadHistoryTable(order){
 

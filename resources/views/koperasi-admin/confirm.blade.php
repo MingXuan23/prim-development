@@ -127,7 +127,7 @@ $.ajax({
       4: '<span class="badge rounded-pill bg-danger text-white">Tidak Diambil</span>',
       1: '<span class="badge rounded-pill bg-warning">In cart</span>',
     };
-    
+    if (orders.length > 0) {
     orders.forEach((order) => {
       //console.log(order)
       const row = document.createElement('tr');
@@ -159,7 +159,17 @@ $.ajax({
       `;
       
       confirmTableBody.appendChild(row);
+    
+    
     });
+  }
+  else {
+  // Display the message when there are no orders
+  document.querySelector('#confirmTable tbody').innerHTML = `
+    <tr>
+      <td colspan="9" class="text-center"><i>Tiada Rekod Pesanan.</i></td>
+    </tr>`;
+}
   }
 </script>
 @endsection

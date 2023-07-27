@@ -53,11 +53,12 @@ class AdminOrderCooperativeController extends Controller
 
         $list_detail = DB::table('pgng_orders as ko')
                         ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                        ->join('transactions as t','t.id','ko.transaction_id')
                         ->where('ko.id', $id)
                         ->where('ko.status', '>' , 0)
                         ->where('ko.user_id', $userID)
                         ->select('ko.updated_at', 'ko.pickup_date', 'ko.total_price', 'ko.note', 'ko.status',
-                                'o.id','o.nama', 'o.parent_org', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state')
+                                'o.id','o.nama', 'o.parent_org', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','t.transac_no as fpxId')
                         ->first();
         
         $date = Carbon::createFromDate($list_detail->pickup_date); // create date based on pickup date
