@@ -501,14 +501,16 @@ input::-webkit-inner-spin-button {
                         $alertMessage.append(message);
                         $alertMessage.delay(1000).fadeOut()
 
-                        let charge=parseFloat($("#charge").attr("charge"));
-                        totalBeforeCharge=parseFloat(result.totalPrice.replace(",", ""))-charge;//because data in database have comma ','
+                        let charge= parseFloat(result.charges);
+                        $('#charge').attr('charge', charge);
+                        $('#charge').text('RM ' + charge.toFixed(2));
+                        totalBeforeCharge=parseFloat(result.totalPrice)-charge;
 
                          
                         $('#total').html("RM "+totalBeforeCharge.toFixed(2));
                         $totalPrice = $('#totalPrice');
-                        console.log(result.totalPrice+" "+totalBeforeCharge+" "+charge );
-                        $totalPrice.html("RM "+result.totalPrice);
+                        //console.log(result.totalPrice+" "+totalBeforeCharge+" "+charge );
+                        $totalPrice.html("RM "+result.totalPrice.toFixed(2));
 
                 },
                 // error:function(result) {
