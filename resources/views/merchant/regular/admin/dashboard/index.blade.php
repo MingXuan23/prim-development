@@ -53,7 +53,7 @@
                                 <div class="float-left mini-stat-img mr-4">
                                     <img src="{{ URL('assets/images/services-icon/02.png')}}" alt="">
                                 </div>
-                                <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Jumlah Pesanan</h5>
+                                <h5 class="font-size-16 text-uppercase mt-0 text-white-50">Jumlah Pesanan Perlu Diselesaikan</h5>
                                 <div class="font-weight-medium font-size-24" id="total_order">                        
                                 </div>
                                 <div id="order_label" class="mini-stat-label bg-success mb-0">

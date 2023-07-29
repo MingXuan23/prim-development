@@ -45,10 +45,11 @@
                 <label>Tapis</label>
                 <select class="form-control" data-parsley-required-message="Pilih Jenis Tapisan" id="filter-order" required>
                     <option value="all" selected>Semua Pesanan (0)</option>
-                    <option value="today">Pesanan Harini (0)</option>
-                    <option value="week">Pesanan Minggu ini (0)</option>
-                    <option value="month">Pesanan Bulan ini (0)</option>
-                    <option value="date">Pilih Tarikh</option>
+                    <option value="receive-today">Pesanan Diterima Hari Ini (0)</option>
+                    <option value="today">Pesanan Perlu Diselesaikan Hari Ini (0)</option>
+                    <option value="week">Pesanan Perlu Diselesaikan Minggu ini (0)</option>
+                    <option value="month">Pesanan Perlu Diselesaikan ini (0)</option>
+                    <option value="date">Pesanan Perlu Diselesaikan Ikut Tarikh</option>
                 </select>
             </div>
         </div>
@@ -244,9 +245,10 @@
                 data: {id:orgId},
                 success:function(result) {
                     $('#filter-order').children('option[value=all]').text("Semua Pesanan ("+result.response.all+")")
-                    $('#filter-order').children('option[value=today]').text("Pesanan Harini ("+result.response.today+")")
-                    $('#filter-order').children('option[value=week]').text("Pesanan Minggu Ini ("+result.response.week+")")
-                    $('#filter-order').children('option[value=month]').text("Pesanan Bulan Ini ("+result.response.month+")")
+                    $('#filter-order').children('option[value=receive-today]').text("Pesanan Diterima Hari Ini ("+result.response.received_today+")")
+                    $('#filter-order').children('option[value=today]').text("Pesanan Perlu Diselesaikan Hari Ini ("+result.response.today+")")
+                    $('#filter-order').children('option[value=week]').text("Pesanan Perlu Diselesaikan Minggu Ini ("+result.response.week+")")
+                    $('#filter-order').children('option[value=month]').text("Pesanan Perlu Diselesaikan Bulan Ini ("+result.response.month+")")
                 },
                 error:function(result) {
                     console.log(result.responseText)

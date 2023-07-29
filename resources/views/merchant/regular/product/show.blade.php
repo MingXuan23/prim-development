@@ -20,6 +20,11 @@
                 color: var(--primary-color);
             }
             /* css */
+            .previous-nav{
+                color:rgb(45, 173, 179);
+                font: bold 19px "Roboto";
+                
+            }
             .cart-btn {
                 z-index: 999;
                 color:var(--secondary-bc);
@@ -282,7 +287,7 @@
     <div class="row align-items-center">
         <div class="col-sm-6">
             <div class="page-title-box">
-                <h4 class="font-size-18"><a href="{{ route('merchant-product.index') }}" class="text-muted">Senarai Produk</a>  <i class="fas fa-angle-right"></i>  {{$product->pg_name}} <i class="fas fa-angle-right"></i>  {{$product->name}}</h4>
+                <h4 class="font-size-18"><a href="{{ route('merchant-product.index') }}" class="previous-nav">Senarai Produk</a>  <i class="fas fa-angle-right"></i>  {{$product->pg_name}} <i class="fas fa-angle-right"></i>  {{$product->name}}</h4>
             </div>
         </div>
         <a href="{{route('merchant.all-cart')}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>

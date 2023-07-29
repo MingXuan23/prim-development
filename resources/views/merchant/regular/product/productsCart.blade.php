@@ -10,6 +10,11 @@
                 --primary-color:#5b626b;
                 --transition: all 0.3s linear;
             }
+            .previous-nav{
+                color:rgb(45, 173, 179);
+                font: bold 22px "Roboto";
+                
+            }
             .main-content{
                 color: var(--primary-color);
             }
@@ -254,12 +259,27 @@
                 .product-details{
                     width: 100%;
                 }
+                h1{
+                    font-size: 1.5rem!important;
+                }
+                h2{
+                    font-size: 1.2rem!important;
+                }
+                h3{
+                    font-size: 1rem!important;
+                }
+                .previous-nav{
+                    font-size: 18px;
+                }
             }
     </style>
 @endsection
 
 @section('content')
-    <div>
+    <div> 
+        <div class="previous-nav">
+        <h1 class="font-size-18"><i class="fas fa-angle-left"></i>  <a href="{{ route('merchant-product.index') }}" class="previous-nav">Senarai Produk</a></h1>
+        </div>
         <h1 class="title">Troli Membeli-Belah</h1>
         <h3 class="carts-counter"></h3>
     </div>
@@ -295,7 +315,7 @@
                                                     <h6 data-qty-available="{{$product->quantity_available}}" id="quantity-available">{{$product->quantity_available}} barang lagi</h6>
                                                 </div>
                                             </div>
-                                            <h5 class="total-price hide" data-pgng-order-id="{{$product->pgng_order_id}}" data-org-id="{{$organization->id}}">Total: RM{{$product->total_price}}</h5>
+                                            <h5 class="total-price hide" data-pgng-order-id="{{$product->pgng_order_id}}" data-org-id="{{$organization->id}}"><!--Jumlah: RM{{$product->total_price}}--></h5>
                                             <div class="alert-message">
                                             {{-- alert message will be appended here --}}
                                             </div>
@@ -329,7 +349,7 @@
                                                     <h6>Kehabisan Stok</h6>
                                                 </div>
                                             </div>
-                                            <h5 class="total-price hide" data-pgng-order-id="{{$product->pgng_order_id}}" data-org-id="{{$organization->id}}">Total: RM{{$product->total_price}}</h5>
+                                            <h5 class="total-price hide" data-pgng-order-id="{{$product->pgng_order_id}}" data-org-id="{{$organization->id}}">Jumlah: RM{{$product->total_price}}</h5>
                                             <div class="alert-message">
                                             {{-- alert message will be appended here --}}
                                             </div>
@@ -435,11 +455,15 @@
                         org_id: $(totalPrice).attr('data-org-id'),
                     },
                     success: function (result) {
-                        if(result.fixed_charges > 0)
-                        $(totalPrice).html("Jumlah: RM"+result.totalPrice + "(Service Charge :RM" + result.fixed_charges +")" );
-                        else
-                        $(totalPrice).html("Jumlah: RM"+result.totalPrice);
-
+                        let total = result.totalPrice;
+                        total = parseFloat(total).toFixed(2);
+                        if(parseFloat(result.fixed_charges) > 0){   
+                            let fixed_charges = parseFloat(result.fixed_charges).toFixed(2);
+                            $(totalPrice).html("Jumlah: RM"+total + "<br>(incl. Cas Servis:RM" + fixed_charges +")" );                        
+                        }                        
+                        else{
+                            $(totalPrice).html("Jumlah: RM"+total);
+                        }
                     }
                 });
             });
@@ -571,9 +595,18 @@
                         $alertMessage.empty();
                         $alertMessage.append(message);
                         $alertMessage.delay(1000).fadeOut()
-                            
+
                         $totalPrice = $parent.parent().parent().children().children('.product-details').children('.total-price');
-                        $totalPrice.html("Total: RM"+result.totalPrice);
+                        let total = result.totalPrice;
+                        total = total.toFixed(2);                        
+                        if(parseFloat(result.charges) > 0){   
+                            let fixed_charges = parseFloat(result.charges).toFixed(2);
+                            $totalPrice.html("Jumlah: RM"+total + "<br>(incl. Cas Servis:RM" + fixed_charges +")" );                        
+                        }                        
+                        else{
+                            $totalPrice.html("Jumlah: RM"+total);
+                        }
+
                 },
                 // error:function(result) {
                 //     console.log(result.responseText)
