@@ -67,6 +67,22 @@ class OrderController extends Controller
             {
                 $order->whereBetween('pickup_date', 
                 [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])->get();
+            }else if($filter_type == "receive-today"){
+                // to get list of order paid today
+                $order = DB::table('pgng_orders as pu')
+                ->join('users as u', 'pu.user_id', 'u.id')
+                ->select('pu.id', 'pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
+                'u.name', 'u.telno')
+                ->orderBy('status', 'desc')
+                ->orderBy('pickup_date', 'asc')
+                ->orderBy('pu.updated_at', 'desc')
+                ->whereIn('pu.status', ["Paid"])
+                ->where('organization_id', $org_id)
+                ->join('transactions', 'transactions.id','pu.transaction_id')
+                ->where('transactions.status','Success');
+                $order->whereBetween('datetime_created', 
+                [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])
+                ->get();
             }   
             
             $table = Datatables::of($order);
@@ -127,8 +143,13 @@ class OrderController extends Controller
         [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])->count() ?: 0;
         $count_month = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date', 
         [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])->count() ?: 0;
-
+        $count_receive_today = PgngOrder::where('organization_id', $org_id)->where('pgng_orders.status', 'Paid')
+        ->join('transactions','transactions.id','transaction_id')
+        ->where('transactions.status','Success')
+        ->whereBetween('datetime_created', 
+        [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->count() ?: 0;
         $response = [
+            'received_today'=>$count_receive_today,
             'all' => $count_all,
             'today' => $count_today,
             'week' => $count_week,

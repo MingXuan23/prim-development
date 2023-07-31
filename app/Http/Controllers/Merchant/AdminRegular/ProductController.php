@@ -314,7 +314,10 @@ class ProductController extends Controller
             ['product_item.id',$request->id],
         ])
         ->join('pgng_orders','pgng_orders.id','product_order.pgng_order_id')
-        ->where('pgng_orders.deleted_at',NULL)
+        ->where([
+            ['pgng_orders.deleted_at',NULL],
+            ['pgng_orders.status',"In Cart"]
+        ])
         ->get();
         $regularProductController = new RegularProductController();
 
@@ -324,8 +327,8 @@ class ProductController extends Controller
                 $org_id = $row->organization_id;
                 $charge = Organization::find($org_id)
                 ->fixed_charges;
-
                 $totalPrice = $regularProductController->calculateTotalPrice($pgng_order_id, $charge);
+
                 // update total in PGNG_ORDERS
                 DB::table('pgng_orders')
                 ->where([

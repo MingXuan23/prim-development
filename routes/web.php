@@ -266,7 +266,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
         Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
         
-        // Route::get('/testPay','ProductController@testPay')->name('merchant.testPay');
+       //  Route::get('/testPay','ProductController@testPay')->name('merchant.testPay');
          
          // Checkout
         Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
