@@ -13,7 +13,7 @@ use App\Models\ProductOrder;
 use App\Models\PgngOrder;
 use App\Models\Transaction;
 
-
+// testing commit
 use Yajra\DataTables\DataTables;//for datatable
 
 class ProductController extends Controller
@@ -109,7 +109,6 @@ class ProductController extends Controller
     public function calculateTotalPrice($order_id,$orgId) 
     {
         $total_price = 0; // total price without charges
-
         $cart_item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                     ->where([
@@ -125,15 +124,13 @@ class ProductController extends Controller
                     })
                     ->select('po.quantity as qty', 'pi.price')
                     ->get();
-
-          
-     
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)
             {
                     $total_price += doubleval($row->price * $row->qty );
             }          
         }
+       
         $fixed_charges = $this->calCharge($total_price,$orgId);
         
         $new_total_price = $total_price+$fixed_charges;
@@ -185,22 +182,19 @@ class ProductController extends Controller
          $organizationId = DB::table('pgng_orders')
          ->find($request->pgngOrderId)
          ->organization_id;
-
         //  $charge = DB::table('organizations')
         //  ->find($organizationId)
         //  ->fixed_charges;
      // to update total price in PGNGOrder
          $priceData = $this->calculateTotalPrice($request->pgngOrderId, $organizationId);
-         $totalPrice=$priceData['new_total_price'];
-         $charges=$priceData['charges'];
-         return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges]);
+         $totalPrice=$priceData['new_total_price'];       
+         $charges=$priceData['charges'];         
          DB::table('pgng_orders')
          ->where('id', $request->pgngOrderId)
          ->update([
                'total_price' => $totalPrice,
                'updated_at' => Carbon::now(),
          ]);
-         $totalPrice = number_format($totalPrice, 2);
          return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges]);
     }
     //to get the number of items in cart
@@ -252,10 +246,10 @@ class ProductController extends Controller
      $pgng_id = $request->pgng_order_id;
     //  $charge = Organization::find($request->org_id)
     //  ->fixed_charges;
-    $priceData = $this->calculateTotalPrice($request->pgngOrderId, $organizationId);
+    $priceData = $this->calculateTotalPrice($pgng_id, $request->org_id);
     $totalPrice=$priceData['new_total_price'];
     $charges=$priceData['charges'];
-     // update total in PGNG_ORDERS
+     // update totzal in PGNG_ORDERS
      DB::table('pgng_orders')
          ->where([
           ['id', $pgng_id]
@@ -263,8 +257,8 @@ class ProductController extends Controller
          ->update([
                'total_price' => $totalPrice
          ]);
-     $totalPrice = number_format($totalPrice, 2);
-     return response()->json(['totalPrice'=>$totalPrice,'fixed_charges'=>$charge]);
+    //  $totalPrice = number_format($totalPrice, 2);
+     return response()->json(['totalPrice'=>$totalPrice,'fixed_charges'=>$charges]);
    }
 //    public function checkOut(){
 //           $user_id = Auth::id();

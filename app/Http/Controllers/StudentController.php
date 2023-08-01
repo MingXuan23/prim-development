@@ -561,9 +561,10 @@ class StudentController extends Controller
 
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = '<div class="d-flex justify-content-center"></div>';
+                    // $btn = '<div class="d-flex justify-content-center">';
+                    // $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
                 });
 
