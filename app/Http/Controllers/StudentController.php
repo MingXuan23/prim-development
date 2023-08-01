@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\StudentExport;
 use App\Imports\StudentImport;
+use App\Imports\StudentCompare;
 use App\Models\ClassModel;
 use App\Models\Organization;
 use App\Models\Student;
@@ -86,15 +87,30 @@ class StudentController extends Controller
 
         $etx = $file->getClientOriginalExtension();
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
+
         if (!in_array($etx, $formats)) {
 
             return redirect('/student')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
+        if($request->compareOption ==true){
+            //Excel::import(new StudentCompare($classID), $public_path . '/uploads/excel/' . $namaFile);
+            $import = new StudentCompare($classID);
+            Excel::import($import, $public_path . '/uploads/excel/' . $namaFile);
 
-        Excel::import(new StudentImport($classID), $public_path . '/uploads/excel/' . $namaFile);
+            $studentArray = $import->getStudentArray();
+            $sameClassStudents= $studentArray['sameClassStudents'];
+            $differentClassStudents=$studentArray['differentClassStudents'];
+            $differentOrgStudents=$studentArray['differentOrgStudents'];
+            $newStudents=$studentArray['newStudents'];
+            dd($newStudents);
+            return view('student.compare',compact('sameClassStudents','differentClassStudents','differentOrgStudents','newStudents'));
+        }
+        else{
+            Excel::import(new StudentImport($classID), $public_path . '/uploads/excel/' . $namaFile);
+        }
+       
         return redirect('/student')->with('success', 'New student has been added successfully');
     }
-
 
     public function create()
     {
@@ -217,26 +233,34 @@ class StudentController extends Controller
                     'status'            => 1,
                 ]);
             } 
-        }
+        }   
+        $this->assignStudentToParent($newparent->id,$request->get('parent_phone'),$request,$classid);
+        return redirect('/student')->with('success', 'New student has been added successfully');
+    }
 
+    public function assignStudentToParent($parentId,$telno,$studentData,$classId){
+        $co= DB::table('class_organization')
+        ->select('id', 'organization_id as oid')
+        ->where('class_id', $classId)
+        ->first();
 
         $ou = DB::table('organization_user')
-            ->where('user_id', $newparent->id)
+            ->where('user_id', $parentId)
             ->where('organization_id', $co->oid)
             ->where('role_id', 6)
             ->first();
         // dd($newparent->id);
-        $user = User::find($newparent->id);
+        $user = User::find($parentId);
 
         // role parent
         $rolename = OrganizationRole::find(6);
         $user->assignRole($rolename->nama);
 
         $student = new Student([
-            'nama'          =>  $request->get('name'),
+            'nama'          =>  $studentData->name,
             // 'icno'          =>  $request->get('icno'),
-            'gender'        =>  $request->get('gender'),
-            'email'         =>  $request->get('email'),
+            'gender'        =>  $studentData->gender,
+            'email'         =>  $studentData->email,
         ]);
 
         $student->save();
@@ -265,7 +289,7 @@ class StudentController extends Controller
         */
         DB::table('students')
             ->where('id', $student->id)
-            ->update(['parent_tel' => $newparent->telno]);
+            ->update(['parent_tel' => $telno]);
 
         // check fee for new in student
         // check category A fee
@@ -328,7 +352,7 @@ class StudentController extends Controller
 
             $organ_user_id = DB::table('organization_user')->insertGetId([
                 'organization_id'   => $child_organ->id,
-                'user_id'           => $newparent->id,
+                'user_id'           => $parentId,
                 'role_id'           => 6,
                 'start_date'        => now(),
                 'status'            => 1,
@@ -396,8 +420,6 @@ class StudentController extends Controller
                 }
             }
         }
-
-        return redirect('/student')->with('success', 'New student has been added successfully');
     }
 
     public function show($id)
@@ -692,5 +714,100 @@ class StudentController extends Controller
         $pdf = PDF::loadView('fee.report-search.template-pdf', compact('data', 'get_organization'));
 
         return $pdf->download($class->nama . '.pdf');
+    }
+
+    public function compareAddNewStudent(Request $request){
+        $classid = $request->get('classes');
+        $class = ClassModel::find($classid);
+
+        $co = DB::table('class_organization')
+            ->select('id', 'organization_id as oid')
+            ->where('class_id', $classid)
+            ->first();
+
+        $this->validate($request, [
+            'name'              =>  'required',
+            'classes'           =>  'required',
+            'parent_name'       =>  'required',
+            'parent_phone'      =>  'required',
+        ]);
+
+        $ifExits = DB::table('users as u')
+                    ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+                    ->where('u.telno', '=', $request->get('parent_phone'))
+                    ->where('ou.organization_id', $co->oid)
+                    ->whereIn('ou.role_id', [5, 6])
+                    ->get();
+        
+        if(count($ifExits) == 0) { // if not teacher or parent
+
+            $newparent = DB::table('users')
+                            ->where('telno', '=', $request->get('parent_phone'))
+                            ->first();
+            
+            // dd($newparent);
+
+            if (empty($newparent)) {
+                $this->validate($request, [
+                    'parent_phone'      =>  'required|unique:users,telno',
+                ]);
+
+                if ($request->parent_email != null)
+                {
+                    $this->validate($request, [
+                        'parent_email'     =>  'required|email|unique:users,email',
+                    ]);
+                }
+    
+                $newparent = new Parents([
+                    'name'           =>  strtoupper($request->get('parent_name')),
+                    'email'          =>  $request->get('parent_email'),
+                    'password'       =>  Hash::make('abc123'),
+                    'telno'          =>  $request->get('parent_phone'),
+                    'remember_token' =>  Str::random(40),
+                ]);
+                $newparent->save();
+            }
+
+            // add parent role
+            $parentRole = DB::table('organization_user')
+                ->where('user_id', $newparent->id)
+                ->where('organization_id', $co->oid)
+                ->where('role_id', 6)
+                ->first();
+
+            if (empty($parentRole)) {
+                DB::table('organization_user')->insert([
+                    'organization_id'   => $co->oid,
+                    'user_id'           => $newparent->id,
+                    'role_id'           => 6,
+                    'start_date'        => now(),
+                    'status'            => 1,
+                ]);
+            }
+        } else {
+            $newparent = DB::table('users')
+                        ->where('telno', '=', "{$request->get('parent_phone')}")
+                        ->first();
+
+            $parentRole = DB::table('organization_user')
+                ->where('user_id', $newparent->id)
+                ->where('organization_id', $co->oid)
+                ->where('role_id', 6)
+                ->first();
+                
+            // dd($parentRole);
+
+            if(empty($parentRole))
+            {
+                DB::table('organization_user')->insert([
+                    'organization_id'   => $co->oid,
+                    'user_id'           => $newparent->id,
+                    'role_id'           => 6,
+                    'start_date'        => now(),
+                    'status'            => 1,
+                ]);
+            } 
+        }  
     }
 }

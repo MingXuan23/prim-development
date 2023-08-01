@@ -132,7 +132,7 @@
     $(document).ready(function() {
         $('#icno').mask('000000-00-0000');
         $('#parent_icno').mask('000000-00-0000');
-        $('#parent_phone').mask('+600000000000');
+        $('#parent_phone').mask('000000000000');
     });
 
     $(document).ready(function(){

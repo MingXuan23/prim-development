@@ -55,6 +55,7 @@ class AdminProductCooperativeController extends Controller
     //first time to fetch the product menu
     public function productMenu(Request $request)
     {
+        //$this->testing();
         $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
         $userID = Auth::id();
 
@@ -669,4 +670,82 @@ class AdminProductCooperativeController extends Controller
             ]);
         //return redirect('koperasi/produkmenu')->with('success', 'Product type have been added successfully');
     }
+
+
+    ///////////////testing area////////////////////////////////////////////
+    // public function findParentTesting(){
+    //     $user=DB::table('organization_user as ou')
+    //                         ->join('users as u','u.id','ou.user_id')
+    //                         ->where('ou.organization_id',159)
+    //                         ->where('ou.status',1)                       
+    //                         ->groupBy('ou.user_id')
+    //                         ->havingRaw('COUNT(ou.user_id) >= 2')
+    //                         ->select('ou.user_id as uid')
+    //                         ->distinct('ou.id')
+    //                         ->get();
+    //     $Array = [];
+    //     foreach($user as $u ){
+    //         $ou=DB::table('organization_user as ou')
+    //             ->join('users as u','u.id','ou.user_id')
+    //             ->where('u.id',$u->uid)
+    //             ->where('ou.organization_id',159)
+    //             ->select('ou.id')               
+    //             ->get();
+    //         $first=0;
+    //         foreach($ou as $o){
+    //             if($first++==0)
+    //                 continue;
+    //            DB::table('organization_user')->where('id',$o->id)->update([
+    //                 'status' => 0, 
+    //                 ]);
+
+    //         }
+    //         //dd("stop");
+    //     }
+  
+    //     dd($user);
+    // }
+    // public function testing(){
+    //     $user=DB::table('organization_user as ou')
+    //                             ->join('users as u','u.id','ou.user_id')
+    //                             ->where('ou.organization_id',141)
+    //                             ->where('ou.role_id',6)
+    //                             ->where('ou.status',1)                       
+    //                             ->groupBy('u.id')
+    //                             ->select('ou.user_id as uid')
+    //                             ->distinct('u.id')
+    //                             ->get();
+        
+    //     $class = DB::table('classes as c')
+    //                 ->join('class_organization as co','co.class_id','c.id')
+    //                 ->where('co.organization_id',141)
+    //                 ->select('c.id','c.nama')
+    //                 ->get();
+    //     //dd($class);
+    //     foreach($user as $u)
+    //     {
+    //         $students= DB::table('students as s')
+    //                     ->join('organization_user_student as ous','s.id','ous.student_id')
+    //                     ->join('organization_user as ou','ous.organization_user_id','ou.id')
+    //                     ->join('users as u','u.id','ou.user_id')
+    //                     ->join('class_student as cs','cs.student_id','s.id')
+    //                     ->join('class_organization as co','co.id','cs.organclass_id')
+    //                     ->whereIn('co.class_id',[315,316,317,318,319])
+    //                     ->where('u.id',$u->uid)
+    //                     ->get();
+            
+    //         if(count($students)==1){
+    //             $result=DB::table('fees_new_organization_user as fou')
+    //                     ->join('organization_user as ou','ou.id','fou.organization_user_id')
+    //                     ->where('ou.user_id',$u->uid)
+    //                     ->where('fou.status',"Debt")
+    //                     ->where('fees_new_id',565)
+    //                     ->select('fou.id')
+    //                     ->get();
+               
+    //             dd($students,$u,$result);
+    //         }
+    //     }                       
+    //     dd($user);
+    // }
 }

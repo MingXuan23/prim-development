@@ -15,54 +15,7 @@
             <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
-        </div>
-    </div>
-</div>
-<div class="row">
-
-    <div class="col-md-12">
-        <div class="card card-primary">
-            {{csrf_field()}}
-            <div class="card-body">
-
-                <div class="form-group">
-                    <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div id="dkelas" class="form-group">
-                    <label> Kelas</label>
-                    <select name="classes" id="classes" class="form-control">
-                        <option value="" disabled selected>Pilih Kelas</option>
-
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-12">
-        <div class="card">
-            <div>
-                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
-                        class="fas fa-plus"></i> Import</a>
-                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
-                        class="fas fa-plus"></i> Export</a>
-                <!-- <a style="margin: 1px;" href="{{ route('exportstudent') }} " class="btn btn-success"> <i
-                        class="fas fa-plus"></i> Export</a> -->
-                {{-- {{ route('exportmurid') }} {{ route('murid.create') }} --}}
-                <a style="margin: 19px; float: right;" href="{{ route('student.create') }}" class="btn btn-primary"> <i
-                        class="fas fa-plus"></i> Tambah Murid</a>
-            </div>
-
-            <div class="card-body">
-
-                @if(count($errors) > 0)
+            @if(count($errors) > 0)
                 <div class="alert alert-danger">
                     <ul>
                         @foreach($errors->all() as $error)
@@ -76,130 +29,142 @@
                     <p>{{ \Session::get('success') }}</p>
                 </div>
                 @endif
+        </div>
+    </div>
+</div>
 
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
                 <div class="table-responsive">
+                    <h4>Pelajar Baharu</h4>
                     <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
-                                <th> No. </th>
                                 <th>Nama Penuh</th>
                                 {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Kelas</th>
-                                <th>Status</th>
-                                <th>Details</th>
+                                <th>Nama Penjaga</th>
+                                <th>Tel No Penjaga</th>
                             </tr>
                         </thead>
+                        <tbody>
+                            @foreach($newStudents as $row)
+                            <tr>
+                                <td>{{$row->studentName}}</td>
+                                <td>{{$row->gender}}</td>
+                                <td>{{$row->parentName}}</td>
+                                <td>{{$row->parentTelno}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        {{-- confirmation delete modal --}}
-        <div id="deleteConfirmationModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Padam Murid</h4>
-                    </div>
-                    <div class="modal-body">
-                        Adakah anda pasti?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
-                            name="delete">Padam</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
-                    </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <h4>Pelajar Yang Dalam Kelas Lain</h4>
+                    <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th>Nama Penuh</th>
+                                {{-- <th>Nombor Kad pengenalan</th> --}}
+                                <th>Kelas</th>
+                                <th>Nama Penjaga</th>
+                                <th>Tel No Penjaga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($differentClassStudents as $row)
+                            <tr>
+                                <td>{{$row->studentName}}</td>
+                                <td>{{$row->gender}}</td>
+                                <td>{{$row->parentName}}</td>
+                                <td>{{$row->parentTelno}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        {{-- end confirmation delete modal --}}
+    </div>
+</div>
 
-        <!-- Modal -->
-        <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Import Murid</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {{-- {{ route('importmurid')}} --}}
-                    <form action="{{ route('importstudent')}}" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organImport" id="organImport" class="form-control">
-                                @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                @endforeach
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Nama Kelas</label>
-                                <select name="classImport" id="classImport" class="form-control">
-
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <input type="file" name="file" required>
-                            </div>
-                            <div class="form-group">
-                                <input type="checkbox" name="compareOption">  Compare Student
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
-                            </div>
-                        </div>
-
-                    </form>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <h4>Pelajar Yang Dalam Kelas Sama</h4>
+                    <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th>Nama Penuh</th>
+                                {{-- <th>Nombor Kad pengenalan</th> --}}
+                                <th>Kelas</th>
+                                <th>Nama Penjaga</th>
+                                <th>Tel No Penjaga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($sameClassStudents as $row)
+                            <tr>
+                                <td>{{$row->studentName}}</td>
+                                <td>{{$row->gender}}</td>
+                                <td>{{$row->parentName}}</td>
+                                <td>{{$row->parentTelno}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-
-        <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Export Murid</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {{-- {{ route('exportstudent') }} --}}
-                    <form action="{{ route('exportstudent') }}" method="post">
-                        <div class="modal-body">
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organExport" id="organExport" class="form-control">
-                                    @foreach($organization as $row)
-                                        <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Nama Kelas</label>
-                                <select name="classExport" id="classExport" class="form-control">
-
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
-                            </div>
-                        </div>
-                    </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <h4>Pelajar Yang Di Sekolah Lain</h4>
+                    <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th>Nama Penuh</th>
+                                {{-- <th>Nombor Kad pengenalan</th> --}}
+                                <th>Kelas</th>
+                                <th>Nama Penjaga</th>
+                                <th>Tel No Penjaga</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($differentOrgStudents as $row)
+                            <tr>
+                                <td>{{$row->studentName}}</td>
+                                <td>{{$row->gender}}</td>
+                                <td>{{$row->parentName}}</td>
+                                <td>{{$row->parentTelno}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 @endsection
