@@ -10,6 +10,7 @@ use App\Models\Organization;
 use App\Models\Student;
 use App\Models\Parents;
 use PDF;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -102,7 +103,7 @@ class StudentController extends Controller
             $differentClassStudents=$studentArray['differentClassStudents'];
             $differentOrgStudents=$studentArray['differentOrgStudents'];
             $newStudents=$studentArray['newStudents'];
-            dd($newStudents);
+            //dd($differentClassStudents);
             return view('student.compare',compact('sameClassStudents','differentClassStudents','differentOrgStudents','newStudents'));
         }
         else{
@@ -234,15 +235,17 @@ class StudentController extends Controller
                 ]);
             } 
         }   
-        $this->assignStudentToParent($newparent->id,$request->get('parent_phone'),$request,$classid);
+        $this->assignStudentToParent($newparent->id,$request->get('parent_phone'),$request,$classid, $ifExits);
         return redirect('/student')->with('success', 'New student has been added successfully');
     }
 
-    public function assignStudentToParent($parentId,$telno,$studentData,$classId){
+    public function assignStudentToParent($parentId,$telno,$studentData,$classId, $ifExits){
+        
         $co= DB::table('class_organization')
         ->select('id', 'organization_id as oid')
         ->where('class_id', $classId)
         ->first();
+        $class = ClassModel::find($classId);
 
         $ou = DB::table('organization_user')
             ->where('user_id', $parentId)
@@ -257,10 +260,10 @@ class StudentController extends Controller
         $user->assignRole($rolename->nama);
 
         $student = new Student([
-            'nama'          =>  $studentData->name,
+            'nama'          =>  empty($studentData->name)?$studentData->studentName:$studentData->name,
             // 'icno'          =>  $request->get('icno'),
             'gender'        =>  $studentData->gender,
-            'email'         =>  $studentData->email,
+            //'email'         =>  $studentData->email,
         ]);
 
         $student->save();
@@ -321,7 +324,7 @@ class StudentController extends Controller
                 $target = json_decode($kateBC->target);
 
                 if (isset($target->gender)) {
-                    if ($target->gender != $request->get('gender')) {
+                    if ($target->gender != $studentData->gender) {
                         continue;
                     }
                 }
@@ -718,24 +721,22 @@ class StudentController extends Controller
     }
 
     public function compareAddNewStudent(Request $request){
-        $classid = $request->get('classes');
-        $class = ClassModel::find($classid);
-
+      
+        $student = json_decode($request->student);
+        //return response()->json(['data'=>$student->parentName]);
+        
+        $classid=$student->classId;
+       
         $co = DB::table('class_organization')
             ->select('id', 'organization_id as oid')
             ->where('class_id', $classid)
             ->first();
 
-        $this->validate($request, [
-            'name'              =>  'required',
-            'classes'           =>  'required',
-            'parent_name'       =>  'required',
-            'parent_phone'      =>  'required',
-        ]);
+       
 
         $ifExits = DB::table('users as u')
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
-                    ->where('u.telno', '=', $request->get('parent_phone'))
+                    ->where('u.telno', '=', $student->parentTelno)
                     ->where('ou.organization_id', $co->oid)
                     ->whereIn('ou.role_id', [5, 6])
                     ->get();
@@ -743,28 +744,27 @@ class StudentController extends Controller
         if(count($ifExits) == 0) { // if not teacher or parent
 
             $newparent = DB::table('users')
-                            ->where('telno', '=', $request->get('parent_phone'))
+                            ->where('telno', '=', $student->parentTelno)
                             ->first();
             
             // dd($newparent);
 
             if (empty($newparent)) {
-                $this->validate($request, [
-                    'parent_phone'      =>  'required|unique:users,telno',
+                $validator = Validator::make((array)$student, [
+                    'parentTelno' => 'required|unique:users,telno',
                 ]);
-
-                if ($request->parent_email != null)
-                {
-                    $this->validate($request, [
-                        'parent_email'     =>  'required|email|unique:users,email',
-                    ]);
+                
+                if ($validator->fails()) {
+                    // Handle validation failure, return response, or redirect back with errors
+                    // For example:
+                    return response()->json(['errors' => $validator->errors()], 422);
                 }
     
                 $newparent = new Parents([
-                    'name'           =>  strtoupper($request->get('parent_name')),
-                    'email'          =>  $request->get('parent_email'),
+                    'name'           =>  $student->parentName,
+                    //'email'          =>  $request->get('parent_email'),
                     'password'       =>  Hash::make('abc123'),
-                    'telno'          =>  $request->get('parent_phone'),
+                    'telno'          =>  $student->parentTelno,
                     'remember_token' =>  Str::random(40),
                 ]);
                 $newparent->save();
@@ -788,7 +788,7 @@ class StudentController extends Controller
             }
         } else {
             $newparent = DB::table('users')
-                        ->where('telno', '=', "{$request->get('parent_phone')}")
+                        ->where('telno', '=', "{$student->parentTelno}")
                         ->first();
 
             $parentRole = DB::table('organization_user')
@@ -810,5 +810,89 @@ class StudentController extends Controller
                 ]);
             } 
         }  
+        $this->assignStudentToParent($newparent->id,$student->parentTelno,$student,$classid, $ifExits);
+
+    }
+
+    public function compareTransferStudent(Request $request){
+        $student = json_decode($request->student);
+
+        $co=DB::table('class_organization as co')
+            ->where('co.class_id',$student->newClass)
+            ->first();
+        $class=DB::table('classes as c')
+                ->where('c.id',$student->newClass)
+                ->first();
+        $class_student=DB::table('class_organization as co')
+                        ->join('class_student as cs','cs.organclass_id','co.id')
+                        ->where('cs.student_id',$student->studentId)
+                        ->where('co.class_id',$student->oldClassId);
+        
+        $class_student_details=$class_student->first();
+      
+        $class_student->update([
+                            'cs.organclass_id'=>$co->id
+                        ]);
+
+
+        $ifExitsCateBC = DB::table('fees_new')
+        ->whereIn('category', ['Kategory B', 'Kategory C'])
+        ->where('organization_id', $co->organization_id)
+        ->where('status', 1)
+        ->get();
+
+        $studentHaveFees=DB::table('student_fees_new as sfn')
+                        ->join('class_student as cs','cs.id','sfn.class_student_id')
+                        ->where('sfn.class_student_id',$class_student_details->id)
+                        ->where('sfn.status','Debt')
+                        ->get();
+
+        $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
+
+        
+        if (!$ifExitsCateBC->isEmpty()) {
+            foreach ($ifExitsCateBC as $kateBC) {
+                $target = json_decode($kateBC->target);
+
+                if (isset($target->gender)) {
+                    if ($target->gender != $studentData->gender) {
+                        continue;
+                    }
+                }
+                
+                if ($target->data == "All_Level" || $target->data == $class->levelid) {
+                    if (in_array($kateBC->id, $studentFeesIDs)){
+                        continue;
+                    }else{
+                        DB::table('student_fees_new')->insert([
+                            'status'            => 'Debt',
+                            'fees_id'           =>  $kateBC->id,
+                            'class_student_id'  =>  $class_student_details->id
+                        ]);
+                    }
+                    
+                } else if (is_array($target->data)) {
+                    if (in_array($student->newClass, $target->data)) { 
+                        if (in_array($kateBC->id, $studentFeesIDs)){
+                            continue;
+                        }else{
+                            DB::table('student_fees_new')->insert([
+                                'status'            => 'Debt',
+                                'fees_id'           =>  $kateBC->id,
+                                'class_student_id'  =>  $class_student_details->id
+                            ]);
+                        }
+                    }
+                    else{
+                        $delete=DB::table('student_fees_new as sfn')
+                                ->where('sfn.fees_id',$kateBC->id)
+                                ->where('sfn.class_student_id',$class_student_details->id)
+                                ->delete();
+                        //return response()->json(['data'=>$delete]);  
+                    }
+                }
+            }
+        }
+
     }
 }

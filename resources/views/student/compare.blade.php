@@ -2,6 +2,17 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<style>
+.heading{
+    float:left;
+    margin-bottom:6px;
+}
+
+#addAllNewStudent,#transferAllStudent{
+    float:right;
+    margin-bottom:6px;
+}
+</style>
 @include('layouts.datatable')
 
 @endsection
@@ -38,25 +49,34 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <h4>Pelajar Baharu</h4>
+                    <div id="head">
+                        <h4 class="heading">Pelajar Baharu </h4>
+                        @if(count($newStudents)>0)
+                        <button id="addAllNewStudent" class="btn btn-primary align-right">Tambah Semua Pelajar Baharu</button>
+                        @endif
+                    </div>
                     <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
+                                <th>No</th>
                                 <th>Nama Penuh</th>
                                 {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Kelas</th>
                                 <th>Nama Penjaga</th>
                                 <th>Tel No Penjaga</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($newStudents as $row)
                             <tr>
+                                <td>{{$loop->iteration}}</td>
                                 <td>{{$row->studentName}}</td>
                                 <td>{{$row->gender}}</td>
                                 <td>{{$row->parentName}}</td>
                                 <td>{{$row->parentTelno}}</td>
+                                <td><button class="btn btn-primary addNewStudent" studentNo="{{$loop->iteration - 1}}">Tambah</button></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -72,25 +92,36 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <h4>Pelajar Yang Dalam Kelas Lain</h4>
+                <div id="head">
+                        <h4 class="heading">Pelajar Yang Dalam Kelas Lain</h4>
+                        @if(count($differentClassStudents)>0)
+                        <button id="transferAllStudent" class="btn btn-primary align-right">Pindah Semua Pelajar</button>
+                        @endif
+                    </div>
                     <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
+                                <th>No</th>
                                 <th>Nama Penuh</th>
                                 {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Kelas</th>
                                 <th>Nama Penjaga</th>
                                 <th>Tel No Penjaga</th>
+                                <th>Kelas</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($differentClassStudents as $row)
                             <tr>
+                                <td>{{$loop->iteration}}</td>
                                 <td>{{$row->studentName}}</td>
                                 <td>{{$row->gender}}</td>
                                 <td>{{$row->parentName}}</td>
                                 <td>{{$row->parentTelno}}</td>
+                                <td>{{$row->oldClassName}}</td>
+                                <td><button class="btn btn-primary transferStudent" studentNo="{{$loop->iteration - 1}}">Pindah</button></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -111,20 +142,24 @@
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
+                                <th>No</th>
                                 <th>Nama Penuh</th>
                                 {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Kelas</th>
                                 <th>Nama Penjaga</th>
                                 <th>Tel No Penjaga</th>
+                                
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($sameClassStudents as $row)
                             <tr>
+                                <td>{{$loop->iteration}}</td>
                                 <td>{{$row->studentName}}</td>
                                 <td>{{$row->gender}}</td>
                                 <td>{{$row->parentName}}</td>
                                 <td>{{$row->parentTelno}}</td>
+                               
                             </tr>
                             @endforeach
                         </tbody>
@@ -180,179 +215,100 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    $(document).ready(function(){
-        
-        var studentTable;
-
-        if($("#organization").val() != ""){
-            $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetchClass($("#organization").val(), '#classes');
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
+    });
 
-        if($("#organImport").val() != ""){
-            $("#organImport").prop("selectedIndex", 0).trigger('change');
-            fetchClass($("#organImport").val(), '#classImport');
-        }
+    var number=0;
+    $(document).ready(function() {
+        $('.addNewStudent').on('click', function() {
+            document.querySelectorAll('button').forEach(button => button.disabled = true);
+            const studentNo = $(this).attr('studentNo');
+            const newStudents = @json($newStudents);
 
-        if($("#organExport").val() != ""){
-            $("#organExport").prop("selectedIndex", 0).trigger('change');
-            fetchClass($("#organExport").val(), '#classExport');
-        }
-
-        
-        // fetch_data();
-        // alert($("#organization").val());
-
-            function fetch_data(cid = '') {
-                studentTable = $('#studentTable').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('student.getStudentDatatable') }}",
-                        data: {
-                            classid: cid,
-                            hasOrganization: true
-                        },
-                        type: 'GET',
-
-                    },
-                    'columnDefs': [{
-                        "targets": [0], // your case first column
-                        "className": "text-center",
-                        "width": "2%"
-                    },{
-                        "targets": [2,3,4], // your case first column
-                        "className": "text-center",
-                    },],
-                    order: [
-                        [1, 'asc']
-                    ],
-                    columns: [{
-                        "data": null,
-                        searchable: false,
-                        "sortable": false,
-                        render: function (data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        }
-                    }, {
-                        data: "studentname",
-                        name: 'studentname'
-                    }, {
-                        data: "classname",
-                        name: 'classname'
-                    }, {
-                        data: 'status',
-                        name: 'status',
-                        orderable: false,
-                        searchable: false
-                    }, {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },]
-                });
-            }
-
-            /* 
-                {
-                    data: "icno",
-                    name: 'icno'
-                }
-            */
-
-            $('#organization').change(function() {
-                var organizationid    = $("#organization").val();
-                var _token            = $('input[name="_token"]').val();
-                fetchClass(organizationid, "#classes");
-            });
-
-            $('#organImport').change(function() {
-                var organizationid    = $("#organImport").val();
-                var _token            = $('input[name="_token"]').val();
-                fetchClass(organizationid, '#classImport');
-            });
-
-            $('#organExport').change(function() {
-                var organizationid    = $("#organExport").val();
-                var _token            = $('input[name="_token"]').val();
-                fetchClass(organizationid, '#classExport');
-            });
-
-            function fetchClass(organizationid = '', classId = ''){
-                var _token = $('input[name="_token"]').val();
-                $.ajax({
-                    url:"{{ route('student.fetchClass') }}",
-                    method:"POST",
-                    data:{ oid:organizationid,
-                            _token:_token },
-                    success:function(result)
-                    {
-                        $(classId).empty();
-                        $(classId).append("<option value='' disabled selected> Pilih Kelas</option>");
-                        jQuery.each(result.success, function(key, value){
-                            // $('select[name="kelas"]').append('<option value="'+ key +'">'+value+'</option>');
-                            $(classId).append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
-                        });
-                    }
-                })
-            }
-
-            $('#classes').change(function() {
-                var organizationid    = $("#organization option:selected").val();
-
-                var classid    = $("#classes option:selected").val();
-                if(classid){
-                    $('#studentTable').DataTable().destroy();
-                    fetch_data( classid);
-                }
-                // console.log(organizationid);
-            });
-
-            // csrf token for ajax
-            $.ajaxSetup({
-                    headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            var student_id;
-
-            $(document).on('click', '.btn-danger', function(){
-                student_id = $(this).attr('id');
-                $('#deleteConfirmationModal').modal('show');
-            });
-
-            $('#delete').click(function() {
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'html',
-                        data: {
-                            "_token": "{{ csrf_token() }}",
-                            _method: 'DELETE'
-                        },
-                        url: "/student/" + student_id,
-                        success: function(data) {
-                            setTimeout(function() {
-                                $('#confirmModal').modal('hide');
-                            }, 2000);
-
-                            $('div.flash-message').html(data);
-
-                            studentTable.ajax.reload();
-                        },
-                        error: function (data) {
-                            $('div.flash-message').html(data);
-                        }
-                    })
-                });
-                
-                $('.alert').delay(3000).fadeOut();
-
-                $('#buttonExport').click(function() {
-                    $('#modelId1').modal('hide');
-                });
+            var student =JSON.stringify(newStudents[studentNo]);
+            number=0;
+            addStudent(student,1);
+            location.reload();
         });
+
+        $('.transferStudent').on('click', function() {
+            document.querySelectorAll('button').forEach(button => button.disabled = true);
+            const studentNo = $(this).attr('studentNo');
+            const difStudents = @json($differentClassStudents);
+            
+            var student =JSON.stringify(difStudents[studentNo]);
+            number=0;
+            //console.log(student);
+            transferStudent(student,1);
+            //location.reload();
+        });
+
+        $('#addAllNewStudent').on('click', function() {
+            document.querySelectorAll('button').forEach(button => button.disabled = true);
+            const newStudents = @json($newStudents);
+            newStudents.forEach(function(Student) {
+                // Access properties of the student object
+
+                var student =JSON.stringify(Student);
+                number=0;
+                addStudent(student,newStudents.length);
+               
+            });
+            //location.reload();
+        });
+
+        $('#transferAllStudent').on('click', function() {
+            document.querySelectorAll('button').forEach(button => button.disabled = true);
+            const difStudents = @json($differentClassStudents);
+            difStudents.forEach(function(Student) {
+                // Access properties of the student object
+
+                var student =JSON.stringify(Student);
+                number=0;
+                transferStudent(student,difStudents.length);
+               
+            });
+            //location.reload();
+        });
+    });
+
+    function addStudent(student,n){
+        $.ajax({
+                type: 'GET',
+                url: '{{ route("student.compareAddNewStudent") }}',
+                data: {
+                    student: student,
+                },
+                success:function(response){
+                    //console.log(JSON.stringify(response.data));
+                    number++;
+                    //console.log("success",n)
+                    if(n===number)
+                        location.reload();
+                }
+            });    
+    }
+
+    function transferStudent(student,n){
+        $.ajax({
+                type: 'GET',
+                url: '{{ route("student.compareTransferStudent") }}',
+                data: {
+                    student: student,
+                },
+                success:function(response){
+                    //console.log(JSON.stringify(response.data));
+                    // console.log(response);
+                    number++;
+                    //console.log("success",n)
+                    if(n===number)
+                        location.reload();
+                }
+            });    
+    }
 </script>
 
 @endsection

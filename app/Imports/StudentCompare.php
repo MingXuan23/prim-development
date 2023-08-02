@@ -118,6 +118,10 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                     $this->sameClassStudents[]=$findStudent;//this student is still at same class
                 }
                 else{
+                    $findStudent->newClass=$this->class_id;
+                    $oldClass=DB::table('classes as c')->where('c.id' ,$sameOrgStudent->first()->class_id)->first();
+                    $findStudent->oldClassId=$oldClass->id;
+                    $findStudent->oldClassName=$oldClass->nama;
                     $this->differentClassStudents[]=$findStudent;//this student is still at same org but diffretn class
                 }
             }
@@ -126,6 +130,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
             }
         }
         else{
+            //dd($findStudent);
             $newStudentData = new stdClass();
             $newStudentData->studentName = strtoupper($row["nama"]);
             $newStudentData->gender = $row["jantina"];

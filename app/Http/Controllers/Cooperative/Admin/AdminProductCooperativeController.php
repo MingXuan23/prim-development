@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use App\Models\Fee;
 use App\Models\Fee_New;
 use App\Models\Category;
+use App\Models\Transaction;
 use App\Models\ClassModel;
 use Psy\Command\WhereamiCommand;
 
@@ -673,6 +674,93 @@ class AdminProductCooperativeController extends Controller
 
 
     ///////////////testing area////////////////////////////////////////////
+    // public function testing(){
+    //     $transaction = Transaction::where('id', '=', 29489)->first();
+    //     //dd($transaction);
+    //     $list_student_fees_id = DB::table('student_fees_new')
+    //     ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+    //     ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
+    //     ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
+    //     ->where('transactions.id', $transaction->id)
+    //     ->get();
+
+    //     $list_parent_fees_id  = DB::table('fees_new')
+    //         ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+    //         ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+    //         ->select('fees_new_organization_user.*')
+    //         ->orderBy('fees_new.category')
+    //         ->where('organization_user.user_id', $transaction->user_id)
+    //         ->where('organization_user.role_id', 6)
+    //         ->where('organization_user.status', 1)
+    //         ->where('fees_new_organization_user.transaction_id', $transaction->id)
+    //         ->get();
+    //     dd($list_parent_fees_id ,$list_student_fees_id);
+
+    // for ($i = 0; $i < count($list_student_fees_id); $i++) {
+
+    //     // ************************* update student fees status fees by transactions *************************
+    //     $res  = DB::table('student_fees_new')
+    //         ->where('id', $list_student_fees_id[$i]->student_fees_id)
+    //         ->update(['status' => 'Paid']);
+
+    //     // ************************* check the student if have still debt *************************
+        
+    //     if ($i == count($list_student_fees_id) - 1)
+    //     {
+    //         $check_debt = DB::table('students')
+    //             ->join('class_student', 'class_student.student_id', '=', 'students.id')
+    //             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+    //             ->select('students.*')
+    //             ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
+    //             ->where('student_fees_new.status', 'Debt')
+    //             ->count();
+
+
+    //         // ************************* update status fees for student if all fees completed paid*************************
+
+    //         if ($check_debt == 0) {
+    //             DB::table('class_student')
+    //                 ->where('id', $list_student_fees_id[$i]->class_student_id)
+    //                 ->update(['fees_status' => 'Completed']);
+    //         }
+    //     }
+    // }
+
+    // for ($i = 0; $i < count($list_parent_fees_id); $i++) {
+
+    //     // ************************* update status fees for parent *************************
+    //     DB::table('fees_new_organization_user')
+    //         ->where('id', $list_parent_fees_id[$i]->id)
+    //         ->update([
+    //             'status' => 'Paid'
+    //         ]);
+            
+    //     // ************************* check the parent if have still debt *************************
+    //     if ($i == count($list_parent_fees_id) - 1)
+    //     {
+    //         $check_debt = DB::table('organization_user')
+    //             ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
+    //             ->where('organization_user.user_id', $transaction->user_id)
+    //             ->where('organization_user.role_id', 6)
+    //             ->where('organization_user.status', 1)
+    //             ->where('fees_new_organization_user.status', 'Debt')
+    //             ->count();
+
+    //         // ************************* update status fees for organization user (parent) if all fees completed paid *************************
+
+    //         if ($check_debt == 0) {
+    //             DB::table('organization_user')
+    //                 ->where('user_id', $transaction->user_id)
+    //                 ->where('role_id', 6)
+    //                 ->where('status', 1)
+    //                 ->update(['fees_status' => 'Completed']);
+    //         }
+    //     }
+    // }
+
+                    
+    //                 //return $this->ReceiptFees($transaction->id);
+    // }
     // public function findParentTesting(){
     //     $user=DB::table('organization_user as ou')
     //                         ->join('users as u','u.id','ou.user_id')
