@@ -180,7 +180,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         $user->assignRole($rolename->nama);
         
         $student = new Student([
-            'nama'       => $row["nama"],
+            'nama'       => strtoupper($row["nama"]),
             // 'icno'       => $row["no_kp"],
             'gender'     => $row["jantina"],
             'email'      => isset($row['email']) ? $row['email'] : NULL,

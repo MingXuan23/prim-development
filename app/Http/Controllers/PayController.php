@@ -756,7 +756,7 @@ class PayController extends AppBaseController
                             ]);
 
                         // ************************* check the parent if have still debt *************************
-                        if ($i == count($list_student_fees_id) - 1)
+                        if ($i == count($list_parent_fees_id) - 1)
                         {
                             $check_debt = DB::table('organization_user')
                                 ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
