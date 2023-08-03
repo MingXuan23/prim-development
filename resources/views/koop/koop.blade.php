@@ -226,6 +226,23 @@
     @endforeach   
 </div>
 
+{{-- wan 1/8/2023, tmbh textbar search --}}
+<div>
+  <div class="card-body pl-0 pr-0" id="search-product-div">
+    <div class="row">
+        <div class="col">
+            <div class="card p-2">
+                <div class="input-group">
+                    <input type="search" id="searchTextBox"class="form-control rounded" placeholder="Cari Produk" aria-label="Search" aria-describedby="search-addon" onkeyup="searchProduct()" />
+                    {{-- <button type="button" class="btn btn-secondary">Search</button> --}}
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+{{-- end --}}
+
 <div class="card-body pl-0 pr-0" id="product-div">
         
         <div class="flash-message"></div>
@@ -580,6 +597,11 @@ function initialiseCartButton()
         }
       })
     });
+}
+
+function searchProduct(){
+  var keyword=$('#searchTextBox').val();
+  console.log(keyword);
 }
 </script>
 @endsection
