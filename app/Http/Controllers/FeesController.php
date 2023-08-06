@@ -1343,7 +1343,34 @@ class FeesController extends AppBaseController
     public function cetegoryReportIndex(){
 
         $organization = $this->getOrganizationByUserId();
+        // $student_user = DB::table('students as s')
+        // ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
+        // ->leftJoin('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
+        // ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+        // ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+        // ->where('co.class_id', 530)
+        // ->select('ou.user_id','s.*')
+        // ->orderBy('s.nama')
+        // ->get()
+        // ->keyBy('user_id');
 
+        // $feeA=DB::table('fees_new_organization_user as fou')
+        //         ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
+        //         ->where('ou.organization_id',159)
+        //         ->where('fou.fees_new_id',565)
+        //         ->select('ou.user_id','fou.status')
+        //         ->get()
+        //         ->keyBy('user_id');
+        // $data = $student_user->map(function ($student) use ($feeA) {
+        //     $user_id = $student->user_id;
+        //     if ($feeA->has($user_id)) {
+        //         $fee_data = $feeA->get($user_id);
+        //         $student->status = $fee_data->status; // Add the status from $feeA to $student_user
+        //     }
+        //     return $student;
+        // });
+
+        
         return view('fee.categoryReport.index', compact('organization'));
     }
 
@@ -1442,17 +1469,33 @@ class FeesController extends AppBaseController
         if (request()->ajax()) {
             if($fees->category == "Kategory A")
             {
-                $data = DB::table('students as s')
-                    ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
-                    ->leftJoin('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
-                    ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
-                    ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
-                    ->leftJoin('fees_new_organization_user as fou', 'fou.organization_user_id', 'ou.id')
-                    ->where('fou.fees_new_id', $fees->id)
-                    ->where('co.class_id', $request->classid)
-                    ->select('s.*', 'fou.status')
-                    ->orderBy('s.nama')
-                    ->get();
+                $student_user = DB::table('students as s')
+                ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
+                ->leftJoin('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
+                ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+                ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+                ->where('co.class_id', $request->classid)
+                ->select('ou.user_id','s.*')
+                ->orderBy('s.nama')
+                ->get()
+                ->keyBy('user_id');
+    
+                $feeA=DB::table('fees_new_organization_user as fou')
+                        ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
+                        ->where('ou.organization_id',$request->orgId)
+                        ->where('fou.fees_new_id',$request->feeid)
+                        ->select('ou.user_id','fou.status')
+                        ->get()
+                        ->keyBy('user_id');
+                $data = $student_user->map(function ($student) use ($feeA) {
+                    $user_id = $student->user_id;
+                    if ($feeA->has($user_id)) {
+                        $fee_data = $feeA->get($user_id);
+                        $student->status = $fee_data->status; // Add the status from $feeA to $student_user
+                    }
+                    return $student;
+                });
+                
             }
             else
             {
@@ -1470,14 +1513,24 @@ class FeesController extends AppBaseController
             $table = Datatables::of($data);
 
             $table->addColumn('status', function ($row) {
-                if ($row->status == 'Debt') {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
+                if (property_exists($row, 'status')) {
+                    if($row->status == 'Debt')
+                    {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
 
-                    return $btn;
+                        return $btn;
+                    }
+                    else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success"> Telah Bayar </span></div>';
+    
+                        return $btn;
+                    }
+                    
                 } else {
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-success"> Telah Bayar </span></div>';
+                    $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
 
                     return $btn;
                 }

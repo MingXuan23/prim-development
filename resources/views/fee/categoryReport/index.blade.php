@@ -281,7 +281,8 @@
                             type: 'GET',
                             data: {
                                 feeid: $("#fees").val(),
-                                classid: $("#classes").val()
+                                classid: $("#classes").val(),
+                                orgId:$("#organization").val()
                             }
                         },
                         'columnDefs': [{
