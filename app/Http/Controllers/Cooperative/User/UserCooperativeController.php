@@ -804,12 +804,13 @@ class UserCooperativeController extends Controller
         ->join('classes as c','c.id','=','co.class_id')
         ->select('s.*','users.id as parentId','users.name as parentName', 'ou.organization_id','c.nama as className','c.id as classId')
         ->where('ou.organization_id', $koperasi->parent_org)
+        ->where('ou.user_id',Auth::id())
         ->where('ou.role_id', 6)
         ->where('ou.status', 1)
         ->orderBy('c.nama')
         ->get();
 
-        //dd($childrenOfParent);
+        //dd($childrenByParent);
         $k_open_hour = date('h:i A', strtotime($koperasi->open_hour));
         
         $k_close_hour = date('h:i A', strtotime($koperasi->close_hour));
@@ -964,6 +965,15 @@ class UserCooperativeController extends Controller
             ->whereNull('pg.deleted_at')
            ->get();  
         }
+
+        if ($request->searchKey != "") {
+            $searchKey = strtolower($request->searchKey);
+            $products = $products->filter(function ($product) use ($searchKey) {
+                return (strpos(strtolower($product->groupName), $searchKey) !== false)
+                    || (strpos(strtolower($product->name), $searchKey) !== false);
+            });
+        }
+       
         //return response()->json(['status' => "success"]);
         return response()->json(['products' => $products]);
     }

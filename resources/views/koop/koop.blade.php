@@ -227,20 +227,17 @@
 </div>
 
 {{-- wan 1/8/2023, tmbh textbar search --}}
-<div>
+<!-- <div>
   <div class="card-body pl-0 pr-0" id="search-product-div">
     <div class="row">
         <div class="col">
             <div class="card p-2">
-                <div class="input-group">
-                    <input type="search" id="searchTextBox"class="form-control rounded" placeholder="Cari Produk" aria-label="Search" aria-describedby="search-addon" onkeyup="searchProduct()" />
-                    {{-- <button type="button" class="btn btn-secondary">Search</button> --}}
-                </div>
+                
             </div>
         </div>
     </div>
   </div>
-</div>
+</div> -->
 {{-- end --}}
 
 <div class="card-body pl-0 pr-0" id="product-div">
@@ -250,8 +247,12 @@
         <div class="row">
                 <div class="col">
                   <div class="card  p-2">
+                  <label><span style="font-size: 18px;margin:10px 10px">Nama Produk</span></label>
+                  <div class="input-group">
+                    <input style="margin-bottom:10px" type="search" id="searchTextBox"class="form-control rounded" placeholder="Cari Produk" aria-label="Search" aria-describedby="search-addon" onkeyup="searchProduct()" />
+                </div>
                   <label><span style="font-size: 18px;margin:10px 10px">Pilih Kategori</span></label>
-                    <div class="d-flex">
+                    <div class="d-flex input-group">
                         
                         <select name="product_group" id="group_combobox" class="form-control">
                             <option value="AllItem" class="categoryGroup" selected>Semua Kategori </option>
@@ -370,7 +371,8 @@ function loadProductList(selectedGroup){
             type: 'POST', // Replace with GET or POST depending on your route
             data:{
                 selectedGroup:selectedGroup,
-                kooperasiId:{{$koperasi->id}}
+                kooperasiId:{{$koperasi->id}},
+                searchKey:$('#searchTextBox').val()
             },
             success: function(response) {
                 // Clear the current content of the container div
@@ -599,9 +601,22 @@ function initialiseCartButton()
     });
 }
 
+
+var searchTimeout; //run if the users stop to input to prevent too much ajax run
 function searchProduct(){
-  var keyword=$('#searchTextBox').val();
-  console.log(keyword);
+  clearTimeout(searchTimeout);
+  const searchTextBox = document.getElementById('searchTextBox');
+    const textBefore = searchTextBox.value;
+ 
+    // Set a new timeout to call searchProduct after 0.5 seconds
+    searchTimeout = setTimeout(function() {    
+        var searchText =searchTextBox.value;
+        if(textBefore===searchText){
+          var selectedGroup = $('#group_combobox').val();
+          loadProductList(selectedGroup);
+        }
+            
+    }, 250); // 500 milliseconds = 0.5 seconds
 }
 </script>
 @endsection
