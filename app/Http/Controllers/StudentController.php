@@ -815,6 +815,7 @@ class StudentController extends Controller
     }
 
     public function compareTransferStudent(Request $request){
+        set_time_limit(300);
         $student = json_decode($request->student);
 
         $co=DB::table('class_organization as co')
