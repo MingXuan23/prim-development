@@ -56,6 +56,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
 
     public function model(array $row)
     {
+        set_time_limit(300);
         if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_tel_bimbit_penjaga'])){
             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
@@ -126,6 +127,18 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                 }
             }
             else{
+                
+                $sameOrgStudent=DB::table('class_student as cs')
+                            ->join('class_organization as co','co.id','cs.organclass_id')
+                            //->join('organizations as o','o.id','co.organizaiton_id')
+                            ->where('cs.student_id', $findStudent->studentId)
+                            //->where('co.organization_id',$this->oid)
+                            ->select('co.class_id')
+                            ->get();
+                $findStudent->newClass=$this->class_id;
+                $oldClass=DB::table('classes as c')->where('c.id' ,$sameOrgStudent->first()->class_id)->first();
+                $findStudent->oldClassId=$oldClass->id;
+                $findStudent->oldClassName=$oldClass->nama;
                 $this->differentOrgStudents[]=$findStudent; // this student exist but in different school
             }
         }

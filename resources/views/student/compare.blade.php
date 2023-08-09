@@ -175,6 +175,9 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <h4>Pelajar Yang Di Sekolah Lain</h4>
+                    <!-- @if(count($differentOrgStudents)>0)
+                        <button id="transferOutsideStudent" class="btn btn-primary align-right">Pindah Semua Pelajar</button>
+                    @endif -->
                     <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
@@ -263,6 +266,20 @@
         $('#transferAllStudent').on('click', function() {
             document.querySelectorAll('button').forEach(button => button.disabled = true);
             const difStudents = @json($differentClassStudents);
+            difStudents.forEach(function(Student) {
+                // Access properties of the student object
+
+                var student =JSON.stringify(Student);
+                number=0;
+                transferStudent(student,difStudents.length);
+               
+            });
+            //location.reload();
+        });
+
+        $('#transferOutsideStudent').on('click', function() {
+            document.querySelectorAll('button').forEach(button => button.disabled = true);
+            const difStudents = @json($differentOrgStudents);
             difStudents.forEach(function(Student) {
                 // Access properties of the student object
 
