@@ -161,8 +161,9 @@
           <thead>
               <tr>
                   <th>Item</th>
-                  <th>Harga Per Unit (RM)</th>
                   <th>Kuantiti</th>
+                  <th>Harga Per Unit (RM)</th>
+                  
                   <th>Jumlah (RM)</th>
               </tr>
           </thead>
@@ -171,8 +172,9 @@
             @foreach($item as $row)
               <tr>
                 <td>{{ $row->name }}</td>
-                <td>{{ number_format($row->price, 2, '.', '') }}</td>
                 <td>{{ $row->quantity }}</td>
+                <td>{{ number_format($row->price, 2, '.', '') }}</td>
+                
                 <td>{{ number_format($totalPrice[$row->name], 2, '.', '') }}</td>
               </tr>
             @endforeach

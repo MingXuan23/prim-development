@@ -42,6 +42,7 @@ class AdminOrderCooperativeController extends Controller
         ->where('ou.organization_id', $request->koopId)
         ->where('pg.status', 2)
         ->groupBy('pg.id')
+        ->orderBy('pg.pickup_date')
         ->select('pg.*','u.*','u.id as customerID','ou.*','pg.id as id','pg.status as status','pg.created_at as orderTime')
         ->get();
         return response()->json(['order'=>$order]);

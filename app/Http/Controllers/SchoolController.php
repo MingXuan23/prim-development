@@ -21,36 +21,54 @@ class SchoolController extends Controller
         $title="";
         $placeholder="Email/Nombor Telefon/Nombor IC";
         $loginText="Log Masuk ke PRIM";
-        switch($name)
-        {
-            case "lmm":
-                $oid=137;
-                $placeholder="Email/Nombor IC";
-                $title="Lembaga Maktab Mahmud";
-                $loginText="Laman Web Untuk Bayar Yuran LMM";
-                break;
-            case "polimas":
-                $oid =107;
-                $placeholder="Email/Nombor IC";
-                $title="Polimas";
-                $loginText="Laman Web Untuk Bayar Yuran Polimas";
-                break;
-            case "samura":
-                $oid=141;
-                $placeholder="Email/Nombor IC";
-                $title="Sains Muar";
-                $loginText="Laman Web Untuk Bayar Yuran SAMURA";
-                break;
-            case "srab":
-                $oid=160;
-                $placeholder="Email/Nombor IC";
-                $title="SRAB";
-                $loginText="Laman Web Untuk Bayar Yuran SRAB MUAR";
-                break;
-             default:
-                return redirect('/login');
-
+        $orgUrl=DB::table('organization_url as url')
+            ->join('organizations as o','o.id','url.organization_id')
+            ->where('url.url_name',$name)
+            ->whereIn('o.type_org',[1,2,3])
+            ->where('url.status',1)
+            ->select('url.*')
+            ->first();
+        if($orgUrl==null){
+            return redirect('/login');
         }
+        else{
+            $oid=$orgUrl->organization_id;
+            $title=$orgUrl->title;
+            $texts = explode("\\", $orgUrl->description);
+            $loginText=$texts[0];
+            $placeholder=$texts[2];
+            //dd($loginText,$placeholder,$orgUrl->description);
+        }
+        // switch($name)
+        // {
+        //     case "lmm":
+        //         $oid=137;
+        //         $placeholder="Email/Nombor IC";
+        //         $title="Lembaga Maktab Mahmud";
+        //         $loginText="Laman Web Untuk Bayar Yuran LMM";
+        //         break;
+        //     case "polimas":
+        //         $oid =107;
+        //         $placeholder="Email/Nombor IC";
+        //         $title="Polimas";
+        //         $loginText="Laman Web Untuk Bayar Yuran Polimas";
+        //         break;
+        //     case "samura":
+        //         $oid=141;
+        //         $placeholder="Email/Nombor IC";
+        //         $title="Sains Muar";
+        //         $loginText="Laman Web Untuk Bayar Yuran SAMURA";
+        //         break;
+        //     case "srab":
+        //         $oid=160;
+        //         $placeholder="Email/Nombor IC";
+        //         $title="SRAB";
+        //         $loginText="Laman Web Untuk Bayar Yuran SRAB MUAR";
+        //         break;
+        //      default:
+        //         return redirect('/login');
+
+        // }
 
         $org=DB::table('organizations')->where('id',$oid)->first()->organization_picture;
         //dd($org);
