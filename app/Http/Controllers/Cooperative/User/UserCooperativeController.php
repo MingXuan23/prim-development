@@ -47,9 +47,24 @@ class UserCooperativeController extends Controller
                     ->distinct()
                     ->get();
         
-        $koperasi = Organization::where('type_org', $role_id)->select('id', 'nama', 'parent_org')->get();
+        if(count($orgID)==0){
+            $isBuyer = DB::table('users as u')
+                ->join('model_has_roles as r', 'u.id', '=', 'r.model_id')
+                ->select('u.*')
+                ->where('u.id',$userID)
+                ->where('r.role_id',15)
+                ->first();
+            if($isBuyer!=null){
+                $orgID = DB::table('organizations as k')
+                ->join('organizations as o','o.id','k.parent_org')
+                ->select('o.id', 'o.nama')
+                ->distinct()
+                ->get();
+            }
+        }
+        //$koperasi = Organization::where('type_org', $role_id)->select('id', 'nama', 'parent_org')->get();
 
-        return view('koperasi.index', compact('koperasi', 'orgID'));
+        return view('koperasi.index', compact('orgID'));
     }
 
     public function fetchKoop(Request $request)
@@ -774,6 +789,7 @@ class UserCooperativeController extends Controller
         ->where('type_org',$role_id)
         ->where('id',$id)
         ->first();
+        $userId=Auth::id();
 
         $products = DB::table('product_group as pg')
          ->join('product_item as p','pg.id','p.product_group_id')
@@ -795,16 +811,19 @@ class UserCooperativeController extends Controller
                 'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
         ->first();
 
-        $childrenByParent = DB::table('users')
-        ->join('organization_user as ou', 'ou.user_id', '=', 'users.id')
+        $parent = DB::table('users')
+                            ->where('id',$userId)
+                            ->first();
+
+        $childrenByParent=DB::table('organization_user as ou')
         ->join('organization_user_student as ous','ou.id','=','ous.organization_user_id')
         ->join('students as s','s.id','=','ous.student_id')
         ->join('class_student as cs','cs.student_id','=','s.id')
         ->join('class_organization as co','co.id','=','cs.organclass_id')
         ->join('classes as c','c.id','=','co.class_id')
-        ->select('s.*','users.id as parentId','users.name as parentName', 'ou.organization_id','c.nama as className','c.id as classId')
+        ->select('s.*', 'ou.organization_id','c.nama as className','c.id as classId')
         ->where('ou.organization_id', $koperasi->parent_org)
-        ->where('ou.user_id',Auth::id())
+        ->where('ou.user_id',$parent->id)
         ->where('ou.role_id', 6)
         ->where('ou.status', 1)
         ->orderBy('c.nama')
@@ -821,7 +840,8 @@ class UserCooperativeController extends Controller
         ->with('koperasi',$koperasi)
         ->with('k_open_hour', $k_open_hour)
         ->with('k_close_hour', $k_close_hour)
-        ->with('childrenByParent',$childrenByParent);
+        ->with('childrenByParent',$childrenByParent)
+        ->with('parent',$parent);
     }
 
     public function storeKoop()

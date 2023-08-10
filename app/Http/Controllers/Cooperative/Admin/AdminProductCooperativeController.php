@@ -550,7 +550,7 @@ class AdminProductCooperativeController extends Controller
         return redirect('koperasi/produkmenu')->with('success',$returnInformation);
     }
 
-    public function fetchClassyear(){
+    public function fetchClassyear(Request $request){
         
         
         $userID = Auth::id();
@@ -560,6 +560,15 @@ class AdminProductCooperativeController extends Controller
                 ->where('o.type_org',10)
                 ->select('o.parent_org')
                 ->first();
+        if($oid==null){
+            $oid = DB::table('organizations as o')
+            ->join('organization_user as os', 'o.id', 'os.organization_id')
+            ->where('o.id',$request->koopId)
+            ->where('o.type_org',10)
+            ->select('o.parent_org')
+            ->first();
+        }
+
         
         $organization = Organization::find($oid->parent_org);
 

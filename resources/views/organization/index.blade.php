@@ -53,6 +53,7 @@
                                 <th>Email</th>
                                 <th>Alamat</th>
                                 <th>Action</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                     </table>
@@ -145,7 +146,15 @@
                     orderable: false,
                     searchable: false,
                     "width": "10%"
-                },]
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    orderable: false,
+                    searchable: false,
+                    "width": "10%"
+                }
+            ]
           });
 
         // csrf token for ajax

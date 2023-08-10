@@ -46,11 +46,20 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
     }
 
     public function model(array $row)
-    {
+    {   //
+        //dd(!isset($row['nama']) , !isset($row['nama_penjaga']) , !isset($row['jantina']) , !isset($row['no_tel_bimbit_penjaga']));
+        //dd($row);
         if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_tel_bimbit_penjaga'])){
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+            
+            if($row['nama']==null &&$row['nama_penjaga']==null &&$row['jantina']==null &&$row['no_tel_bimbit_penjaga']==null){
+               return null;
+            }
+            else{
+                //dd("I stop");
+                throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+            }
         }
-
+        //dd("Success");
         $phone = trim((string)$row['no_tel_bimbit_penjaga']);
 
         if(!$this->startsWith($phone,"+60") && !$this->startsWith($phone,"60")){
@@ -77,7 +86,6 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         else{
             throw ValidationException::withMessages(["error" => "Invalid phone number"]);
         }
-
         
         $co = DB::table('class_organization')
         ->select('id', 'organization_id as oid')
@@ -88,7 +96,9 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         
         // $gender = (int) substr($row["no_kp"], -1) % 2 == 0 ? "P" : "L";
         $gender = $row["jantina"];
-
+        if($gender!="L" && $gender!="P"){
+            throw ValidationException::withMessages(["error" => "Invalid gender Information"]);
+        }
         $ifExits = DB::table('users as u')
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
                     // ->where('u.email', '=', $request->get('parent_email'))
@@ -111,7 +121,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                 ]);
     
                 $newparent = new Parents([
-                    'name'           =>  strtoupper($row['nama_penjaga']),
+                    'name'           =>  trim(strtoupper($row['nama_penjaga'])),
                     'password'       =>  Hash::make('abc123'),
                     'telno'          =>  $phone,
                     'remember_token' =>  Str::random(40),
@@ -180,7 +190,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         $user->assignRole($rolename->nama);
         
         $student = new Student([
-            'nama'       => strtoupper($row["nama"]),
+            'nama'       => trim(strtoupper($row["nama"])),
             // 'icno'       => $row["no_kp"],
             'gender'     => $row["jantina"],
             'email'      => isset($row['email']) ? $row['email'] : NULL,
