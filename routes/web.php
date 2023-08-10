@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Auth::routes();
+Route::get('registerAdmin', 'Auth\RegisterController@AdminRegisterIndex')->name('register.admin');
+//Route::post('registerAdmin', 'Auth\RegisterController@registerAdmin');
 // Auth::routes(['register' => false]);
 
 Route::get('/home', 'HomeController@index');
