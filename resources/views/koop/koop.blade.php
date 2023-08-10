@@ -165,18 +165,14 @@
 
 <div class="card-body pl-0 pr-0">
     <label for="DisplayParentName">
-        <span style="font-size: 35px">{{ $childrenByParent[0]->parentName }}</span>
+        <span style="font-size: 35px">{{ $parent->name }}</span>
         <br> 
     </label>
     <a href="{{route('koperasi.edit', $Sekolah->id)}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
 <!-- <a href="{{ route('koperasi.edit', $Sekolah->id) }}" class=" btn btn-primary waves-effect waves-light">
                     <i class="fas fa-cart-arrow-down"></i> View Cart</a> -->
     {{-- display item --}}
-  
-    @foreach($childrenByParent as $key=>$child)
-    @if($key === 0)
-    <!-- display the option to choose genaral product or all products  -->
-        <div class="inputGroup">
+    <div class="inputGroup">
             <input
                 id="GeneralItem"
                 class="childrenList"
@@ -204,9 +200,10 @@
                 <br>
             </label>
         </div>
-        
-        
-    @endif
+  @if(count($childrenByParent)!=0)
+    @foreach($childrenByParent as $key=>$child)
+    <!-- display the option to choose genaral product or all products  -->
+
     <!-- display the children with their class -->
     <div class="inputGroup">
         <input
@@ -224,6 +221,23 @@
     </div>
     
     @endforeach   
+  @else
+  <div class="inputGroup">
+            <input
+                id="ByTahun"
+                class="childrenList"
+                value="Tahun1"
+                
+                onchange=""
+                type="checkbox" />
+
+            <label for="ByTahun">
+                <span style="font-size: 18px">Products/Items By Tahun</span>
+                <br>
+            </label>
+        </div>
+  @endif
+    
 </div>
 
 {{-- wan 1/8/2023, tmbh textbar search --}}
@@ -322,6 +336,7 @@ $(document).ready(function(){
     $.ajax({
                url: "{{ route('koperasi.fetchClassYear') }}",
                method: "GET",
+               data:{'koopId':{{$koperasi->id}}},
                success: function(result) {
                             jQuery.each(result.datayear, function(key, value) {
                                 $("#group_combobox").append("<option value='Tahun"+ value.year +"' class='tahunGroup'> Tahun " + value.year + "</option>");
@@ -335,6 +350,7 @@ $(document).ready(function(){
                     });
                     
     $('.childrenList').change(function() {
+      
         $('.childrenList').prop('checked', false);
         $(this).prop('checked', true);
         $('#product-div').show();
@@ -342,6 +358,8 @@ $(document).ready(function(){
         if(selectedGroup!="AllItem" &&selectedGroup!="GeneralItem")
         {
             updateOption("tahun");//display when children is selected
+            if(selectedGroup==="Tahun1")
+              $('#group_combobox').val("Tahun1");
         }
         else{
             updateOption("category");//display when general item or all item is selected

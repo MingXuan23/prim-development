@@ -248,15 +248,26 @@ class OrganizationController extends Controller
                         $token = csrf_token();
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<a href="' . route('organization.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                        //$btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     } else {
                         $token = csrf_token();
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<a href="' . route('admin-reg.edit-merchant', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                        //$btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     }
                     return $btn;
                 })
+                //->rawColumns(['action'])
+                ->addColumn('status', function ($row) {
+                    if($row->seller_id != null) {
+                        $fpxstatus='<span class="badge rounded-pill bg-success text-white">Ready</span>';
+                    } else {
+                        $fpxstatus='<span class="badge rounded-pill bg-warning text-white">Pending</span>';
+                    }
+                    return $fpxstatus;
+                })
+                
+                ->rawColumns(['status','action'])
                 ->make(true);
         }
     }

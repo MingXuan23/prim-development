@@ -58,10 +58,18 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
     {
         set_time_limit(300);
         if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_tel_bimbit_penjaga'])){
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+            
+            if($row['nama']==null &&$row['nama_penjaga']==null &&$row['jantina']==null &&$row['no_tel_bimbit_penjaga']==null){
+               return null;
+            }
+            else{
+                //dd("I stop");
+                throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+            }
         }
 
         $phone = trim((string)$row['no_tel_bimbit_penjaga']);
+        $phone = str_replace('-', '', $phone);
 
         if(!$this->startsWith($phone,"+60") && !$this->startsWith($phone,"60")){
             if(strlen($phone) == 10) {
@@ -97,8 +105,8 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                             ->join('organization_user_student as ous','ous.student_id','s.id')
                             ->join('organization_user as ou','ou.id','ous.organization_user_id')
                             ->join('users as u','u.id','ou.user_id')
-                            ->where('s.nama', 'LIKE', '%' . $row['nama'] . '%')
-                            ->where('u.name','LIKE', '%' . $row['nama_penjaga'] . '%')
+                            ->where('s.nama', 'LIKE', '%' . trim($row['nama']) . '%')
+                            ->where('u.name','LIKE', '%' . trim($row['nama_penjaga']) . '%')
                             ->where('u.telno',$phone)
                             ->select('s.id as studentId','s.nama as studentName','s.gender as gender','u.name as parentName','u.id as parentId','u.telno as parentTelno')
                             ->first();
@@ -145,9 +153,9 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
         else{
             //dd($findStudent);
             $newStudentData = new stdClass();
-            $newStudentData->studentName = strtoupper($row["nama"]);
+            $newStudentData->studentName = trim(strtoupper($row["nama"]));
             $newStudentData->gender = $row["jantina"];
-            $newStudentData->parentName = strtoupper($row['nama_penjaga']);
+            $newStudentData->parentName = trim(strtoupper($row['nama_penjaga']));
             $newStudentData->parentTelno = $phone;
             $newStudentData->classId = $this->class_id;
 
