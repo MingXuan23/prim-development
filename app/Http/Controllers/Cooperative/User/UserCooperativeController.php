@@ -60,6 +60,12 @@ class UserCooperativeController extends Controller
                 ->select('o.id', 'o.nama')
                 ->distinct()
                 ->get();
+
+                $orgID = array_map(function ($org) {
+                    $org->isBuyer = true;
+                    return $org;
+                }, $orgID->toArray());
+
             }
         }
         //$koperasi = Organization::where('type_org', $role_id)->select('id', 'nama', 'parent_org')->get();
@@ -70,9 +76,21 @@ class UserCooperativeController extends Controller
     public function fetchKoop(Request $request)
     {
         $sID = $request->get('sID');
-        
-        $koop = Organization::where('parent_org', $sID)->get();
-
+        $isBuyer=$request->get('isBuyer');
+        if($isBuyer==true){
+            $koop = DB::table('organizations as o')
+            ->join('organization_url as url','url.organization_id','o.id')
+            ->where('o.parent_org', $sID)
+            ->where('url.status',1)
+            ->select('o.*','url.url_name')
+            ->get();
+        }
+        else{
+            $koop = DB::table('organizations as o')
+            ->where('parent_org', $sID)
+            ->select('o.*')
+            ->get();
+        }
         return response()->json(['success' => $koop]);
     }
     /**
@@ -667,11 +685,12 @@ class UserCooperativeController extends Controller
 
         $list_detail = DB::table('pgng_orders as ko')
                         ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                        ->join('transactions as t','t.id','ko.transaction_id')
                         ->where('ko.id', $id)
                         ->where('ko.status', '>' , 0)
                         ->where('ko.user_id', $userID)
                         ->select('ko.updated_at', 'ko.pickup_date', 'ko.total_price', 'ko.note', 'ko.status',
-                                'o.id','o.nama', 'o.parent_org', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state')
+                                'o.id','o.nama', 'o.parent_org', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','t.transac_no as fpxId')
                         ->first();
 
         $date = Carbon::createFromDate($list_detail->pickup_date); // create date based on pickup date
@@ -707,7 +726,10 @@ class UserCooperativeController extends Controller
             $totalPrice[$key] = doubleval($row->price * $row->quantity); // calculate total for each item in cart
         }
 
-        return view('koperasi.list', compact('list_detail', 'allOpenDays', 'sekolah_name', 'item', 'totalPrice'));
+        $previousUrl = url()->previous();
+        $previousUrl = str_replace('/', '-', $previousUrl);
+        //dd($previousUrl);
+        return view('koperasi.list', compact('list_detail', 'allOpenDays', 'sekolah_name', 'item', 'totalPrice','previousUrl'));
     }
 
     public function fetchAvailableDay(Request $request)
@@ -782,8 +804,17 @@ class UserCooperativeController extends Controller
         return view('koop.index',compact('sekolah'))->with('sekolah',$sekolah);
     }
 
-    public function koopShop(Int $id)
+    public function koopShop($koop)
     {
+        if(is_int($koop)){
+            $id=$koop;
+        }
+        else{
+            $id = DB::table('organization_url')
+                ->where('url_name',$koop)
+                ->first()
+                ->organization_id;
+        }
         $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $Sekolah = DB::table('organizations')
         ->where('type_org',$role_id)
