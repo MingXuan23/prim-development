@@ -14,6 +14,7 @@ use Psy\Command\WhereamiCommand;
 use Yajra\DataTables\DataTables;
 use App\Exports\ExportYuranStatus;
 use App\Exports\ExportJumlahBayaranIbuBapa;
+use App\Exports\ExportYuranOverview;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -1571,4 +1572,39 @@ class FeesController extends AppBaseController
         $kelasId=$request->yuranExport1;
         return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
     }
+
+    public function exportYuranOverview(Request $request){
+        
+        $org=DB::table('organizations')
+        ->where('id',$request->organization)
+        ->first();
+        //dd($request);
+        $filename="Yuran_Overview_".$org->nama;
+        return Excel::download(new ExportYuranOverview($org->id ), $filename . '.xlsx');
+    }
 }
+
+
+// set_time_limit(500);
+//         $users=DB::table('organization_user as ou')
+//                 ->leftJoin('organization_user_student as ous', 'ous.organization_user_id', 'ou.id')
+//                 ->leftJoin('students as s', 's.id', 'ous.student_id')
+//                 ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+//                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+//                 ->leftJoin('classes as c','c.id','co.class_id')
+//                 ->leftJoin('users as u','u.id','ou.user_id')
+//                 ->whereIn('c.id',[538,539,540])
+
+//                 ->select('u.*')
+//                 ->get();
+//         //dd($users);
+//         foreach($users as $u){
+
+//             DB::table('users')
+            
+//             ->where('id', $u->id)
+//             ->update([
+//                 'name'=> preg_replace('/^\s+|\s+$/u', '', $u->name)
+//             ]);
+//         }
+//         dd("success");

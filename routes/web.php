@@ -444,6 +444,8 @@ Route::post('send-message', 'MessageController@sendMessage')->name('send-message
 
 Route::post('/exportAllYuranStatus', 'FeesController@ExportAllYuranStatus')->name('exportAllYuranStatus');
 Route::post('/exportJumlahBayaranIbuBapa', 'FeesController@ExportJumlahBayaranIbuBapa')->name('exportJumlahBayaranIbuBapa');
+Route::post('/exportYuranOverview', 'FeesController@exportYuranOverview')->name('exportYuranOverview');
+
 
 
 Route::group(['prefix' => 'notification'], function () {

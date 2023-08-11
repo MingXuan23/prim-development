@@ -812,6 +812,7 @@ class UserCooperativeController extends Controller
         else{
             $id = DB::table('organization_url')
                 ->where('url_name',$koop)
+                ->where('status',1)
                 ->first()
                 ->organization_id;
         }

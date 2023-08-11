@@ -28,6 +28,7 @@ class SchoolController extends Controller
             ->where('url.status',1)
             ->select('url.*')
             ->first();
+            
         if($orgUrl==null){
             return redirect('/login');
         }
