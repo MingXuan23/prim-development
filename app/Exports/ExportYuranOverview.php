@@ -22,7 +22,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
     {
         $fee=DB::table('fees_new as fn')
             ->where('fn.organization_id',$this->orgId)
-            //->where('fn.status',1)
+            ->where('fn.status',1)
             ->orderBy('fn.category')
             ->get();
         //dd($fee);
