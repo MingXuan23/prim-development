@@ -33,7 +33,7 @@
                 <div class="form-group">
                     <label>Nama Organisasi</label>
                     <div class="row"> <!-- Assuming you're using Bootstrap's grid system -->
-                    <div class="col-md-10"> <!-- Adjust the column size based on your layout -->
+                    <div class="col-md-9"> <!-- Adjust the column size based on your layout -->
                         <select name="organization" id="organization" class="form-control">
                             <option value="" selected disabled>Pilih Organisasi</option>
                             @foreach($organization as $row)
@@ -41,7 +41,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2"> <!-- Adjust the column size based on your layout -->
+                    <div class="col-md-3"> <!-- Adjust the column size based on your layout -->
                         <button id="buttonExport" type="submit" class="btn btn-primary" >Export Overview Report</button>
                     </div>
                 </div>
