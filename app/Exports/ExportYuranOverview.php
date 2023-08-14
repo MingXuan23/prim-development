@@ -120,6 +120,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                     ->join('fees_new as fn','fn.id','fou.fees_new_id')
                     ->where('fn.organization_id',$this->orgId)
                     ->where('t.status',"Success")
+                    ->where('fn.status',1)
                     ->select('t.*')
                     ->distinct('t.id')
                     ->get();
@@ -130,6 +131,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                     ->join('fees_new as fn','fn.id','sfn.fees_id')
                     ->where('t.status',"Success")
                     ->where('fn.organization_id',$this->orgId)
+                    ->where('fn.status',1)
                     ->select('t.*')
                     ->distinct('t.id')
                     ->get();
