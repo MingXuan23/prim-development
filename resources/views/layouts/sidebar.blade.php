@@ -547,7 +547,34 @@
                         <span>Parcel</span>
                     </a>
                 </li>
-
+            
+                <li>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="mdi mdi-home-city-outline"></i>
+                    <span>Homestay</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    
+                    <li>
+                        <a href="{{ route('homestay.index') }}" class=" waves-effect">
+                            <i class="mdi mdi-home-edit-outline"></i>
+                            <span>Daftar Homestay</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="mdi mdi-room-service-outline"></i>
+                            <span>Semak Bilik</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Lihat Tempahan</span>
+                        </a>
+                    </li>
+                </ul>  
+            </li>
             <!-- <li>
                     <a href="" class=" waves-effect">
                         <i class="ti-clipboard"></i>
