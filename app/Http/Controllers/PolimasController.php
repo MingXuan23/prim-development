@@ -16,9 +16,29 @@ class PolimasController extends Controller
     //
     private $oid = 107;
 
-    public function indexLogin()
+    public function indexLogin($name)
     {
-        return view('polimas.index');
+        $title="";
+        $placeholder="Masukkan Email/Nombor Telefon/Nombor IC";
+        switch($name)
+        {
+            case "lmm":
+                $oid=137;
+                $placeholder="Masukkan Email/Nombor IC";
+                $title="Lembaga Maktab Mahmud";
+                break;
+            case "polimas":
+                $oid =107;
+                $title="Polimas";
+                break;
+             default:
+                return redirect('/login');
+
+        }
+
+        $org=DB::table('organizations')->where('id',$oid)->first();
+        //dd($org);
+        return view('polimas.index',compact('org','placeholder','title'));
     }
 
     public function indexBatch()

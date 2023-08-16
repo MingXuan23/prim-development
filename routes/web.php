@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Auth::routes();
+Route::get('registerAdmin', 'Auth\RegisterController@AdminRegisterIndex')->name('register.admin');
+//Route::post('registerAdmin', 'Auth\RegisterController@registerAdmin');
 // Auth::routes(['register' => false]);
 
 Route::get('/home', 'HomeController@index');
@@ -96,6 +98,8 @@ Route::group(['prefix' => 'class'], function () {
 
 Route::group(['prefix' => 'student'], function () {
     Route::get('list', 'StudentController@getStudentDatatable')->name('student.getStudentDatatable');
+    Route::get('compareAddNewStudent', 'StudentController@compareAddNewStudent')->name('student.compareAddNewStudent');
+    Route::get('compareTransferStudent', 'StudentController@compareTransferStudent')->name('student.compareTransferStudent');
     Route::post('student/fetchClass', 'StudentController@fetchClass')->name('student.fetchClass');
 });
 
@@ -188,6 +192,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::post('/order/update-pick-up-date', 'UserCooperativeController@updatePickUpDate')->name('koperasi.updatePickUpDate');
         Route::delete('/order/{id}', 'UserCooperativeController@destroyUserOrder')->name('koperasi.destroyUserOrder');
         Route::get('/history', 'UserCooperativeController@indexHistory')->name('koperasi.history');
+        
         Route::get('/{id}/list', 'UserCooperativeController@indexList')->name('koperasi.list');
         
         // Koop_Shop
@@ -199,41 +204,56 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::post('/koop/{id}/fetchItemToModel','UserCooperativeController@fetchItemToModel')->name('koperasi.fetchItemToModel');
         Route::post('/koop/storeInCart','UserCooperativeController@storeInCart')->name('koperasi.storeInCart');
         Route::post('/checkCart','UserCooperativeController@checkCart')->name('koperasi.checkCart');
+
+        //Route::get('/testPay','UserCooperativeController@testPay')->name('koperasi.testPay');
+        //created for test action after payment only
         
         
     });
 
     Route::group(['namespace' => 'Admin'], function() {
         Route::get('/produkmenu','AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
+        Route::get('/fetchprodukmenu','AdminProductCooperativeController@changeProductMenuByOrgId')->name('koperasi.changeProductMenu');
         Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
         Route::post('/produkmenu/deleteSelectedProducts','AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
         Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
         Route::post('/produktype/getProductNumOfGroup','AdminProductCooperativeController@getProductNumOfGroup')->name('koperasi.getProductNumOfGroup');
 
-        Route::get('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
-        Route::post('/produktype','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
+        
+        Route::any('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
+        Route::post('/produktype/add','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
         Route::post('/produktype/update/{id}','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
         Route::get('/produktype/edit/{id}','AdminProductCooperativeController@editType')->name('koperasi.editType');
         Route::post('/importproducttype', 'AdminProductCooperativeController@importproducttype')->name('importproducttype');
         Route::post('/importproduct', 'AdminProductCooperativeController@importproduct')->name('importproduct');
 
         Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
-        Route::get('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
-        Route::post('/produk','AdminProductCooperativeController@storeProduct')->name('koperasi.storeProduct');
+        Route::post('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
+        Route::post('/storeproduk','AdminProductCooperativeController@storeProduct')->name('koperasi.storeProduct');
         Route::get('/produk/update/{id}','AdminProductCooperativeController@editProduct')->name('koperasi.editProduct');
         Route::post('/produk/update/{id}','AdminProductCooperativeController@updateProduct')->name('koperasi.updateProduct');
         Route::get('/produk/delete/{id}','AdminProductCooperativeController@deleteProduct')->name('koperasi.deleteProduct');
 
 
         Route::get('/openingHours','AdminOpeningHoursCooperativeController@indexOpening')->name('koperasi.indexOpening');
+        Route::get('/openingChangeKoperasi','AdminOpeningHoursCooperativeController@openingChangeKoperasi')->name('koperasi.openingChangeKoperasi');
         Route::post('/openingHours','AdminOpeningHoursCooperativeController@storeOpening')->name('koperasi.storeOpening');
 
         Route::get('/Confirm','AdminOrderCooperativeController@indexConfirm')->name('koperasi.indexConfirm');
+        Route::get('/fetchConfirmTable','AdminOrderCooperativeController@fetchConfirmTable')->name('koperasi.fetchConfirmTable');
+
         Route::get('/Confirm/update/{id}','AdminOrderCooperativeController@storeConfirm')->name('koperasi.storeConfirm');
         Route::get('/Confirm/delete/{id}','AdminOrderCooperativeController@notConfirm')->name('koperasi.notConfirm');
 
         Route::get('/returnProdukMenu/{page}','AdminProductCooperativeController@returnProdukMenu')->name('koperasi.return');
         Route::get('/fetchClassyear','AdminProductCooperativeController@fetchClassyear')->name('koperasi.fetchClassYear');
+
+        Route::get('/{id}/{customerID}/list', 'AdminOrderCooperativeController@viewPgngList')->name('koperasi.viewPgngList');
+        Route::get('returnFromList/{url}/{koopId}', 'AdminOrderCooperativeController@returnFromList')->name('koperasi.returnFromList');
+        Route::get('/adminHistory', 'AdminOrderCooperativeController@adminHistory')->name('koperasi.adminHistory');
+        Route::get('/fetchAdminHistory', 'AdminOrderCooperativeController@fetchAdminHistory')->name('koperasi.fetchAdminHistory');
+
+
     });
 });
 
@@ -249,7 +269,10 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
         Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
-        // Checkout
+        
+       //  Route::get('/testPay','ProductController@testPay')->name('merchant.testPay');
+         
+         // Checkout
         Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
         Route::get('get-checkout-items', 'ProductController@getCheckoutItems')->name('merchant.get-checkout-items');
         // Get all cart
@@ -257,6 +280,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         // Orders
         Route::get('all-orders', 'HistoryController@index')->name('merchant.all-orders');
         Route::get('get-all-orders', 'HistoryController@getAllOrder')->name('merchant.get-all-orders');
+        Route::post('picked-up-order','HistoryController@orderPickedUp')->name('merchant.order-picked-up');
         Route::delete('delete-order', 'HistoryController@deletePaidOrder')->name('merchant.delete-order');
         Route::get('all-orders/history', 'HistoryController@history')->name('merchant.order-history');
         Route::get('get-order-history', 'HistoryController@getOrderHistory')->name('merchant.get-order-history');
@@ -272,6 +296,8 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::post('fetch-disabled-dates', 'OrderController@fetchDisabledDates')->name('merchant-reg.disabled-dates');
         Route::post('fetch-hours', 'OrderController@fetchOperationHours')->name('merchant-reg.fetch-hours');
         Route::post('{org_id}/cart/{order_id}/payment', 'OrderController@store')->name('merchant-reg.store-order');
+        
+       
     });
 
     Route::group(['prefix' => 'admin-regular', 'namespace' => 'AdminRegular'], function() {
@@ -305,6 +331,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::delete('destroy-item', 'ProductController@destroyProductItem')->name('admin-reg.destroy-item');
         Route::get('/p-group-list/{id}/edit/{item}', 'ProductController@editProductItem')->name('admin-reg.edit-item');
         Route::put('update-item', 'ProductController@updateProductItem')->name('admin-reg.update-item');
+        Route::post('/importMerchantProduct', 'ProductController@importMerchantProduct')->name('importMerchantProduct');
         
         # Order Dashboard
         Route::get('orders', 'OrderController@index')->name('admin-reg.orders');
@@ -351,7 +378,6 @@ Route::group(['middleware' => ['auth']], function () {
         'dorm'               => 'DormController',
         'koperasi'           => 'Cooperative\User\UserCooperativeController',
         'delivery'           => 'DeliveryController',
-        'homestay'           => 'HomestayController',
     ]);
 });
 
@@ -417,6 +443,8 @@ Route::post('send-message', 'MessageController@sendMessage')->name('send-message
 
 Route::post('/exportAllYuranStatus', 'FeesController@ExportAllYuranStatus')->name('exportAllYuranStatus');
 Route::post('/exportJumlahBayaranIbuBapa', 'FeesController@ExportJumlahBayaranIbuBapa')->name('exportJumlahBayaranIbuBapa');
+Route::post('/exportYuranOverview', 'FeesController@exportYuranOverview')->name('exportYuranOverview');
+
 
 
 Route::group(['prefix' => 'notification'], function () {
@@ -448,25 +476,8 @@ Route::group(['prefix' => 'session'], function () {
     Route::get('session/remove', 'SessionController@deleteSessionData');
 });
 
-Route::group(['prefix' => 'polimas'], function () {
-    // Route::get('/', 'PolimasController@indexLogin');
-    Route::group(['middleware' => ['auth']], function () {
-        Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
-        Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
-        Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
-        Route::get('/student-list', 'PolimasController@getStudentDatatable')->name('polimas.student.getStudentDatatable');
-        Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
-        Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
-        Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
-    });
-});
 
 
-Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
-    Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
-    Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
-    Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
-});
 
 Route::resource('dorm', 'DormController');
 Route::group(['prefix' => 'sekolah'], function () {
@@ -560,3 +571,24 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('inserthomestay', 'HomestayController@inserthomestay')->name('homestay.inserthomestay');
     Route::post('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
     
+
+Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
+    Route::get('/', 'DonationController@indexLHDN')->name('lhdn.index');
+    Route::get('/list/datatable', 'DonationController@getLHDNHistoryDatatable')->name('donate.lhdn_dataTable');
+    Route::get('/lhdn-receipt/{id}', 'DonationController@getLHDNReceipt')->name('lhdn-receipt');
+});
+
+Route::group(['prefix' => 'polimas'], function () {
+    // Route::get('/', 'PolimasController@indexLogin');
+    Route::group(['middleware' => ['auth']], function () {
+        Route::get('/batch', 'PolimasController@indexBatch')->name('polimas.batch');
+        Route::get('/batch-list', 'PolimasController@getBatchDataTable')->name('polimas.batch.getBatchDataTable');
+        Route::get('/student', 'PolimasController@indexStudent')->name('polimas.student');
+        Route::get('/student-list', 'PolimasController@getStudentDatatable')->name('polimas.student.getStudentDatatable');
+        Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
+        Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
+        Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
+    });
+});

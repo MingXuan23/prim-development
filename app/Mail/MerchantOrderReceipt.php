@@ -28,7 +28,7 @@ class MerchantOrderReceipt extends Mailable
         $this->item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                     ->where('po.pgng_order_id', $order->id)
-                    ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                    ->select('pi.name', 'po.quantity', 'pi.price')
                     ->get();
         $this->organization = $organization;
         $this->transaction = $transaction;

@@ -23,6 +23,7 @@
         </div>
     </div>
 </div>
+<form action="{{ route('exportYuranOverview') }}" method="post">
 <div class="row">
     <div class="col-md-12">
         <div class="card card-primary">
@@ -31,12 +32,22 @@
             <div class="card-body">
                 <div class="form-group">
                     <label>Nama Organisasi</label>
-                    <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
-                        @foreach($organization as $row)
-                        <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach
-                    </select>
+                    <div class="row"> <!-- Assuming you're using Bootstrap's grid system -->
+                    <div class="col-md-9"> <!-- Adjust the column size based on your layout -->
+                        <select name="organization" id="organization" class="form-control">
+                            <option value="" selected disabled>Pilih Organisasi</option>
+                            @foreach($organization as $row)
+                                <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3"> <!-- Adjust the column size based on your layout -->
+                        <button id="buttonExport" type="submit" class="btn btn-primary" >Export Overview Report</button>
+                    </div>
+                </div>
+                    
+
+                    
                 </div>
                 <br>
                 <div class="row">
@@ -152,7 +163,13 @@
                 </div>
             </div>
         </div>
-
+        
+                
+                    
+                    
+                    
+                </div>
+            </form>
         <!-- Modal -->
         <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
             aria-hidden="true">
@@ -175,7 +192,7 @@
 
     </div>
 </div>
-
+</form>
 
 @endsection
 

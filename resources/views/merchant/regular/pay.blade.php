@@ -168,8 +168,8 @@
           </div>
         </div>
         
-        {{-- <input type="hidden" name="amount" id="total_price" value="{{ $cart->total_price }}"> --}}
-        <input type="hidden" name="amount" id="total_price" value="2.00">
+        <input type="hidden" name="amount" id="total_price" value="{{ $cart->total_price }}">
+        {{-- <input type="hidden" name="amount" id="total_price" value="2.00"> --}}
         <input type="hidden" name="desc" id="desc" value="Merchant">
         <input type="hidden" name="order_id" id="order_id" value="{{ $cart->id }}">
         

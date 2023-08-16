@@ -14,6 +14,7 @@ use Psy\Command\WhereamiCommand;
 use Yajra\DataTables\DataTables;
 use App\Exports\ExportYuranStatus;
 use App\Exports\ExportJumlahBayaranIbuBapa;
+use App\Exports\ExportYuranOverview;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -325,8 +326,25 @@ class FeesController extends AppBaseController
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->where('class_organization.organization_id', $oid)
+            ->select('class_student.id as csid');
+        
+        foreach($all_student->get() as $s){
+            $check_debt = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->select('students.*')
+            ->where('class_student.id',$s->csid)
+            ->where('student_fees_new.status', 'Debt')
             ->count();
 
+            if ($check_debt == 0) {
+                DB::table('class_student')
+                    ->where('id', $s->csid)
+                    ->update(['fees_status' => 'Completed']);
+
+            }
+        }
+        $all_student=$all_student->count();
         // dd($all_student);
         $student_complete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -345,8 +363,28 @@ class FeesController extends AppBaseController
         $all_parent =  DB::table('organization_user')
             ->where('organization_id', $oid)
             ->where('role_id', 6)
-            ->where('status', 1)
+            ->where('status', 1);
+            
+
+        foreach($all_parent->get() as $p){
+            $check_debt = DB::table('organization_user')
+            ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
+            ->where('organization_user.user_id', $p->user_id)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
+            ->where('fees_new_organization_user.status', 'Debt')
             ->count();
+    
+            if ($check_debt == 0) {
+                DB::table('organization_user')
+                    ->where('user_id', $p->user_id)
+                    ->where('role_id', 6)
+                    ->where('status', 1)
+                    ->update(['fees_status' => 'Completed']);
+            }
+        }
+      
+        $all_parent=$all_parent->count();
 
         $parent_complete =  DB::table('organization_user')
             ->where('organization_id', $oid)
@@ -490,6 +528,7 @@ class FeesController extends AppBaseController
         }
     }
 
+
     public function getstudentDatatable(Request $request)
     {
         // dd($request->oid);
@@ -509,7 +548,7 @@ class FeesController extends AppBaseController
                 ->where('class_student.fees_status', $status)
                 ->orderBy('students.nama')
                 ->get();
-
+            //$this->validateStatus($data);
             // dd($first);
             $table = Datatables::of($data);
 
@@ -1100,7 +1139,7 @@ class FeesController extends AppBaseController
         {
             array_push($list_dependent, $dependent->studentid);
         }
-
+        
         // ************************* get list organization by parent  *******************************
 
         $organizations = DB::table('organizations')
@@ -1131,7 +1170,7 @@ class FeesController extends AppBaseController
             ->whereIn('students.id', $list_dependent)
             ->where('student_fees_new.status', 'Debt')
             ->get();
-        
+       
         $getfees_bystudent = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
@@ -1156,7 +1195,7 @@ class FeesController extends AppBaseController
             ->where('organization_user.status', 1)
             ->where('fees_new_organization_user.status', 'Debt')
             ->get();
-
+            
         $getfees_category_A_byparent  = DB::table('fees_new')
             ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
@@ -1167,9 +1206,10 @@ class FeesController extends AppBaseController
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
             ->where('fees_new_organization_user.status', 'Debt')
+            ->distinct()
             ->get();
         //dd($list,$organizations,$getfees,$getfees_bystudent,$getfees_category_A,$getfees_category_A_byparent);
- 
+        //dd($getfees_category_A_byparent);
         return view('fee.pay.index', compact('list', 'organizations', 'getfees', 'getfees_bystudent', 'getfees_category_A', 'getfees_category_A_byparent'));
     }
 
@@ -1342,7 +1382,34 @@ class FeesController extends AppBaseController
     public function cetegoryReportIndex(){
 
         $organization = $this->getOrganizationByUserId();
+        // $student_user = DB::table('students as s')
+        // ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
+        // ->leftJoin('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
+        // ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+        // ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+        // ->where('co.class_id', 530)
+        // ->select('ou.user_id','s.*')
+        // ->orderBy('s.nama')
+        // ->get()
+        // ->keyBy('user_id');
 
+        // $feeA=DB::table('fees_new_organization_user as fou')
+        //         ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
+        //         ->where('ou.organization_id',159)
+        //         ->where('fou.fees_new_id',565)
+        //         ->select('ou.user_id','fou.status')
+        //         ->get()
+        //         ->keyBy('user_id');
+        // $data = $student_user->map(function ($student) use ($feeA) {
+        //     $user_id = $student->user_id;
+        //     if ($feeA->has($user_id)) {
+        //         $fee_data = $feeA->get($user_id);
+        //         $student->status = $fee_data->status; // Add the status from $feeA to $student_user
+        //     }
+        //     return $student;
+        // });
+
+        
         return view('fee.categoryReport.index', compact('organization'));
     }
 
@@ -1441,17 +1508,33 @@ class FeesController extends AppBaseController
         if (request()->ajax()) {
             if($fees->category == "Kategory A")
             {
-                $data = DB::table('students as s')
-                    ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
-                    ->leftJoin('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
-                    ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
-                    ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
-                    ->leftJoin('fees_new_organization_user as fou', 'fou.organization_user_id', 'ou.id')
-                    ->where('fou.fees_new_id', $fees->id)
-                    ->where('co.class_id', $request->classid)
-                    ->select('s.*', 'fou.status')
-                    ->orderBy('s.nama')
-                    ->get();
+                $student_user = DB::table('students as s')
+                ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
+                ->leftJoin('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
+                ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+                ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+                ->where('co.class_id', $request->classid)
+                ->select('ou.user_id','s.*')
+                ->orderBy('s.nama')
+                ->get()
+                ->keyBy('user_id');
+    
+                $feeA=DB::table('fees_new_organization_user as fou')
+                        ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
+                        ->where('ou.organization_id',$request->orgId)
+                        ->where('fou.fees_new_id',$request->feeid)
+                        ->select('ou.user_id','fou.status')
+                        ->get()
+                        ->keyBy('user_id');
+                $data = $student_user->map(function ($student) use ($feeA) {
+                    $user_id = $student->user_id;
+                    if ($feeA->has($user_id)) {
+                        $fee_data = $feeA->get($user_id);
+                        $student->status = $fee_data->status; // Add the status from $feeA to $student_user
+                    }
+                    return $student;
+                });
+                
             }
             else
             {
@@ -1469,14 +1552,24 @@ class FeesController extends AppBaseController
             $table = Datatables::of($data);
 
             $table->addColumn('status', function ($row) {
-                if ($row->status == 'Debt') {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
+                if (property_exists($row, 'status')) {
+                    if($row->status == 'Debt')
+                    {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
 
-                    return $btn;
+                        return $btn;
+                    }
+                    else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . '<span class="badge badge-success"> Telah Bayar </span></div>';
+    
+                        return $btn;
+                    }
+                    
                 } else {
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-success"> Telah Bayar </span></div>';
+                    $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
 
                     return $btn;
                 }
@@ -1500,10 +1593,56 @@ class FeesController extends AppBaseController
 
     public function ExportJumlahBayaranIbuBapa(Request $request)
     {
-        $kelas = DB::table('classes')
-            ->where('id', $request->yuranExport1)
-            ->first();
+        $org=DB::table('organizations')
+        ->where('id',$request->organExport1)
+        ->first();
 
-        return Excel::download(new ExportJumlahBayaranIbuBapa($kelas, $request->organExport1), $kelas->nama . '.xlsx');
+       if($request->yuranExport1!=0){
+        $kelas= DB::table('classes')
+        ->where('id', $request->yuranExport1)
+        ->first();
+        $filename=$kelas->nama;
+       }else{
+        $filename=$org->nama;
+       }
+       
+        
+        $kelasId=$request->yuranExport1;
+        return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
+    }
+
+    public function exportYuranOverview(Request $request){
+        
+        $org=DB::table('organizations')
+        ->where('id',$request->organization)
+        ->first();
+        //dd($request);
+        $filename="Yuran_Overview_".$org->nama;
+        return Excel::download(new ExportYuranOverview($org->id ), $filename . '.xlsx');
     }
 }
+
+
+// set_time_limit(500);
+//         $users=DB::table('organization_user as ou')
+//                 ->leftJoin('organization_user_student as ous', 'ous.organization_user_id', 'ou.id')
+//                 ->leftJoin('students as s', 's.id', 'ous.student_id')
+//                 ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+//                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+//                 ->leftJoin('classes as c','c.id','co.class_id')
+//                 ->leftJoin('users as u','u.id','ou.user_id')
+//                 ->whereIn('c.id',[538,539,540])
+
+//                 ->select('u.*')
+//                 ->get();
+//         //dd($users);
+//         foreach($users as $u){
+
+//             DB::table('users')
+            
+//             ->where('id', $u->id)
+//             ->update([
+//                 'name'=> preg_replace('/^\s+|\s+$/u', '', $u->name)
+//             ]);
+//         }
+//         dd("success");

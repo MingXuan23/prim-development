@@ -15,13 +15,14 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-
+                @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga'))
                 <li>
                     <a href="{{ route('organization.index') }}" class=" waves-effect">
                         <i class="mdi mdi-account-group"></i>
                         <span>Organisasi</span>
                     </a>
                 </li>
+                @endunless
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -29,12 +30,14 @@
                         <span>Derma</span>
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga'))
                         <li>
                             <a href="{{ route('donation.index') }}" class=" waves-effect">
                                 <i class="fas fa-user-cog"></i>
                                 <span>Urus Derma</span>
                             </a>
                         </li>
+                    @endunless
 
                         <li>
                             <a href="{{ route('donate.index') }}" class=" waves-effect">
@@ -390,6 +393,13 @@
                     <span>Pengesahan</span>
                     </a>
                 </li>
+
+                <li>
+                        <a href="{{ route('koperasi.adminHistory') }}" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Sejarah Koperasi</span>
+                        </a>
+                </li>
             </ul>
             </li>
             @endrole 
@@ -440,7 +450,7 @@
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
-                    <span>Peniaga</span>
+                    <span>Get&Go</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     
@@ -494,7 +504,7 @@
             </li>
             @endrole --> --}}
 
-            @role('Superadmin|Penjaga') <!--haziq nye-->
+            @role('Superadmin|Penjaga|Buyer') <!--haziq nye-->
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-border-color"></i>
@@ -541,40 +551,13 @@
             </li>
             @endrole --}}
 
-            <li>
+            {{-- <li>
                     <a href="{{route('delivery.index')}}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Parcel</span>
                     </a>
                 </li>
-            
-                <li>
-                <a href="javascript: void(0);" class="has-arrow waves-effect">
-                    <i class="mdi mdi-home-city-outline"></i>
-                    <span>Homestay</span>
-                </a>
-                <ul class="sub-menu mm-collapse" aria-expanded="false">
-                    
-                    <li>
-                        <a href="{{ route('homestay.index') }}" class=" waves-effect">
-                            <i class="mdi mdi-home-edit-outline"></i>
-                            <span>Daftar Homestay</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="" class=" waves-effect">
-                            <i class="mdi mdi-room-service-outline"></i>
-                            <span>Semak Bilik</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="" class=" waves-effect">
-                            <i class="ti-clipboard"></i>
-                            <span>Lihat Tempahan</span>
-                        </a>
-                    </li>
-                </ul>  
-            </li>
+
             <!-- <li>
                     <a href="" class=" waves-effect">
                         <i class="ti-clipboard"></i>

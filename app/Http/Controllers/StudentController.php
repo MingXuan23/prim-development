@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Exports\StudentExport;
 use App\Imports\StudentImport;
+use App\Imports\StudentCompare;
 use App\Models\ClassModel;
 use App\Models\Organization;
 use App\Models\Student;
 use App\Models\Parents;
 use PDF;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -86,15 +88,30 @@ class StudentController extends Controller
 
         $etx = $file->getClientOriginalExtension();
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
+
         if (!in_array($etx, $formats)) {
 
             return redirect('/student')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
+        if($request->compareOption ==true){
+            //Excel::import(new StudentCompare($classID), $public_path . '/uploads/excel/' . $namaFile);
+            $import = new StudentCompare($classID);
+            Excel::import($import, $public_path . '/uploads/excel/' . $namaFile);
 
-        Excel::import(new StudentImport($classID), $public_path . '/uploads/excel/' . $namaFile);
+            $studentArray = $import->getStudentArray();
+            $sameClassStudents= $studentArray['sameClassStudents'];
+            $differentClassStudents=$studentArray['differentClassStudents'];
+            $differentOrgStudents=$studentArray['differentOrgStudents'];
+            $newStudents=$studentArray['newStudents'];
+            //dd($differentClassStudents);
+            return view('student.compare',compact('sameClassStudents','differentClassStudents','differentOrgStudents','newStudents'));
+        }
+        else{
+            Excel::import(new StudentImport($classID), $public_path . '/uploads/excel/' . $namaFile);
+        }
+       
         return redirect('/student')->with('success', 'New student has been added successfully');
     }
-
 
     public function create()
     {
@@ -217,26 +234,36 @@ class StudentController extends Controller
                     'status'            => 1,
                 ]);
             } 
-        }
+        }   
+        $this->assignStudentToParent($newparent->id,$request->get('parent_phone'),$request,$classid, $ifExits);
+        return redirect('/student')->with('success', 'New student has been added successfully');
+    }
 
+    public function assignStudentToParent($parentId,$telno,$studentData,$classId, $ifExits){
+        
+        $co= DB::table('class_organization')
+        ->select('id', 'organization_id as oid')
+        ->where('class_id', $classId)
+        ->first();
+        $class = ClassModel::find($classId);
 
         $ou = DB::table('organization_user')
-            ->where('user_id', $newparent->id)
+            ->where('user_id', $parentId)
             ->where('organization_id', $co->oid)
             ->where('role_id', 6)
             ->first();
         // dd($newparent->id);
-        $user = User::find($newparent->id);
+        $user = User::find($parentId);
 
         // role parent
         $rolename = OrganizationRole::find(6);
         $user->assignRole($rolename->nama);
 
         $student = new Student([
-            'nama'          =>  $request->get('name'),
+            'nama'          =>  empty($studentData->name)?$studentData->studentName:$studentData->name,
             // 'icno'          =>  $request->get('icno'),
-            'gender'        =>  $request->get('gender'),
-            'email'         =>  $request->get('email'),
+            'gender'        =>  $studentData->gender,
+            //'email'         =>  $studentData->email,
         ]);
 
         $student->save();
@@ -265,7 +292,7 @@ class StudentController extends Controller
         */
         DB::table('students')
             ->where('id', $student->id)
-            ->update(['parent_tel' => $newparent->telno]);
+            ->update(['parent_tel' => $telno]);
 
         // check fee for new in student
         // check category A fee
@@ -297,7 +324,7 @@ class StudentController extends Controller
                 $target = json_decode($kateBC->target);
 
                 if (isset($target->gender)) {
-                    if ($target->gender != $request->get('gender')) {
+                    if ($target->gender != $studentData->gender) {
                         continue;
                     }
                 }
@@ -328,7 +355,7 @@ class StudentController extends Controller
 
             $organ_user_id = DB::table('organization_user')->insertGetId([
                 'organization_id'   => $child_organ->id,
-                'user_id'           => $newparent->id,
+                'user_id'           => $parentId,
                 'role_id'           => 6,
                 'start_date'        => now(),
                 'status'            => 1,
@@ -396,8 +423,6 @@ class StudentController extends Controller
                 }
             }
         }
-
-        return redirect('/student')->with('success', 'New student has been added successfully');
     }
 
     public function show($id)
@@ -539,9 +564,10 @@ class StudentController extends Controller
 
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = '<div class="d-flex justify-content-center"></div>';
+                    // $btn = '<div class="d-flex justify-content-center">';
+                    // $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
                 });
 
@@ -599,6 +625,28 @@ class StudentController extends Controller
         return response()->json(['success' => $list]);
     }
 
+    public function validateStatus($data){
+        $update=false;
+        foreach($data as $d){
+            $check_debt = DB::table('students')
+                                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                                    ->select('students.*')
+                                    ->where('class_student.id', $d->csid)
+                                    ->where('student_fees_new.status', 'Debt')
+                                    ->count();
+
+            if ($check_debt == 0) {
+                $update=true;
+                DB::table('class_student')
+                    ->where('id', $d->csid)
+                    ->update(['fees_status' => 'Completed']);
+
+            }
+        }
+        return $update;
+    }
+
     public function getStudentDatatableFees(Request $request)
     {
         // dd($request->oid);
@@ -616,13 +664,25 @@ class StudentController extends Controller
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.*', 'class_student.fees_status')
+                    ->select('students.*', 'class_student.fees_status','class_student.id as csid')
                     ->where([
                         ['classes.id', $classid],
                         ['class_student.status', 1],
                     ])
                     ->orderBy('students.nama');
-
+                $update=$this->validateStatus($data->get());
+                if($update){
+                    $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                    ->select('students.*', 'class_student.fees_status','class_student.id as csid')
+                    ->where([
+                        ['classes.id', $classid],
+                        ['class_student.status', 1],
+                    ])
+                    ->orderBy('students.nama');
+                }
                 $table = Datatables::of($data);
 
                 $table->addColumn('gender', function ($row) {
@@ -692,5 +752,182 @@ class StudentController extends Controller
         $pdf = PDF::loadView('fee.report-search.template-pdf', compact('data', 'get_organization'));
 
         return $pdf->download($class->nama . '.pdf');
+    }
+
+    public function compareAddNewStudent(Request $request){
+      
+        $student = json_decode($request->student);
+        //return response()->json(['data'=>$student->parentName]);
+        
+        $classid=$student->classId;
+       
+        $co = DB::table('class_organization')
+            ->select('id', 'organization_id as oid')
+            ->where('class_id', $classid)
+            ->first();
+
+       
+
+        $ifExits = DB::table('users as u')
+                    ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+                    ->where('u.telno', '=', $student->parentTelno)
+                    ->where('ou.organization_id', $co->oid)
+                    ->whereIn('ou.role_id', [5, 6])
+                    ->get();
+        
+        if(count($ifExits) == 0) { // if not teacher or parent
+
+            $newparent = DB::table('users')
+                            ->where('telno', '=', $student->parentTelno)
+                            ->first();
+            
+            // dd($newparent);
+
+            if (empty($newparent)) {
+                $validator = Validator::make((array)$student, [
+                    'parentTelno' => 'required|unique:users,telno',
+                ]);
+                
+                if ($validator->fails()) {
+                    // Handle validation failure, return response, or redirect back with errors
+                    // For example:
+                    return response()->json(['errors' => $validator->errors()], 422);
+                }
+    
+                $newparent = new Parents([
+                    'name'           =>  $student->parentName,
+                    //'email'          =>  $request->get('parent_email'),
+                    'password'       =>  Hash::make('abc123'),
+                    'telno'          =>  $student->parentTelno,
+                    'remember_token' =>  Str::random(40),
+                ]);
+                $newparent->save();
+            }
+
+            // add parent role
+            $parentRole = DB::table('organization_user')
+                ->where('user_id', $newparent->id)
+                ->where('organization_id', $co->oid)
+                ->where('role_id', 6)
+                ->first();
+
+            if (empty($parentRole)) {
+                DB::table('organization_user')->insert([
+                    'organization_id'   => $co->oid,
+                    'user_id'           => $newparent->id,
+                    'role_id'           => 6,
+                    'start_date'        => now(),
+                    'status'            => 1,
+                ]);
+            }
+        } else {
+            $newparent = DB::table('users')
+                        ->where('telno', '=', "{$student->parentTelno}")
+                        ->first();
+
+            $parentRole = DB::table('organization_user')
+                ->where('user_id', $newparent->id)
+                ->where('organization_id', $co->oid)
+                ->where('role_id', 6)
+                ->first();
+                
+            // dd($parentRole);
+
+            if(empty($parentRole))
+            {
+                DB::table('organization_user')->insert([
+                    'organization_id'   => $co->oid,
+                    'user_id'           => $newparent->id,
+                    'role_id'           => 6,
+                    'start_date'        => now(),
+                    'status'            => 1,
+                ]);
+            } 
+        }  
+        $this->assignStudentToParent($newparent->id,$student->parentTelno,$student,$classid, $ifExits);
+
+    }
+
+    public function compareTransferStudent(Request $request){
+        set_time_limit(300);
+        $student = json_decode($request->student);
+
+        $co=DB::table('class_organization as co')
+            ->where('co.class_id',$student->newClass)
+            ->first();
+        $class=DB::table('classes as c')
+                ->where('c.id',$student->newClass)
+                ->first();
+        $class_student=DB::table('class_organization as co')
+                        ->join('class_student as cs','cs.organclass_id','co.id')
+                        ->where('cs.student_id',$student->studentId)
+                        ->where('co.class_id',$student->oldClassId);
+        
+        $class_student_details=$class_student->first();
+      
+        $class_student->update([
+                            'cs.organclass_id'=>$co->id
+                        ]);
+
+
+        $ifExitsCateBC = DB::table('fees_new')
+        ->whereIn('category', ['Kategory B', 'Kategory C'])
+        ->where('organization_id', $co->organization_id)
+        ->where('status', 1)
+        ->get();
+
+        $studentHaveFees=DB::table('student_fees_new as sfn')
+                        ->join('class_student as cs','cs.id','sfn.class_student_id')
+                        ->where('sfn.class_student_id',$class_student_details->id)
+                        ->where('sfn.status','Debt')
+                        ->get();
+
+        $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
+
+        
+        if (!$ifExitsCateBC->isEmpty()) {
+            foreach ($ifExitsCateBC as $kateBC) {
+                $target = json_decode($kateBC->target);
+
+                if (isset($target->gender)) {
+                    if ($target->gender != $studentData->gender) {
+                        continue;
+                    }
+                }
+                
+                if ($target->data == "All_Level" || $target->data == $class->levelid) {
+                    if (in_array($kateBC->id, $studentFeesIDs)){
+                        continue;
+                    }else{
+                        DB::table('student_fees_new')->insert([
+                            'status'            => 'Debt',
+                            'fees_id'           =>  $kateBC->id,
+                            'class_student_id'  =>  $class_student_details->id
+                        ]);
+                    }
+                    
+                } else if (is_array($target->data)) {
+                    if (in_array($student->newClass, $target->data)) { 
+                        if (in_array($kateBC->id, $studentFeesIDs)){
+                            continue;
+                        }else{
+                            DB::table('student_fees_new')->insert([
+                                'status'            => 'Debt',
+                                'fees_id'           =>  $kateBC->id,
+                                'class_student_id'  =>  $class_student_details->id
+                            ]);
+                        }
+                    }
+                    else{
+                        $delete=DB::table('student_fees_new as sfn')
+                                ->where('sfn.fees_id',$kateBC->id)
+                                ->where('sfn.class_student_id',$class_student_details->id)
+                                ->delete();
+                        //return response()->json(['data'=>$delete]);  
+                    }
+                }
+            }
+        }
+
     }
 }

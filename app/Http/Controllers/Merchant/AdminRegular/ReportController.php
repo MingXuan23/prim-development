@@ -138,7 +138,11 @@ class ReportController extends Controller
                 ->join('product_order as po', 'pu.id', 'po.pgng_order_id')
                 ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                 ->whereIn('pu.id', $order_id)
-                ->select('po.quantity', 'po.selling_quantity', 'pi.price', 'pi.product_group_id')
+                ->where([
+                    ['po.deleted_at',NULL],
+                    ['pi.deleted_at',NULL],
+                ])
+                ->select('po.quantity', 'pi.price', 'pi.product_group_id')
                 ->get();
 
         foreach($groups as $group){
@@ -146,8 +150,8 @@ class ReportController extends Controller
             $total_sales = 0;
             foreach($items as $item){
                 if($item->product_group_id == $group->id){
-                    $total_quantity += $item->quantity * $item->selling_quantity;
-                    $total_sales += ($item->quantity * $item->selling_quantity) * $item->price;
+                    $total_quantity += $item->quantity ;
+                    $total_sales += $item->quantity * $item->price;
                 }
             }
             $group_name[$group->id] = $group->name;
@@ -230,7 +234,11 @@ class ReportController extends Controller
                 ->join('product_order as po', 'pu.id', 'po.pgng_order_id')
                 ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                 ->whereIn('pu.id', $order_id)
-                ->select('po.product_item_id', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                ->where([
+                    ['po.deleted_at',NULL],
+                    ['pi.deleted_at',NULL],
+                ])
+                ->select('po.product_item_id', 'po.quantity', 'pi.price')
                 ->get();
         
         foreach($items as $item){
@@ -238,8 +246,8 @@ class ReportController extends Controller
             $total_sales = 0;
             foreach($carts as $cart){
                 if($item->id == $cart->product_item_id){
-                    $total_quantity += $cart->quantity * $cart->selling_quantity;
-                    $total_sales += ($cart->quantity * $cart->selling_quantity) * $cart->price;
+                    $total_quantity += $cart->quantity;
+                    $total_sales += $cart->quantity * $cart->price;
                 }
             }
             $item_name[$item->id] = $item->name;

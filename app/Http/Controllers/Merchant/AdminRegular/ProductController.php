@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\DataTables;
+// for import function
+use App\Imports\ProductTypeImport;
+use App\Imports\ProductImport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class ProductController extends Controller
 {
@@ -65,12 +70,12 @@ class ProductController extends Controller
         $group = ProductGroup::find($id);
         $item = ProductItem::where('product_group_id', $id)->get();
 
-        // $org_id = RegularMerchantController::getOrganizationId();
+        $org_id = RegularMerchantController::getOrganizationId();
         $org_code = Organization::find($group->organization_id)->code;
         
         $image_url = "/merchant-image/product-item/".$org_code."/";
         
-        return view('merchant.regular.admin.product.show', compact('item', 'group', 'image_url'));
+        return view('merchant.regular.admin.product.show', compact('item', 'group','org_id' ,'image_url'));
     }
 
     public function getAllProductItem(Request $request)
@@ -309,7 +314,10 @@ class ProductController extends Controller
             ['product_item.id',$request->id],
         ])
         ->join('pgng_orders','pgng_orders.id','product_order.pgng_order_id')
-        ->where('pgng_orders.deleted_at',NULL)
+        ->where([
+            ['pgng_orders.deleted_at',NULL],
+            ['pgng_orders.status',"In Cart"]
+        ])
         ->get();
         $regularProductController = new RegularProductController();
 
@@ -319,8 +327,8 @@ class ProductController extends Controller
                 $org_id = $row->organization_id;
                 $charge = Organization::find($org_id)
                 ->fixed_charges;
-
                 $totalPrice = $regularProductController->calculateTotalPrice($pgng_order_id, $charge);
+
                 // update total in PGNG_ORDERS
                 DB::table('pgng_orders')
                 ->where([
@@ -442,5 +450,24 @@ class ProductController extends Controller
         $item->update(['status' => 0, 'deleted_at' => Carbon::now()->toDateTimeString()]);
 
         Session::flash('success', 'Item Berjaya Dibuang');
+    }
+    public function importMerchantProduct(Request $request){
+         
+        $file       = $request->file('file');
+        $namaFile   = $file->getClientOriginalName();
+        $file->move('uploads/excel/', $namaFile);
+        
+        $etx = $file->getClientOriginalExtension();
+        $formats = ['xls', 'xlsx', 'ods', 'csv'];
+        
+        if (!in_array($etx, $formats)) {
+
+            return redirect('admin-regular/p-group-list/'.$request->type)->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
+        }
+        $data=['data' => 'All'];
+        $target = json_encode($data);//to make json
+        Excel::import(new ProductImport($request->type,$target,$request->organ,null), public_path('/uploads/excel/' . $namaFile));
+        
+        return redirect('admin-regular/p-group-list/'.$request->type)->with('success', 'Products have been added successfully');
     }
 }

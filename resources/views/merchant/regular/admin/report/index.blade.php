@@ -7,6 +7,10 @@
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet">
 @include('layouts.datatable')
+
+<style>
+    
+</style>
 @endsection
 
 @section('content')
@@ -389,8 +393,10 @@
         let amount = new Array()
         
         for (var i=0; i < Object.keys(groupObject).length; i++) {
-            name[i] = groupObject[i].name;
-            amount[i] = groupObject[i].totalSales;               
+            if(groupObject[i].totalSales > 0){
+                name[i] = groupObject[i].name;
+                amount[i] = groupObject[i].totalSales; 
+            }
         }
         
         var data = {
@@ -414,7 +420,7 @@
                 }
             }],
             ['screen and (min-width: 1024px)', {
-                labelOffset: 80,
+                labelOffset: 50,
                 chartPadding: 20
             }]
         ];

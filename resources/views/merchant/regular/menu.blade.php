@@ -80,7 +80,15 @@
   height: 35px;
   display:none;
 }
+.cart-add-btn{
+  background-color:#5b626b!important;
+  border: 2px solid #5b626b!important;
 
+}
+.cart-add-btn:hover{
+  background-color:#ffffff!important;
+  color:#5b626b!important;
+}
 /* .cart-btn {
   position: relative;
 }
@@ -123,7 +131,13 @@
 
 }
 #shop-bg-img{
-  background-image: url(/merchant-image/shop-background-image.jpg);
+  /* background-image: url("{{ URL('/merchant-image/shop-background-image.jpg')}}"); */
+  background: linear-gradient(
+    180deg,
+    #5b626b 0%,
+    rgb(65, 65, 65) 47%,
+    rgb(66, 66, 66) 100%
+  );
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover; 

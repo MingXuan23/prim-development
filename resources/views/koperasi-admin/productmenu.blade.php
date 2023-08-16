@@ -20,7 +20,7 @@
 
   }
   
-  #buttonGroup a {
+  #buttonGroup a,button {
     flex-basis: 100%;
     width: 100%
     
@@ -30,6 +30,9 @@
   }
 }
 
+form {
+  display:inline;
+}
 
 </style>
 
@@ -43,12 +46,20 @@
 @section('content')
 <div class="row">
   <div class="col-md-12">
-    <div class="page-title-box">
-      <h4 class="font-size-18">{{ $koperasi->nama }}</h4>
-      <!-- <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-            </ol> -->
-    </div>
+    <div style="padding-top: 24px" class="row">
+      <div class="col-md-12 ">
+          <div class=" align-items-center">
+              <div class="form-group card-title">
+                  <select name="org" id="org_dropdown" class="form-control col-md-12">
+                      <option value="" selected disabled>Pilih Organisasi</option>
+                      @foreach($koperasiList as $row)
+                      <option value="{{ $row->organization_id }}">{{ $row->nama }}</option>
+                      @endforeach
+                  </select>
+              </div>
+          </div>
+      </div>
+</div>
 
 
 @if(count($errors) > 0)
@@ -76,23 +87,35 @@
       <div id="buttonGroup">
       <h4>Manage Product and Product Type</h4>
       <span style="margin-right: 15px;">
-        <a  href="{{route('koperasi.addtype')}}" class="btn btn-primary"> <i
-            class="fas fa-plus"></i> Urus jenis produk</a></span>
-            
-        
-     
-            @if(count($group)>0)
-            <span style="margin-right: 15px;"> 
-                <a  href="{{route('koperasi.createProduct')}}" class="btn btn-primary"> <i
-                    class="fas fa-plus" ></i> Tambah produk</a></span>
-                    <span style="margin-right: 15px;"> 
+      <form id="addTypeForm" method="POST" action="{{ route('koperasi.addtype') }}">
+      {{ csrf_field() }}
+        <!-- Add a hidden input field to hold the organization_id -->
+        <input type="hidden" name="koopId" class="koperasi_id">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-plus"></i> Urus jenis produk </button>
+      
+    </form>
+  </span>
+      
+
+            <span style="margin-right: 15px;" class="showButton"> 
+            <form id="addProductForm" method="POST" action="{{ route('koperasi.createProduct') }}">
+              {{ csrf_field() }}
+                <!-- Add a hidden input field to hold the organization_id -->
+                <input type="hidden" name="koopId" class="koperasi_id">
+                <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus" ></i> Tambah produk</button>
+              
+            </form>
+                
+                    <span style="margin-right: 15px;"  class="showButton"> 
                     <a  href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId" style="float:right;" > <i
                     class="fas fa-plus" ></i> Import produk</a></span>
               
-            @else
-            <span class="font-size-18"> 
+
+            <span class="font-size-18" id="noButton"> 
                Anda perlu tambah jenis produk dahulu</span>
-            @endif
+
 
       </div>
 <br><br>
@@ -188,7 +211,7 @@
                                 <input type="file" name="file" required>
                             </div>
                             
-                            <input type="hidden" name="organ" id="organ" value="{{$koperasi->organization_id}}">
+                            <input type="hidden" name="organ" class="koperasi_id" >
                         
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary" onclick="checkByClassOrByYear()">Import</button>
@@ -210,11 +233,18 @@
 function loadProducts() {
   
   //console.log("TABLE run");
+  koopId = $("#org_dropdown option:selected").val();
+  if ($.fn.DataTable.isDataTable('#productTable')) {
+    // Check if DataTable exists before destroying
+    var dataTable = $('#productTable').DataTable().destroy();
+  }
+
   var productTable = $('#productTable').DataTable({
                   processing: true,
                   serverSide: true,
                   ajax: {
                       url: "{{ route('koperasi.getProductList') }}",
+                      data:{koopId:koopId},
                       type: 'GET',
                   },
                   'columnDefs': [{
@@ -273,7 +303,14 @@ function loadProducts() {
                       data: "price",
                       name: 'Price',
                       "className": "text-center",
-                      "width": "10%"
+                      "width": "10%",
+                      render: function (data) {
+                        // Parse the value as a float and round it to 2 decimal places
+                        var formattedPrice = parseFloat(data).toFixed(2);
+
+                        
+                        return formattedPrice;
+                    }
                   },{
                       data: 'status',
                       name: 'status',
@@ -318,13 +355,16 @@ function initialise()
 {
   //console.log("checkbox run");
 //if no data inside table
-const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+const checkboxes = document.querySelectorAll('#productTable input[type="checkbox"]');
 const deleteBtn = document.getElementById('delete-btn');
 const selectBtn =document.getElementById('select-btn');
 if(checkboxes.length==0)
 {
   //console.log(checkboxes.length);
     selectBtn.style.display='none';
+}
+else{
+  selectBtn.style.display = 'inline';
 }
 
 //add click listener to each checkbox
@@ -344,13 +384,70 @@ checkboxes.forEach(checkbox => {
     }
   });
 });
+
+
 //console.log("checkbox end");
-
-
-
 }
 
+$('#org_dropdown').change(function() {   
+    orgId = $("#org_dropdown option:selected").val();
+
+    $.ajax({
+            type: 'GET',
+            url: '{{ route("koperasi.changeProductMenu") }}',
+            data: {
+                koopId:orgId
+            },
+            success:function(response){
+              loadProducts();
+              initialiseTargetCheckBox();
+              koopInitialise(response.group);
+              $('.koperasi_id').val(orgId);
+              if(response.message!=="")
+              alert(response.message);
+            }
+        });
+})
+
+function koopInitialise(group){
+  if(group.length>0){
+    $(".showButton").show();
+    $("#noButton").hide();
+  }
+  else{
+    $(".showButton").hide();
+    $("#noButton").show();
+  }
+
+  $('#type').empty();
+
+// Re-create the options based on the 'group' variable
+group.forEach(function(item) {
+    $('#type').append($('<option>', {
+        value: item.id,
+        text: item.name
+    }));
+});
+}
+
+
 $(document).ready(function() {
+  dropdownLength = $('#org_dropdown').children('option').length
+  if(dropdownLength > 1) {
+    var koopId = "{{ $koperasi->organization_id }}";
+    // Loop through each option in the dropdown
+    $('#org_dropdown option').each(function() {
+        // Check if the option value matches the organization ID
+        if ($(this).val() == koopId) {
+            // Set the selected attribute for the matching option
+            $(this).prop('selected', true);
+            // Set the value of the hidden input field
+            
+        }
+    });
+    orgId = $("#org_dropdown option:selected").val();
+    $('.koperasi_id').val(orgId);
+  }
 
  loadProducts();
  //initialise(checkboxes);
@@ -365,6 +462,10 @@ initialiseTargetCheckBox();
 if ("{{ $reminderMessage }}" !== "") {
     alert("{!! $reminderMessage !!}");
   }
+  var group = {!! json_encode($group) !!};
+  console.log(group);
+  koopInitialise(group);
+ 
 });
 
 //selectall
@@ -425,6 +526,9 @@ function initialiseTargetCheckBox(){
         url: "{{ route('koperasi.fetchClassYear') }}",
         method: "GET",
         success: function(result) {
+                      $("#year").empty();
+                      $(".cbhide").empty();
+                      $("#year").append("<option value='All' selected> Semua Tahun</option>");
                      jQuery.each(result.datayear, function(key, value) {
                          $("#year").append("<option value='"+ value.year +"'> Tahun " + value.year + "</option>");
                          let htmlContent="<div id='Tahun"+value.year+"' class='form-check-inline pb-3 pt-3'>";

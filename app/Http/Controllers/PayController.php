@@ -110,7 +110,7 @@ class PayController extends AppBaseController
 
         $getstudent         = "";
         $getorganization    = "";
-        //$getfees            = "";
+        $getfees            = "";
         $getfees_bystudent  = "";
         $getstudentfees     = "";
 
@@ -192,10 +192,10 @@ class PayController extends AppBaseController
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
                 ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
                 ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-                ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category', 'students.id as studentid')
+                ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid')
                 ->whereIn('student_fees_new.id', $student_fees)
                 ->get();
-
+            
             $getorganization  = DB::table('organizations')
                 ->where('id', $getfees_bystudent[0]->organization_id)
                 ->first();
@@ -273,6 +273,7 @@ class PayController extends AppBaseController
                 ->where('organization_user.role_id', 6)
                 ->where('organization_user.status', 1)
                 ->whereIn('fees_new.id', $res_fee_A)
+                ->distinct()
                 ->get();
 
             $get_fees_by_parent   = DB::table('fees_new')
@@ -409,7 +410,7 @@ class PayController extends AppBaseController
             if(isset($request->email))
             {
                 $fpx_buyerEmail = $request->email;
-                $telno = "+6" . $request->telno;
+                $telno = $request->telno;
                 $fpx_buyerName = $request->name;
             }
             else
@@ -481,7 +482,7 @@ class PayController extends AppBaseController
             $fpx_sellerOrderNo  = "MUPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
-            $fpx_sellerId       = config('app.env') == 'production' ? $ficts_seller_id : "SE00013841";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id: "SE00013841";
         }
         else if($request->desc == 'Koperasi')
         {
@@ -499,7 +500,7 @@ class PayController extends AppBaseController
             $fpx_sellerOrderNo  = "KOPPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
-            $fpx_sellerId       = config('app.env') == 'production' ? $ficts_seller_id : "SE00013841";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         }
 
         $fpx_msgType        = "AR";
@@ -693,12 +694,13 @@ class PayController extends AppBaseController
                     Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
                     $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
 
-                    $list_student_fees_id = DB::table('student_fees_new')
+                    $list_student_fees_id_by_student = DB::table('student_fees_new')
                         ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
                         ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
                         ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
                         ->where('transactions.id', $transaction->id)
-                        ->get();
+                        ->get()
+                        ->groupBy('class_student_id');
 
                     $list_parent_fees_id  = DB::table('fees_new')
                         ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
@@ -711,36 +713,38 @@ class PayController extends AppBaseController
                         ->where('fees_new_organization_user.transaction_id', $transaction->id)
                         ->get();
 
+                   foreach($list_student_fees_id_by_student as $list_student_fees_id){
+                        for ($i = 0; $i < count($list_student_fees_id); $i++) {
+                            
+                            // ************************* update student fees status fees by transactions *************************
+                            $res  = DB::table('student_fees_new')
+                                ->where('id', $list_student_fees_id[$i]->student_fees_id)
+                                ->update(['status' => 'Paid']);
 
-                    for ($i = 0; $i < count($list_student_fees_id); $i++) {
+                            // ************************* check the student if have still debt *************************
+                            
+                            if ($i == count($list_student_fees_id) - 1)
+                            {
+                                $check_debt = DB::table('students')
+                                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                                    ->select('students.*')
+                                    ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
+                                    ->where('student_fees_new.status', 'Debt')
+                                    ->count();
+        
+        
+                                // ************************* update status fees for student if all fees completed paid*************************
+        
+                                if ($check_debt == 0) {
+                                    DB::table('class_student')
+                                        ->where('id', $list_student_fees_id[$i]->class_student_id)
+                                        ->update(['fees_status' => 'Completed']);
 
-                        // ************************* update student fees status fees by transactions *************************
-                        $res  = DB::table('student_fees_new')
-                            ->where('id', $list_student_fees_id[$i]->student_fees_id)
-                            ->update(['status' => 'Paid']);
-
-                        // ************************* check the student if have still debt *************************
-                        
-                        if ($i == count($list_student_fees_id) - 1)
-                        {
-                            $check_debt = DB::table('students')
-                                ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                                ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                                ->select('students.*')
-                                ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
-                                ->where('student_fees_new.status', 'Debt')
-                                ->count();
-    
-    
-                            // ************************* update status fees for student if all fees completed paid*************************
-    
-                            if ($check_debt == 0) {
-                                DB::table('class_student')
-                                    ->where('id', $list_student_fees_id[$i]->class_student_id)
-                                    ->update(['fees_status' => 'Completed']);
+                                }
                             }
                         }
-                    }
+                   }
 
                     for ($i = 0; $i < count($list_parent_fees_id); $i++) {
 
@@ -752,7 +756,7 @@ class PayController extends AppBaseController
                             ]);
 
                         // ************************* check the parent if have still debt *************************
-                        if ($i == count($list_student_fees_id) - 1)
+                        if ($i == count($list_parent_fees_id) - 1)
                         {
                             $check_debt = DB::table('organization_user')
                                 ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
@@ -826,19 +830,57 @@ class PayController extends AppBaseController
                     $transaction->status = "Success";
                     $transaction->save();
                     
-                    PgngOrder::where('transaction_id', $transaction->id)->update([
+                    PgngOrder::where('transaction_id', $transaction->id)->first()->update([
                         'status' => 'Paid'
                     ]);
 
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
-                    $item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
-                    ->where('po.pgng_order_id', $order->id)
-                    ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
-                    ->get();
+
                     $organization = Organization::find($order->organization_id);
                     $user = User::find($order->user_id);
                     
+                    $relatedProductOrder =DB::table('product_order')
+                    ->where([
+                        ['pgng_order_id',$order->id],
+                        ['deleted_at',NULL]
+                    ])
+                    ->select('product_item_id as itemId','quantity')
+                    ->get();
+            
+                    foreach($relatedProductOrder as $item){
+                        $relatedItem=DB::table('product_item')
+                        ->where('id',$item->itemId);
+                        
+                        $relatedItemQuantity=$relatedItem->first()->quantity_available;
+            
+                        $newQuantity= intval($relatedItemQuantity - $item->quantity);
+                       
+                        if($newQuantity<=0){
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>0,
+                                'type' => 'no inventory',
+                                'status'=>0
+                            ]);
+                        }
+                        else{
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>$newQuantity
+                        ]);
+                        }
+                        
+                    }
+                    $item = DB::table('product_order as po')
+                    ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
+                    ->where([
+                        ['po.pgng_order_id', $order->id],
+                        ['po.deleted_at',NULL],
+                        ['pi.deleted_at',NULL],
+                    ])
+                    ->select('pi.name', 'po.quantity', 'pi.price')
+                    ->get();
+
                     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
                     
                     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
@@ -853,22 +895,29 @@ class PayController extends AppBaseController
 
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
                     
-                    PgngOrder::where('transaction_id', $transaction->id)->first()->update([
-                        'status' => 2
-                    ]);
-                    $organization = Organization::find($order->organization_id);
-                    $user = User::find($order->user_id);
+
+                    $pgngOrder= PgngOrder::where('transaction_id', $transaction->id)->first();
+                    $pgngOrder->status=2;
+                    $pgngOrder->created_at=now();
+                    $pgngOrder->updated_at=now();
+                    $pgngOrder->save();
                     
+                    $organization = Organization::where('id','=',$order->organization_id)->first();
+                    $user = User::where('id','=',$order->user_id)->first();
+
                     $relatedProductOrder =DB::table('product_order')
                     ->where('pgng_order_id',$order->id)
                     ->select('product_item_id as itemId','quantity')
                     ->get();
+
                     foreach($relatedProductOrder as $item){
                         $relatedItem=DB::table('product_item')
-                        ->where('id',$item->itemId)
-                        ->first();
-    
-                        $newQuantity= intval($relatedItem->quantity_available - $item->quantity);
+                        ->where('id',$item->itemId);
+                        
+                        $relatedItemQuantity=$relatedItem->first()->quantity_available;
+
+                        $newQuantity= intval($relatedItemQuantity - $item->quantity);
+                    
                         if($newQuantity<=0){
                             $relatedItem
                             ->update([
@@ -882,13 +931,13 @@ class PayController extends AppBaseController
                                 'quantity_available'=>$newQuantity
                         ]);
                         }
-                        
+                        //dd($relatedItem);
                     }
                     
                     $item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                     ->where('po.pgng_order_id', $order->id)
-                    ->select('pi.name', 'po.quantity', 'po.selling_quantity', 'pi.price')
+                    ->select('pi.name', 'po.quantity', 'pi.price')
                     ->get();
                     
                     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));

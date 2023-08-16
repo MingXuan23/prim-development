@@ -1,6 +1,10 @@
 <?php
 
 namespace App\Http\Controllers\Cooperative\User;
+use App\User;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\MerchantOrderReceipt;
 
 use App\Http\Controllers\Controller;
 use App\Models\PickUpOrder;
@@ -43,17 +47,50 @@ class UserCooperativeController extends Controller
                     ->distinct()
                     ->get();
         
-        $koperasi = Organization::where('type_org', $role_id)->select('id', 'nama', 'parent_org')->get();
+        if(count($orgID)==0){
+            $isBuyer = DB::table('users as u')
+                ->join('model_has_roles as r', 'u.id', '=', 'r.model_id')
+                ->select('u.*')
+                ->where('u.id',$userID)
+                ->where('r.role_id',15)
+                ->first();
+            if($isBuyer!=null){
+                $orgID = DB::table('organizations as k')
+                ->join('organizations as o','o.id','k.parent_org')
+                ->select('o.id', 'o.nama')
+                ->distinct()
+                ->get();
 
-        return view('koperasi.index', compact('koperasi', 'orgID'));
+                $orgID = array_map(function ($org) {
+                    $org->isBuyer = true;
+                    return $org;
+                }, $orgID->toArray());
+
+            }
+        }
+        //$koperasi = Organization::where('type_org', $role_id)->select('id', 'nama', 'parent_org')->get();
+
+        return view('koperasi.index', compact('orgID'));
     }
 
     public function fetchKoop(Request $request)
     {
         $sID = $request->get('sID');
-        
-        $koop = Organization::where('parent_org', $sID)->get();
-
+        $isBuyer=$request->get('isBuyer');
+        if($isBuyer==true){
+            $koop = DB::table('organizations as o')
+            ->join('organization_url as url','url.organization_id','o.id')
+            ->where('o.parent_org', $sID)
+            ->where('url.status',1)
+            ->select('o.*','url.url_name')
+            ->get();
+        }
+        else{
+            $koop = DB::table('organizations as o')
+            ->where('parent_org', $sID)
+            ->select('o.*')
+            ->get();
+        }
         return response()->json(['success' => $koop]);
     }
     /**
@@ -147,9 +184,9 @@ class UserCooperativeController extends Controller
                     $newTotalPrice += doubleval($row->price * $row->quantity);
                 }
 
-                $charge = DB::table('organizations')
-                        ->find($request->o_id)
-                        ->fixed_charges;
+                $charge=$this->calCharge( $newTotalPrice,$request->o_id);
+
+                
                 $newTotalPrice+=doubleval($charge);
                 PgngOrder::where([
                     ['user_id', $userID],
@@ -162,12 +199,11 @@ class UserCooperativeController extends Controller
             }
             else // order did not exists
             {
-                $charge = DB::table('organizations')
-                        ->find($request->o_id)
-                        ->fixed_charges;
+               
                     
-                $totalPrice = $item->price * (int)$request->qty+doubleval($charge);
-
+                $totalPrice = $item->price * (int)$request->qty;
+                $charge=$this->calCharge( $totalPrice,$request->o_id);
+                $totalPrice+=doubleval($charge);
                 $newQuantity = intval((int)$item->quantity_available - (int)$request->qty);
 
                 $newOrder = PgngOrder::create([
@@ -213,7 +249,7 @@ class UserCooperativeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)// strange to use??
+    public function show(int $id)// strange to use??
     {
         $todayDate = Carbon::now()->format('l');
 
@@ -227,7 +263,7 @@ class UserCooperativeController extends Controller
                             'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
                     ->first();
 
-        $org = Organization::where('id', $koperasi->parent_org)->select('nama')->first();
+        $org = Organization::where('id', $koperasi->id)->select('nama')->first();
         
         $product_item = DB::table('product_item as pi')
                         ->join('product_group as pt', 'pi.product_group_id', '=', 'pt.id')
@@ -324,15 +360,7 @@ class UserCooperativeController extends Controller
             ->where('pi.id',$before_cart_item->first()->itemId)
             ->select('pg.organization_id')
             ->first()
-            ->organization_id;
-            
-            $charge = DB::table('organizations')
-            ->find($org_id)
-            ->fixed_charges;
-            if($charge==null){
-                $charge=0;
-            }
-
+            ->organization_id;      
             
             $updateMessage="";
             foreach($before_cart_item as $item){
@@ -345,7 +373,6 @@ class UserCooperativeController extends Controller
                     ])->update(['quantity' => $item->quantity_available]);
 
                     $userID=Auth::id();
-                    
 
                     $newTotalPrice = 0;
                     // Recalculate total
@@ -361,7 +388,8 @@ class UserCooperativeController extends Controller
                     {
                         $newTotalPrice += doubleval($row->price * $row->quantity);
                     }
-                        
+                    
+                    $charge=$this->calCharge( $newTotalPrice,$org_id);    
                     $newTotalPrice += doubleval($charge);
 
                     PgngOrder::where([
@@ -382,6 +410,15 @@ class UserCooperativeController extends Controller
             ->where('po.pgng_order_id', $cart->id)
             ->select('pg.id as pgngId','po.id as productOrderId', 'po.quantity', 'pi.name', 'pi.price', 'pi.image','pi.quantity_available','pi.status')
             ->get();
+
+            $newTotalPrice=0;
+            foreach($cart_item as $row)
+            {
+                $newTotalPrice += doubleval($row->price * $row->quantity);
+            }
+            
+            $charge=$this->calCharge( $newTotalPrice,$org_id); 
+
             $allDay = OrganizationHours::where([
                 ['organization_id', $id],
                 ['status', 1],
@@ -406,7 +443,7 @@ class UserCooperativeController extends Controller
                 ['organization_id', $id],
                 ['user_id', $user_id],
             ])->first();
-
+            
             return view('koperasi.cart', compact('cart', 'cart_item', 'allDay', 'isPast' ,'id','updateMessage','charge'));
         }
         else
@@ -451,9 +488,11 @@ class UserCooperativeController extends Controller
     {
         $userID = Auth::id();
         $id=$request->cart_id; //pgng order id
+        
         $productOrderId=$request->productOrderInCartId;
         // $cart_item = ProductOrder::where('pgng_order_id', $id);
-        $cart_item = ProductOrder::where([['pgng_order_id', $id],['id',$productOrderId]]);
+        $cart_item = ProductOrder::where([['pgng_order_id', $id],['id',$productOrderId]])->first();
+        
 
         
         // $item=$cart_item->first();
@@ -488,7 +527,7 @@ class UserCooperativeController extends Controller
         $this->destroyProductOrder($cart_item->id,$id);
         
         
-        return response()->json(['item' => $allCartItem])->with('success', 'Item Berjaya Dibuang');
+        return response()->json(['deleteId' => $productOrderId]);
         //return back()->with('success', 'Item Berjaya Dibuang');
     }
 
@@ -531,10 +570,9 @@ class UserCooperativeController extends Controller
                 $newTotalPrice += doubleval($row->price * $row->quantity);
             }
 
+            //dd($newTotalPrice);
+            $charge=$this->calCharge( $newTotalPrice,$org_id);
             
-            $charge = DB::table('organizations')
-                ->find($org_id)
-                ->fixed_charges;
             $newTotalPrice += doubleval($charge);
 
             PgngOrder::where([
@@ -597,8 +635,8 @@ class UserCooperativeController extends Controller
             {
                 $isPast[$key] = 1;
             }
-
-            if($row->pickup_date == $key && $isPast[$row->pickup_date] == 1)
+            
+            if($isPast[$key]== 1)
             {
                 // Status changed to overdue
                 PgngOrder::where('pickup_date', $row->pickup_date)->update(['status' => 4]);
@@ -610,7 +648,7 @@ class UserCooperativeController extends Controller
             }
         }
 
-        $order = $query->paginate(5);
+        $order = $query->get();
 
         return view('koperasi.order', compact('order'));
     }
@@ -620,33 +658,39 @@ class UserCooperativeController extends Controller
         $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $userID = Auth::id();
 
-        $query = DB::table('pgng_orders as ko')
+        $order = DB::table('pgng_orders as ko')
                 ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                ->join('users as u','u.id','ko.confirm_by')
                 ->whereIn('status', [3, 100, 200])
                 ->where('user_id', $userID)
                 ->where('o.type_org', $role_id)
-                ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno')
+                ->select('ko.*', 'o.nama as koop_name', 'o.telno as koop_telno','u.name as confirmPerson')
                 ->orderBy('ko.status', 'desc')
                 ->orderBy('ko.pickup_date', 'asc')
-                ->orderBy('ko.updated_at', 'desc');
+                ->orderBy('ko.updated_at', 'desc')
+                ->get();
+        //dd($order);
 
-        $order = $query->paginate(5);
-
-        return view('koperasi.history', compact('order'));
+        //$order = $query->paginate(5);
+        $koperasiList="";
+        $koperasi="";
+        return view('koperasi.history', compact('order','koperasiList','koperasi'));
     }
 
     public function indexList($id)
     {
-        $userID = Auth::id();
 
+        $userID = Auth::id();
         // Get Information about the order
+
         $list_detail = DB::table('pgng_orders as ko')
                         ->join('organizations as o', 'ko.organization_id', '=', 'o.id')
+                        ->join('transactions as t','t.id','ko.transaction_id')
                         ->where('ko.id', $id)
                         ->where('ko.status', '>' , 0)
                         ->where('ko.user_id', $userID)
                         ->select('ko.updated_at', 'ko.pickup_date', 'ko.total_price', 'ko.note', 'ko.status',
-                                'o.id','o.nama', 'o.parent_org', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state')
+                                'o.id','o.nama', 'o.parent_org', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','t.transac_no as fpxId')
                         ->first();
 
         $date = Carbon::createFromDate($list_detail->pickup_date); // create date based on pickup date
@@ -682,7 +726,10 @@ class UserCooperativeController extends Controller
             $totalPrice[$key] = doubleval($row->price * $row->quantity); // calculate total for each item in cart
         }
 
-        return view('koperasi.list', compact('list_detail', 'allOpenDays', 'sekolah_name', 'item', 'totalPrice'));
+        $previousUrl = url()->previous();
+        $previousUrl = str_replace('/', '-', $previousUrl);
+        //dd($previousUrl);
+        return view('koperasi.list', compact('list_detail', 'allOpenDays', 'sekolah_name', 'item', 'totalPrice','previousUrl'));
     }
 
     public function fetchAvailableDay(Request $request)
@@ -729,11 +776,9 @@ class UserCooperativeController extends Controller
         }
     }
 
-    public function destroyUserOrder($id)
+    public function destroyUserOrder($id)//not to used
     {
-        $queryKO = PgngOrder::find($id)->update(['status', 'Cancel by user']);
-        
-        $resultKO = PgngOrder::find($id)->delete();
+        $resultKO = PgngOrder::find($id)->update(['status', 'Cancel by user'],['deleted_at',now()]);
         
         $resultPO = ProductOrder::where('pgng_order_id', $id)->delete();
 
@@ -759,13 +804,24 @@ class UserCooperativeController extends Controller
         return view('koop.index',compact('sekolah'))->with('sekolah',$sekolah);
     }
 
-    public function koopShop(Int $id)
+    public function koopShop($koop)
     {
+        if(is_int($koop)){
+            $id=$koop;
+        }
+        else{
+            $id = DB::table('organization_url')
+                ->where('url_name',$koop)
+                ->where('status',1)
+                ->first()
+                ->organization_id;
+        }
         $role_id = DB::table('type_organizations')->where('nama','Koperasi')->first()->id;
         $Sekolah = DB::table('organizations')
         ->where('type_org',$role_id)
         ->where('id',$id)
         ->first();
+        $userId=Auth::id();
 
         $products = DB::table('product_group as pg')
          ->join('product_item as p','pg.id','p.product_group_id')
@@ -787,21 +843,25 @@ class UserCooperativeController extends Controller
                 'oh.day', 'oh.open_hour', 'oh.close_hour', 'oh.status')
         ->first();
 
-        $childrenByParent = DB::table('users')
-        ->join('organization_user as ou', 'ou.user_id', '=', 'users.id')
+        $parent = DB::table('users')
+                            ->where('id',$userId)
+                            ->first();
+
+        $childrenByParent=DB::table('organization_user as ou')
         ->join('organization_user_student as ous','ou.id','=','ous.organization_user_id')
         ->join('students as s','s.id','=','ous.student_id')
         ->join('class_student as cs','cs.student_id','=','s.id')
         ->join('class_organization as co','co.id','=','cs.organclass_id')
         ->join('classes as c','c.id','=','co.class_id')
-        ->select('s.*','users.id as parentId','users.name as parentName', 'ou.organization_id','c.nama as className','c.id as classId')
+        ->select('s.*', 'ou.organization_id','c.nama as className','c.id as classId')
         ->where('ou.organization_id', $koperasi->parent_org)
+        ->where('ou.user_id',$parent->id)
         ->where('ou.role_id', 6)
         ->where('ou.status', 1)
         ->orderBy('c.nama')
         ->get();
 
-        //dd($childrenOfParent);
+        //dd($childrenByParent);
         $k_open_hour = date('h:i A', strtotime($koperasi->open_hour));
         
         $k_close_hour = date('h:i A', strtotime($koperasi->close_hour));
@@ -812,7 +872,8 @@ class UserCooperativeController extends Controller
         ->with('koperasi',$koperasi)
         ->with('k_open_hour', $k_open_hour)
         ->with('k_close_hour', $k_close_hour)
-        ->with('childrenByParent',$childrenByParent);
+        ->with('childrenByParent',$childrenByParent)
+        ->with('parent',$parent);
     }
 
     public function storeKoop()
@@ -956,6 +1017,15 @@ class UserCooperativeController extends Controller
             ->whereNull('pg.deleted_at')
            ->get();  
         }
+
+        if ($request->searchKey != "") {
+            $searchKey = strtolower($request->searchKey);
+            $products = $products->filter(function ($product) use ($searchKey) {
+                return (strpos(strtolower($product->groupName), $searchKey) !== false)
+                    || (strpos(strtolower($product->name), $searchKey) !== false);
+            });
+        }
+       
         //return response()->json(['status' => "success"]);
         return response()->json(['products' => $products]);
     }
@@ -1001,4 +1071,77 @@ class UserCooperativeController extends Controller
 
         return response()->json(['item' => $item, 'body' => $modal, 'quantity' => $max_quantity]);
     }
+    
+    public function calCharge($total,$oid){
+        $findCharge = DB::table('organization_charges')
+                        ->where('organization_id', $oid)
+                        ->where('minimum_amount', '<=', $total)
+                        ->orderByDesc('minimum_amount')
+                        ->first();
+        if($findCharge==null)
+        {
+            $charge = DB::table('organizations')
+            ->find($oid)
+            ->fixed_charges;
+        }
+        else{
+            $charge=$findCharge->remaining_charges;
+        }
+
+        if($charge==null){
+            $charge=0;
+        }
+        //dd($findCharge,$total);
+        return $charge;
+
+    }
+    //no need to un comment unless code
+    // public function testPay(){
+    //     $order = PgngOrder::where('transaction_id', 25853)->first();
+    //     $transaction = Transaction::where('id', '=', 25853)->first();           
+    //     PgngOrder::where('transaction_id', 25853)->first()->update([
+    //         'status' => 2
+    //     ]);
+    //     $organization = Organization::where('id','=',$order->organization_id)->first();
+    //     $user = User::where('id','=',$order->user_id)->first();
+
+    //     $relatedProductOrder =DB::table('product_order')
+    //     ->where('pgng_order_id',$order->id)
+    //     ->select('product_item_id as itemId','quantity')
+    //     ->get();
+
+    //     foreach($relatedProductOrder as $item){
+    //         $relatedItem=DB::table('product_item')
+    //         ->where('id',$item->itemId);
+            
+    //         $relatedItemQuantity=$relatedItem->first()->quantity_available;
+
+    //         $newQuantity= intval($relatedItemQuantity - $item->quantity);
+           
+    //         if($newQuantity<=0){
+    //             $relatedItem
+    //             ->update([
+    //                 'quantity_available'=>0,
+    //                 'status'=>0
+    //             ]);
+    //         }
+    //         else{
+    //             $relatedItem
+    //             ->update([
+    //                 'quantity_available'=>$newQuantity
+    //         ]);
+    //         }
+    //         //dd($relatedItem);
+    //     }
+        
+    //     $item = DB::table('product_order as po')
+    //     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+    //     ->where('po.pgng_order_id', $order->id)
+    //     ->select('pi.name', 'po.quantity', 'pi.price')
+    //     ->get();
+
+    //     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+        
+    //     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+    // }
 }
