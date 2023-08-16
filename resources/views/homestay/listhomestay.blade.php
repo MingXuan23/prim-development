@@ -61,6 +61,51 @@
             </div>
         </div>
 
+        <div class="modal fade" id="promomodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Promotions</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+              <form class="row g-3" id="promoform" method="POST" action="">
+    @csrf
+          
+    <input type="text" class="form-control" name="id" id="id" hidden>
+    <div class="col-12">
+        <label class="form-label">Promotions Name:</label>
+        <input type="text" class="form-control" id="promotionname" name="promotionname">
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Date From:</label>
+        <input type="text" class="form-control" id="datefrom" name="datefrom">
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">Date To:</label>
+        <input type="text" class="form-control" id="dateto" name="dateto">
+    </div>
+
+
+    <div class="col-md-6">
+        <label class="form-label">Discount (%)</label>
+        <input type="text" class="form-control" id="discount" name="discount">
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+</form>
+              </div>
+              <div class="modal-footer">
+              <a href="homestay" class="btn btn-secondary" id="homestay">Close</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
     </div>
 </div>
 
@@ -78,6 +123,41 @@
     $(document).ready(function() {
     
         $('#homestaytable').DataTable();
+
+        $(document).on('click', '#promo', function(e) {
+    e.preventDefault(); // Prevent the default form submission
+    $('#promomodal').modal('show');
+    id = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
+    $('#id').val(id);
+
+    var today = new Date();
+    var maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+
+    // Fetch disabled dates
+     $.ajax({
+         url: "/disabledatepromo/" + id, // Use the appropriate URL for the disabledate route
+         type: "GET",
+         success: function(response) {
+             var disabledDates = response.disabledDates;
+            
+            $("#datefrom, #dateto").datepicker({
+                minDate: 0,
+                maxDate: maxDate,
+                dateFormat: "yy-mm-dd",
+                beforeShowDay: function(date) {
+                    var string = jQuery.datepicker.formatDate('yy-mm-dd', date);
+                    var isDisabled = (disabledDates.indexOf(string) !== -1);
+                    return [!isDisabled];
+                }
+                
+            });
+         },
+         error: function() {
+             // Handle error
+         }
+     });
+
+});
 
         $('.alert').delay(3000).fadeOut()
 });

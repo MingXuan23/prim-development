@@ -558,4 +558,5 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('homestay', 'HomestayController@index')->name('homestay.index');
     Route::get('createhomestay', 'HomestayController@createhomestay')->name('homestay.createhomestay');
     Route::post('inserthomestay', 'HomestayController@inserthomestay')->name('homestay.inserthomestay');
+    Route::post('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
     

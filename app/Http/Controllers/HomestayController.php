@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use View;
 use App\Models\Homestay;
+use App\Models\Promotion;
 
 class HomestayController extends Controller
 {
@@ -55,6 +56,28 @@ class HomestayController extends Controller
 
         }
     }
+
+    public function disabledatepromo($homestayid)
+{
+    
+    $promotions = Promotion::where('homestayid', $homestayid) // Add your additional condition here
+                   ->get();
+
+    $disabledDates = [];
+
+    foreach ($promotions as $promotion) {
+        $begin = new DateTime($promotion->datefrom);
+        $end = new DateTime($promotion->dateto);
+        $interval = new DateInterval('P1D');
+        $daterange = new DatePeriod($begin, $interval, $end);
+
+        foreach ($daterange as $date) {
+            $disabledDates[] = $date->format('Y-m-d');
+        }
+    }
+
+    return response()->json(['disabledDates' => $disabledDates]);
+}
 
     public function store(Request $request)
     {
