@@ -18,26 +18,12 @@
     <div class="col-md-12">
         <div class="card">
             <div>
-                <a style="margin: 19px; float: right;" href=""
+                <a style="margin: 19px; float: right;" href="{{ route('homestay.createhomestay') }}"
                     class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Homestay</a>
             </div>
 
             <div class="card-body">
 
-                @if(count($errors) > 0)
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                        <li id="failed">{{$error}}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-                @if(\Session::has('success'))
-                <div class="alert alert-success">
-                    <p id="success">{{ \Session::get('success') }}</p>
-                </div>
-                @endif
 
                 <div class="flash-message"></div>
                 <div class="table-responsive">
@@ -45,14 +31,31 @@
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
-                                <th>No</th>
+                                <th hidden>Homestay ID</th>
                                 <th>Nama Homestay</th>
                                 <th>Lokasi</th>
                                 <th>No Telefon</th>
                                 <th>Status</th>
+                                <th>Set Promosi</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-              
+                        <tbody>
+                        @foreach($data as $record)
+                        <tr>
+                            <td hidden>{{ $record->homestayid }}</td>
+                            <td style="width: 200px;">{{ $record->name }}</td>
+                            <td style="width: 450px;">{{ $record->location }}</td>
+                            <td>{{ $record->pno }}</td>
+                            <td>{{ $record->status }}</td>
+                            <td><button type="button" class="btn btn-success" id="promo">Set</button></td>
+                            <td style="width: 200px;">
+                            <button type="button" class="btn btn-primary" id="addroom">Add Rooms</button>
+                            <button class="btn btn-success" id="editbutton">Edit</button>
+                            </td>
+                    </tr>
+                    @endforeach
+                    </tbody>
                     </table>
                 </div>
             </div>
@@ -73,61 +76,10 @@
 
 <script>
     $(document).ready(function() {
-    var homestaytable = $('#homestaytable').DataTable({
-        ordering: true,
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: "{{ route('homestay.getHomestayDatatable') }}",
-            type: 'GET',
-            success: function(data) {
-                // Log the received data to the console
-                console.log('Received data:', data);
-            }
-        },
-        order: [
-            [1, 'asc']
-        ],
-        columns: [
-            {
-                data: null,
-                searchable: false,
-                sortable: false,
-                render: function(data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
-            },
-            {
-                data: "name", // Column name "name" from the database
-                name: "name", // Column name "name" from the database
-                width: "20%"
-            },
-            {
-                data: "location", // Column name "location" from the database
-                name: "location", // Column name "location" from the database
-                width: "30%"
-            },
-            {
-                data: "pno", // Column name "pno" from the database
-                name: "pno", // Column name "pno" from the database
-                width: "10%"
-            },
-            {
-                data: "status", // Column name "status" from the database
-                name: "status", // Column name "status" from the database
-                width: "10%"
-            }
-        ]
-    });
+    
+        $('#homestaytable').DataTable();
 
-    // csrf token for ajax
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    console.log("Homestay Table:", homestaytable); // Check the DataTable instance
+        $('.alert').delay(3000).fadeOut()
 });
 
 </script>

@@ -555,12 +555,7 @@ Route::group(['prefix' => 'delivery'], function () {
    //Route::get('')
 });
 
-Route::group(['prefix' => 'homestay'], function () {
-    Route::get('', 'HomestayController@index')->name('homestay.index');
-    Route::get('list', 'HomestayController@getHomestayDatatable')->name('homestay.getHomestayDatatable');
-    // Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
-    // Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
-    // Route::get('testRepeater', 'OrganizationController@testRepeater');
-    // Route::post('parent-koop', 'OrganizationController@fetchAvailableParentKoop')->name('organization.fetchAvailableParentKoop');
-    // Route::get('/edit-merchant/{id}', 'Merchant\AdminRegular\DashboardController@edit')->name('admin-reg.edit-merchant'); // edit for merchant
-});
+    Route::get('homestay', 'HomestayController@index')->name('homestay.index');
+    Route::get('createhomestay', 'HomestayController@createhomestay')->name('homestay.createhomestay');
+    Route::post('inserthomestay', 'HomestayController@inserthomestay')->name('homestay.inserthomestay');
+    

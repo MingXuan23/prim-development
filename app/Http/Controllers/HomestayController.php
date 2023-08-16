@@ -15,7 +15,45 @@ class HomestayController extends Controller
 {
     public function index()
     {
-        return view('homestay.listhomestay');
+        $userId = Auth::id();
+        $data = Homestay::where('ownerid', $userId)->get();
+
+        return view('homestay.listhomestay', compact('data'));
+    }
+
+    public function createhomestay()
+    {
+        return view('homestay.createhomestay');
+    }
+
+    public function inserthomestay(Request $request)
+    {
+        
+        $userId = Auth::id();
+        $request->validate([
+            'name' => 'required|unique:homestays,name',
+            'location' =>'required',
+            'pno' =>'required|numeric',
+            'stat' =>'required'
+            ]);
+
+            $homestay = new Homestay();
+            $homestay->name = $request->name;
+            $homestay->location = $request->location;
+            $homestay->pno = $request->pno;
+            $homestay->status = $request->stat;
+            $homestay->ownerid = $userId;
+            $result = $homestay->save();
+
+            if($result)
+        {
+            return back()->with('success', 'Homestay Berjaya Ditambah');
+        }
+        else
+        {
+            return back()->withInput()->with('error', 'Homestay Telahpun Didaftarkan');
+
+        }
     }
 
     public function store(Request $request)
@@ -26,24 +64,6 @@ class HomestayController extends Controller
     public function show($id)
     {
         //
-    }
-
-    public function getHomestayDatatable()
-    {
-        $homestayList = $this->getHomestayByUserId();
-        
-        if (request()->ajax()) {
-            return datatables()->of($homestayList)->make(true);
-        }
-    }
-
-    public static function getHomestayByUserId()
-    {
-
-            $userId = Auth::id();
-            return Homestay::where('ownerid', $userId)->get();
-
-        
     }
 
     public function edit($id)
