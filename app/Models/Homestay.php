@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Promotion;
+use App\Models\Room;
 
 class Homestay extends Model
 {
@@ -16,4 +18,14 @@ class Homestay extends Model
     ];
 
     public $timestamps = false;
+
+    public function rooms()
+    {
+        return $this->hasMany(Room::class, 'homestayid');
+    }
+
+    public function promotion()
+    {
+        return $this->hasMany(Promotion::class, 'homestayid');
+    }
 }

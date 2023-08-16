@@ -50,7 +50,7 @@
                             <td>{{ $record->status }}</td>
                             <td><button type="button" class="btn btn-success" id="promo">Set</button></td>
                             <td style="width: 200px;">
-                            <button type="button" class="btn btn-primary" id="addroom">Add Rooms</button>
+                            <button type="button" class="btn btn-primary" id="addroom">Tambah Bilik</button>
                             <button class="btn btn-success" id="editbutton">Edit</button>
                             </td>
                     </tr>
@@ -62,49 +62,138 @@
         </div>
 
         <div class="modal fade" id="promomodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Promotions</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-              <form class="row g-3" id="promoform" method="POST" action="">
-    @csrf
-          
-    <input type="text" class="form-control" name="id" id="id" hidden>
-    <div class="col-12">
-        <label class="form-label">Promotions Name:</label>
-        <input type="text" class="form-control" id="promotionname" name="promotionname">
-    </div>
-
-    <div class="col-md-6">
-        <label class="form-label">Date From:</label>
-        <input type="text" class="form-control" id="datefrom" name="datefrom">
-    </div>
-
-    <div class="col-md-6">
-        <label class="form-label">Date To:</label>
-        <input type="text" class="form-control" id="dateto" name="dateto">
-    </div>
-
-
-    <div class="col-md-6">
-        <label class="form-label">Discount (%)</label>
-        <input type="text" class="form-control" id="discount" name="discount">
-    </div>
-
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-    </div>
-</form>
-              </div>
-              <div class="modal-footer">
-              <a href="homestay" class="btn btn-secondary" id="homestay">Close</a>
-              </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Set Promosi</h1>
             </div>
-          </div>
+            <div class="modal-body" style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc;">
+                <form class="row g-3" id="promoform" method="POST" action="">
+                    @csrf
+                    <input type="text" class="form-control" name="id" id="id" hidden>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Nama Promosi:</label>
+                        <input type="text" class="form-control" id="promotionname" name="promotionname" placeholder="Masukkan Nama Promosi">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tarikh Dari :</label>
+                        <input type="text" class="form-control" id="datefrom" name="datefrom">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Tarikh Hingga :</label>
+                        <input type="text" class="form-control" id="dateto" name="dateto">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Diskaun Dikenakan (%)</label>
+                        <input type="text" class="form-control" id="discount" name="discount" placeholder="Jumlah Diskaun">
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="homestay" class="btn btn-secondary" id="homestay">Kembali</a>
+            </div>
         </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Set Bilik</h1>
+            </div>
+            <div class="modal-body" style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc;">
+                <form class="row g-3" id="roomform" method="POST" action="">
+                    @csrf
+                    <input type="text" class="form-control" name="homestayid" id="homestayid" hidden>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nama Bilik</label>
+                        <input type="text" class="form-control" id="roomname" name="roomname" placeholder="Nama / Nombor Bilik">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Bilangan Orang Sebilik</label>
+                        <input type="text" class="form-control" id="roompax" name="roompax" placeholder="Contoh : 1 - 4 Orang">
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Maklumat Bilik</label>
+                        <input type="text" class="form-control" id="details" name="details" placeholder="Contoh : 2 Bilik, 1 Bilik Air, Wifi, 2 Katil Queen Size, Parking Disediakan">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Harga Bilik (RM)</label>
+                        <input type="text" class="form-control" id="roomprice" name="roomprice" placeholder="Harga Bilik Semalam (RM)">
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="homestay" class="btn btn-secondary" id="homestay">Kembali</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Data Homestay</h1>
+            </div>
+            <div class="modal-body" style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc;">
+                <form class="row g-3" id="homestayform" method="POST" action="">
+                    @csrf
+                    <input type="text" class="form-control" name="idhomestay" id="idhomestay" hidden>
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Nama Homestay</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Lokasi</label>
+                        <input type="text" class="form-control" id="location" name="location">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nombor Telefon</label>
+                        <input type="text" class="form-control" id="pno" name="pno">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                    <label class="control-label">Status Homestay</label>
+                                <select name="stat" id="stat" class="form-control">
+                                    <option selected>Pilih Status Homestay</option>
+                                    <option value="Available">Available</option>
+                                    <option value="Disabled">Disabled</option>
+                                </select>
+                            </div>
+                    
+
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a href="homestay" class="btn btn-secondary" id="homestay">Kembali</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 
     </div>
 </div>
@@ -144,6 +233,13 @@
                 minDate: 0,
                 maxDate: maxDate,
                 dateFormat: "yy-mm-dd",
+                beforeShow: function(input, inst) {
+
+                inst.dpDiv.css({
+                    "background-color": "#dce0df" // Change this value to your preferred font size
+
+                });
+            },
                 beforeShowDay: function(date) {
                     var string = jQuery.datepicker.formatDate('yy-mm-dd', date);
                     var isDisabled = (disabledDates.indexOf(string) !== -1);
@@ -159,7 +255,113 @@
 
 });
 
-        $('.alert').delay(3000).fadeOut()
+$(document).on('submit', '#promoform', function(e) {
+    e.preventDefault(); // Prevent the default form submission
+
+    console.log("Form submitted"); // Added console.log statement
+
+    var promotionname = $('#promotionname').val();
+    var datefrom = $('#datefrom').val();
+    var dateto = $('#dateto').val();
+    var discount = $('#discount').val();
+    var id = $('#id').val();
+
+    console.log("Room Name:", promotionname); // Added console.log statement
+    console.log("Room Pax:", datefrom);
+    console.log("Details:", dateto);
+    console.log("Price:", discount); // Added console.log statement
+    console.log("ID:", id); // Added console.log statement
+
+    $.ajax({
+        type: 'POST',
+        url: '/addpromo/' + id,
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            promotionname: promotionname,
+            datefrom: datefrom,
+            dateto: dateto,
+            discount: discount
+        },
+        success: function(response) {
+            // Handle the success response
+            console.log("Success:", response); // Added console.log statement
+            window.location.href = '{{ route("homestay.index") }}';
+        },
+        error: function(error) {
+            // Handle the error response
+            console.log("Error:", error); // Added console.log statement
+        }
+    });
+  });
+
+  $(document).on('click', '#addroom', function(e) {
+    e.preventDefault(); // Prevent the default form submission
+    $('#exampleModal').modal('show');
+    id = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
+    $('#homestayid').val(id);
+});
+
+$(document).on('submit', '#roomform', function(e) 
+{
+    e.preventDefault(); // Prevent the default form submission
+
+    console.log("Form submitted"); // Added console.log statement
+
+    var roomname = $('#roomname').val();
+    var roompax = $('#roompax').val();
+    var details = $('#details').val();
+    var roomprice = $('#roomprice').val();
+    var id = $('#homestayid').val();
+
+    console.log("Room Name:", roomname); // Added console.log statement
+    console.log("Room Pax:", roompax);
+    console.log("Details:", details);
+    console.log("Price:", roomprice); // Added console.log statement
+    console.log("ID:", id); // Added console.log statement
+
+    $.ajax({
+        type: 'POST',
+        url: '/addroom/' + id,
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            roomname: roomname,
+            roompax: roompax,
+            details: details,
+            roomprice: roomprice
+        },
+        success: function(response) {
+            // Handle the success response
+            console.log("Success:", response); // Added console.log statement
+            window.location.href = '{{ route("homestay.index") }}';
+        },
+        error: function(error) {
+            // Handle the error response
+            console.log("Error:", error); // Added console.log statement
+        }
+    });
+
+
+       
+});
+
+$(document).on('click', '#editbutton', function(e) {
+    status = e.target.parentElement.previousElementSibling.previousElementSibling.innerText;
+    pno = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
+    loc = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
+    name = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
+    id = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
+    console.log(id);
+    $('#idhomestay').val(id);
+    $('#name').val(name);
+    $('#location').val(loc);
+    $('#pno').val(pno);
+    $('#stat').val(status);
+    
+    $('#homestayform').attr('action','edithomestay/'+id);
+    $('#staticBackdrop').modal('show');
+  });
+
+$('.alert').delay(3000).fadeOut()
 });
 
 </script>
