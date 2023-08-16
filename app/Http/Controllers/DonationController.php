@@ -308,8 +308,13 @@ class DonationController extends Controller
         if (Auth::id()) {
             $user = $this->user->getUserById();
         }
+        $specialSrabRequest=0;
+        if($donation->id==161){
+            $specialSrabRequest=1;
+        }
+        // this code can be remove if this donation is not active 
 
-        return view('paydonate.pay', compact('donation', 'user'));
+        return view('paydonate.pay', compact('donation', 'user','specialSrabRequest'));
     }
 
     public function anonymouIndex($link)

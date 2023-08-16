@@ -156,10 +156,11 @@
                         <form id="bayarform" class="form-validation" method="POST" action="{{ route('fpxIndex') }}"
                             enctype="multipart/form-data">
                             {{csrf_field()}}
+                            @if($specialSrabRequest==0)
                             <div class="form-group">
                                 <label>Nama</label>
                                 <input type="text" name="name" id="name" class="form-control text-left"
-                                    placeholder="Nama" value="{{ !empty($user) ? $user->name : '' }}"
+                                    placeholder="Nama Pelajar" value="{{ !empty($user) ? $user->name : '' }}"
                                     data-parsley-required-message="Sila masukkan nama penuh" required>
                             </div>
                             <div class="form-group">
@@ -168,6 +169,7 @@
                                     placeholder="Email" value="{{ !empty($user) ? $user->email : '' }}"
                                     data-parsley-required-message="Sila masukkan email" required>
                             </div>
+
                             <div class="form-group">
                                 <label>No Telefon</label>
                                 <input type="text" name="telno" class="form-control phone_no text-left"
@@ -175,6 +177,29 @@
                                     value="{{ !empty($user) ? substr($user->telno , 2) : '' }}"
                                     data-parsley-required-message="Sila masukkan no telefon" required>
                             </div>
+                            @else
+                            <div class="form-group">
+                                <label>Nama Murid</label>
+                                <input type="text" name="name" id="name" class="form-control text-left"
+                                    placeholder="Nama murid" value="{{ !empty($user) ? $user->name : '' }}"
+                                    data-parsley-required-message="Sila masukkan nama penuh murid" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Kelas</label>
+                                <input type="text" name="telno" class="form-control text-left"
+                                    placeholder="Kelas murid"
+                                    value="{{ !empty($user) ? substr($user->telno , 2) : '' }}"
+                                    data-parsley-required-message="Sila masukkan kelas murid" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" parsley-type="email" name="email" class="form-control text-left"
+                                    placeholder="Email" value="{{ !empty($user) ? $user->email : '' }}"
+                                    data-parsley-required-message="Sila masukkan email" required>   
+                            </div>
+                            @endif
+                           
                             <div class="form-group">
                                 <label>Amaun</label>
                                 <input id="input-currency" class="form-control input-mask text-left"

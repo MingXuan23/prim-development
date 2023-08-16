@@ -54,7 +54,7 @@
         @if($list->status == 'Paid')
         <span class="badge rounded-pill bg-info text-white">Selesai Dibayar</span>
         @elseif($list->status == 'Cancel by merchant')
-        <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Restoran</span>
+        <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Peniaga</span>
         @elseif($list->status == 'Cancel by user')
         <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Anda</span>
         @elseif($list->status == 'Pending' || $list->status == 'Failed')
@@ -83,12 +83,12 @@
       </div>
     </div>
 
-    <div class="row">
+    {{-- <div class="row">
       <label class="col-sm-3 col-form-label ">Tarikh dan Waktu Pesan</label>
       <div class="col-sm-7">
         <p class="col col-form-label">{{ $order_date }}</p>
       </div>
-    </div>
+    </div> --}}
 
     <div class="row">
       <label class="col-sm-3 col-form-label ">Tarikh Pengambilan</label>
@@ -96,7 +96,20 @@
         <p class="col col-form-label">{{ $pickup_date }}</p>
       </div>
     </div>
-
+    @if($confirm_picked_up_time && $confirm_by )
+    <div class="row">
+      <label class="col-sm-3 col-form-label ">Tarikh Pengesahan Pengambilan Order</label>
+      <div class="col-sm-7">
+        <p class="col col-form-label">{{ $confirm_picked_up_time }}</p>
+      </div>
+    </div>
+    <div class="row">
+      <label class="col-sm-3 col-form-label ">Disahkan Oleh</label>
+      <div class="col-sm-7">
+        <p class="col col-form-label">{{ $confirm_by }}</p>
+      </div>
+    </div>
+@endif
     <div class="row">
       <label class="col-sm-3 col-form-label ">Nota</label>
       <div class="col-sm-7">
@@ -129,7 +142,7 @@
               <tr>
                 <td>{{ $row->name }}</td>
                 <td>{{ $price[$row->id] }}</td>
-                <td>{{ $row->quantity * $row->selling_quantity }}</td>
+                <td>{{ $row->quantity}}</td>
                 <td>{{ $total_price[$row->id] }}</td>
               </tr>
             @endforeach

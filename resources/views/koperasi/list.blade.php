@@ -3,7 +3,6 @@
 @section('css')
 
 @include('layouts.datatable');
-
 <style>
 .noborder{
   border: none!important;
@@ -13,6 +12,26 @@
 {
   width: 15%;
   object-fit: cover;
+}
+
+.rounded-pill{
+   color:#fff;
+  }
+
+@media print {
+  /* Add styles for printing, including background colors */
+  .row {
+    background-color: #333547;
+    border-radius: 20px;
+  }
+
+  .rounded-pill{
+   color:#5B626B;
+  }
+
+  #hide-print{
+    display:none;
+  }
 }
 </style>
 
@@ -52,13 +71,13 @@
     <div class="row">
       <div class="col d-flex justify-content-center align-items-center text-center mb-3">
         @if($list_detail->status == 2)
-        <span class="badge rounded-pill bg-warning">Sedang Diproses</span>
+        <span class="badge rounded-pill bg-warning" style="font-size:15px">Sedang Diproses</span>
         @elseif($list_detail->status == 100)
-        <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Restoran</span>
+        <span class="badge rounded-pill bg-danger" style="font-size:15px">Dibatalkan oleh Peniaga</span>
         @elseif($list_detail->status == 200)
-        <span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh Anda</span>
+        <span class="badge rounded-pill bg-danger" style="font-size:15px">Dibatalkan oleh Anda</span>
         @elseif($list_detail->status == 3)
-        <span class="badge rounded-pill bg-success text-white">Berjaya Diambil</span>
+        <span class="badge rounded-pill bg-success" style="font-size:15px">Berjaya Diambil</span>
         @endif
       </div>
     </div>
@@ -109,7 +128,14 @@
         </p>
       </div>
     </div>
-
+    <div class="row">
+      <label class="col-sm-3 col-form-label ">FPX ID</label>
+      <div class="col-sm-7">
+        <p class="col col-form-label">
+          {{ $list_detail->fpxId }}
+        </p>
+      </div>
+    </div>
     <div class="row">
       <label class="col-sm-3 col-form-label ">Nota</label>
       <div class="col-sm-7">
@@ -135,8 +161,9 @@
           <thead>
               <tr>
                   <th>Item</th>
-                  <th>Harga Per Unit (RM)</th>
                   <th>Kuantiti</th>
+                  <th>Harga Per Unit (RM)</th>
+                  
                   <th>Jumlah (RM)</th>
               </tr>
           </thead>
@@ -145,24 +172,31 @@
             @foreach($item as $row)
               <tr>
                 <td>{{ $row->name }}</td>
-                <td>{{ number_format($row->price, 2, '.', '') }}</td>
                 <td>{{ $row->quantity }}</td>
+                <td>{{ number_format($row->price, 2, '.', '') }}</td>
+                
                 <td>{{ number_format($totalPrice[$row->name], 2, '.', '') }}</td>
               </tr>
             @endforeach
               <tr>
-                <td class="noborder"></td>
-                <td class="noborder"></td>
-                <td class="table-dark noborder">Jumlah Keseluruhan</td>
+                <td class="table-dark noborder" colspan="3" style="text-align:center">Cas yang dikenakan</td>
+                <td class="table-dark noborder" id="chargeColumn"></td>
+              </tr>
+              <tr>
+                <td class="table-dark noborder" colspan="3" style="text-align:center">Jumlah Keseluruhan</td>
                 <td class="table-dark noborder">RM {{ number_format($list_detail->total_price, 2, '.', '') }}</td>
               </tr>
           </tbody>
       </table>
     </div>
 
-    <div class="row">
+    <div class="row" id="hide-print">
       <div class="col d-flex justify-content-end">
-        <a href="{{ url()->previous() }}" type="button" class="btn btn-light mr-2">Kembali</a>
+      <button class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px"
+            onclick="window.print();">
+            <span class="mdi mdi-file-pdf"> Print </span>
+        </button>
+        <a href="{{ route('koperasi.returnFromList',[$previousUrl,$list_detail->id]) }}" type="button" class="btn btn-light mr-2" style="font-size:18px">Kembali</a>
       </div>
     </div>
 
@@ -175,5 +209,14 @@
 
 @section('script')
 
+<script>
+  var totalPrice = @json($totalPrice);
 
+var totalPriceSum = Object.values(totalPrice).reduce((a, b) => a + b, 0);
+
+
+var totalAmount=@json($list_detail->total_price);
+var charge=totalAmount-totalPriceSum;
+$("#chargeColumn").text("RM " + charge.toFixed(2));
+</script>
 @endsection

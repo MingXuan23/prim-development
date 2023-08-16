@@ -7,6 +7,8 @@ use App\Providers\RouteServiceProvider;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -47,6 +49,12 @@ class RegisterController extends Controller
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
+
+    public function AdminRegisterIndex()
+    {
+        return view('auth.registerAdmin');
+    }
+
     protected function validator(array $data)
     {
         return Validator::make($data, [
@@ -60,6 +68,15 @@ class RegisterController extends Controller
         ]);
     }
 
+    public function registerAdmin(Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        event(new Registered($user = $this->createAdmin($request->all())));
+
+        // You can customize this redirect after admin registration
+        return redirect(route('home'));
+    }
     /**
      * Create a new user instance after a valid registration.
      *
@@ -68,7 +85,8 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        //dd($data,isset($data['isAdmin']));
+        $user= User::create([
             'name'              => $data['name'],
             'email'             => $data['email'],
             'password'          => Hash::make($data['password']),
@@ -76,5 +94,36 @@ class RegisterController extends Controller
             'remember_token'    => $data['_token'],
 
         ]);
+
+        if (!isset($data['isAdmin'])) {
+            $role = DB::table('model_has_roles')->insert([
+                'role_id' => 15,
+                'model_type' => "App\User",
+                'model_id' => $user->id,
+            ]);
+        }
+        
+        return $user;
+
+    }
+    // to redirect back to intended link even after revalidation
+    public function showRegistrationForm(Request $request)
+    {
+        if (!$request->session()->has('url.intended') && url()->previous() !== url()->current()) {
+            $request->session()->put('url.intended', url()->previous());
+        }
+
+        return view('auth.register');
+    }
+    // to redirect back to intended link
+    protected function registered(Request $request, $user)
+    {
+        if ($request->session()->has('url.intended')) {
+            $redirectUrl = $request->session()->get('url.intended');
+            $request->session()->forget('url.intended');
+            return redirect($redirectUrl);
+        }
+        
+        return redirect($this->redirectTo);
     }
 }

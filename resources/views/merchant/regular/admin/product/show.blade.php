@@ -87,6 +87,9 @@ nav .pagination{
    white-space: pre-wrap;
    text-align: justify;
 }
+input[type="file"]{
+    border: none !important;
+}
 @media screen and (max-width: 768px) { 
   #img-size
   {
@@ -132,7 +135,8 @@ nav .pagination{
           </div>
         @endif
         <div class="d-flex justify-content-end mb-3">
-            <button id="add-product-item-modal" class="btn btn-grey"><i class="fas fa-plus-circle"></i> Produk Item</button>
+            <button id="import-product-item-modal" class="btn btn-grey m-1"><i class="fas fa-plus-circle"></i> Import Product</button>
+            <button id="add-product-item-modal" class="btn btn-grey m-1"><i class="fas fa-plus-circle"></i> Produk Item</button>
         </div>
 
         <div class="table-responsive">
@@ -286,7 +290,7 @@ nav .pagination{
                         
                     </div>
 
-                    <div class="row quantity-section" hidden>
+                    <div class="row quantity-section">
                         <div class="col">
                             <div class="form-group required">
                                 <label class="control-label">Kuantiti Dalam Inventori</label>
@@ -351,7 +355,35 @@ nav .pagination{
     </div>
 </div>
 
-
+{{--import modal--}}
+<div class="modal fade" id="importProductItemModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('importMerchantProduct') }}" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="type" id="type" value="{{$group->id}}">
+                    <label>*Import Excel file that contains three column about the products(name, quantity & price)</label>
+                    <div class="form-group">
+                        
+                        <input type="file" name="file" accept=".xls, .xlsx, .ods, .csv" required>
+                    </div>
+                    <input type="hidden" name="organ" id="organ" value="{{$org_id}}">
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-grey">Import</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>       
+{{--end import modal--}}
 @endsection
 
 @section('script')
@@ -492,7 +524,9 @@ nav .pagination{
             $('.quantity-section').prop('hidden', true)
             $("#item_quantity").prop('required',false)
         })
-
+        $('#import-product-item-modal').click(function() {
+            $('#importProductItemModal').modal('show');
+        })
         $("#item_price").on('keydown', function(e){
             var input = $(this);
             var oldVal = input.val();

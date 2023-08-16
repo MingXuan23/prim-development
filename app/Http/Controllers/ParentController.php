@@ -331,6 +331,8 @@ class ParentController extends Controller
                 ->whereIn('ou.role_id', [4, 5, 6, 12])
                 ->get();
 
+            
+
             $organizations = [];
 
             foreach ($organs as $organ)
@@ -346,7 +348,8 @@ class ParentController extends Controller
                     }
                 }
             }
-
+            //dd($organizations);
+            $organizations = array_unique($organizations, SORT_REGULAR);
             return $organizations;
         }
     }

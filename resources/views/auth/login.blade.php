@@ -32,8 +32,8 @@ Login
                             <form class="form-horizontal mt-4" method="POST" action="{{ route('login') }}">
                                 @csrf
                                     <div class="form-group">
-                                        <label for="username">Email / Nombor Telefon</label>
-                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" @if(old('email')) value="{{ old('email') }}" @else value="" @endif  id="username" placeholder="Masukkan Email ataupun Nombor Telefon" autocomplete="email" autofocus>
+                                        <label for="username">Email/Nombor Telefon/Nombor IC</label>
+                                        <input name="email" type="text" class="form-control @error('email') is-invalid @enderror" @if(old('email')) value="{{ old('email') }}" @else value="" @endif  id="username" placeholder="Masukkan Email/Nombor Telefon/Nombor IC" autocomplete="email" autofocus>
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -43,7 +43,7 @@ Login
 
                                     <div class="form-group">
                                         <label for="userpassword">Kata Laluan</label>
-                                        <input type="password" name="password" class="form-control  @error('password') is-invalid @enderror" id="userpassword" value="" placeholder="Kata Laluan">
+                                        <input type="password" name="password" class="form-control  @error('password') is-invalid @enderror" id="userpassword" value="" placeholder="Masukkan Kata Laluan">
                                         @error('password')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -64,8 +64,11 @@ Login
                                     </div>
 
                                     <div class="form-group mt-2 mb-0 row">
-                                        <div class="col-12 mt-4">
+                                        <div class="col-6 mt-4">
                                             <a href="{{ route('password.request') }}"><i class="mdi mdi-lock"></i> 	Lupa Kata Laluan?</a>
+                                        </div>
+                                        <div class="col-6 mt-4" style="text-align:right;">
+                                            <a href="/register"><i class="mdi mdi-account-plus"></i>  Daftar Akaun</a>
                                         </div>
                                     </div>
                                 </form>

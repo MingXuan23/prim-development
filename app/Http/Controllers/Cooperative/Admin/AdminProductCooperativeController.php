@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use App\Models\Fee;
 use App\Models\Fee_New;
 use App\Models\Category;
+use App\Models\Transaction;
 use App\Models\ClassModel;
 use Psy\Command\WhereamiCommand;
 
@@ -52,29 +53,54 @@ class AdminProductCooperativeController extends Controller
         ->with('product',$product);
     }
     
-    public function productMenu()
+    //first time to fetch the product menu
+    public function productMenu(Request $request)
     {
+        //$this->testing();
         $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
         $userID = Auth::id();
-        $koperasi = DB::table('organizations as o')
+
+        $koperasiList = DB::table('organizations as o')
         ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
         ->where('ou.user_id', $userID)
         ->where('ou.role_id', $role_id)
-        ->first();
+        ->get();
+        //d($request);
+        $koperasi = $koperasiList->first();
+        $koopId=$request->session()->get('koopId');
+        if($koopId!=null)
+            $koperasi=$koperasiList->where('organization_id',$koopId)->first();
+        //dd($koperasi->organization_id,$koopId,$request);
+        $getResult=$this->getProductMenuByOrgId($koperasi->organization_id);
+        $group =$getResult['group'];
+        $product=$getResult['product'];
+        $hour=$getResult['hour'];
+       
+        $reminderMessage="";
+        if(count($hour)==0)
+        {
+            $reminderMessage="Anda belum kemas kini waktu operasi koperasi anda. Sila pergi 'Hari Dibuka' dekat 'Koop Admin' untuk mengemaskini maklumat.";
+        }
+        //dd($koperasi->organization_id);
+        return view('koperasi-admin.productmenu', compact('koperasi','koperasiList'),compact('group','product','reminderMessage'));
+    }
 
+    //get the information throught the organization id
+    public function getProductMenuByOrgId($koopId){
+        
         $product = DB::table('product_item as p')
         ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
         ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
         ->select('p.*','pg.name as type_name')
-        ->where('ou.user_id', $userID)
+        ->where('ou.organization_id', $koopId)
         ->whereNull('p.deleted_at')
         ->distinct('ou.user.id')
         ->get();
 
         $group = DB::table('product_group as pg')
         ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
-        ->where('ou.user_id', $userID)
-        ->where('pg.organization_id',$koperasi->organization_id)
+        ->where('ou.organization_id', $koopId)
+        ->where('pg.organization_id',$koopId)
         ->whereNull('pg.deleted_at')
         ->select('pg.*')
         ->distinct('pg.id')
@@ -85,16 +111,16 @@ class AdminProductCooperativeController extends Controller
                 ->join('organizations as o', 'o.id', '=', 'ou.organization_id')
                 ->select('oh.*')
                 ->distinct('o.id')
-                ->where('ou.user_id', $userID)
+                //->where('ou.user_id', $userID)
                 ->where('o.type_org',10)
-                ->where('o.id',$koperasi->organization_id)
+                ->where('o.id',$koopId)
                 ->where('oh.status',1)
                 ->get();
         $reminderMessage="";
         if(count($hour)==0)
         {
             $reminderMessage="Anda belum kemas kini waktu operasi koperasi anda. Sila pergi 'Hari Dibuka' dekat 'Koop Admin' untuk mengemaskini maklumat.";
-        }//najmi
+        }
         return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product','reminderMessage'));
     }
 
@@ -104,19 +130,14 @@ class AdminProductCooperativeController extends Controller
 
             $role_id = DB::table('roles')->where('name','Koop Admin')->first()->id;
             $userID = Auth::id();
-            $koperasi = DB::table('organizations as o')
-            ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
-            ->where('ou.user_id', $userID)
-            ->where('ou.role_id', $role_id)
-            ->select('o.id as koperasiID')
-            ->first();
-
+            $koopId=$request->koopId;
+        
             $product = DB::table('product_item as p')
             ->join('product_group as pg', 'pg.id', '=', 'p.product_group_id')
             ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
             ->select('p.*','pg.name as type_name')
             ->where('ou.user_id', $userID)
-            ->where('pg.organization_id',$koperasi->koperasiID)
+            ->where('pg.organization_id',$koopId)
             ->whereNull('p.deleted_at')
             ->distinct('ou.user_id')
             ->get();
@@ -201,14 +222,21 @@ class AdminProductCooperativeController extends Controller
 
     public function deleteType(Int $id) //deleted_at to soft delete ,dont remove directly from db
     {
-        $delete = DB::table('product_group')->where('id',$id)->update([
+        $delete=DB::table('product_group')->where('id',$id);
+        $org=$delete->first()->organization_id;
+        $delete->update([
             'deleted_at' => now(),   
         ]);
         $removeType = DB::table('product_item')->where('product_group_id',$id)->update([
             'deleted_at'=>now(),
             'status'=>0,
         ]);
-        return redirect('koperasi/produktype')->with('success','Produk type berjaya dipadam');
+       
+        return redirect('koperasi/produktype')->with([
+            'success' => 'Produk type berjaya dipadam',
+            'koopId' => $org,
+            ]);
+       
     }
 
     public function editType(Int $id)
@@ -221,23 +249,34 @@ class AdminProductCooperativeController extends Controller
     public function updateType(Int $id,Request $request)
     {    
       
-        $update = DB::table('product_group')->where('id',$id)->update([
+        $update = DB::table('product_group')->where('id',$id);
+        $org=$update->first()->organization_id;
+        $update->update([
             'name' => $request->name,  
             'updated_at'=>now()        
         ]);
-        return redirect('koperasi/produktype')->with('success','Produk type berjaya diubah');
+        return redirect('koperasi/produktype')->with([
+            'success' => 'Produk type berjaya diubah.',
+            'koopId' => $org,
+            ]);
+        
     }
 
-    public function createType()
+    public function createType(Request $request)
     {
+        $kid=$request->koopId;
+        if($kid==null){
+            $kid= $request->session()->get('koopId');
+        }
         $userID = Auth::id();
+       
         $org = DB::table('organizations as o')
         ->join('organization_user as os', 'o.id', 'os.organization_id')
-        ->where('os.user_id', $userID)
+        ->where('os.organization_id', $kid)
+        ->where('os.user_id',$userID)
         ->where('o.type_org',10)
-        ->select('o.id')
+        ->select('o.id','o.nama')
         ->first();
-
         /*
         $type = DB::table('product_group as p')
         ->where('p.organization_id',$org->id)
@@ -246,7 +285,7 @@ class AdminProductCooperativeController extends Controller
         $group = DB::table('product_group as pg')
         ->join('organization_user as ou', 'pg.organization_id', '=', 'ou.organization_id')
         ->where('ou.user_id', $userID)
-        ->where ('ou.organization_id',$org->id)
+        ->where ('ou.organization_id',$kid)
         ->whereNull('pg.deleted_at')
         ->select('pg.*')
         ->distinct('pg.id')
@@ -259,42 +298,36 @@ class AdminProductCooperativeController extends Controller
     public function storeType(Request $request) //insert type in database
     {
         $userID = Auth::id();
-        $org = DB::table('organizations as o')
-                ->join('organization_user as os', 'o.id', 'os.organization_id')
-                ->where('os.user_id', $userID)
-                ->where('o.type_org',10)
-                ->select('o.id')
-                ->first();
+        $org = $request->koopId;
 
        $add = DB::table('product_group') -> insert([
         'name' => $request->input('name'), 
-        'organization_id' =>$org->id,
+        'organization_id' =>$org,
         'created_at'=>now(),
         'updated_at'=>now(),
        ]);
-
-       return redirect('koperasi/produktype')->with('success','Produk type berjaya ditambah.');
+      
+       return redirect('koperasi/produktype')->with([
+        'success' => 'Produk type berjaya ditambah.',
+        'koopId' => $org,
+        ]);
+    //    return redirect('koperasi/produktype')->with('success','Produk type berjaya ditambah.');
     }
 
-    public function createProduct() //show add product view
+    public function createProduct(Request $request) //show add product view
     {
         $userID = Auth::id();
-        $org = DB::table('organizations as o')
-        ->join('organization_user as os', 'o.id', 'os.organization_id')
-        ->where('os.user_id', $userID)
-        ->where('o.type_org',10)
-        ->select('o.id')
-        ->first();
-
+        $koopId=$request->koopId;
+        
         $type = DB::table('product_group as p')
-        ->where('p.organization_id',$org->id)
+        ->where('p.organization_id',$koopId)
         ->whereNull('p.deleted_at')
         ->get();
         if(count($type)==0)
         {
             return redirect('koperasi/produkmenu')->with('success','Sila tambah produk type dahulu'); //use success session only
         }
-        return view('koperasi-admin.add',compact('type'));
+        return view('koperasi-admin.add',compact('type','koopId'));
     }
 
     public function storeProduct(Request $request) //insert item in database
@@ -315,11 +348,7 @@ class AdminProductCooperativeController extends Controller
         }
 
         $userID = Auth::id();
-        $org = DB::table('organizations as o')
-                ->join('organization_user as os', 'o.id', 'os.organization_id')
-                ->where('os.user_id', $userID)
-                ->select('o.id')
-                ->first();
+        
         if($request->cb_year){
             if($request->classCheckBoxEmpty==="true"){
                 $data = array(
@@ -359,7 +388,11 @@ class AdminProductCooperativeController extends Controller
     //        $add->image =$request->file('image')->getClientOriginalName();
     //        $add -> upsert(['image' => $request->input('image')]);
     //    }
-       return redirect('koperasi/produkmenu')->with('success','Product created successfully.');
+        return redirect('koperasi/produkmenu')->with([
+            'success' => 'Product created successfully.',
+            'koopId' => $request->koopId,
+            ]);
+       //return redirect('koperasi/produkmenu')->with('success','Product created successfully.');
     }
 
     public function editProduct(Int $id)// show edit view
@@ -395,12 +428,8 @@ class AdminProductCooperativeController extends Controller
     public function updateProduct(Request $request,Int $id)//update product in database
     {
         $userID = Auth::id();
-        // $org = DB::table('organizations as o')
-        // ->join('organization_user as os', 'o.id', 'os.organization_id')
-        // ->where('os.user_id', $userID)
-        // ->where('o.type_org',10)
-        // ->select('o.id')
-        // ->first();
+       
+
         if($request->cb_year){
             if($request->classCheckBoxEmpty==="true"){
                 $data = array(
@@ -437,7 +466,20 @@ class AdminProductCooperativeController extends Controller
         {
             DB::table('product_item')->where('id',$id)->update(['status'=> 0]);
         }
-        return redirect('koperasi/produkmenu')->with('success','Product updated successfully.');
+
+        $koopId = DB::table('organizations as o')
+        ->join('organization_user as os', 'o.id', 'os.organization_id')
+        ->join('product_group as pg','pg.organization_id','o.id')
+        ->where('pg.id', $request->type)
+        ->where('os.user_id', $userID)
+        ->where('o.type_org',10)
+        ->select('o.id')
+        ->first();
+       
+        return redirect('koperasi/produkmenu')->with([
+            'success' => 'Product updated successfully.',
+            'koopId' => $koopId->id,
+            ]);
     }
 
 
@@ -489,7 +531,7 @@ class AdminProductCooperativeController extends Controller
         return redirect('koperasi/produkmenu')->with('success',$returnInformation);
     }
 
-    public function fetchClassyear(){
+    public function fetchClassyear(Request $request){
         
         
         $userID = Auth::id();
@@ -499,6 +541,15 @@ class AdminProductCooperativeController extends Controller
                 ->where('o.type_org',10)
                 ->select('o.parent_org')
                 ->first();
+        if($oid==null){
+            $oid = DB::table('organizations as o')
+            ->join('organization_user as os', 'o.id', 'os.organization_id')
+            ->where('o.id',$request->koopId)
+            ->where('o.type_org',10)
+            ->select('o.parent_org')
+            ->first();
+        }
+
         
         $organization = Organization::find($oid->parent_org);
 
@@ -563,13 +614,16 @@ class AdminProductCooperativeController extends Controller
         
         Excel::import(new ProductTypeImport($request->organ), public_path('/uploads/excel/' . $namaFile));
         
-        return redirect('koperasi/produktype')->with('success', 'Product type have been added successfully');
+        return redirect('koperasi/produktype')->with([
+            'success' => 'Produk type berjaya ditambah.',
+            'koopId' => $request->organ,
+            ]);
+       
         
     
     }
 
     public function importproduct(Request $request){
-         
         $file       = $request->file('file');
         $namaFile   = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
@@ -601,6 +655,175 @@ class AdminProductCooperativeController extends Controller
         $target = json_encode($data);//to make json
         Excel::import(new ProductImport($request->type,$target,$request->organ,null), public_path('/uploads/excel/' . $namaFile));
         
-        return redirect('koperasi/produkmenu')->with('success', 'Product type have been added successfully');
+        return redirect('koperasi/produkmenu')->with([
+            'success' => 'Product type have been added successfully.',
+            'koopId' => $request->organ,
+            ]);
+        //return redirect('koperasi/produkmenu')->with('success', 'Product type have been added successfully');
     }
+
+
+    ///////////////testing area////////////////////////////////////////////
+    // public function testing(){
+    //     $transaction = Transaction::where('id', '=', 29489)->first();
+    //     //dd($transaction);
+    //     $list_student_fees_id = DB::table('student_fees_new')
+    //     ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+    //     ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
+    //     ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
+    //     ->where('transactions.id', $transaction->id)
+    //     ->get();
+
+    //     $list_parent_fees_id  = DB::table('fees_new')
+    //         ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+    //         ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+    //         ->select('fees_new_organization_user.*')
+    //         ->orderBy('fees_new.category')
+    //         ->where('organization_user.user_id', $transaction->user_id)
+    //         ->where('organization_user.role_id', 6)
+    //         ->where('organization_user.status', 1)
+    //         ->where('fees_new_organization_user.transaction_id', $transaction->id)
+    //         ->get();
+    //     dd($list_parent_fees_id ,$list_student_fees_id);
+
+    // for ($i = 0; $i < count($list_student_fees_id); $i++) {
+
+    //     // ************************* update student fees status fees by transactions *************************
+    //     $res  = DB::table('student_fees_new')
+    //         ->where('id', $list_student_fees_id[$i]->student_fees_id)
+    //         ->update(['status' => 'Paid']);
+
+    //     // ************************* check the student if have still debt *************************
+        
+    //     if ($i == count($list_student_fees_id) - 1)
+    //     {
+    //         $check_debt = DB::table('students')
+    //             ->join('class_student', 'class_student.student_id', '=', 'students.id')
+    //             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+    //             ->select('students.*')
+    //             ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
+    //             ->where('student_fees_new.status', 'Debt')
+    //             ->count();
+
+
+    //         // ************************* update status fees for student if all fees completed paid*************************
+
+    //         if ($check_debt == 0) {
+    //             DB::table('class_student')
+    //                 ->where('id', $list_student_fees_id[$i]->class_student_id)
+    //                 ->update(['fees_status' => 'Completed']);
+    //         }
+    //     }
+    // }
+
+    // for ($i = 0; $i < count($list_parent_fees_id); $i++) {
+
+    //     // ************************* update status fees for parent *************************
+    //     DB::table('fees_new_organization_user')
+    //         ->where('id', $list_parent_fees_id[$i]->id)
+    //         ->update([
+    //             'status' => 'Paid'
+    //         ]);
+            
+    //     // ************************* check the parent if have still debt *************************
+    //     if ($i == count($list_parent_fees_id) - 1)
+    //     {
+    //         $check_debt = DB::table('organization_user')
+    //             ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
+    //             ->where('organization_user.user_id', $transaction->user_id)
+    //             ->where('organization_user.role_id', 6)
+    //             ->where('organization_user.status', 1)
+    //             ->where('fees_new_organization_user.status', 'Debt')
+    //             ->count();
+
+    //         // ************************* update status fees for organization user (parent) if all fees completed paid *************************
+
+    //         if ($check_debt == 0) {
+    //             DB::table('organization_user')
+    //                 ->where('user_id', $transaction->user_id)
+    //                 ->where('role_id', 6)
+    //                 ->where('status', 1)
+    //                 ->update(['fees_status' => 'Completed']);
+    //         }
+    //     }
+    // }
+
+                    
+    //                 //return $this->ReceiptFees($transaction->id);
+    // }
+    // public function findParentTesting(){
+    //     $user=DB::table('organization_user as ou')
+    //                         ->join('users as u','u.id','ou.user_id')
+    //                         ->where('ou.organization_id',159)
+    //                         ->where('ou.status',1)                       
+    //                         ->groupBy('ou.user_id')
+    //                         ->havingRaw('COUNT(ou.user_id) >= 2')
+    //                         ->select('ou.user_id as uid')
+    //                         ->distinct('ou.id')
+    //                         ->get();
+    //     $Array = [];
+    //     foreach($user as $u ){
+    //         $ou=DB::table('organization_user as ou')
+    //             ->join('users as u','u.id','ou.user_id')
+    //             ->where('u.id',$u->uid)
+    //             ->where('ou.organization_id',159)
+    //             ->select('ou.id')               
+    //             ->get();
+    //         $first=0;
+    //         foreach($ou as $o){
+    //             if($first++==0)
+    //                 continue;
+    //            DB::table('organization_user')->where('id',$o->id)->update([
+    //                 'status' => 0, 
+    //                 ]);
+
+    //         }
+    //         //dd("stop");
+    //     }
+  
+    //     dd($user);
+    // }
+    // public function testing(){
+    //     $user=DB::table('organization_user as ou')
+    //                             ->join('users as u','u.id','ou.user_id')
+    //                             ->where('ou.organization_id',141)
+    //                             ->where('ou.role_id',6)
+    //                             ->where('ou.status',1)                       
+    //                             ->groupBy('u.id')
+    //                             ->select('ou.user_id as uid')
+    //                             ->distinct('u.id')
+    //                             ->get();
+        
+    //     $class = DB::table('classes as c')
+    //                 ->join('class_organization as co','co.class_id','c.id')
+    //                 ->where('co.organization_id',141)
+    //                 ->select('c.id','c.nama')
+    //                 ->get();
+    //     //dd($class);
+    //     foreach($user as $u)
+    //     {
+    //         $students= DB::table('students as s')
+    //                     ->join('organization_user_student as ous','s.id','ous.student_id')
+    //                     ->join('organization_user as ou','ous.organization_user_id','ou.id')
+    //                     ->join('users as u','u.id','ou.user_id')
+    //                     ->join('class_student as cs','cs.student_id','s.id')
+    //                     ->join('class_organization as co','co.id','cs.organclass_id')
+    //                     ->whereIn('co.class_id',[315,316,317,318,319])
+    //                     ->where('u.id',$u->uid)
+    //                     ->get();
+            
+    //         if(count($students)==1){
+    //             $result=DB::table('fees_new_organization_user as fou')
+    //                     ->join('organization_user as ou','ou.id','fou.organization_user_id')
+    //                     ->where('ou.user_id',$u->uid)
+    //                     ->where('fou.status',"Debt")
+    //                     ->where('fees_new_id',565)
+    //                     ->select('fou.id')
+    //                     ->get();
+               
+    //             dd($students,$u,$result);
+    //         }
+    //     }                       
+    //     dd($user);
+    // }
 }

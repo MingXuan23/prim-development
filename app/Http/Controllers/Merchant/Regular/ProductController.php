@@ -11,12 +11,15 @@ use App\Models\Organization;
 use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use App\Models\PgngOrder;
+use App\Models\Transaction;
+
+// testing commit
 use Yajra\DataTables\DataTables;//for datatable
 
 class ProductController extends Controller
 {
     //product home page
-    public function index(){
+    public function index(Request $request){
         //get products of merchants (Peniaga Barang Umum)
        $products = ProductItem::
        join('product_group as pg','pg.id','product_group_id')
@@ -24,6 +27,7 @@ class ProductController extends Controller
        ->where([
             ['pg.deleted_at',NULL],
             ['product_item.deleted_at',NULL],
+            ['product_item.type','have inventory'],
             ['product_item.status', 1],
             ['product_item.quantity_available' ,'>', 0],//only get those products that haven't sold out yet
        ])
@@ -32,9 +36,10 @@ class ProductController extends Controller
             ['org.type_org',9]
        ])
        ->select('product_item.name','product_item.id','price','image','org.code')
-       ->inRandomOrder()//randomize the row
+    //    ->inRandomOrder()//randomize the row
        //->get();//get() to get multiple rows and put in into a collection
-       ->paginate(12);
+       ->orderBy('product_item.created_at','desc')
+       ->paginate(20);
        foreach($products as $product){
             $product->price = number_format($product->price,2);
        }
@@ -51,10 +56,11 @@ class ProductController extends Controller
                ['product_item.id',$id]
           ])
           ->where('org.deleted_at',NULL)
-          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'district','city','organization_picture','code')//need to use DB::raw because both table have same column name
+          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'address','postcode','state','district','city','organization_picture','code')//need to use DB::raw because both table have same column name
           ->first(); //first() to get a single row
           $product->price = number_format($product->price,2);
-          return view('merchant.regular.product.show',compact('product'));
+          $address = $product->address.','.$product->city;
+          return view('merchant.regular.product.show',compact('product','address'));
     }
     public function showAllCart(){
           $user_id = Auth::id();
@@ -93,17 +99,16 @@ class ProductController extends Controller
                ['po.user_id',$user_id],
                ['po.status','In cart']
           ])
-          ->select('org.id','nama')
+          ->select('org.id','nama','fixed_charges')
           ->distinct('nama')
           ->orderBy('po.id','desc')
           ->get();
 
           return view('merchant.regular.product.productsCart',compact('productInCart','organizations'));
     } 
-    public function calculateTotalPrice($order_id,$charge) 
+    public function calculateTotalPrice($order_id,$orgId) 
     {
-        $new_total_price = 0;
-
+        $total_price = 0; // total price without charges
         $cart_item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                     ->where([
@@ -119,21 +124,46 @@ class ProductController extends Controller
                     })
                     ->select('po.quantity as qty', 'pi.price')
                     ->get();
-
-        $fixed_charges = $charge;   
-     
         if(count($cart_item) != 0) {
             foreach($cart_item as $row)
             {
-                    $new_total_price += doubleval($row->price * $row->qty );
+                    $total_price += doubleval($row->price * $row->qty );
             }          
         }
-        $new_total_price += $fixed_charges;
-         return $new_total_price;
+       
+        $fixed_charges = $this->calCharge($total_price,$orgId);
+        
+        $new_total_price = $total_price+$fixed_charges;
+         return ['new_total_price'=>$new_total_price,
+                'charges'=>$fixed_charges,
+                'total_price'=>$total_price        
+        ];
     }
         
        
-    
+    public function calCharge($total,$oid){
+        $findCharge = DB::table('organization_charges')
+                        ->where('organization_id', $oid)
+                        ->where('minimum_amount', '<=', $total)
+                        ->orderByDesc('minimum_amount')
+                        ->first();
+        if($findCharge==null)
+        {
+            $charge = DB::table('organizations')
+            ->find($oid)
+            ->fixed_charges;
+        }
+        else{
+            $charge=$findCharge->remaining_charges;
+        }
+
+        if($charge==null){
+            $charge=0;
+        }
+
+        return $charge;
+
+    }
     //for updating a cart 
     public function updateCart(Request $request){
      // to update quantity in ProductOrder
@@ -152,20 +182,20 @@ class ProductController extends Controller
          $organizationId = DB::table('pgng_orders')
          ->find($request->pgngOrderId)
          ->organization_id;
-
-         $charge = DB::table('organizations')
-         ->find($organizationId)
-         ->fixed_charges;
+        //  $charge = DB::table('organizations')
+        //  ->find($organizationId)
+        //  ->fixed_charges;
      // to update total price in PGNGOrder
-         $totalPrice = $this->calculateTotalPrice($request->pgngOrderId, $charge);
+         $priceData = $this->calculateTotalPrice($request->pgngOrderId, $organizationId);
+         $totalPrice=$priceData['new_total_price'];       
+         $charges=$priceData['charges'];         
          DB::table('pgng_orders')
          ->where('id', $request->pgngOrderId)
          ->update([
                'total_price' => $totalPrice,
                'updated_at' => Carbon::now(),
          ]);
-         $totalPrice = number_format($totalPrice, 2);
-          return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice]);
+         return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges]);
     }
     //to get the number of items in cart
    public function loadCartCounter(){
@@ -214,10 +244,12 @@ class ProductController extends Controller
    }
    public function getTotalPrice(Request $request ){
      $pgng_id = $request->pgng_order_id;
-     $charge = Organization::find($request->org_id)
-     ->fixed_charges;
-     $totalPrice = $this->calculateTotalPrice($pgng_id, $charge);
-     // update total in PGNG_ORDERS
+    //  $charge = Organization::find($request->org_id)
+    //  ->fixed_charges;
+    $priceData = $this->calculateTotalPrice($pgng_id, $request->org_id);
+    $totalPrice=$priceData['new_total_price'];
+    $charges=$priceData['charges'];
+     // update totzal in PGNG_ORDERS
      DB::table('pgng_orders')
          ->where([
           ['id', $pgng_id]
@@ -225,8 +257,8 @@ class ProductController extends Controller
          ->update([
                'total_price' => $totalPrice
          ]);
-     $totalPrice = number_format($totalPrice, 2);
-     return response()->json(['totalPrice'=>$totalPrice]);
+    //  $totalPrice = number_format($totalPrice, 2);
+     return response()->json(['totalPrice'=>$totalPrice,'fixed_charges'=>$charges]);
    }
 //    public function checkOut(){
 //           $user_id = Auth::id();
@@ -363,6 +395,64 @@ class ProductController extends Controller
         }
 
     }
+    // public function testPay(){
+    //     $transaction = Transaction::where('id', '=', 66666)->first();
+        
+    //     PgngOrder::where('transaction_id', $transaction->id)->update([
+    //         'status' => 'Paid'
+    //     ]);
+
+    //     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
+    //     $item = DB::table('product_order as po')
+    //     ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
+    //     ->where([
+    //         ['po.pgng_order_id', $order->id],
+    //         ['po.deleted_at',NULL],
+    //         ['pi.deleted_at',NULL],
+    //     ])
+    //     ->select('pi.name', 'po.quantity', 'pi.price')
+    //     ->get();
+        
+    //     $organization = Organization::find($order->organization_id);
+    //     $user = DB::table('users')->find($order->user_id);
+        
+    //     $relatedProductOrder =DB::table('product_order')
+    //     ->where([
+    //         ['pgng_order_id',$order->id],
+    //         ['deleted_at',NULL]
+    //     ])
+    //     ->select('product_item_id as itemId','quantity')
+    //     ->get();
+
+    //     foreach($relatedProductOrder as $item){
+    //         $relatedItem=DB::table('product_item')
+    //         ->where('id',$item->itemId);
+            
+    //         $relatedItemQuantity=$relatedItem->first()->quantity_available;
+
+    //         $newQuantity= intval($relatedItemQuantity - $item->quantity);
+           
+    //         if($newQuantity<=0){
+    //             $relatedItem
+    //             ->update([
+    //                 'quantity_available'=>0,
+    //                 'type' => 'no inventory',
+    //                 'status'=>0
+    //             ]);
+    //         }
+    //         else{
+    //             $relatedItem
+    //             ->update([
+    //                 'quantity_available'=>$newQuantity
+    //         ]);
+    //         }
+            
+    //     }
+    //     dd($relatedProductOrder);
+    //     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+        
+    //     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+    // }
 //    public function store(Request $request, $org_id, $order_id)
 //     {
 //         $pickup_date = $request->pickup_date;

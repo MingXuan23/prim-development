@@ -86,6 +86,8 @@ class OrderController extends Controller
             ['pu.organization_id', $o_id],
             ['po.product_item_id', $i_id],
             ['pu.status', 'In cart'],
+            ['po.deleted_at',null],
+            ['pu.deleted_at',null],
         ])
         ->select('quantity as qty')
         ->first();
@@ -343,11 +345,8 @@ class OrderController extends Controller
         //     }
         // }
         
-        //ProductOrder::where('id', $cart_id)->forceDelete();
-        ProductOrder::where('id', $cart_id)->update([
-            'deleted_at' => Carbon::now()
-        ]);
-        
+        ProductOrder::where('id', $cart_id)->forceDelete();
+
         $total_price = $this->calculateTotalPrice($cart_item->o_id);
 
         if($total_price != null) {
@@ -356,10 +355,7 @@ class OrderController extends Controller
                 'total_price' => $total_price
             ]);
         } else {
-            //DB::table('pgng_orders')->where('id', $cart_item->o_id)->delete();
-            DB::table('pgng_orders')->where('id', $cart_item->o_id)->update([
-                'deleted_at' => Carbon::now()
-            ]);
+            DB::table('pgng_orders')->where('id', $cart_item->o_id)->delete();
         }
     }
 

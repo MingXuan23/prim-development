@@ -165,18 +165,14 @@
 
 <div class="card-body pl-0 pr-0">
     <label for="DisplayParentName">
-        <span style="font-size: 35px">{{ $childrenByParent[0]->parentName }}</span>
+        <span style="font-size: 35px">{{ $parent->name }}</span>
         <br> 
     </label>
     <a href="{{route('koperasi.edit', $Sekolah->id)}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
 <!-- <a href="{{ route('koperasi.edit', $Sekolah->id) }}" class=" btn btn-primary waves-effect waves-light">
                     <i class="fas fa-cart-arrow-down"></i> View Cart</a> -->
     {{-- display item --}}
-  
-    @foreach($childrenByParent as $key=>$child)
-    @if($key === 0)
-    <!-- display the option to choose genaral product or all products  -->
-        <div class="inputGroup">
+    <div class="inputGroup">
             <input
                 id="GeneralItem"
                 class="childrenList"
@@ -204,9 +200,10 @@
                 <br>
             </label>
         </div>
-        
-        
-    @endif
+  @if(count($childrenByParent)!=0)
+    @foreach($childrenByParent as $key=>$child)
+    <!-- display the option to choose genaral product or all products  -->
+
     <!-- display the children with their class -->
     <div class="inputGroup">
         <input
@@ -224,7 +221,38 @@
     </div>
     
     @endforeach   
+  @else
+  <div class="inputGroup">
+            <input
+                id="ByTahun"
+                class="childrenList"
+                value="Tahun1"
+                
+                onchange=""
+                type="checkbox" />
+
+            <label for="ByTahun">
+                <span style="font-size: 18px">Products/Items By Tahun</span>
+                <br>
+            </label>
+        </div>
+  @endif
+    
 </div>
+
+{{-- wan 1/8/2023, tmbh textbar search --}}
+<!-- <div>
+  <div class="card-body pl-0 pr-0" id="search-product-div">
+    <div class="row">
+        <div class="col">
+            <div class="card p-2">
+                
+            </div>
+        </div>
+    </div>
+  </div>
+</div> -->
+{{-- end --}}
 
 <div class="card-body pl-0 pr-0" id="product-div">
         
@@ -233,8 +261,12 @@
         <div class="row">
                 <div class="col">
                   <div class="card  p-2">
+                  <label><span style="font-size: 18px;margin:10px 10px">Nama Produk</span></label>
+                  <div class="input-group">
+                    <input style="margin-bottom:10px" type="search" id="searchTextBox"class="form-control rounded" placeholder="Cari Produk" aria-label="Search" aria-describedby="search-addon" onkeyup="searchProduct()" />
+                </div>
                   <label><span style="font-size: 18px;margin:10px 10px">Pilih Kategori</span></label>
-                    <div class="d-flex">
+                    <div class="d-flex input-group">
                         
                         <select name="product_group" id="group_combobox" class="form-control">
                             <option value="AllItem" class="categoryGroup" selected>Semua Kategori </option>
@@ -304,6 +336,7 @@ $(document).ready(function(){
     $.ajax({
                url: "{{ route('koperasi.fetchClassYear') }}",
                method: "GET",
+               data:{'koopId':{{$koperasi->id}}},
                success: function(result) {
                             jQuery.each(result.datayear, function(key, value) {
                                 $("#group_combobox").append("<option value='Tahun"+ value.year +"' class='tahunGroup'> Tahun " + value.year + "</option>");
@@ -317,6 +350,7 @@ $(document).ready(function(){
                     });
                     
     $('.childrenList').change(function() {
+      
         $('.childrenList').prop('checked', false);
         $(this).prop('checked', true);
         $('#product-div').show();
@@ -324,6 +358,8 @@ $(document).ready(function(){
         if(selectedGroup!="AllItem" &&selectedGroup!="GeneralItem")
         {
             updateOption("tahun");//display when children is selected
+            if(selectedGroup==="Tahun1")
+              $('#group_combobox').val("Tahun1");
         }
         else{
             updateOption("category");//display when general item or all item is selected
@@ -353,7 +389,8 @@ function loadProductList(selectedGroup){
             type: 'POST', // Replace with GET or POST depending on your route
             data:{
                 selectedGroup:selectedGroup,
-                kooperasiId:{{$koperasi->id}}
+                kooperasiId:{{$koperasi->id}},
+                searchKey:$('#searchTextBox').val()
             },
             success: function(response) {
                 // Clear the current content of the container div
@@ -580,6 +617,24 @@ function initialiseCartButton()
         }
       })
     });
+}
+
+
+var searchTimeout; //run if the users stop to input to prevent too much ajax run
+function searchProduct(){
+  clearTimeout(searchTimeout);
+  const searchTextBox = document.getElementById('searchTextBox');
+    const textBefore = searchTextBox.value;
+ 
+    // Set a new timeout to call searchProduct after 0.5 seconds
+    searchTimeout = setTimeout(function() {    
+        var searchText =searchTextBox.value;
+        if(textBefore===searchText){
+          var selectedGroup = $('#group_combobox').val();
+          loadProductList(selectedGroup);
+        }
+            
+    }, 250); // 500 milliseconds = 0.5 seconds
 }
 </script>
 @endsection

@@ -20,6 +20,11 @@
                 color: var(--primary-color);
             }
             /* css */
+            .previous-nav{
+                color:rgb(45, 173, 179);
+                font: bold 19px "Roboto";
+                
+            }
             .cart-btn {
                 z-index: 999;
                 color:var(--secondary-bc);
@@ -270,7 +275,11 @@
             .btn:hover{
                     color:var(--primary-bc)!important;
             }
-           
+           @media only screen and (max-width:600px){
+             .google-map{
+                height:300px;
+             }
+           }
     </style>
 @endsection
 
@@ -278,7 +287,7 @@
     <div class="row align-items-center">
         <div class="col-sm-6">
             <div class="page-title-box">
-                <h4 class="font-size-18"><a href="{{ route('merchant-product.index') }}" class="text-muted">Senarai Produk</a>  <i class="fas fa-angle-right"></i>  {{$product->pg_name}} <i class="fas fa-angle-right"></i>  {{$product->name}}</h4>
+                <h4 class="font-size-18"><a href="{{ route('merchant-product.index') }}" class="previous-nav">Senarai Produk</a>  <i class="fas fa-angle-right"></i>  {{$product->pg_name}} <i class="fas fa-angle-right"></i>  {{$product->name}}</h4>
             </div>
         </div>
         <a href="{{route('merchant.all-cart')}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
@@ -300,13 +309,18 @@
                 <div class="product-details-content">
                     <p>{{$product->desc}}</p>
                 </div>
-                {{-- <div class="product-details-title mt-0" >
-                    <h4>Review</h3>
+                <div class="product-details-title mt-0" >
+                    <h4>Location</h3>
                     <i class="fas fa-angle-down arrow-icon"></i>
                 </div>
                 <div class="product-details-content">
-                    <p>Reviews</p>
-                </div> --}}
+                    <iframe
+                    width="100%"
+                    height="400"
+                    frameborder="0" style="border:0"
+                    src="https://www.google.com/maps?q={{ urlencode($address) }}&output=embed" class="google-map">
+                </iframe>
+                </div>
             </div>
         </section>
         <section class="col-md-4 right-container">

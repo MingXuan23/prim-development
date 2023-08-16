@@ -150,7 +150,9 @@
                             <div class="form-group">
                                 <input type="file" name="file" required>
                             </div>
-
+                            <div class="form-group">
+                                <input type="checkbox" name="compareOption">  Compare Student
+                            </div>
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary">Import</button>
                             </div>

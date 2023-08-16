@@ -66,6 +66,7 @@ class OrganizationController extends Controller
 
         if (!is_null($request->organization_picture)) {
             $extension = $request->organization_picture->extension();
+           
             $storagePath  = $request->organization_picture->storeAs('/public/organization-picture', $str . '.' . $extension);
             $file_name = basename($storagePath);
         }
@@ -191,6 +192,20 @@ class OrganizationController extends Controller
     public function update(OrganizationRequest $request, $id)
     {
         Organization::where('id', $id)->update($request->validated());
+        $file_name = '';
+        $link = explode(" ", $request->nama);
+        $str = implode("-", $link);
+        // dd($request->donation_type);
+        //dd($str);
+        if (!is_null($request->images)) {
+            $extension = $request->images->extension();
+            $storagePath  = $request->images->move(public_path('organization-picture'), $str . '.' . $extension);
+            $file_name = basename($storagePath);
+            //dd($storagePath,$file_name,$extension);
+            Organization::where('id', $id)->update([
+                'organization_picture'   => $file_name,
+            ]);
+        }
 
         if (isset($request->seller_id)) {
             Organization::where('id', $id)->update([
@@ -233,15 +248,26 @@ class OrganizationController extends Controller
                         $token = csrf_token();
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<a href="' . route('organization.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                        //$btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     } else {
                         $token = csrf_token();
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<a href="' . route('admin-reg.edit-merchant', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                        $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                        //$btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     }
                     return $btn;
                 })
+                //->rawColumns(['action'])
+                ->addColumn('status', function ($row) {
+                    if($row->seller_id != null) {
+                        $fpxstatus='<span class="badge rounded-pill bg-success text-white">Ready</span>';
+                    } else {
+                        $fpxstatus='<span class="badge rounded-pill bg-warning text-white">Pending</span>';
+                    }
+                    return $fpxstatus;
+                })
+                
+                ->rawColumns(['status','action'])
                 ->make(true);
         }
     }
