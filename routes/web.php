@@ -566,12 +566,6 @@ Route::group(['prefix' => 'delivery'], function () {
    //Route::get('')
 });
 
-    Route::get('homestay', 'HomestayController@index')->name('homestay.index');
-    Route::get('createhomestay', 'HomestayController@createhomestay')->name('homestay.createhomestay');
-    Route::post('inserthomestay', 'HomestayController@inserthomestay')->name('homestay.inserthomestay');
-    Route::post('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
-    
-
 Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'lhdn'], function () {
@@ -592,3 +586,9 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
     });
 });
+
+Route::get('homestay', 'HomestayController@index')->name('homestay.index');
+    Route::get('createhomestay', 'HomestayController@createhomestay')->name('homestay.createhomestay');
+    Route::post('inserthomestay', 'HomestayController@inserthomestay')->name('homestay.inserthomestay');
+    Route::post('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
+    
