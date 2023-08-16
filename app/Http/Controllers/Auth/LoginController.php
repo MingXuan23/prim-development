@@ -102,6 +102,13 @@ class LoginController extends Controller
             }
             return ['telno'=>$phone,'password'=>$request->get('password')];
         }
+        else if(strpos($request->get('email'), "@") !== false){
+            return ['email' => $request->get('email'), 'password'=>$request->get('password')];
+        }
+        else{
+            return ['telno' => $phone, 'password'=>$request->get('password')];
+
+        }
         // //elseif (filter_var($request->get('email'), FILTER_VALIDATE_EMAIL)) {
         //     return ['email' => $request->get('email'), 'password'=>$request->get('password')];
         // }
