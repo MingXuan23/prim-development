@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Homestay;
 
 class Promotion extends Model
 {
@@ -18,8 +17,8 @@ class Promotion extends Model
 
     public $timestamps = false;
 
-    public function homestay()
+    public function organization()
     {
-        return $this->belongsTo(Homestay::class, 'homestayid');
+        return $this->belongsTo(Organization::class);
     }
 }

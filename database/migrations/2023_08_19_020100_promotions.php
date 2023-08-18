@@ -20,7 +20,7 @@ class Promotions extends Migration
             $table->date('dateto');
             $table->double('discount');
             $table->unsignedBigInteger('homestayid')->index();
-            $table->foreign('homestayid')->references('homestayid')->on('homestays')->onDelete('cascade');
+            $table->foreign('homestayid')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 

@@ -558,23 +558,23 @@
                     </a>
                 </li>
 
+                @role('Homestay Admin')
                 <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-home-city-outline"></i>
                     <span>Homestay</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
-                    
-                    <li>
+                <li>
                         <a href="{{ route('homestay.index') }}" class=" waves-effect">
-                            <i class="mdi mdi-home-edit-outline"></i>
-                            <span>Daftar Homestay</span>
+                            <i class="mdi mdi-percent"></i>
+                            <span>Set Promosi</span>
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
                             <i class="mdi mdi-room-service-outline"></i>
-                            <span>Semak Bilik</span>
+                            <span>Urus Bilik</span>
                         </a>
                     </li>
                     <li>
@@ -585,6 +585,9 @@
                     </li>
                 </ul>  
             </li>
+            @endrole 
+
+                
 
             <!-- <li>
                     <a href="" class=" waves-effect">

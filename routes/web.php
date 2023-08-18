@@ -567,12 +567,14 @@ Route::group(['prefix' => 'delivery'], function () {
 });
 
     Route::get('homestay', 'HomestayController@index')->name('homestay.index');
-    Route::get('createhomestay', 'HomestayController@createhomestay')->name('homestay.createhomestay');
-    Route::post('inserthomestay', 'HomestayController@inserthomestay')->name('homestay.inserthomestay');
+    Route::get('setpromotion', 'HomestayController@setpromotion')->name('homestay.setpromotion');
+    Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
     Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
-    Route::post('addpromo/{id}', 'HomestayController@addpromo');
-    Route::post('addroom/{id}', 'HomestayController@addroom');
-    Route::post('edithomestay/{id}', 'HomestayController@edithomestay');
+    // Route::post('addpromo/{id}', 'HomestayController@addpromo');
+    // Route::post('addroom/{id}', 'HomestayController@addroom');
+    Route::post('editpromo/{id}', 'HomestayController@editpromo');
+    Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
+    Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
 
 Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');
 
