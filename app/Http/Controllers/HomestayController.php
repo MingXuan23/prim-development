@@ -107,44 +107,37 @@ class HomestayController extends Controller
     return response()->json(['disabledDates' => $disabledDates]);
 }
 
-public function addroom(Request $request, $id)
+public function addroom(Request $request)
 {
+    $userId = Auth::id();
     $request->validate([
+        'homestayid' => 'required',
         'roomname' => 'required',
         'roompax' => 'required',
         'details' => 'required',
-        'roomprice' => 'required'
+        'price' => 'required'
     ]);
 
-    // Retrieve the roomname and price from the request
-    $roomname = $request->input('roomname');
-    $roompax = $request->input('roompax');
-    $details = $request->input('details');
-    $roomprice = $request->input('roomprice');
-    $status = "Available";
+    $status = 'Available';
 
-    // Perform the logic to add the room using the provided data
-    // You can use the $id, $roomname, and $price variables as needed
-
-    // Example logic to add the room
     $room = new Room();
-    $room->homestayid = $id;
-    $room->roomname = $roomname;
-    $room->roompax = $roompax;
-    $room->details = $details;
-    $room->price = $roomprice;
+    $room->homestayid = $request->homestayid;
+    $room->roomname = $request->roomname;
+    $room->roompax = $request->roompax;
+    $room->details = $request->details;
+    $room->price = $request->price;
     $room->status = $status;
     $result = $room->save();
 
     if($result)
-    {
-        return back()->with('success', 'Bilik Berjaya Ditambah');
-    }
-    else
-    {
-        return back()->withInput()->with('error', 'Bilik Telahpun Didaftarkan');
+{
+    return back()->with('success', 'Bilik Berjaya Ditambah');
+}
+else
+{
+    return back()->withInput()->with('error', 'Bilik Telahpun Didaftarkan');
 
-    }
+}
 
     
 }
@@ -202,57 +195,44 @@ public function editpromo(Request $request,$promotionid)
             ->where('to.nama', $orgtype)
             ->where('o.deleted_at', null)
             ->get();
-        return view('homestay.urusbilik', compact('data'));
+
+            $rooms = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('organization_user','organizations.id', '=', 'organization_user.organization_id')
+                ->where('organization_user.user_id',$userId)
+                ->select('organizations.id', 'rooms.roomid','rooms.roomname','rooms.details', 'rooms.roompax','rooms.price','rooms.status')
+                ->get();
+        return view('homestay.urusbilik', compact('data','rooms'));
     }
 
-    public function gettabledata()
+    public function gettabledata(Request $request)
     {
-        if (request()->ajax()) {
-            $homestayid = $request->homestayid;
+        $homestayid = $request->homestayid;
+        $userId = Auth::id();
 
-            $hasOrganization = $request->hasOrganization;
+        $rooms = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('organization_user', 'organizations.id', '=', 'organization_user.organization_id')
+                ->where('organization_user.user_id', $userId)
+                ->where('organizations.id', $homestayid) // Filter by the selected homestay
+                ->select('organizations.id', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status')
+                ->get();
+              
+                return response()->json($rooms);
+    }
 
-            $userId = Auth::id();
-
-            if ($homestayid != '' && !is_null($hasOrganization)) {
-
-                    $data = DB::table('rooms')
-                    ->join('organizations', 'organizations.id', '=', 'rooms.homestayid')
-                    ->join('organization_user as ou', 'o.id', 'ou.organization_id')
-                    ->select('organizations.id as id', 'rooms.homestayid', 'rooms.roomname', 'rooms.roompax', 'rooms.details', 'rooms.price', 'rooms.status')
-                    ->distinct()
-                    ->where('ou.user_id', $userId)
-                    ->where('organizations.id', $homestayid);
-            }
-            elseif ($hasOrganization == "true") {
-                $data = DB::table('rooms')
-                    ->join('organizations', 'organizations.id', '=', 'rooms.homestayid')
-                    ->join('organization_user as ou', 'o.id', 'ou.organization_id')
-                    ->select('organizations.id as id', 'rooms.homestayid', 'rooms.roomname', 'rooms.roompax', 'rooms.details', 'rooms.price', 'rooms.status')
-                    ->distinct()
-                    ->where('ou.user_id', $userId);
-            }
-            
-
-            // dd($data->oid);
-            $table = Datatables::of($data);
-
-            $table->addColumn('status', function ($row) {
-                if ($row->status == '1') {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
-
-                    return $btn;
-                } else {
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
-
-                    return $btn;
-                }
-            });
-            return $table->make(true);
-        }
-        // return Donation::geturl();
+    public function tambahbilik()
+    {
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+        $data = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+        return view('homestay.tambahbilik',compact('data'));
     }
 
     public function store(Request $request)

@@ -21,7 +21,7 @@ class Rooms extends Migration
             $table->decimal('price',5,2);
             $table->string('status');
             $table->unsignedBigInteger('homestayid')->index();
-            $table->foreign('homestayid')->references('homestayid')->on('homestays')->onDelete('cascade');
+            $table->foreign('homestayid')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 

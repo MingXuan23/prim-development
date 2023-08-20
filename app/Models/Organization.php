@@ -79,4 +79,9 @@ class Organization extends Model
     {
         return $this->hasMany(Promotion::class);
     }
+
+    public function room()
+    {
+        return $this->hasMany(Room::class);
+    }
 }

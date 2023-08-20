@@ -570,11 +570,11 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('setpromotion', 'HomestayController@setpromotion')->name('homestay.setpromotion');
     Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
     Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
-    // Route::post('addpromo/{id}', 'HomestayController@addpromo');
-    // Route::post('addroom/{id}', 'HomestayController@addroom');
     Route::post('editpromo/{id}', 'HomestayController@editpromo');
     Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
     Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
+    Route::get('tambahbilik', 'HomestayController@tambahbilik')->name('homestay.tambahbilik');
+    Route::post('addroom', 'HomestayController@addroom')->name('homestay.addroom');
 
 Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');
 

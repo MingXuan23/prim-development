@@ -21,8 +21,8 @@ class Room extends Model
 
     public $timestamps = false;
 
-    public function homestay()
+    public function organization()
     {
-        return $this->belongsTo(Homestay::class, 'homestayid');
+        return $this->belongsTo(Organization::class);
     }
 }
