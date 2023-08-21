@@ -26,10 +26,18 @@ Route::get('/form', 'HomeController@form');
 // Route::get('/school', 'SchoolController@index');
 
 //landing page route
-Route::get('/', 'LandingPageController@index');
-Route::get('/organization-list', 'LandingPageController@organizationList');
+// Route::get('/', 'LandingPageController@index'); //maintenance page
+// Route::get('/organization-list', 'LandingPageController@organizationList');
 Route::get('/activity-list', 'LandingPageController@activitylist');
 Route::get('/activity-details', 'LandingPageController@activitydetails');
+
+//wan add
+//landing page route
+Route::group(['prefix' => ''], function () {
+    Route::get('', 'LandingPageController@indexprim');
+    //Route::get('/school-list', 'LandingPageController@getSchoolList')->name('landingpage.school');
+});
+//end wan add
 
 //landing donation page route
 Route::group(['prefix' => 'derma'], function () {
@@ -47,6 +55,8 @@ Route::group(['prefix' => 'derma'], function () {
 //landing fees page route
 Route::group(['prefix' => 'yuran'], function () {
     Route::get('', 'LandingPageController@indexFees');
+    Route::get('/organization-list', 'LandingPageController@indexOrganizationList');
+    Route::get('organization-all-list', 'LandingPageController@getAllOrganizationList')->name('landingpage.organization.list');
 });
 // feedback
 Route::post('feedback', 'LandingPageController@storeMessage')->name('feedback.store');

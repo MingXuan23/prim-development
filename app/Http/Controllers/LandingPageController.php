@@ -28,10 +28,59 @@ class LandingPageController extends AppBaseController
         return view('custom-errors.maintenance');
     }
 
+    //wan add
+    public function indexPrim()
+    {
+        //$schoollist = '';
+
+        $schools = DB::table('organization_url')
+            ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+            ->whereIn('type_organizations.id', [1, 2, 3])
+            ->where('organization_url.title', 'NOT LIKE', '%Poli%')
+            ->get();
+
+        //dd($schools);
+
+        $politeknik = DB::table('organization_url')
+        ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+        ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+        ->whereIn('type_organizations.id', [1, 2, 3])
+        ->where('organization_url.title', 'LIKE', '%Poli%')
+        ->get();
+
+        //dd($politeknik);
+
+        return view('landing-page.prim.index', ['schools' => $schools], ['politeknik' => $politeknik]);
+    }
+    //end wan add
+
+    //edit by wan
     public function indexFees()
     {
-        return view('landing-page.fees.index');
+        $organization = DB::table('organization_url')
+            ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+            ->get();
+
+        $schools = DB::table('organization_url')
+            ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+            ->whereIn('type_organizations.id', [1, 2, 3])
+            ->where('organization_url.title', 'NOT LIKE', '%Poli%')
+            ->get();
+
+        //dd($schools);
+
+        $politeknik = DB::table('organization_url')
+            ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+            ->whereIn('type_organizations.id', [1, 2, 3])
+            ->where('organization_url.title', 'LIKE', '%Poli%')
+            ->get();
+
+        return view('landing-page.fees.index', ['organizations' => $organization]);
     }
+    //end edit by wan
 
     public function storeMessage(Request $request)
     {
@@ -53,10 +102,43 @@ class LandingPageController extends AppBaseController
         return redirect()->back()->with('alert', 'Terima kasih');
     }
 
-    public function organizationList()
+    //edit by wan
+    // public function organizationList()
+    public function indexOrganizationList()
     {
+        // $organization = DB::table('organization_url')
+        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+        //     ->get();
+            
+        // return view('landing-page.organization_list', ['organizations' => $organization]);
         return view('landing-page.organization_list');
     }
+
+    public function getAllOrganizationList(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $data = DB::table('organization_url')
+                ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+                ->get();
+
+            // $data = OrganizationUrl::latest()->get();
+
+            $table = Datatables::of($data);
+            // return Datatables::of($data);
+                // ->addIndexColumn()
+                // // ->addColumn('action', function($row){
+                // //     $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
+                // //     return $actionBtn;
+                // // })
+                // ->rawColumns(['action'])
+
+            dd($table);
+            return $table->make(true);
+            
+        }
+    }
+    //end edit by wan
 
     public function activitylist()
     {

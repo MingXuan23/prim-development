@@ -7,9 +7,37 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noarchive">
-    <title> PRIM </title>
+    <title> PRiM | Yuran </title>
 
-    @include('landing-page.head')
+    @include('landing-page.fees.head')
+    <style>
+        /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
+            transform: scale(1.0);
+        }
+
+        .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
+            transform: scale(1.1);
+        } */
+
+        #headerhover {
+            transform: scale(0.9);
+            transition: transform 1s ease;
+        }
+
+        #headerhover:hover {
+            transform: scale(1.2);
+        }
+
+        @media only screen and (max-width: 991px){
+            .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
+                transform: scale(1.0);
+            }
+
+            .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.slash {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -18,7 +46,7 @@
         <div class="container nav-container">
             <div class="responsive-mobile-menu">
                 <div class="logo-wrapper">
-                    <a href="index.html" class="logo">
+                    <a href="/" class="logo">
                         <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
                     </a>
                 </div>
@@ -29,28 +57,19 @@
             </div>
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
-                    <li class="current-menu-item">
-                        <a href="/">Utama</a>
-                    </li>
+                    <li><a href="/">Utama</a></li>
+                    <li><a href="/derma">Derma</a></li>
+                    <li class="current-menu-item"><a href="#" style="font-size: 19px">Yuran</a></li>
                     <li class="menu-item-has-children">
-                        <a href="#">Organisasi</a>
+                        <a href="#">Perniagaan</a>
                         <ul class="sub-menu">
-                            <li><a href="/organization-list">Masjid</a></li>
-                            <li><a href="blog-details.html">Sekolah JAIM</a></li>
+                            <li><a href="/merchant/product">Get&Go</a></li>
+                            <li><a href="">Homestay</a></li>
+                            <li><a href="">Bus</a></li>
                         </ul>
                     </li>
-                    {{-- <li><a href="/organization-list">Derma</a></li> --}}
-                    <li class="menu-item-has-children">
-                        <a href="#">Derma</a>
-                        <ul class="sub-menu">
-                            <li><a href="/organization-list">Derma Tahfiz UTeM</a></li>
-                            {{-- <li><a href="blog-details.html">Sekolah JAIM</a></li> --}}
-                        </ul>
-                    </li>
-                    {{-- <li><a href="#pricing">Pricing</a></li> --}}
-                    {{-- <li><a href="#sekolah">Sekolah</a></li> --}}
-                    {{-- <li><a href="#team">Modul</a></li> --}}
-                    
+                    {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
+                    <li class="slash">|</li>
                     <li><a href="#contact">Hubungi Kami</a></li>
                 </ul>
             </div>
@@ -65,17 +84,20 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="header-area header-bg-2 style-two" id="home">
-        <div class="header-right-image  wow zoomIn" style="text-align: right">
+    <header class="header-area header-bg-3 style-two" id="home" style="padding-top: 170px; padding-bottom: 170px;">
+        {{-- <div class="header-right-image  wow zoomIn" style="text-align: right">
             <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image" style="padding-bottom: 358px;
             max-width: 63%;">
-        </div>
+        </div> --}}
         <div class="container">
-            <div class="row">
-                <div class="col-lg-7">
+            <div class="row d-flex align-items-center">
+                <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: center">
+                    <img src="{{ URL::asset('assets/landing-page/img/header-yuran.png') }}" alt="header right image" style="max-width: 75%;" id="headerhover">
+                </div>
+                <div class="col-lg-6 justify-content-center">
                     <div class="header-inner">
-                        <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
+                        <h1 class="title wow fadeInDown">Yuran</h1>
+                        <p>Sebuah sistem yang menyediakan perkhidmatan untuk pengurusan yuran sesebuah organisasi
                             berdaftar.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
@@ -89,934 +111,56 @@
     <!-- header area end  -->
 
     <!-- about us area start -->
-
-    <section class="about-us-area style-two">
+    <section class="about-us-area">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="section-title left-aligned">
-                        <!-- section title -->
-                        {{-- <span class="subtitle">Tentang PRiM</span> --}}
-                        <h3 class="title extra">Tentang PRiM</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
-                    </div><!-- //. section title -->
-                </div>
-                <div class="col-lg-6">
-                    <div class="feature-area">
-                        <ul class="feature-list">
-                            <li class="single-feature-list wow zoomIn">
-                                <div class="icon icon-bg-1">
-                                    <i class="flaticon-vector"></i>
-                                </div>
-                                <div class="content">
-                                    <h4 class="title"><a href="#">Clean Design</a></h4>
-                                    <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                        tempor incididunt</p>
-                                </div>
-                            </li>
-                            <li class="single-feature-list wow zoomIn">
-                                <div class="icon icon-bg-2">
-                                    <i class="flaticon-responsive"></i>
-                                </div>
-                                <div class="content">
-                                    <h4 class="title"><a href="#">Fully Respnosive</a></h4>
-                                    <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labor tempor
-                                        incididunt</p>
-                                </div>
-                            </li>
-                            <li class="single-feature-list wow zoomIn">
-                                <div class="icon icon-bg-3">
-                                    <i class="flaticon-layers-2"></i>
-                                </div>
-                                <div class="content">
-                                    <h4 class="title"><a href="#">Pixel Perfect</a></h4>
-                                    <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                        tempor incididunt</p>
-                                </div>
-                            </li>
-                            <li class="single-feature-list wow zoomIn">
-                                <div class="icon icon-bg-4">
-                                    <i class="flaticon-picture"></i>
-                                </div>
-                                <div class="content">
-                                    <h4 class="title"><a href="#">Retina Ready</a></h4>
-                                    <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                        tempor incididunt</p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- about us area end -->
-    <!-- portfolio area start -->
-    <section class="portfolio" class="portfolio-area portfolio-four pb-100">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-10">
+            <div class="row justify-content-center" style="">
+                <div class="col-lg-10">
                     <div class="section-title text-center pb-10">
-                        <h3 class="title">Organisasi</h3>
-                        <p class="text">Stop wasting time and money designing and managing a website that doesn’t get
-                            results. Happiness guaranteed!</p>
-                    </div> <!-- section title -->
-                </div>
-            </div> <!-- row -->
-            <div class="row">
-                <div class="col-lg-3 col-md-3">
-                    <div class="portfolio-menu text-center mt-50">
-                        <ul>
-                            <li class="active"> Semua Organisasi </li>
-                            <li data-filter=".branding-4" >Masjid An-Najihah </li>
-                            <li data-filter=".marketing-4">Masjid Al-Alami</li>
-                            <li data-filter=".planning-4">Tahfiz Iman</li>
-                            <li data-filter=".research-4">Pusat Islam UTeM</li>
-                            {{-- <li >Semua Organisasi</li> --}}
-                        </ul>
-                    </div> <!-- portfolio menu -->
-                </div>
-                <div class="col-lg-9 col-md-9">
-                    <div class="row">
-                        <div class="col no-gutters grid mt-50">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <div class="branding-4">
-                                        <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                                            <div class="carousel-inner" role="listbox">
-                                                <div style="max-width:100%; height:auto; !important;" >
-                                                    <div class="carousel-item active">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1-min.jpg') }}" alt="First slide">
-                                                    </div>
-                                                    <div class="carousel-item">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5-min.jpg') }}" alt="Second slide">
-                                                    </div>
-                                                    <div class="carousel-item">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3-min.jpeg') }}" alt="Third slide">
-                                                    </div>
-                                                </div>
-                                                
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> <!-- row -->
-                        <div class="col no-gutters grid mt-50">
-                            <div class="marketing-4">
-                                <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                                    <div class="carousel-inner" role="listbox">
-                                        <div style="max-width:100%; height:auto; !important;" >
-                                            <div class="carousel-item active">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
-                                            </div>
-                                            <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
-                                            </div>
-                                            <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h1 class="title wow fadeInDown">Organisasi</h1>
+                        <p class="text-center">Antara organisasi yang telah berdaftar bersama Yuran PRiM dan diperakui Bank Islam boleh diakses disini.</p>
+                        
                     </div>
-                    <div class="row">
-                        <div class="col no-gutters grid mt-50">
-                        <div class="planning-4">
-                            <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                                <div class="carousel-inner" role="listbox">
-                                    <div style="max-width:100%; height:auto; !important;" >
-                                        <div class="carousel-item active">
-                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
-                                        </div>
-                                        <div class="carousel-item">
-                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
-                                        </div>
-                                        <div class="carousel-item">
-                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
-                                        </div>
-                                    </div>
-                                    
-                                </div>
-                            </div>
-                        </div>
-                        </div> <!-- row -->
-                        <div class="col no-gutters grid mt-50">
-                            <div class="research-4">
-                                <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                                    <div class="carousel-inner" role="listbox">
-                                        <div style="max-width:100%; height:auto; !important;" >
-                                            <div class="carousel-item active">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
-                                            </div>
-                                            <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
-                                            </div>
-                                            <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                        {{-- <div class="col-lg-4 col-sm-6 marketing-4 research-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/landing-page/img/blog/2.jpg') }}" alt="blog image"
-                                        width="277" height="277">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/2.png"><i
-                                                        class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- single portfolio -->
-                        </div>
-                        <div class="col-lg-4 col-sm-6 branding-4 marketing-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="blog image"
-                                        width="277" height="277">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/3.png"><i
-                                                        class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- single portfolio -->
-                        </div>
-                        <div class="col-lg-4 col-sm-6 planning-4 research-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/landing-page/img/blog/4.jpg') }}" alt="blog image"
-                                        width="277" height="277">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/4.png"><i
-                                                        class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- single portfolio -->
-                        </div>
-                        <div class="col-lg-4 col-sm-6 marketing-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="blog image"
-                                        width="277" height="277">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/5.png"><i
-                                                        class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- single portfolio -->
-                        </div>
-                        <div class="col-lg-4 col-sm-6 planning-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/landing-page/img/blog/2.jpg') }}" alt="blog image"
-                                        width="277" height="277">
-                                    <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                                        <div class="portfolio-content">
-                                            <div class="portfolio-icon">
-                                                <a class="image-popup" href="assets/images/portfolio/6.png"><i
-                                                        class="lni lni-zoom-in"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                            <div class="portfolio-icon">
-                                                <a href="#"><i class="lni lni-link"></i></a>
-                                                <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> <!-- single portfolio -->
-                        </div> --}}
-
-
-                        <!-- portfolio menu -->
-                        {{-- <div class="col-lg-4 col-sm-6 research-4">
-                            <div class="single-portfolio">
-                                <div class="portfolio-image">
-                                    <img src="{{ URL::asset('assets/images/portfolio/7.png') }}" alt="">
-                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                            <div class="portfolio-content">
-                                <div class="portfolio-icon">
-                                    <a class="image-popup" href="assets/images/portfolio/7.png"><i
-                                            class="lni lni-zoom-in"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                                <div class="portfolio-icon">
-                                    <a href="#"><i class="lni lni-link"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- single portfolio -->
-            </div>
-            <div class="col-lg-4 col-sm-6 branding-4 planning-4">
-                <div class="single-portfolio">
-                    <div class="portfolio-image">
-                        <img src="{{ URL::asset('assets/images/portfolio/8.png') }}" alt="">
-                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                            <div class="portfolio-content">
-                                <div class="portfolio-icon">
-                                    <a class="image-popup" href="assets/images/portfolio/8.png"><i
-                                            class="lni lni-zoom-in"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                                <div class="portfolio-icon">
-                                    <a href="#"><i class="lni lni-link"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- single portfolio -->
-            </div>
-            <div class="col-lg-4 col-sm-6 marketing-4">
-                <div class="single-portfolio">
-                    <div class="portfolio-image">
-                        <img src="{{ URL::asset('assets/images/portfolio/9.png') }}" alt="">
-                        <div class="portfolio-overlay d-flex align-items-center justify-content-center">
-                            <div class="portfolio-content">
-                                <div class="portfolio-icon">
-                                    <a class="image-popup" href="assets/images/portfolio/9.png"><i
-                                            class="lni lni-zoom-in"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                                <div class="portfolio-icon">
-                                    <a href="#"><i class="lni lni-link"></i></a>
-                                    <img src="assets/images/portfolio/shape.svg" alt="shape" class="shape">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- single portfolio -->
-            </div> --}}
-        </div>
-        </div> <!-- row -->
-        </div>
-    </section>
-    <!-- video area end -->
-
-    <!-- counterup area start -->
-    <section class="counterup-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="fa fa-users" aria-hidden="true"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">14,567</span>
-                            <h4 class="title">Jumlah Organisasi</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="fas fa-donate"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">567</span>
-                            <h4 class="title">Derma Terkumpul</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="flaticon-email"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">36,778</span>
-                            <h4 class="title">App Downloads</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="single-counter-item">
-                        <!-- single counter item -->
-                        <div class="icon">
-                            <i class="flaticon-trophy"></i>
-                        </div>
-                        <div class="content">
-                            <span class="count-num">30</span>
-                            <h4 class="title">Best Awards</h4>
-                        </div>
-                    </div><!-- //. single counter item -->
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- counterup area end -->
-
-    <!-- why choose area start -->
-    <section class="why-choose-area why-choose-us-bg">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title white">
-                        <!-- section title -->
-                        {{-- <span class="subtitle">Modul</span> --}}
-                        <h3 class="title extra">Modul</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
-                    </div><!-- //. section title -->
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-4 col-md-12">
-                    <div class="single-why-us-item margin-top-60 wow zoomIn">
-                        <!-- single why us item -->
-                        <div class="icon gdbg-1">
-                            <i class="flaticon-settings-1"></i>
-                        </div>
-                        <div class="content">
-                            <h4 class="title">Easy Customize</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
-                        </div>
-                    </div><!-- //. single why us item -->
-                    <div class="single-why-us-item wow zoomIn">
-                        <!-- single why us item -->
-                        <div class="icon gdbg-2">
-                            <i class="flaticon-checked"></i>
-                        </div>
-                        <div class="content">
-                            <h4 class="title">Fast & Secure</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
-                        </div>
-                    </div><!-- //. single why us item -->
+                <div class="col-lg-12 text-center">
+                    <div class="team-carousel">
+                        <!-- team carousel -->
+                        @foreach ($organizations as $org)
+                            <div class="single-team-member">
+                                <!-- single team member -->
+                                <div class="thumb">
+                                    <img src="{{ URL::asset('organization-picture/' . $org->organization_picture ) }}"
+                                        alt="{{ $org->url_name }} logo">
+                                    <div class="hover">
+                                        <ul class="social-icon">
+                                            <li class="white"><a href="/{{ $org->url_name }}"><i class="fa fa-link"></i></a></i></a>prim.my/{{ $org->url_name }}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="content">
+                                    <h4 class="title">{{ $org->title }}</h4>
+                                    {{-- <span class="post">CEO, Appside</span> --}}
+                                </div>
+                            </div><!-- //. single team member -->
+                            {{-- <div class="owl-dots" style="text-align: center"></div> --}}
+                         @endforeach
+                    </div><!-- //. team carousel -->
+                    {{-- <div class="btn-wrapper wow fadeInUp">
+                        <a href="/yuran/organization-list" class="boxed-btn btn-rounded">Lebih Lanjut</a>
+                    </div> --}}
                 </div>
-                <div class="col-lg-4 col-md-12">
-                    <div class="single-why-us-item margin-top-60 wow zoomIn">
-                        <!-- single why us item -->
-                        <div class="icon gdbg-3">
-                            <i class="flaticon-chat-1"></i>
-                        </div>
-                        <div class="content">
-                            <h4 class="title">Live Chat</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
-                        </div>
-                    </div><!-- //. single why us item -->
-                    <div class="single-why-us-item wow zoomIn">
-                        <!-- single why us item -->
-                        <div class="icon gdbg-4">
-                            <i class="flaticon-cloud"></i>
-                        </div>
-                        <div class="content">
-                            <h4 class="title">Secure Data</h4>
-                            <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore</p>
-                        </div>
-                    </div><!-- //. single why us item -->
-                </div>
-            </div>
+            </div>  
         </div>
     </section>
-    <!-- why choose area end -->
-
-    <!-- how it works area start -->
-    <section class="how-it-work-area">
-        <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-        <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
-        <div class="shape-3"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-        <div class="shape-4"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title">
-                        <!-- section title -->
-                        {{-- <span class="subtitle">Working Process</span> --}}
-                        <h3 class="title">Proses Sistem</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
-                    </div><!-- //. section title -->
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="how-it-work-tab-nav">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="account-tab" data-toggle="tab" href="#account" role="tab"
-                                    aria-controls="account" aria-selected="true"><i class="flaticon-checked"></i> Daftar
-                                    Akaun <span class="number">1</span></a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab"
-                                    aria-controls="settings" aria-selected="false"><i class="flaticon-settings-1"></i>
-                                    Log Masuk <span class="number">2</span></a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="chat-tab" data-toggle="tab" href="#chat" role="tab"
-                                    aria-controls="chat" aria-selected="false"><i class="flaticon-chat-1"></i> Mula
-                                    Gunakan Sistem <span class="number">3</span></a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="tab-content wow slideInUp">
-                        <div class="tab-pane fade show active" id="account" role="tabpanel"
-                            aria-labelledby="account-tab">
-                            <div class="how-it-works-tab-content">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="left-content-area">
-                                            <h4 class="title">Daftar </h4>
-                                            <p>Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="right-content-area">
-                                            <div class="img-wrapper">
-                                                <img src="{{ URL::asset('assets/landing-page/img/how-it-works-image.png') }}"
-                                                    alt="how it works image">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
-                            <div class="how-it-works-tab-content">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="left-content-area">
-                                            <h4 class="title">Login Account</h4>
-                                            <p>Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="right-content-area">
-                                            <div class="img-wrapper">
-                                                <img src="{{ URL::asset('assets/landing-page/img/how-it-works-image.png') }}"
-                                                    alt="how it works image">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="chat" role="tabpanel" aria-labelledby="chat-tab">
-                            <div class="how-it-works-tab-content">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="left-content-area">
-                                            <h4 class="title">Login Account</h4>
-                                            <p>Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                            <p>Adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor
-                                                tempor incididunt ut labore et dolore
-                                                Innovative solutions with the best. Incididunt dolor sit amet,
-                                                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                                                et dolor tempor incididunt ut labore et dolore </p>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="right-content-area">
-                                            <div class="img-wrapper">
-                                                <img src="{{ URL::asset('assets/landing-page/img/how-it-works-image.png') }}"
-                                                    alt="how it works image">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- how it works area end -->
-
-    <!-- screenshort area start -->
-    <section class="screenshort-area">
-        <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-        <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title">
-                        <!-- section title -->
-                        <span class="subtitle">Screenshots</span>
-                        <h3 class="title extra">Amazing visual interface</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
-                    </div><!-- //. section title -->
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="screenshort-carousel">
-                        <!-- screenshort carousel -->
-                        <div class="single-screenshort-item">
-                            <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-1-min.jpg') }}" alt="">
-                        </div><!-- //.single screenshort item -->
-                        <div class="single-screenshort-item">
-                            <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-2-min.jpg') }}" alt="">
-                        </div><!-- //.single screenshort item -->
-                        <div class="single-screenshort-item">
-                            <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-3-min.jpg') }}" alt="">
-                        </div><!-- //.single screenshort item -->
-                        <div class="single-screenshort-item">
-                            <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-4-min.jpg') }}" alt="">
-                        </div><!-- //.single screenshort item -->
-                    </div><!-- //. screenshort carousel -->
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- screenshort area end -->
-
-    <!-- testimonial area start -->
-    {{-- <section class="testimonial-area">
-            <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-    <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="section-title ">
-                    <!-- section title -->
-                    <span class="subtitle">Testimonial</span>
-                    <h3 class="title extra">Testimonial</h3>
-                    <p>Apa kata pengguna-pengguna kami</p>
-                </div><!-- //. section title -->
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="testimonial-carousel">
-
-                    <div class="single-testimonial-item">
-                        <!-- single testimonial item -->
-                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/01.jpg') }}" alt="">
-                        <div class="hover">
-                            <!-- hover -->
-                            <div class="hover-inner">
-                                <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                    dolor tempor incididunt .</p>
-                                <div class="author-meta">
-                                    <h4 class="name">Riley Cassidy</h4>
-                                    <span class="post">Chief executive</span>
-                                </div>
-                            </div>
-                        </div><!-- //. hover -->
-                    </div><!-- //. single testimonial item -->
-                    <div class="single-testimonial-item">
-                        <!-- single testimonial item -->
-                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/02.jpg') }}" alt="">
-                        <div class="hover">
-                            <!-- hover -->
-                            <div class="hover-inner">
-                                <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                    dolor tempor incididunt .</p>
-                                <div class="author-meta">
-                                    <h4 class="name">Archie Tracey</h4>
-                                    <span class="post">Technician</span>
-                                </div>
-                            </div>
-                        </div><!-- //. hover -->
-                    </div><!-- //. single testimonial item -->
-                    <div class="single-testimonial-item">
-                        <!-- single testimonial item -->
-                        <img src="{{ URL::asset('assets/landing-page/img/testimonial/03.jpg') }}" alt="">
-                        <div class="hover">
-                            <!-- hover -->
-                            <div class="hover-inner">
-                                <div class="icon"><i class="fas fa-quote-left"></i></div>
-                                <p>They provide innovative solutions with the best. tempor incididunt utla bore et
-                                    dolor tempor incididunt .</p>
-                                <div class="author-meta">
-                                    <h4 class="name">Brodie Hopley</h4>
-                                    <span class="post">Chief Elevator</span>
-                                </div>
-                            </div>
-                        </div><!-- //. hover -->
-                    </div><!-- //. single testimonial item -->
-
-                </div>
-            </div>
-        </div>
-    </div>
-    </section> --}}
-    <!-- testimonial area end -->
-
-    <!-- price plan area start -->
-    <section class="pricing-plan-area pricing-plan-bg" id="pricing">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title white">
-                        <!-- section title -->
-                        {{-- <span class="subtitle">Pricing plans</span> --}}
-                        <h3 class="title extra">Testimonial</h3>
-                        <p>Apa kata pengguna-pengguna kami....</p>
-                    </div><!-- //. section title -->
-                </div>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-6">
-                    <div class="single-testimonial">
-                        <div class="testimonial-text">
-                            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                                volutpat nisl, sit amet convallis nunc turp.”</p>
-                        </div>
-                        <div class="testimonial-author d-sm-flex justify-content-between">
-                            <div class="author-info d-flex align-items-center">
-                                <div class="author-image">
-                                    <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}" alt="author">
-                                </div>
-                                <div class="author-name media-body">
-                                    <h5 class="name">Mr. Jems Bond</h5>
-                                    <span class="sub-title">CEO Mbuild Firm</span>
-                                </div>
-                            </div>
-                            <div class="author-review">
-                                <ul class="star">
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                </ul>
-                                <span class="review">( 7 Reviews )</span>
-                            </div>
-                        </div>
-                    </div> <!-- single testimonial -->
-                </div>
-                <div class="col-lg-6">
-
-                    <div class="single-testimonial">
-                        <div class="testimonial-text">
-                            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                                volutpat nisl, sit amet convallis nunc turp.”</p>
-                        </div>
-                        <div class="testimonial-author d-sm-flex justify-content-between">
-                            <div class="author-info d-flex align-items-center">
-                                <div class="author-image">
-                                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}" alt="author">
-                                </div>
-                                <div class="author-name media-body">
-                                    <h5 class="name">Mr. Jems Bond</h5>
-                                    <span class="sub-title">CEO Mbuild Firm</span>
-                                </div>
-                            </div>
-                            <div class="author-review">
-                                <ul class="star">
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                    <li><i class="lni lni-star-filled"></i></li>
-                                </ul>
-                                <span class="review">( 7 Reviews )</span>
-                            </div>
-                        </div>
-                    </div> <!-- single testimonial -->
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- price plan area end -->
-    <!--====== TESTIMONIAL PART START ======-->
-
-
-    {{-- <section id="testimonial" class="testimonial-area">
-        <div class="container">
-            
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="contact-area-wrapper" id="contact">
-                        <!-- contact area wrapper -->
-                        <span class="subtitle">Contact us</span>
-                        <h3 class="title">Testimonial</h3>
-                        <p>Apa kata pelanggan kami...</p>
-                       
-                    </div><!-- //. contact area wrapper -->
-                </div>
-                <div class="col-lg-6">
-                    <div class="testimonial-right-content mt-50">
-                        <div class="quota">
-                            <i class="lni lni-quotation"></i>
-                        </div>
-                        <div class="testimonial-content-wrapper testimonial-active">
-                            <div class="single-testimonial">
-                                <div class="testimonial-text">
-                                    <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                                        volutpat nisl, sit amet convallis nunc turp.”</p>
-                                </div>
-                                <div class="testimonial-author d-sm-flex justify-content-between">
-                                    <div class="author-info d-flex align-items-center">
-                                        <div class="author-image">
-                                            <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}"
-    alt="author">
-    </div>
-    <div class="author-name media-body">
-        <h5 class="name">Mr. Jems Bond</h5>
-        <span class="sub-title">CEO Mbuild Firm</span>
-    </div>
-    </div>
-    <div class="author-review">
-        <ul class="star">
-            <li><i class="lni lni-star-filled"></i></li>
-            <li><i class="lni lni-star-filled"></i></li>
-            <li><i class="lni lni-star-filled"></i></li>
-            <li><i class="lni lni-star-filled"></i></li>
-            <li><i class="lni lni-star-filled"></i></li>
-        </ul>
-        <span class="review">( 7 Reviews )</span>
-    </div>
-    </div>
-    </div> <!-- single testimonial -->
-    <div class="single-testimonial">
-        <div class="testimonial-text">
-            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                volutpat nisl, sit amet convallis nunc turp.”</p>
-        </div>
-        <div class="testimonial-author d-sm-flex justify-content-between">
-            <div class="author-info d-flex align-items-center">
-                <div class="author-image">
-                    <img src="{{ URL::asset('assets/images/testimonial/author-2.jpg') }}" alt="author">
-                </div>
-                <div class="author-name media-body">
-                    <h5 class="name">Mr. Jems Bond</h5>
-                    <span class="sub-title">CEO Mbuild Firm</span>
-                </div>
-            </div>
-            <div class="author-review">
-                <ul class="star">
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                </ul>
-                <span class="review">( 7 Reviews )</span>
-            </div>
-        </div>
-    </div> <!-- single testimonial -->
-    <div class="single-testimonial">
-        <div class="testimonial-text">
-            <p class="text">“Praesent scelerisque, odio eu fermentum malesuada, nisi arcu
-                volutpat nisl, sit amet convallis nunc turp.”</p>
-        </div>
-        <div class="testimonial-author d-sm-flex justify-content-between">
-            <div class="author-info d-flex align-items-center">
-                <div class="author-image">
-                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}" alt="author">
-                </div>
-                <div class="author-name media-body">
-                    <h5 class="name">Mr. Jems Bond</h5>
-                    <span class="sub-title">CEO Mbuild Firm</span>
-                </div>
-            </div>
-            <div class="author-review">
-                <ul class="star">
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                    <li><i class="lni lni-star-filled"></i></li>
-                </ul>
-                <span class="review">( 7 Reviews )</span>
-            </div>
-        </div>
-    </div> <!-- single testimonial -->
-    </div> <!-- testimonial content wrapper -->
-    </div> <!-- testimonial right content -->
-    </div>
-    </div> <!-- row -->
-    </div> <!-- container -->
-    </section> --}}
-
+    <!-- about us area end -->
     <!--====== TESTIMONIAL PART ENDS ======-->
 
     <!-- team member area start -->
-    <section class="team-member-area" id="team">
-        <div class="bg-shape-1">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="">
+    <section class="team-member-area" id="ourteam">
+
+        <div class="bg-shape-3 fa-rotate-180" style="top: 0px !important;right:0px;">
+            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width:45%">
         </div>
         <div class="bg-shape-2">
             <img src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg-min.jpg') }}" alt="">
@@ -1025,158 +169,80 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title">
-                        <!-- section title -->
-                        <span class="subtitle">Our Team</span>
-                        <h3 class="title">Meet The Team</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
-                    </div><!-- //. section title -->
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="section-title">
+                            <!-- section title -->
+                            {{-- <span class="subtitle">Screenshots</span> --}}
+                            <h3 class="title extra">Kerjasama</h3>
+                            <p>Laman web ini telah diakui dan disahkan selamat untuk digunakan.</p>
+                        </div><!-- //. section title -->
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="team-carousel">
-                        <!-- team carousel -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/01.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
+                <div class="row text-center">
+                    <div class="col-lg-12">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt=""
+                                    style="max-width:70%">
                             </div>
-                            <div class="content">
-                                <h4 class="title">Eiusmod Tempor</h4>
-                                <span class="post">CEO, Appside</span>
+
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt=""
+                                    style="max-width:70%">
+
                             </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/02.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
+
+                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt=""
+                                    style="max-width:70%">
+
                             </div>
-                            <div class="content">
-                                <h4 class="title">Maria Hexa</h4>
-                                <span class="post">CEO, Appside</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/03.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Scotty Hedge</h4>
-                                <span class="post">Creative Designer</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/04.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Lara Croft</h4>
-                                <span class="post">CEO, Appside</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                        <div class="single-team-member">
-                            <!-- single team member -->
-                            <div class="thumb">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/05.jpg') }}"
-                                    alt="team member image">
-                                <div class="hover">
-                                    <ul class="social-icon">
-                                        <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <h4 class="title">Eiusmoy Smith</h4>
-                                <span class="post">Developer</span>
-                            </div>
-                        </div><!-- //. single team member -->
-                    </div><!-- //. team carousel -->
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="download-area-wrapper margin-top-120">
-                        <!-- download area wrapper -->
-                        <span class="subtitle">Download now</span>
-                        <h3 class="title">Available for all device</h3>
-                        <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
-                            incididunt ut labore dolore magna.</p>
-                        <div class="btn-wrapper">
-                            <a href="#" class="boxed-btn btn-rounded gd-bg-1"><i class="flaticon-apple-1"></i> App
-                                Store</a>
-                            <a href="#" class="boxed-btn btn-rounded gd-bg-2"><i class="flaticon-android-logo"></i> Play
-                                Store</a>
-                            <a href="#" class="boxed-btn btn-rounded gd-bg-3"><i class="flaticon-windows"></i>
-                                Windows</a>
+
                         </div>
-                    </div><!-- //. download area wrapper -->
+                    </div>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-lg-6">
                     <div class="contact-area-wrapper" id="contact">
                         <!-- contact area wrapper -->
                         {{-- <span class="subtitle">Contact us</span> --}}
                         <h3 class="title">Hubungi Kami</h3>
-                        <p>Untuk sebarang pertanyaan dan pendaftaran, sila hubungi kami.</p>
-                        <form action="index.html" id="contact_form_submit" class="contact-form sec-margin">
+                        <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>
+                        <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"
+                            enctype="multipart/form-data">
+
+                            @csrf
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-lg-12">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="uname" placeholder="Your Name">
+                                        <input type="text" class="form-control" id="uname" name="uname"
+                                            placeholder="Nama Penuh" required>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="email" placeholder="Your Email">
+                                        <input type="email" class="form-control" id="email" name="email"
+                                            placeholder="Email" required>
                                     </div>
                                 </div>
+
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control phone_no" id="telno" name="telno"
+                                            placeholder="Nombor Telefon" required>
+                                    </div>
+                                </div>
+
                                 <div class="col-lg-12">
                                     <div class="form-group textarea">
                                         <textarea name="message" id="message" class="form-control" cols="30" rows="10"
-                                            placeholder="Message"></textarea>
+                                            placeholder="Mesej" required></textarea>
                                     </div>
-                                    <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Submit Now</button>
+                                    <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>
                                 </div>
                             </div>
                         </form>
@@ -1184,28 +250,15 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="contact-area-wrapper" id="contact">
-                        <div class="mapouter">
-                            <div class="gmap_canvas"><iframe width="500" height="500" id="gmap_canvas"
-                                    src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                    frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a
-                                    href="https://123movies-to.org"></a><br>
-                                <style>
-                                    .mapouter {
-                                        position: relative;
-                                        text-align: right;
-                                        height: 500px;
-                                        width: 600px;
-                                    }
-                                </style><a href="https://www.embedgooglemap.net">html code for google maps</a>
-                                <style>
-                                    .gmap_canvas {
-                                        overflow: hidden;
-                                        background: none !important;
-                                        height: 500px;
-                                        width: 600px;
-                                    }
-                                </style>
-                            </div>
+                        <div class="map-responsive">
+                            <iframe
+                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                                width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""
+                                aria-hidden="false" tabindex="0">
+                            </iframe>
+
+                            <br>
+
                         </div>
                     </div><!-- //. contact area wrapper -->
                 </div>
@@ -1221,48 +274,46 @@
                 <div class="row justify-content-md-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
-                            <a href="index.html" class="footer-logo"><img
+                            <a href="" style="pointer-events: none;" class="footer-logo"><img
                                     src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
-                            <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
-                                berdaftar. </p>
-                            <ul class="social-icon">
-                                <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                <li><a href="#"><i class="fab fa-pinterest-p"></i></a></li>
-                            </ul>
+                            <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk
+                                menghubungkan ibu bapa serta penjaga dengan pihak sekolah.</p>
+
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-8">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Hubungi</h4>
-
-                            <p>Email : hishamudin.ali@gmail.com </p>
-
-                            <p>Phone : 06 - 270 1000</p>
-
-
+                            <p>Email : yahya@utem.edu.my </p>
+                            <p>Phone : 60 13-647 7388</p>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Alamat</h4>
-                            <p> Universiti Teknikal Malaysia Melaka, Jalan Hang Tuah Jaya, 76100 Durian Tunggal, Melaka</p>
+                            <p> Universiti Teknikal Malaysia Melaka, Hang Tuah Jaya, 76100 Durian Tunggal, Melaka
+                            </p>
 
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
-                        <div class="footer-widget about_widget">
-                            <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-utem.png') }}" alt=""></a>
+                        <div class="footer-widget about_widget" style="text-align: center">
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
+                                    src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt=""
+                                    style="max-width: 70%"></a>
 
-                            <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""></a>
-                            <ul class="social-icon">
-                                <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
-                                <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                                <li><a href="#"><i class="fab fa-pinterest-p"></i></a></li>
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
+                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""
+                                    style="max-width: 70%"></a>
+
+                            <ul class="social-icon" style="text-align: center; ">
+                                <li><a href="https://www.facebook.com/MyUTeM/"><i class="fab fa-facebook-f"></i></a>
+                                </li>
+                                <li><a href="https://www.instagram.com/myutem/"><i class="fab fa-instagram"></i></a>
+                                </li>
+                                <li><a href="https://twitter.com/myutem"><i class="fab fa-twitter"></i></a></li>
+                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i
+                                            class="fab fa-youtube"></i></a></li>
                             </ul>
                         </div>
                     </div>
@@ -1278,11 +329,11 @@
                             <!-- copyright inner wrapper -->
                             <div class="left-content-area">
                                 <!-- left content area -->
-                                &copy; Copyrights 2019 Appside All rights reserved.
+                                &copy; Copyrights <span id="year"></span> All rights reserved | PRiM
                             </div><!-- //. left content aera -->
                             <div class="right-content-area">
                                 <!-- right content area -->
-                                Designed by <strong>Love</strong>
+                                {{-- Designed by <strong>Love</strong> --}}
                             </div><!-- //. right content area -->
                         </div><!-- //.copyright inner wrapper -->
                     </div>
@@ -1320,6 +371,150 @@
     </div>
     <!-- back to top area end -->
     @include('landing-page.footer-script')
-</body>
 
+    <script>
+        var msg = '{{Session::get('alert')}}';
+        var exist = '{{Session::has('alert')}}';
+
+    if (exist) {
+        Swal.fire({
+            title: 'Terima Kasih',
+            text: 'Kerana anda telah menghubungi kami!',
+            type: 'success',
+            confirmButtonColor: '#556ee6',
+            cancelButtonColor: "#f46a6a"
+        });
+    }
+
+    $(document).ready(function() {
+        window.onload = function() {
+            document.getElementById("8").click();
+        };
+
+        // $.ajax({
+        //     url: "{{ route('landingpage.donation.header') }}",
+        //     type: 'GET',
+        //     success: function( result ){
+
+        //         $('#headerPoster').html( result );
+        //         $('#headerPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+        //         $('#headerPoster').find('.owl-stage-outer').children().unwrap();
+        //         $('#headerPoster').owlCarousel({
+        //             loop:true,
+        //             autoplay:true,
+        //             autoplayTimeout:5000,
+        //             responsiveClass:true,
+        //             responsive:{
+        //                 0:{
+        //                     items:1,
+        //                     nav:false
+        //                 },
+        //                 600:{
+        //                     items:1,
+        //                     nav:false
+        //                 },
+        //                 1000:{
+        //                     items:1,
+        //                     nav:false,
+        //                 }
+        //             }, 
+        //         });
+        //     }
+        // });
+
+        $('#feedback').owlCarousel({
+            loop: true,
+            autoplay: true, //true if you want enable autoplay
+            autoPlayTimeout: 1000,
+            margin: 30,
+            dots: false,
+            nav: true,
+            smartSpeed:3000,
+            animateIn:'fadeIn',
+            animateOut:"fadeOut",
+            navText:['',''],
+            responsive: {
+                0: {
+                    items: 1,
+                    nav: false
+                },
+                414: {
+                    items: 1,
+                    nav: false
+                },
+                520: {
+                    items: 2,
+                    nav: false
+                },
+                767: {
+                    items: 2,
+                    nav: false
+                },
+                768: {
+                    items: 2,
+                    nav: false
+                },
+                960: {
+                    items: 3,
+                    nav:false
+                },
+                1200: {
+                    items: 4
+                },
+                1920: {
+                    items: 4
+                }
+            }
+        });
+
+        $('.phone_no').mask('00000000000');
+
+        var typedonation;
+        $(document).on('click', '.btn-organization', function() {
+            var type = $(this).attr("id");
+            typedonation = type;
+            $.ajax({
+                url: "{{ route('landingpage.donation.bytabbing') }}",
+                type: 'GET',
+                data: {
+                    type: type,
+                },
+                success: function( result ){
+
+                    var posterExist = true;
+                    if (result === '') {
+                        result = `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
+                        posterExist = false;
+                    }
+
+                    $('#donationPoster').html( result );
+                    $('#donationPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                    $('#donationPoster').find('.owl-stage-outer').children().unwrap();
+                    $('#donationPoster').owlCarousel({
+                        // loop:true,
+                        dots: posterExist,
+                        // paginationNumbers: false,
+                        responsiveClass:true,
+                        responsive:{
+                            0:{
+                                items:1,
+                                nav:false
+                            },
+                            600:{
+                                items:2,
+                                nav:false
+                            },
+                            1000:{
+                                items:3,
+                                nav:false,
+                                loop:false
+                            }
+                        }, 
+                    });
+                }
+            });
+        });
+    });
+    </script>
+</body>
 </html>
