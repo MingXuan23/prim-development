@@ -61,7 +61,9 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         }
         //dd("Success");
         $phone = trim((string)$row['no_tel_bimbit_penjaga']);
-
+        $phone = str_replace('-', '', $phone);
+        $phone= preg_replace('/^\s+|\s+$/u', '',$phone);
+        
         if(!$this->startsWith($phone,"+60") && !$this->startsWith($phone,"60")){
             if(strlen($phone) == 10) {
                 $phone = str_pad($phone, 12, "+60", STR_PAD_LEFT);
@@ -119,9 +121,9 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                 $validator = Validator::make($row, [
                     $phone      =>  'required|unique:users,telno',
                 ]);
-    
+
                 $newparent = new Parents([
-                    'name'           =>  trim(strtoupper($row['nama_penjaga'])),
+                    'name'           =>  preg_replace('/^\s+|\s+$/u', '',trim(strtoupper($row['nama_penjaga']))),
                     'password'       =>  Hash::make('abc123'),
                     'telno'          =>  $phone,
                     'remember_token' =>  Str::random(40),
@@ -190,7 +192,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         $user->assignRole($rolename->nama);
         
         $student = new Student([
-            'nama'       => trim(strtoupper($row["nama"])),
+            'nama'       => preg_replace('/^\s+|\s+$/u', '',trim(strtoupper($row["nama"]))),
             // 'icno'       => $row["no_kp"],
             'gender'     => $row["jantina"],
             'email'      => isset($row['email']) ? $row['email'] : NULL,

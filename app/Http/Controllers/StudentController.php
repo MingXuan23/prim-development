@@ -625,6 +625,28 @@ class StudentController extends Controller
         return response()->json(['success' => $list]);
     }
 
+    public function validateStatus($data){
+        $update=false;
+        foreach($data as $d){
+            $check_debt = DB::table('students')
+                                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                                    ->select('students.*')
+                                    ->where('class_student.id', $d->csid)
+                                    ->where('student_fees_new.status', 'Debt')
+                                    ->count();
+
+            if ($check_debt == 0) {
+                $update=true;
+                DB::table('class_student')
+                    ->where('id', $d->csid)
+                    ->update(['fees_status' => 'Completed']);
+
+            }
+        }
+        return $update;
+    }
+
     public function getStudentDatatableFees(Request $request)
     {
         // dd($request->oid);
@@ -642,13 +664,25 @@ class StudentController extends Controller
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.*', 'class_student.fees_status')
+                    ->select('students.*', 'class_student.fees_status','class_student.id as csid')
                     ->where([
                         ['classes.id', $classid],
                         ['class_student.status', 1],
                     ])
                     ->orderBy('students.nama');
-
+                $update=$this->validateStatus($data->get());
+                if($update){
+                    $data = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                    ->select('students.*', 'class_student.fees_status','class_student.id as csid')
+                    ->where([
+                        ['classes.id', $classid],
+                        ['class_student.status', 1],
+                    ])
+                    ->orderBy('students.nama');
+                }
                 $table = Datatables::of($data);
 
                 $table->addColumn('gender', function ($row) {

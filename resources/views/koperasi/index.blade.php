@@ -90,11 +90,15 @@
       if($(this).val() != '')
       {
         var sekolah_id = $(this).children(":selected").val();
-        
+        const isBuyer = {!! json_encode(collect($orgID)->contains('isBuyer', true)) !!};
+       
         $.ajax({
           url: "{{ route('koperasi.fetchKoop') }}",
           method: "POST",
-          data: {sID : sekolah_id},
+          data: {
+                    sID : sekolah_id,
+                    isBuyer:isBuyer
+                },
           success:function(result)
           {
             $("#koop").removeAttr('style');
@@ -107,7 +111,7 @@
             else
             {
               $.each(result.success, function(key, value){
-                console.log(value);
+                //console.log(value);
                 let htmlText='<div class="row">' +
                     '<div class="col-12">' +
                         '<h4 class="my-3"></h4>' +
@@ -151,7 +155,12 @@
                     
                 //$('#koop').append(htmlText);
                 var url = '{{ route("koperasi.koopShop", ":id") }}';
-                url = url.replace(':id', value.id);
+                if(value.url_name!=null){
+                  url = url.replace(':id', value.url_name);
+                }else{
+                  url = url.replace(':id', value.id);
+                }
+                
                 $('#koop').append(htmlText+"<a href='"+url+"') }}' class='btn btn-success waves-effect waves-light'>Pesan</a></div></div></div></div></div>");
               })
             } 
