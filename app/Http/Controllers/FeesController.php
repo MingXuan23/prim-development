@@ -1605,8 +1605,8 @@ class FeesController extends AppBaseController
        }else{
         $filename=$org->nama;
        }
-       
-        
+
+        $filename = str_replace(['/', '\\'], '', $filename);
         $kelasId=$request->yuranExport1;
         return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
     }
