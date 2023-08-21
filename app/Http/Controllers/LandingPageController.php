@@ -60,6 +60,7 @@ class LandingPageController extends AppBaseController
     {
         $organization = DB::table('organization_url')
             ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+            ->where('organization_url.status',1)
             ->get();
 
         $schools = DB::table('organization_url')
