@@ -194,7 +194,7 @@ $(document).on('click', '#bookbutton', function(e) {
          }
      });
     
-    $('#promoform').attr('action','editpromo/'+id);
+    $('#bookform').attr('action','book/'+id);
     $('#bookmodal').modal('show');
   });
 
