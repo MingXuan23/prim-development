@@ -235,6 +235,63 @@ public function editpromo(Request $request,$promotionid)
         return view('homestay.tambahbilik',compact('data'));
     }
 
+    public function bookinglist()
+    {
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+        $data = DB::table('organizations as o')
+            ->join('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->join('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->selectRaw('(SELECT MIN(price) FROM rooms WHERE homestayid = o.id) AS cheapest')
+            ->distinct()
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                      ->from('rooms')
+                      ->whereRaw('rooms.homestayid = o.id');
+            }) // Add WHERE EXISTS condition
+            ->get();
+            return view('homestay.bookinglist',compact('data'));
+    }
+
+    public function bookhomestay($homestayid)
+    {
+
+
+        $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('organization_user', 'organizations.id', '=', 'organization_user.organization_id')
+                ->where('organizations.id', $homestayid) // Filter by the selected homestay
+                ->select('organizations.id','organizations.nama', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status')
+                ->get();
+
+                $nama = $data->isEmpty() ? '' : $data[0]->nama;
+
+                return view('homestay.bookhomestay', compact('data', 'nama','homestayid'));
+    }
+
+    public function disabledateroom($roomid)
+    {
+        $rooms = Room::where('roomid', $roomid) // Add your additional condition here
+                   ->get();
+
+    $disabledDates = [];
+
+    foreach ($rooms as $room) {
+        $begin = new DateTime($room->checkin);
+        $end = new DateTime($room->checkout);
+        $interval = new DateInterval('P1D');
+        $daterange = new DatePeriod($begin, $interval, $end);
+
+        foreach ($daterange as $date) {
+            $disabledDates[] = $date->format('Y-m-d');
+        }
+    }
+
+    return response()->json(['disabledDates' => $disabledDates]);
+    }
+
     public function store(Request $request)
     {
         //
