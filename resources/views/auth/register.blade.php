@@ -120,7 +120,7 @@ Register
                                     <div class="form-group row">
                                         <div class="col-12 text-center">
                                             <button class="btn btn-light w-md waves-effect waves-light"
-                                            type="button" onclick="window.location='{{ url("/derma") }}'">Kembali</button>
+                                            type="button" onclick="window.location='{{ url("/") }}'">Kembali</button>
 
                                             <button class="btn btn-primary w-md waves-effect waves-light"
                                                 type="submit">Daftar</button>
