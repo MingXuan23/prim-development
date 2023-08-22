@@ -346,7 +346,7 @@ public function editpromo(Request $request,$promotionid)
 
         if($result)
             {
-                return back()->with('success', 'PromTempahanosi Berjaya Dibuat');
+                return back()->with('success', 'Promosi Berjaya Disunting');
             }
             else
             {
