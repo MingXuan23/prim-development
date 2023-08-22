@@ -1,13 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\customer;
-use App\room;
-use App\payment;
 
-class booking extends Model
+
+class Booking extends Model
 {
     protected $primaryKey = 'bookingid';
     protected $fillable = [
@@ -18,8 +16,6 @@ class booking extends Model
         'customerid',
         'roomid'
     ];
-
-    public $timestamps = false;
 
     public function users()
     {

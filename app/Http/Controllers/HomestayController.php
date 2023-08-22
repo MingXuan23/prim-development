@@ -16,9 +16,10 @@ use App\Models\Donation;
 use Illuminate\Support\Facades\Validator;
 use App\Models\OrganizationRole;
 use App\Models\Promotion;
+use App\Models\Booking;
 use App\Models\Room;
 use View;
-
+use Carbon\Carbon;
 use DateTime;
 use DateInterval;
 use DatePeriod;
@@ -273,14 +274,18 @@ public function editpromo(Request $request,$promotionid)
 
     public function disabledateroom($roomid)
     {
-        $rooms = Room::where('roomid', $roomid) // Add your additional condition here
+        $bookings = Booking::where('roomid', $roomid)
+                   ->where(function($query) {
+                       $query->where('status', 'Booked')
+                             ->orWhere('status', 'Paid');
+                   })
                    ->get();
 
     $disabledDates = [];
 
-    foreach ($rooms as $room) {
-        $begin = new DateTime($room->checkin);
-        $end = new DateTime($room->checkout);
+    foreach ($bookings as $booking) {
+        $begin = new DateTime($booking->checkin);
+        $end = new DateTime($booking->checkout);
         $interval = new DateInterval('P1D');
         $daterange = new DatePeriod($begin, $interval, $end);
 
@@ -291,6 +296,66 @@ public function editpromo(Request $request,$promotionid)
 
     return response()->json(['disabledDates' => $disabledDates]);
     }
+
+    public function insertbooking(Request $request, $roomid, $price)
+    {
+        $request->validate([
+            'checkin' => 'required',
+            'checkout' => 'required',
+        ]);
+
+        $userId = Auth::id();
+        $fkroom = $roomid;
+        $status = "Booked";
+
+        $homestay = Room::where('roomid', $fkroom)->first();
+
+        if (!$homestay) {
+            return back()->with('fail', 'Homestay not found!');
+        }
+
+        $homestayid = $homestay->homestayid;
+
+        $checkinDate = Carbon::createFromFormat('Y-m-d', $request->checkin);
+        $checkoutDate = Carbon::createFromFormat('Y-m-d', $request->checkout);
+        $totalDays = $checkoutDate->diffInDays($checkinDate) + 1;
+    
+    // Retrieve the applicable promotion based on check-in and check-out dates
+        $promotion = Promotion::where('datefrom', '<=', $request->checkin)
+        ->where('dateto', '>=', $request->checkout)
+        ->where('homestayid',$homestayid)
+        ->first();
+    
+    // Calculate the total price with discount if a promotion is applicable
+        if ($promotion !== null) {
+            $discountedPrice = $price - ($price * $promotion->discount / 100);
+            $totalPrice = $discountedPrice * $totalDays;
+        } else {
+            $totalPrice = $price * $totalDays;
+        }
+
+        $booking = new Booking();
+        $booking->checkin = $request->checkin;
+        $booking->checkout = $request->checkout;
+        $booking->status = $status;
+        $booking->totalprice = $totalPrice;
+        $booking->customerid = $userId;
+        $booking->roomid = $fkroom;
+
+        $result = $booking->save();
+
+        if($result)
+            {
+                return back()->with('success', 'PromTempahanosi Berjaya Dibuat');
+            }
+            else
+            {
+                return back()->withInput()->with('error', 'Tempahan Gagal Dibuat');
+    
+            }
+
+    }
+
 
     public function store(Request $request)
     {

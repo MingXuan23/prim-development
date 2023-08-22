@@ -77,17 +77,12 @@
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Tarikh Dari</label>
-                        <input type="text" class="form-control" id="datefrom" name="datefrom">
+                        <input type="text" class="form-control" id="checkin" name="checkin">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Tarikh Hingga</label>
-                        <input type="text" class="form-control" id="dateto" name="dateto">
-                    </div>
-
-                    <div class="col-12 mb-3">
-                        <label class="form-label">Harga Semalam (RM)</label>
-                        <input type="text" class="form-control" id="price" name="price" disabled>
+                        <input type="text" class="form-control" id="checkout" name="checkout">
                     </div>
 
                     <div class="col-12 d-flex justify-content-end">
@@ -132,12 +127,11 @@
 
 $(document).on('click', '#bookbutton', function(e) {
     price = e.target.parentElement.previousElementSibling.innerText;
-    datefrom = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
+    roomname = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
     id = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
     console.log(id);
     $('#roomid').val(id);
-    $('#roomname').val(datefrom);
-    $('#price').val(price);
+    $('#roomname').val(roomname);
 
     var today = new Date();
     var maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
@@ -149,9 +143,9 @@ $(document).on('click', '#bookbutton', function(e) {
          success: function(response) {
              var disabledDates = response.disabledDates;
 
-             $("#datefrom, #dateto").datepicker("destroy");
+             $("#checkin, #checkout").datepicker("destroy");
             
-             $("#datefrom").datepicker({
+             $("#checkin").datepicker({
                 minDate: 0,
                 maxDate: maxDate,
                 dateFormat: "yy-mm-dd",
@@ -166,11 +160,11 @@ $(document).on('click', '#bookbutton', function(e) {
                     return [!isDisabled];
                 },
                 onSelect: function(selectedDate) {
-                    $("#dateto").datepicker("option", "minDate", selectedDate);
+                    $("#checkout").datepicker("option", "minDate", selectedDate);
                 }
             });
 
-            $("#dateto").datepicker({
+            $("#checkout").datepicker({
                 minDate: 0,
                 maxDate: maxDate,
                 dateFormat: "yy-mm-dd",
@@ -185,7 +179,7 @@ $(document).on('click', '#bookbutton', function(e) {
                     return [!isDisabled];
                 },
                 onSelect: function(selectedDate) {
-                    $("#datefrom").datepicker("option", "maxDate", selectedDate);
+                    $("#checkin").datepicker("option", "maxDate", selectedDate);
                 }
             });
          },
@@ -194,7 +188,7 @@ $(document).on('click', '#bookbutton', function(e) {
          }
      });
     
-    $('#bookform').attr('action','book/'+id);
+    $('#bookform').attr('action','insertbooking/'+id + '/' + price);
     $('#bookmodal').modal('show');
   });
 
