@@ -138,7 +138,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
         $combinedTransactions = $transactionA->merge($transactionB);
 
         $transaction = $combinedTransactions->pluck('id')->unique();
-        dd($transaction);
+
         $totalAmount = DB::table('transactions as t')
             ->whereIn('t.id', $transaction)
             ->sum('t.amount');
