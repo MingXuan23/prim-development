@@ -7,12 +7,52 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noarchive">
-    <title> PRIM | Senarai Derma</title>
+    <title> PRIM | Senarai Organisasi</title>
 
     @include('landing-page.head')
-    @include('layouts.datatable')
-    @include('layouts.datatable-responsive')
+    <style>
+        .map-responsive {
+            overflow: hidden;
+            padding-bottom: 56.25%;
+            position: relative;
+            height: 0;
+        }
 
+        .map-responsive iframe {
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+
+        #headerhover {
+            transform: scale(0.9);
+            transition: transform 1s ease;
+        }
+
+        #headerhover:hover {
+            transform: scale(1.2);
+        }
+
+        /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
+            transform: scale(1.0);
+        }
+
+        .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
+            transform: scale(1.1);
+        } */
+
+        @media only screen and (max-width: 991px){
+            .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
+                transform: scale(1.0);
+            }
+
+            .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.slash {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -21,7 +61,7 @@
         <div class="container nav-container">
             <div class="responsive-mobile-menu">
                 <div class="logo-wrapper">
-                    <a href="index.html" class="logo">
+                    <a href="/" class="logo">
                         <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
                     </a>
                 </div>
@@ -32,20 +72,10 @@
             </div>
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
-                    <li class="current-menu-item">
+                    {{-- <li class="current-menu-item">
                         <a href="/">Utama</a>
-                    </li>
-                    <li><a href="/organization-list">Derma</a></li>
-                    {{-- <li><a href="#pricing">Pricing</a></li> --}}
-                    <li><a href="#sekolah">Sekolah</a></li>
-                    <li class="menu-item-has-children">
-                        <a href="#">Organisasi</a>
-                        <ul class="sub-menu">
-                            <li><a href="/organization-list">Masjid</a></li>
-                            <li><a href="blog-details.html">Sekolah JAIM</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#contact">Hubungi Kami</a></li>
+                    </li> --}}
+                    <li><i class="fa fa-arrow-left" aria-hidden="true"><a href="/javascript:history.back()">Back</a></i></li>
                 </ul>
             </div>
             <div class="nav-right-content">

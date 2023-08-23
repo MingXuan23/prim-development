@@ -7,18 +7,25 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noarchive">
-    <title> PRiM | Yuran </title>
+    <title> PRiM </title>
 
-    @include('landing-page.fees.head')
+    @include('landing-page.head')
     <style>
-        /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
-            transform: scale(1.0);
+        .map-responsive {
+            overflow: hidden;
+            padding-bottom: 56.25%;
+            position: relative;
+            height: 0;
         }
 
-        .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
-            transform: scale(1.1);
-        } */
-
+        .map-responsive iframe {
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+        }
+        
         #headerhover {
             transform: scale(0.9);
             transition: transform 1s ease;
@@ -27,6 +34,14 @@
         #headerhover:hover {
             transform: scale(1.2);
         }
+
+        /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
+            transform: scale(1.0);
+        }
+
+        .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
+            transform: scale(1.1);
+        } */
 
         @media only screen and (max-width: 991px){
             .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
@@ -46,9 +61,10 @@
         <div class="container nav-container">
             <div class="responsive-mobile-menu">
                 <div class="logo-wrapper">
-                    <a href="/" class="logo">
+                    <a class="navbar-brand" href="/">
                         <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
                     </a>
+                    {{-- <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo"> --}}
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
                     aria-expanded="false" aria-label="Toggle navigation">
@@ -57,9 +73,9 @@
             </div>
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
-                    <li><a href="/">Utama</a></li>
+                    <li class="current-menu-item"><a href="#" style="font-size: 19px">Utama</a></li>
                     <li><a href="/derma">Derma</a></li>
-                    <li class="current-menu-item"><a href="#" style="font-size: 19px">Yuran</a></li>
+                    <li><a href="/yuran">Yuran</a></li>
                     <li class="menu-item-has-children">
                         <a href="#">Perniagaan</a>
                         <ul class="sub-menu">
@@ -68,6 +84,27 @@
                             <li><a href="">Bus</a></li>
                         </ul>
                     </li>
+                    {{-- <li class="menu-item-has-children">
+                        <a href="#">Yuran</a>
+                        <ul class="sub-menu">
+                            <li class="menu-item-has-children">
+                                <a href="#">Sekolah</a>
+                                <ul class="sub-menu">
+                                    @foreach ($schools as $school)
+                                        <li><a href="/{{ $school->url_name }}">{{ $school->title }}</a></li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                            <li class="menu-item-has-children">
+                                <a href="#">Politeknik</a>
+                                <ul class="sub-menu">
+                                    @foreach ($politeknik as $poli)
+                                        <li><a href="/{{ $poli->url_name }}">{{ $poli->title }}</a></li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        </ul>
+                    </li> --}}
                     {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
                     <li class="slash">|</li>
                     <li><a href="#contact">Hubungi Kami</a></li>
@@ -84,76 +121,115 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="header-area header-bg-3 style-two" id="home" style="padding-top: 170px; padding-bottom: 170px;">
-        {{-- <div class="header-right-image  wow zoomIn" style="text-align: right">
-            <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image" style="padding-bottom: 358px;
-            max-width: 63%;">
-        </div> --}}
+    <header class="header-area header-bg-2 style-two img-fluid" id="home" style="margin-bottom: 10px; background: url('{{ asset('assets/landing-page/img/bg/header-bg-2.png') }}') no-repeat; padding-top: 150px; padding-bottom: 130px;">
+
         <div class="container">
             <div class="row d-flex align-items-center">
-                <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: center">
-                    <img src="{{ URL::asset('assets/landing-page/img/header-yuran.png') }}" alt="header right image" style="max-width: 75%;" id="headerhover">
-                </div>
                 <div class="col-lg-6 justify-content-center">
+                    {{-- <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div> --}}
                     <div class="header-inner">
-                        <h1 class="title wow fadeInDown">Yuran</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan untuk pengurusan yuran sesebuah organisasi
-                            berdaftar.</p>
+                        <h1 class="title wow fadeInDown white">PRiM</h1>
+                        <p class="white" style="font-size: 20px;">Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                        berdaftar. Antara perkhidmatan yang telah kami sediakan ialah Derma, Yuran, Get&Go dan sebagainya.</p>
                         <div class="btn-wrapper wow fadeInUp">
-                            <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
+                            <a href="/register" class="boxed-btn btn-rounded">Daftar</a>
                             <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: right">
+                    <img src="{{ URL::asset('assets/landing-page/img/header-mockup-yuran-2.png') }}" alt="header right image" style="max-width: 110%;" id="headerhover">
+                </div>
             </div>
+            {{-- <div class="row justify-content-center" style="padding-top: 120px">
+                <div class="col-lg-12 justify-content-center">
+                    <h3 class="title wow white">Tentang PRiM</h3>
+                    <p class="white" style="font-size: 20px;">Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
+                        ibu bapa serta penjaga dengan pihak sekolah. PRiM menyediakan gerbang pembayaran yuran
+                        sekolah secara dalam talian dan juga pengumuman kelas dan sekolah. Di samping itu, PRiM juga
+                        menyediakan perkhidmatan lain dalam talian seperti kutipan derma bagi organisasi berdaftar.
+                    </p>
+                </div>
+            </div> --}}
         </div>
+        
     </header>
     <!-- header area end  -->
-
-    <!-- about us area start -->
+    
+    {{-- about us area --}}
     <section class="about-us-area">
+        {{-- <div class="bg-shape-1">
+            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="">
+        </div> --}}
+        
         <div class="container">
+            <div class="row justify-content-center" style="padding-bottom: 116px">
+                <div class="col-lg-10">
+                    <div class="section-title">
+                        <!-- section title -->
+                        {{-- <span class="subtitle">Our Team</span> --}}
+                        <h3 class="title">Tentang PRiM</h3>
+                        <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
+                            ibu bapa serta penjaga dengan pihak sekolah. PRiM menyediakan gerbang pembayaran yuran
+                            sekolah secara dalam talian dan juga pengumuman kelas dan sekolah. Di samping itu, PRiM juga
+                            menyediakan perkhidmatan lain dalam talian seperti kutipan derma bagi organisasi berdaftar.
+                        </p>
+                    </div><!-- //. section title -->
+                </div>
+            </div>
+
             <div class="row justify-content-center" style="">
                 <div class="col-lg-10">
-                    <div class="section-title text-center pb-10">
-                        <h1 class="title wow fadeInDown">Organisasi</h1>
-                        <p class="text-center">Antara organisasi yang telah berdaftar bersama Yuran PRiM dan diperakui Bank Islam boleh diakses disini.</p>
-                        
+                    <div class="section-title">
+                        {{-- <span class="subtitle">Nyot</span> --}}
+                        <h3 class="title">Kelebihan PRiM</h3>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-12 text-center">
-                    <div class="team-carousel">
-                        <!-- team carousel -->
-                        @foreach ($organizations as $org)
-                            <div class="single-team-member">
-                                <!-- single team member -->
-                                <div class="thumb">
-                                    <img src="{{ URL::asset('organization-picture/' . $org->organization_picture ) }}"
-                                        alt="{{ $org->url_name }} logo">
-                                    <div class="hover">
-                                        <ul class="social-icon">
-                                            <li class="white"><a href="/{{ $org->url_name }}"><i class="fa fa-link"></i></a></i></a>prim.my/{{ $org->url_name }}</li>
-                                        </ul>
-                                    </div>
+                <div class="col-md-12">
+                    <div class="feature-area">
+                        <ul class="feature-list wow fadeInUp" style="visibility: visible; animation-name: fadeInUp;">
+                            <li class="single-feature-list">
+                                <div class="icon icon-bg-1">
+                                    <i class="flaticon-checked"></i>
                                 </div>
                                 <div class="content">
-                                    <h4 class="title">{{ $org->title }}</h4>
-                                    {{-- <span class="post">CEO, Appside</span> --}}
+                                    <h4 class="title">
+                                        <a href="#">Mudah</a>
+                                    </h4>
+                                    <p>Memudahkan pembayaran dalam talian untuk transaksi atau pembayaran harian maupun bulanan.</p>
                                 </div>
-                            </div><!-- //. single team member -->
-                            {{-- <div class="owl-dots" style="text-align: center"></div> --}}
-                         @endforeach
-                    </div><!-- //. team carousel -->
-                    {{-- <div class="btn-wrapper wow fadeInUp">
-                        <a href="/yuran/organization-list" class="boxed-btn btn-rounded">Lebih Lanjut</a>
-                    </div> --}}
+                            </li>
+                            <li class="single-feature-list">
+                                <div class="icon icon-bg-2">
+                                    <i class="flaticon-layers"></i>
+                                </div>
+                                <div class="content">
+                                    <h4 class="title">
+                                        <a href="#">Cepat</a>
+                                    </h4>
+                                    <p>Kebolehan untuk melakukan transaksi secara terus kepada penerima dengan pantas.</p>
+                                </div>
+                            </li>
+                            <li class="single-feature-list">
+                                <div class="icon icon-bg-3">
+                                    <i class="flaticon-shield"></i>
+                                </div>
+                                <div class="content">
+                                    <h4 class="title">
+                                        <a href="#">Selamat</a>
+                                    </h4>
+                                    <p>Organisasi yang berdaftar adalah organisasi-organisasi yang diiktiraf oleh Bank Islam.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>  
+            </div>
         </div>
+    </div>
     </section>
-    <!-- about us area end -->
     <!--====== TESTIMONIAL PART ENDS ======-->
 
     <!-- team member area start -->
@@ -169,6 +245,54 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="section-title">
+                            <!-- section title -->
+                            {{-- <span class="subtitle">Screenshots</span> --}}
+                            <h3 class="title extra">Pasukan Kami</h3>
+                        </div><!-- //. section title -->
+                    </div>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-lg-12 mb-200">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                            <div class="p-3">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">
+                            </div>
+                            <div class="pt-3">
+                                <h4>Yahya Bin Ibrahim</h4>
+                                <p>Chief Executive Officer</p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                            <div class="p-3">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">
+                            </div>
+                            <div class="pt-3">
+                                <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>
+                                <p>Chief Operating Officer</p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                            <div class="p-3">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">
+                            </div>
+                            <div class="pt-3">
+                                <h4>Muhammad 'Ammar Muhammad Sani</h4>
+                                <p>Chief Technology Officer</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">

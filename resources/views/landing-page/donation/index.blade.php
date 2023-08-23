@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noarchive">
-    <title> PRIM </title>
+    <title> PRiM | Derma </title>
 
     @include('landing-page.head')
     <style>
@@ -25,6 +25,33 @@
             width: 100%;
             position: absolute;
         }
+
+        #headerhover {
+            transform: scale(0.9);
+            transition: transform 1s ease;
+        }
+
+        #headerhover:hover {
+            transform: scale(1.2);
+        }
+
+        /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
+            transform: scale(1.0);
+        }
+
+        .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
+            transform: scale(1.1);
+        } */
+
+        @media only screen and (max-width: 991px){
+            .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
+                transform: scale(1.0);
+            }
+
+            .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.slash {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -34,22 +61,40 @@
         <div class="container nav-container">
             <div class="responsive-mobile-menu">
                 <div class="logo-wrapper">
-                    <!-- <a href="index.html" class="logo">
+                    <a class="navbar-brand" href="/">
                         <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
-                    </a> -->
-                    <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
+                    </a>
+                    {{-- <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo"> --}}
                 </div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
                     aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
-            <div class="collapse navbar-collapse" id="appside_main_menu">
+            {{-- <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
-                    <li class="current-menu-item"><a href="#">Utama</a></li>
+                    <li class="current-menu-item"><a href="#">Derma</a></li>
                     <li><a href="#team">Info</a></li>
                     <li><a href="#organization">Organisasi</a></li>
                     <li><a href="#ourteam">Kerjasama</a></li>
+                    <li><a href="#contact">Hubungi Kami</a></li>
+                </ul>
+            </div> --}}
+            <div class="collapse navbar-collapse" id="appside_main_menu">
+                <ul class="navbar-nav">
+                    <li><a href="/">Utama</a></li>
+                    <li class="current-menu-item"><a href="#" style="font-size: 19px">Derma</a></li>
+                    <li><a href="/yuran">Yuran</a></li>
+                    <li class="menu-item-has-children">
+                        <a href="#">Perniagaan</a>
+                        <ul class="sub-menu">
+                            <li><a href="/merchant/product">Get&Go</a></li>
+                            <li><a href="">Homestay</a></li>
+                            <li><a href="">Bus</a></li>
+                        </ul>
+                    </li>
+                    {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
+                    <li class="slash">|</li>
                     <li><a href="#contact">Hubungi Kami</a></li>
                 </ul>
             </div>
@@ -64,7 +109,7 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="header-area header-bg-2 style-two" id="home" style="margin-bottom: 10px;">
+    <header class="breadcrumb-area breadcrumb-bg style-two" id="home" style="padding-top: 170px; padding-bottom: 170px;">
         <!-- <div class="header-right-image wow zoomIn" style="text-align: right">
             <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="padding-bottom: 482px;
             max-width: 70%;">
@@ -72,24 +117,40 @@
 
         <div class="container">
             <div class="row d-flex align-items-center">
-                <!-- <div class="col-lg-7">
+                <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: center">
+                    <img src="{{ URL::asset('assets/landing-page/img/header-derma.png') }}" alt="header right image" style="max-width: 110%;" id="headerhover">
+                </div>
+                <div class="col-lg-6">
                     <div class="header-inner">
-                        <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
-                            berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
+                        <h1 class="title wow fadeInDown white">Derma</h1>
+                        <p class="white">Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b>
+                            sehari
+                            dalam <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam
+                            sistem
+                            PRiM.</p>
                             <div class="btn-wrapper wow fadeInUp">
                                 <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
-                                
-                                {{-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
-                                    <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a> --}}
                             </div>
-                        </div>
-                </div> -->
+                    </div>
+                </div>
+                
+                {{-- <div class="col-lg-7">
+                    <h1 class="title wow fadeInDown white ">PRiM</h1>
+                    <p class=" white" style="font-size: 20px">Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                    berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
+                    <div class="btn-wrapper wow fadeInUp ">
+                        <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
+                        <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
+                    </div>
+                </div>
                 <div class="col-lg-5">
                     <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
+                </div> --}}
+                {{-- <div class="col-lg-5">
+                    <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
                 </div>
-                <div class="col-lg-7 align-items-center d-none d-lg-block" style="text-align: right">
-                    <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="max-width: 100%;">
+                <div class="col-lg-7 align-items-center d-none d-lg-block" style="text-align: center">
+                    <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image" style="max-width: 100%;">
                 </div>
             </div>
             <div class="row justify-content-center" style="padding-top: 150px">
@@ -99,21 +160,22 @@
                 <div class="btn-wrapper wow fadeInUp">
                     <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </header>
     <!-- header area end  -->
 
     <section class="team-member-area" id="team">
         <div class="bg-shape-1">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="">
+            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width: 90%";>
         </div>
         <div class="container">
-            <div class="row justify-content-center">
+            
+            {{-- <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <div class="section-title">
                         <!-- section title -->
-                        {{-- <span class="subtitle">Our Team</span> --}}
+                        
                         <h3 class="title">Tentang PRiM</h3>
                         <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
                             ibu bapa serta penjaga dengan pihak sekolah. PRiM menyediakan gerbang pembayaran yuran
@@ -122,15 +184,20 @@
                         </p>
                     </div><!-- //. section title -->
                 </div>
-            </div>
+            </div> --}}
 
-            <div class="about-us-area style-two">
+            <div class="about-us-area style-two" style="padding-top: 20px">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="section-title left-aligned">
-                                <!-- section title -->
-                                {{-- <span class="subtitle">Tentang PRiM</span> --}}
+                                <h3 class="title extra" style="margin-top: 24px;">Terkini</h3>
+                                <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
+                            </div>
+                        </div>
+                        {{-- <div class="col-lg-6">
+                            <div class="section-title left-aligned">
+                                
                                 <h3 class="title extra" style="margin-top: 24px;">Derma</h3>
                                 <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b>
                                     sehari
@@ -138,7 +205,7 @@
                                     sistem
                                     PRiM.</p>
                             </div><!-- //. section title -->
-                        </div>
+                        </div> --}}
                         <div class="col-lg-6">
                             <h3 class="title extra" style="margin-bottom: 24px; margin-top: 24px;">Syarat-syarat</h3>
                             <div class="feature-area">
@@ -280,8 +347,8 @@
                     <div class="section-title white">
                         <!-- section title -->
                         {{-- <span class="subtitle">Modul</span> --}}
-                        <h3 class="title extra">Kelebihan </h3>
-                        <p>Berikut antara kelebihan di dalam sistem ini.</p>
+                        <h3 class="title extra">Kelebihan</h3>
+                        <p>Berikut antara kelebihan di dalam Derma PRiM.</p>
                     </div><!-- //. section title -->
                 </div>
             </div>
@@ -349,7 +416,7 @@
                     <div class="section-title">
                         <!-- section title -->
                         <h3 class="title">Organisasi</h3>
-                        <p>Antara derma yang berdaftar dengan PRiM </p>
+                        <p>Antara organisasi derma yang berdaftar bersama PRiM.</p>
                     </div><!-- //. section title -->
                 </div>
             </div>
@@ -421,12 +488,11 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
-            <div class="container">
+            {{-- <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
                         <div class="section-title">
                             <!-- section title -->
-                            {{-- <span class="subtitle">Screenshots</span> --}}
                             <h3 class="title extra">Our Team</h3>
                         </div><!-- //. section title -->
                     </div>
@@ -467,7 +533,7 @@
 
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="container">
                 <div class="row justify-content-center">

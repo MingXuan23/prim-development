@@ -346,7 +346,7 @@ public function editpromo(Request $request,$promotionid)
 
         if($result)
             {
-                return back()->with('success', 'PromTempahanosi Berjaya Dibuat');
+                return $this->bookinglist();
             }
             else
             {
@@ -354,6 +354,32 @@ public function editpromo(Request $request,$promotionid)
     
             }
 
+    }
+
+    public function tempahananda()
+    {
+        $userId = Auth::id();
+        $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('bookings','rooms.roomid','=','bookings.roomid')
+                ->where('bookings.customerid', $userId) // Filter by the selected homestay
+                ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
+                ->get();
+
+        return view('homestay.tempahananda',compact('data'));
+    }
+
+    public function homestayresit($bookingid)
+    {
+        $userId = Auth::id();
+        $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('bookings','rooms.roomid','=','bookings.roomid')
+                ->where('bookings.customerid', $userId)
+                ->where('bookings.bookingid',$bookingid) // Filter by the selected homestay
+                ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
+                ->get();
+
+
+        return view('homestay.homestayresit',compact('data','bookingid'));
     }
 
 

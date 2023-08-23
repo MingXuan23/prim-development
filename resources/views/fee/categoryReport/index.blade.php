@@ -151,7 +151,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Name Yuran</label>
+                        <label>Nama Kelas</label>
                         <select name="yuranExport1" id="yuranExport1" class="form-control">
 
                         </select>
@@ -329,6 +329,7 @@
     });
 
     function remindMessage(){
+        //document.querySelectorAll('#buttonExport').forEach(button => button.disabled = true);
         if( $('#yuranExport1').val()==0)
             alert("To download all data may take more time,dont refresh the page");
     }
