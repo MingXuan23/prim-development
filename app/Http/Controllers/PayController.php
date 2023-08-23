@@ -509,7 +509,8 @@ class PayController extends AppBaseController
             $homestay = Booking::find($request->bookingid);
             $user = User::find($homestay->customerid);
             $room = Room::find($homestay->roomid);
-
+            
+            $request->amount = $homestay->totalprice;
             $bookingId = $request->bookingid;
 
             DB::table('bookings')->where('bookingid', $bookingId)->update([
