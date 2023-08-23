@@ -141,6 +141,13 @@ class OrganizationController extends Controller
 
             $this->insertOrganizationHours($organization->id);
         }
+
+        if ($type_org->nama == "Homestay / Hotel") {
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
+            $user->assignRole($role->nama);
+
+            $this->insertOrganizationHours($organization->id);
+        }
         
         return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
     }
@@ -276,7 +283,7 @@ class OrganizationController extends Controller
     {
         $role_id = [];
         $userId = Auth::id();
-        $roles = DB::table('organization_roles')->whereIn('nama', ['Admin', 'Regular Merchant Admin'])->get();
+        $roles = DB::table('organization_roles')->whereIn('nama', ['Admin', 'Regular Merchant Admin','Homestay Admin'])->get();
 
         foreach($roles as $row) { $role_id[] = $row->id; }
 
@@ -372,6 +379,11 @@ class OrganizationController extends Controller
         {
             $role = OrganizationRole::where('nama', '=', 'Regular Merchant Admin')->first();
         }
+        else if($type_org_name == "Homestay / Hotel")
+        {
+            $role = OrganizationRole::where('nama', '=', 'Homestay Admin')->first();
+        }
+
 
         return $role;
     }

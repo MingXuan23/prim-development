@@ -116,31 +116,12 @@ class AdminProductCooperativeController extends Controller
                 ->where('o.id',$koopId)
                 ->where('oh.status',1)
                 ->get();
-
-        return [
-            'product' => $product,
-            'group' => $group,
-            'hour' => $hour,
-        ];
-    }
-
-    //change product menu by select the org id
-    public function changeProductMenuByOrgId(Request $request){
-        if (request()->ajax()){
-            $koopId=$request->koopId;
-            $getResult=$this->getProductMenuByOrgId($koopId);
-
-            $group =$getResult['group'];
-            $product=$getResult['product'];
-            $hour=$getResult['hour'];
-
-            $reminderMessage="";
-            if(count($hour)==0)
-            {
-                $reminderMessage="Anda belum kemas kini waktu operasi koperasi anda. Sila pergi 'Hari Dibuka' dekat 'Koop Admin' untuk mengemaskini maklumat.";
-            }
-            return response()->json(['koopId' => $koopId,'group'=>$group,'product'=>$product,'message'=>$reminderMessage]);
+        $reminderMessage="";
+        if(count($hour)==0)
+        {
+            $reminderMessage="Anda belum kemas kini waktu operasi koperasi anda. Sila pergi 'Hari Dibuka' dekat 'Koop Admin' untuk mengemaskini maklumat.";
         }
+        return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product','reminderMessage'));
     }
 
     public function getProductList(Request $request){ //ajax request to show product in product menu

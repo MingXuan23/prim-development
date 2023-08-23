@@ -551,12 +551,60 @@
             </li>
             @endrole --}}
 
-            {{-- <li>
+             <li>
                     <a href="{{route('delivery.index')}}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Parcel</span>
                     </a>
-                </li> --}}
+                </li>
+
+                
+                <li>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="mdi mdi-home-city-outline"></i>
+                    <span>Homestay</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    <li>
+                @role('Homestay Admin')
+                        <a href="{{ route('homestay.index') }}" class=" waves-effect">
+                            <i class="mdi mdi-percent"></i>
+                            <span>Set Promosi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
+                            <i class="mdi mdi-room-service-outline"></i>
+                            <span>Urus Bilik</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Urus Tempahan</span>
+                        </a>
+                    </li>
+                    @endrole 
+                    <li>
+                        <a href="{{ route('homestay.bookinglist') }}" class=" waves-effect">
+                            <i class="mdi mdi-percent"></i>
+                            <span>Buat Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="mdi mdi-room-service-outline"></i>
+                            <span>Tempahan Anda</span>
+                        </a>
+                    </li>
+                    <li>
+                </ul>  
+            </li>
+
+            <label>TESTINGGGGGGGGGGGGGGGG</label>
+            
+
+                
 
             <!-- <li>
                     <a href="" class=" waves-effect">

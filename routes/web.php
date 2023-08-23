@@ -388,7 +388,6 @@ Route::group(['middleware' => ['auth']], function () {
         'dorm'               => 'DormController',
         'koperasi'           => 'Cooperative\User\UserCooperativeController',
         'delivery'           => 'DeliveryController',
-        //'polimas'            =>'PolimasController',
     ]);
 });
 
@@ -576,6 +575,21 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('/index', 'DeliveryController@index')->name('delivery.parcelIndex');
    //Route::get('')
 });
+
+    Route::get('homestay', 'HomestayController@index')->name('homestay.index');
+    Route::get('setpromotion', 'HomestayController@setpromotion')->name('homestay.setpromotion');
+    Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
+    Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
+    Route::post('editpromo/{id}', 'HomestayController@editpromo');
+    Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
+    Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
+    Route::get('tambahbilik', 'HomestayController@tambahbilik')->name('homestay.tambahbilik');
+    Route::post('addroom', 'HomestayController@addroom')->name('homestay.addroom');
+    Route::get('bookinglist', 'HomestayController@bookinglist')->name('homestay.bookinglist');
+    Route::get('bookhomestay/{id}', 'HomestayController@bookhomestay')->name('homestay.bookhomestay');
+    Route::get('disabledateroom/{id}', 'HomestayController@disabledateroom');
+    Route::post('bookhomestay/insertbooking/{id}/{price}', 'HomestayController@insertbooking');
+    
 
 Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');
 
