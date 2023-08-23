@@ -57,9 +57,9 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
     public function model(array $row)
     {
         set_time_limit(300);
-        if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_tel_bimbit_penjaga'])){
+        if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_ic_penjaga'])){
             
-            if($row['nama']==null &&$row['nama_penjaga']==null &&$row['jantina']==null &&$row['no_tel_bimbit_penjaga']==null){
+            if($row['nama']==null &&$row['nama_penjaga']==null &&$row['jantina']==null &&$row['no_ic_penjaga']==null){
                return null;
             }
             else{
@@ -68,7 +68,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
             }
         }
 
-        $phone = trim((string)$row['no_tel_bimbit_penjaga']);
+        $phone = trim((string)$row['no_ic_penjaga']);
         
         $phone = str_replace('-', '', $phone);
         $phone= preg_replace('/^\s+|\s+$/u', '',$phone);

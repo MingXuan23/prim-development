@@ -42,7 +42,6 @@
 
                     </select>
                 </div>
-            </div>
         </div>
     </div>
 
@@ -56,7 +55,7 @@
                 <!-- <a style="margin: 1px;" href="{{ route('exportstudent') }} " class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a> -->
                 {{-- {{ route('exportmurid') }} {{ route('murid.create') }} --}}
-                <a style="margin: 19px; float: right;" href="{{ route('student.create') }}" class="btn btn-primary"> <i
+                <a style="margin: 19px; float: right;" href="{{ route('student.create') }} " target="_blank" class="btn btn-primary"> <i
                         class="fas fa-plus"></i> Tambah Murid</a>
             </div>
 
@@ -78,7 +77,7 @@
                 @endif
 
                 <div class="table-responsive">
-                    <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap"
+                    <table id="studentTable" class="table table-bordered table-striped dt-responsive nowrap "
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
@@ -234,14 +233,23 @@
             fetchClass($("#organExport").val(), '#classExport');
         }
 
-        
-        // fetch_data();
-        // alert($("#organization").val());
+        // //this function is use to detect tab view changed
+        // function detectFocus() {
+        //     // Using document.visibilityState
+        //     let state = document.visibilityState;
+        //     if (state === "visible") {
+        //         var datatable=$('#studentTable').DataTable();
+        //         datatable.ajax.reload();
+        //     } 
+        // }
+
+            // When visibility changes, detectFocus is executed
 
             function fetch_data(cid = '') {
                 studentTable = $('#studentTable').DataTable({
                     processing: true,
                     serverSide: true,
+                    
                     ajax: {
                         url: "{{ route('student.getStudentDatatable') }}",
                         data: {
@@ -289,6 +297,23 @@
                 });
             }
 
+            //to let the datatable reload once when the user view on it
+            var losefocus=false;
+            window.onblur = function () {
+                losefocus=true;
+            };
+            // Using focus event in the window object
+            window.onfocus = function () {
+                if (losefocus && $.fn.DataTable.isDataTable('#studentTable')) {
+                    var datatable = $('#studentTable').DataTable();
+                    datatable.ajax.reload();
+                    //console.log(losefocus);
+                    losefocus=false;
+                    
+                    //alert("hellos");
+                }
+                
+            };
             /* 
                 {
                     data: "icno",

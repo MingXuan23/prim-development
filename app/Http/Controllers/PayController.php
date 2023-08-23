@@ -784,9 +784,12 @@ class PayController extends AppBaseController
                         // ************************* check the parent if have still debt *************************
                         if ($i == count($list_parent_fees_id) - 1)
                         {
-                            $check_debt = DB::table('organization_user')
+                            $org = DB::table('organization_user as ou')->where('ou.user_id',$transaction->user_id)->get();
+                            foreach($org as $o){
+                                $check_debt = DB::table('organization_user')
                                 ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
                                 ->where('organization_user.user_id', $transaction->user_id)
+                                ->where('organization_user.organization_id',$o->organization_id)
                                 ->where('organization_user.role_id', 6)
                                 ->where('organization_user.status', 1)
                                 ->where('fees_new_organization_user.status', 'Debt')
@@ -794,13 +797,15 @@ class PayController extends AppBaseController
     
                             // ************************* update status fees for organization user (parent) if all fees completed paid *************************
     
-                            if ($check_debt == 0) {
-                                DB::table('organization_user')
-                                    ->where('user_id', $transaction->user_id)
-                                    ->where('role_id', 6)
-                                    ->where('status', 1)
-                                    ->update(['fees_status' => 'Completed']);
+                                if ($check_debt == 0) {
+                                    DB::table('organization_user')
+                                        ->where('user_id', $transaction->user_id)
+                                        ->where('role_id', 6)
+                                        ->where('status', 1)
+                                        ->update(['fees_status' => 'Completed']);
+                                }
                             }
+                           
                         }
                     }
                     
