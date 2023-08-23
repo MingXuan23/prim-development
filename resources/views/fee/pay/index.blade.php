@@ -145,6 +145,7 @@
                                         <!-- Accordion item 1 -->
                                         <div class="card">
                                             <div class="inputGroup">
+                                                @if($row->levelid!=0)
                                                 <input id="option-{{ $organization->id }}-{{ $row->studentid }}"
                                                     name="nameSchool" value="{{ $organization->id }}" type="checkbox"
                                                     data-toggle="collapse"
@@ -153,13 +154,25 @@
                                                     aria-controls="collapse{{ $organization->id }}-{{ $row->studentid }}"
                                                     class="d-block position-relative text-dark collapsible-link py-2" />
 
-                                                <label for="option-{{ $organization->id }}-{{ $row->studentid }}">
+                                                    <label for="option-{{ $organization->id }}-{{ $row->studentid }}">
                                                     <span style="font-size: 18px">{{ $loop->iteration }}.
                                                         {{ $row->studentname  }}</span>
                                                     <span> ( {{ $row->classname }} )</span>
                                                     <br>
                                                     <span> {{ $row->nschool }} </span>
                                                 </label>
+                                                @else
+                                                <label for="option-{{ $organization->id }}-{{ $row->studentid }}" style=" color:gray;">
+                                                    <span style="font-size: 18px;" >{{ $loop->iteration }}.
+                                                        {{ $row->studentname  }}</span>
+                                                    <span> ( {{ $row->classname }} )</span>
+                                                    <br>
+                                                    <span> {{ $row->nschool }} </span>
+                                                </label>
+                                                @endif
+                                            
+                                               
+                                                
                                             </div>
 
                                             <div id="collapse{{ $organization->id }}-{{ $row->studentid }}"

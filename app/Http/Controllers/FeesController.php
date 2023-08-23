@@ -260,7 +260,7 @@ class FeesController extends AppBaseController
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname')
             ->where('organizations.id', $oid)
-            ->where('classes.nama', 'LIKE', '%' . $year . '%')
+            ->where('classes.nama', 'LIKE',  $year . '%')
             ->where('classes.status', 1)
             ->orderBy('classes.nama')
             ->get();
@@ -365,17 +365,18 @@ class FeesController extends AppBaseController
             ->where('role_id', 6)
             ->where('status', 1);
             
-
+        
         foreach($all_parent->get() as $p){
             $check_debt = DB::table('organization_user')
             ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
-            ->where('organization_user.user_id', $p->user_id)
+            ->where('organization_user.id', $p->id)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
             ->where('fees_new_organization_user.status', 'Debt')
             ->count();
     
             if ($check_debt == 0) {
+                
                 DB::table('organization_user')
                     ->where('user_id', $p->user_id)
                     ->where('role_id', 6)
@@ -400,7 +401,7 @@ class FeesController extends AppBaseController
             ->where('fees_status', 'Not Complete')
             ->count();
 
-        return response()->json(['all_student' => $all_student, 'student_complete' => $student_complete, 'student_notcomplete' => $student_notcomplete, 'all_parent' => $all_parent, 'parent_complete' => $parent_complete, 'parent_notcomplete' => $parent_notcomplete], 200);
+        return response()->json(['all_student' => $all_student, 'student_complete' => $student_complete, 'student_notcomplete' => $student_notcomplete, 'all_parent' => $all_parent, 'parent_complete' => $parent_complete, 'parent_notcomplete' => $parent_notcomplete]);
 
     }
 
@@ -610,7 +611,7 @@ class FeesController extends AppBaseController
         // dd($fee);
 
         if ($fee->save()) {
-            $parent_id = DB::table('organization_user')
+            $parent_id = DB::table('organization_user as ou')
                 ->where('organization_id', $oid)
                 ->where('role_id', 6)
                 ->where('status', 1)
@@ -618,8 +619,19 @@ class FeesController extends AppBaseController
 
             // to make sure one parent would recieve one only katagory fee if he or she hv more than children in school
             for ($i = 0; $i < count($parent_id); $i++) {
-                $fees_parent = DB::table('organization_user')
-                    ->where('id', $parent_id[$i]->id)
+                $activeChildren= DB::table('organization_user_student as ous')
+                        ->join('students as s' ,'s.id','ous.student_id')
+                        ->join('class_student as cs','cs.student_id','s.id')
+                        ->join('class_organization as co','co.id','cs.organclass_id')
+                        ->join('classes as c','c.id','co.class_id')
+                        ->where('c.levelid','>',0)
+                        ->where('ous.organization_user_id',$parent_id[$i]->id)
+                        ->select('s.id')
+                        ->distinct();
+
+                if(count($activeChildren)>0){
+                    $fees_parent = DB::table('organization_user')
+                    ->where('id', )
                     ->update(['fees_status' => 'Not Complete']);
 
                 DB::table('fees_new_organization_user')->insert([
@@ -627,6 +639,8 @@ class FeesController extends AppBaseController
                     'fees_new_id' => $fee->id,
                     'organization_user_id' => $parent_id[$i]->id,
                 ]);
+                }
+               
             }
 
             return redirect('/fees/A')->with('success', 'Yuran Kategori A telah berjaya dimasukkan');
@@ -903,10 +917,11 @@ class FeesController extends AppBaseController
                 ->join('students', 'students.id', '=', 'class_student.student_id')
                 ->select('class_student.id as class_student_id')
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
+                ->where('classes.levelid','>',0)
                 ->where('classes.status', "1")
-                ->where('students.gender', $gender)
+                ->where('students.gender', $gender)  
                 ->get();
-
+           
             $data = array(
                 'data' => $level,
                 'gender' => $gender
@@ -917,9 +932,9 @@ class FeesController extends AppBaseController
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->select('class_student.id as class_student_id')
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
+                ->where('classes.levelid','>',0)
                 ->where('classes.status', "1")
                 ->get();
-
             $data = array(
                 'data' => $level
             );
@@ -1125,7 +1140,7 @@ class FeesController extends AppBaseController
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('organizations.id as oid', 'organizations.nama as nschool', 'organizations.parent_org as parent_org', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname')
+            ->select('organizations.id as oid', 'organizations.nama as nschool', 'organizations.parent_org as parent_org', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname','classes.levelid')
             ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
@@ -1160,9 +1175,11 @@ class FeesController extends AppBaseController
 
         $getfees = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization','class_student.organclass_id','class_organization.id')
+            ->join('classes','class_organization.class_id','classes.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-            ->select('fees_new.category', 'fees_new.organization_id', 'students.id as studentid')
+            ->select('fees_new.category', 'fees_new.organization_id', 'students.id as studentid','classes.levelid')
             ->distinct()
             ->orderBy('students.id')
             ->orderBy('fees_new.category')
@@ -1181,7 +1198,7 @@ class FeesController extends AppBaseController
             ->where('student_fees_new.status', 'Debt')
             ->whereIn('students.id', $list_dependent)
             ->get();
-
+        //dd($getfees,$getfees_bystudent);
         // ************************* get fees category A  *******************************
         $getfees_category_A = DB::table('fees_new')
             ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')

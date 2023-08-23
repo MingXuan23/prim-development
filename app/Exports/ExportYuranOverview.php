@@ -37,7 +37,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                         ->where('fou.fees_new_id',$fn->id)  
                         ->where('ou.status',"1")
                         ->select('fou.*','t.status as tstatus')
-                        ->distinct('u.name')
+                        ->distinct()
                         ->get();
 
                 $paid=$parent->where('status',"Paid")->where('tstatus',"Success");
@@ -138,7 +138,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
         $combinedTransactions = $transactionA->merge($transactionB);
 
         $transaction = $combinedTransactions->pluck('id')->unique();
-        
+        dd($transaction);
         $totalAmount = DB::table('transactions as t')
             ->whereIn('t.id', $transaction)
             ->sum('t.amount');

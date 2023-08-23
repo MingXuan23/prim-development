@@ -2,9 +2,18 @@
 
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+
 @endsection
 
 @section('content')
+
+@if(session('closeTab'))
+    <script>
+        alert("Data save successfully");
+        window.close();
+    </script>
+@endif
+
 {{-- <p>Welcome to this beautiful admin panel.</p> --}}
 <div class="row align-items-center">
     <div class="col-sm-6">
@@ -84,6 +93,20 @@
                                 {{ ($student->gender =="P")? "checked" : "" }}> Perempuan </label>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Nama Penjaga</label>
+                            <input type="text"  style="color: gray;" class="form-control" disabled value="{{ $student->parentName }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>IC No Penjaga</label>
+                            <input type="text" style="color: gray;"class="form-control" disabled value="{{ $student->parentIC }}">
+                        </div>
+                    </div>
+                </div>
                 <div class="form-group mb-0">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
@@ -114,7 +137,8 @@
 
 <script>
     $(document).ready(function(){
-        
+
+        $('#sidebar-menu').hide();
         $('#organization').change(function(){
         
                 // $('#kelas').val('');
