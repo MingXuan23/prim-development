@@ -591,6 +591,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('bookhomestay/{id}', 'HomestayController@bookhomestay')->name('homestay.bookhomestay');
     Route::get('disabledateroom/{id}', 'HomestayController@disabledateroom');
     Route::post('bookhomestay/insertbooking/{id}/{price}', 'HomestayController@insertbooking');
+    Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
+    Route::get('homestayresit/{id}', 'HomestayController@homestayresit')->name('homestay.homestayresit');
     
 
 Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');

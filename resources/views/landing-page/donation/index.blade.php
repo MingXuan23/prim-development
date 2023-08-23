@@ -109,7 +109,7 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="header-area header-bg-4 style-two" id="home" style="padding-top: 170px; padding-bottom: 170px;">
+    <header class="breadcrumb-area breadcrumb-bg style-two" id="home" style="padding-top: 170px; padding-bottom: 170px;">
         <!-- <div class="header-right-image wow zoomIn" style="text-align: right">
             <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="padding-bottom: 482px;
             max-width: 70%;">
@@ -122,8 +122,8 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="header-inner">
-                        <h1 class="title wow fadeInDown">Derma</h1>
-                        <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b>
+                        <h1 class="title wow fadeInDown white">Derma</h1>
+                        <p class="white">Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b>
                             sehari
                             dalam <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam
                             sistem
