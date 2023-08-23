@@ -592,7 +592,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('homestay.tempahananda') }}" class=" waves-effect">
                             <i class="mdi mdi-room-service-outline"></i>
                             <span>Tempahan Anda</span>
                         </a>

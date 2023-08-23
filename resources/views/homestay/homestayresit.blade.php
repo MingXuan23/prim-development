@@ -93,7 +93,7 @@
   <div class="row d-flex justify-content-center align-items-center">
     <div class="col">
       <div class="d-flex justify-content-center align-items-center">
-        <span class="h2 m-4">Senarai Pesanan</span>
+        <span class="h2 m-4">Bayaran Homestay</span>
       </div>
 
       <div class="card">
@@ -114,7 +114,7 @@
                 <thead class="thead-dark">
                     <tr class="text-center">
 
-                      <th hidden>Room ID</th>
+                      <th hidden>Booking ID</th>
                       <th>Nama Homestay</th>
                       <th>Nama Bilik</th>
                       <th>Alamat</th>
@@ -127,7 +127,7 @@
                 <tbody>
                         @foreach($data as $record)
                         <tr>
-                            <td hidden>{{ $record->roomid }}</td>
+                            <td hidden>{{ $record->bookingid }}</td>
                             <td>{{ $record->nama }}</td>
                             <td>{{ $record->roomname }}</td>
                             <td>{{ $record->address }}</td>
@@ -159,7 +159,8 @@
         
       <form action="{{ route('fpxIndex') }}" method="POST" enctype="multipart/form-data">
         @csrf
-
+        <input type="hidden" name="desc" id="desc" value="Homestay / Hotel">
+        <input type="hidden" name="bookingid" id = "bookingid" value="{{ $bookingid }}">
         <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
@@ -207,65 +208,6 @@
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
-
-    let cId = $('input#order_id').val()
-    
-    fetch_data(cId)
-
-    function fetch_data(cId = '') {
-        cartTable = $('#cartTable').DataTable({
-            "searching": false,
-            "bLengthChange": false,
-            "bPaginate": false,
-            "info": false,
-            "orderable": false,
-            "ordering": false,
-            processing: true,
-            serverSide: true,
-            "language": {
-                "zeroRecords": "Tiada Item Buat Masa Sekarang."
-            },
-            ajax: {
-                url: "{{ route('merchant-reg.get-all-items') }}",
-                data: {
-                    id:cId,
-                    type:'pay',
-                    "_token": "{{ csrf_token() }}",
-                },
-                type: 'GET',
-            },
-            'columnDefs': [{
-                "targets": [0, 1, 2, 3], // your case first column
-                "className": "align-middle text-center", 
-            },
-            { "responsivePriority": 1, "targets": 0 },
-            { "responsivePriority": 2, "targets": 2 },
-            ],
-            columns: [{
-                data: "name",
-                name: 'name',
-                orderable: false,
-                searchable: false,
-            }, {
-                data: "quantity",
-                name: 'quantity',
-                orderable: false,
-                searchable: false,
-            }, {
-                data: 'price',
-                name: 'price',
-                orderable: false,
-                searchable: false,
-            },{
-                data: 'action',
-                name: 'action',
-                orderable: false,
-                searchable: false,
-            },]
-        });
-      }
-
-    var arr = [];
     
     $.ajax({
         type: 'GET',

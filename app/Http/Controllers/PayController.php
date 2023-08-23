@@ -6,6 +6,8 @@ use App\User;
 use App\Models\Order;
 use App\Models\Fee_New;
 use App\Models\Student;
+use App\Models\Booking;
+use App\Models\Room;
 use App\Models\Donation;
 use App\Mail\OrderReceipt;
 use App\Mail\MerchantOrderReceipt;
@@ -498,6 +500,29 @@ class PayController extends AppBaseController
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "KOPPRIM" . date('YmdHis') . rand(10000, 99999);
+
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
+        }
+        else if($request->desc == 'Homestay / Hotel')
+        {
+            $homestay = Booking::find($request->bookingid);
+            $user = User::find($homestay->customerid);
+            $room = Room::find($homestay->roomid);
+
+            $bookingId = $request->bookingid;
+
+            DB::table('bookings')->where('bookingid', $bookingId)->update([
+                'updated_at' => Carbon::now(),
+                'status' => 'Paid'
+            ]);
+
+            $organization = Organization::find($room->homestayid);
+            $fpx_buyerEmail      = $user->email;
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
