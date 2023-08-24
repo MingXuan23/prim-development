@@ -577,7 +577,7 @@ class StudentController extends Controller
                 ['students.id', $id],
             ]);
         if($student->first()->class_id!=$classid){
-            $this->transferClass($getOrganizationClass,$classid,$student->first());
+            //$this->transferClass($getOrganizationClass,$classid,$student->first());
         }
         $student->update(
                 [
