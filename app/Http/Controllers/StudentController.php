@@ -474,7 +474,7 @@ class StudentController extends Controller
     }
 
     public function transferClass($co,$classid,$student){
-
+        //dd($co,$classid,$student);
             $class=DB::table('classes as c')
                     ->where('c.id',$classid)
                     ->first();
@@ -539,10 +539,11 @@ class StudentController extends Controller
                                 }
                             }
                             else{
-                                $delete=DB::table('student_fees_new as sfn')
-                                        ->where('sfn.fees_id',$kateBC->id)
-                                        ->where('sfn.class_student_id',$class_student_details->id)
-                                        ->where('sfn.status',"Debt")
+                                $Debt = "Debt";
+                                $delete = DB::table('student_fees_new as sfn')
+                                        ->where('sfn.fees_id', $kateBC->id)
+                                        ->where('sfn.class_student_id', $class_student_details->id)
+                                        ->where('sfn.status','=',$Debt)
                                         ->delete();
                                 //return response()->json(['data'=>$delete]);  
                             }
@@ -577,7 +578,7 @@ class StudentController extends Controller
                 ['students.id', $id],
             ]);
         if($student->first()->class_id!=$classid){
-            //$this->transferClass($getOrganizationClass,$classid,$student->first());
+            $this->transferClass($getOrganizationClass,$classid,$student->first());
         }
         $student->update(
                 [
