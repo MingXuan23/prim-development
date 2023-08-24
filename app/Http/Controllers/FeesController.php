@@ -320,8 +320,10 @@ class FeesController extends AppBaseController
 
     public function feesReportByOrganizationId(Request $request)
     {
-        $oid = $request->oid;
-
+        set_time_limit(2000);
+        $organization = Organization::find($request->oid);
+        $oid=$organization->parent_org != null ? $organization->parent_org: $oid;
+        //makesure student from parent_org is fetched
         $all_student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
@@ -360,8 +362,10 @@ class FeesController extends AppBaseController
             ->where('class_student.fees_status', 'Not Complete')
             ->count();
 
+        $oid=$request->oid;//change back the children org if necessary
         $all_parent =  DB::table('organization_user')
-            ->where('organization_id', $oid)
+            //->where('organization_id', $oid)
+            ->whereIn('organization_id',[160,159,154,153,152,151,150,149,148,147,146,145,144,143,142,141,137,127,107,106,93,88,80])
             ->where('role_id', 6)
             ->where('status', 1);
             
@@ -378,10 +382,16 @@ class FeesController extends AppBaseController
             if ($check_debt == 0) {
                 
                 DB::table('organization_user')
-                    ->where('user_id', $p->user_id)
+                    ->where('id', $p->id)
                     ->where('role_id', 6)
                     ->where('status', 1)
                     ->update(['fees_status' => 'Completed']);
+            }else{
+                DB::table('organization_user')
+                    ->where('id', $p->id)
+                    ->where('role_id', 6)
+                    ->where('status', 1)
+                    ->update(['fees_status' => 'Not Complete']);
             }
         }
       
