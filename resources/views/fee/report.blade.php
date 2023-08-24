@@ -243,7 +243,7 @@
 
                     parent_completed       = response.parent_complete;
                     parent_notcompleted    = response.parent_notcomplete;
-
+                    console.log(response);
                     document.getElementById("student-complete").innerHTML = completed +" / "+ response.all_student;
                     document.getElementById("student-not-complete").innerHTML = notcompleted +" / "+ response.all_student;
                     document.getElementById("parent-complete").innerHTML = parent_completed +" / "+ response.all_parent;
