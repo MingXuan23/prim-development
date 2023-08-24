@@ -499,7 +499,6 @@ class StudentController extends Controller
                 $studentHaveFees=DB::table('student_fees_new as sfn')
                                 ->join('class_student as cs','cs.id','sfn.class_student_id')
                                 ->where('sfn.class_student_id',$class_student_details->id)
-                                //->where('sfn.status','Debt')
                                 ->get();
     
                 $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
@@ -539,13 +538,19 @@ class StudentController extends Controller
                                 }
                             }
                             else{
+
                                 $Debt = "Debt";
                                 $delete = DB::table('student_fees_new as sfn')
-                                        ->where('sfn.fees_id', $kateBC->id)
-                                        ->where('sfn.class_student_id', $class_student_details->id)
-                                        ->where('sfn.status','=',$Debt)
-                                        ->delete();
-                                //return response()->json(['data'=>$delete]);  
+                                    ->where([
+                                        ['sfn.fees_id', $kateBC->id],
+                                        ['sfn.class_student_id', $class_student_details->id],
+                                        ['sfn.status', '=', 'Debt'],
+                                    ])
+                                    ->get()->pluck('id');
+                                DB::table('student_fees_new')->whereIn('id',$delete)->delete();
+
+                               
+                                  
                             }
                         }
                     }
