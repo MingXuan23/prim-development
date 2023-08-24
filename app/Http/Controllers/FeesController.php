@@ -364,8 +364,8 @@ class FeesController extends AppBaseController
 
         $oid=$request->oid;//change back the children org if necessary
         $all_parent =  DB::table('organization_user')
-            //->where('organization_id', $oid)
-            ->whereIn('organization_id',[160,159,154,153,152,151,150,149,148,147,146,145,144,143,142,141,137,127,107,106,93,88,80])
+            ->where('organization_id', $oid)
+            //->whereIn('organization_id',[160,159,154,153,152,151,150,149,148,147,146,145,144,143,142,141,137,127,107,106,93,88,80])
             ->where('role_id', 6)
             ->where('status', 1);
             
@@ -386,12 +386,6 @@ class FeesController extends AppBaseController
                     ->where('role_id', 6)
                     ->where('status', 1)
                     ->update(['fees_status' => 'Completed']);
-            }else{
-                DB::table('organization_user')
-                    ->where('id', $p->id)
-                    ->where('role_id', 6)
-                    ->where('status', 1)
-                    ->update(['fees_status' => 'Not Complete']);
             }
         }
       
