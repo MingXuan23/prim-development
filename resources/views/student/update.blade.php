@@ -9,8 +9,8 @@
 
 @if(session('closeTab'))
     <script>
-        alert("Data save successfully");
-        window.close();
+        // alert("Data save successfully");
+        // window.close();
     </script>
 @endif
 

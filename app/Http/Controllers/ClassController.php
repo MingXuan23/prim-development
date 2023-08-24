@@ -154,10 +154,16 @@ class ClassController extends Controller
             ->update(
                 [
                     'nama'      => $request->get('name'),
-                    'levelid'   => $request->get('level')
+                    
                 ]
             );
-
+        DB::table('classes')
+            ->where('id',$id)
+            ->where('levelid','>',0)
+            ->update([
+                'levelid'   => $request->get('level')
+            ]);
+            
         DB::table('class_organization')->where('class_id', $id)
             ->update([
                 'organization_id' => $request->get('organization'),
