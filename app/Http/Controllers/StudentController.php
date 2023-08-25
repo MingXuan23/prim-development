@@ -840,7 +840,7 @@ class StudentController extends Controller
                         foreach($unique as $t){
                            
                             $href = route('receipttest', [ 'transaction_id' => $t->transaction_id ]);
-                            $btn = $btn . '<a class="btn btn-success mb-2" href ="'.$href.'" target="_blank" >RM '.number_format($t->amount, 2, '.', '').'</a>';
+                            $btn = $btn . '<a href ="'.$href.'" target="_blank" >RM '.number_format($t->amount, 2, '.', '').'</a>';
                         }
                         $btn =$btn.'</div>';
                         return $btn;
