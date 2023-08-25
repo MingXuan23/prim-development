@@ -105,6 +105,7 @@
         // alert($("#organization").val());
 
             function fetch_data(cid = '') {
+                //console.log($("#organization").val());
                 studentTable = $('#studentTable').DataTable({
                         processing: true,
                         serverSide: true,
@@ -112,6 +113,7 @@
                             url: "{{ route('fees.getStudentDatatableFees') }}",
                             data: {
                                 classid: cid,
+                                orgId : $("#organization").val(),
                                 hasOrganization: true
                             },
                             type: 'GET',
