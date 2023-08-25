@@ -760,7 +760,7 @@ class StudentController extends Controller
         if (request()->ajax()) {
             // $oid = $request->oid;
             $classid = $request->classid;
-
+            $orgId =$request->orgId;
             $hasOrganizaton = $request->hasOrganization;
 
             $userId = Auth::id();
@@ -805,12 +805,14 @@ class StudentController extends Controller
                     }
                 });
 
-                $table->addColumn('status', function ($row) {
+                $table->addColumn('status', function ($row) use ($orgId){
 
                     $tranB=DB::table('class_student as cs')
                     ->join('student_fees_new as sfn' ,'sfn.class_student_id','cs.id')
                     ->join('fees_transactions_new as ftn','ftn.student_fees_id','sfn.id')
+                    ->join('fees_new as fn','fn.id','sfn.fees_id')
                     ->join('transactions as t','t.id','ftn.transactions_id')
+                    ->where('fn.organization_id',$orgId)
                     ->where('cs.id',$row->csid)
                     ->where('t.status',"Success")
                     ->select('t.id as transaction_id','t.amount')
@@ -823,6 +825,7 @@ class StudentController extends Controller
                     ->leftJoin('fees_new as fn', 'fn.id', 'fou.fees_new_id')
                     ->distinct()
                     ->where('ous.student_id', $row->id)
+                    ->where('fn.organization_id',$orgId)
                     ->where('t.status', 'Success')
                     ->select('t.id as transaction_id','t.amount')
                     ->get();
@@ -830,14 +833,16 @@ class StudentController extends Controller
 
                 $combined = $tranA->concat($tranB);
     
-                $unique = $combined->unique('id');
+                $unique = $combined->unique('transaction_id');
                
                     if(count($unique)>0) {
+                        $btn = '<div class="d-flex  align-items-center flex-column">';
                         foreach($unique as $t){
-                            $btn = '<div class="d-flex justify-content-center">';
+                           
                             $href = route('receipttest', [ 'transaction_id' => $t->transaction_id ]);
-                            $btn = $btn . '<a class="btn btn-success" href ="'.$href.'" target="_blank">RM '.number_format($t->amount, 2, '.', '').'</a></div>';
+                            $btn = $btn . '<a class="btn btn-success mb-2" href ="'.$href.'" target="_blank" >RM '.number_format($t->amount, 2, '.', '').'</a>';
                         }
+                        $btn =$btn.'</div>';
                         return $btn;
                     } else {
                         $btn = '<div class="d-flex justify-content-center">';
