@@ -806,15 +806,42 @@ class StudentController extends Controller
                 });
 
                 $table->addColumn('status', function ($row) {
-                    if ($row->fees_status == 'Completed') {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success">Selesai</span></div>';
 
+                    $tranB=DB::table('class_student as cs')
+                    ->join('student_fees_new as sfn' ,'sfn.class_student_id','cs.id')
+                    ->join('fees_transactions_new as ftn','ftn.student_fees_id','sfn.id')
+                    ->join('transactions as t','t.id','ftn.transactions_id')
+                    ->where('cs.id',$row->csid)
+                    ->where('t.status',"Success")
+                    ->select('t.id as transaction_id','t.amount')
+                    ->get();
+                    
+                    $tranA = DB::table('transactions as t')
+                    ->leftJoin('fees_new_organization_user as fou', 't.id', 'fou.transaction_id')
+                    ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
+                    ->leftJoin('organization_user_student as ous','ous.organization_user_id','ou.id')
+                    ->leftJoin('fees_new as fn', 'fn.id', 'fou.fees_new_id')
+                    ->distinct()
+                    ->where('ous.student_id', $row->id)
+                    ->where('t.status', 'Success')
+                    ->select('t.id as transaction_id','t.amount')
+                    ->get();
+    
+
+                $combined = $tranA->concat($tranB);
+    
+                $unique = $combined->unique('id');
+               
+                    if(count($unique)>0) {
+                        foreach($unique as $t){
+                            $btn = '<div class="d-flex justify-content-center">';
+                            $href = route('receipttest', [ 'transaction_id' => $t->transaction_id ]);
+                            $btn = $btn . '<a class="btn btn-success" href ="'.$href.'" target="_blank">RM '.number_format($t->amount, 2, '.', '').'</a></div>';
+                        }
                         return $btn;
                     } else {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Belum Selesai </span></div>';
-
+                        $btn = $btn . '<span class="badge badge-danger"> Belum Bayar </span></div>';
                         return $btn;
                     }
                 });

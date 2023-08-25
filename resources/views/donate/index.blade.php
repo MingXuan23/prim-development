@@ -137,7 +137,7 @@
       function fetch_data(oid = '') {
           donationTable = $('#donationTable').DataTable({
                   processing: true,
-                  serverSide: true,
+                  serverSide: false,
                   ajax: {
                       url: "{{ route('donate.donation_list') }}",
                       data: {
@@ -168,19 +168,23 @@
                   }, {
                       data: "nama",
                       name: 'nama',
+                      searchable: true,
                       "width": "20%"
                   }, {
                       data: "description",
                       name: 'description',
+                      searchable: true,
                       "width": "30%"
                   }, {
                       data: "date_started",
                       name: 'start_date',
+                      searchable: false,
                       "className": "text-center",
                       "width": "10%"
                   }, {
                       data: "date_end",
                       name: 'end_date',
+                      searchable: false,
                       "className": "text-center",
                       "width": "10%"
                   }, {
