@@ -301,6 +301,10 @@
                         _token:_token },
                 success:function(result)
                 {
+                    result.success.sort(function(a, b) {
+                        return b.cid - a.cid;
+                    });
+
                     $(classId).empty();
                     $(classId).append("<option value='' disabled selected> Pilih Kelas</option>");
                     jQuery.each(result.success, function(key, value){
