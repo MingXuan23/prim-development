@@ -320,9 +320,9 @@ class FeesController extends AppBaseController
 
     public function feesReportByOrganizationId(Request $request)
     {
-        set_time_limit(2000);
+        set_time_limit(120);
         $organization = Organization::find($request->oid);
-        $oid=$organization->parent_org != null ? $organization->parent_org: $oid;
+        $oid=$organization->parent_org != null ? $organization->parent_org: $organization->id;
         //makesure student from parent_org is fetched
         $all_student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -601,7 +601,7 @@ class FeesController extends AppBaseController
         $fee = new Fee_New([
             'name'              =>  $request->get('name'),
             'desc'              =>  $request->get('description'),
-            'category'          =>  "Kategory A",
+            'category'          =>  "Kategori A",
             'quantity'          =>  $request->get('quantity'),
             'price'             =>  $request->get('price'),
             'totalAmount'       =>  $total,
@@ -665,7 +665,7 @@ class FeesController extends AppBaseController
                 if ($category == "A") {
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
-                        ->where('category', "Kategory A")
+                        ->where('category', "Kategori A")
                         ->where('status', "1")
                         ->get();
                     
@@ -677,7 +677,7 @@ class FeesController extends AppBaseController
                 } elseif ($category == "B") {
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
-                        ->where('category', "Kategory B")
+                        ->where('category', "Kategori B")
                         ->where('status', "1")
                         ->get();
                     
@@ -713,7 +713,7 @@ class FeesController extends AppBaseController
                 } elseif($category == "C") {
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
-                        ->where('category', "Kategory C")
+                        ->where('category', "Kategori C")
                         ->where('status', "1")
                         ->get();
                     
@@ -806,7 +806,7 @@ class FeesController extends AppBaseController
         $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
         $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
         $total          = $price * $quantity;
-        $category       = "Kategory B";
+        $category       = "Kategori B";
 
         if ($level == "All_Level") {
             return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
@@ -846,7 +846,7 @@ class FeesController extends AppBaseController
         $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
         $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
         $total          = $price * $quantity;
-        $category       = "Kategory C";
+        $category       = "Kategori C";
 
         if ($level == "All_Level") {
             return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
@@ -974,7 +974,7 @@ class FeesController extends AppBaseController
             ]);
         }
 
-        if ($category == "Kategory B") {
+        if ($category == "Kategori B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
@@ -1044,7 +1044,7 @@ class FeesController extends AppBaseController
             ]);
         }
 
-        if ($category == "Kategory B") {
+        if ($category == "Kategori B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
@@ -1123,7 +1123,7 @@ class FeesController extends AppBaseController
             ]);
         }
         
-        if ($category == "Kategory B") {
+        if ($category == "Kategori B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
         } else {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
@@ -1527,7 +1527,7 @@ class FeesController extends AppBaseController
         $fees = Fee_New::find($request->feeid);
 
         if (request()->ajax()) {
-            if($fees->category == "Kategory A")
+            if($fees->category == "Kategori A")
             {
                 $student_user = DB::table('students as s')
                 ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')

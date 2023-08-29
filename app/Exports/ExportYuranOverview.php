@@ -159,13 +159,13 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
 
         return [
             'No',
-            'Yuran Category',
-            'Yuran Name',
-            'Yuran Price',
-            'Total Parents/Students Have Paid',
-            'Estimate Parent/Students',
-            'Total Income',
-            'Estimate Income'
+            'Kategori Yuran',
+            'Nama Yuran',
+            'Harga Yuran',
+            'Jumlah Penjaga/Murid Telah Bayar',
+            'Jumlah Penjaga/Murid Perlu Bayar',
+            'Jumlah Pendapatan',
+            'Jangkaan Pendapatan'
         ];
     }
 }
