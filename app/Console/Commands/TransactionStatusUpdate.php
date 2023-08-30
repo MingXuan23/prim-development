@@ -36,14 +36,14 @@ class TransactionStatusUpdate extends Command
     
     public function handle()
     {
-        // $transactions = DB::table('transactions')
-        //     ->where('status', 'pending')
-        //     ->whereBetween('datetime_created', [now()->subDays(2), now()])
-        //     ->get();
+        $transactions = DB::table('transactions')
+            ->where('status', 'pending')
+            ->whereBetween('datetime_created', [now()->subDays(2), now()])
+            ->get();
 
-        $transaction = DB::table('transactions')
-                    ->where('id',29268)
-                    ->get();
+        // $transaction = DB::table('transactions')
+        //             ->where('id',29268)
+        //             ->get();
         foreach ($transactions as $transaction)
         {
             $fpx_msgType = "AE";
