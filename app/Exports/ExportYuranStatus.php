@@ -20,7 +20,7 @@ class ExportYuranStatus implements FromCollection, ShouldAutoSize, WithHeadings
     */
     public function collection()
     {
-        if($this->yuran->category == "Kategory A")
+        if($this->yuran->category == "Kategori A")
         {
             
             $org=DB::table('organizations as o')

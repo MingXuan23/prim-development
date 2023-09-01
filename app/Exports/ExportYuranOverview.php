@@ -28,7 +28,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
         //dd($fee);
         $data=[];
         foreach($fee as $key => $fn){
-            if($fn->category=="Kategory A"){
+            if($fn->category=="Kategori A"){
                 $feedata = new stdClass();
                 $parent=DB::table('fees_new_organization_user as fou')
                         ->join('organization_user as ou','ou.id','fou.organization_user_id')
