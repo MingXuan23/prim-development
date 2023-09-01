@@ -306,13 +306,13 @@ class StudentController extends Controller
         // check fee for new in student
         // check category A fee
         $ifExitsCateA = DB::table('fees_new')
-            ->where('category', 'Kategory A')
+            ->where('category', 'Kategori A')
             ->where('organization_id', $co->oid)
             ->where('status', 1)
             ->get();
 
         $ifExitsCateBC = DB::table('fees_new')
-            ->whereIn('category', ['Kategory B', 'Kategory C'])
+            ->whereIn('category', ['Kategori B', 'Kategori C'])
             ->where('organization_id', $co->oid)
             ->where('status', 1)
             ->get();
@@ -371,13 +371,13 @@ class StudentController extends Controller
             ]);
 
             $ifExitsCateA = DB::table('fees_new')
-                        ->where('category', 'Kategory A')
+                        ->where('category', 'Kategori A')
                         ->where('organization_id', $child_organ->id)
                         ->where('status', 1)
                         ->get();
         
             $ifExitsCateBC = DB::table('fees_new')
-                    ->whereIn('category', ['Kategory B', 'Kategory C'])
+                    ->whereIn('category', ['Kategori B', 'Kategori C'])
                     ->where('organization_id', $child_organ->id)
                     ->where('status', 1)
                     ->get();
@@ -491,7 +491,7 @@ class StudentController extends Controller
 
             if($class->levelid>0){
                 $ifExitsCateBC = DB::table('fees_new')
-                ->whereIn('category', ['Kategory B', 'Kategory C'])
+                ->whereIn('category', ['Kategori B', 'Kategori C'])
                 ->where('organization_id', $co->organization_id)
                 ->where('status', 1)
                 ->get();
@@ -1010,7 +1010,7 @@ class StudentController extends Controller
         //if inactive or graduated will not run this 
         if($class->levelid>0){
             $ifExitsCateBC = DB::table('fees_new')
-            ->whereIn('category', ['Kategory B', 'Kategory C'])
+            ->whereIn('category', ['Kategori B', 'Kategori C'])
             ->where('organization_id', $co->organization_id)
             ->where('status', 1)
             ->get();
