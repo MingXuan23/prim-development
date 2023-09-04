@@ -579,7 +579,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('homestay.urustempahan') }}" class=" waves-effect">
                             <i class="ti-clipboard"></i>
                             <span>Urus Tempahan</span>
                         </a>

@@ -346,7 +346,7 @@ public function editpromo(Request $request,$promotionid)
 
         if($result)
             {
-                return $this->bookinglist();
+                return back()->withInput()->with('success', 'Bilik Berjaya Ditempah');
             }
             else
             {
@@ -380,6 +380,66 @@ public function editpromo(Request $request,$promotionid)
 
 
         return view('homestay.homestayresit',compact('data','bookingid'));
+    }
+
+    public function urustempahan()
+    {
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+        $data = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+
+
+        return view('homestay.urustempahan', compact('data'));
+    }
+
+    public function tunjukpelanggan(Request $request)
+    {
+        $homestayid = $request->input('homestayid');
+
+        $data = Booking::join('rooms', 'bookings.roomid', '=', 'rooms.roomid')
+        ->join('organizations', 'organizations.id', '=', 'rooms.homestayid')
+        ->join('users', 'bookings.customerid', '=', 'users.id')
+        ->where('organizations.id', $homestayid)
+        ->select(
+            'users.name',
+            'users.telno',
+            'bookings.checkin',
+            'bookings.checkout',
+            'bookings.bookingid',
+            'bookings.status',
+            'bookings.totalprice',
+            'rooms.roomname'
+    )
+    ->get();
+
+        return response()->json($data);
+    }
+
+    public function cancelpelanggan($bookingid)
+    {
+        $status = "Canceled";
+        $booking = Booking::find($bookingid);
+        $booking->status = $status;
+
+        $result = $booking->save();
+
+        if($result)
+            {
+                return back()->withInput()->with('success', 'Tempahan Berjaya Dibatalkan');
+            }
+            else
+            {
+                return back()->withInput()->with('error', 'Tempahan Gagal Dibatalkan');
+    
+            }
     }
 
 
