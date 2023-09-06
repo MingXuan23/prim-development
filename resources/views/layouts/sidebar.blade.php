@@ -608,14 +608,20 @@
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                @role('Grab Student Admin')
+                    @role('Grab Student Admin')
                         <a href="{{ route('grab.setinsert') }}" class=" waves-effect">
-                            <i class="mdi  mdi-taxi"></i>
+                            <i class="mdi mdi-taxi"></i>
                             <span>Daftar Kereta</span>
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('grab.check') }}" class=" waves-effect">
+                            <i class="mdi mdi-taxi"></i>
+                            <span>Urus Kereta</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('grab.setdestination') }}" class=" waves-effect">
                             <i class="mdi mdi-city"></i>
                             <span>Daftar Destinasi</span>
                         </a>
@@ -629,6 +635,36 @@
                     @endrole 
                 </ul>  
             </li>
+
+            <li>
+                <a href="javascript: void(0);7" class="has-arrow waves-effect">
+                    <i class="mdi  mdi-bus"></i>
+                    <span>Bas</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    <li>
+                    @role('Bas Admin')
+                        <a href="{{ route('bus.setinsert') }}" class=" waves-effect">
+                            <i class="mdi mdi-bus"></i>
+                            <span>Daftar Bas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.manage') }}" class=" waves-effect">
+                            <i class="mdi mdi-bus"></i>
+                            <span>Urus Bas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="mdi mdi-account-multiple"></i>
+                            <span>Senarai Penumpang</span>
+                        </a>
+                    </li>
+                    @endrole 
+                </ul>  
+            </li>
+
 
             
             

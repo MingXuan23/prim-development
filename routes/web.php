@@ -596,6 +596,17 @@ Route::group(['prefix' => 'delivery'], function () {
 
     Route::get('/grab-setcar','GrabStudentController@setcar')->name('grab.setinsert');
     Route::post('/grab-insertcar','GrabStudentController@insertcar')->name('grab.insert');
+    Route::get('/grab-check','GrabStudentController@checkcar')->name('grab.check');
+    Route::post('/updaterow-grab/{id}','GrabStudentController@updatecar')->name('grab.update/{id}');
+    Route::get('/grab-destination','GrabStudentController@setdestination')->name('grab.setdestination');
+    Route::post('/grab-insertdestination','GrabStudentController@insertdestination')->name('grab.insertdestination');
+
+    Route::get('/bus-setbus','BusController@setbus')->name('bus.setinsert');
+    Route::post('/bus-insertbus','BusController@insertbus')->name('bus.insert');
+    Route::get('/bus-managebus','BusController@managebus')->name('bus.manage');
+    Route::post('/managebus-bus/{id}','BusController@manageselectedbus')->name('bus.displaymanage/{id}');
+    Route::post('/updatemanagebus-bus/{id}','BusController@updatebus')->name('bus.update/{id}');
+
 
 
     

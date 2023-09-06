@@ -32,19 +32,19 @@
                          @endif
                          @csrf
                         <div class="form-group">
-                        <label>Car Brand</label>
+                        <label>Jenama Kereta</label>
                         <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Car Brand" name="carbrand">
                         </div><br>
                         <div class="form-group">
-                        <label>Car Name</label>
+                        <label>Nama Kereta</label>
                         <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Car Name" name="carname">
                         </div><br>
                         <div class="form-group">
-                        <label>Car Registration Number</label>
+                        <label>Nombor Plat Kenderaan</label>
                         <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Car Registration Number" name="carregisternumber">
                         </div><br>
                         <div class="form-group">
-                        <label>Number of Seat</label>
+                        <label>Bilangan Tempat Duduk</label>
                         <select class="form-select" aria-label="Default select example"  name="totalseat">
                         <option selected disabled>Select Total Seat</option>
                         <option value="4">4 seater</option>
@@ -53,14 +53,14 @@
                         </div><br>
                         <div class="form-group">
                         @foreach($data as $rows)
-                        <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Car Registration Number" name="organizationid" value ="{{ $rows->organization_id }}" hidden>
+                        <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Car Registration Number" name="organizationid" value ="{{ $rows->id }}" hidden>
                         @endforeach
                         </div>
                         <div class="form-group">
                         <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Car Registration Number" name="status" value ="NEW INSERT" hidden>
                         </div>
                         <div class="form-group">
-                        <label>Available Time</label>
+                        <label>Masa </label>
                         <input type="time" class="form-control" placeholder="Available Time"  name="time">
                         </div><br>
                         <div class="form-group mb-0">
