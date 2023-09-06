@@ -603,21 +603,21 @@
 
             <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
-                    <i class="mdi mdi-home-city-outline"></i>
+                    <i class="mdi  mdi-taxi"></i>
                     <span>Grab Student</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
                 @role('Grab Student Admin')
-                        <a href="" class=" waves-effect">
-                            <i class="mdi mdi-percent"></i>
-                            <span>Set Promosi</span>
+                        <a href="{{ route('grab.setinsert') }}" class=" waves-effect">
+                            <i class="mdi  mdi-taxi"></i>
+                            <span>Daftar Kereta</span>
                         </a>
                     </li>
                     <li>
                         <a href="" class=" waves-effect">
-                            <i class="mdi mdi-room-service-outline"></i>
-                            <span>Urus Bilik</span>
+                            <i class="mdi mdi-city"></i>
+                            <span>Daftar Destinasi</span>
                         </a>
                     </li>
                     <li>
