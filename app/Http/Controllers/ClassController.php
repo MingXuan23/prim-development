@@ -19,7 +19,7 @@ class ClassController extends Controller
 
     public function index()
     {
-        $organization = $this->getOrganizationByUserId();
+        $organization = $this->getOrganizationByUserId(); 
         return view('class.index', compact('organization'));
     }
 
@@ -80,6 +80,47 @@ class ClassController extends Controller
         return redirect('/class')->with('success', 'New class has been added successfully');
     }
 
+    public function storeDummyClass($id){
+        
+        $class = new ClassModel([
+            'nama'          =>  "Graduated Class",
+            'levelid'       => 0,
+            'status'       =>  "1",
+        ]);
+        $class->save();
+
+        DB::table('class_organization')->insert([
+            'organization_id' => $id,
+            'class_id'        => $class->id,
+            'start_date'      => now(),
+        ]);
+
+        $class = new ClassModel([
+            'nama'          =>  "Inactive Class",
+            'levelid'       => 0,
+            'status'       =>  "1",
+        ]);
+        $class->save();
+
+        DB::table('class_organization')->insert([
+            'organization_id' => $id,
+            'class_id'        => $class->id,
+            'start_date'      => now(),
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function getDummyClassStatus(Request $request){
+       
+        
+        $dummy = DB::table('classes as c')
+                ->join('class_organization as co','co.class_id','c.id')
+                ->where('co.organization_id',$request->oid)
+                ->where('c.levelid',0)
+                ->count();
+        return response()->json(['data' =>$dummy]);
+    }
     public function show($id)
     {
         //
@@ -113,10 +154,16 @@ class ClassController extends Controller
             ->update(
                 [
                     'nama'      => $request->get('name'),
-                    'levelid'   => $request->get('level')
+                    
                 ]
             );
-
+        DB::table('classes')
+            ->where('id',$id)
+            ->where('levelid','>',0)
+            ->update([
+                'levelid'   => $request->get('level')
+            ]);
+            
         DB::table('class_organization')->where('class_id', $id)
             ->update([
                 'organization_id' => $request->get('organization'),
@@ -208,7 +255,8 @@ class ClassController extends Controller
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
                 $btn = $btn . '<a href="' . route('class.edit', $row->cid) . '" class="btn btn-primary m-1">Edit</a>';
-                $btn = $btn . '<button id="' . $row->cid . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                //$btn = $btn . '<button id="' . $row->cid . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button>';
+                $btn=$btn.'</div>';
                 return $btn;
             });
 

@@ -28,7 +28,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
         //dd($fee);
         $data=[];
         foreach($fee as $key => $fn){
-            if($fn->category=="Kategory A"){
+            if($fn->category=="Kategori A"){
                 $feedata = new stdClass();
                 $parent=DB::table('fees_new_organization_user as fou')
                         ->join('organization_user as ou','ou.id','fou.organization_user_id')
@@ -37,7 +37,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                         ->where('fou.fees_new_id',$fn->id)  
                         ->where('ou.status',"1")
                         ->select('fou.*','t.status as tstatus')
-                        ->distinct('u.name')
+                        ->distinct()
                         ->get();
 
                 $paid=$parent->where('status',"Paid")->where('tstatus',"Success");
@@ -138,7 +138,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
         $combinedTransactions = $transactionA->merge($transactionB);
 
         $transaction = $combinedTransactions->pluck('id')->unique();
-        
+
         $totalAmount = DB::table('transactions as t')
             ->whereIn('t.id', $transaction)
             ->sum('t.amount');
@@ -159,13 +159,13 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
 
         return [
             'No',
-            'Yuran Category',
-            'Yuran Name',
-            'Yuran Price',
-            'Total Parents/Students Have Paid',
-            'Estimate Parent/Students',
-            'Total Income',
-            'Estimate Income'
+            'Kategori Yuran',
+            'Nama Yuran',
+            'Harga Yuran',
+            'Jumlah Penjaga/Murid Telah Bayar',
+            'Jumlah Penjaga/Murid Perlu Bayar',
+            'Jumlah Pendapatan',
+            'Jangkaan Pendapatan'
         ];
     }
 }

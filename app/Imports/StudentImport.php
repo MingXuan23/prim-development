@@ -49,9 +49,9 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
     {   //
         //dd(!isset($row['nama']) , !isset($row['nama_penjaga']) , !isset($row['jantina']) , !isset($row['no_tel_bimbit_penjaga']));
         //dd($row);
-        if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_tel_bimbit_penjaga'])){
+        if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_ic_penjaga'])){
             
-            if($row['nama']==null &&$row['nama_penjaga']==null &&$row['jantina']==null &&$row['no_tel_bimbit_penjaga']==null){
+            if($row['nama']==null &&$row['nama_penjaga']==null &&$row['jantina']==null &&$row['no_ic_penjaga']==null){
                return null;
             }
             else{
@@ -60,7 +60,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             }
         }
         //dd("Success");
-        $phone = trim((string)$row['no_tel_bimbit_penjaga']);
+        $phone = trim((string)$row['no_ic_penjaga']);
         $phone = str_replace('-', '', $phone);
         $phone= preg_replace('/^\s+|\s+$/u', '',$phone);
         
@@ -224,13 +224,13 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         // check fee for new in student
         // check category A fee
         $ifExitsCateA = DB::table('fees_new')
-                        ->where('category', 'Kategory A')
+                        ->where('category', 'Kategori A')
                         ->where('organization_id', $co->oid)
                         ->where('status', 1)
                         ->get();
         
         $ifExitsCateBC = DB::table('fees_new')
-                        ->whereIn('category', ['Kategory B', 'Kategory C'])
+                        ->whereIn('category', ['Kategori B', 'Kategori C'])
                         ->where('organization_id', $co->oid)
                         ->where('status', 1)
                         ->get();
@@ -300,13 +300,13 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             ]);
 
             $ifExitsCateA = DB::table('fees_new')
-                        ->where('category', 'Kategory A')
+                        ->where('category', 'Kategori A')
                         ->where('organization_id', $child_organ->id)
                         ->where('status', 1)
                         ->get();
         
             $ifExitsCateBC = DB::table('fees_new')
-                    ->whereIn('category', ['Kategory B', 'Kategory C'])
+                    ->whereIn('category', ['Kategori B', 'Kategori C'])
                     ->where('organization_id', $child_organ->id)
                     ->where('status', 1)
                     ->get();

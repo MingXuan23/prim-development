@@ -102,43 +102,92 @@ class PolimasController extends Controller
         }
     }
 
-    public function indexStudent()
-    {
+
+    public function konvoChart(Request $request){
+  
+        $class=DB::table('classes')->where('id',$request->class)->first();
         $organization = DB::table('organizations')
-            ->where('id', $this->oid)
-            ->first();
+        ->where('id', $request->orgId)
+        ->first();
+        $allFees = DB::table('fees_new as fn')
+            ->join('student_fees_new as sfn', 'sfn.fees_id','fn.id')
+            ->join('class_student as cs','cs.id','sfn.class_student_id')
+            ->join('class_organization as co','co.id','cs.organclass_id')
+            ->where('fn.organization_id', $organization->id)
+            ->where('co.class_id', $class->id)
+            ->where('fn.name','LIKE','%HADIR%')
+            ->select('fn.*')
+            ->distinct();
+        
+        $allFeesId = $allFees->get()->pluck('id');
+        
+        $hadirFees = DB::table('fees_new')
+            ->whereIn('id', $allFeesId)
+            ->where('name', 'NOT LIKE', '%TIDAK%')
+            ->get();
+        $hadirFeesId=  $hadirFees->pluck('id');
+        
+        $tidakHadirFees = DB::table('fees_new')
+            ->whereIn('id', $allFeesId)
+            ->where('name', 'LIKE', '%TIDAK%')
+            ->get();
+        
+        $tidakhadirFeesId = $tidakHadirFees->pluck('id');
 
         $batch1_totalStudent = DB::table('class_organization')
-            ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->join('students', 'students.id', '=', 'class_student.student_id')
-            ->where([
-                'classes.levelid' => 1,
-                'class_organization.organization_id' => $this->oid
-            ])
-            ->count();
-        
+        ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+        ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+        ->join('students', 'students.id', '=', 'class_student.student_id')
+        ->join('student_fees_new','student_fees_new.class_student_id','class_student.id')
+        ->where([
+            'classes.id' => $class->id,
+            'class_organization.organization_id' => $this->oid
+        ])
+        ->select('class_student.id')
+        ->distinct()
+        ->get()
+        ->pluck('id');
+    
         $batch1_hadir = DB::table('student_fees_new')
             ->where([
                 'status' => 'Paid',
             ])
-            ->whereIn('fees_id', [243, 244])
+            ->whereIn('fees_id', $hadirFeesId)
+            ->whereIn('class_student_id',$batch1_totalStudent)
             ->count();
-        
+    
         $batch1_tidakhadir = DB::table('student_fees_new')
             ->where([
                 'status' => 'Paid',
-                'fees_id' => 246
             ])
+            ->whereIn('fees_id', $tidakhadirFeesId)
+            ->whereIn('class_student_id',$batch1_totalStudent)
             ->count();
         
-        $batch1_hutang = $batch1_totalStudent - $batch1_hadir - $batch1_tidakhadir;
+        $batch1_hutang = count($batch1_totalStudent) - $batch1_hadir - $batch1_tidakhadir;
 
         $batch1 = [
             'hadir'         => $batch1_hadir,
             'tidak_hadir'   => $batch1_tidakhadir,
             'hutang'        => $batch1_hutang
         ];
+
+        return response()->json(['batch1'=>$batch1,'class'=>$class,'allfee'=>$allFeesId]);
+    }
+    public function indexStudent()
+    {
+        $organization = DB::table('organizations')
+            ->where('id', $this->oid)
+            ->first();
+
+        $class=DB::table('class_organization as co')
+                ->join('classes as c', 'c.id', '=', 'co.class_id')
+                ->where('co.organization_id',$organization->id)
+                ->get();
+
+        
+
+       
         
         $batch2_totalStudent = DB::table('class_organization')
             ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
@@ -172,7 +221,7 @@ class PolimasController extends Controller
             'hutang'        => $batch2_hutang
         ];
 
-        return view('polimas.student', compact('organization', 'batch1', 'batch2'));
+        return view('polimas.student', compact('organization',  'batch2',));
     }
 
     public function getStudentDatatable(Request $request)

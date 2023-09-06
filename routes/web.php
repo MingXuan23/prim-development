@@ -103,6 +103,8 @@ Route::group(['prefix' => 'teacher'], function () {
 
 Route::group(['prefix' => 'class'], function () {
     Route::get('list', 'ClassController@getClassesDatatable')->name('class.getClassesDatatable');
+    Route::get('/getDummyClassStatus', 'ClassController@getDummyClassStatus')->name('class.getDummyClassStatus');
+    Route::get('/dummyclass/{id}', 'ClassController@storeDummyClass')->name('class.storeDummyClass');
     Route::post('/fetchTeacher', 'ClassController@fetchTeacher')->name('class.fetchTeacher');
 });
 
@@ -616,5 +618,7 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::get('/studentfees', 'PolimasController@student_fees')->name('polimas.studentfees');
         Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
         Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
+
+        Route::get('/konvoChart','PolimasController@konvoChart')->name('polimas.student.konvoChart');
     });
 });

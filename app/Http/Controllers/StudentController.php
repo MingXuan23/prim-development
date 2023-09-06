@@ -141,11 +141,16 @@ class StudentController extends Controller
         return view('student.add', compact('listclass', 'organization'));
     }
 
+    public function trimString($text){
+        $text = trim($text);
+        $text= preg_replace('/^\s+|\s+$/u', '',$text);
+        return $text;
+    }
     public function store(Request $request)
     {
         $classid = $request->get('classes');
         $class = ClassModel::find($classid);
-
+    
         $co = DB::table('class_organization')
             ->select('id', 'organization_id as oid')
             ->where('class_id', $classid)
@@ -155,12 +160,16 @@ class StudentController extends Controller
             'name'              =>  'required',
             'classes'           =>  'required',
             'parent_name'       =>  'required',
-            'parent_phone'      =>  'required',
+            'parent_icno'      =>  'required',
         ]);
+
+        $icno=$this->trimString(str_replace('-', '',$request->get('parent_icno')));
+
+        $parentname=$this->trimString(strtoupper($request->get('parent_name')));
 
         $ifExits = DB::table('users as u')
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
-                    ->where('u.telno', '=', $request->get('parent_phone'))
+                    ->where('u.telno', '=',$icno)
                     ->where('ou.organization_id', $co->oid)
                     ->whereIn('ou.role_id', [5, 6])
                     ->get();
@@ -168,14 +177,14 @@ class StudentController extends Controller
         if(count($ifExits) == 0) { // if not teacher or parent
 
             $newparent = DB::table('users')
-                            ->where('telno', '=', $request->get('parent_phone'))
+                            ->where('telno', '=', $icno)
                             ->first();
             
             // dd($newparent);
 
             if (empty($newparent)) {
                 $this->validate($request, [
-                    'parent_phone'      =>  'required|unique:users,telno',
+                    'parent_icno'      =>  'required|unique:users,telno',
                 ]);
 
                 if ($request->parent_email != null)
@@ -186,10 +195,10 @@ class StudentController extends Controller
                 }
     
                 $newparent = new Parents([
-                    'name'           =>  strtoupper($request->get('parent_name')),
+                    'name'           =>  $parentname,
                     'email'          =>  $request->get('parent_email'),
                     'password'       =>  Hash::make('abc123'),
-                    'telno'          =>  $request->get('parent_phone'),
+                    'telno'          =>  $icno,
                     'remember_token' =>  Str::random(40),
                 ]);
                 $newparent->save();
@@ -213,7 +222,7 @@ class StudentController extends Controller
             }
         } else {
             $newparent = DB::table('users')
-                        ->where('telno', '=', "{$request->get('parent_phone')}")
+                        ->where('telno', '=', "{$icno}")
                         ->first();
 
             $parentRole = DB::table('organization_user')
@@ -235,7 +244,7 @@ class StudentController extends Controller
                 ]);
             } 
         }   
-        $this->assignStudentToParent($newparent->id,$request->get('parent_phone'),$request,$classid, $ifExits);
+        $this->assignStudentToParent($newparent->id,$icno,$request,$classid, $ifExits);
         return redirect('/student')->with('success', 'New student has been added successfully');
     }
 
@@ -260,7 +269,7 @@ class StudentController extends Controller
         $user->assignRole($rolename->nama);
 
         $student = new Student([
-            'nama'          =>  empty($studentData->name)?$studentData->studentName:$studentData->name,
+            'nama'          =>  empty($studentData->name)? $this->trimString(strtoupper($studentData->studentName)):$this->trimString(strtoupper($studentData->name)),
             // 'icno'          =>  $request->get('icno'),
             'gender'        =>  $studentData->gender,
             //'email'         =>  $studentData->email,
@@ -297,13 +306,13 @@ class StudentController extends Controller
         // check fee for new in student
         // check category A fee
         $ifExitsCateA = DB::table('fees_new')
-            ->where('category', 'Kategory A')
+            ->where('category', 'Kategori A')
             ->where('organization_id', $co->oid)
             ->where('status', 1)
             ->get();
 
         $ifExitsCateBC = DB::table('fees_new')
-            ->whereIn('category', ['Kategory B', 'Kategory C'])
+            ->whereIn('category', ['Kategori B', 'Kategori C'])
             ->where('organization_id', $co->oid)
             ->where('status', 1)
             ->get();
@@ -362,13 +371,13 @@ class StudentController extends Controller
             ]);
 
             $ifExitsCateA = DB::table('fees_new')
-                        ->where('category', 'Kategory A')
+                        ->where('category', 'Kategori A')
                         ->where('organization_id', $child_organ->id)
                         ->where('status', 1)
                         ->get();
         
             $ifExitsCateBC = DB::table('fees_new')
-                    ->whereIn('category', ['Kategory B', 'Kategory C'])
+                    ->whereIn('category', ['Kategori B', 'Kategori C'])
                     ->where('organization_id', $child_organ->id)
                     ->where('status', 1)
                     ->get();
@@ -431,15 +440,23 @@ class StudentController extends Controller
     }
 
     public function edit($id)
-    {
+    {   $organization = $this->getOrganizationByUserId();
+        $organizationId = collect($organization)->pluck('id');
+
         $student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('class_organization.organization_id', 'students.id as id', 'students.nama as studentname', 'students.icno', 'students.gender', 'classes.id as classid', 'classes.nama as classname', 'class_student.status', 'students.email')
+            ->join('organization_user_student as ous','ous.student_id','students.id')
+            ->join('organization_user as ou', 'ou.id','ous.organization_user_id')
+            ->join('users as u','u.id','ou.user_id')
+            ->select('class_organization.organization_id', 'students.id as id', 'students.nama as studentname', 
+                    'students.icno', 'students.gender', 'classes.id as classid', 'classes.nama as classname'
+                    , 'class_student.status','students.email','u.name as parentName','u.telno as parentIC')
             ->where([
                 ['students.id', $id],
             ])
+            ->whereIn('class_organization.organization_id',$organizationId)
             ->orderBy('classes.nama')
             ->first();
 
@@ -452,10 +469,95 @@ class StudentController extends Controller
             ->orderBy('classes.nama')
             ->get();
 
-        $organization = $this->getOrganizationByUserId();
+        
         return view('student.update', compact('student', 'organization', 'listclass'));
     }
 
+    public function transferClass($co,$classid,$student){
+        //dd($co,$classid,$student);
+            $class=DB::table('classes as c')
+                    ->where('c.id',$classid)
+                    ->first();
+            $class_student=DB::table('class_organization as co')
+                            ->join('class_student as cs','cs.organclass_id','co.id')
+                            ->where('cs.student_id',$student->id)
+                            ->where('co.class_id',$student->class_id);
+            
+            $class_student_details=$class_student->first();
+            //dd( $student->id,$student->class_id,$classid);
+            $class_student->update([
+                                'cs.organclass_id'=>$co->id
+                            ]);
+
+            if($class->levelid>0){
+                $ifExitsCateBC = DB::table('fees_new')
+                ->whereIn('category', ['Kategori B', 'Kategori C'])
+                ->where('organization_id', $co->organization_id)
+                ->where('status', 1)
+                ->get();
+    
+                $studentHaveFees=DB::table('student_fees_new as sfn')
+                                ->join('class_student as cs','cs.id','sfn.class_student_id')
+                                ->where('sfn.class_student_id',$class_student_details->id)
+                                ->get();
+    
+                $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
+    
+                
+                if (!$ifExitsCateBC->isEmpty()) {
+                    foreach ($ifExitsCateBC as $kateBC) {
+                        $target = json_decode($kateBC->target);
+    
+                        if (isset($target->gender)) {
+                            if ($target->gender != $studentData->gender) {
+                                continue;
+                            }
+                        }
+                        
+                        if ($target->data == "All_Level" || $target->data == $class->levelid) {
+                            if (in_array($kateBC->id, $studentFeesIDs)){
+                                continue;
+                            }else{
+                                DB::table('student_fees_new')->insert([
+                                    'status'            => 'Debt',
+                                    'fees_id'           =>  $kateBC->id,
+                                    'class_student_id'  =>  $class_student_details->id
+                                ]);
+                            }
+                            
+                        } else if (is_array($target->data)) {
+                            if (in_array($classid, $target->data)) { 
+                                if (in_array($kateBC->id, $studentFeesIDs)){
+                                    continue;
+                                }else{
+                                    DB::table('student_fees_new')->insert([
+                                        'status'            => 'Debt',
+                                        'fees_id'           =>  $kateBC->id,
+                                        'class_student_id'  =>  $class_student_details->id
+                                    ]);
+                                }
+                            }
+                            else{
+
+                                $Debt = "Debt";
+                                $delete = DB::table('student_fees_new as sfn')
+                                    ->where([
+                                        ['sfn.fees_id', $kateBC->id],
+                                        ['sfn.class_student_id', $class_student_details->id],
+                                        ['sfn.status', '=', 'Debt'],
+                                    ])
+                                    ->get()->pluck('id');
+                                DB::table('student_fees_new')->whereIn('id',$delete)->delete();
+
+                               
+                                  
+                            }
+                        }
+                    }
+                }
+            }
+            
+    }
     public function update(Request $request, $id)
     {
         //
@@ -476,21 +578,24 @@ class StudentController extends Controller
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status')
+            ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status','classes.id as class_id')
             ->where([
                 ['students.id', $id],
-            ])
-            ->update(
+            ]);
+        if($student->first()->class_id!=$classid){
+            $this->transferClass($getOrganizationClass,$classid,$student->first());
+        }
+        $student->update(
                 [
                     'students.nama' => $request->get('name'),
                     //'students.icno' => $request->get('icno'),
                     'students.gender' => $request->get('gender'),
                     'students.email' => $request->get('email'),
-                    'class_student.organclass_id'    => $getOrganizationClass->id,
+                    //'class_student.organclass_id'    => $getOrganizationClass->id,
                 ]
             );
 
-        return redirect('/student')->with('success', 'The data has been updated!');
+        return redirect()->back()->with('success', 'The data has been updated!')->with('closeTab', true);;
     }
 
     public function destroy($id)
@@ -565,9 +670,10 @@ class StudentController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center"></div>';
-                    // $btn = '<div class="d-flex justify-content-center">';
-                    // $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1" target="_blank">Edit</a>';
+                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button>';
+                    $btn=$btn.'</div>';
                     return $btn;
                 });
 
@@ -654,7 +760,7 @@ class StudentController extends Controller
         if (request()->ajax()) {
             // $oid = $request->oid;
             $classid = $request->classid;
-
+            $orgId =$request->orgId;
             $hasOrganizaton = $request->hasOrganization;
 
             $userId = Auth::id();
@@ -699,16 +805,48 @@ class StudentController extends Controller
                     }
                 });
 
-                $table->addColumn('status', function ($row) {
-                    if ($row->fees_status == 'Completed') {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success">Selesai</span></div>';
+                $table->addColumn('status', function ($row) use ($orgId){
 
+                    $tranB=DB::table('class_student as cs')
+                    ->join('student_fees_new as sfn' ,'sfn.class_student_id','cs.id')
+                    ->join('fees_transactions_new as ftn','ftn.student_fees_id','sfn.id')
+                    ->join('fees_new as fn','fn.id','sfn.fees_id')
+                    ->join('transactions as t','t.id','ftn.transactions_id')
+                    ->where('fn.organization_id',$orgId)
+                    ->where('cs.id',$row->csid)
+                    ->where('t.status',"Success")
+                    ->select('t.id as transaction_id','t.amount')
+                    ->get();
+                    
+                    $tranA = DB::table('transactions as t')
+                    ->leftJoin('fees_new_organization_user as fou', 't.id', 'fou.transaction_id')
+                    ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
+                    ->leftJoin('organization_user_student as ous','ous.organization_user_id','ou.id')
+                    ->leftJoin('fees_new as fn', 'fn.id', 'fou.fees_new_id')
+                    ->distinct()
+                    ->where('ous.student_id', $row->id)
+                    ->where('fn.organization_id',$orgId)
+                    ->where('t.status', 'Success')
+                    ->select('t.id as transaction_id','t.amount')
+                    ->get();
+    
+
+                $combined = $tranA->concat($tranB);
+    
+                $unique = $combined->unique('transaction_id');
+               
+                    if(count($unique)>0) {
+                        $btn = '<div class="d-flex  align-items-center flex-column">';
+                        foreach($unique as $t){
+                           
+                            $href = route('receipttest', [ 'transaction_id' => $t->transaction_id ]);
+                            $btn = $btn . '<a href ="'.$href.'" target="_blank" >RM '.number_format($t->amount, 2, '.', '').'</a>';
+                        }
+                        $btn =$btn.'</div>';
                         return $btn;
                     } else {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Belum Selesai </span></div>';
-
+                        $btn = $btn . '<span class="badge badge-danger"> Belum Bayar </span></div>';
                         return $btn;
                     }
                 });
@@ -868,46 +1006,34 @@ class StudentController extends Controller
         $class_student->update([
                             'cs.organclass_id'=>$co->id
                         ]);
-
-
-        $ifExitsCateBC = DB::table('fees_new')
-        ->whereIn('category', ['Kategory B', 'Kategory C'])
-        ->where('organization_id', $co->organization_id)
-        ->where('status', 1)
-        ->get();
-
-        $studentHaveFees=DB::table('student_fees_new as sfn')
-                        ->join('class_student as cs','cs.id','sfn.class_student_id')
-                        ->where('sfn.class_student_id',$class_student_details->id)
-                        ->where('sfn.status','Debt')
-                        ->get();
-
-        $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
-
         
-        if (!$ifExitsCateBC->isEmpty()) {
-            foreach ($ifExitsCateBC as $kateBC) {
-                $target = json_decode($kateBC->target);
-
-                if (isset($target->gender)) {
-                    if ($target->gender != $studentData->gender) {
-                        continue;
-                    }
-                }
-                
-                if ($target->data == "All_Level" || $target->data == $class->levelid) {
-                    if (in_array($kateBC->id, $studentFeesIDs)){
-                        continue;
-                    }else{
-                        DB::table('student_fees_new')->insert([
-                            'status'            => 'Debt',
-                            'fees_id'           =>  $kateBC->id,
-                            'class_student_id'  =>  $class_student_details->id
-                        ]);
+        //if inactive or graduated will not run this 
+        if($class->levelid>0){
+            $ifExitsCateBC = DB::table('fees_new')
+            ->whereIn('category', ['Kategori B', 'Kategori C'])
+            ->where('organization_id', $co->organization_id)
+            ->where('status', 1)
+            ->get();
+    
+            $studentHaveFees=DB::table('student_fees_new as sfn')
+                            ->join('class_student as cs','cs.id','sfn.class_student_id')
+                            ->where('sfn.class_student_id',$class_student_details->id)
+                            ->get();
+    
+            $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
+    
+            
+            if (!$ifExitsCateBC->isEmpty()) {
+                foreach ($ifExitsCateBC as $kateBC) {
+                    $target = json_decode($kateBC->target);
+    
+                    if (isset($target->gender)) {
+                        if ($target->gender != $studentData->gender) {
+                            continue;
+                        }
                     }
                     
-                } else if (is_array($target->data)) {
-                    if (in_array($student->newClass, $target->data)) { 
+                    if ($target->data == "All_Level" || $target->data == $class->levelid) {
                         if (in_array($kateBC->id, $studentFeesIDs)){
                             continue;
                         }else{
@@ -917,17 +1043,33 @@ class StudentController extends Controller
                                 'class_student_id'  =>  $class_student_details->id
                             ]);
                         }
-                    }
-                    else{
-                        $delete=DB::table('student_fees_new as sfn')
-                                ->where('sfn.fees_id',$kateBC->id)
-                                ->where('sfn.class_student_id',$class_student_details->id)
-                                ->delete();
-                        //return response()->json(['data'=>$delete]);  
+                        
+                    } else if (is_array($target->data)) {
+                        if (in_array($student->newClass, $target->data)) { 
+                            if (in_array($kateBC->id, $studentFeesIDs)){
+                                continue;
+                            }else{
+                                DB::table('student_fees_new')->insert([
+                                    'status'            => 'Debt',
+                                    'fees_id'           =>  $kateBC->id,
+                                    'class_student_id'  =>  $class_student_details->id
+                                ]);
+                            }
+                        }
+                        else{
+                            $delete=DB::table('student_fees_new as sfn')
+                                    ->where('sfn.fees_id',$kateBC->id)
+                                    ->where('sfn.class_student_id',$class_student_details->id)
+                                    ->where('sfn.status',"Debt")
+                                    ->delete();
+                            //return response()->json(['data'=>$delete]);  
+                        }
                     }
                 }
             }
+    
         }
 
+        
     }
 }

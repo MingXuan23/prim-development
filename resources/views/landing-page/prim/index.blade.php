@@ -284,7 +284,7 @@
                                 <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">
                             </div>
                             <div class="pt-3">
-                                <h4>Muhammad 'Ammar Muhammad Sani</h4>
+                                <h4>Chuan Chuan You</h4>
                                 <p>Chief Technology Officer</p>
                             </div>
                         </div>

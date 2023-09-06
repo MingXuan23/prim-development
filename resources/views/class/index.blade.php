@@ -58,6 +58,9 @@
                 {{-- href="{{ route('kelas.create') }}" {{ route('exportkelas') }}--}}
                 <a style="margin: 19px; float: right;" href="{{ route('class.create') }}" class="btn btn-primary"> <i
                         class="fas fa-plus"></i> Tambah Kelas</a>
+                <a style="margin-top:19px;float: right;" href="#" class="btn btn-warning" id="dummyBtn"> <i
+                        class="fas fa-plus" ></i> Tambah Dummy Kelas</a>
+                
             </div>
 
             <div class="card-body">
@@ -204,7 +207,8 @@
 
 <script>
     $(document).ready(function() {
-  
+        $('#dummyBtn').hide();
+        
       var classesTable;
   
         if($("#organization").val() != ""){
@@ -212,7 +216,30 @@
             fetch_data($("#organization").val());
         }
   
+        function getDummyClassStatus(){
+            oid =$("#organization").val();
+            $.ajax({
+                url: "{{ route('class.getDummyClassStatus') }}",
+                data: {
+                    oid: oid
+                },
+                type: 'GET',
+                success: function(response) {
+                    if (response.data==0) {
+                            $('#dummyBtn').show();
+                            var newHref = "{{ route('class.storeDummyClass', ':oid') }}".replace(":oid", oid);
+                            $('#dummyBtn').attr('href', newHref);
+
+                    } else {
+                        $('#dummyBtn').hide();
+                    }
+                }
+            });
+        }
+
+
         function fetch_data(oid = '') {
+            getDummyClassStatus();
             classesTable = $('#classesTable').DataTable({
                     processing: true,
                     serverSide: true,
@@ -223,7 +250,6 @@
                             hasOrganization: true
                         },
                         type: 'GET',
-  
                     },
                     'columnDefs': [{
                         "targets": [0], // your case first column
@@ -232,6 +258,7 @@
                     },{
                         "targets": [1,2,3,4], // your case first column
                         "className": "text-center",
+                        "width":"20%"
                     },],
                     order: [
                         [1, 'asc']
@@ -259,14 +286,16 @@
                         name: 'action',
                         orderable: false,
                         searchable: false
-                    },]
+                    },],
+       
+                    
             });
         }
   
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('#classesTable').DataTable().destroy();
-            console.log(organizationid);
+            //console.log(organizationid);
             fetch_data(organizationid);
         });
   

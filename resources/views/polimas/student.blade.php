@@ -18,64 +18,54 @@
 
     <div class="col-md-12">
         <div class="card">
+        
+        <div class="row">
+        <div class="card-body">
+            <div class="card-body">
+                <div id="dkelas" class="form-group2">
+                <label> Kelas</label>
+                <select name="classes" id="chartclass" class="form-control" onchange= drawKonvoChart()>
+                    <option value="" disabled selected>Pilih Kelas</option>
+                </select>
+                </div>
+            </div>
+        </div>
+        
+        </div>
             <div class="row">
                 <div class="col-sm-6" style="margin-top: 30px">
-                    <h4 class="card-title mb-4 text-center font-size-20">Statistik untuk Batch JUN 19, DIS 19, JUN 20</h4>
-
+                    <h4 class="card-title mb-4 text-center font-size-20" id ="titleKonvo">Kelas </h4>
                     <div class="row justify-content-center">
                         <div class="col-sm-4">
                             <div class="text-center">
-                                <h5 class="mb-0 font-size-20">{{ $batch1['hadir'] }}</h5>
+                                <h5 class="mb-0 font-size-20" id ="hadirStudent">-</h5>
                             <p class="text-muted">Hadir</p>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="text-center">
-                                <h5 class="mb-0 font-size-20">{{ $batch1['tidak_hadir'] }}</h5>
+                                <h5 class="mb-0 font-size-20" id ="tidakhadirStudent">-</h5>
                                 <p class="text-muted">Tidak Hadir</p>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="text-center">
-                                <h5 class="mb-0 font-size-20">{{ $batch1['hutang'] }}</h5>
+                                <h5 class="mb-0 font-size-20" id ="hutangStudent">-</h5>
                             <p class="text-muted">Belum Bayar</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <div id="pie-chart-batch1" style="width:500px;height:250px; margin: 0 auto;">
+
+                </div>
+                <div class="col-sm-6" style="margin-top: 30px">
+                <h4 class="card-title mb-4 text-center font-size-20" id ="titleKonvo">Statistik </h4>
+                <div class ="col-sm-4">
+                <div id="pie-chart-batch1" style="width:500px;height:250px; margin: 0 auto;">
                         <div id="pie-chart-container" class="flot-charts flot-charts-height">
                         </div>
                     </div>
                 </div>
-
-                <div class="col-sm-6" style="margin-top: 30px">
-                    <h4 class="card-title mb-4 text-center font-size-20">Statistik untuk Batch DIS 20, Sesi 1: 2020/2021</h4>
-                    <div class="row justify-content-center">
-                        <div class="col-sm-4">
-                            <div class="text-center">
-                                <h5 class="mb-0 font-size-20">{{ $batch2['hadir']  }}</h5>
-                            <p class="text-muted">Hadir</p>
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="text-center">
-                                <h5 class="mb-0 font-size-20">{{ $batch2['tidak_hadir'] }}</h5>
-                                <p class="text-muted">Tidak Hadir</p>
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="text-center">
-                                <h5 class="mb-0 font-size-20">{{ $batch2['hutang']  }}</h5>
-                            <p class="text-muted">Belum Bayar</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="pie-chart-batch2" style="width:500px;height:250px; margin: 0 auto;">
-                        <div id="pie-chart-container" class="flot-charts flot-charts-height">
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
 
@@ -225,6 +215,7 @@
         if($("#organization").val() != ""){
             $("#organization").prop("selectedIndex", 0).trigger('change');
             fetchClass($("#organization").val(), '#classes');
+            fetchClass($("#organization").val(), '#chartclass');
         }
 
         if($("#organExport").val() != ""){
@@ -310,6 +301,10 @@
                         _token:_token },
                 success:function(result)
                 {
+                    result.success.sort(function(a, b) {
+                        return b.cid - a.cid;
+                    });
+
                     $(classId).empty();
                     $(classId).append("<option value='' disabled selected> Pilih Kelas</option>");
                     jQuery.each(result.success, function(key, value){
@@ -328,56 +323,56 @@
             }
         });
 
-        $(function(){
-            var colors = ["#a4023d", '#02a499', '#a102a4'];
+        // $(function(){
+        //     var colors = ["#a4023d", '#02a499', '#a102a4'];
 
-            var data1 = [{
-                label: "Hadir",  
-                data: {{ $batch1['hadir']  }},
-            }, {
-                label: "Tidak Hadir",  
-                data: {{ $batch1['tidak_hadir']  }},
-            }, {
-                label: "Belum Bayar",  
-                data: {{ $batch1['hutang'] }},
-            }];
+        //     var data1 = [{
+        //         label: "Hadir",  
+        //         data: {{ $batch2['hadir']  }},
+        //     }, {
+        //         label: "Tidak Hadir",  
+        //         data: {{ $batch2['tidak_hadir']  }},
+        //     }, {
+        //         label: "Belum Bayar",  
+        //         data: {{ $batch2['hutang'] }},
+        //     }];
 
-            var data2 = [{
-                label: "Hadir",  
-                data: {{ $batch2['hadir']  }},
-            }, {
-                label: "Tidak Hadir",  
-                data: {{ $batch2['tidak_hadir']  }},
-            }, {
-                label: "Belum Bayar",  
-                data: {{ $batch2['hutang'] }},
-            }];
+        //     var data2 = [{
+        //         label: "Hadir",  
+        //         data: {{ $batch2['hadir']  }},
+        //     }, {
+        //         label: "Tidak Hadir",  
+        //         data: {{ $batch2['tidak_hadir']  }},
+        //     }, {
+        //         label: "Belum Bayar",  
+        //         data: {{ $batch2['hutang'] }},
+        //     }];
 
-            var options = {
-                series: {
-                    pie: {
-                    show: true,
-                    }
-                },
-                legend: {
-                    show: true,
-                    backgroundColor: "transparent"
-                },
-                grid: {
-                    hoverable: true,
-                    clickable: true
-                },
-                    colors: colors,
-                    tooltip: true,
-                    tooltipOpts: {
-                        content: "%s, %p.0%",
-                        defaultTheme: false
-                    }
-            }; 
+        //     var options = {
+        //         series: {
+        //             pie: {
+        //             show: true,
+        //             }
+        //         },
+        //         legend: {
+        //             show: true,
+        //             backgroundColor: "transparent"
+        //         },
+        //         grid: {
+        //             hoverable: true,
+        //             clickable: true
+        //         },
+        //             colors: colors,
+        //             tooltip: true,
+        //             tooltipOpts: {
+        //                 content: "%s, %p.0%",
+        //                 defaultTheme: false
+        //             }
+        //     }; 
 
-            $.plot($("#pie-chart-batch1"), data1, options);
-            $.plot($("#pie-chart-batch2"), data2, options);
-        })
+        //     $.plot($("#pie-chart-batch1"), data1, options);
+        //     $.plot($("#pie-chart-batch2"), data2, options);
+        // })
 
         // csrf token for ajax
         $.ajaxSetup({
@@ -440,6 +435,64 @@
 
         });
     });
+
+    function drawKonvoChart(){
+        const classChart = $('#chartclass').val();
+        const orgId = $("#organization").val();
+        $.ajax({
+            url: "{{ route('polimas.student.konvoChart') }}",
+            data: {
+                class:classChart,
+                orgId:orgId
+            },
+            type: 'GET',
+            success : function(data){
+                $('#titleKonvo').html("Kelas " + data.class.nama);
+                $('#hadirStudent').html(data.batch1.hadir);
+                $('#tidakhadirStudent').html(data.batch1.tidak_hadir);
+                $('#hutangStudent').html(data.batch1.hutang);
+                console.log(data.allfee);
+
+                var colors = ["#a4023d", '#02a499', '#a102a4'];
+
+                var data1 = [{
+                    label: "Hadir",  
+                    data: data.batch1.hadir,
+                }, {
+                    label: "Tidak Hadir",  
+                    data: data.batch1.tidak_hadir,
+                }, {
+                    label: "Belum Bayar",  
+                    data: data.batch1.hutang,
+                }];
+
+                var options = {
+                series: {
+                    pie: {
+                    show: true,
+                    }
+                },
+                legend: {
+                    show: true,
+                    backgroundColor: "transparent"
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: true
+                },
+                    colors: colors,
+                    tooltip: true,
+                    tooltipOpts: {
+                        content: "%s, %p.0%",
+                        defaultTheme: false
+                    }
+            }; 
+
+            $.plot($("#pie-chart-batch1"), data1, options);
+                
+            }
+        });
+    }
 </script>
 
 @endsection

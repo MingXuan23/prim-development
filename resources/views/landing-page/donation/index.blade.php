@@ -51,6 +51,14 @@
             .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.slash {
                 display: none;
             }
+
+            header {
+                padding-bottom: 50px !important;
+            }
+
+            .team-member-area {
+                padding-top: 20px !important;
+            }
         }
     </style>
 </head>
@@ -120,17 +128,23 @@
                 <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: center">
                     <img src="{{ URL::asset('assets/landing-page/img/header-derma.png') }}" alt="header right image" style="max-width: 110%;" id="headerhover">
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-6 justify-content-center">
                     <div class="header-inner">
+                        {{-- <h1 class="title wow fadeInDown white">Derma</h1>
+                        <p class="white">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu subuh. Allah menjanjikan 
+                            banyak kelebihan dan ganjarannya. Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
+                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
+                        <div class="btn-wrapper wow fadeInUp">
+                            <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
+                        </div> --}}
                         <h1 class="title wow fadeInDown white">Derma</h1>
-                        <p class="white">Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b>
-                            sehari
-                            dalam <b> 7 hari </b> seminggu untuk organisasi yang telah berdaftar di dalam
-                            sistem
-                            PRiM.</p>
-                            <div class="btn-wrapper wow fadeInUp">
-                                <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
-                            </div>
+                        <p class="white" style="font-size: 20px;">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu Subuh. Allah menjanjikan 
+                            banyak kelebihan dan ganjarannya. 
+                            Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
+                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
+                        <div class="btn-wrapper wow fadeInUp">
+                            <a href="/register" class="boxed-btn btn-rounded">Jom Derma</a>
+                        </div>
                     </div>
                 </div>
                 
@@ -186,7 +200,7 @@
                 </div>
             </div> --}}
 
-            <div class="about-us-area style-two" style="padding-top: 20px">
+            <div class="about-us-area style-two" style="padding-top:20px">
                 <div class="container">
                     <div class="row">
                         <div class="col-lg-6">
