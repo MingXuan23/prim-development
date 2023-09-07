@@ -208,6 +208,8 @@
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
+
+    var arr = [];
     
     $.ajax({
         type: 'GET',

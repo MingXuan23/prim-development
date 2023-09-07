@@ -84,4 +84,14 @@ class Organization extends Model
     {
         return $this->hasMany(Room::class);
     }
+
+    public function grab()
+    {
+        return $this->hasMany(Grab_Student::class);
+    }
+
+    public function bus()
+    {
+        return $this->hasMany(Bus::class);
+    }
 }

@@ -593,6 +593,31 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('bookhomestay/insertbooking/{id}/{price}', 'HomestayController@insertbooking');
     Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
     Route::get('homestayresit/{id}', 'HomestayController@homestayresit')->name('homestay.homestayresit');
+    Route::get('urustempahan', 'HomestayController@urustempahan')->name('homestay.urustempahan');
+    Route::post('tunjukpelanggan', 'HomestayController@tunjukpelanggan');
+    Route::post('cancelpelanggan/{id}', 'HomestayController@cancelpelanggan');
+
+    Route::get('/grab-setcar','GrabStudentController@setcar')->name('grab.setinsert');
+    Route::post('/grab-insertcar','GrabStudentController@insertcar')->name('grab.insert');
+    Route::get('/grab-check','GrabStudentController@checkcar')->name('grab.check');
+    Route::post('/updaterow-grab/{id}','GrabStudentController@updatecar')->name('grab.update/{id}');
+    Route::get('/grab-destination','GrabStudentController@setdestination')->name('grab.setdestination');
+    Route::post('/grab-insertdestination','GrabStudentController@insertdestination')->name('grab.insertdestination');
+    Route::get('/grab-checkpassenger','GrabStudentController@grabcheckpassenger')->name('grab.checkpassenger');
+
+    Route::get('/bus-setbus','BusController@setbus')->name('bus.setinsert');
+    Route::post('/bus-insertbus','BusController@insertbus')->name('bus.insert');
+    Route::get('/bus-managebus','BusController@managebus')->name('bus.manage');
+    Route::post('/managebus-bus/{id}','BusController@manageselectedbus')->name('bus.displaymanage/{id}');
+    Route::post('/updatemanagebus-bus/{id}','BusController@updatebus')->name('bus.update/{id}');
+
+    Route::get('/book-grab','GrabStudentController@bookgrab')->name('book.grab');
+    Route::post('/passengerselect-grab/{id}','GrabStudentController@selectbookgrab')->name('passengerselect-grab/{id}');
+    Route::post('/passengerpay-grab/{id}','GrabStudentController@paymentgrab')->name('passengerpay-grab/{id}');
+    
+
+
+
     
 
 Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');
