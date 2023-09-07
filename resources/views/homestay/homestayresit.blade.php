@@ -161,6 +161,7 @@
         @csrf
         <input type="hidden" name="desc" id="desc" value="Homestay / Hotel">
         <input type="hidden" name="bookingid" id = "bookingid" value="{{ $bookingid }}">
+        <input type="hidden" name="amount" id="amount" value="{{ $totalprice }}">
         <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
