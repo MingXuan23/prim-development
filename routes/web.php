@@ -603,12 +603,18 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('/updaterow-grab/{id}','GrabStudentController@updatecar')->name('grab.update/{id}');
     Route::get('/grab-destination','GrabStudentController@setdestination')->name('grab.setdestination');
     Route::post('/grab-insertdestination','GrabStudentController@insertdestination')->name('grab.insertdestination');
+    Route::get('/grab-checkpassenger','GrabStudentController@grabcheckpassenger')->name('grab.checkpassenger');
 
     Route::get('/bus-setbus','BusController@setbus')->name('bus.setinsert');
     Route::post('/bus-insertbus','BusController@insertbus')->name('bus.insert');
     Route::get('/bus-managebus','BusController@managebus')->name('bus.manage');
     Route::post('/managebus-bus/{id}','BusController@manageselectedbus')->name('bus.displaymanage/{id}');
     Route::post('/updatemanagebus-bus/{id}','BusController@updatebus')->name('bus.update/{id}');
+
+    Route::get('/book-grab','GrabStudentController@bookgrab')->name('book.grab');
+    Route::post('/passengerselect-grab/{id}','GrabStudentController@selectbookgrab')->name('passengerselect-grab/{id}');
+    Route::post('/passengerpay-grab/{id}','GrabStudentController@paymentgrab')->name('passengerpay-grab/{id}');
+    
 
 
 

@@ -627,12 +627,18 @@
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('grab.checkpassenger') }}" class=" waves-effect">
                             <i class="ti-clipboard"></i>
                             <span>Urus Tempahan</span>
                         </a>
                     </li>
                     @endrole 
+                    <li>
+                        <a href="{{ route('book.grab') }}" class=" waves-effect">
+                            <i class="mdi  mdi-taxi"></i>
+                            <span>Buat Tempahan</span>
+                        </a>
+                    </li>
                 </ul>  
             </li>
 

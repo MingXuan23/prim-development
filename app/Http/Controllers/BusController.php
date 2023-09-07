@@ -109,7 +109,7 @@ class BusController extends Controller
             'status' => $request->input('status'),
         ]);
         
-        return redirect('/bus.manage')->with('success', 'Bus has been updated');
+        return redirect()->route('bus.manage')->with('success', 'Update bus was successful');
     }
 
 }
