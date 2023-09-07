@@ -378,8 +378,15 @@ public function editpromo(Request $request,$promotionid)
                 ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
                 ->get();
 
+        $totalprice = 0; // Initialize the total price variable
 
-        return view('homestay.homestayresit',compact('data','bookingid'));
+        foreach ($data as $record) {
+                // Add the totalprice for each record to the totalPrice variable
+                $totalprice += $record->totalprice;
+        }
+
+
+        return view('homestay.homestayresit',compact('data','bookingid','totalprice'));
     }
 
     public function urustempahan()
@@ -467,4 +474,5 @@ public function editpromo(Request $request,$promotionid)
     {
         //
     }
+
 }
