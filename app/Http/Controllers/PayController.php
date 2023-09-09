@@ -504,7 +504,7 @@ class PayController extends AppBaseController
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         }
-        else if($request->desc == 'Homestay / Hotel')
+        else if($request->desc == 'Homestay')
         {
             $homestay = Booking::find($request->bookingid);
             $user = User::find($homestay->customerid);
@@ -635,6 +635,15 @@ class PayController extends AppBaseController
                     'pickup_date' => $pickUp,
                     'note' => $request->note,
                     'transaction_id' => $transaction->id
+                ]);
+               
+            }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'H')
+            {
+                $result = DB::table('bookings')
+                ->where('id', $bookingId)
+                ->update([
+                    'transactionid' => $transaction->id
                 ]);
                
             }

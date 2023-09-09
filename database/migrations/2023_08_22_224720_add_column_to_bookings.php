@@ -14,7 +14,10 @@ class AddColumnToBookings extends Migration
     public function up()
     {
         Schema::table('bookings', function (Blueprint $table) {
+            $table->unsignedBigInteger('transactionid')->nullable()->index();
+            $table->foreign('transactionid')->nullable()->references('id')->on('transactions')->onDelete('cascade');
             $table->timestamps();
+            
         });
     }
 
@@ -26,8 +29,10 @@ class AddColumnToBookings extends Migration
     public function down()
     {
         Schema::table('bookings', function (Blueprint $table) {
+            $table->dropColumn('transactionid');
             $table->dropColumn('created_at');
             $table->dropColumn('updated_at');
+            
         });
     }
 }
