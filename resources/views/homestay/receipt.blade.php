@@ -64,7 +64,7 @@
                             <div class="col-12 pt-3">
                                 <table style="width:100%" class="infotbl">
                                     <tr style="background-color:#e9ecef">
-                                        <th colspan="9" class="text-center">Maklumat Pembeli</th>
+                                        <th colspan="9" class="text-center">Maklumat Pelanggan</th>
                                     </tr>
                                     <tr>
                                         <td class="py-3">Nama</td>
@@ -98,7 +98,8 @@
                                         <th style="width:20%">Nama Bilik</th>
                                         <th style="width:20%">Tarikh Dari</th>
                                         <th style="width:20%">Tarikh Hingga</th>
-                                        <th style="width:20%">Amaun (RM)</th>
+                                        <th style="width:20%">Detail Bilik</th>
+                                        <th style="width:20%">Amaun Semalam (RM)</th>
                                     </tr>
                                     @foreach ($booking_order as $item)
                                     <tr>
@@ -109,6 +110,7 @@
                                         
                                         <td style="text-align: center">{{ $item->checkin }}</td>
                                         <td style="text-align: center">{{ $item->checkout }}</td>
+                                        <td style="text-align: center">{{ $item->details }}</td>
                                         <td style="text-align: center">
                                             {{  $item->price  }}</td>
                                     </tr>
@@ -126,15 +128,6 @@
                                 </table>
 
                                 <table style="width:100%" class="infotbl">
-                                    <tr>
-                                        <td></td>
-                                        <td colspan="3" style="text-align:right">
-                                            Caj yang dikenakan oleh organisasi (RM)
-                                        </td>
-                                        <td style="text-align:center;width:20%">
-                                            {{  number_format((float)$organization->fixed_charges, 2, '.', '') }}
-                                        </td>
-                                    </tr>
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran

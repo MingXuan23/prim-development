@@ -1000,13 +1000,11 @@ class PayController extends AppBaseController
                         $user = User::find($transaction->user_id);
                         $organization = Organization::find($room->homestayid);
                         
-                        $booking_order = DB::table('organiaztions as o')
-                            ->leftJoin('rooms as r', 'r.homestayid', 'o.id')
-                            ->leftJoin('bookings as b', 'b.roomid', 'r.roomid')
-                            ->select('o.*', 'r.*', 'b.*')
-                            ->where('b.bookingid', $booking->bookingid)
-                            ->orderBy('r.roomname')
-                            ->get();
+                        $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                        ->join('bookings','rooms.roomid','=','bookings.roomid')
+                        ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
+                        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
+                        ->get();
                         
                         Mail::to($transaction->email)->send(new HomestayReceipt($booking, $organization, $transaction, $user));
     
