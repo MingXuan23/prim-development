@@ -93,7 +93,6 @@
                                 <table class="table table-bordered table-striped" style="">
                                     <tr style="text-align: center">
                                         <th style="width:3%">Bil.</th>
-                                        <th>Item</th>
                                         <th style="width:10%">Nama Homestay</th>
                                         <th style="width:20%">Nama Bilik</th>
                                         <th style="width:20%">Tarikh Dari</th>
@@ -107,12 +106,11 @@
                                         <td>
                                             <div class="pl-2"> {{ $item->nama }} </div>
                                         </td>
-                                        
+                                        <td style="text-align: center">{{ $item->roomname }}</td>
                                         <td style="text-align: center">{{ $item->checkin }}</td>
                                         <td style="text-align: center">{{ $item->checkout }}</td>
                                         <td style="text-align: center">{{ $item->details }}</td>
-                                        <td style="text-align: center">
-                                            {{  $item->price  }}</td>
+                                        <td style="text-align: center">{{  $item->price  }}</td>
                                     </tr>
                                     @endforeach
 
