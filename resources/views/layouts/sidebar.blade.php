@@ -551,14 +551,14 @@
             </li>
             @endrole --}}
 
-             <li>
+             <!-- <li>
                     <a href="{{route('delivery.index')}}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Parcel</span>
                     </a>
-                </li>
+                </li> -->
 
-                
+                @role('Homestay Admin|Superadmin|Buyer')
                 <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
                     <i class="mdi mdi-home-city-outline"></i>
@@ -600,7 +600,9 @@
                     <li>
                 </ul>  
             </li>
-
+            @endrole
+            
+            @role('Grab Student Admin|Superadmin|Buyer')
             <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
                     <i class="mdi  mdi-taxi"></i>
@@ -641,7 +643,9 @@
                     </li>
                 </ul>  
             </li>
+            @endrole
 
+            @role('Bas Admin|Superadmin|Buyer')
             <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
                     <i class="mdi  mdi-bus"></i>
@@ -670,7 +674,7 @@
                     @endrole 
                 </ul>  
             </li>
-
+            @endrole
 
             
             

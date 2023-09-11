@@ -23,7 +23,7 @@ class HomestayReceipt extends Mailable
      */
     public function __construct(Booking $booking, Organization $organization, Transaction $transaction, User $user)
     {
-        $this->$booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+        $this->booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
         ->join('bookings','rooms.roomid','=','bookings.roomid')
         ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
         ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
