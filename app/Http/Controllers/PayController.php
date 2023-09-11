@@ -504,7 +504,7 @@ class PayController extends AppBaseController
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         }
-        else if($request->desc == 'Homestay / Hotel')
+        else if($request->desc == 'Homestay')
         {
             $homestay = Booking::find($request->bookingid);
             $user = User::find($homestay->customerid);
@@ -635,6 +635,15 @@ class PayController extends AppBaseController
                     'pickup_date' => $pickUp,
                     'note' => $request->note,
                     'transaction_id' => $transaction->id
+                ]);
+               
+            }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'H')
+            {
+                $result = DB::table('bookings')
+                ->where('id', $bookingId)
+                ->update([
+                    'transactionid' => $transaction->id
                 ]);
                
             }
@@ -976,6 +985,32 @@ class PayController extends AppBaseController
                     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
 
                     break;
+
+                    case 'Homestay':
+                        $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                        $transaction->transac_no = $request->fpx_fpxTxnId;
+                        $transaction->status = "Success";
+                        $transaction->save();
+    
+                        $userid = $transaction->user_id;
+    
+                        $booking = Booking::where('transactionid', '=', $transaction->id)->first();
+                        $room = Room::find($booking->roomid);
+                        $user = User::find($transaction->user_id);
+                        $organization = Organization::find($room->homestayid);
+                        
+                        $booking_order = DB::table('organiaztions as o')
+                            ->leftJoin('rooms as r', 'r.homestayid', 'o.id')
+                            ->leftJoin('bookings as b', 'b.roomid', 'r.roomid')
+                            ->where('b.bookingid', $booking->bookingid)
+                            ->orderBy('r.roomname')
+                            ->get();
+                        
+                        Mail::to($transaction->email)->send(new HomestayReceipt($booking, $organization, $transaction, $user));
+    
+                        return view('homestay.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
+    
+                        break;
                         
                 default:
                     return view('errors.500');

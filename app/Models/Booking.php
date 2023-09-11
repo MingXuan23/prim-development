@@ -14,7 +14,8 @@ class Booking extends Model
         'status',
         'totalprice',
         'customerid',
-        'roomid'
+        'roomid',
+        'transactionid'
     ];
 
     public function users()
@@ -24,5 +25,9 @@ class Booking extends Model
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
     }
 }
