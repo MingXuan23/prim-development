@@ -985,6 +985,32 @@ class PayController extends AppBaseController
                     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
 
                     break;
+
+                    case 'Homestay':
+                        $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                        $transaction->transac_no = $request->fpx_fpxTxnId;
+                        $transaction->status = "Success";
+                        $transaction->save();
+    
+                        $userid = $transaction->user_id;
+    
+                        $booking = Booking::where('transactionid', '=', $transaction->id)->first();
+                        $room = Room::find($booking->roomid);
+                        $user = User::find($transaction->user_id);
+                        $organization = Organization::find($room->homestayid);
+                        
+                        $booking_order = DB::table('organiaztions as o')
+                            ->leftJoin('rooms as r', 'r.homestayid', 'o.id')
+                            ->leftJoin('bookings as b', 'b.roomid', 'r.roomid')
+                            ->where('b.bookingid', $booking->bookingid)
+                            ->orderBy('r.roomname')
+                            ->get();
+                        
+                        Mail::to($transaction->email)->send(new HomestayReceipt($booking, $organization, $transaction, $user));
+    
+                        return view('homestay.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
+    
+                        break;
                         
                 default:
                     return view('errors.500');
