@@ -596,6 +596,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('urustempahan', 'HomestayController@urustempahan')->name('homestay.urustempahan');
     Route::post('tunjukpelanggan', 'HomestayController@tunjukpelanggan');
     Route::post('cancelpelanggan/{id}', 'HomestayController@cancelpelanggan');
+    //Route::post('test', 'HomestayController@test')->name('homestay.test');
 
     Route::get('/grab-setcar','GrabStudentController@setcar')->name('grab.setinsert');
     Route::post('/grab-insertcar','GrabStudentController@insertcar')->name('grab.insert');
