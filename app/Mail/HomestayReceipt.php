@@ -26,6 +26,7 @@ class HomestayReceipt extends Mailable
         $this->$booking_order = DB::table('organiaztions as o')
         ->leftJoin('rooms as r', 'r.homestayid', 'o.id')
         ->leftJoin('bookings as b', 'b.roomid', 'r.roomid')
+        ->select('o.*', 'r.*', 'b.*')
         ->where('b.bookingid', $booking->bookingid)
         ->orderBy('r.roomname')
         ->get();

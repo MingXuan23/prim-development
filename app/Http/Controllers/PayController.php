@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Donation;
+use App\Models\Promotion;
 use App\Mail\OrderReceipt;
 use App\Mail\MerchantOrderReceipt;
 use App\Models\PgngOrder;
@@ -641,7 +642,7 @@ class PayController extends AppBaseController
             else if (substr($fpx_sellerExOrderNo, 0, 1) == 'H')
             {
                 $result = DB::table('bookings')
-                ->where('id', $bookingId)
+                ->where('bookingid', $bookingId)
                 ->update([
                     'transactionid' => $transaction->id
                 ]);
@@ -1002,6 +1003,7 @@ class PayController extends AppBaseController
                         $booking_order = DB::table('organiaztions as o')
                             ->leftJoin('rooms as r', 'r.homestayid', 'o.id')
                             ->leftJoin('bookings as b', 'b.roomid', 'r.roomid')
+                            ->select('o.*', 'r.*', 'b.*')
                             ->where('b.bookingid', $booking->bookingid)
                             ->orderBy('r.roomname')
                             ->get();
