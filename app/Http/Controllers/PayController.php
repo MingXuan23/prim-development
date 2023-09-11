@@ -12,6 +12,7 @@ use App\Models\Donation;
 use App\Models\Promotion;
 use App\Mail\OrderReceipt;
 use App\Mail\MerchantOrderReceipt;
+use App\Mail\HomestayReceipt;
 use App\Models\PgngOrder;
 use App\Models\Transaction;
 use App\Models\Organization;
