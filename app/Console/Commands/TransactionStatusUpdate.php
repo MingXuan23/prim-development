@@ -37,7 +37,7 @@ class TransactionStatusUpdate extends Command
     public function handle()
     {
         $transactions = DB::table('transactions')
-            ->where('status', 'pending')
+            ->whereIn('status', ['Pending', 'Failed'])
             ->whereBetween('datetime_created', [now()->subDays(2), now()])
             ->get();
 
@@ -279,6 +279,8 @@ class TransactionStatusUpdate extends Command
                             break;
                                 
                         default:
+                            Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['transac_no' => $response_value['fpx_fpxTxnId'], 'status' => 'Success']);
+
                             break;
                     }
                 } 
