@@ -236,6 +236,43 @@ public function editpromo(Request $request,$promotionid)
         return view('homestay.tambahbilik',compact('data'));
     }
 
+    public function editroom(Request $request,$roomid)
+    {
+        $request->validate([
+            'roompax' => 'required',
+            'details' => 'required',
+            'price' => 'required|numeric'
+        ]);
+
+        $roompax = $request->input('roompax');
+        $details = $request->input('details');
+        $price = $request->input('price');
+
+        $userId = Auth::id();
+        $room = Room::where('roomid',$roomid)
+            ->first();
+
+            if ($room) {
+                $room->roompax = $request->roompax;
+                $room->details = $request->details;
+                $room->price = $request->price;
+
+                $result = $room->save();
+
+                if($result)
+                {
+                    return back()->with('success', 'Bilik Berjaya Disunting');
+                }
+                else
+                {
+                    return back()->withInput()->with('error', 'Bilik Gagal Disunting');
+    
+                }
+            } else {
+                return back()->with('fail', 'Bilik not found!');
+            }
+    }
+
     public function bookinglist()
     {
         $orgtype = 'Homestay / Hotel';
@@ -449,6 +486,18 @@ public function editpromo(Request $request,$promotionid)
                 return back()->withInput()->with('error', 'Tempahan Gagal Dibatalkan');
     
             }
+    }
+
+    public function userhistory()
+    {
+        $userId = Auth::id();
+        $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('bookings','rooms.roomid','=','bookings.roomid')
+                ->where('bookings.customerid', $userId)
+                ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.status')
+                ->get();
+
+        return view('homestay.userhistory',compact('data'));
     }
 
     public function store(Request $request)
