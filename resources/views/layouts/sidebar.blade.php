@@ -584,6 +584,12 @@
                             <span>Urus Tempahan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('homestay.tunjuksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-finance"></i>
+                            <span>Lihat Keuntungan</span>
+                        </a>
+                    </li>
                     @endrole 
                     <li>
                         <a href="{{ route('homestay.bookinglist') }}" class=" waves-effect">

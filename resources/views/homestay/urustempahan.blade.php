@@ -44,10 +44,6 @@
 
   <div id="customerResults" class="col-md-12">
     <div class="card">
-      <div>
-        <a style="margin: 19px; float: right;" href="{{ route('homestay.tambahbilik')}}" class="btn btn-success"> <i
-            class="fas fa-plus"></i> Lihat Hasil Jualan</a>
-      </div>
 
       <div class="card-body">
 
