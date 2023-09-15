@@ -359,9 +359,11 @@ public function editpromo(Request $request,$promotionid)
     public function tempahananda()
     {
         $userId = Auth::id();
+        $status = 'Booked';
         $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
                 ->join('bookings','rooms.roomid','=','bookings.roomid')
-                ->where('bookings.customerid', $userId) // Filter by the selected homestay
+                ->where('bookings.customerid', $userId)
+                ->where('bookings.status', $status) // Filter by the selected homestay
                 ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
                 ->get();
 
@@ -448,7 +450,6 @@ public function editpromo(Request $request,$promotionid)
     
             }
     }
-
 
     public function store(Request $request)
     {

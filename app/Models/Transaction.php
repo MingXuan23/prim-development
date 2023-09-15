@@ -18,6 +18,11 @@ class Transaction extends Model
         return $this->belongsToMany(Donation::class, 'donation_transaction', 'transaction_id', 'donation_id');
     }
 
+    public function booking()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
     public static function getTransactionByOrganizationIdAndStatus($organizationId)
     {
         $transaction = Transaction::select('*')
