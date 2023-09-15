@@ -1,6 +1,10 @@
 @extends('layouts.master')
 
 @section('css')
+
+@include('layouts.datatable');
+
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -44,7 +48,7 @@
                 @if ($selectedData)
                 <h4 class="font-size-18">Pilih Grab Student :</h4><br>
                 <div class="table-responsive">
-                <table id="managegrabtable" class="table table-bordered table-striped dt-responsive wrap"
+                <table id="organizationTable" class="table table-bordered table-striped dt-responsive wrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                 <thead>
                 <tr>
