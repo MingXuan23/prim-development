@@ -52,7 +52,7 @@ class GrabStudentController extends Controller
         ->where('status', '=', 'AVAILABLE')->get();
         $list = DB::table('grab_students')
         ->join('destination_offers', 'grab_students.id', '=', 'destination_offers.id_grab_student')
-        ->select('grab_students.car_brand','grab_students.car_name', 'grab_students.car_registration_num', 'grab_students.available_time', 'grab_students.status', 'destination_offers.destination_name', 'destination_offers.pick_up_point', 'destination_offers.price_destination')
+        ->select('grab_students.car_brand','grab_students.car_name', 'grab_students.car_registration_num', 'grab_students.available_time', 'grab_students.status as grab_status', 'destination_offers.destination_name', 'destination_offers.id', 'destination_offers.status as destination_status', 'destination_offers.pick_up_point', 'destination_offers.price_destination')
         ->get();
         return view("grab.insertdestination", compact('list','data'));
     }
@@ -63,6 +63,17 @@ class GrabStudentController extends Controller
         $updategrab->update($request->all());
         $updategrab->update([
             'available_time' => $request->input('time'),
+            'status' => $request->input('status'),
+        ]);
+        
+        return back()->with('success', 'Row updated successfully');
+    }
+
+    public function updatedestination(Request $request, $id)
+    {
+        $updategrab = Destination_Offer::findOrFail($id);
+        $updategrab->update($request->all());
+        $updategrab->update([
             'status' => $request->input('status'),
         ]);
         
@@ -81,7 +92,8 @@ class GrabStudentController extends Controller
             $selectedData = Destination_Offer::join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
             ->where('destination_offers.destination_name', $selectedDestination)
             ->where('grab_students.status', '=', 'AVAILABLE')
-            ->select( 'destination_offers.id','grab_students.car_brand', 'grab_students.number_of_seat', 'grab_students.available_time', 'destination_offers.destination_name','destination_offers.pick_up_point', 'destination_offers.price_destination')
+            ->orWhere('grab_students.status', '=', 'OPEN FOR BOOK')
+            ->select( 'destination_offers.id','grab_students.car_brand','grab_students.car_name','grab_students.status', 'grab_students.number_of_seat', 'grab_students.available_time', 'destination_offers.destination_name','destination_offers.pick_up_point', 'destination_offers.price_destination')
             ->get();
         }
     
@@ -151,10 +163,12 @@ class GrabStudentController extends Controller
             'pickup'=>'required',
             'price'=>'required',
             'grabcar'=>'required',
+            'status'=>'required',
         ]);
         
         $destinationoffer = new Destination_Offer();
         $destinationoffer->destination_name = $request->destination;
+        $destinationoffer->status = $request->status;
         $destinationoffer->pick_up_point = $request->pickup;
         $destinationoffer->price_destination = $request->price;
         $destinationoffer->id_grab_student = $request->grabcar;

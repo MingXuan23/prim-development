@@ -8,7 +8,7 @@ class Destination_Offer extends Model
 {
     protected $table = 'destination_offers';
     protected $primaryKey = 'id';
-    protected $fillable = ['destination_name', 'pick_up_point',  'price_destination', 'id_grab_student'];
+    protected $fillable = ['destination_name', 'pick_up_point', 'status',  'price_destination', 'id_grab_student'];
     public $timestamps = false;
 
     public function grab()
