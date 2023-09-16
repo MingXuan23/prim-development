@@ -20,6 +20,19 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+            <div class="flash-message"></div>
+                <div class="table-responsive">
+                @if(Session::has('success'))
+                <div class="alert alert-success">{{Session::get('success')}}</div>
+                @endif
+                @if(Session::has('fail'))
+                <div class="alert alert-danger">{{Session::get('fail')}}</div>
+                @endif
+                <br><br>
 <table id="checkbook" class="table table-bordered table-striped dt-responsive wrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
     <thead>
@@ -55,6 +68,11 @@
             @endforeach
         </tbody>
 </table>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection
 

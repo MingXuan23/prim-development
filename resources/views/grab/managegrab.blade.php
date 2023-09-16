@@ -36,12 +36,10 @@
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                         <tr>
-                            <th>Number</th>
                             <th>Car Brand</th>
                             <th>Car Name</th>
                             <th>Car Registration Number</th>
                             <th>Seat </th>
-                            <th>Available Time</th>
                             <th>Status</th>
                             <th>Edit</th>
                         </tr>
@@ -51,12 +49,10 @@
                         <tr>                
                             <form action="/updaterow-grab/{{ $item->id }}" method="POST">
                             @csrf
-                            <td>{{ $item->id }}</td>
                             <td>{{ $item->car_brand }}</td>
                             <td>{{ $item->car_name }}</td>
                             <td>{{ $item->car_registration_num}}</td>
                             <td>{{ $item->number_of_seat}}</td>
-                            <td><input type="time" name="time" value="{{ $item->available_time }}"></td>
                             <td>            
                             <select class="form-select" aria-label="Default select example"  name="status">         
                             <option hidden value="{{ $item->status }}">{{ $item->status }}</option>
@@ -64,7 +60,7 @@
                             <option value="NOT AVAILABLE">NOT AVAILABLE</option>
                             </select>
                             </td>
-                            <td> <button type="submit" class="btn btn-secondary">Update</button></td>
+                            <td> <button type="submit" class="btn btn-primary">Update Car</button></td>
                             </form>
                         </tr>
                         @endforeach

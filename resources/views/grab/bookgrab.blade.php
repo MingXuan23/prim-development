@@ -35,17 +35,31 @@
                 @endif
                 <form action="{{ route('book.grab') }}" method="get">
                 @csrf
-                <select class="form-select" aria-label="Default select example"  name="availabledestination">
-                <option selected disabled>Available Destination</option>
-                @foreach($uniqueDestinations as $destination) 
-                <option value="{{ $destination }}" {{ $selectedDestination == $destination ? 'selected' : '' }}>{{ $destination  }}</option>
-                @endforeach
-                </select>
-                 <br>
-                <button type="submit" class="btn btn-success">View Detail</button>
+                <label for="pick_up_point">Select Pickup Point:</label>
+                <select aria-label="Default select example"  class="form-select" name="pick_up_point" id="pick_up_point">
+                <option value="">Select a Pickup Point</option>
+                    @foreach($uniquePickupPoints as $pickupPoint)
+                        <option value="{{ $pickupPoint }}" {{ $selectedPickupPoint == $pickupPoint ? 'selected' : '' }}>
+                            {{ $pickupPoint }}
+                        </option>
+                    @endforeach
+                </select><br>
+
+                <label for="availabledestination">Select Destination:</label>
+                <select aria-label="Default select example"  class="form-select" name="availabledestination" id="availabledestination">
+            <option value="">Select a Destination</option>
+            @foreach($uniqueDestinations as $destination)
+                <option value="{{ $destination }}" {{ $selectedDestination == $destination ? 'selected' : '' }}>
+                    {{ $destination }}
+                </option>
+            @endforeach
+        </select>
+        <br>
+        <button type="submit"  class="btn btn-primary">Show Matched Data</button>
+    </form>
                 </form>
                 </div> <br><br>
-                @if ($selectedData)
+                @if ($matchedData->isNotEmpty())
                 <h4 class="font-size-18">Pilih Grab Student :</h4><br>
                 <div class="table-responsive">
                 <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap"
@@ -63,7 +77,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ($selectedData as $item)
+                @foreach ($matchedData as $item)
                 <tr>                
                     <form action="passengerselect-grab/{{ $item->id }}" method="POST">
                     @csrf

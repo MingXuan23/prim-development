@@ -16,7 +16,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Daftar Destinasi Baru</h4>
+            <h4 class="font-size-18">Destinasi Sedia Ada</h4>
         </div>
     </div>
 </div>
@@ -39,12 +39,12 @@
                         <th>Car Brand</th>
                         <th>Car Name</th>
                         <th>Car Registration Number</th>
-                        <th>Available Time</th>
                         <th>Status</th>
                         <th>Pick Up Point</th>
                         <th>Destination Name</th>
                         <th>Destination Price</th>
                         <th>Destination Status</th>
+                        <th>Available Time</th>
                         <th>Manage Destination</th>
                         </tr>
                         </thead>
@@ -56,7 +56,7 @@
                         <td>{{ $item->car_brand }}</td>
                         <td>{{ $item->car_name }}</td>
                         <td>{{ $item->car_registration_num}}</td>
-                        <td>{{ $item->available_time }}</td>
+                        
                         <td>{{ $item->grab_status }}</td>
                         <td>{{ $item->pick_up_point }}</td>
                         <td>{{ $item->destination_name }}</td>
@@ -64,17 +64,34 @@
                         <td>
                         <select class="form-select" aria-label="Default select example"  name="status">         
                             <option hidden value="{{ $item->destination_status }}">{{ $item->destination_status }}</option>
-                            <option value="OPEN FOR BOOK">OPEN FOR BOOK</option>
-                            <option value="CANNOT BOOK">CANNOT BOOK</option>
+                            <option value="TRIP CONFIRM">TRIP CONFIRM</option>
+                            <option value="NOT CONFIRM">NOT CONFIRM</option>
                             </select>
                         </td>
+                        <td>{{ $item->available_time }}</td>
                         <td> <button type="submit" class="btn btn-primary">Update Destination</button></td>
                         </form>
                         </tr>
                         @endforeach
                         </tbody>
                 </table>
-                </div><br><br><br>
+                </div>
+                </div>
+        </div>
+    </div>
+</div>
+<div class="row align-items-center">
+    <div class="col-sm-6">
+        <div class="page-title-box">
+            <h4 class="font-size-18">Daftar Destinasi Baharu</h4>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+            <div class="flash-message"></div>
                 <form action="{{route('grab.insertdestination')}}" method="post">
                 @csrf
                 <div class="form-group">
@@ -91,15 +108,28 @@
                 <input type="text" hidden class="form-control" aria-describedby="emailHelp" value="NEW" placeholder="Price For Offered Destination" name="status">
                 </div><br>
                 <div class="form-group">
+                <label>Time for Pick Up</label>
+                <input type="time" name="time" class="form-control" aria-describedby="emailHelp" placeholder="Time for Pickup" name="time">
+                </div><br>
+                <div class="form-group">
                 <label>Choose Your Car</label>
                 <select class="form-select" aria-label="Default select example"  name="grabcar">
                 <option hidden >Available Car</option>
                 @foreach($data as $item)
-                <option value="{{ $item->id }}">{{ $item->car_brand }} ({{ $item->car_registration_num}})</option>
+                <option value="{{ $item->id }}">{{ $item->car_brand }} - {{ $item->car_name }} ({{ $item->car_registration_num}})</option>
                 @endforeach
                 </select>
                 </div><br>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <div class="form-group mb-0">
+                        <div class="text-right">
+                            <a type="button" href="{{ url()->previous() }}"
+                                class="btn btn-secondary waves-effect waves-light mr-1">
+                                Kembali
+                            </a>
+                            <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
+                                Simpan
+                            </button>
+                        </div>
                 </form>
             </div>
         </div>
