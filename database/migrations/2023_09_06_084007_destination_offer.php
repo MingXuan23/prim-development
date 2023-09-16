@@ -18,6 +18,7 @@ class DestinationOffer extends Migration
             $table->text('destination_name');
             $table->text('pick_up_point');
             $table->text('price_destination');
+            $table->text('status');
             $table->unsignedBigInteger('id_grab_student'); // Foreign key column
             $table->foreign('id_grab_student')->references('id')->on('grab_students'); // Create foreign key
         });

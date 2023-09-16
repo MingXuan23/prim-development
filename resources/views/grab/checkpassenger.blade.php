@@ -20,7 +20,7 @@
         </div>
     </div>
 </div>
-<table id="organizationTable" class="table table-bordered table-striped dt-responsive wrap"
+<table id="checkbook" class="table table-bordered table-striped dt-responsive wrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
     <thead>
             <tr>
@@ -55,5 +55,23 @@
             @endforeach
         </tbody>
 </table>
+
+@endsection
+
+@section('script')
+<!-- Peity chart-->
+<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+
+{{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
+
+<script>
+    $(document).ready(function() {
+    
+        $('#checkbook').DataTable({
+            "order": [[0, "desc"]] 
+        });
+});
+
+</script>
 
 @endsection

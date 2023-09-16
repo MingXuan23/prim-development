@@ -48,7 +48,7 @@
                 @if ($selectedData)
                 <h4 class="font-size-18">Pilih Grab Student :</h4><br>
                 <div class="table-responsive">
-                <table id="organizationTable" class="table table-bordered table-striped dt-responsive wrap"
+                <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                 <thead>
                 <tr>
@@ -57,6 +57,7 @@
                     <th>Available Time</th>
                     <th>Pick Up Point</th>
                     <th>Destination</th>
+                    <th>Status</th>
                     <th>Price</th>
                     <th>Choose Grab</th>
                 </tr>
@@ -66,11 +67,12 @@
                 <tr>                
                     <form action="passengerselect-grab/{{ $item->id }}" method="POST">
                     @csrf
-                    <td>{{ $item->car_brand }}</td>
+                    <td>{{ $item->car_brand }} - {{ $item->car_name }}</td>
                     <td>{{ $item->number_of_seat}}</td>
                     <td>{{ $item->available_time}}</td>
                     <td>{{ $item->pick_up_point}}</td>
                     <td>{{ $item->destination_name}}</td>
+                    <td>{{ $item->status}}</td>
                     <td>RM {{ $item->price_destination}}</td>
                     <td> <button type="submit" class="btn btn-success">Select Grab</button></td>
                     </form>
@@ -84,5 +86,21 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('script')
+<!-- Peity chart-->
+<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+
+{{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
+
+<script>
+    $(document).ready(function() {
+    
+        $('#bookgrab').DataTable();
+});
+
+</script>
 
 @endsection
