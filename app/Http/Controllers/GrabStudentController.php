@@ -58,6 +58,40 @@ class GrabStudentController extends Controller
         return view("grab.insertdestination", compact('list','data'));
     }
 
+    public function grabsendnotify(Request $request)
+    {
+        $uniqueDestinations = Destination_Offer::where('destination_offers.status', '=', 'NOT CONFIRM')
+        ->distinct()
+        ->pluck('destination_name');
+
+        $selectedDestination = $request->input('availabledestination');
+        $selectedData = null;
+    
+        if ($selectedDestination) 
+        {
+            $selectedData =DB::table('destination_offers')
+            ->join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
+            ->join('grab_notifys', 'grab_notifys.id_destination_offer', '=', 'destination_offers.id')
+            ->join('users', 'users.id', '=', 'grab_notifys.id_user')
+            ->where('destination_offers.destination_name', $selectedDestination)
+            ->where('destination_offers.status', '=', 'NOT CONFIRM')
+            ->select( 'grab_notifys.id','users.name','destination_offers.pick_up_point', 'destination_offers.destination_name', 'grab_students.car_name', 'grab_students.car_brand', 'grab_students.car_registration_num','grab_notifys.time_notify')
+            ->get();
+        }
+    
+        return view('grab.notifypassenger', compact('uniqueDestinations', 'selectedDestination', 'selectedData'));
+    }
+
+    public function updatenotifygrab($id)
+    {
+        $updategrab = NotifyGrab::findOrFail($id);
+        $updategrab->update([
+            'status' => "CAN BOOK",
+        ]);
+        
+        return back()->with('success', 'Email has send successfully');
+    }
+
     public function updatecar(Request $request, $id)
     {
         $updategrab = Grab_Student::findOrFail($id);

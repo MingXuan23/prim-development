@@ -29,7 +29,7 @@
     @endif
     @csrf
     <div class="table-responsive">
-    <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+    <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap" style="border-collapse: collapse; border-spacing: 0; width: 80%;">
     @foreach ($datadestinationid as $itemdes)
     <tr>
     <th>Destination ID :</th>
@@ -81,7 +81,7 @@
     @endif
     @csrf
     <div class="table-responsive">
-    <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+    <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap" style="border-collapse: collapse; border-spacing: 0; width: 80%;">
     @foreach ($datadestinationid as $itemdes)
     <tr>
     <th>Destination ID :</th>

@@ -646,6 +646,12 @@
                             <span>Urus Tempahan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('grab.notifypassenger') }}" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Notify Penumpang</span>
+                        </a>
+                    </li>
                     @endrole 
                     <li>
                         <a href="{{ route('book.grab') }}" class=" waves-effect">
