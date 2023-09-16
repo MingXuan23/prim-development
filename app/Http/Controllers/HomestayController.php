@@ -236,6 +236,43 @@ public function editpromo(Request $request,$promotionid)
         return view('homestay.tambahbilik',compact('data'));
     }
 
+    public function editroom(Request $request,$roomid)
+    {
+        $request->validate([
+            'roompax' => 'required',
+            'details' => 'required',
+            'price' => 'required|numeric'
+        ]);
+
+        $roompax = $request->input('roompax');
+        $details = $request->input('details');
+        $price = $request->input('price');
+
+        $userId = Auth::id();
+        $room = Room::where('roomid',$roomid)
+            ->first();
+
+            if ($room) {
+                $room->roompax = $request->roompax;
+                $room->details = $request->details;
+                $room->price = $request->price;
+
+                $result = $room->save();
+
+                if($result)
+                {
+                    return back()->with('success', 'Bilik Berjaya Disunting');
+                }
+                else
+                {
+                    return back()->withInput()->with('error', 'Bilik Gagal Disunting');
+    
+                }
+            } else {
+                return back()->with('fail', 'Bilik not found!');
+            }
+    }
+
     public function bookinglist()
     {
         $orgtype = 'Homestay / Hotel';
@@ -450,6 +487,78 @@ public function editpromo(Request $request,$promotionid)
     
             }
     }
+
+    public function userhistory()
+    {
+        $userId = Auth::id();
+        $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('bookings','rooms.roomid','=','bookings.roomid')
+                ->where('bookings.customerid', $userId)
+                ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.status')
+                ->get();
+
+        return view('homestay.userhistory',compact('data'));
+    }
+
+    public function tunjuksales()
+    {
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+
+        $data = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+
+
+        return view('homestay.tunjuksales', compact('data'));
+    }
+
+    public function homestaysales($id)
+    {
+
+    // Fetch the sales data for the selected homestay for the current year
+    $salesData = DB::table('bookings')
+    ->join('rooms', 'bookings.roomid', '=', 'rooms.roomid')
+    ->join('organizations', 'rooms.homestayid', '=', 'organizations.id')
+    ->select(DB::raw('MONTH(bookings.created_at) as month'), DB::raw('SUM(bookings.totalprice) as total_sales'))
+    ->where('bookings.status', 'Paid')
+    ->where('organizations.id', $id) // Filter by the specific organization's ID
+    ->whereYear('bookings.created_at', now()->year)
+    ->groupBy(DB::raw('MONTH(bookings.created_at)'))
+    ->get();
+
+ // Initialize an array to store the sales data for each month
+$monthlySales = array_fill(1, 12, 0); // Initialize with zeros for all twelve months
+
+// Initialize an array to store the month labels (all twelve months)
+$monthLabels = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'October', 'November', 'December'];
+
+// Create an associative array to map month numbers to labels
+$monthMap = [
+    1 => 'Januari', 2 => 'Februari', 3 => 'Mac', 4 => 'April', 5 => 'Mei', 6 => 'Jun',
+    7 => 'Julai', 8 => 'Ogos', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
+];
+
+// Loop through the sales data and update the corresponding sales data for each month
+foreach ($salesData as $entry) {
+    $monthNumber = $entry->month;
+    $monthlySales[$monthNumber] = $entry->total_sales;
+}
+
+// Prepare the data for the chart
+$chartData = [
+    'labels' => $monthLabels, // Use predefined month labels
+    'dataset' => array_values($monthlySales), // Use the formatted array of sales data
+];
+
+return response()->json($chartData);
+}
 
     public function store(Request $request)
     {

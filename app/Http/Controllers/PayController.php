@@ -1006,8 +1006,12 @@ class PayController extends AppBaseController
                         ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
                         ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
                         ->get();
+
+                        if($transaction->email != NULL)
+                        {
+                            Mail::to($transaction->email)->send(new HomestayReceipt($booking, $organization, $transaction, $user));
+                        }
                         
-                        Mail::to($transaction->email)->send(new HomestayReceipt($booking, $organization, $transaction, $user));
     
                         return view('homestay.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
     

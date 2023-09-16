@@ -584,17 +584,29 @@
                             <span>Urus Tempahan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('homestay.tunjuksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-finance"></i>
+                            <span>Lihat Keuntungan</span>
+                        </a>
+                    </li>
                     @endrole 
                     <li>
                         <a href="{{ route('homestay.bookinglist') }}" class=" waves-effect">
-                            <i class="mdi mdi-percent"></i>
+                            <i class="mdi mdi-book-search"></i>
                             <span>Buat Tempahan</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('homestay.tempahananda') }}" class=" waves-effect">
-                            <i class="mdi mdi-room-service-outline"></i>
+                            <i class="mdi mdi-cart"></i>
                             <span>Tempahan Anda</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.userhistory') }}" class=" waves-effect">
+                            <i class="mdi mdi-history"></i>
+                            <span>Sejarah Tempahan</span>
                         </a>
                     </li>
                     <li>

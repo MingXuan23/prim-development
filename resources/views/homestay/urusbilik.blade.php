@@ -103,7 +103,7 @@
             <div class="modal-body" style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc;">
                 <form class="row g-3" id="roomform" method="POST" action="">
                     @csrf
-                    <input type="text" class="form-control" name="roomid" id="roomid">
+                    <input type="text" class="form-control" name="roomid" id="roomid" hidden>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Nama / Nombor Bilik</label>
                         <input type="text" class="form-control" id="roomname" name="roomname" disabled>
@@ -161,7 +161,7 @@ function initializeData(rowData) {
     $('#details').val(details);
     $('#price').val(price);
 
-    $('#roomform').attr('action', 'editpromo/' + roomid);
+    $('#roomform').attr('action', 'editroom/' + roomid);
 }
 
 $(document).ready(function() {
