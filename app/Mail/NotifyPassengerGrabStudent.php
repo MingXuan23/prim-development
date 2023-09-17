@@ -13,7 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class NotifyPassengerGrab extends Mailable
+class NotifyPassengerGrabStudent extends Mailable
 {
     use Queueable, SerializesModels;
 

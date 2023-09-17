@@ -12,7 +12,7 @@ use App\Models\Organization;
 use App\Models\NotifyGrab;
 use App\User;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\NotifyPassengerGrab;
+use App\Mail\NotifyPassengerGrabStudent;
 use Hash;
 use Session;
 use PDF;
@@ -108,7 +108,7 @@ class GrabStudentController extends Controller
 
             $notify = NotifyGrab::where('id', '=', $id)->first();
             
-            Mail::to($user->email)->send(new NotifyPassengerGrab($notify, $user));
+            Mail::to($user->email)->send(new NotifyPassengerGrabStudent($notify, $user));
         } else {
             // Handle the case where no user was found for the given $id
         }
