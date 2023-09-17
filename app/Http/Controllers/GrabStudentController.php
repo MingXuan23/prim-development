@@ -10,6 +10,9 @@ use App\Models\Grab_Student;
 use App\Models\Grab_Booking;
 use App\Models\Organization;
 use App\Models\NotifyGrab;
+use App\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifyPassengerGrab;
 use Hash;
 use Session;
 use PDF;
@@ -69,13 +72,14 @@ class GrabStudentController extends Controller
     
         if ($selectedDestination) 
         {
-            $selectedData =DB::table('destination_offers')
+            $selectedData = DB::table('destination_offers')
             ->join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
             ->join('grab_notifys', 'grab_notifys.id_destination_offer', '=', 'destination_offers.id')
             ->join('users', 'users.id', '=', 'grab_notifys.id_user')
             ->where('destination_offers.destination_name', $selectedDestination)
             ->where('destination_offers.status', '=', 'NOT CONFIRM')
-            ->select( 'grab_notifys.id','users.name','destination_offers.pick_up_point', 'destination_offers.destination_name', 'grab_students.car_name', 'grab_students.car_brand', 'grab_students.car_registration_num','grab_notifys.time_notify')
+            ->where('grab_notifys.status', '!=', 'PAID')
+            ->select( 'grab_notifys.id','users.name','destination_offers.pick_up_point', 'destination_offers.destination_name', 'grab_students.car_name', 'grab_students.car_brand', 'grab_students.car_registration_num', 'grab_notifys.status','grab_notifys.time_notify')
             ->get();
         }
     
@@ -86,10 +90,39 @@ class GrabStudentController extends Controller
     {
         $updategrab = NotifyGrab::findOrFail($id);
         $updategrab->update([
-            'status' => "CAN BOOK",
+            'status' => "ALREADY NOTIFY FOR BOOK",
         ]);
         
-        return back()->with('success', 'Email has send successfully');
+        // Fetch user data as stdClass
+        $userData = DB::table('grab_notifys')
+            ->join('users', 'grab_notifys.id_user', '=', 'users.id')
+            ->where('grab_notifys.id', $id)
+            ->first(); // Use first() to get a single user object
+        
+        if ($userData) {
+            // Typecast the stdClass to an array
+            $userDataArray = (array) $userData;
+        
+            // Create a User instance from the array
+            $user = new User($userDataArray);
+
+            $notify = NotifyGrab::where('id', '=', $id)->first();
+            
+            Mail::to($user->email)->send(new NotifyPassengerGrab($notify, $user));
+        } else {
+            // Handle the case where no user was found for the given $id
+        }
+
+        $grab_notify = Organization::join('grab_students', 'organizations.id', '=', 'grab_students.id_organizations')
+        ->join('destination_offers','grab_students.id','=','destination_offers.id_grab_student')
+        ->join('grab_notifys','destination_offers.id','=','grab_notifys.id_destination_offer')
+        ->where('grab_notifys.id',$notify->id) 
+        ->select('destination_offers.pick_up_point','destination_offers.destination_name','destination_offers.available_time', 'grab_students.car_brand', 'grab_students.car_name', 'grab_students.car_registration_num', 'grab_students.number_of_seat')
+        ->get();
+
+        return view('grab.notifyemail', compact('grab_notify','notify', 'user'));
+    
+
     }
 
     public function updatecar(Request $request, $id)

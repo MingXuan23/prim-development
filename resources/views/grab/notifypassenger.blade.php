@@ -53,6 +53,7 @@
                             <th>Kenderaan </th>
                             <th>No Plat</th>
                             <th>Masa Notify Tempahan</th>
+                            <th>Status Notify</th>
                             <th>Hantar Email</th>
                         </tr>
                         </thead>
@@ -67,6 +68,7 @@
                             <td>{{ $item->car_brand}} - {{ $item->car_name}}</td>
                             <td>{{ $item->car_registration_num}}</td>
                             <td>{{ $item->time_notify}}</td>
+                            <td>{{ $item->status}}</td>
                             <td> <button type="submit" class="btn btn-success">Hantar Notifikasi Email</button></td>
                             </form>
                         </tr>
