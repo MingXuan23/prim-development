@@ -659,6 +659,12 @@
                             <span>Buat Tempahan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('grab.bayartempahan') }}" class=" waves-effect">
+                        <i class="mdi mdi-cash-multiple"></i>
+                            <span>Bayar Tempahan</span>
+                        </a>
+                    </li>
                 </ul>  
             </li>
             @endrole

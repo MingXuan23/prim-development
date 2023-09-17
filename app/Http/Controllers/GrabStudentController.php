@@ -61,6 +61,21 @@ class GrabStudentController extends Controller
         return view("grab.insertdestination", compact('list','data'));
     }
 
+    public function grabbayartempahan()
+    {
+        $userId = Auth::id();
+        $list = DB::table('grab_notifys')
+        ->join('destination_offers', 'grab_notifys.id_destination_offer', '=', 'destination_offers.id')
+        ->join('users', 'users.id', '=', 'grab_notifys.id_user')
+        ->join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
+        ->where('grab_notifys.status', '=', 'ALREADY NOTIFY FOR BOOK')
+        ->where('destination_offers.status', '!=', 'OCCUPIED')
+        ->where('users.id', $userId)
+        ->select('destination_offers.id','destination_offers.pick_up_point', 'destination_offers.destination_name', 'grab_students.car_name', 'grab_students.car_brand', 'grab_students.car_registration_num','grab_notifys.time_notify')
+        ->get();
+        return view("grab.bayartempahan", compact('list'));
+    }
+
     public function grabsendnotify(Request $request)
     {
         $uniqueDestinations = Destination_Offer::where('destination_offers.status', '=', 'NOT CONFIRM')
@@ -172,6 +187,20 @@ class GrabStudentController extends Controller
     return view('grab.bookgrab', compact('uniquePickupPoints', 'uniqueDestinations', 'selectedPickupPoint', 'selectedDestination', 'matchedData'));
 
 
+    }
+
+    public function selecttempahangrab($id)
+    {
+        $userId = Auth::id();
+        $data =  Destination_Offer::join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
+        ->where('destination_offers.id', $id)
+        ->select( 'destination_offers.id','grab_students.id','grab_students.car_brand','grab_students.car_name', 'grab_students.number_of_seat', 'destination_offers.available_time', 'destination_offers.status', 'destination_offers.destination_name', 'destination_offers.pick_up_point', 'destination_offers.price_destination')
+        ->get();
+        $datadestinationid =  Destination_Offer::join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
+        ->where('destination_offers.id', $id)
+        ->select( 'destination_offers.id','grab_students.car_brand', 'grab_students.number_of_seat', 'destination_offers.available_time', 'destination_offers.destination_name', 'destination_offers.price_destination')
+        ->get();
+        return view("grab.bayartempahan", compact('data','datadestinationid','userId'));
     }
 
     public function selectbookgrab($id)
