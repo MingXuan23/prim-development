@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<form method="post" action="passengertempahan-grab/{{ $item->grabid }}"> 
+<form method="post" action="/passengerbayartempahan-grab/{{ $item->grabid }}"> 
     @if(Session::has('success'))
         <div class="alert alert-success">{{Session::get('success')}}</div>
     @endif
@@ -74,21 +74,5 @@
 </form>
 @endforeach 
 
-
-@endsection
-
-@section('script')
-<!-- Peity chart-->
-<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
-
-{{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
-
-<script>
-    $(document).ready(function() {
-    
-        $('#bookgrab').DataTable();
-});
-
-</script>
 
 @endsection

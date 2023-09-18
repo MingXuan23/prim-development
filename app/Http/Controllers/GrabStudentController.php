@@ -178,7 +178,7 @@ class GrabStudentController extends Controller
     return view('grab.bookgrab', compact('uniquePickupPoints', 'uniqueDestinations', 'selectedPickupPoint', 'selectedDestination', 'matchedData'));
     }
 
-    public function selecttempahangrab($id)
+    public function passengerpilihtempahan($id)
     {
         $userId = Auth::id();
         $data =  Destination_Offer::join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
@@ -186,7 +186,7 @@ class GrabStudentController extends Controller
         ->where('grab_notifys.id', $id)
         ->select( 'grab_notifys.id as notifyid','destination_offers.id as desid','grab_students.id as grabid','grab_students.car_brand','grab_students.car_name', 'grab_students.number_of_seat', 'destination_offers.available_time', 'destination_offers.status', 'destination_offers.destination_name', 'destination_offers.pick_up_point', 'destination_offers.price_destination')
         ->get();
-        return view("grab.bayargrabtempahan", compact('data','userId'));
+        return view("grab.passengerbayartempahan", compact('data','userId'));
     }
 
     public function selectbookgrab($id)
@@ -295,7 +295,7 @@ class GrabStudentController extends Controller
         return redirect()->route('book.grab')->with('success', 'Payment Received');
     }
 
-    public function paymenttempahangrab(Request $request, $id)
+    public function passengerbayartempahan(Request $request, $id)
     {
         $updategrab = Grab_Student::findOrFail($id);
         $updategrab->update([
@@ -304,12 +304,18 @@ class GrabStudentController extends Controller
 
         $request->validate([
             'iddestination'=>'required',
-            'idpassenger'=>'required'
+            'idpassenger'=>'required',
+            'notify'=>'required'
         ]);
 
         $updatedestinationgrab = Destination_Offer::findOrFail($request->iddestination);
         $updatedestinationgrab->update([
             'status' => "OCCUPIED",
+        ]);
+
+        $updatenotify = NotifyGrab::findOrFail($request->notify);
+        $updatenotify->update([
+            'status' => "PAID",
         ]);
 
         $today = Carbon::now();

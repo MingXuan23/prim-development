@@ -45,7 +45,7 @@
                         <tbody>
                         @foreach ($list as $item)
                         <tr>                
-                            <form action="passengertempahan-grab/{{ $item->id }}" method="POST">
+                            <form action="passengerpilihtempahan-grab/{{ $item->id }}" method="POST">
                             @csrf
                             <td>{{ $item->pick_up_point }}</td>
                             <td>{{ $item->destination_name}}</td>
