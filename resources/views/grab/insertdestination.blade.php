@@ -36,15 +36,14 @@
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                         <tr>
-                        <th>Car Brand</th>
-                        <th>Car Name</th>
+                        <th>Car</th>
                         <th>Car Registration Number</th>
                         <th>Status</th>
                         <th>Pick Up Point</th>
                         <th>Destination Name</th>
                         <th>Destination Price</th>
+                        <th>Pick Up Time</th>
                         <th>Destination Status</th>
-                        <th>Available Time</th>
                         <th>Manage Destination</th>
                         </tr>
                         </thead>
@@ -53,22 +52,21 @@
                         <tr>
                         <form action="/updaterow-destinationgrab/{{ $item->id }}" method="POST">
                             @csrf
-                        <td>{{ $item->car_brand }}</td>
-                        <td>{{ $item->car_name }}</td>
+                        <td>{{ $item->car_brand }} -  {{ $item->car_name }}</td>
                         <td>{{ $item->car_registration_num}}</td>
-                        
                         <td>{{ $item->grab_status }}</td>
                         <td>{{ $item->pick_up_point }}</td>
                         <td>{{ $item->destination_name }}</td>
                         <td>RM {{ $item->price_destination }}</td>
+                        <td><input type="time" name="updatetime" class="form-control" aria-describedby="emailHelp" value="{{ $item->available_time }}"></td>
                         <td>
                         <select class="form-select" aria-label="Default select example"  name="status">         
                             <option hidden value="{{ $item->destination_status }}">{{ $item->destination_status }}</option>
                             <option value="TRIP CONFIRM">TRIP CONFIRM</option>
                             <option value="NOT CONFIRM">NOT CONFIRM</option>
+                            <option value="NOT AVAILABLE">NOT AVAILABLE</option>
                             </select>
                         </td>
-                        <td>{{ $item->available_time }}</td>
                         <td> <button type="submit" class="btn btn-primary">Update Destination</button></td>
                         </form>
                         </tr>
@@ -109,7 +107,7 @@
                 </div><br>
                 <div class="form-group">
                 <label>Time for Pick Up</label>
-                <input type="time" name="time" class="form-control" aria-describedby="emailHelp" placeholder="Time for Pickup" name="time">
+                <input type="time" name="time" class="form-control" aria-describedby="emailHelp" placeholder="Time for Pickup">
                 </div><br>
                 <div class="form-group">
                 <label>Choose Your Car</label>

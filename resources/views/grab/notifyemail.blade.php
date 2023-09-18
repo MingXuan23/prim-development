@@ -24,7 +24,6 @@
 </head>
 
 <body>
-    <div>You are being redirected to our homepage in <span id="time">5</span> seconds</div>
     <div class="container">
         <div class="row mt-3">
             <div class="col-12">
@@ -70,15 +69,4 @@
             </div>
         </div>
     </div>
-</body>
-<script>
-    var count = 5;
-    setInterval(function(){
-        count--;
-        document.getElementById('time').innerHTML = count;
-        if (count <= 0) {
-            window.location = '/home'; 
-        }
-    },1000);
-</script>
-</html>
+</body> 

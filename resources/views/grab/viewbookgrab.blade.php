@@ -20,7 +20,7 @@
 </div>
 
 @if ($item->status == 'TRIP CONFIRM')
-<form  method="post" action="/passengerpay-grab/{{ $item->id }}"> 
+<form  method="post" action="/passengerpay-grab/{{ $item->grabid }}"> 
     @if(Session::has('success'))
         <div class="alert alert-success">{{Session::get('success')}}</div>
     @endif
@@ -30,12 +30,10 @@
     @csrf
     <div class="table-responsive">
     <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap" style="border-collapse: collapse; border-spacing: 0; width: 80%;">
-    @foreach ($datadestinationid as $itemdes)
     <tr>
     <th>Destination ID :</th>
-    <td><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $itemdes->id }}" readonly name="iddestination"></td>
+    <td><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $item->desid }}" readonly name="iddestination"></td>
     </tr>
-    @endforeach 
     <tr>
     <th hidden>Passenger ID :</th>
     <td  hidden><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $userId }}" readonly name="idpassenger"></td>
@@ -67,12 +65,12 @@
     </table>
 </div>
     <br>
-    <button class="btn btn-success">Make Payment</button>
+    <button type="submit" class="btn btn-success">Make Payment</button>
     <button class="btn btn-danger"><a href="/passenger-grab" style="text-decoration: none; color: white;">Cancel</a></button>
 </form>
 
 @elseif ($item->status == 'NOT CONFIRM')
-<form  method="post" action="/passengernotify-grab/{{ $item->id }}"> 
+<form  method="post" action="/passengernotify-grab/{{ $item->grabid }}"> 
     @if(Session::has('success'))
         <div class="alert alert-success">{{Session::get('success')}}</div>
     @endif
@@ -82,12 +80,10 @@
     @csrf
     <div class="table-responsive">
     <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap" style="border-collapse: collapse; border-spacing: 0; width: 80%;">
-    @foreach ($datadestinationid as $itemdes)
     <tr>
     <th>Destination ID :</th>
-    <td><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $itemdes->id }}" readonly name="iddestination"></td>
+    <td><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $item->desid }}" readonly name="iddestination"></td>
     </tr>
-    @endforeach 
     <tr>
     <th hidden>Passenger ID :</th>
     <td  hidden><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $userId }}" readonly name="idpassenger"></td>
@@ -119,7 +115,7 @@
     </table>
 </div>
     <br>
-    <button class="btn btn-warning">Add to Book List</button>
+    <button type="submit" class="btn btn-warning">Add to Book List</button>
     <button class="btn btn-danger"><a href="/passenger-grab" style="text-decoration: none; color: white;">Cancel</a></button>
 </form>
 @endif
