@@ -17,7 +17,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Tempah Grab Student Anda :</h4>
+            <h4 class="font-size-18">Tempah Perkhidmatan Bas :</h4>
         </div>
     </div>
 </div>
@@ -33,10 +33,10 @@
                 @if(Session::has('fail'))
                 <div class="alert alert-danger">{{Session::get('fail')}}</div>
                 @endif
-                <form action="{{ route('book.grab') }}" method="get">
+                <form action="{{ route('book.bus') }}" method="get">
                 @csrf
                 <label for="pick_up_point">Select Pickup Point:</label>
-                <select aria-label="Default select example"  class="form-select" name="pick_up_point" id="pick_up_point">
+                <select aria-label="Default select example"  class="form-select" name="departfrom" id="departfrom">
                 <option value="">Select a Pickup Point</option>
                     @foreach($uniquePickupPoints as $pickupPoint)
                         <option value="{{ $pickupPoint }}" {{ $selectedPickupPoint == $pickupPoint ? 'selected' : '' }}>
@@ -46,7 +46,7 @@
                 </select><br>
 
                 <label for="availabledestination">Select Destination:</label>
-                <select aria-label="Default select example"  class="form-select" name="availabledestination" id="availabledestination">
+                <select aria-label="Default select example"  class="form-select" name="destination" id="destination">
             <option value="">Select a Destination</option>
             @foreach($uniqueDestinations as $destination)
                 <option value="{{ $destination }}" {{ $selectedDestination == $destination ? 'selected' : '' }}>
@@ -56,7 +56,7 @@
         </select>
         <br>
         <button type="submit" class="btn btn-success" name="button1" value="value1">Show Matched Data</button>
-        <button type="submit" class="btn btn-primary" name="button2" value="value2">Show All Available Grab</button>
+        <button type="submit" class="btn btn-primary" name="button2" value="value2">Show All Available Bus</button>
     </form>
                 </form>
                 </div> <br><br>
@@ -67,29 +67,29 @@
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                 <thead>
                 <tr>
-                    <th>Car Brand</th>   
-                    <th>Number of Seat</th>
-                    <th>Available Time</th>
-                    <th>Pick Up Point</th>
-                    <th>Destination</th>
+                    <th>Bus Depart From</th>   
+                    <th>Bus Destination</th>
+                    <th>Departure Time</th>
+                    <th>Departure Date</th>
+                    <th>Available Seat</th>
+                    <th>Price Per Seat</th>
                     <th>Status</th>
-                    <th>Price</th>
-                    <th>Choose Grab</th>
+                    <th>Choose Bus</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach ($matchedData as $item)
                 <tr>                
-                    <form action="passengerselect-grab/{{ $item->id }}" method="POST">
+                    <form action="passengerselect-bus/{{ $item->id }}" method="POST">
                     @csrf
-                    <td>{{ $item->car_brand }} - {{ $item->car_name }}</td>
-                    <td>{{ $item->number_of_seat}}</td>
-                    <td>{{ $item->available_time}}</td>
-                    <td>{{ $item->pick_up_point}}</td>
-                    <td>{{ $item->destination_name}}</td>
+                    <td>{{ $item->bus_depart_from}}</td>
+                    <td>{{ $item->bus_destination}}</td>
+                    <td>{{ $item->departure_time}}</td>
+                    <td>{{ $item->departure_date}}</td>
+                    <td>{{ $item->available_seat}}</td>
+                    <td>RM {{ $item->price_per_seat}}</td>
                     <td>{{ $item->status}}</td>
-                    <td>RM {{ $item->price_destination}}</td>
-                    <td> <button type="submit" class="btn btn-success">Select Grab</button></td>
+                    <td> <button type="submit" class="btn btn-success">Select Bus</button></td>
                     </form>
                 </tr>
                 @endforeach

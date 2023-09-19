@@ -23,7 +23,8 @@
             <div class="card-body">
             <div class="flash-message"></div>
                 <div class="table-responsive">
-                <table class="table table-striped-columns">
+                <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                 @if(Session::has('success'))
                     <div class="alert alert-success">{{Session::get('success')}}</div>
                     @endif
@@ -54,7 +55,7 @@
                     <td>{{ $item->bus_depart_from }}</td>
                     <td>{{ $item->bus_destination }}</td>
                     <td>{{ $item->status }}</td>
-                    <td> <button type="submit" class="btn btn-secondary">Manage</button></td>
+                    <td> <button type="submit" class="btn btn-primary">Manage and Update Bus</button></td>
                     </form>
                 </tr>
             @endforeach
@@ -65,5 +66,20 @@
         </div>
     </div>
 </div>
+
+@endsection
+@section('script')
+<!-- Peity chart-->
+<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
+
+{{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
+
+<script>
+    $(document).ready(function() {
+    
+        $('#bookgrab').DataTable();
+});
+
+</script>
 
 @endsection

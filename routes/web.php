@@ -626,6 +626,12 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('/bus-managebus','BusController@managebus')->name('bus.manage');
     Route::post('/managebus-bus/{id}','BusController@manageselectedbus')->name('bus.displaymanage/{id}');
     Route::post('/updatemanagebus-bus/{id}','BusController@updatebus')->name('bus.update/{id}');
+    Route::get('/book-bus','BusController@bookbus')->name('book.bus');
+    Route::post('/passengerselect-bus/{id}','BusController@selectbookbus')->name('passengerselect-bus/{id}');
+    Route::post('/passengerpay-bus/{id}','BusController@paymentbus')->name('passengerpay-bus/{id}');
+    Route::post('/passengernotify-bus/{id}','BusController@notifybus')->name('passengernotify-bus/{id}');
+    Route::get('/bus-notify','BusController@bussendnotify')->name('bus.notifypassenger');
+    Route::post('/notifybus-passenger/{id}','BusController@updatenotifybus')->name('notifybus-passenger/{id}');
 
 
     

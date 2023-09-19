@@ -648,14 +648,14 @@
                     </li>
                     <li>
                         <a href="{{ route('grab.notifypassenger') }}" class=" waves-effect">
-                            <i class="ti-clipboard"></i>
+                            <i class="mdi mdi-comment-alert"></i>
                             <span>Notify Penumpang</span>
                         </a>
                     </li>
                     @endrole 
                     <li>
                         <a href="{{ route('book.grab') }}" class=" waves-effect">
-                            <i class="mdi  mdi-taxi"></i>
+                            <i class="mdi mdi-library-books"></i>
                             <span>Buat Tempahan</span>
                         </a>
                     </li>
@@ -695,7 +695,25 @@
                             <span>Senarai Penumpang</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('bus.notifypassenger') }}" class=" waves-effect">
+                            <i class="mdi mdi-comment-alert"></i>
+                            <span>Notify Penumpang</span>
+                        </a>
+                    </li>
                     @endrole 
+                    <li>
+                        <a href="{{ route('book.bus') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Buat Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="mdi mdi-cash-multiple"></i>
+                            <span>Bayar Tempahan</span>
+                        </a>
+                    </li>
                 </ul>  
             </li>
             @endrole

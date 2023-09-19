@@ -72,6 +72,7 @@
                     <select class="form-select" aria-label="Default select example"  name="status">         
                     <option hidden value="{{ $databus->status }}">{{ $databus->status }}</option>
                     <option value="AVAILABLE">AVAILABLE</option>
+                    <option value="NOT CONFIRM">NOT CONFIRM</option>
                     <option value="NOT AVAILABLE">NOT AVAILABLE</option>
                     </select>
                     </div><br>
