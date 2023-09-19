@@ -632,6 +632,9 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('/passengernotify-bus/{id}','BusController@notifybus')->name('passengernotify-bus/{id}');
     Route::get('/bus-notify','BusController@bussendnotify')->name('bus.notifypassenger');
     Route::post('/notifybus-passenger/{id}','BusController@updatenotifybus')->name('notifybus-passenger/{id}');
+    Route::get('/bus-bayartempahan','BusController@busbayartempahan')->name('bus.bayartempahan');
+    Route::post('/passengerpilihtempahan-bus/{id}','BusController@buspilihtempahan')->name('passengerpilihtempahan-bus/{id}');
+    Route::post('/passengerbayartempahan-bus/{id}','BusController@passengerbusbayartempahan')->name('passengerbayartempahan-bus/{id}');
 
 
     

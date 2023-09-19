@@ -709,7 +709,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('bus.bayartempahan') }}" class=" waves-effect">
                             <i class="mdi mdi-cash-multiple"></i>
                             <span>Bayar Tempahan</span>
                         </a>

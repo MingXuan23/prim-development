@@ -10,8 +10,8 @@
 @endsection
 
 @section('content')
-@foreach ($data as $item)
 
+@foreach ($data as $item)
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
@@ -20,9 +20,8 @@
     </div>
 </div>
 
-@if ($item->status == 'AVAILABLE')
-<form  method="post" action="/passengerpay-bus/{{ $item->id }}"> 
-    @if(Session::has('success'))
+<form method="post" action="/passengerbayartempahan-bus/{{ $item->busid }}"> 
+@if(Session::has('success'))
         <div class="alert alert-success">{{Session::get('success')}}</div>
     @endif
     @if(Session::has('fail'))
@@ -34,6 +33,10 @@
     <tr>
     <th hidden>Passenger ID :</th>
     <td  hidden><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $userId }}" readonly name="idpassenger"></td>
+    </tr>
+    <tr>
+    <th hidden>Notify ID :</th>
+    <td hidden><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $item->notifyid }}" readonly name="notify"></td>
     </tr>
     <tr>
     <th>Trip Number :</th>
@@ -79,70 +82,10 @@
     <button type="submit" class="btn btn-success">Make Payment</button>
     <button class="btn btn-danger"><a href="/passenger-grab" style="text-decoration: none; color: white;">Cancel</a></button>
 </form>
-
-@elseif ($item->status == 'NOT CONFIRM')
-<form  method="post" action="/passengernotify-bus/{{ $item->id }}"> 
-    @if(Session::has('success'))
-        <div class="alert alert-success">{{Session::get('success')}}</div>
-    @endif
-    @if(Session::has('fail'))
-        <div class="alert alert-danger">{{Session::get('fail')}}</div>
-    @endif
-    @csrf
-    <div class="table-responsive">
-    <table id="bookgrab" class="table table-bordered table-striped dt-responsive wrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-    <tr>
-    <th hidden>Passenger ID :</th>
-    <td  hidden><input type="text" class="form-control" aria-describedby="emailHelp" value="{{ $userId }}" readonly name="idpassenger"></td>
-    </tr>
-    <tr>
-    <th>Trip Number :</th>
-    <td>{{ $item->trip_number }}</td>
-    </tr>
-    <tr>
-    <th>Bus Registration Number :</th>
-    <td>{{ $item->bus_registration_number }}</td>
-    </tr>
-    <tr>
-    <th>Available Seat :</th>
-    <td>{{ $item->available_seat }} seat</td>
-    </tr>
-    <tr>
-    <th>Depart From :</th>
-    <td>{{ $item->bus_depart_from }}</td>
-    </tr>
-    <tr>
-    <th>Bus Destination :</th>
-    <td>{{ $item->bus_destination }}</td>
-    </tr>
-    <tr>
-    <th>Price Per Seat :</th>
-    <td>RM {{ $item->price_per_seat }}</td>
-    </tr>
-    <tr>
-    <th>Departure Time :</th>
-    <td>{{ $item->departure_time }}</td>
-    </tr>
-    <tr>
-    <th>Estimate Arrive Destination Time :</th>
-    <td>{{ $item->estimate_arrive_time }}</td>
-    </tr>
-    <tr>
-    <th>Departure Date :</th>
-    <td>{{ $item->departure_date }}</td>
-    </tr>
-    </table>
-</div>
-    <br>
-    <button type="submit" class="btn btn-primary">Add to Book List</button>
-    <button class="btn btn-danger"><a href="/passenger-grab" style="text-decoration: none; color: white;">Cancel</a></button>
-</form>
-@endif
 @endforeach 
 
 
 @endsection
-
 @section('script')
 <!-- Peity chart-->
 <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>

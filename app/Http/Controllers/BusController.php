@@ -85,6 +85,30 @@ class BusController extends Controller
         return view('bus.notifypassenger', compact('uniqueDestinations', 'selectedDestination', 'selectedData'));
     }
 
+    public function busbayartempahan()
+    {
+        $userId = Auth::id();
+        $list = DB::table('bus_notifys')
+        ->join('buses', 'bus_notifys.id_bus', '=', 'buses.id')
+        ->join('users', 'users.id', '=', 'bus_notifys.id_user')
+        ->where('bus_notifys.status', '=', 'ALREADY NOTIFY FOR BOOK')
+        ->where('buses.status', '!=', 'FULLY BOOK')
+        ->where('users.id', $userId)
+        ->select('bus_notifys.id','buses.bus_depart_from', 'buses.bus_destination', 'buses.price_per_seat', 'buses.trip_number', 'buses.departure_time', 'buses.departure_date','bus_notifys.time_notify')
+        ->get();
+        return view("bus.bayartempahan", compact('list'));
+    }
+
+    public function buspilihtempahan($id)
+    {
+        $userId = Auth::id();
+        $data =  Bus::join('bus_notifys','bus_notifys.id_bus','=','buses.id')
+        ->where('bus_notifys.id', $id)
+        ->select( 'bus_notifys.id as notifyid','buses.id as busid','buses.bus_depart_from', 'buses.bus_destination', 'buses.departure_time', 'buses.departure_date', 'buses.bus_registration_number', 'buses.trip_number', 'buses.price_per_seat', 'buses.available_seat', 'buses.estimate_arrive_time', 'buses.booked_seat')
+        ->get();
+        return view("bus.passengerbayartempahan", compact('data','userId'));
+    }
+
     public function bookbus(Request $request)
     {
         $uniquePickupPoints = Bus::distinct()->pluck('bus_depart_from');
@@ -267,5 +291,43 @@ class BusController extends Controller
     
         return redirect()->route('book.bus')->with('success', 'Payment Received');
     }
+
+    public function passengerbusbayartempahan(Request $request, $id)
+    {
+        $currentValue = $request->input('seat');
+        $newValue = $currentValue - 1;
+
+        $bookedValue = $request->input('bookedseat');
+        $newBookedValue = $bookedValue + 1;
+
+        $updatebus = Bus::findOrFail($id);
+        $updatebus->update([
+            'available_seat' =>  $newValue,
+            'booked_seat' =>  $newBookedValue,
+        ]);
+
+        $request->validate([
+            'idpassenger'=>'required',
+            'notify'=>'required'
+        ]);
+
+        $today = Carbon::now();
+        $formattedDate = $today->format('Y-m-d');
+
+        $destination = new Bus_Booking();
+        $destination->id_bus =  $id;
+        $destination->id_user = $request->idpassenger;
+        $destination->book_date = $formattedDate;
+        $res = $destination->save();
+
+        $updatenotify = NotifyBus::findOrFail($request->notify);
+        $updatenotify->update([
+            'status' => "PAID",
+        ]);
+
+        return redirect()->route('bus.bayartempahan')->with('success', 'Payment Received');
+    }
+
+  
 
 }
