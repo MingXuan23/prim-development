@@ -23,10 +23,10 @@ class NotifyPassengerBus extends Mailable
      */
     public function __construct(NotifyBus $notify,User $user)
     {
-        $this->grab_notify = Organization::join('buses', 'organizations.id', '=', 'buses.id_organizations')
+        $this->bus_notify = Organization::join('buses', 'organizations.id', '=', 'buses.id_organizations')
         ->join('bus_notifys','buses.id','=','bus_notifys.id_bus')
         ->where('bus_notifys.id',$notify->id) 
-        ->select('buses.pick_up_point','buses.destination_name','buses.available_time', 'buses.car_brand', 'buses.car_name', 'buses.car_registration_num')
+        ->select('buses.bus_depart_from','buses.bus_destination','bus_notifys.time_notify','buses.departure_time', 'buses.trip_number', 'buses.bus_registration_number', 'buses.departure_date', 'buses.price_per_seat')
         ->get();
 
         $this->notify = $notify;
@@ -40,10 +40,10 @@ class NotifyPassengerBus extends Mailable
      */
     public function build()
     {
-        $grab_notify = $this->grab_notify;
+        $bus_notify = $this->bus_notify;
         $notify = $this->notify;
         $user = $this->user;
 
-        return $this->view('grab.notifyemail', compact('grab_notify', 'notify', 'user'));
+        return $this->view('bus.notifyemail', compact('bus_notify', 'notify', 'user'));
     }
 }

@@ -10,6 +10,8 @@ use App\Models\Bus;
 use App\Models\Bus_Booking;
 use App\Models\NotifyBus;
 use App\Mail\NotifyPassengerBus;
+use Illuminate\Support\Facades\Mail;
+use App\User;
 use Hash;
 use Session;
 use PDF;
