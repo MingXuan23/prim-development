@@ -599,7 +599,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('cancelpelanggan/{id}', 'HomestayController@cancelpelanggan');
     Route::get('userhistory', 'HomestayController@userhistory')->name('homestay.userhistory');
     Route::get('tunjuksales', 'HomestayController@tunjuksales')->name('homestay.tunjuksales');
-    Route::get('homestaysales/{id}', 'HomestayController@homestaysales');
+    Route::get('homestaysales/{id}/{checkin}/{checkout}', 'HomestayController@homestaysales');
     
     //Route::post('test', 'HomestayController@test')->name('homestay.test');
 
