@@ -31,11 +31,11 @@
                 @endif
 <form action="{{ route('grab.notifypassenger') }}" method="get">
 @csrf
-        <label>Pilih Destinasi :</label>
+        <label>Pilih Tawaran Perjalanan Anda :</label>
         <select class="form-select" aria-label="Default select example"  name="availabledestination">
-        <option selected disabled>Not Confirm Destination</option>
-        @foreach($uniqueDestinations as $destination) 
-        <option value="{{ $destination }}" {{ $selectedDestination == $destination ? 'selected' : '' }}>{{ $destination  }}</option>
+        <option selected disabled>Not Confirm Trip</option>
+        @foreach($uniqueDestinations as $item) 
+        <option value="{{ $item->id }}">{{ $item->pick_up_point }} - {{ $item->destination_name }} Time : {{ $item->available_time }}</option>
         @endforeach
         </select>
         <br>

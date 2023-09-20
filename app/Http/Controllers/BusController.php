@@ -64,8 +64,7 @@ class BusController extends Controller
     public function bussendnotify(Request $request)
     {
         $uniqueDestinations = Bus::where('status', '=', 'NOT CONFIRM')
-        ->distinct()
-        ->pluck('bus_destination');
+        ->get();
 
         $selectedDestination = $request->input('availabledestination');
         $selectedData = null;
@@ -75,7 +74,7 @@ class BusController extends Controller
             $selectedData = DB::table('buses')
             ->join('bus_notifys', 'bus_notifys.id_bus', '=', 'buses.id')
             ->join('users', 'users.id', '=', 'bus_notifys.id_user')
-            ->where('buses.bus_destination', $selectedDestination)
+            ->where('buses.id', $selectedDestination)
             ->where('buses.status', '=', 'NOT CONFIRM')
             ->where('bus_notifys.status', '!=', 'PAID')
             ->select( 'bus_notifys.id','users.name','buses.bus_depart_from', 'buses.bus_destination', 'buses.trip_number', 'buses.bus_registration_number', 'bus_notifys.status','bus_notifys.time_notify')

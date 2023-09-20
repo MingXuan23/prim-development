@@ -78,9 +78,10 @@ class GrabStudentController extends Controller
 
     public function grabsendnotify(Request $request)
     {
-        $uniqueDestinations = Destination_Offer::where('destination_offers.status', '=', 'NOT CONFIRM')
+        $uniqueDestinations = Destination_Offer::select('id','destination_name','pick_up_point','available_time')
+        ->where('status', '=', 'NOT CONFIRM')
         ->distinct()
-        ->pluck('destination_name');
+        ->get();
 
         $selectedDestination = $request->input('availabledestination');
         $selectedData = null;
@@ -91,7 +92,7 @@ class GrabStudentController extends Controller
             ->join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
             ->join('grab_notifys', 'grab_notifys.id_destination_offer', '=', 'destination_offers.id')
             ->join('users', 'users.id', '=', 'grab_notifys.id_user')
-            ->where('destination_offers.destination_name', $selectedDestination)
+            ->where('destination_offers.id', $selectedDestination)
             ->where('destination_offers.status', '=', 'NOT CONFIRM')
             ->where('grab_notifys.status', '!=', 'PAID')
             ->select( 'grab_notifys.id','users.name','destination_offers.pick_up_point', 'destination_offers.destination_name', 'grab_students.car_name', 'grab_students.car_brand', 'grab_students.car_registration_num', 'grab_notifys.status','grab_notifys.time_notify')
@@ -330,7 +331,22 @@ class GrabStudentController extends Controller
         $destination->book_date = $formattedDate;
         $res = $destination->save();
     
-        return redirect()->route('book.grab')->with('success', 'Payment Received');
+        return redirect()->route('bayar.grab');
+    }
+
+    public function makepaymentgrab()
+    {
+        $data = Grab_Booking::join('destination_offers', 'destination_offers.id', '=', 'grab_bookings.id_destination_offer')
+        ->join('users', 'users.id', '=', 'grab_bookings.id_user')
+        ->join('grab_students', 'grab_students.id', '=', 'destination_offers.id_grab_student')
+        ->select('grab_bookings.id as bookid', 'grab_students.car_brand', 'grab_students.car_name', 'destination_offers.pick_up_point', 'destination_offers.destination_name', 'grab_students.number_of_seat', 'destination_offers.available_time', 'destination_offers.price_destination')
+        ->where('grab_bookings.id', '=', function ($query) {
+            $query->selectRaw('MAX(id)')
+                ->from('grab_bookings');
+        })
+        ->get();
+
+       return view('grab.grabreceipt', compact('data'));
     }
 
     public function passengerbayartempahan(Request $request, $id)
@@ -367,6 +383,8 @@ class GrabStudentController extends Controller
     
         return redirect()->route('grab.bayartempahan')->with('success', 'Payment Received');
     }
+
+
 
     public function notifygrab(Request $request, $id)
     {

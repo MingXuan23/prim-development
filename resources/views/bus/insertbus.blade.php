@@ -81,7 +81,7 @@
                     @endforeach
                     </div>
                     <div class="form-group">
-                    <input type="text" class="form-control" aria-describedby="emailHelp" name="status" value ="NEW INSERT" hidden>
+                    <input type="text" class="form-control" aria-describedby="emailHelp" name="status" value ="NEWLY INSERT" hidden>
                     </div>
                     <div class="form-group mb-0">
                     <div class="text-right">
