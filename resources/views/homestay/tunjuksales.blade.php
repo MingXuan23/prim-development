@@ -169,7 +169,7 @@ $(document).ready(function() {
                 x: {
                     title: {
                         display: true,
-                        text: 'Bulan' // Label for the x-axis
+                        text: 'Tarikh' // Label for the x-axis
                     }
                 }
             }
