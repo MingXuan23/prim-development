@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DestinationOffer extends Migration
+class TableDestinationOffers extends Migration
 {
     /**
      * Run the migrations.
@@ -19,6 +19,7 @@ class DestinationOffer extends Migration
             $table->text('pick_up_point');
             $table->text('price_destination');
             $table->text('status');
+            $table->text('available_time');
             $table->unsignedBigInteger('id_grab_student'); // Foreign key column
             $table->foreign('id_grab_student')->references('id')->on('grab_students'); // Create foreign key
         });

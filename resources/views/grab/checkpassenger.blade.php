@@ -39,7 +39,10 @@
             <tr>
                 <th>Passenger Name</th>
                 <th>Car Brand</th>
+                <th>Pick Up Point</th>
                 <th>Destination Name</th>
+                <th>Pick Up Time </th>
+                <th>Price Destination </th>
                 <th>Book Date </th>
                 <th>Status</th>
             </tr>
@@ -55,7 +58,10 @@
                     @endif
                 </td>
                       <td>{{ $item->car_brand }} - {{ $item->car_name }}</td>
+                      <td>{{ $item->pick_up_point}}</td>
                       <td>{{ $item->destination_name}}</td>
+                      <td>{{ $item->available_time}}</td>
+                      <td>RM {{ $item->price_destination}}</td>
                       <td>{{ $item->book_date}}</td>
                       <td>
                     @if($index === 0)

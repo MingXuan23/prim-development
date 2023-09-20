@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class GrabBooking extends Migration
+class TableGrabNotifys extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class GrabBooking extends Migration
      */
     public function up()
     {
-        Schema::create('grab_bookings', function (Blueprint $table) {
+        Schema::create('grab_notifys', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_destination_offer'); 
             $table->unsignedBigInteger('id_user'); 
-            $table->text('book_date');
+            $table->text('status');
+            $table->text('time_notify');
             $table->foreign('id_destination_offer')->references('id')->on('destination_offers'); 
             $table->foreign('id_user')->references('id')->on('users'); 
         });
@@ -30,6 +31,6 @@ class GrabBooking extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('grab_bookings');
+        Schema::dropIfExists('grab_notifys');
     }
 }

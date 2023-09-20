@@ -93,7 +93,7 @@
   <div class="row d-flex justify-content-center align-items-center">
     <div class="col">
       <div class="d-flex justify-content-center align-items-center">
-        <span class="h2 m-4">Bayaran Grab Student Anda</span>
+        <span class="h2 m-4">Bayaran Bas Anda</span>
       </div>
 
       <div class="card">
@@ -114,24 +114,28 @@
                 <thead class="thead-dark">
                     <tr class="text-center">
                       <th hidden>Booking ID</th>
-                      <th>Kenderaan</th>
-                      <th>Pick Up Point</th>
-                      <th>Destinasi</th>
-                      <th>Seat Kenderaan</th>
-                      <th>Masa Pick Up</th>
-                      <th>Harga</th>
+                      <th>Ticket Number</th>
+                      <th>Bus Registration Number</th>
+                      <th>Trip Number</th>
+                      <th>Berlepas Dari</th>
+                      <th>Destinasi Bas</th>
+                      <th>Waktu Berlepas</th>
+                      <th>Tarikh Berlepas</th>
+                      <th>Harga Tiket</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($data as $item)
                         <tr class="text-center">
                             <td hidden>{{ $item->bookid }}</td>
-                            <td>{{ $item->car_brand }} - {{ $item->car_name }}</td>
-                            <td>{{ $item->pick_up_point }}</td>
-                            <td>{{ $item->destination_name }}</td>
-                            <td>{{ $item->number_of_seat }} Seater</td>
-                            <td>{{ $item->available_time }}</td>
-                            <td>RM {{ $item->price_destination }}</td>
+                            <td>{{ $item->trip_number }}-{{ $item->bookid }}{{ $item->available_seat }}{{ $item->booked_seat }}</td>
+                            <td>{{ $item->bus_registration_number }}</td>
+                            <td>{{ $item->trip_number }}</td>
+                            <td>{{ $item->bus_depart_from }}</td>
+                            <td>{{ $item->bus_destination }}</td>
+                            <td>{{ $item->departure_time }}</td>
+                            <td>{{ $item->departure_date }}</td>
+                            <td>RM {{ $item->price_per_seat }}</td>
                     </tr>
                     @endforeach
                     </tbody>
@@ -156,9 +160,9 @@
       <form action="{{ route('fpxIndex') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @foreach($data as $item)
-        <input type="hidden" name="desc" id="desc" value="Grab Student">
+        <input type="hidden" name="desc" id="desc" value="Bus">
         <input type="hidden" name="bookingid" id = "bookingid" value="{{ $item->bookid }}">
-        <input type="hidden" name="amount" id="amount" value="{ $item->price_destination }}">
+        <input type="hidden" name="amount" id="amount" value="{ $item->price_per_seat }}">
         @endforeach
         <div class="card mb-4 border">
           <div class="card-body p-4">
