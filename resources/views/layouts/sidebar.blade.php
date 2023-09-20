@@ -739,7 +739,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('orders.laporanjualan') }}" class=" waves-effect">
                             <i class="mdi mdi-chart-bar"></i>
                             <span>Laporan Jualan</span>
                         </a>

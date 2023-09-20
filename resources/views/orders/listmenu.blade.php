@@ -87,7 +87,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Jenis Menu</label>
                                     <select name="dishtype" id="dishtype" class="form-control" required>
-                                        <option selected disabled>Pilih Jenis Menu</option>
+                                        <option value="" selected disabled>Pilih Jenis Menu</option>
                                         @foreach($dishtype as $rows)
                                             <option value="{{ $rows->id }}">{{ $rows->name }}</option>
                                         @endforeach
