@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class BusBooking extends Migration
+class TableBusNotifys extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class BusBooking extends Migration
      */
     public function up()
     {
-        Schema::create('bus_bookings', function (Blueprint $table) {
+        Schema::create('bus_notifys', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_bus'); // Foreign key column
             $table->unsignedBigInteger('id_user'); // Foreign key column
-            $table->text('book_date');
+            $table->text('status');
+            $table->text('time_notify');
             $table->foreign('id_bus')->references('id')->on('buses'); // Create foreign key
             $table->foreign('id_user')->references('id')->on('users'); // Create foreign key
         });
@@ -30,6 +31,6 @@ class BusBooking extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bus_bookings');
+        Schema::dropIfExists('bus_notifys');
     }
 }

@@ -93,12 +93,12 @@
                 <form action="{{route('grab.insertdestination')}}" method="post">
                 @csrf
                 <div class="form-group">
-                <label>Destination You Offer</label>
-                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Destination" name="destination">
-                </div><br>
-                <div class="form-group">
                 <label>Pick Up Point</label>
                 <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Pick Up Point" name="pickup">
+                </div><br>
+                <div class="form-group">
+                <label>Destination You Offer</label>
+                <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Destination" name="destination">
                 </div><br>
                 <div class="form-group">
                 <label>Price for the Destination</label>

@@ -288,7 +288,7 @@ class BusController extends Controller
         $destination->book_date = $formattedDate;
         $res = $destination->save();
     
-        return redirect()->route('book.bus')->with('success', 'Payment Received');
+        return redirect()->route('bayar.bus');
     }
 
     public function passengerbusbayartempahan(Request $request, $id)
@@ -324,7 +324,21 @@ class BusController extends Controller
             'status' => "PAID",
         ]);
 
-        return redirect()->route('bus.bayartempahan')->with('success', 'Payment Received');
+        return redirect()->route('bayar.bus');
+    }
+
+    public function makepaymentbus()
+    {
+        $data = Bus_Booking::join('buses', 'buses.id', '=', 'bus_bookings.id_bus')
+        ->join('users', 'users.id', '=', 'bus_bookings.id_user')
+        ->select('bus_bookings.id as bookid', 'buses.bus_registration_number', 'buses.booked_seat', 'buses.available_seat', 'buses.trip_number', 'buses.bus_depart_from', 'buses.bus_destination', 'buses.departure_time', 'buses.departure_date', 'buses.price_per_seat')
+        ->where('bus_bookings.id', '=', function ($query) {
+            $query->selectRaw('MAX(id)')
+                ->from('bus_bookings');
+        })
+        ->get();
+
+       return view('bus.busreceipt', compact('data'));
     }
 
   
