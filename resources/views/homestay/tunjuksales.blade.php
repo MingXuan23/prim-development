@@ -152,8 +152,8 @@ $(document).ready(function() {
                         datasets: [{
                             label: 'Total Dapat (RM)',
                             data: chartData.dataset,
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(255, 100, 100, 0.2)',
+                            borderColor: 'rgba(255, 100, 100, 1)',
                             borderWidth: 1
                         }]
                     },
