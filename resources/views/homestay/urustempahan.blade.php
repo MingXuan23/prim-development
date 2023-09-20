@@ -47,20 +47,15 @@
 
       <div class="card-body">
 
-        @if(count($errors) > 0)
-        <div class="alert alert-danger">
-          <ul>
-            @foreach($errors->all() as $error)
-            <li>{{$error}}</li>
-            @endforeach
-          </ul>
-        </div>
-        @endif
-        @if(\Session::has('success'))
-        <div class="alert alert-success">
-          <p>{{ \Session::get('success') }}</p>
-        </div>
-        @endif
+      @if(Session::has('success'))
+            <div class="alert alert-success">
+              <p>{{ Session::get('success') }}</p>
+            </div>
+          @elseif(Session::has('error'))
+            <div class="alert alert-danger">
+              <p>{{ Session::get('error') }}</p>
+            </div>
+          @endif
 
         <div class="flash-message"></div>
 
@@ -157,8 +152,10 @@ $(document).ready(function() {
       headers: { "X-CSRF-TOKEN": "{{ csrf_token() }}", },
       success: function(response) {
         console.log(response);
-        // Refresh the DataTable after cancelling booking
         dataTable.draw();
+        
+        // Reload the page to reflect changes
+        window.location.reload();
       },
       error: function(xhr) {
         console.log(xhr.responseText);
