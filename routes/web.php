@@ -642,6 +642,7 @@ Route::group(['prefix' => 'delivery'], function () {
 Route::group(['prefix' => 'orders'], function () {
 
     Route::get('/managemenu', 'OrderSController@managemenu')->name('orders.managemenu');
+    Route::get('/listmenu/{id}', 'OrderSController@listmenu')->name('orders.listmenu');
     // Route::get('/trackorder', 'OrderSController@trackorder')->name('orders.trackorder');
     // Route::get('/admindashboard', 'OrderSController@admindashboard')->name('orders.admindashboard');
     // Route::get('/adminaddorganization', 'OrderSController@adminaddorganization')->name('orders.adminaddorganization');

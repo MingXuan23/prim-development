@@ -33,9 +33,16 @@ use GuzzleHttp\Client;
 class OrderSController extends Controller
 {   
     public function managemenu(){
-
+        $userId = Auth::id();
+        $data = Organization::where('type_org', '12')->get();
+        return view('orders.menu', compact('data'));
     }
 
+    public function listmenu($organizationId){
+        dd($organizationId);
+    }
+
+    //old
     public function dashboard(Request $request){
         $data = array();
         $organizations = Organization::all();
