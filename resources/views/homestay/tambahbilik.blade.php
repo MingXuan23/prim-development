@@ -23,21 +23,17 @@
 <div class="row">
     <div class="col-md-12">
         <div class="card card-primary">
-        @if(count($errors) > 0)
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach($errors->all() as $error)
-                    <li>{{$error}}</li>
-                    @endforeach
-                </ul>
-            </div>
-            @endif
 
-            @if(\Session::has('error'))
-                <div class="alert alert-danger">
-                    <p>{{ \Session::get('error') }}</p>
-                </div>
-            @endif
+        @if(Session::has('success'))
+            <div class="alert alert-success">
+              <p>{{ Session::get('success') }}</p>
+            </div>
+          @elseif(Session::has('error'))
+            <div class="alert alert-danger">
+              <p>{{ Session::get('error') }}</p>
+            </div>
+          @endif
+
             <form method="post" action="{{route('homestay.addroom')}}" enctype="multipart/form-data"
                 class="form-validation">
                 {{csrf_field()}}
