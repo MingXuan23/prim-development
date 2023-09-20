@@ -381,7 +381,7 @@ class GrabStudentController extends Controller
         $destination->book_date = $formattedDate;
         $res = $destination->save();
     
-        return redirect()->route('grab.bayartempahan')->with('success', 'Payment Received');
+        return redirect()->route('bayar.grab');
     }
 
 

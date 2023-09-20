@@ -179,7 +179,7 @@
         
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
-            <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b">KEMBALI</a>
+            <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b">Kembali</a>
             {{-- <button type="submit" class="btn-lg btn-primary">Bayar</button> --}}
             <button class="submit-btn" type="submit">
               <span class="hover-underline-animation">Bayar</span>
