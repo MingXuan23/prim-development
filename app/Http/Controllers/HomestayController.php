@@ -533,45 +533,53 @@ public function editpromo(Request $request,$promotionid)
         return view('homestay.tunjuksales', compact('data'));
     }
 
-    public function homestaysales($id)
+    public function homestaysales($id,$checkin,$checkout)
     {
+        $checkinTimestamp = strtotime($checkin);
+        $checkoutTimestamp = strtotime($checkout);
+        
+        $salesData = DB::table('bookings')
+            ->join('rooms', 'bookings.roomid', '=', 'rooms.roomid')
+            ->join('organizations', 'rooms.homestayid', '=', 'organizations.id')
+            ->select(DB::raw('DATE(bookings.updated_at) as date'), DB::raw('SUM(bookings.totalprice) as total_sales'))
+            ->where('bookings.status', 'Paid')
+            ->where('organizations.id', $id)
+            ->whereBetween(DB::raw('DATE(bookings.updated_at)'), [date('Y-m-d', $checkinTimestamp), date('Y-m-d', $checkoutTimestamp)])
+            ->groupBy(DB::raw('DATE(bookings.updated_at)'))
+            ->get();
+        
+        $dateLabels = [];
+        $currentDate = $checkinTimestamp;
+        while ($currentDate <= $checkoutTimestamp) {
+            $dateLabels[] = date('Y-m-d', $currentDate);
+            $currentDate += 86400;
+        }
+        
 
-    // Fetch the sales data for the selected homestay for the current year
-    $salesData = DB::table('bookings')
-    ->join('rooms', 'bookings.roomid', '=', 'rooms.roomid')
-    ->join('organizations', 'rooms.homestayid', '=', 'organizations.id')
-    ->select(DB::raw('MONTH(bookings.created_at) as month'), DB::raw('SUM(bookings.totalprice) as total_sales'))
-    ->where('bookings.status', 'Paid')
-    ->where('organizations.id', $id) // Filter by the specific organization's ID
-    ->whereYear('bookings.created_at', now()->year)
-    ->groupBy(DB::raw('MONTH(bookings.created_at)'))
-    ->get();
+        $dailySales = [];
+        
 
- // Initialize an array to store the sales data for each month
-$monthlySales = array_fill(1, 12, 0); // Initialize with zeros for all twelve months
-
-// Initialize an array to store the month labels (all twelve months)
-$monthLabels = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'October', 'November', 'December'];
-
-// Create an associative array to map month numbers to labels
-$monthMap = [
-    1 => 'Januari', 2 => 'Februari', 3 => 'Mac', 4 => 'April', 5 => 'Mei', 6 => 'Jun',
-    7 => 'Julai', 8 => 'Ogos', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'
-];
-
-// Loop through the sales data and update the corresponding sales data for each month
-foreach ($salesData as $entry) {
-    $monthNumber = $entry->month;
-    $monthlySales[$monthNumber] = $entry->total_sales;
-}
-
-// Prepare the data for the chart
-$chartData = [
-    'labels' => $monthLabels, // Use predefined month labels
-    'dataset' => array_values($monthlySales), // Use the formatted array of sales data
-];
-
-return response()->json($chartData);
+        foreach ($dateLabels as $dateLabel) {
+            $found = false;
+            foreach ($salesData as $entry) {
+                if ($entry->date === $dateLabel) {
+                    $dailySales[] = $entry->total_sales;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $dailySales[] = 0; // No sales for this date
+            }
+        }
+        
+        // Prepare the data for the chart
+        $chartData = [
+            'labels' => $dateLabels,
+            'dataset' => $dailySales,
+        ];
+        
+        return response()->json($chartData);
 }
 
     public function store(Request $request)
