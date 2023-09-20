@@ -641,7 +641,20 @@ Route::group(['prefix' => 'delivery'], function () {
 
     
 
+Route::group(['prefix' => 'orders'], function () {
 
+    Route::get('/managemenu', 'OrderSController@managemenu')->name('orders.managemenu');
+    // Route::get('/trackorder', 'OrderSController@trackorder')->name('orders.trackorder');
+    // Route::get('/admindashboard', 'OrderSController@admindashboard')->name('orders.admindashboard');
+    // Route::get('/adminaddorganization', 'OrderSController@adminaddorganization')->name('orders.adminaddorganization');
+    // Route::post('/add-organization', 'OrderSController@addOrganization')->name('orders.add-organization');
+    // Route::get('/adminadddishes', 'OrderSController@adminadddishes')->name('orders.adminadddishes');
+    // Route::post('/add-dishes', 'OrderSController@addDishes')->name('orders.add-dishes');
+    // Route::match(['get', 'post'], '/orders', 'OrderSController@storeOrders')->name('orders.orders');
+    // Route::post('/addOrders', 'OrderSController@addOrders')->name('orders.addOrders');
+    // Route::post('/checkout', 'OrderSController@checkoutOrders')->name('orders.checkout');
+    // Route::get('/dishes/{organizationId}', 'OrderSController@getDishesByOrganization')->name('orders.dishes/{organizationId}');
+});
 
     
 

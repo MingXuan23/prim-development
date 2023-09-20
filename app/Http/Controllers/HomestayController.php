@@ -371,25 +371,39 @@ public function editpromo(Request $request,$promotionid)
             $totalPrice = $price * $totalDays;
         }
 
-        $booking = new Booking();
-        $booking->checkin = $request->checkin;
-        $booking->checkout = $request->checkout;
-        $booking->status = $status;
-        $booking->totalprice = $totalPrice;
-        $booking->customerid = $userId;
-        $booking->roomid = $fkroom;
+        $availability = Booking::where('roomid', $fkroom)
+        ->where(function ($query) use ($request) {
+        $query->where('checkin', '<', $request->checkout)
+            ->where('checkout', '>', $request->checkin);
+    })
+    ->get();
 
-        $result = $booking->save();
+    if ($availability->isEmpty()) {
 
-        if($result)
-            {
-                return back()->withInput()->with('success', 'Bilik Berjaya Ditempah');
-            }
-            else
-            {
-                return back()->withInput()->with('error', 'Tempahan Gagal Dibuat');
+            $booking = new Booking();
+            $booking->checkin = $request->checkin;
+            $booking->checkout = $request->checkout;
+            $booking->status = $status;
+            $booking->totalprice = $totalPrice;
+            $booking->customerid = $userId;
+            $booking->roomid = $fkroom;
     
-            }
+            $result = $booking->save();
+    
+            if($result)
+                {
+                    return back()->withInput()->with('success', 'Bilik Berjaya Ditempah');
+                }
+                else
+                {
+                    return back()->withInput()->with('error', 'Tempahan Gagal Dibuat');
+        
+                }
+        } else {
+            return back()->withInput()->with('error', 'Bilik Pada Tarikh Tersebut Telah Penuh');
+        }
+
+        
 
     }
 
