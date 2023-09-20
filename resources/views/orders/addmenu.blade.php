@@ -12,197 +12,94 @@
     <div class="row align-items-center">
         <div class="col-sm-6">
             <div class="page-title-box">
-                <h4 class="font-size-18">Urus Menu</h4>
+                <h4 class="font-size-18">Tambah Menu</h4>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div>
-                    <a style="margin: 19px; float: right;" href="{{ route('homestay.setpromotion') }}"
-                        class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Menu </a>
-                </div>
+            <div class="card card-primary">
 
-                <div class="card-body">
-                    @if(Session::has('success'))
-                        <div class="alert alert-success">
-                        <p>{{ Session::get('success') }}</p>
-                        </div>
-                    @elseif(Session::has('error'))
-                        <div class="alert alert-danger">
-                        <p>{{ Session::get('error') }}</p>
-                        </div>
-                    @endif
-                    <div class="flash-message"></div>
-                    <div class="table-responsive">
-                        <table id="homestaytable" class="table table-bordered table-striped dt-responsive wrap"
-                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                            <thead>
-                                <tr style="text-align:center">
-                                    <th hidden>Promotion ID</th>
-                                    <th>Promosi</th>
-                                    <th>Nama Homestay</th>
-                                    <th>Tarikh Dari</th>
-                                    <th>Tarikh Hingga</th>
-                                    <th>Diskaun (%)</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($data as $record)
-                                <tr>
-                                    <td hidden>{{ $record->promotionid }}</td>
-                                    <td>{{ $record->promotionname }}</td>
-                                    <td>{{ $record->nama }}</td>
-                                    <td>{{ $record->datefrom }}</td>
-                                    <td>{{ $record->dateto }}</td>
-                                    <td>{{ $record->discount }}</td>
-                                    <td><button class="btn btn-success" id="editbutton">Edit</button></td>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
+                @if(Session::has('success'))
+                    <div class="alert alert-success">
+                    <p>{{ Session::get('success') }}</p>
                     </div>
-                </div>
-            </div>
+                @elseif(Session::has('error'))
+                    <div class="alert alert-danger">
+                    <p>{{ Session::get('error') }}</p>
+                    </div>
+                @endif
 
-            <div class="modal fade" id="promomodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Promosi</h1>
+                <form method="post" action="{{ route('orders.processaddmenu', ['id' => $organizationId]) }}" enctype="multipart/form-data"
+                    class="form-validation">
+                    {{csrf_field()}}
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group required">
+                                    <label class="control-label"> Nama Menu <span style="color:#d00"> *</span></label>
+                                    <input type="text" name="dishname" id="dishname" class="form-control" placeholder="Nama Menu"
+                                        data-parsley-required-message="Sila masukkan nama menu" required>
+                                    </input>
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-body" style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc;">
-                            <form class="row g-3" id="promoform" method="POST" action="">
-                                @csrf
-                                <input type="text" class="form-control" name="promotionid" id="promotionid" hidden>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nama Homestay</label>
-                                    <input type="text" class="form-control" id="nama" name="nama" disabled>
+                        
+                        <div class="row">
+                            <div class="col">
+                                <div class="form-group required">
+                                    <label class="control-label"> Jenis Menu <span style="color:#d00"> *</span></label>
+                                    <select name="dishtype" id="dishtype" class="form-control"
+                                        data-parsley-required-message="Sila pilih jenis menu" required>
+                                        <option selected>Pilih Jenis Menu</option>
+                                        @foreach($data as $rows)
+                                            <option value="{{ $rows->id }}">{{ $rows->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nama Promosi</label>
-                                    <input type="text" class="form-control" id="promotionname" name="promotionname">
+                            </div>
+                            <div class="col">
+                                <div class="form-group required">
+                                    <label class="control-label"> Harga Menu (RM) </label>
+                                    <input type="number" class="form-control" id="price" name="price">
                                 </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Tarikh Dari</label>
-                                    <input type="text" class="form-control" id="datefrom" name="datefrom">
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Tarikh Hingga</label>
-                                    <input type="text" class="form-control" id="dateto" name="dateto">
-                                </div>
-
-                                <div class="col-12 mb-3">
-                                    <label class="form-label">Diskaun (%)</label>
-                                    <input type="text" class="form-control" id="discount" name="discount">
-                                </div>
-
-                                <div class="col-12 d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-primary">Simpan</button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <a href="homestay" class="btn btn-secondary" id="homestay">Kembali</a>
+                    
+                        <div class="form-group mb-0">
+                            <div class="text-right">
+                                <!-- url()->previous() -->
+                                <a type="button" href="{{ route('orders.listmenu', ['id' => $organizationId]) }}"
+                                    class="btn btn-secondary waves-effect waves-light mr-1">
+                                    Kembali
+                                </a>
+                                <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
+                                    Simpan
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
 @endsection
 
 @section('script')
-    <!-- Peity chart-->
-    <script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
-    {{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
+    <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
+    <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
+    <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
     <script>
-        $(document).ready(function() {
-        
-            $('#homestaytable').DataTable();
 
-            $(document).on('click', '#editbutton', function(e) {
-                discount = e.target.parentElement.previousElementSibling.innerText;
-                dateto = e.target.parentElement.previousElementSibling.previousElementSibling.innerText;
-                datefrom = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
-                nama = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
-                promotionname = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
-                id = e.target.parentElement.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerText;
-                console.log(id);
-                $('#promotionid').val(id);
-                $('#nama').val(nama);
-                $('#promotionname').val(promotionname);
-                $('#datefrom').val(datefrom);
-                $('#dateto').val(dateto);
-                $('#discount').val(discount);
-
-                var today = new Date();
-                var maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-
-                // Fetch disabled dates
-                $.ajax({
-                    url: "/disabledatepromo/" + id, // Use the appropriate URL for the disabledate route
-                    type: "GET",
-                    success: function(response) {
-                        var disabledDates = response.disabledDates;
-
-                        $("#datefrom, #dateto").datepicker("destroy");
-                        
-                        $("#datefrom").datepicker({
-                            minDate: 0,
-                            maxDate: maxDate,
-                            dateFormat: "yy-mm-dd",
-                            beforeShow: function(input, inst) {
-                                inst.dpDiv.css({
-                                    "background-color": "#dce0df"
-                                });
-                            },
-                            beforeShowDay: function(date) {
-                                var string = jQuery.datepicker.formatDate('yy-mm-dd', date);
-                                var isDisabled = (disabledDates.indexOf(string) !== -1);
-                                return [!isDisabled];
-                            },
-                            onSelect: function(selectedDate) {
-                                $("#dateto").datepicker("option", "minDate", selectedDate);
-                            }
-                        });
-
-                        $("#dateto").datepicker({
-                            minDate: 0,
-                            maxDate: maxDate,
-                            dateFormat: "yy-mm-dd",
-                            beforeShow: function(input, inst) {
-                                inst.dpDiv.css({
-                                    "background-color": "#dce0df"
-                                });
-                            },
-                            beforeShowDay: function(date) {
-                                var string = jQuery.datepicker.formatDate('yy-mm-dd', date);
-                                var isDisabled = (disabledDates.indexOf(string) !== -1);
-                                return [!isDisabled];
-                            },
-                            onSelect: function(selectedDate) {
-                                $("#datefrom").datepicker("option", "maxDate", selectedDate);
-                            }
-                        });
-                    },
-                    error: function() {
-                        // Handle error
-                    }
-                });
-                
-                $('#promoform').attr('action','editpromo/'+id);
-                $('#promomodal').modal('show');
-            });
-
+        $(document).ready(function () {
+            $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
             $('.alert').delay(3000).fadeOut()
         });
+
     </script>
 @endsection
