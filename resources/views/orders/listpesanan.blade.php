@@ -78,14 +78,15 @@
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Status</label>
-                                    <select name="status" id="status" class="form-control" required>
+                                    <select name="status" id="status" class="form-control" style="width: 200px;" required>
                                         <option value="" selected disabled>Pilih Status</option>
                                         <option value="Pending">Pending</option>
-                                        <option value="Pending">Preparing</option>
-                                        <option value="Pending">Delivering</option>
-                                        <option value="Pending">Delivered</option>
+                                        <option value="Preparing">Preparing</option>
+                                        <option value="Delivering">Delivering</option>
+                                        <option value="Delivered">Delivered</option>
                                     </select>
                                 </div>
+
 
                                 <div class="col-12 d-flex justify-content-end">
                                     <button type="submit" class="btn btn-primary">Simpan</button>

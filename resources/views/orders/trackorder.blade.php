@@ -49,7 +49,7 @@
                                     <td>{{ $list->quantity }}</td>
                                     <td>{{ $list->delivery_status }}</td>
                                     <td>{{ $list->order_description }}</td>
-                                    <td>{{ $list->created_at }}</td>
+                                    <td>{{ $list->updated_at }}</td>
                                 </tr>
                             @endforeach
                             </tbody>

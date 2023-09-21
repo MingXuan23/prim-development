@@ -654,11 +654,9 @@ Route::group(['prefix' => 'orders'], function () {
         Route::get('/addmenu/{id}', 'OrderSController@addmenu')->name('orders.addmenu');
         Route::post('/processaddmenu/{id}', 'OrderSController@processaddmenu')->name('orders.processaddmenu');
         Route::post('/editmenu', 'OrderSController@editmenu')->name('orders.editmenu');
-        //uruspesanan
         Route::get('/uruspesanan', 'OrderSController@uruspesanan')->name('orders.uruspesanan');
         Route::get('/listpesanan/{id}', 'OrderSController@listpesanan')->name('orders.listpesanan');
         Route::post('/editpesanan', 'OrderSController@editpesanan')->name('orders.editpesanan');
-
         Route::get('/laporanjualan', 'OrderSController@laporanjualan')->name('orders.laporanjualan');
         Route::get('/salesreport/{id}/{start}/{end}', 'OrderSController@salesreport')->name('orders.salesreport');
         Route::get('/buatpesanan', 'OrderSController@buatpesanan')->name('orders.buatpesanan');

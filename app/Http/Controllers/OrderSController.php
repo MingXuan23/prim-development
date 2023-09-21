@@ -143,10 +143,10 @@ class OrderSController extends Controller
         $userId = Auth::id();
         $data = Order::join('order_dish as od', 'od.order_id', '=', 'orders.id')
         ->join('dish_available as da', 'da.id', '=', 'orders.dish_available_id')
-        ->join('dishes as d', 'd.id', '=', 'order_dish.dish_id')
-        ->where('organ_id',$organizationId)
+        ->join('dishes as d', 'd.id', '=', 'od.dish_id') // Corrected 'order_dish' to 'od'
+        ->where('orders.organ_id', $organizationId)
         ->select('orders.id', 'd.name as dishname', 'od.quantity', 'da.date', 'da.time', 'da.delivery_address', 'orders.delivery_status')
-        ->groupBy('orders.id')
+        ->groupBy('orders.id', 'd.name', 'od.quantity', 'da.date', 'da.time', 'da.delivery_address', 'orders.delivery_status') // Added missing columns in GROUP BY
         ->get();
 
         $org_name = Organization::where('id',$organizationId)
@@ -398,6 +398,7 @@ class OrderSController extends Controller
         $data = DB::table('dishes')
             ->join('order_dish', 'dishes.id', '=', 'order_dish.dish_id')
             ->join('orders', 'orders.id', '=', 'order_dish.order_id')
+            ->where('orders.user_id', $userId)
             ->select('dishes.name', 'order_dish.quantity', 'orders.delivery_status','orders.order_description','orders.updated_at')
             ->get();    
 
