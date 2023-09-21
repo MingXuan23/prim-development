@@ -196,17 +196,17 @@ class OrderSController extends Controller
     }
 
     public function salesreport($id,$start,$end){
-        dd($id,$start,$end);
+        //dd($id,$start,$end);
         $checkinTimestamp = strtotime($start);
         $checkoutTimestamp = strtotime($end);
         
         $salesData = DB::table('order_dish')
-            ->join('orders', 'order_dish.order_id', '=', 'orders.id')
-            ->join('dishes', 'order_dish.dish_id', '=', 'dishes.id')
-            ->select(DB::raw('dishes.name as dish'), DB::raw('DATE(order_dish.updated_at) as date'), DB::raw('SUM(order_dish.totalprice) as total_sales'))
-            ->where('order.transaction_id', null)
+            ->join('orders', 'orders.id', '=', 'order_dish.order_id')
+            ->join('dishes', 'dishes.id', '=', 'order_dish.dish_id')
+            ->select(DB::raw('DATE(order_dish.updated_at) as date'), DB::raw('SUM(order_dish.quantity*dishes.price) as total_sales'))
+            //->where('order.transaction_id', null)
             // ->whereNotNull('order.transaction_id')
-            ->where('dishes.organ_id', $id)
+            ->where('orders.organ_id', $id)
             ->whereBetween(DB::raw('DATE(order_dish.updated_at)'), [date('Y-m-d', $checkinTimestamp), date('Y-m-d', $checkoutTimestamp)])
             ->groupBy(DB::raw('DATE(order_dish.updated_at)'))
             ->get();
