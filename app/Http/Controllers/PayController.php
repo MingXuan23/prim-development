@@ -561,7 +561,7 @@ class PayController extends AppBaseController
         else if($request->desc == 'Bus')
         {
             $bus = Bus_Booking::find($request->bookingid);
-            $user = User::find($grab->id_user);
+            $user = User::find($bus->id_user);
             $basorg = Bus::find($bus->id_bus);
         
             $bookingId = $request->bookingid;
