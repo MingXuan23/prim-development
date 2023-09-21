@@ -71,6 +71,45 @@ class BusController extends Controller
         return $pdf->stream('passengerlistpdf.pdf');
     }
 
+    public function checksales()
+    {
+        $orgtype = 'Bas';
+        $userId = Auth::id();
+
+        $org = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+
+        return view('bus.tunjuksales', compact('org'));
+    }
+
+    public function bussales(Request $request)
+    {
+        $org = $request->input('org');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+    
+        // Fetch sales data from the database
+        $salesData = DB::table('bus_bookings')
+        ->join('buses', 'bus_bookings.id_bus', '=', 'buses.id')
+        ->select('bus_bookings.book_date', DB::raw('SUM(buses.price_per_seat) as total_sales'))
+        ->whereBetween('bus_bookings.book_date', [$startDate, $endDate])
+        ->where('buses.id_organizations', $org)
+        ->groupBy('bus_bookings.book_date')
+        ->get();
+    
+        // Render the graph using a charting library like Chart.js
+        // You can pass $salesData to your view and use JavaScript to render the graph.
+    
+        return view('bus.tunjuksales', compact('salesData','org'));
+    }
+
     public function selectbookbus($id)
     {
         $userId = Auth::id();

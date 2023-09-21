@@ -621,6 +621,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('/grab-bayartempahan','GrabStudentController@grabbayartempahan')->name('grab.bayartempahan');
     Route::post('/passengerpilihtempahan-grab/{id}','GrabStudentController@passengerpilihtempahan')->name('passengerpilihtempahan-grab/{id}');
     Route::post('/passengerbayartempahan-grab/{id}','GrabStudentController@passengerbayartempahan')->name('passengerbayartempahan-grab/{id}');
+    Route::get('/grab-checksales','GrabStudentController@checksales')->name('grab.checksales');
+    Route::post('/grab-sales', 'GrabStudentController@grabsales')->name('generate-sales-graph');
 
     Route::get('/bus-setbus','BusController@setbus')->name('bus.setinsert');
     Route::post('/bus-insertbus','BusController@insertbus')->name('bus.insert');
@@ -639,6 +641,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('/bayar-bus','BusController@makepaymentbus')->name('bayar.bus');
     Route::get('/bus-listpassenger','BusController@listpassenger')->name('bus.listpassenger');
     Route::post('/passengerlist-bus/{id}','BusController@listpassengerbus')->name('passengerlist-bus/{id}');
+    Route::get('/bus-checksales','BusController@checksales')->name('bus.checksales');
+    Route::post('/bus-sales', 'BusController@bussales')->name('generate-sales-busgraph');
 
 
     
