@@ -696,6 +696,22 @@ class PayController extends AppBaseController
                 ]);
                
             }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'G')
+            {
+                $result = DB::table('grab_bookings')
+                ->where('id', $bookingId)
+                ->update([
+                    'transactionid' => $transaction->id
+                ]);           
+            }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'B')
+            {
+                $result = DB::table('bus_bookings')
+                ->where('id', $bookingId)
+                ->update([
+                    'transactionid' => $transaction->id
+                ]);           
+            }
             else {
                 $transaction->donation()->attach($id, ['payment_type_id' => 1]);
             }
@@ -1090,6 +1106,12 @@ class PayController extends AppBaseController
                             {
                                 Mail::to($transaction->email)->send(new ResitBayaranGrab($booking, $user));
                             }
+
+                            $result = DB::table('grab_bookings')
+                            ->where('id', $$booking->id)
+                            ->update([
+                            'status' => "PAID"
+                            ]);   
                             
         
                             return view('grab.resitbayaran', compact('grab_booking', 'booking', 'user'));
@@ -1118,6 +1140,12 @@ class PayController extends AppBaseController
                             {
                                 Mail::to($transaction->email)->send(new ResitBayaranBus($booking, $user));
                             }
+
+                            $result = DB::table('bus_bookings')
+                            ->where('id', $$booking->id)
+                            ->update([
+                            'status' => "PAID"
+                            ]);
                             
         
                             return view('bus.resitbayaran', compact('bus_booking', 'booking', 'user'));
