@@ -543,15 +543,13 @@ class PayController extends AppBaseController
         {
             $grab = Grab_Booking::find($request->bookingid);
             $user = User::find($grab->id_user);
-            $room = Destination_Offer::join('grab_students', 'destination_offers.id_grab_student', '=', 'grab_students.id')
-                    ->where('destination_offers.id', $grab->id_destination_offer)
-                    ->select('grab_students.*','destination_offers.price_destination')
-                    ->first();
-
-            $request->amount = $room->price_destination;
+            $destination = Destination_Offer::find($grab->id_destination_offer);
+            $kereta = Grab_Student::find($destination->id_grab_student);
+                   
+            $request->amount = $destination->price_destination;
             $bookingId = $request->bookingid;
 
-            $organization = Organization::find($room->id_organizations);
+            $organization = Organization::find($kereta->id_organizations);
             $fpx_buyerEmail      = $user->email;
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
@@ -565,13 +563,12 @@ class PayController extends AppBaseController
         {
             $bus = Bus_Booking::find($request->bookingid);
             $user = User::find($grab->id_user);
-            $room = Bus::where('id', $bus->id_bus)
-                    ->first();
+            $basorg = Bus::find($bus->id_bus);
         
             $bookingId = $request->bookingid;
-            $request->amount = $room->price_per_seat;
+            $request->amount = $basorg->price_per_seat;
 
-            $organization = Organization::find($room->id_organizations);
+            $organization = Organization::find($basorg->id_organizations);
             $fpx_buyerEmail      = $user->email;
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
