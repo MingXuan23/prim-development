@@ -63,13 +63,7 @@
                       <td>{{ $item->available_time}}</td>
                       <td>RM {{ $item->price_destination}}</td>
                       <td>{{ $item->book_date}}</td>
-                      <td>
-                    @if($index === 0)
-                    <button>Cancel Booking</button>
-                    @else
-                   Status
-                    @endif
-                </td>
+                      <td>{{ $item->status}}</td>
                 </tr>
             @endforeach
         </tbody>

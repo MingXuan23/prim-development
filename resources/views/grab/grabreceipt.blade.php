@@ -158,7 +158,7 @@
         @foreach($data as $item)
         <input type="hidden" name="desc" id="desc" value="Grab Student">
         <input type="hidden" name="bookingid" id = "bookingid" value="{{ $item->bookid }}">
-        <input type="hidden" name="amount" id="amount" value="{ $item->price_destination }}">
+        <input type="hidden" name="amount" id="amount" value="{{ $item->price_destination }}">
         @endforeach
         <div class="card mb-4 border">
           <div class="card-body p-4">
