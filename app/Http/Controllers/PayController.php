@@ -576,6 +576,29 @@ class PayController extends AppBaseController
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         }
+        else if($request->desc == 'OrderS')
+        {
+            $orders = Order::find($request->orderid);
+            $user = User::find($orders->user_id);
+            
+            $amount = $request->amount;
+            $orderId = $request->orderId;
+
+            DB::table('orders')->where('id', $orderId)->update([
+                'updated_at' => Carbon::now(),
+                'status' => 'Preparing'
+            ]);
+
+            $organization = Organization::find($orders->organ_id);
+            $fpx_buyerEmail      = $user->email;
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
+
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
+        }
         
 
         $fpx_msgType        = "AR";
@@ -695,6 +718,31 @@ class PayController extends AppBaseController
                     'transactionid' => $transaction->id
                 ]);
                
+            }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'O')
+            {
+                $result = DB::table('orders')
+                ->where('id', $orderId)
+                ->update([
+                    'transaction_id' => $transaction->id
+                ]);
+               
+            }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'G')
+            {
+                $result = DB::table('grab_bookings')
+                ->where('id', $bookingId)
+                ->update([
+                    'transactionid' => $transaction->id
+                ]);           
+            }
+            else if (substr($fpx_sellerExOrderNo, 0, 1) == 'B')
+            {
+                $result = DB::table('bus_bookings')
+                ->where('id', $bookingId)
+                ->update([
+                    'transactionid' => $transaction->id
+                ]);           
             }
             else {
                 $transaction->donation()->attach($id, ['payment_type_id' => 1]);
@@ -1090,6 +1138,12 @@ class PayController extends AppBaseController
                             {
                                 Mail::to($transaction->email)->send(new ResitBayaranGrab($booking, $user));
                             }
+
+                            $result = DB::table('grab_bookings')
+                            ->where('id', $$booking->id)
+                            ->update([
+                            'status' => "PAID"
+                            ]);   
                             
         
                             return view('grab.resitbayaran', compact('grab_booking', 'booking', 'user'));
@@ -1118,11 +1172,47 @@ class PayController extends AppBaseController
                             {
                                 Mail::to($transaction->email)->send(new ResitBayaranBus($booking, $user));
                             }
+
+                            $result = DB::table('bus_bookings')
+                            ->where('id', $$booking->id)
+                            ->update([
+                            'status' => "PAID"
+                            ]);
                             
         
                             return view('bus.resitbayaran', compact('bus_booking', 'booking', 'user'));
         
                             break;
+                    case 'OrderS':
+                        $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                        $transaction->transac_no = $request->fpx_fpxTxnId;
+                        $transaction->status = "Success";
+                        $transaction->save();
+    
+                        $userid = $transaction->user_id;
+    
+                        $orders = Order::where('transaction_id', '=', $transaction->id)->first();
+                        
+                        $user = User::find($transaction->user_id);
+                        $organization = Organization::find($orders->organ_id);
+                        
+                        $booking_order = Organization::join('orders', 'organizations.id', '=', 'orders.organ_id')
+                        ->join('order_dish','orders.id','=','order_dish.order_id')
+                        ->join('dishes','order_dish.dish_id','=','dishes.id')
+                        ->where('orders.user_id', $userId)
+                        ->where('orders.id',$orderId)
+                        ->select('organizations.id as orgid','organizations.nama','organizations.address', 'orders.id as orderid', 'dishes.name', 'orders.order_description', 'order_dish.quantity', 'dishes.price', 'orders.delivery_status','order_dish.id as odid','order_dish.updated_at')
+                        ->get();
+
+                        if($transaction->email != NULL)
+                        {
+                            Mail::to($transaction->email)->send(new OrderSReceipt($orders, $organization, $transaction, $user));
+                        }
+                        
+    
+                        return view('orders.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
+    
+                    break;
                         
                 default:
                     return view('errors.500');

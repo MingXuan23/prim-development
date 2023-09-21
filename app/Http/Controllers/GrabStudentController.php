@@ -244,7 +244,7 @@ class GrabStudentController extends Controller
         $data =  Grab_Booking::join('destination_offers', 'destination_offers.id', '=', 'grab_bookings.id_destination_offer')
         ->join('users','users.id','=','grab_bookings.id_user')
         ->join('grab_students','grab_students.id','=','destination_offers.id_grab_student')
-        ->select( 'users.name','grab_students.car_brand','grab_students.car_name','destination_offers.pick_up_point','destination_offers.available_time','destination_offers.price_destination','destination_offers.destination_name','grab_bookings.book_date')
+        ->select( 'users.name','grab_students.car_brand','grab_students.car_name','destination_offers.pick_up_point','destination_offers.available_time','destination_offers.price_destination','destination_offers.destination_name','grab_bookings.book_date','grab_bookings.status')
         ->orderBy('grab_bookings.id','desc')
         ->get();
         return view("grab.checkpassenger", compact('data'));
