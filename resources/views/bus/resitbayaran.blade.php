@@ -57,7 +57,7 @@
                                     </tr>
                                 </thead>
                                     <tr>
-                                    <td>{{ $item->trip_number }}-{{ $item->bookid }}{{ $item->available_seat }}{{ $item->booked_seat }}</td>
+                                    <td>T-{{ $item->trip_number }}-{{ $item->bookid }}{{ $item->available_seat }}{{ $item->booked_seat }}</td>
                                     <td>{{ $item->bus_registration_number }}</td>
                                     <td>{{ $item->trip_number }}</td>
                                     <td>{{ $item->bus_depart_from }}</td>

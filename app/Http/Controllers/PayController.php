@@ -545,9 +545,10 @@ class PayController extends AppBaseController
             $user = User::find($grab->id_user);
             $room = Destination_Offer::join('grab_students', 'destination_offers.id_grab_student', '=', 'grab_students.id')
                     ->where('destination_offers.id', $grab->id_destination_offer)
-                    ->select('grab_students.*')
+                    ->select('grab_students.*','destination_offers.price_destination')
                     ->first();
-        
+
+            $request->amount = $room->price_destination;
             $bookingId = $request->bookingid;
 
             $organization = Organization::find($room->id_organizations);
@@ -568,6 +569,7 @@ class PayController extends AppBaseController
                     ->first();
         
             $bookingId = $request->bookingid;
+            $request->amount = $room->price_per_seat;
 
             $organization = Organization::find($room->id_organizations);
             $fpx_buyerEmail      = $user->email;

@@ -53,6 +53,24 @@ class BusController extends Controller
         return view("bus.manageselectedbus", compact('databus'));
     }
 
+    public function listpassenger()
+    {
+        $data = Bus::all();
+        return view("bus.passengerlist", compact('data'));
+    }
+
+    public function listpassengerbus($id)
+    {
+        $bus_booking = Bus::join('bus_bookings','buses.id','=','bus_bookings.id_bus')
+        ->join('users','users.id','=','bus_bookings.id_user')
+        ->where('buses.id',$id) 
+        ->select('bus_bookings.id as bookid', 'buses.bus_registration_number', 'buses.booked_seat', 'users.name', 'buses.available_seat', 'buses.trip_number', 'buses.bus_depart_from', 'buses.bus_destination', 'buses.departure_time', 'buses.departure_date', 'bus_bookings.book_date')
+        ->get();
+    
+        $pdf = PDF::loadView('bus.passengerlistpdf', ['data' => $bus_booking]);
+        return $pdf->stream('passengerlistpdf.pdf');
+    }
+
     public function selectbookbus($id)
     {
         $userId = Auth::id();
