@@ -556,7 +556,7 @@ class PayController extends AppBaseController
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
+            $fpx_sellerOrderNo  = "GSPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -576,7 +576,7 @@ class PayController extends AppBaseController
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
+            $fpx_sellerOrderNo  = "BUPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
