@@ -96,9 +96,8 @@
                                         <th>Nama Organisasi</th>
                                         <th>Alamat</th>
                                         <th>Nama Menu</th>
-                                        <th>Note Tambahan</th>
                                         <th>Kuantiti</th>
-                                        <th>Masa Pesanan</th>
+                                        <th>Waktu Pesanan</th>
                                         <th>Harga (RM)</th>
                                     </tr>
                                     @foreach ($booking_order as $item)
@@ -109,7 +108,6 @@
                                         </td>
                                         <td style="text-align: center">{{ $item->address }}</td>
                                         <td style="text-align: center">{{ $item->name }}</td>
-                                        <td style="text-align: center">{{ $item->order_description }}</td>
                                         <td style="text-align: center">{{ $item->quantity }}</td>
                                         <td style="text-align: center">{{ $item->updated_at }}</td>
                                         <td style="text-align: center">{{ $item->price }}</td>
