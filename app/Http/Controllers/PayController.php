@@ -546,7 +546,6 @@ class PayController extends AppBaseController
             $destination = Destination_Offer::find($grab->id_destination_offer);
             $kereta = Grab_Student::find($destination->id_grab_student);
                    
-            $request->amount = $destination->price_destination;
             $bookingId = $request->bookingid;
 
             $organization = Organization::find($kereta->id_organizations);
@@ -566,8 +565,7 @@ class PayController extends AppBaseController
             $basorg = Bus::find($bus->id_bus);
         
             $bookingId = $request->bookingid;
-            $request->amount = $basorg->price_per_seat;
-
+          
             $organization = Organization::find($basorg->id_organizations);
             $fpx_buyerEmail      = $user->email;
             $telno               = $user->telno;
