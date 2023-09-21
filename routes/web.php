@@ -621,6 +621,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('/grab-bayartempahan','GrabStudentController@grabbayartempahan')->name('grab.bayartempahan');
     Route::post('/passengerpilihtempahan-grab/{id}','GrabStudentController@passengerpilihtempahan')->name('passengerpilihtempahan-grab/{id}');
     Route::post('/passengerbayartempahan-grab/{id}','GrabStudentController@passengerbayartempahan')->name('passengerbayartempahan-grab/{id}');
+    Route::get('/grab-checksales','GrabStudentController@checksales')->name('grab.checksales');
+    Route::post('/grab-sales', 'GrabStudentController@grabsales')->name('generate-sales-graph');
 
     Route::get('/bus-setbus','BusController@setbus')->name('bus.setinsert');
     Route::post('/bus-insertbus','BusController@insertbus')->name('bus.insert');
@@ -637,6 +639,10 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('/passengerpilihtempahan-bus/{id}','BusController@buspilihtempahan')->name('passengerpilihtempahan-bus/{id}');
     Route::post('/passengerbayartempahan-bus/{id}','BusController@passengerbusbayartempahan')->name('passengerbayartempahan-bus/{id}');
     Route::get('/bayar-bus','BusController@makepaymentbus')->name('bayar.bus');
+    Route::get('/bus-listpassenger','BusController@listpassenger')->name('bus.listpassenger');
+    Route::post('/passengerlist-bus/{id}','BusController@listpassengerbus')->name('passengerlist-bus/{id}');
+    Route::get('/bus-checksales','BusController@checksales')->name('bus.checksales');
+    Route::post('/bus-sales', 'BusController@bussales')->name('generate-sales-busgraph');
 
 
     
@@ -651,6 +657,12 @@ Route::group(['prefix' => 'orders'], function () {
         //uruspesanan
         Route::get('/laporanjualan', 'OrderSController@laporanjualan')->name('orders.laporanjualan');
         Route::get('/salesreport/{id}/{start}/{end}', 'OrderSController@salesreport')->name('orders.salesreport');
+        Route::get('/buatpesanan', 'OrderSController@buatpesanan')->name('orders.buatpesanan');
+        Route::get('/pilihlokasi/{id}', 'OrderSController@pilihlokasi')->name('orders.pilihlokasi');
+        Route::post('/addorder/{id}', 'OrderSController@addorder')->name('orders.addorder');
+        Route::post('/extraorder/{id}/{id2}', 'OrderSController@extraorder')->name('orders.extraorder');
+        Route::get('/checkout/{id}', 'OrderSController@checkout')->name('orders.checkout');
+
     });
 });
 

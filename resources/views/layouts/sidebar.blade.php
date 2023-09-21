@@ -652,6 +652,12 @@
                             <span>Notify Penumpang</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('grab.checksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Semak Untung</span>
+                        </a>
+                    </li>
                     @endrole 
                     <li>
                         <a href="{{ route('book.grab') }}" class=" waves-effect">
@@ -690,7 +696,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('bus.listpassenger') }}" class=" waves-effect">
                             <i class="mdi mdi-account-multiple"></i>
                             <span>Senarai Penumpang</span>
                         </a>
@@ -699,6 +705,12 @@
                         <a href="{{ route('bus.notifypassenger') }}" class=" waves-effect">
                             <i class="mdi mdi-comment-alert"></i>
                             <span>Notify Penumpang</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.checksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Semak Untung</span>
                         </a>
                     </li>
                     @endrole 
@@ -746,17 +758,17 @@
                     </li>
                     @endrole
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('orders.buatpesanan') }}" class=" waves-effect">
                             <i class="mdi mdi-note-plus"></i>
                             <span>Buat Pesanan</span>
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="" class=" waves-effect">
                             <i class="mdi mdi-cart"></i>
                             <span>Cart</span>
                         </a>
-                    </li>
+                    </li> -->
                     <li>
                         <a href="" class=" waves-effect">
                             <i class="mdi mdi-package-variant-closed"></i>

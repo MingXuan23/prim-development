@@ -545,9 +545,10 @@ class PayController extends AppBaseController
             $user = User::find($grab->id_user);
             $room = Destination_Offer::join('grab_students', 'destination_offers.id_grab_student', '=', 'grab_students.id')
                     ->where('destination_offers.id', $grab->id_destination_offer)
-                    ->select('grab_students.*')
+                    ->select('grab_students.*','destination_offers.price_destination')
                     ->first();
-        
+
+            $request->amount = $room->price_destination;
             $bookingId = $request->bookingid;
 
             $organization = Organization::find($room->id_organizations);
@@ -555,7 +556,7 @@ class PayController extends AppBaseController
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
+            $fpx_sellerOrderNo  = "GSPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -568,13 +569,14 @@ class PayController extends AppBaseController
                     ->first();
         
             $bookingId = $request->bookingid;
+            $request->amount = $room->price_per_seat;
 
             $organization = Organization::find($room->id_organizations);
             $fpx_buyerEmail      = $user->email;
             $telno               = $user->telno;
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-            $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
+            $fpx_sellerOrderNo  = "BUPRIM" . date('YmdHis') . rand(10000, 99999);
 
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
