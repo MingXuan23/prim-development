@@ -33,7 +33,7 @@
               <p>{{ Session::get('error') }}</p>
             </div>
           @endif
-
+          <div class="flash-message"></div>
             <form method="post" action="{{route('homestay.insertpromotion')}}" enctype="multipart/form-data"
                 class="form-validation">
                 {{csrf_field()}}
