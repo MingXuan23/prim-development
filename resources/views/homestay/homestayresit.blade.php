@@ -108,7 +108,7 @@
               <p>{{ Session::get('error') }}</p>
             </div>
           @endif
-
+          <div class="flash-message"></div>
           <div class="table-responsive">
             <table class="table table-borderless responsive" id="cartTable" width="100%" cellspacing="0">
                 <thead class="thead-dark">

@@ -63,7 +63,7 @@ class HomestayController extends Controller
             'promotionname' => 'required',
             'datefrom' => 'required',
             'dateto' => 'required',
-            'discount' => 'required'
+            'discount' => 'required|numeric|min:1|max:100'
         ]);
 
         
@@ -116,7 +116,7 @@ public function addroom(Request $request)
         'roomname' => 'required',
         'roompax' => 'required',
         'details' => 'required',
-        'price' => 'required'
+        'price' => 'required|numeric|min:0'
     ]);
 
     $status = 'Available';
@@ -241,7 +241,7 @@ public function editpromo(Request $request,$promotionid)
         $request->validate([
             'roompax' => 'required',
             'details' => 'required',
-            'price' => 'required|numeric'
+            'price' => 'required|numeric|min:0'
         ]);
 
         $roompax = $request->input('roompax');

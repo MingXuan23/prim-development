@@ -33,6 +33,7 @@
               <p>{{ Session::get('error') }}</p>
             </div>
           @endif
+          <div class="flash-message"></div>
 
             <form method="post" action="{{route('homestay.addroom')}}" enctype="multipart/form-data"
                 class="form-validation">
