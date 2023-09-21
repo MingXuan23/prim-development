@@ -187,4 +187,36 @@ class OrderSController extends Controller
         
         return response()->json($chartData);
     }
+
+    public function buatpesanan(){
+        $orgtype = 'OrderS';
+        $data = DB::table('organizations as o')
+        ->leftJoin('type_organizations as to', 'o.type_org', '=', 'to.id')
+        ->select("o.*")
+        ->distinct()
+        ->where('to.nama', $orgtype)
+        ->get();
+
+        return view('orders.pesanan', compact('data'));
+    }
+
+    public function pilihlokasi($organizationId){
+        //dd($organizationId);
+        $dishes = DB::table('dishes')
+        ->where('organ_id', $organizationId)
+        ->get();
+
+        $latitudeLongitude = "2.3138° N, 102.3211° E";
+        list($latitude, $longitude) = sscanf($latitudeLongitude, "%f° N, %f° E");
+
+        // Pass the converted latitude and longitude to the view
+        $apiKey = config('app.google_maps_api_key');
+        $zoom = 15;
+
+        return view('orders.pilihlokasi', compact('dishes', 'apiKey', 'latitude', 'longitude', 'zoom','organizationId'));
+    }
+
+    public function addorder(Request $request, $organizationId){
+        dd($request->all());
+    }
 }

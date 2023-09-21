@@ -746,17 +746,17 @@
                     </li>
                     @endrole
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('orders.buatpesanan') }}" class=" waves-effect">
                             <i class="mdi mdi-note-plus"></i>
                             <span>Buat Pesanan</span>
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="" class=" waves-effect">
                             <i class="mdi mdi-cart"></i>
                             <span>Cart</span>
                         </a>
-                    </li>
+                    </li> -->
                     <li>
                         <a href="" class=" waves-effect">
                             <i class="mdi mdi-package-variant-closed"></i>

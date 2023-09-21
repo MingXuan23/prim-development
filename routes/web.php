@@ -651,6 +651,9 @@ Route::group(['prefix' => 'orders'], function () {
         //uruspesanan
         Route::get('/laporanjualan', 'OrderSController@laporanjualan')->name('orders.laporanjualan');
         Route::get('/salesreport/{id}/{start}/{end}', 'OrderSController@salesreport')->name('orders.salesreport');
+        Route::get('/buatpesanan', 'OrderSController@buatpesanan')->name('orders.buatpesanan');
+        Route::get('/pilihlokasi/{id}', 'OrderSController@pilihlokasi')->name('orders.pilihlokasi');
+        Route::post('/addorder/{id}', 'OrderSController@addorder')->name('orders.addorder');
     });
 });
 
