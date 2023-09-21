@@ -650,6 +650,9 @@ Route::group(['prefix' => 'orders'], function () {
         Route::get('/addmenu/{id}', 'OrderSController@addmenu')->name('orders.addmenu');
         Route::post('/processaddmenu/{id}', 'OrderSController@processaddmenu')->name('orders.processaddmenu');
         Route::post('/editmenu', 'OrderSController@editmenu')->name('orders.editmenu');
+        //uruspesanan
+        Route::get('/laporanjualan', 'OrderSController@laporanjualan')->name('orders.laporanjualan');
+        Route::get('/salesreport/{id}/{start}/{end}', 'OrderSController@salesreport')->name('orders.salesreport');
     });
 });
 

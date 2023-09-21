@@ -33,12 +33,14 @@ use GuzzleHttp\Client;
 class OrderSController extends Controller
 {   
     public function managemenu(){
+        $orgtype = 'OrderS';
         $userId = Auth::id();
         $data = DB::table('organizations as o')
         ->leftJoin('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+        ->leftJoin('type_organizations as to', 'o.type_org', '=', 'to.id')
         ->select("o.*")
         ->distinct()
-        ->where('o.type_org', '12')
+        ->where('to.nama', $orgtype)
         ->where('ou.user_id',$userId)
         ->get();
 
@@ -120,5 +122,69 @@ class OrderSController extends Controller
         } else {
             return back()->withInput()->with('error', 'Menu Gagal Disunting');
         }        
+    }
+
+    public function laporanjualan(){
+        $orgtype = 'OrderS';
+        $userId = Auth::id();
+
+        $data = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+
+        return view('orders.laporanjualan', compact('data'));
+    }
+
+    public function salesreport($id,$start,$end){
+        dd($id,$start,$end);
+        $checkinTimestamp = strtotime($start);
+        $checkoutTimestamp = strtotime($end);
+        
+        $salesData = DB::table('order_dish')
+            ->join('orders', 'order_dish.order_id', '=', 'orders.id')
+            ->join('dishes', 'order_dish.dish_id', '=', 'dishes.id')
+            ->select(DB::raw('dishes.name as dish'), DB::raw('DATE(order_dish.updated_at) as date'), DB::raw('SUM(order_dish.totalprice) as total_sales'))
+            ->where('order.transaction_id', null)
+            // ->whereNotNull('order.transaction_id')
+            ->where('dishes.organ_id', $id)
+            ->whereBetween(DB::raw('DATE(order_dish.updated_at)'), [date('Y-m-d', $checkinTimestamp), date('Y-m-d', $checkoutTimestamp)])
+            ->groupBy(DB::raw('DATE(order_dish.updated_at)'))
+            ->get();
+        
+        $dateLabels = [];
+        $currentDate = $checkinTimestamp;
+        while ($currentDate <= $checkoutTimestamp) {
+            $dateLabels[] = date('Y-m-d', $currentDate);
+            $currentDate += 86400;
+        }
+        
+        $dailySales = [];
+        foreach ($dateLabels as $dateLabel) {
+            $found = false;
+            foreach ($salesData as $entry) {
+                if ($entry->date === $dateLabel) {
+                    $dailySales[] = $entry->total_sales;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $dailySales[] = 0; // No sales for this date
+            }
+        }
+        
+        // Prepare the data for the chart
+        $chartData = [
+            'labels' => $dateLabels,
+            'dataset' => $dailySales,
+        ];
+        
+        return response()->json($chartData);
     }
 }
