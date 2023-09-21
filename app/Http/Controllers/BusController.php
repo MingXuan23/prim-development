@@ -186,6 +186,7 @@ class BusController extends Controller
                 })
                 ->where('status', '!=', 'NOT AVAILABLE')
                 ->where('status', '!=', 'FULLY BOOK')
+                ->where('status', '!=', 'NEWLY INSERT')
                 ->where('bus_depart_from', '=', $selectedPickupPoint)
                 ->where('bus_destination', '=', $selectedDestination)
                 ->get();
@@ -196,6 +197,7 @@ class BusController extends Controller
                 // Fetch data matching both selections
                 $matchedData = Bus::where('status', '!=', 'NOT AVAILABLE')
                 ->where('status', '!=', 'FULLY BOOK')
+                ->where('status', '!=', 'NEWLY INSERT')
                 ->get();
         }
 

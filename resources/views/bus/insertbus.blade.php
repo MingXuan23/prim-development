@@ -73,7 +73,7 @@
                     </div><br>
                     <div class="form-group">
                     <label>Price Per Seat</label>
-                    <input type="number" class="form-control" aria-describedby="emailHelp" placeholder="Price Per Seat" name="priceperseat">
+                    <input type="number" class="form-control" aria-describedby="emailHelp" placeholder="Price Per Seat" name="priceperseat"  min="0">
                     </div><br>
                     <div class="form-group">
                     @foreach($data as $rows)
@@ -99,5 +99,37 @@
         </div>
     </div>
 </div>
+
+@endsection
+
+@section('script')
+<script>
+   // Get the input element by its ID
+   const dateInput = document.getElementById('date');
+
+// Get the current date in the format "YYYY-MM-DD"
+const currentDate = new Date();
+
+// Add 1 day to the current date
+currentDate.setDate(currentDate.getDate() + 1);
+
+// Format the current date as "YYYY-MM-DD"
+const minDate = currentDate.toISOString().split('T')[0];
+
+// Set the minimum date for the input element to the current date + 1 day
+dateInput.min = minDate;
+
+// Add an event listener to the input element to check for changes
+dateInput.addEventListener('change', function() {
+  // Get the selected date from the input
+  const selectedDate = new Date(dateInput.value);
+
+  // If the selected date is before the current date + 1 day, clear the input value
+  if (selectedDate < currentDate) {
+    alert('Please select a date at least 1 day ahead.');
+    dateInput.value = '';
+  }
+});
+</script>
 
 @endsection

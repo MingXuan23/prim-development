@@ -102,7 +102,7 @@
                 </div><br>
                 <div class="form-group">
                 <label>Price for the Destination</label>
-                <input type="number" class="form-control" aria-describedby="emailHelp" placeholder="Price For Offered Destination" name="price">
+                <input type="number" class="form-control" aria-describedby="emailHelp" placeholder="Price For Offered Destination" name="price"  min="0">
                 <input type="text" hidden class="form-control" aria-describedby="emailHelp" value="NEW" placeholder="Price For Offered Destination" name="status">
                 </div><br>
                 <div class="form-group">

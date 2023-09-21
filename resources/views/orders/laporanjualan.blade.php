@@ -118,15 +118,19 @@
 
             $('#showBtn').click(function() {
                 var orgid = $('#orgid').val();
-                var checkin = $('#startdate').val();
-                var checkout = $('#enddate').val();
+                var startdate = $('#startdate').val();
+                var enddate = $('#enddate').val();
+
+                console.log(orgid);
+                console.log(startdate);
+                console.log(enddate);
 
                 if (myChart) {
                     myChart.destroy();
                 }
 
                 $.ajax({
-                    url: '/orders' + '/salesreport/' + orgid + '/' + checkin + '/' + checkout,
+                    url: 'salesreport/' + orgid + '/' + startdate + '/' + enddate,
                     type: 'GET',
                     dataType: 'json',
                     success: function(chartData) {

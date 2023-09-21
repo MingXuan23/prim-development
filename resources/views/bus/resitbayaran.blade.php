@@ -38,7 +38,7 @@
                                 <h4>{{ $user->name }}</h4>
                             </div>
                             <div class="col-12 pt-3" >
-                                <h4>Resit perjalanan anda ke {{ $item->bus_destination }}</h4>
+                                <h4>Ticket perjalanan anda ke {{ $item->bus_destination }}</h4>
                             </div>
                             <div class="col-12 pt-3">
                             <h4>Berikut adalah butiran tempahan perjalanan anda : </h4>
