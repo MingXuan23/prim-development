@@ -1108,7 +1108,7 @@ class PayController extends AppBaseController
                             }
 
                             $result = DB::table('grab_bookings')
-                            ->where('id', $$booking->id)
+                            ->where('id', $booking->id)
                             ->update([
                             'status' => "PAID"
                             ]);   
@@ -1142,7 +1142,7 @@ class PayController extends AppBaseController
                             }
 
                             $result = DB::table('bus_bookings')
-                            ->where('id', $$booking->id)
+                            ->where('id', $booking->id)
                             ->update([
                             'status' => "PAID"
                             ]);
