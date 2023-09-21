@@ -315,6 +315,27 @@ class OrderSController extends Controller
     }
 
     public function checkout($orderId){
-        dd($orderId);
+        //dd($orderId);
+
+        $userId = Auth::id();
+        $data = Organization::join('orders', 'organizations.id', '=', 'orders.organ_id')
+            ->join('order_dish','orders.id','=','order_dish.order_id')
+            ->join('dishes','order_dish.dish_id','=','dishes.id')
+            ->where('orders.user_id', $userId)
+            ->where('orders.id',$orderId)
+            ->select('organizations.id as orgid','organizations.nama','organizations.address', 'orders.id as orderid', 'dishes.name', 'orders.order_description', 'order_dish.quantity', 'dishes.price', 'orders.delivery_status','order_dish.id as odid','order_dish.updated_at')
+            ->get();
+
+        $sum = 0;
+        $totalprice = 0;
+
+        foreach ($data as $record) {
+            $sum = $record->price * $record->quantity;
+            $totalprice += $sum;
+        }
+
+        //return view('homestay.homestayresit',compact('data','bookingid','totalprice'));
+
+        return view('orders.checkout', compact('orderId','data','totalprice'));
     }
 }
