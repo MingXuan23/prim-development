@@ -99,6 +99,16 @@
       <div class="card">
         <div class="card-body">
 
+        @if(count($errors) > 0)
+      <div class="alert alert-danger">
+        <ul>
+          @foreach($errors->all() as $error)
+          <li>{{$error}}</li>
+          @endforeach
+        </ul>
+      </div>
+      @endif
+
           @if(Session::has('success'))
             <div class="alert alert-success">
               <p>{{ Session::get('success') }}</p>
@@ -108,7 +118,7 @@
               <p>{{ Session::get('error') }}</p>
             </div>
           @endif
-
+          <div class="flash-message"></div>
           <div class="table-responsive">
             <table class="table table-borderless responsive" id="cartTable" width="100%" cellspacing="0">
                 <thead class="thead-dark">
