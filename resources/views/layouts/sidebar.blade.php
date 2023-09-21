@@ -690,7 +690,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('bus.listpassenger') }}" class=" waves-effect">
                             <i class="mdi mdi-account-multiple"></i>
                             <span>Senarai Penumpang</span>
                         </a>
