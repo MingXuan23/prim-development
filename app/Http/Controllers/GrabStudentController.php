@@ -250,6 +250,46 @@ class GrabStudentController extends Controller
         return view("grab.checkpassenger", compact('data'));
     }
 
+    public function checksales()
+    {
+        $orgtype = 'Grab Student';
+        $userId = Auth::id();
+
+        $org = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+
+        return view('grab.tunjuksales', compact('org'));
+    }
+
+    public function grabsales(Request $request)
+    {
+        $org = $request->input('org');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+    
+        // Fetch sales data from the database
+        $salesData = DB::table('grab_bookings')
+        ->join('destination_offers', 'grab_bookings.id_destination_offer', '=', 'destination_offers.id')
+        ->join('grab_students', 'destination_offers.id_grab_student', '=', 'grab_students.id')
+        ->select('grab_bookings.book_date', DB::raw('SUM(destination_offers.price_destination) as total_sales'))
+        ->whereBetween('grab_bookings.book_date', [$startDate, $endDate])
+        ->where('grab_students.id_organizations', $org)
+        ->groupBy('grab_bookings.book_date')
+        ->get();
+    
+        // Render the graph using a charting library like Chart.js
+        // You can pass $salesData to your view and use JavaScript to render the graph.
+    
+        return view('grab.tunjuksales', compact('salesData','org'));
+    }
+
 
     public function insertcar(Request $request)
     {

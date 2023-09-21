@@ -652,6 +652,12 @@
                             <span>Notify Penumpang</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('grab.checksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Semak Untung</span>
+                        </a>
+                    </li>
                     @endrole 
                     <li>
                         <a href="{{ route('book.grab') }}" class=" waves-effect">
@@ -699,6 +705,12 @@
                         <a href="{{ route('bus.notifypassenger') }}" class=" waves-effect">
                             <i class="mdi mdi-comment-alert"></i>
                             <span>Notify Penumpang</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.checksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Semak Untung</span>
                         </a>
                     </li>
                     @endrole 
