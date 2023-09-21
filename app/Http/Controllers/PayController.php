@@ -561,7 +561,7 @@ class PayController extends AppBaseController
         else if($request->desc == 'Bus')
         {
             $bus = Bus_Booking::find($request->bookingid);
-            $user = User::find($grab->id_user);
+            $user = User::find($bus->id_user);
             $basorg = Bus::find($bus->id_bus);
         
             $bookingId = $request->bookingid;
@@ -1140,7 +1140,7 @@ class PayController extends AppBaseController
                             }
 
                             $result = DB::table('grab_bookings')
-                            ->where('id', $$booking->id)
+                            ->where('id', $booking->id)
                             ->update([
                             'status' => "PAID"
                             ]);   
@@ -1174,7 +1174,7 @@ class PayController extends AppBaseController
                             }
 
                             $result = DB::table('bus_bookings')
-                            ->where('id', $$booking->id)
+                            ->where('id', $booking->id)
                             ->update([
                             'status' => "PAID"
                             ]);
