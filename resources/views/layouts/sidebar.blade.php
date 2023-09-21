@@ -745,7 +745,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('orders.uruspesanan') }}" class=" waves-effect">
                             <i class="mdi mdi-table-edit"></i>
                             <span>Urus Pesanan</span>
                         </a>
@@ -763,14 +763,8 @@
                             <span>Buat Pesanan</span>
                         </a>
                     </li>
-                    <!-- <li>
-                        <a href="" class=" waves-effect">
-                            <i class="mdi mdi-cart"></i>
-                            <span>Cart</span>
-                        </a>
-                    </li> -->
                     <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('orders.trackorder') }}" class=" waves-effect">
                             <i class="mdi mdi-package-variant-closed"></i>
                             <span>Pesanan</span>
                         </a>

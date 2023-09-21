@@ -124,6 +124,60 @@ class OrderSController extends Controller
         }        
     }
 
+    public function uruspesanan(){
+        $orgtype = 'OrderS';
+        $userId = Auth::id();
+        $data = DB::table('organizations as o')
+        ->leftJoin('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+        ->leftJoin('type_organizations as to', 'o.type_org', '=', 'to.id')
+        ->select("o.*")
+        ->distinct()
+        ->where('to.nama', $orgtype)
+        ->where('ou.user_id',$userId)
+        ->get();
+
+        return view('orders.uruspesanan', compact('data'));
+    }
+
+    public function listpesanan($organizationId){
+        $userId = Auth::id();
+        $data = Order::join('order_dish as od', 'od.order_id', '=', 'orders.id')
+        ->join('dish_available as da', 'da.id', '=', 'orders.dish_available_id')
+        ->join('dishes as d', 'd.id', '=', 'od.dish_id') // Corrected 'order_dish' to 'od'
+        ->where('orders.organ_id', $organizationId)
+        ->select('orders.id', 'd.name as dishname', 'od.quantity', 'da.date', 'da.time', 'da.delivery_address', 'orders.delivery_status')
+        ->groupBy('orders.id', 'd.name', 'od.quantity', 'da.date', 'da.time', 'da.delivery_address', 'orders.delivery_status') // Added missing columns in GROUP BY
+        ->get();
+
+        $org_name = Organization::where('id',$organizationId)
+        ->select('nama')
+        ->get();
+
+        $nama = $org_name->isEmpty() ? '' : $org_name[0]->nama;
+
+        return view('orders.listpesanan', compact('data','nama','organizationId'));
+    }
+
+    public function editpesanan(Request $request){
+        //dd($request->all());
+
+        $request->validate([
+            'status' => 'required'
+        ]);
+        
+        $updatedRows = DB::table('orders')
+            ->where('id', $request->orderid)
+            ->update([
+                'delivery_status' => $request->status
+            ]);
+        
+        if ($updatedRows) {
+            return back()->with('success', 'Status Berjaya Disunting');
+        } else {
+            return back()->withInput()->with('error', 'Status Gagal Disunting');
+        } 
+    }
+    
     public function laporanjualan(){
         $orgtype = 'OrderS';
         $userId = Auth::id();
@@ -335,7 +389,19 @@ class OrderSController extends Controller
         }
 
         //return view('homestay.homestayresit',compact('data','bookingid','totalprice'));
-
         return view('orders.checkout', compact('orderId','data','totalprice'));
+    }
+
+    public function trackorder(){
+        $userId = Auth::id();
+
+        $data = DB::table('dishes')
+            ->join('order_dish', 'dishes.id', '=', 'order_dish.dish_id')
+            ->join('orders', 'orders.id', '=', 'order_dish.order_id')
+            ->where('orders.user_id', $userId)
+            ->select('dishes.name', 'order_dish.quantity', 'orders.delivery_status','orders.order_description','orders.updated_at')
+            ->get();    
+
+        return view('orders.trackorder',compact('data'));
     }
 }
