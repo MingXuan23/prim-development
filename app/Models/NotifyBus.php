@@ -4,16 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Grab_Booking extends Model
+class NotifyBus extends Model
 {
-    protected $table = 'grab_bookings';
+    protected $table = 'bus_notifys';
     protected $primaryKey = 'id';
-    protected $fillable = ['id_destination_offer','id_user','book_date'];
+    protected $fillable = ['id_bus','id_user','status','time_notify'];
     public $timestamps = false;
 
     public function grab()
     {
-        return $this->belongsTo(Destination_Offer::class);
+        return $this->belongsTo(Bus::class);
     }
 
     public function user()

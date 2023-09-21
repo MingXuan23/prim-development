@@ -59,10 +59,6 @@
                         <div class="form-group">
                         <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Car Registration Number" name="status" value ="NEW INSERT" hidden>
                         </div>
-                        <div class="form-group">
-                        <label>Masa </label>
-                        <input type="time" class="form-control" placeholder="Available Time"  name="time">
-                        </div><br>
                         <div class="form-group mb-0">
                         <div class="text-right">
                             <a type="button" href="{{ url()->previous() }}"

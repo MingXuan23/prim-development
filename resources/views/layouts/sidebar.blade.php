@@ -567,15 +567,15 @@
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
                 @role('Homestay Admin')
-                        <a href="{{ route('homestay.index') }}" class=" waves-effect">
-                            <i class="mdi mdi-percent"></i>
-                            <span>Set Promosi</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
                             <i class="mdi mdi-room-service-outline"></i>
                             <span>Urus Bilik</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.index') }}" class=" waves-effect">
+                            <i class="mdi mdi-percent"></i>
+                            <span>Set Promosi</span>
                         </a>
                     </li>
                     <li>
@@ -584,17 +584,29 @@
                             <span>Urus Tempahan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('homestay.tunjuksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-finance"></i>
+                            <span>Lihat Keuntungan</span>
+                        </a>
+                    </li>
                     @endrole 
                     <li>
                         <a href="{{ route('homestay.bookinglist') }}" class=" waves-effect">
-                            <i class="mdi mdi-percent"></i>
+                            <i class="mdi mdi-book-search"></i>
                             <span>Buat Tempahan</span>
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('homestay.tempahananda') }}" class=" waves-effect">
-                            <i class="mdi mdi-room-service-outline"></i>
+                            <i class="mdi mdi-cart"></i>
                             <span>Tempahan Anda</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.userhistory') }}" class=" waves-effect">
+                            <i class="mdi mdi-history"></i>
+                            <span>Sejarah Tempahan</span>
                         </a>
                     </li>
                     <li>
@@ -634,11 +646,23 @@
                             <span>Urus Tempahan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('grab.notifypassenger') }}" class=" waves-effect">
+                            <i class="mdi mdi-comment-alert"></i>
+                            <span>Notify Penumpang</span>
+                        </a>
+                    </li>
                     @endrole 
                     <li>
                         <a href="{{ route('book.grab') }}" class=" waves-effect">
-                            <i class="mdi  mdi-taxi"></i>
+                            <i class="mdi mdi-library-books"></i>
                             <span>Buat Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('grab.bayartempahan') }}" class=" waves-effect">
+                        <i class="mdi mdi-cash-multiple"></i>
+                            <span>Bayar Tempahan</span>
                         </a>
                     </li>
                 </ul>  
@@ -671,12 +695,77 @@
                             <span>Senarai Penumpang</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('bus.notifypassenger') }}" class=" waves-effect">
+                            <i class="mdi mdi-comment-alert"></i>
+                            <span>Notify Penumpang</span>
+                        </a>
+                    </li>
                     @endrole 
+                    <li>
+                        <a href="{{ route('book.bus') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Buat Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.bayartempahan') }}" class=" waves-effect">
+                            <i class="mdi mdi-cash-multiple"></i>
+                            <span>Bayar Tempahan</span>
+                        </a>
+                    </li>
                 </ul>  
             </li>
             @endrole
 
-            
+            @role('OrderS Admin|Superadmin|Buyer')
+            <li>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="mdi mdi-silverware"></i>
+                    <span>OrderS</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    @role('OrderS Admin')
+                    <li>
+                        <a href="{{ route('orders.managemenu') }}" class=" waves-effect">
+                            <i class="mdi mdi-table-edit"></i>
+                            <span>Urus Menu</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="mdi mdi-table-edit"></i>
+                            <span>Urus Pesanan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('orders.laporanjualan') }}" class=" waves-effect">
+                            <i class="mdi mdi-chart-bar"></i>
+                            <span>Laporan Jualan</span>
+                        </a>
+                    </li>
+                    @endrole
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="mdi mdi-note-plus"></i>
+                            <span>Buat Pesanan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="mdi mdi-cart"></i>
+                            <span>Cart</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" class=" waves-effect">
+                            <i class="mdi mdi-package-variant-closed"></i>
+                            <span>Pesanan</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @endrole 
             
 
                 

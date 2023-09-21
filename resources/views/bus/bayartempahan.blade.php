@@ -1,8 +1,6 @@
 @extends('layouts.master')
 
 @section('css')
-
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
         <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -15,7 +13,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Urus Kenderaan Anda</h4>
+            <h4 class="font-size-18">Bayar Tempahan Bas Anda</h4>
         </div>
     </div>
 </div>
@@ -36,31 +34,29 @@
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                         <tr>
-                            <th>Car Brand</th>
-                            <th>Car Name</th>
-                            <th>Car Registration Number</th>
-                            <th>Seat </th>
-                            <th>Status</th>
-                            <th>Edit</th>
+                            <th>Berlepas Dari</th>
+                            <th>Destinasi</th>
+                            <th>Nombor Trip Bas </th>
+                            <th>Waktu Berlepas</th>
+                            <th>Tarikh Berlepas</th>
+                            <th>Masa Notify Tempahan</th>
+                            <th>Harga Trip Bas</th>
+                            <th>Bayar Tempahan</th>
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($data as $item)
+                        @foreach ($list as $item)
                         <tr>                
-                            <form action="/updaterow-grab/{{ $item->id }}" method="POST">
+                            <form action="passengerpilihtempahan-bus/{{ $item->id }}" method="POST">
                             @csrf
-                            <td>{{ $item->car_brand }}</td>
-                            <td>{{ $item->car_name }}</td>
-                            <td>{{ $item->car_registration_num}}</td>
-                            <td>{{ $item->number_of_seat}}</td>
-                            <td>            
-                            <select class="form-select" aria-label="Default select example"  name="status">         
-                            <option hidden value="{{ $item->status }}">{{ $item->status }}</option>
-                            <option value="AVAILABLE">AVAILABLE</option>
-                            <option value="NOT AVAILABLE">NOT AVAILABLE</option>
-                            </select>
-                            </td>
-                            <td> <button type="submit" class="btn btn-primary">Update Car</button></td>
+                            <td>{{ $item->bus_depart_from }}</td>
+                            <td>{{ $item->bus_destination}}</td>
+                            <td>{{ $item->trip_number}}</td>
+                            <td>{{ $item->departure_time}}</td>
+                            <td>{{ $item->departure_date}}</td>
+                            <td>{{ $item->time_notify}}</td>
+                            <td>RM {{ $item->price_per_seat}}</td>
+                            <td> <button type="submit" class="btn btn-success">Bayar Tempahan</button></td>
                             </form>
                         </tr>
                         @endforeach

@@ -13,14 +13,16 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Tempahan Homestay / Hotel</h4>
+            <h4 class="font-size-18"> Sejarah Tempahan</h4>
         </div>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
         <div class="card">
+
             <div class="card-body">
+
             @if(Session::has('success'))
             <div class="alert alert-success">
               <p>{{ Session::get('success') }}</p>
@@ -36,30 +38,27 @@
                     <table id="homestaytable" class="table table-bordered table-striped dt-responsive wrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
-                            <tr style="text-align:center">
-                                <th hidden>Homestay ID</th>
-                                <th>Nama Homestay</th>
-                                <th>Alamat</th>
-                                <th>Nombor Telefon</th>
-                                <th>Email</th>
-                                <th>Daerah</th>
-                                <th>Negeri</th>
-                                <th>Harga Terendah Dari (RM)</th>
-                                <th>Tempah</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                    <tr class="text-center">
+
+                      <th>Nama Homestay / (Bilik)</th>
+                      <th>Alamat</th>
+                      <th>Detail Bilik</th>
+                      <th>Tarikh Dari</th>
+                      <th>Tarikh Hingga</th>
+                      <th>Bayaran (RM)</th>
+                      <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
                         @foreach($data as $record)
                         <tr>
-                            <td hidden>{{ $record->id }}</td>
-                            <td>{{ $record->nama }}</td>
+                            <td><center> {{ $record->nama }} <br> ({{ $record->roomname }})</center></td>
                             <td>{{ $record->address }}</td>
-                            <td>{{ $record->telno }}</td>
-                            <td>{{ $record->email }}</td>
-                            <td>{{ $record->district}}</td>
-                            <td>{{ $record->state }}</td>
-                            <td>{{ $record->cheapest}}</td>
-                            <td><button class="btn btn-success book-button" data-homestay-id="{{ $record->id }}">Tempah Sekarang</button></td>
+                            <td>{{ $record->details }}</td>
+                            <td>{{ $record->checkin }}</td>
+                            <td>{{ $record->checkout }}</td>
+                            <td>{{ $record->totalprice }}</td>
+                            <td>{{ $record->status }}</td>
                             </td>
                     </tr>
                     @endforeach
@@ -68,7 +67,6 @@
                 </div>
             </div>
         </div>
-
 
     </div>
 </div>
@@ -87,13 +85,6 @@
     $(document).ready(function() {
     
         $('#homestaytable').DataTable();
-
-        $('.book-button').click(function() {
-            var id = $(this).data('homestay-id');
-            console.log(id);
-            window.location.href = '/bookhomestay/' + id;
-             // Change '/book/' to your actual route
-        });
 
 $('.alert').delay(3000).fadeOut()
 });

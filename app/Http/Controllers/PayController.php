@@ -16,8 +16,17 @@ use App\Mail\HomestayReceipt;
 use App\Models\PgngOrder;
 use App\Models\Transaction;
 use App\Models\Organization;
+use App\Models\Destination_Offer;
+use App\Models\Grab_Student;
+use App\Models\Grab_Booking;
+use App\Models\Bus;
+use App\Models\Bus_Booking;
+use App\Models\NotifyBus;
+use App\Models\NotifyGrab;
 use Illuminate\Http\Request;
 use App\Mail\DonationReceipt;
+use App\Mail\ResitBayaranGrab;
+use App\Mail\ResitBayaranBus;
 use App\Models\Dev\DevTransaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -530,6 +539,47 @@ class PayController extends AppBaseController
             $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
         }
+        else if($request->desc == 'Grab Student')
+        {
+            $grab = Grab_Booking::find($request->bookingid);
+            $user = User::find($grab->id_user);
+            $room = Destination_Offer::join('grab_students', 'destination_offers.id_grab_student', '=', 'grab_students.id')
+                    ->where('destination_offers.id', $grab->id_destination_offer)
+                    ->select('grab_students.*')
+                    ->first();
+        
+            $bookingId = $request->bookingid;
+
+            $organization = Organization::find($room->id_organizations);
+            $fpx_buyerEmail      = $user->email;
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
+
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
+        }
+        else if($request->desc == 'Bus')
+        {
+            $bus = Bus_Booking::find($request->bookingid);
+            $user = User::find($grab->id_user);
+            $room = Bus::where('id', $bus->id_bus)
+                    ->first();
+        
+            $bookingId = $request->bookingid;
+
+            $organization = Organization::find($room->id_organizations);
+            $fpx_buyerEmail      = $user->email;
+            $telno               = $user->telno;
+            $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+            $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+            $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
+
+            $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
+            $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
+        }
+        
 
         $fpx_msgType        = "AR";
         $fpx_msgToken       = "01";
@@ -1006,12 +1056,76 @@ class PayController extends AppBaseController
                         ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
                         ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
                         ->get();
+
+                        if($transaction->email != NULL)
+                        {
+                            Mail::to($transaction->email)->send(new HomestayReceipt($booking, $organization, $transaction, $user));
+                        }
                         
-                        Mail::to($transaction->email)->send(new HomestayReceipt($booking, $organization, $transaction, $user));
     
                         return view('homestay.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
     
                         break;
+
+                    case 'Grab Student':
+                            $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                            $transaction->transac_no = $request->fpx_fpxTxnId;
+                            $transaction->status = "Success";
+                            $transaction->save();
+        
+                            $userid = $transaction->user_id;
+        
+                            $booking = Grab_Booking::where('transactionid', '=', $transaction->id)->first();
+                            $destination = Destination_Offer::find($booking->id_destination_offer);
+                            $user = User::find($transaction->user_id);
+                            $grab = Grab_Student::find($destination->id_grab_student);
+                            $organization = Organization::find($grab->id_organizations);
+                            
+                            $grab_booking = Organization::join('grab_students', 'organizations.id', '=', 'grab_students.id_organizations')
+                            ->join('destination_offers','grab_students.id','=','destination_offers.id_grab_student')
+                            ->join('grab_bookings','destination_offers.id','=','grab_bookings.id_destination_offer')
+                            ->where('grab_bookings.id',$booking->id) 
+                            ->select('destination_offers.pick_up_point','destination_offers.destination_name','destination_offers.available_time', 'grab_students.car_brand', 'grab_students.car_name', 'grab_students.car_registration_num', 'grab_students.number_of_seat')
+                            ->get();
+                    
+    
+                            if($transaction->email != NULL)
+                            {
+                                Mail::to($transaction->email)->send(new ResitBayaranGrab($booking, $user));
+                            }
+                            
+        
+                            return view('grab.resitbayaran', compact('grab_booking', 'booking', 'user'));
+        
+                            break;
+                    case 'Bus':
+                            $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+                            $transaction->transac_no = $request->fpx_fpxTxnId;
+                            $transaction->status = "Success";
+                            $transaction->save();
+        
+                            $userid = $transaction->user_id;
+        
+                            $booking = Bus_Booking::where('transactionid', '=', $transaction->id)->first();
+                            $bus = Bus::find($booking->id_bus);
+                            $user = User::find($transaction->user_id);
+                            $organization = Organization::find($bus->id_organizations);
+                            
+                            $bus_booking = Organization::join('buses', 'organizations.id', '=', 'buses.id_organizations')
+                            ->join('bus_bookings','buses.id','=','bus_bookings.id_bus')
+                            ->where('bus_bookings.id',$booking->id) 
+                            ->select('bus_bookings.id as bookid', 'buses.bus_registration_number', 'buses.booked_seat', 'buses.available_seat', 'buses.trip_number', 'buses.bus_depart_from', 'buses.bus_destination', 'buses.departure_time', 'buses.departure_date', 'buses.price_per_seat')
+                            ->get();
+                    
+                            if($transaction->email != NULL)
+                            {
+                                Mail::to($transaction->email)->send(new ResitBayaranBus($booking, $user));
+                            }
+                            
+        
+                            return view('bus.resitbayaran', compact('bus_booking', 'booking', 'user'));
+        
+                            break;
                         
                 default:
                     return view('errors.500');
