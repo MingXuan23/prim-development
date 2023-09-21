@@ -37,7 +37,10 @@
                     </div>
                 @endif
 
-                <div id="map"></div>
+                <center>
+                    <div id="map"></div>
+                </center>
+                
                 <form method="post" action="{{ route('orders.addorder', ['id' => $organizationId]) }}" enctype="multipart/form-data"
                     class="form-validation">
                     {{csrf_field()}}
@@ -71,7 +74,7 @@
                             </div>
                             <div class="col">
                                 <div class="form-group required">
-                                    <label class="control-label"> Kuantiti </label>
+                                    <label class="control-label"> Kuantiti <span style="color:#d00"> *</span></label>
                                     <input type="number" class="form-control" id="quantity" name="quantity" min="1" max="9999" required>
                                 </div>
                             </div>
@@ -80,7 +83,7 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group required">
-                                    <label class="control-label"> Note Tambahan <span style="color:#d00"> </span></label>
+                                    <label class="control-label"> Note Tambahan </label>
                                     <input type="text" name="description" id="description" class="form-control" placeholder="Contoh: Extra Nasi">
                                     </input>
                                 </div>
@@ -90,13 +93,13 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group required">
-                                    <label class="control-label"> Tarikh </label>
+                                    <label class="control-label"> Tarikh <span style="color:#d00"> *</span></label>
                                     <input type="date" class="form-control" id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" required>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group required">
-                                    <label class="control-label"> Masa </label>
+                                    <label class="control-label"> Masa <span style="color:#d00"> *</span></label>
                                     <input type="time" class="form-control" id="delivery_time" name="delivery_time" required>
                                 </div>
                             </div>

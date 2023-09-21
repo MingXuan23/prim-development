@@ -217,6 +217,104 @@ class OrderSController extends Controller
     }
 
     public function addorder(Request $request, $organizationId){
-        dd($request->all());
+        //dd($request->all());
+
+        $userId = Auth::id();
+
+        $status = 'Pending';
+
+        $latitudeLongitude = "2.3138° N, 102.3211° E";
+        list($latitude, $longitude) = sscanf($latitudeLongitude, "%f° N, %f° E");
+
+        $request->validate([
+            'address' => 'required',
+            'dish' => 'required',
+            'quantity' => 'required',
+            'delivery_date' => 'required',
+            'delivery_time' => 'required'
+        ]);
+    
+        $delivery = new Dish_Available();
+        $delivery->date = $request->input('delivery_date');
+        $delivery->time = $request->input('delivery_time');
+        $delivery->delivery_address = $request->input('address');
+        $delivery->dish_id = $request->input('dish');
+        $delivery->latitude = $latitude;
+        $delivery->longitude = $longitude;
+        $result = $delivery->save();
+    
+        if($result)
+        {
+            $deliveryId = DB::getPdo()->lastInsertId();
+
+            $order = new Order();
+            $order->delivery_status = $status;
+            $order->user_id = $userId;
+            $order->organ_id = $organizationId;
+            $order->dish_available_id = $deliveryId;
+            $order->order_description = $request->input('description');
+            $result2 = $order->save();
+
+            if($result2)
+            {
+                $orderId = DB::getPdo()->lastInsertId();
+
+                $orderDish = new Order_Dish();
+                $orderDish->quantity = $request->input('quantity');
+                $orderDish->order_id = $orderId;
+                $orderDish->dish_id = $request->input('dish');
+                $result3 = $orderDish->save();
+
+                if($result3)
+                {
+                    //return back()->with('success', 'Pesanan Berjaya Dihantar');
+
+                    $dishes = DB::table('dishes')
+                    ->where('organ_id', $organizationId)
+                    ->get();
+
+                    return view('orders.extraorder', compact('organizationId', 'orderId', 'dishes'));
+                }
+                else
+                {
+                    return back()->withInput()->with('error', 'Pesanan Gagal Dihantar (OrderDish)');
+                }
+            }
+            else
+            {
+                return back()->withInput()->with('error', 'Pesanan Gagal Dihantar (Order)');
+            }
+        }
+        else
+        {
+            return back()->withInput()->with('error', 'Pesanan Gagal Dihantar (Delivery)');
+        }
+    }
+
+    public function extraorder(Request $request, $organizationId, $orderId){
+        $orderDish = new Order_Dish();
+        $orderDish->quantity = $request->input('quantity');
+        $orderDish->order_id = $orderId;
+        $orderDish->dish_id = $request->input('dish');
+        $result = $orderDish->save();
+
+        if($result)
+        {
+            //return back()->with('success', 'Pesanan Berjaya Dihantar');
+
+            $dishes = DB::table('dishes')
+            ->where('organ_id', $organizationId)
+            ->get();
+
+            return view('orders.extraorder', compact('organizationId', 'orderId', 'dishes'));
+        }
+        else
+        {
+            return back()->withInput()->with('error', 'Pesanan Gagal Dihantar');
+        }
+    }
+
+    public function checkout($orderId){
+        dd($orderId);
     }
 }
