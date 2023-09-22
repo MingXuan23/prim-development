@@ -24,7 +24,7 @@
 </head>
 
 <body>
-<div hidden>You are being redirected to our homepage in <span id="time">5</span> seconds</div>
+<div>You are being redirected to our homepage in <span id="time">5</span> seconds</div>
     <div class="container">
         <div class="row mt-3">
             <div class="col-12">
