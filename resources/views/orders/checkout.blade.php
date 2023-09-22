@@ -115,9 +115,8 @@
                                         <th>Nama Organisasi</th>
                                         <th>Alamat</th>
                                         <th>Nama Menu</th>
-                                        <th>Note Tambahan</th>
                                         <th>Kuantiti</th>
-                                        <th>Masa Pesanan</th>
+                                        <th>Waktu Pesanan</th>
                                         <th>Harga (RM)</th>
                                         <!-- <th>Total Harga (RM)</th> -->
                                     </tr>
@@ -129,7 +128,6 @@
                                         <td>{{ $record->nama }}</td>
                                         <td>{{ $record->address }}</td>
                                         <td>{{ $record->name }}</td>
-                                        <td>{{ $record->order_description }}</td>
                                         <td>{{ $record->quantity }}</td>
                                         <td>{{ $record->updated_at }}</td>
                                         <td>{{ $record->price }}</td>
@@ -138,8 +136,8 @@
                                     @endforeach
                                     <tr>
                                         <td></td>
-                                        <td><b>Total Harga (RM)</b> </td>
-                                        <td>
+                                        <td style="text-align:right"><b>Total Harga (RM)</b> </td>
+                                        <td style="text-align:right">
                                             <b>{{ $record->totalprice  }}</b>
                                         </td>
                                     </tr>
@@ -164,7 +162,7 @@
                     @csrf
                     <input type="hidden" name="desc" id="desc" value="OrderS">
                     <input type="hidden" name="orderid" id = "orderid" value="{{ $orderId }}">
-                    <input type="hidden" name="amount" id="amount" value="{{ $totalprice }}">
+                    <input type="hidden" name="amount" id="amount" value="{{ $record->totalprice }}">
                     <div class="card mb-4 border">
                         <div class="card-body p-4">
                             <div class="row">
