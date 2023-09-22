@@ -545,7 +545,7 @@ class PayController extends AppBaseController
             $user = User::find($grab->id_user);
             $destination = Destination_Offer::find($grab->id_destination_offer);
             $kereta = Grab_Student::find($destination->id_grab_student);
-                   
+            
             $bookingId = $request->bookingid;
 
             $organization = Organization::find($kereta->id_organizations);
@@ -1160,7 +1160,7 @@ class PayController extends AppBaseController
                             $booking = Bus_Booking::where('transactionid', '=', $transaction->id)->first();
                             $bus = Bus::find($booking->id_bus);
                             $user = User::find($transaction->user_id);
-                            $organization = Organization::find($bus->id_organizations);
+                            $organization = Organization::find($bus->id_organizations);     
                             
                             $bus_booking = Organization::join('buses', 'organizations.id', '=', 'buses.id_organizations')
                             ->join('bus_bookings','buses.id','=','bus_bookings.id_bus')
