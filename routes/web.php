@@ -225,7 +225,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
 
     Route::group(['namespace' => 'Admin'], function() {
         Route::get('/produkmenu','AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
-        Route::get('/fetchprodukmenu','AdminProductCooperativeController@changeProductMenuByOrgId')->name('koperasi.changeProductMenu');
+        Route::get('/fetchprodukmenu/{koopId}','AdminProductCooperativeController@getProductMenuByOrgId')->name('koperasi.changeProductMenu');
         Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
         Route::post('/produkmenu/deleteSelectedProducts','AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
         Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');

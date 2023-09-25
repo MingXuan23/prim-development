@@ -121,7 +121,13 @@ class AdminProductCooperativeController extends Controller
         {
             $reminderMessage="Anda belum kemas kini waktu operasi koperasi anda. Sila pergi 'Hari Dibuka' dekat 'Koop Admin' untuk mengemaskini maklumat.";
         }
-        return view('koperasi-admin.productmenu', compact('koperasi'),compact('group','product','reminderMessage'));
+        $data = [
+            'group'=>$group,'product'=>$product,'reminderMessage'=> $reminderMessage,'hour'=>$hour
+        ];
+    
+        // Return the array
+        return $data;
+        
     }
 
     public function getProductList(Request $request){ //ajax request to show product in product menu
