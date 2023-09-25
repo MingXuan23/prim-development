@@ -394,17 +394,16 @@ $('#org_dropdown').change(function() {
 
     $.ajax({
             type: 'GET',
-            url: '{{ route("koperasi.changeProductMenu") }}',
-            data: {
-                koopId:orgId
-            },
+            url: '/koperasi/fetchprodukmenu/' + orgId,
+           
             success:function(response){
+              console.log(response);
               loadProducts();
               initialiseTargetCheckBox();
               koopInitialise(response.group);
               $('.koperasi_id').val(orgId);
-              if(response.message!=="")
-              alert(response.message);
+              if(response.reminderMessage!=="")
+                alert(response.reminderMessage);
             }
         });
 })
