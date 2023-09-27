@@ -192,20 +192,20 @@ input::-webkit-inner-spin-button {
         </div>
 
         @if($cart)
+        @if($allDay[0]->date_selection_enable ==1)
         <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
               <div class="col">
+               
                 <div class="form-group required">
-                  {{-- <label for="example-date-input" class="col-sm-2">Tarikh Pengambilan</label>
-                  <div class="col">
-                      <input class="form-control" type="date" value="{{ $tomorrowDate}}" min="{{ $tomorrowDate }}" id="date_pick_up">
-                  </div> --}}
+
+                  
                   <label class="col-sm-2">Hari Pengambilan</label>
                     <div class="col">
                         <select class="form-control" data-parsley-required-message="Sila pilih hari" id="pick_up_date" required>
                           <option value="" selected>Pilih Hari</option>
-                          @foreach($allDay as $row)
+                          @foreach($allDay->where('status',1) as $row)
                             @if($row->day == 1)
                               <option value="{{ $row->day }}">Isnin {{ $isPast[strval($row->day)] }}</option>
                             @elseif($row->day == 2)
@@ -223,23 +223,29 @@ input::-webkit-inner-spin-button {
                             @endif
                           @endforeach
                         </select>
-                        
+                       
                     </div>
                 </div>
+                 
               </div>
             </div>
           </div>
         </div>
-
+        @else
+          <select class="form-control d-none" data-parsley-required-message="Sila pilih hari" id="pick_up_date" required >
+                  <option value="-1" selected></option>
+          </select>
+          @endif
         <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
               <div class="col">
               <div class="form-group">
+             
                                 <label>Pilih Bank</label>
                                 <select name="bankid" id="bankid" class="form-control"
                                     data-parsley-required-message="Sila pilih bank" required>
-                                    <option value="">Pilih bank</option>
+                                    <option value=""> Pilih bank</option>
                                 </select>
 
                             </div>
@@ -257,7 +263,7 @@ input::-webkit-inner-spin-button {
                 <div class="form-group required">
                   <label class="col">Nota kepada Koperasi</label>
                   <div class="col">
-                    <input type="text" name="note" class="form-control" placeholder="Optional">
+                    <input type="text" name="note" class="form-control" id="noteTxt" placeholder="Optional" data-parsley-required-message="Sila isi nota">
                   </div>
                 </div>
               </div>
@@ -319,6 +325,16 @@ input::-webkit-inner-spin-button {
         $(".input-mask").inputmask();
         $('.phone_no').mask('01000000000');
         $('.form-validation').parsley();
+        var inputElement = document.getElementById('noteTxt');
+        
+        const pholder = "{{$allDay[0]->note_requirement}}";
+        if(pholder){
+          // Check if pholder is null or empty, if not, use the original placeholder
+          inputElement.placeholder = pholder ? pholder : 'Optional';
+          inputElement.required = true;
+          $('#week_status').val(-1);
+        }
+       
     });
     
     $('.alert').delay(12000).fadeOut();

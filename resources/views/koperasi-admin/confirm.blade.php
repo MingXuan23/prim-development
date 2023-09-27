@@ -141,12 +141,15 @@ $.ajax({
       
       const confirmLink="{{ route('koperasi.storeConfirm', ':pgngId') }}".replace(':pgngId',order.id);
       const notconfirmLink="{{ route('koperasi.notConfirm', ':pgngId') }}".replace(':pgngId',order.id);
+
+      const pickupDate = order.pickup_date== '0001-01-01 00:00:00'?'Wait message from seller':order.pickup_date;
+      console.log(order.pickup_date,new Date(1, 0, 1, 0, 0, 0));
       row.innerHTML = `
         <td>${order.id}</td>
         <td>${order.name}</td>
         <td>${order.telno}</td>
         <td>${order.orderTime}</td>
-        <td>${order.pickup_date}</td>
+        <td>${pickupDate}</td>
         <td>${descriptionCell.innerHTML}</td>
         <td>${order.total_price.toFixed(2)}</td>
         <td>${statusLabels[order.status]}</td>
