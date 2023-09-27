@@ -700,8 +700,14 @@ class PayController extends AppBaseController
             }
             else if (substr($fpx_sellerExOrderNo, 0, 1) == 'K')
             {
-                $daySelect = (int)$request->week_status;     
-                $pickUp = Carbon::now()->next($daySelect)->toDateString();
+                $daySelect = (int)$request->week_status;
+                if($daySelect ==-1){
+                    $pickUp = Carbon::create(1, 1, 1)->toDateString();//mindate
+                }     
+                else{
+                    $pickUp = Carbon::now()->next($daySelect)->toDateString();
+                }
+                
                 $result = DB::table('pgng_orders')
                 ->where('id', $request->cartId)
                 ->update([

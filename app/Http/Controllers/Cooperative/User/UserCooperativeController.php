@@ -421,7 +421,7 @@ class UserCooperativeController extends Controller
 
             $allDay = OrganizationHours::where([
                 ['organization_id', $id],
-                ['status', 1],
+                //['status', 1],
             ])->get();
             
             $isPast = array();
