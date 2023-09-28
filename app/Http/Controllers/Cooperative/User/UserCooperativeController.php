@@ -337,7 +337,12 @@ class UserCooperativeController extends Controller
             ['organization_id', $id],
             ['user_id', $user_id],
         ])->first();
-        
+
+        $allDay = OrganizationHours::where([
+            ['organization_id', $id],
+            //['status', 1],
+        ])->get();
+
         if($cart)
         {   
 
@@ -419,10 +424,7 @@ class UserCooperativeController extends Controller
             
             $charge=$this->calCharge( $newTotalPrice,$org_id); 
 
-            $allDay = OrganizationHours::where([
-                ['organization_id', $id],
-                ['status', 1],
-            ])->get();
+            
             
             $isPast = array();
             
@@ -448,7 +450,7 @@ class UserCooperativeController extends Controller
         }
         else
         {
-            return view('koperasi.cart', compact('cart', 'cart_item' , 'id'));
+            return view('koperasi.cart', compact('cart', 'cart_item' , 'id','allDay'));
         }
     }
 
@@ -806,7 +808,8 @@ class UserCooperativeController extends Controller
 
     public function koopShop($koop)
     {
-        if(is_int($koop)){
+        //dd(is_numeric($koop),$koop);
+        if(is_numeric($koop)){
             $id=$koop;
         }
         else{

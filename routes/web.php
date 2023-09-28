@@ -234,7 +234,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
 
     Route::group(['namespace' => 'Admin'], function() {
         Route::get('/produkmenu','AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
-        Route::get('/fetchprodukmenu','AdminProductCooperativeController@changeProductMenuByOrgId')->name('koperasi.changeProductMenu');
+        Route::get('/fetchprodukmenu/{koopId}','AdminProductCooperativeController@getProductMenuByOrgId')->name('koperasi.changeProductMenu');
         Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
         Route::post('/produkmenu/deleteSelectedProducts','AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
         Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
@@ -274,6 +274,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/adminHistory', 'AdminOrderCooperativeController@adminHistory')->name('koperasi.adminHistory');
         Route::get('/fetchAdminHistory', 'AdminOrderCooperativeController@fetchAdminHistory')->name('koperasi.fetchAdminHistory');
 
+        Route::get('/exportKoperasiOverview/{id}', 'AdminOrderCooperativeController@exportKoperasiOverview')->name('koperasi.exportKoperasiOverview');
 
     });
 });
@@ -614,12 +615,87 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
     Route::get('tambahbilik', 'HomestayController@tambahbilik')->name('homestay.tambahbilik');
     Route::post('addroom', 'HomestayController@addroom')->name('homestay.addroom');
+    Route::post('editroom/{id}', 'HomestayController@editroom');
     Route::get('bookinglist', 'HomestayController@bookinglist')->name('homestay.bookinglist');
     Route::get('bookhomestay/{id}', 'HomestayController@bookhomestay')->name('homestay.bookhomestay');
     Route::get('disabledateroom/{id}', 'HomestayController@disabledateroom');
     Route::post('bookhomestay/insertbooking/{id}/{price}', 'HomestayController@insertbooking');
     Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
     Route::get('homestayresit/{id}', 'HomestayController@homestayresit')->name('homestay.homestayresit');
+    Route::get('urustempahan', 'HomestayController@urustempahan')->name('homestay.urustempahan');
+    Route::post('tunjukpelanggan', 'HomestayController@tunjukpelanggan');
+    Route::post('cancelpelanggan/{id}', 'HomestayController@cancelpelanggan');
+    Route::get('userhistory', 'HomestayController@userhistory')->name('homestay.userhistory');
+    Route::get('tunjuksales', 'HomestayController@tunjuksales')->name('homestay.tunjuksales');
+    Route::get('homestaysales/{id}/{checkin}/{checkout}', 'HomestayController@homestaysales');
+    
+    //Route::post('test', 'HomestayController@test')->name('homestay.test');
+
+    Route::get('/grab-setcar','GrabStudentController@setcar')->name('grab.setinsert');
+    Route::post('/grab-insertcar','GrabStudentController@insertcar')->name('grab.insert');
+    Route::get('/grab-check','GrabStudentController@checkcar')->name('grab.check');
+    Route::post('/updaterow-grab/{id}','GrabStudentController@updatecar')->name('grab.update/{id}');
+    Route::post('/updaterow-destinationgrab/{id}','GrabStudentController@updatedestination')->name('grab.updatedestination/{id}');
+    Route::get('/grab-destination','GrabStudentController@setdestination')->name('grab.setdestination');
+    Route::post('/grab-insertdestination','GrabStudentController@insertdestination')->name('grab.insertdestination');
+    Route::get('/grab-checkpassenger','GrabStudentController@grabcheckpassenger')->name('grab.checkpassenger');
+    Route::get('/book-grab','GrabStudentController@bookgrab')->name('book.grab');
+    Route::post('/passengerselect-grab/{id}','GrabStudentController@selectbookgrab')->name('passengerselect-grab/{id}');
+    Route::post('/passengerpay-grab/{id}','GrabStudentController@paymentgrab')->name('passengerpay-grab/{id}');
+    Route::get('/bayar-grab','GrabStudentController@makepaymentgrab')->name('bayar.grab');
+    Route::post('/passengernotify-grab/{id}','GrabStudentController@notifygrab')->name('passengernotify-grab/{id}');
+    Route::get('/grab-notify','GrabStudentController@grabsendnotify')->name('grab.notifypassenger');
+    Route::post('/notifygrab-passenger/{id}','GrabStudentController@updatenotifygrab')->name('notifygrab-passenger/{id}');
+    Route::get('/grab-bayartempahan','GrabStudentController@grabbayartempahan')->name('grab.bayartempahan');
+    Route::post('/passengerpilihtempahan-grab/{id}','GrabStudentController@passengerpilihtempahan')->name('passengerpilihtempahan-grab/{id}');
+    Route::post('/passengerbayartempahan-grab/{id}','GrabStudentController@passengerbayartempahan')->name('passengerbayartempahan-grab/{id}');
+    Route::get('/grab-checksales','GrabStudentController@checksales')->name('grab.checksales');
+    Route::post('/grab-sales', 'GrabStudentController@grabsales')->name('generate-sales-graph');
+
+    Route::get('/bus-setbus','BusController@setbus')->name('bus.setinsert');
+    Route::post('/bus-insertbus','BusController@insertbus')->name('bus.insert');
+    Route::get('/bus-managebus','BusController@managebus')->name('bus.manage');
+    Route::post('/managebus-bus/{id}','BusController@manageselectedbus')->name('bus.displaymanage/{id}');
+    Route::post('/updatemanagebus-bus/{id}','BusController@updatebus')->name('bus.update/{id}');
+    Route::get('/book-bus','BusController@bookbus')->name('book.bus');
+    Route::post('/passengerselect-bus/{id}','BusController@selectbookbus')->name('passengerselect-bus/{id}');
+    Route::post('/passengerpay-bus/{id}','BusController@paymentbus')->name('passengerpay-bus/{id}');
+    Route::post('/passengernotify-bus/{id}','BusController@notifybus')->name('passengernotify-bus/{id}');
+    Route::get('/bus-notify','BusController@bussendnotify')->name('bus.notifypassenger');
+    Route::post('/notifybus-passenger/{id}','BusController@updatenotifybus')->name('notifybus-passenger/{id}');
+    Route::get('/bus-bayartempahan','BusController@busbayartempahan')->name('bus.bayartempahan');
+    Route::post('/passengerpilihtempahan-bus/{id}','BusController@buspilihtempahan')->name('passengerpilihtempahan-bus/{id}');
+    Route::post('/passengerbayartempahan-bus/{id}','BusController@passengerbusbayartempahan')->name('passengerbayartempahan-bus/{id}');
+    Route::get('/bayar-bus','BusController@makepaymentbus')->name('bayar.bus');
+    Route::get('/bus-listpassenger','BusController@listpassenger')->name('bus.listpassenger');
+    Route::post('/passengerlist-bus/{id}','BusController@listpassengerbus')->name('passengerlist-bus/{id}');
+    Route::get('/bus-checksales','BusController@checksales')->name('bus.checksales');
+    Route::post('/bus-sales', 'BusController@bussales')->name('generate-sales-busgraph');
+
+
+    
+
+Route::group(['prefix' => 'orders'], function () {
+    Route::group(['middleware' => ['auth']], function () {
+        Route::get('/managemenu', 'OrderSController@managemenu')->name('orders.managemenu');
+        Route::get('/listmenu/{id}', 'OrderSController@listmenu')->name('orders.listmenu');
+        Route::get('/addmenu/{id}', 'OrderSController@addmenu')->name('orders.addmenu');
+        Route::post('/processaddmenu/{id}', 'OrderSController@processaddmenu')->name('orders.processaddmenu');
+        Route::post('/editmenu', 'OrderSController@editmenu')->name('orders.editmenu');
+        Route::get('/uruspesanan', 'OrderSController@uruspesanan')->name('orders.uruspesanan');
+        Route::get('/listpesanan/{id}', 'OrderSController@listpesanan')->name('orders.listpesanan');
+        Route::post('/editpesanan', 'OrderSController@editpesanan')->name('orders.editpesanan');
+        Route::get('/laporanjualan', 'OrderSController@laporanjualan')->name('orders.laporanjualan');
+        Route::get('/salesreport/{id}/{start}/{end}', 'OrderSController@salesreport')->name('orders.salesreport');
+        Route::get('/buatpesanan', 'OrderSController@buatpesanan')->name('orders.buatpesanan');
+        Route::get('/pilihlokasi/{id}', 'OrderSController@pilihlokasi')->name('orders.pilihlokasi');
+        Route::post('/addorder/{id}', 'OrderSController@addorder')->name('orders.addorder');
+        Route::post('/extraorder/{id}/{id2}', 'OrderSController@extraorder')->name('orders.extraorder');
+        Route::get('/checkout/{id}', 'OrderSController@checkout')->name('orders.checkout');
+        Route::get('/trackorder', 'OrderSController@trackorder')->name('orders.trackorder');
+    });
+});
+
     
 
 Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');

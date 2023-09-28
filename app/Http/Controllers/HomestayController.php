@@ -63,7 +63,7 @@ class HomestayController extends Controller
             'promotionname' => 'required',
             'datefrom' => 'required',
             'dateto' => 'required',
-            'discount' => 'required'
+            'discount' => 'required|numeric|min:1|max:100'
         ]);
 
         
@@ -116,7 +116,7 @@ public function addroom(Request $request)
         'roomname' => 'required',
         'roompax' => 'required',
         'details' => 'required',
-        'price' => 'required'
+        'price' => 'required|numeric|min:0'
     ]);
 
     $status = 'Available';
@@ -236,6 +236,43 @@ public function editpromo(Request $request,$promotionid)
         return view('homestay.tambahbilik',compact('data'));
     }
 
+    public function editroom(Request $request,$roomid)
+    {
+        $request->validate([
+            'roompax' => 'required',
+            'details' => 'required',
+            'price' => 'required|numeric|min:0'
+        ]);
+
+        $roompax = $request->input('roompax');
+        $details = $request->input('details');
+        $price = $request->input('price');
+
+        $userId = Auth::id();
+        $room = Room::where('roomid',$roomid)
+            ->first();
+
+            if ($room) {
+                $room->roompax = $request->roompax;
+                $room->details = $request->details;
+                $room->price = $request->price;
+
+                $result = $room->save();
+
+                if($result)
+                {
+                    return back()->with('success', 'Bilik Berjaya Disunting');
+                }
+                else
+                {
+                    return back()->withInput()->with('error', 'Bilik Gagal Disunting');
+    
+                }
+            } else {
+                return back()->with('fail', 'Bilik not found!');
+            }
+    }
+
     public function bookinglist()
     {
         $orgtype = 'Homestay / Hotel';
@@ -334,34 +371,50 @@ public function editpromo(Request $request,$promotionid)
             $totalPrice = $price * $totalDays;
         }
 
-        $booking = new Booking();
-        $booking->checkin = $request->checkin;
-        $booking->checkout = $request->checkout;
-        $booking->status = $status;
-        $booking->totalprice = $totalPrice;
-        $booking->customerid = $userId;
-        $booking->roomid = $fkroom;
+        $availability = Booking::where('roomid', $fkroom)
+        ->where(function ($query) use ($request) {
+        $query->where('checkin', '<', $request->checkout)
+            ->where('checkout', '>', $request->checkin);
+    })
+    ->get();
 
-        $result = $booking->save();
+    if ($availability->isEmpty()) {
 
-        if($result)
-            {
-                return $this->bookinglist();
-            }
-            else
-            {
-                return back()->withInput()->with('error', 'Tempahan Gagal Dibuat');
+            $booking = new Booking();
+            $booking->checkin = $request->checkin;
+            $booking->checkout = $request->checkout;
+            $booking->status = $status;
+            $booking->totalprice = $totalPrice;
+            $booking->customerid = $userId;
+            $booking->roomid = $fkroom;
     
-            }
+            $result = $booking->save();
+    
+            if($result)
+                {
+                    return back()->withInput()->with('success', 'Bilik Berjaya Ditempah');
+                }
+                else
+                {
+                    return back()->withInput()->with('error', 'Tempahan Gagal Dibuat');
+        
+                }
+        } else {
+            return back()->withInput()->with('error', 'Bilik Pada Tarikh Tersebut Telah Penuh');
+        }
+
+        
 
     }
 
     public function tempahananda()
     {
         $userId = Auth::id();
+        $status = 'Booked';
         $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
                 ->join('bookings','rooms.roomid','=','bookings.roomid')
-                ->where('bookings.customerid', $userId) // Filter by the selected homestay
+                ->where('bookings.customerid', $userId)
+                ->where('bookings.status', $status) // Filter by the selected homestay
                 ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
                 ->get();
 
@@ -378,10 +431,156 @@ public function editpromo(Request $request,$promotionid)
                 ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
                 ->get();
 
+        $totalprice = 0; // Initialize the total price variable
 
-        return view('homestay.homestayresit',compact('data','bookingid'));
+        foreach ($data as $record) {
+                // Add the totalprice for each record to the totalPrice variable
+                $totalprice += $record->totalprice;
+        }
+
+
+        return view('homestay.homestayresit',compact('data','bookingid','totalprice'));
     }
 
+    public function urustempahan()
+    {
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+        $data = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+
+
+        return view('homestay.urustempahan', compact('data'));
+    }
+
+    public function tunjukpelanggan(Request $request)
+    {
+        $homestayid = $request->input('homestayid');
+
+        $data = Booking::join('rooms', 'bookings.roomid', '=', 'rooms.roomid')
+        ->join('organizations', 'organizations.id', '=', 'rooms.homestayid')
+        ->join('users', 'bookings.customerid', '=', 'users.id')
+        ->where('organizations.id', $homestayid)
+        ->select(
+            'users.name',
+            'users.telno',
+            'bookings.checkin',
+            'bookings.checkout',
+            'bookings.bookingid',
+            'bookings.status',
+            'bookings.totalprice',
+            'rooms.roomname'
+    )
+    ->get();
+
+        return response()->json($data);
+    }
+
+    public function cancelpelanggan($bookingid)
+    {
+        $status = "Canceled";
+        $booking = Booking::find($bookingid);
+        $booking->status = $status;
+
+        $result = $booking->save();
+
+        if($result)
+            {
+                return back()->withInput()->with('success', 'Tempahan Berjaya Dibatalkan');
+            }
+            else
+            {
+                return back()->withInput()->with('error', 'Tempahan Gagal Dibatalkan');
+    
+            }
+    }
+
+    public function userhistory()
+    {
+        $userId = Auth::id();
+        $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('bookings','rooms.roomid','=','bookings.roomid')
+                ->where('bookings.customerid', $userId)
+                ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.status')
+                ->get();
+
+        return view('homestay.userhistory',compact('data'));
+    }
+
+    public function tunjuksales()
+    {
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+
+        $data = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+
+
+        return view('homestay.tunjuksales', compact('data'));
+    }
+
+    public function homestaysales($id,$checkin,$checkout)
+    {
+        $checkinTimestamp = strtotime($checkin);
+        $checkoutTimestamp = strtotime($checkout);
+        
+        $salesData = DB::table('bookings')
+            ->join('rooms', 'bookings.roomid', '=', 'rooms.roomid')
+            ->join('organizations', 'rooms.homestayid', '=', 'organizations.id')
+            ->select(DB::raw('DATE(bookings.updated_at) as date'), DB::raw('SUM(bookings.totalprice) as total_sales'))
+            ->where('bookings.status', 'Paid')
+            ->where('organizations.id', $id)
+            ->whereBetween(DB::raw('DATE(bookings.updated_at)'), [date('Y-m-d', $checkinTimestamp), date('Y-m-d', $checkoutTimestamp)])
+            ->groupBy(DB::raw('DATE(bookings.updated_at)'))
+            ->get();
+        
+        $dateLabels = [];
+        $currentDate = $checkinTimestamp;
+        while ($currentDate <= $checkoutTimestamp) {
+            $dateLabels[] = date('Y-m-d', $currentDate);
+            $currentDate += 86400;
+        }
+        
+
+        $dailySales = [];
+        
+
+        foreach ($dateLabels as $dateLabel) {
+            $found = false;
+            foreach ($salesData as $entry) {
+                if ($entry->date === $dateLabel) {
+                    $dailySales[] = $entry->total_sales;
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $dailySales[] = 0; // No sales for this date
+            }
+        }
+        
+        // Prepare the data for the chart
+        $chartData = [
+            'labels' => $dateLabels,
+            'dataset' => $dailySales,
+        ];
+        
+        return response()->json($chartData);
+}
 
     public function store(Request $request)
     {
@@ -407,4 +606,5 @@ public function editpromo(Request $request,$promotionid)
     {
         //
     }
+
 }

@@ -155,6 +155,28 @@ class OrganizationController extends Controller
             $this->insertOrganizationHours($organization->id);
         }
 
+        if ($type_org->nama == "Grab Student") {
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
+            $user->assignRole($role->nama);
+
+            $this->insertOrganizationHours($organization->id);
+        }
+
+        
+        if ($type_org->nama == "Bas") {
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
+            $user->assignRole($role->nama);
+
+            $this->insertOrganizationHours($organization->id);
+        }
+
+        if ($type_org->nama == "OrderS") {
+            $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
+            $user->assignRole($role->nama);
+
+            $this->insertOrganizationHours($organization->id);
+        }
+        
         return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
     }
 
@@ -289,7 +311,7 @@ class OrganizationController extends Controller
     {
         $role_id = [];
         $userId = Auth::id();
-        $roles = DB::table('organization_roles')->whereIn('nama', ['Admin', 'Regular Merchant Admin','Homestay Admin'])->get();
+        $roles = DB::table('organization_roles')->whereIn('nama', ['Admin', 'Regular Merchant Admin','Homestay Admin','Grab Student Admin','Bas Admin','OrderS Admin'])->get();
 
         foreach($roles as $row) { $role_id[] = $row->id; }
 
@@ -358,6 +380,9 @@ class OrganizationController extends Controller
             case "PIBG Sekolah":
                 $prefix='PIBG';
                 break;
+            case "OrderS":
+                $prefix='OS';
+                break;
         }
        $code=$prefix.str_pad($id, 5, '0', STR_PAD_LEFT);
         return $code;
@@ -388,6 +413,18 @@ class OrganizationController extends Controller
         else if($type_org_name == "Homestay / Hotel")
         {
             $role = OrganizationRole::where('nama', '=', 'Homestay Admin')->first();
+        }
+        else if($type_org_name == "Grab Student")
+        {
+            $role = OrganizationRole::where('nama', '=', 'Grab Student Admin')->first();
+        }
+        else if($type_org_name == "Bas")
+        {
+            $role = OrganizationRole::where('nama', '=', 'Bas Admin')->first();
+        }
+        else if($type_org_name == "OrderS")
+        {
+            $role = OrganizationRole::where('nama', '=', 'OrderS Admin')->first();
         }
 
 

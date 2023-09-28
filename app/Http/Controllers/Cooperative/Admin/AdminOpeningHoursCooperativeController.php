@@ -69,7 +69,14 @@ class AdminOpeningHoursCooperativeController extends Controller
         $userID = Auth::id();
 
         $org = $request->koopId;
+        $enable =$request->checkboxEnablePickUpTime=="on"?1:0;
+        //dd($enable,$request->noteReq);
         
+        $update =DB::table('organization_hours')
+        ->where('organization_id','=',$org)
+        ->update(['date_selection_enable'=>$enable,
+        'note_requirement'=>$request->noteReq,
+        ]);
         $hour = DB::table('organization_hours')
             ->where('day','=',$request->day)
             ->where('organization_id','=',$org)
@@ -77,6 +84,7 @@ class AdminOpeningHoursCooperativeController extends Controller
             'close_hour'=>$request->close,
             'status' => $request->status,]);
 
+       
         return redirect('koperasi/openingHours')->with('koopId',$org);
         // if($request->day == 1)
         // {

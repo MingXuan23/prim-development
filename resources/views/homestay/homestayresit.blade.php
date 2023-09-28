@@ -99,6 +99,16 @@
       <div class="card">
         <div class="card-body">
 
+        @if(count($errors) > 0)
+      <div class="alert alert-danger">
+        <ul>
+          @foreach($errors->all() as $error)
+          <li>{{$error}}</li>
+          @endforeach
+        </ul>
+      </div>
+      @endif
+
           @if(Session::has('success'))
             <div class="alert alert-success">
               <p>{{ Session::get('success') }}</p>
@@ -108,7 +118,7 @@
               <p>{{ Session::get('error') }}</p>
             </div>
           @endif
-
+          <div class="flash-message"></div>
           <div class="table-responsive">
             <table class="table table-borderless responsive" id="cartTable" width="100%" cellspacing="0">
                 <thead class="thead-dark">
@@ -159,8 +169,9 @@
         
       <form action="{{ route('fpxIndex') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <input type="hidden" name="desc" id="desc" value="Homestay / Hotel">
+        <input type="hidden" name="desc" id="desc" value="Homestay">
         <input type="hidden" name="bookingid" id = "bookingid" value="{{ $bookingid }}">
+        <input type="hidden" name="amount" id="amount" value="{{ $totalprice }}">
         <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
@@ -208,6 +219,8 @@
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
     });
+
+    var arr = [];
     
     $.ajax({
         type: 'GET',

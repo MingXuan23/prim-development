@@ -46,7 +46,11 @@
                   <td class="align-middle">{{ $row->koop_name }}</td>
                   <td class="align-middle">{{ $row->koop_telno }}</td>
                   <td class="align-middle">{{ date_format($date,"d M Y, h:m:s A") }}</td>
+                  @if($row->pickup_date == "0001-01-01 00:00:00")
+                  <td class="align-middle">Sila Tunggu Mesaj Dari Koperasi</td>
+                  @else
                   <td class="align-middle">{{ date_format($pickup,"d M  Y") }}</td>
+                  @endif
                   <td class="align-middle">
                     @if($row->note != null)
                     {{ $row->note }}
@@ -66,9 +70,9 @@
                     @endif
                   </td>
                   <td class="align-middle">
-                    
+                  @if($row->pickup_date != "0001-01-01 00:00:00")
                     <button style="margin-bottom:4px " type="button" id="{{ $row->id }}" class="btn btn-primary btn-block">Pilih Hari Lain</button>
-
+                  @endif
                     <a href="{{ route('koperasi.storeConfirm',$row->id) }}" style="display:inline">
                     <button class="btn btn-success btn-block">Telah Diambil</button>
                     </a>

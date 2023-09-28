@@ -49,7 +49,17 @@
           <p>{{ \Session::get('success') }}</p>
         </div>
         @endif
-
+        <div class="container">
+          <div class="row">
+              <div class="col-md-9">
+                  <input type="text" name="searchTxt" id="searchTxt" class="form-control mb-3" placeholder="" value="">
+              </div>
+              <div class="col-md-3">
+                  <button onclick="fetchConfirmOrder()" class="btn btn-primary btn-block">Carian Nama atau No Pesanan</button>
+              </div>
+          </div>
+      </div>
+      <br>
         <div class="flash-message"></div>
 
         <div class="table-responsive">
@@ -106,12 +116,13 @@
 
  function fetchConfirmOrder(){
   orgId = $("#org_dropdown option:selected").val();
-
+const key = $('#searchTxt').val();
 $.ajax({
         type: 'GET',
         url: '{{ route("koperasi.fetchConfirmTable")}}',
         data: {
-            koopId:orgId
+            koopId:orgId,
+            key:key
         },
         success:function(response){
           loadConfirmTable(response.order);
@@ -119,7 +130,11 @@ $.ajax({
     });
  }
 
+ function SearchByName(){
+
+ }
   function loadConfirmTable(orders){
+   // console.log(orders);
     const confirmTableBody = document.querySelector('#confirmTable tbody');
     $("#confirmTable tbody").empty();
     const statusLabels = {
@@ -141,19 +156,22 @@ $.ajax({
       
       const confirmLink="{{ route('koperasi.storeConfirm', ':pgngId') }}".replace(':pgngId',order.id);
       const notconfirmLink="{{ route('koperasi.notConfirm', ':pgngId') }}".replace(':pgngId',order.id);
+//<a href="${notconfirmLink}" style="margin: 4px" class="btn btn-danger m1">Tidak Diambil</a>
+      const pickupDate = order.pickup_date== '0001-01-01 00:00:00'?'Hubungi Pelanggan untuk Mengambil Pesanan':order.pickup_date;
+      console.log(order.pickup_date,new Date(1, 0, 1, 0, 0, 0));
       row.innerHTML = `
         <td>${order.id}</td>
         <td>${order.name}</td>
         <td>${order.telno}</td>
         <td>${order.orderTime}</td>
-        <td>${order.pickup_date}</td>
+        <td>${pickupDate}</td>
         <td>${descriptionCell.innerHTML}</td>
         <td>${order.total_price.toFixed(2)}</td>
         <td>${statusLabels[order.status]}</td>
         <td class="allign-middle">
           <div>
             <a href="${confirmLink}" style="margin: 4px" class="btn btn-primary">Telah Diambil</a>
-            <a href="${notconfirmLink}" style="margin: 4px" class="btn btn-danger m1">Tidak Diambil</a>
+            
           </div>
         </td>
       `;

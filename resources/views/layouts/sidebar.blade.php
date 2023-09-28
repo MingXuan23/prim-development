@@ -683,14 +683,14 @@
             </li>
             @endrole --}}
 
-             <li>
+             <!-- <li>
                     <a href="{{route('delivery.index')}}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Parcel</span>
                     </a>
-                </li>
+                </li> -->
 
-                
+                @role('Homestay Admin|Superadmin|Buyer')
                 <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
                     <i class="mdi mdi-home-city-outline"></i>
@@ -699,70 +699,211 @@
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
                 @role('Homestay Admin')
-                        <a href="{{ route('homestay.index') }}" class=" waves-effect">
-                            <i class="mdi mdi-percent"></i>
-                            <span>Set Promosi</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
                             <i class="mdi mdi-room-service-outline"></i>
                             <span>Urus Bilik</span>
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
-                            <i class="ti-clipboard"></i>
-                            <span>Urus Tempahan</span>
-                        </a>
-                    </li>
-                    @endrole 
-                    <li>
-                        <a href="{{ route('homestay.bookinglist') }}" class=" waves-effect">
-                            <i class="mdi mdi-percent"></i>
-                            <span>Buat Tempahan</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('homestay.tempahananda') }}" class=" waves-effect">
-                            <i class="mdi mdi-room-service-outline"></i>
-                            <span>Tempahan Anda</span>
-                        </a>
-                    </li>
-                    <li>
-                </ul>  
-            </li>
-
-            <li>
-                <a href="javascript: void(0);7" class="has-arrow waves-effect">
-                    <i class="mdi mdi-home-city-outline"></i>
-                    <span>Grab Student</span>
-                </a>
-                <ul class="sub-menu mm-collapse" aria-expanded="false">
-                    <li>
-                @role('Grab Student Admin')
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('homestay.index') }}" class=" waves-effect">
                             <i class="mdi mdi-percent"></i>
                             <span>Set Promosi</span>
                         </a>
                     </li>
                     <li>
-                        <a href="" class=" waves-effect">
-                            <i class="mdi mdi-room-service-outline"></i>
-                            <span>Urus Bilik</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="" class=" waves-effect">
+                        <a href="{{ route('homestay.urustempahan') }}" class=" waves-effect">
                             <i class="ti-clipboard"></i>
                             <span>Urus Tempahan</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="{{ route('homestay.tunjuksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-finance"></i>
+                            <span>Lihat Keuntungan</span>
+                        </a>
+                    </li>
                     @endrole 
+                    <li>
+                        <a href="{{ route('homestay.bookinglist') }}" class=" waves-effect">
+                            <i class="mdi mdi-book-search"></i>
+                            <span>Buat Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.tempahananda') }}" class=" waves-effect">
+                            <i class="mdi mdi-cart"></i>
+                            <span>Tempahan Anda</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.userhistory') }}" class=" waves-effect">
+                            <i class="mdi mdi-history"></i>
+                            <span>Sejarah Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
                 </ul>  
             </li>
-
+            @endrole
             
+            @role('Grab Student Admin|Superadmin|Buyer')
+            <li>
+                <a href="javascript: void(0);7" class="has-arrow waves-effect">
+                    <i class="mdi  mdi-taxi"></i>
+                    <span>Grab Student</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    <li>
+                    @role('Grab Student Admin')
+                        <a href="{{ route('grab.setinsert') }}" class=" waves-effect">
+                            <i class="mdi mdi-taxi"></i>
+                            <span>Daftar Kereta</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('grab.check') }}" class=" waves-effect">
+                            <i class="mdi mdi-taxi"></i>
+                            <span>Urus Kereta</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('grab.setdestination') }}" class=" waves-effect">
+                            <i class="mdi mdi-city"></i>
+                            <span>Daftar Destinasi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('grab.checkpassenger') }}" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Urus Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('grab.notifypassenger') }}" class=" waves-effect">
+                            <i class="mdi mdi-comment-alert"></i>
+                            <span>Notify Penumpang</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('grab.checksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Semak Untung</span>
+                        </a>
+                    </li>
+                    @endrole 
+                    <li>
+                        <a href="{{ route('book.grab') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Buat Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('grab.bayartempahan') }}" class=" waves-effect">
+                        <i class="mdi mdi-cash-multiple"></i>
+                            <span>Bayar Tempahan</span>
+                        </a>
+                    </li>
+                </ul>  
+            </li>
+            @endrole
+
+            @role('Bas Admin|Superadmin|Buyer')
+            <li>
+                <a href="javascript: void(0);7" class="has-arrow waves-effect">
+                    <i class="mdi  mdi-bus"></i>
+                    <span>Bas</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    <li>
+                    @role('Bas Admin')
+                        <a href="{{ route('bus.setinsert') }}" class=" waves-effect">
+                            <i class="mdi mdi-bus"></i>
+                            <span>Daftar Bas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.manage') }}" class=" waves-effect">
+                            <i class="mdi mdi-bus"></i>
+                            <span>Urus Bas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.listpassenger') }}" class=" waves-effect">
+                            <i class="mdi mdi-account-multiple"></i>
+                            <span>Senarai Penumpang</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.notifypassenger') }}" class=" waves-effect">
+                            <i class="mdi mdi-comment-alert"></i>
+                            <span>Notify Penumpang</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.checksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Semak Untung</span>
+                        </a>
+                    </li>
+                    @endrole 
+                    <li>
+                        <a href="{{ route('book.bus') }}" class=" waves-effect">
+                            <i class="mdi mdi-library-books"></i>
+                            <span>Buat Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('bus.bayartempahan') }}" class=" waves-effect">
+                            <i class="mdi mdi-cash-multiple"></i>
+                            <span>Bayar Tempahan</span>
+                        </a>
+                    </li>
+                </ul>  
+            </li>
+            @endrole
+
+            @role('OrderS Admin|Superadmin|Buyer')
+            <li>
+                <a href="javascript: void(0);" class="has-arrow waves-effect">
+                    <i class="mdi mdi-silverware"></i>
+                    <span>OrderS</span>
+                </a>
+                <ul class="sub-menu mm-collapse" aria-expanded="false">
+                    @role('OrderS Admin')
+                    <li>
+                        <a href="{{ route('orders.managemenu') }}" class=" waves-effect">
+                            <i class="mdi mdi-table-edit"></i>
+                            <span>Urus Menu</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('orders.uruspesanan') }}" class=" waves-effect">
+                            <i class="mdi mdi-table-edit"></i>
+                            <span>Urus Pesanan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('orders.laporanjualan') }}" class=" waves-effect">
+                            <i class="mdi mdi-chart-bar"></i>
+                            <span>Laporan Jualan</span>
+                        </a>
+                    </li>
+                    @endrole
+                    <li>
+                        <a href="{{ route('orders.buatpesanan') }}" class=" waves-effect">
+                            <i class="mdi mdi-note-plus"></i>
+                            <span>Buat Pesanan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('orders.trackorder') }}" class=" waves-effect">
+                            <i class="mdi mdi-package-variant-closed"></i>
+                            <span>Pesanan</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @endrole 
             
 
                 

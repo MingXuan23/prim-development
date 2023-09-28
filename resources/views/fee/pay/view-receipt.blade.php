@@ -69,7 +69,7 @@
                             <div class="col-12 pt-3">
                                 <table style="width:100%" class="infotbl">
                                     <tr style="background-color:#e9ecef">
-                                        <th colspan="9" class="text-center">Maklumat Penjaga</th>
+                                        <th colspan="9" class="text-center">Maklumat Pembayar</th>
                                     </tr>
                                     <tr>
                                         <td class="py-3">Nama</td>
@@ -79,7 +79,11 @@
                                         <td class="py-2">No. Kad Pengenalan
                                         </td>
                                         <td class="py-2">:</td>
+                                        @if($getparent->icno)
                                         <td class="py-2">{{ $getparent->icno }}</td>
+                                        @else
+                                        <td class="py-2">{{ $getparent->telno }}</td>
+                                        @endif
                                     </tr>
                                     <tr style="background-color:#e9ecef">
                                         <th colspan="9" class="text-center">Maklumat Yuran</th>

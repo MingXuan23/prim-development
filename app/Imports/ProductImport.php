@@ -38,15 +38,15 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation
     public function rules(): array
     {
         return [
-            'name' => [
-                'required'
-            ],
-            'quantity' => [
-                'required'
-            ],
-            'price' => [
-                'required'
-            ],
+            // 'name' => [
+            //     'required'
+            // ],
+            // 'quantity' => [
+            //     'required'
+            // ],
+            // 'price' => [
+            //     'required'
+            // ],
 
         ];
     }
@@ -55,9 +55,9 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation
     {
         return [
             // 'no_kp.unique' => 'Terdapat maklumat guru yang telah wujud',
-            'name.required' => 'Nama perlu diisikan',
-            'quantity.required'=>'Quantiti perlu diisikan',
-            'price.required'=>"Harga perlu diisikan"
+            // 'name.required' => 'Nama perlu diisikan',
+            // 'quantity.required'=>'Quantiti perlu diisikan',
+            // 'price.required'=>"Harga perlu diisikan"
             
         ];
     }
@@ -65,7 +65,11 @@ class ProductImport implements ToModel, WithHeadingRow, WithValidation
     public function model(array $row)
     {
         if(!isset($row['name'])||!isset($row['quantity'])||!isset($row['price'])){
-            throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
+            
+            if($row['name']==null&& $row['quantity']==null&&$row['price']==null)
+                return null;
+            else
+             throw ValidationException::withMessages(["error" => "Invalid headers or missing column"]);
         }
         if (!is_int($row['quantity']) || !is_numeric($row['price']) || $row['price'] <=0||$row['quantity'] <=0 || !preg_match('/^\d+(\.\d{1,2})?$/', $row['price'])) {
             throw ValidationException::withMessages(["error" => "Invalid format of quantity or price"]);

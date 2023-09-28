@@ -60,6 +60,13 @@
       <div class="card-body">
 
         <form method="POST" action="{{route('koperasi.storeOpening')}}" class="form-validation">
+        <label>
+          
+          <input type="checkbox" name="checkboxEnablePickUpTime" id="selectDate">
+          Benarkan Pilih Masa Pengambilan
+        </label>
+
+        <input type="text" name="noteReq" id="noteReq" class="form-control" placeholder="Masukkan Format Nota"  value=""></br>
           {{csrf_field()}}
           <p class="scroll-indicator">Scroll > >></p>
         <div class="table-responsive">
@@ -215,7 +222,9 @@
             },
             success:function(response){
               //console.log(response.hour)
-              
+              document.getElementById('selectDate').checked= response.hour[0].date_selection_enable;
+              //console.log( $('#selectDate').val(),response.hour[0].date_selection_enable);
+              $('#noteReq').val(response.hour[0].note_requirement);
               $('#hourTable').empty();
               response.hour.forEach(function(hour) {
                 var row = document.createElement('tr');
