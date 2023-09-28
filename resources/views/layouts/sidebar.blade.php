@@ -279,7 +279,114 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin')
+                {{-- yuran sekolah swasta --}}
+                @role('Superadmin|Pentadbir Swasta|Guru Swasta')
+                    <li>
+                        <a href="javascript: void(0);" class="has-arrow waves-effect">
+                            <i class="fas fa-school"></i>
+                            <span>Sekolah Swasta</span>
+                        </a>
+
+                        <ul class="sub-menu mm-collapse" aria-expanded="false">
+                            @role('Superadmin|Pentadbir Swasta')
+                            <li>
+                                <a href="{{ route('private-school.teacher.index') }}" class=" waves-effect">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <span>Guru</span>
+                                </a>
+                            </li>
+                            @endrole
+
+
+                            @role('Superadmin|Pentadbir Swasta')
+                            <li>
+                                <a href="{{ route('private-school.class.index') }}" class=" waves-effect">
+                                    <i class="mdi mdi-google-classroom"></i>
+                                    <span>Kelas</span>
+                                </a>
+                            </li>
+                            @endrole
+
+
+                            @role('Superadmin|Pentadbir Swasta|Guru Swasta')
+                            <li>
+                                <a href="{{ route('private-school.student.index') }}" class=" waves-effect">
+                                    <i class="fas fa-user-graduate"></i>
+                                    <span>Pelajar</span>
+                                </a>
+                            </li>
+
+                            @endrole
+
+                            @role('Superadmin|Pentadbir Swasta|Guru Swasta')
+                            <li>
+                                <a href="{{ route('private-school.parent.index') }}" class=" waves-effect">
+                                    <i class="fas fa-user-friends"></i>
+                                    <span>Ibu Bapa</span>
+                                </a>
+                            </li>
+
+                            @endrole
+                        </ul>
+                    </li>
+
+                    {{-- @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin')
+
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                                <span>Yuran Berulang</span>
+                            </a>
+                            <ul class="sub-menu mm-collapse" aria-expanded="false">
+                                @role('Superadmin|Penjaga')
+                                <li>
+                                    <a href="{{ route('dependent_fees') }}" class=" waves-effect">
+                                        <i class="far fa-credit-card"></i>
+                                        <span>Bayar</span>
+                                    </a>
+                                </li>
+                                @endrole
+
+                                @role('Superadmin|Pentadbir')
+                                <li>
+                                    <a href="{{ route('fees.report') }}" class=" waves-effect" aria-expanded="true">
+                                        <i class="fas fa-list-ul"></i>
+                                        <span>Laporan</span>
+                                    </a>
+                                </li>
+                                @endrole
+
+                                @role('Superadmin|Pentadbir|Guru|Koop Admin')
+                                <li>
+                                    <a href="{{ route('fees.category.report') }}" class=" waves-effect">
+                                        <i class="ti-clipboard"></i>
+                                        <span>Laporan Yuran</span>
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
+                                        <i class="fas fa-search"></i>
+                                        <span>Laporan Kelas</span>
+                                    </a>
+                                </li>
+                                @endrole
+
+                                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin')
+
+                                <li>
+                                    <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
+                                        <i class="ti-clipboard"></i>
+                                        <span>Sejarah Bayaran</span>
+                                    </a>
+                                </li>
+                                @endrole
+                            </ul>
+                        </li>
+                    @endrole --}}
+                @endrole
+
+                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin|Pentadbir Swasta|Guru Swasta')
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -312,23 +419,39 @@
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru|Koop Admin')
+                @role('Superadmin|Pentadbir|Guru|Koop Admin|Pentadbir Swasta|Guru Swasta')
                 <li>
+                    @role('Superadmin|Pentadbir|Guru|Koop Admin')
                     <a href="{{ route('fees.category.report') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Laporan Yuran</span>
                     </a>
+                    @endrole
+                    @role('Superadmin|Guru Swasta|Koop Admin|Pentadbir Swasta')
+                    <a href="{{ route('fees.category.report_swasta') }}" class=" waves-effect">
+                        <i class="ti-clipboard"></i>
+                        <span>Laporan Yuran</span>
+                    </a>
+                    @endrole
                 </li>
 
                 <li>
+                    @role('Superadmin|Pentadbir|Guru|Koop Admin')
                     <a href="{{ route('fees.searchreport') }}" class=" waves-effect" aria-expanded="true">
                         <i class="fas fa-search"></i>
                         <span>Laporan Kelas</span>
                     </a>
+                    @endrole
+                    @role('Superadmin|Guru Swasta|Koop Admin|Pentadbir Swasta')
+                    <a href="{{ route('fees.searchreportswasta') }}" class=" waves-effect" aria-expanded="true">
+                        <i class="fas fa-search"></i>
+                        <span>Laporan Kelas</span>
+                    </a>
+                    @endrole
                 </li>
                 @endrole
 
-                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin')
+                @role('Superadmin|Pentadbir|Guru|Penjaga|Koop Admin|Pentadbir Swasta|Guru Swasta')
 
                 <li>
                     <a href="{{ route('parent.fees.history') }}" class=" waves-effect">
@@ -361,10 +484,19 @@
                 </li>
                 @endrole
 
+                @role('Superadmin|Pentadbir Swasta|Koop Admin')
+                <li>
+                    <a href="{{ route('fees.Recurring') }}" class=" waves-effect" aria-expanded="true">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Yuran Berulang</span>
+                    </a>
+                </li>
+                @endrole
+
             </ul>
             </li>
             @endrole
-            
+
              @role('Superadmin|Koop Admin')
             <li>
             <a href="javascript: void(0);" class="has-arrow waves-effect">

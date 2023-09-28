@@ -40,6 +40,12 @@ class TeacherController extends Controller
         return view('teacher.index', compact('organization'));
     }
 
+    public function indexSwasta()
+    {
+        $organization = $this->getOrganizationByUserId();
+        return view('private-school.teacher.index', compact('organization'));
+    }
+
     //for warden and guard 
     public function perananindex()
     {
@@ -130,6 +136,13 @@ class TeacherController extends Controller
         return view('teacher.add', compact('organization'));
     }
 
+    public function createSwasta()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('private-school.teacher.add', compact('organization'));
+    }
+
     //for warden and guard
     public function peranancreate()
     {
@@ -207,8 +220,80 @@ class TeacherController extends Controller
         $rolename = OrganizationRole::find(5);
         $user->assignRole($rolename->nama);
 
-
         return redirect('/teacher')->with('success', 'New teacher has been added successfully');
+    }
+
+    public function storeSwasta(Request $request)
+    {
+        $this->validate($request, [
+            'name'          =>  'required',
+            // 'icno'          =>  'required',
+            'email'         =>  'required',
+            'telno'         =>  'required',
+            'organization'  =>  'required',
+        ]);
+
+        //check if parent role exists
+        $ifExits = DB::table('users as u')
+            ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
+            ->where('ou.role_id', '=', '6')
+            ->where('u.email', '=', "{$request->get('email')}")
+            // ->where('u.icno', '=', "{$request->get('icno')}")
+            ->where('u.telno', '=', "{$request->get('telno')}")
+            ->get();
+
+        // dd($ifExits);
+
+        if (count($ifExits) == 0) // if not parent
+        {
+            $this->validate($request, [
+                // 'icno'          =>  'required|unique:users',
+                'email'         =>  'required|email|unique:users',
+            ]);
+
+            $newteacher = new Teacher([
+                'name'           =>  $request->get('name'),
+                // 'icno'           =>  $request->get('icno'),
+                'email'          =>  $request->get('email'),
+                'password'       =>  Hash::make('abc123'),
+                'telno'          =>  $request->get('telno'),
+                'remember_token' =>  $request->get('_token'),
+                // 'created_at'     =>  now(),
+            ]);
+            $newteacher->save();
+        } else // if parent
+        {
+            $newteacher = DB::table('users')
+                ->where('email', '=', "{$request->get('email')}")
+                ->first();
+        }
+
+        $username    = DB::table('users')
+            ->where('id', $newteacher->id)
+            ->update(
+                [
+                    'username' => 'GP' . str_pad($newteacher->id, 5, "0", STR_PAD_LEFT),
+                ]
+            );
+
+        // teacher active when first time login then will change status
+        DB::table('organization_user')->insert([
+            'organization_id'   => $request->get('organization'),
+            'user_id'           => $newteacher->id,
+            'role_id'           => 21,
+            'start_date'        => now(),
+            'status'            => 0,
+        ]);
+
+        $user = User::find($newteacher->id);
+
+        // role guru swasta
+        $rolename = OrganizationRole::find(21);
+        $user->assignRole($rolename->nama);
+
+        //dd($newteacher);
+        
+        return redirect('/private-school/teacher')->with('success', 'New teacher has been added successfully');
     }
 
     //for warden and guard
@@ -326,7 +411,7 @@ class TeacherController extends Controller
             ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
             ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
             ->where('users.id', $id)
-            ->where('organization_user.role_id', 5)
+            ->whereIn('organization_user.role_id', [5, 21])
             ->select('organizations.id as organization_id', 'users.id as uid', 'users.name as tcname', 'users.icno as icno', 'users.email as email', 'users.telno as telno', 'organization_user.role_id as role_id')
             ->first();
 
@@ -554,7 +639,7 @@ class TeacherController extends Controller
                     ->join('users', 'users.id', '=', 'organization_user.user_id')
                     ->select('organizations.id as oid', 'organization_user.status as status', 'users.id', 'users.name', 'users.email', 'users.username', 'users.icno', 'users.telno')
                     ->where('organizations.id', $oid)
-                    ->where('organization_user.role_id', 5)
+                    ->whereIn('organization_user.role_id', [5, 21])
                     ->orderBy('users.name');
             }
             // elseif ($hasOrganizaton == "true") {
@@ -662,7 +747,7 @@ class TeacherController extends Controller
             // user role pentadbir 
             //micole try
             return Organization::whereHas('user', function ($query) use ($userId) {
-                $query->where('user_id', $userId)->whereIn('role_id', [4, 5, 13, 14]);
+                $query->where('user_id', $userId)->whereIn('role_id', [4, 5, 13, 14, 20]);
             })->get();
         }
     }

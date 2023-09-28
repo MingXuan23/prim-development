@@ -58,26 +58,27 @@ class LandingPageController extends AppBaseController
     //edit by wan
     public function indexFees()
     {
-        $organization = DB::table('organization_url')
-            ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
-            ->where('organization_url.status',1)
+        $organization = DB::table('organization_url as url')
+            ->join('organizations as o', 'url.organization_id', '=', 'o.id')
+            ->where('url.status',1)
+            ->whereIn('o.type_org', [1, 2, 3])
             ->get();
 
-        $schools = DB::table('organization_url')
-            ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
-            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
-            ->whereIn('type_organizations.id', [1, 2, 3])
-            ->where('organization_url.title', 'NOT LIKE', '%Poli%')
-            ->get();
+        // $schools = DB::table('organization_url')
+        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+        //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+        //     ->whereIn('type_organizations.id', [1, 2, 3])
+        //     ->where('organization_url.title', 'NOT LIKE', '%Poli%')
+        //     ->get();
 
-        //dd($schools);
+        // //dd($schools);
 
-        $politeknik = DB::table('organization_url')
-            ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
-            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
-            ->whereIn('type_organizations.id', [1, 2, 3])
-            ->where('organization_url.title', 'LIKE', '%Poli%')
-            ->get();
+        // $politeknik = DB::table('organization_url')
+        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+        //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+        //     ->whereIn('type_organizations.id', [1, 2, 3])
+        //     ->where('organization_url.title', 'LIKE', '%Poli%')
+        //     ->get();
 
         return view('landing-page.fees.index', ['organizations' => $organization]);
     }
@@ -113,31 +114,6 @@ class LandingPageController extends AppBaseController
             
         // return view('landing-page.organization_list', ['organizations' => $organization]);
         return view('landing-page.organization_list');
-    }
-
-    public function getAllOrganizationList(Request $request)
-    {
-        if ($request->ajax()) {
-
-            $data = DB::table('organization_url')
-                ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
-                ->get();
-
-            // $data = OrganizationUrl::latest()->get();
-
-            $table = Datatables::of($data);
-            // return Datatables::of($data);
-                // ->addIndexColumn()
-                // // ->addColumn('action', function($row){
-                // //     $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
-                // //     return $actionBtn;
-                // // })
-                // ->rawColumns(['action'])
-
-            dd($table);
-            return $table->make(true);
-            
-        }
     }
     //end edit by wan
 

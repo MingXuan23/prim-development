@@ -97,6 +97,12 @@ class OrganizationController extends Controller
             $user->assignRole('Pentadbir');
         }
 
+        // Sekolah Swasta / Tadika
+        if ($request->type_org == 15) {
+            $organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 20]);
+            $user->assignRole('Pentadbir Swasta');
+        }
+        
         // Koperasi
         if ($type_org->nama == "Koperasi") {
             Organization::where('id', $organization->id)->update(['parent_org' => $request->parent_org]);
@@ -148,7 +154,7 @@ class OrganizationController extends Controller
 
             $this->insertOrganizationHours($organization->id);
         }
-        
+
         return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
     }
 

@@ -114,103 +114,224 @@ class PayController extends AppBaseController
         $getorganization    = "";
         $getfees            = "";
         $getfees_bystudent  = "";
+        $getfees_bystudentSwasta = "";
         $getstudentfees     = "";
 
         $cb_categoryA       = $request->get('category');
         $cb_fees_student    = $request->get('id');
+        $cb_org             = $request->get('org');
+
+        $org_type = DB::table('organizations as o')
+                        ->where('id', $cb_org)
+                        ->select('o.type_org as o_type')
+                        ->first();
 
         if ($cb_fees_student) {
 
-            // ************  id from value checkbox (hidden) **************
-            $size_cb  = count(collect($request)->get('id'));
-            $data_cb  = collect($request)->get('id');
+            // if not swasta
+            if($org_type->o_type != 15) {
+                // ************  id from value checkbox (hidden) **************
+                $size_cb  = count(collect($request)->get('id'));
+                $data_cb  = collect($request)->get('id');
 
-            $student_fees  = array();
-            $studentid  = array();
-            $feesid     = array();
-            for ($i = 0; $i < $size_cb; $i++) {
+                $student_fees  = array();
+                $studentid  = array();
+                $feesid     = array();
+                for ($i = 0; $i < $size_cb; $i++) {
 
-                //want seperate data from request
-                //case 0 = student id
-                //case 1 = fees id
-                //format req X-X
+                    //want seperate data from request
+                    //case 0 = student id
+                    //case 1 = fees id
+                    //format req X-X
 
-                $case           = explode("-", $data_cb[$i]);
-                $studentid[]    = $case[0];
-                $feesid[]       = $case[1];
+                    $case           = explode("-", $data_cb[$i]);
+                    $studentid[]    = $case[0];
+                    $feesid[]       = $case[1];
 
-                $getfees_req     = DB::table('students')
+                    $getfees_req     = DB::table('students')
+                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                        ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                        ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                        ->select('student_fees_new.id')
+                        ->where('fees_new.id', $feesid[$i])
+                        ->where('students.id', $studentid[$i])
+                        ->first();
+
+                    // dd($getfees_req);
+                    $student_fees[] = $getfees_req->id;
+                }
+
+                // dd($student_fees);
+
+                $res_student = array_unique($studentid);//result
+                $res_fee     = array_unique($feesid);
+
+                // ************************* get student from array student id *******************************
+
+                $getstudent  = DB::table('students')
+                    ->select('id as studentid', 'nama as studentname')
+                    ->whereIn('id', $res_student)
+                    ->get();
+
+                // ************************* get organization from array student id *******************************
+
+                $getstudent2  = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                    ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                    ->select('students.id as studentid', 'students.nama as studentname', 'fees_new.id as feeid', 'fees_new.organization_id as organizationid')
+                    ->whereIn('students.id', $res_student)
+                    ->first();
+
+                $getorganization  = DB::table('organizations')
+                    ->where('id', $getstudent2->organizationid)
+                    ->first(); 
+
+                // ************************* get fees from array fees id *******************************
+
+                
+                $getfees = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                    ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                    ->select('fees_new.category', 'students.id as studentid')
+                    ->distinct()
+                    ->whereIn('student_fees_new.id', $student_fees)
+                    ->get();
+                //duplicate code 
+
+                $getfees_bystudent     = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                    ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                    ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid')
+                    ->whereIn('student_fees_new.id', $student_fees)
+                    ->get();
+
+                // $getfees_bystudentSwasta     = DB::table('students')
+                //     ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                //     ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                //     ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                //     ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid')
+                //     ->whereIn('student_fees_new.id', $student_fees)
+                //     ->get();
+                
+                $getorganization  = DB::table('organizations')
+                    ->where('id', $getfees_bystudent[0]->organization_id)
+                    ->first();
+
+                // ************************* get student_fees_id from array *******************************
+
+                $getstudentfees  = DB::table('students')
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
                     ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
                     ->select('student_fees_new.id')
-                    ->where('fees_new.id', $feesid[$i])
-                    ->where('students.id', $studentid[$i])
+                    ->whereIn('student_fees_new.id', $student_fees)
+                    ->get();
+            }
+            else {
+                $size_cb  = count(collect($request)->get('id'));
+                $data_cb  = collect($request)->get('id');
+
+                $student_fees  = array();
+                $studentid  = array();
+                $feesid     = array(); //fees_recurring id
+                for ($i = 0; $i < $size_cb; $i++) {
+
+                    //want seperate data from request
+                    //case 0 = student id
+                    //case 1 = fees id
+                    //format req X-X
+
+                    $case           = explode("-", $data_cb[$i]);
+                    $studentid[]    = $case[0];
+                    $feesid[]       = $case[1];
+
+                    $getfees_req     = DB::table('students')
+                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                        ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                        ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                        ->join('fees_recurring as fr', 'fr.student_fees_new_id', '=', 'student_fees_new.id')
+                        ->select('student_fees_new.id')
+                        // ->where('fees_new.id', $feesid[$i])
+                        ->where('fr.id', $feesid[$i]) //fees_recurring id
+                        ->where('students.id', $studentid[$i])
+                        ->first();
+
+                    $student_fees[] = $getfees_req->id;
+                }
+
+                // dd($student_fees);
+
+                $res_student = array_unique($studentid);//result
+                $res_fee     = array_unique($feesid);
+
+                // ************************* get student from array student id *******************************
+
+                $getstudent  = DB::table('students')
+                    ->select('id as studentid', 'nama as studentname')
+                    ->whereIn('id', $res_student)
+                    ->get();
+
+                // ************************* get organization from array student id *******************************
+
+                $getstudent2  = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                    ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                    ->select('students.id as studentid', 'students.nama as studentname', 'fees_new.id as feeid', 'fees_new.organization_id as organizationid')
+                    ->whereIn('students.id', $res_student)
                     ->first();
 
-                $student_fees[] = $getfees_req->id;
+                $getorganization  = DB::table('organizations')
+                    ->where('id', $getstudent2->organizationid)
+                    ->first(); 
+
+                // ************************* get fees from array fees id *******************************
+
+                
+                $getfees = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                    ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                    ->select('fees_new.category', 'students.id as studentid')
+                    ->distinct()
+                    ->whereIn('student_fees_new.id', $student_fees)
+                    ->get();
+                //duplicate code 
+
+                $getfees_bystudent     = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                    ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                    ->join('fees_recurring as fr', 'fr.student_fees_new_id', '=', 'student_fees_new.id')
+                    ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid', 'fr.finalAmount as fr_finalamount')
+                    ->whereIn('student_fees_new.id', $student_fees)
+                    ->get();
+
+                // $getfees_bystudentSwasta     = DB::table('students')
+                //     ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                //     ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                //     ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                //     ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid')
+                //     ->whereIn('student_fees_new.id', $student_fees)
+                //     ->get();
+                
+                $getorganization  = DB::table('organizations')
+                    ->where('id', $getfees_bystudent[0]->organization_id)
+                    ->first();
+
+                // ************************* get student_fees_id from array *******************************
+
+                $getstudentfees  = DB::table('students')
+                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                    ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                    ->select('student_fees_new.id')
+                    ->whereIn('student_fees_new.id', $student_fees)
+                    ->get();
             }
-
-            // dd($student_fees);
-
-            $res_student = array_unique($studentid);//result
-            $res_fee     = array_unique($feesid);
-
-            // ************************* get student from array student id *******************************
-
-            $getstudent  = DB::table('students')
-                ->select('id as studentid', 'nama as studentname')
-                ->whereIn('id', $res_student)
-                ->get();
-
-            // ************************* get organization from array student id *******************************
-
-             $getstudent2  = DB::table('students')
-                ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-                ->select('students.id as studentid', 'students.nama as studentname', 'fees_new.id as feeid', 'fees_new.organization_id as organizationid')
-                ->whereIn('students.id', $res_student)
-                ->first();
-
-            $getorganization  = DB::table('organizations')
-                ->where('id', $getstudent2->organizationid)
-                ->first(); 
-
-            // ************************* get fees from array fees id *******************************
-
-            
-            $getfees = DB::table('students')
-                ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-                ->select('fees_new.category', 'students.id as studentid')
-                ->distinct()
-                ->whereIn('student_fees_new.id', $student_fees)
-                ->get();
-             //duplicate code 
-
-            $getfees_bystudent     = DB::table('students')
-                ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-                ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid')
-                ->whereIn('student_fees_new.id', $student_fees)
-                ->get();
-            
-            $getorganization  = DB::table('organizations')
-                ->where('id', $getfees_bystudent[0]->organization_id)
-                ->first();
-
-            // ************************* get student_fees_id from array *******************************
-
-            $getstudentfees  = DB::table('students')
-                ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
-                ->select('student_fees_new.id')
-                ->whereIn('student_fees_new.id', $student_fees)
-                ->get();
         }
 
 
@@ -1182,18 +1303,37 @@ class PayController extends AppBaseController
 
         // dd($get_category);
 
-        // get fees
-        $get_fees = DB::table('fees_new')
-            ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
-            ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
-            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
-            ->join('students', 'students.id', '=', 'class_student.student_id')
-            ->select('fees_new.*', 'students.id as studentid')
-            ->orderBy('students.id')
-            ->orderBy('fees_new.category')
-            ->where('fees_transactions_new.transactions_id', $id)
-            ->where('student_fees_new.status', 'Paid')
-            ->get();
+        if($get_category == "Kategori Berulang")
+        {
+            // get fees for Kategori Berulang
+            $get_fees = DB::table('fees_new')
+                ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+                ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+                ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+                ->join('students', 'students.id', '=', 'class_student.student_id')
+                ->join('fees_recurring as fr', 'fr.student_fees_new_id', '=', 'student_fees_new.id')
+                ->select('fees_new.*', 'students.id as studentid', 'fr.finalAmount as fr_finalamount', 'fr.desc as fr_desc')
+                ->orderBy('students.id')
+                ->orderBy('fees_new.category')
+                ->where('fees_transactions_new.transactions_id', $id)
+                ->where('student_fees_new.status', 'Paid')
+                ->get();
+        }
+        else
+        {
+            // get fees
+            $get_fees = DB::table('fees_new')
+                ->join('student_fees_new', 'student_fees_new.fees_id', '=', 'fees_new.id')
+                ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+                ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+                ->join('students', 'students.id', '=', 'class_student.student_id')
+                ->select('fees_new.*', 'students.id as studentid')
+                ->orderBy('students.id')
+                ->orderBy('fees_new.category')
+                ->where('fees_transactions_new.transactions_id', $id)
+                ->where('student_fees_new.status', 'Paid')
+                ->get();
+        }
 
         // get transaction for fees category A
         $getfees_categoryA  = DB::table('fees_new')

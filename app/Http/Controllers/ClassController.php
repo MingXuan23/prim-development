@@ -23,6 +23,12 @@ class ClassController extends Controller
         return view('class.index', compact('organization'));
     }
 
+    public function indexSwasta()
+    {
+        $organization = $this->getOrganizationByUserId();
+        return view('private-school.class.index', compact('organization'));
+    }
+
     public function classexport(Request $request)
     {
         return Excel::download(new ClassExport(), 'class.xlsx');
@@ -53,6 +59,13 @@ class ClassController extends Controller
         return view('class.add', compact('organization'));
     }
 
+    public function createSwasta()
+    {
+        //
+        $organization = $this->getOrganizationByUserId();
+        return view('private-school.class.add', compact('organization'));
+    }
+    
     public function store(Request $request)
     {
         //
@@ -78,6 +91,33 @@ class ClassController extends Controller
         ]);
 
         return redirect('/class')->with('success', 'New class has been added successfully');
+    }
+
+    public function storeSwasta(Request $request)
+    {
+        //
+        $this->validate($request, [
+            'name'          =>  'required',
+            'level'         =>  'required',
+            'organization'  =>  'required',
+            'classTeacher'  =>  'required'
+        ]);
+
+        $class = new ClassModel([
+            'nama'          =>  $request->get('name'),
+            'levelid'       =>  $request->get('level'),
+            'status'       =>  "1",
+        ]);
+        $class->save();
+
+        DB::table('class_organization')->insert([
+            'organization_id' => $request->get('organization'),
+            'class_id'        => $class->id,
+            'organ_user_id'  =>  $request->get('classTeacher'),
+            'start_date'      => now(),
+        ]);
+
+        return redirect('/private-school/class')->with('success', 'New class has been added successfully');
     }
 
     public function storeDummyClass($id){
@@ -276,7 +316,9 @@ class ClassController extends Controller
             return Organization::whereHas('user', function ($query) use ($userId) {
                 $query->where('user_id', $userId)->Where(function ($query) {
                     $query->where('organization_user.role_id', '=', 4)
-                        ->Orwhere('organization_user.role_id', '=', 5);
+                        ->Orwhere('organization_user.role_id', '=', 5)
+                        ->Orwhere('organization_user.role_id', '=', 20)
+                        ->Orwhere('organization_user.role_id', '=', 21);
                 });
             })->get();
         }
@@ -289,6 +331,7 @@ class ClassController extends Controller
         ->select('ou.id as id', 'u.name')
         ->where('ou.organization_id', $request->oid)
         ->where('ou.role_id', 5)
+        ->Orwhere('ou.role_id', 21)
         ->orderBy('u.name')
         ->get();
         
