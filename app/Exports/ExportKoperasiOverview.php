@@ -23,7 +23,7 @@ class ExportKoperasiOverview implements FromCollection, ShouldAutoSize, WithHead
     {
         $data=[];
         //array_push($data, $feedata);
-        $this->orgId = 162;
+        
         $items = DB::table('product_item as pi')
         ->join('product_group as g','g.id','pi.product_group_id')
         ->where('g.organization_id',$this->orgId)
