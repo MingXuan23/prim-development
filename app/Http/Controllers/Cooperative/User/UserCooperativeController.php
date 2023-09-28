@@ -806,7 +806,8 @@ class UserCooperativeController extends Controller
 
     public function koopShop($koop)
     {
-        if(is_int($koop)){
+        //dd(is_numeric($koop),$koop);
+        if(is_numeric($koop)){
             $id=$koop;
         }
         else{

@@ -10,6 +10,8 @@ use App\Models\PgngOrder;
 use App\Models\OrganizationHours;
 use App\Models\Organization;
 use Illuminate\Support\Carbon;
+use App\Exports\ExportKoperasiOverview;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminOrderCooperativeController extends Controller
 {
@@ -40,6 +42,11 @@ class AdminOrderCooperativeController extends Controller
         ->join('users as u','pg.user_id','=','u.id')
         ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
         ->where('ou.organization_id', $request->koopId)
+        ->where(function ($query) use ($request) {
+            $query->where('u.name', 'LIKE', '%' . $request->key . '%')
+                ->orWhere('pg.id', $request->key)
+                ->orWhere('pg.note', 'LIKE', '%' . $request->key . '%');
+        })
         ->where('pg.status', 2)
         ->groupBy('pg.id')
         ->orderBy('pg.pickup_date')
@@ -48,7 +55,12 @@ class AdminOrderCooperativeController extends Controller
         return response()->json(['order'=>$order]);
     }
 
+    public function exportKoperasiOverview($id){
+
+        return Excel::download(new ExportKoperasiOverview($id), 'JualanBarang' . '.xlsx');
+    }
     public function viewPgngList($id,$customerID){
+       
         $userID = $customerID;
         // Get Information about the order
 
