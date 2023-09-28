@@ -112,7 +112,9 @@
     <div class="row">
       <label class="col-sm-3 col-form-label ">Tarikh dan Waktu Pesan</label>
       <div class="col-sm-7">
-        <p class="col col-form-label">{{ date_format($order_date,"M D Y, h:i A") }}</p>
+       
+          <p class="col col-form-label">{{ date_format($order_date,"M D Y, h:i A") }}</p>
+          
       </div>
     </div>
 
@@ -122,10 +124,14 @@
     <div class="row">
       <label class="col-sm-3 col-form-label ">Tarikh Pengambilan dan Waktu Buka</label>
       <div class="col-sm-7">
+      @if($list_detail->pickup_date == "0001-01-01 00:00:00")
         <p class="col col-form-label">
-          {{ date_format($pickup_date,"D, M d Y") }} | 
-          {{ date_format($open_hour,'h:i A') }} - {{ date_format($close_hour,'h:i A') }}
+        Sila Tunggu Mesaj Dari Koperasi
         </p>
+        @else
+        {{ date_format($pickup_date,"D, M d Y") }} | 
+          {{ date_format($open_hour,'h:i A') }} - {{ date_format($close_hour,'h:i A') }}
+        @endif
       </div>
     </div>
     <div class="row">

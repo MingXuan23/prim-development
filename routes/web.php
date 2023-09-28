@@ -265,6 +265,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/adminHistory', 'AdminOrderCooperativeController@adminHistory')->name('koperasi.adminHistory');
         Route::get('/fetchAdminHistory', 'AdminOrderCooperativeController@fetchAdminHistory')->name('koperasi.fetchAdminHistory');
 
+        Route::get('/exportKoperasiOverview/{id}', 'AdminOrderCooperativeController@exportKoperasiOverview')->name('koperasi.exportKoperasiOverview');
 
     });
 });

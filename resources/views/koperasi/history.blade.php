@@ -9,6 +9,7 @@
 @section('content')
 
 <div class="col-md-12">
+
 @if($koperasiList!="")
       <div style="padding-top: 24px" class="row">
         <div class="col-md-12 ">
@@ -29,7 +30,12 @@
   <div class="card-header">
     <i class="ti-clipboard mr-2"></i>Sejarah Pesanan Anda</div>
   <div class="card-body">
+  <a href="#" class="btn btn-success" id="itemReport">Eksport Laporan Barang</a>
+  <br>
+  <br>
     <div class="table-responsive">
+      
+      
       <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 
         <thead>
@@ -50,7 +56,7 @@
           @if(isset($order))
             @foreach($order as $row)
             @php($date = date_create($row->updated_at))
-            @php($pickup = date_create($row->pickup_date))
+            @php($pickup = date_create($row->confirm_picked_up_time))
             <tr>
               <td class="align-middle">{{ $row->id }}.</td>
               <td class="align-middle">{{ $row->koop_name }}</td>
@@ -126,10 +132,15 @@
     })
   }
   
+  
   function fetchAdminHistory(){
 
     orgId = $("#org_dropdown option:selected").val();
+  
 
+    const route = "{{ route('koperasi.exportKoperasiOverview', [':id',':orgId']) }}";
+    const finalroute = route.replace(':id', orgId);
+    $('#itemReport').attr('href', finalroute);
     $.ajax({
             type: 'GET',
             url: '{{ route("koperasi.fetchAdminHistory")}}',
