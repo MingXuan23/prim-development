@@ -143,7 +143,7 @@
                             Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
                             untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
                         <div class="btn-wrapper wow fadeInUp">
-                            <a href="/register" class="boxed-btn btn-rounded">Jom Derma</a>
+                            <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                         </div>
                     </div>
                 </div>

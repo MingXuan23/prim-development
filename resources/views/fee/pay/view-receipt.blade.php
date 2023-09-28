@@ -159,6 +159,44 @@
                                     {{ $category->category }}
                                 </div>
 
+                                @if ($category->category == "Kategori Berulang")
+                                <table class="table table-bordered table-striped" style="">
+                                    <tr style="text-align: center">
+                                        <th style="width:3%">Bil.</th>
+                                        <th>Item</th>
+                                        <th style="width:10%">Kuantiti</th>
+                                        <th style="width:20%">Amaun per item (RM)</th>
+                                        <th style="width:20%">Amaun Asal (RM)</th>
+                                        <th style="width:20%">Amaun Akhir (RM)</th>
+                                    </tr>
+                                    @foreach ($get_fees->where('studentid', $student->id)->where('category',
+                                    $category->category) as $item)
+                                    <tr>
+                                        <td style="text-align: center"> {{ $loop->iteration }}.</td>
+                                        <td>
+                                            <div class="pl-2"> {{ $item->name }} </div>
+                                        </td>
+                                        <td style="text-align: center">{{ $item->quantity }}</td>
+                                        <td style="text-align: center">
+                                            {{  number_format((float)$item->price, 2, '.', '') }} </td>
+                                        <td style="text-align: center">
+                                            {{  number_format((float)$item->totalAmount, 2, '.', '')  }}</td>
+                                        <td style="text-align: center">
+                                            {{  number_format((float)$item->fr_finalamount, 2, '.', '')  }}</td>
+                                    </tr>
+                                    @endforeach
+
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="4" style="text-align:center"><b>Jumlah</b> </td>
+                                        <td style="text-align:center">
+                                            <b>{{ number_format($get_fees->where('studentid', $student->id)->where('category', $category->category)->sum('totalAmount'), 2)  }}</b>
+
+                                        </td>
+                                    </tr>
+
+                                </table>
+                                @else 
                                 <table class="table table-bordered table-striped" style="">
                                     <tr style="text-align: center">
                                         <th style="width:3%">Bil.</th>
@@ -192,6 +230,7 @@
                                     </tr>
 
                                 </table>
+                                @endif
                                 @endforeach
 
 

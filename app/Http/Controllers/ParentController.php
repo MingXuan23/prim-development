@@ -38,6 +38,14 @@ class ParentController extends Controller
         return view('parent.index', compact('organization'));
     }
 
+    public function indexSwasta()
+    {
+        //
+        $userId = Auth::id();
+        $organization = $this->getOrganizationByUserId();
+        return view('private-school.parent.index', compact('organization'));
+    }
+
     public function indexDependent()
     {
         $userId =  Auth::id();
@@ -148,7 +156,7 @@ class ParentController extends Controller
         // check if teacher role exists
         $ifExits = DB::table('users as u')
                     ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
-                    ->where('ou.role_id', '=', '5')
+                    ->whereIn('ou.role_id', [5, 21])
                     ->where('u.email', '=', "{$request->get('email')}")
                     ->where('u.icno', '=', "{$request->get('icno')}")
                     ->where('u.telno', '=', "{$request->get('telno')}")
@@ -328,7 +336,7 @@ class ParentController extends Controller
                 ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
                 ->select('o.*')
                 ->where('ou.user_id', $userId)
-                ->whereIn('ou.role_id', [4, 5, 6, 12])
+                ->whereIn('ou.role_id', [4, 5, 6, 12, 20, 21])
                 ->get();
 
             

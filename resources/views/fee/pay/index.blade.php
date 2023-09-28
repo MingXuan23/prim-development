@@ -146,21 +146,41 @@
                                         <div class="card">
                                             <div class="inputGroup">
                                                 @if($row->levelid!=0)
-                                                <input id="option-{{ $organization->id }}-{{ $row->studentid }}"
-                                                    name="nameSchool" value="{{ $organization->id }}" type="checkbox"
-                                                    data-toggle="collapse"
-                                                    data-target="#collapse{{ $organization->id }}-{{ $row->studentid }}"
-                                                    aria-expanded="false"
-                                                    aria-controls="collapse{{ $organization->id }}-{{ $row->studentid }}"
-                                                    class="d-block position-relative text-dark collapsible-link py-2" />
+                                                    @if($row->type_org != 15)
+                                                        <input id="option-{{ $organization->id }}-{{ $row->studentid }}"
+                                                        name="nameSchool" value="{{ $organization->id }}" type="checkbox"
+                                                        data-toggle="collapse"
+                                                        data-target="#collapse{{ $organization->id }}-{{ $row->studentid }}"
+                                                        aria-expanded="false"
+                                                        aria-controls="collapse{{ $organization->id }}-{{ $row->studentid }}"
+                                                        class="d-block position-relative text-dark collapsible-link py-2" />
 
-                                                    <label for="option-{{ $organization->id }}-{{ $row->studentid }}">
-                                                    <span style="font-size: 18px">{{ $loop->iteration }}.
-                                                        {{ $row->studentname  }}</span>
-                                                    <span> ( {{ $row->classname }} )</span>
-                                                    <br>
-                                                    <span> {{ $row->nschool }} </span>
-                                                </label>
+                                                        <label for="option-{{ $organization->id }}-{{ $row->studentid }}">
+                                                        <span style="font-size: 18px">{{ $loop->iteration }}.
+                                                            {{ $row->studentname  }}</span>
+                                                        <span> ( {{ $row->classname }} )</span>
+                                                        <br>
+                                                        <span> {{ $row->nschool }} </span>
+                                                        </label>
+                                                    @else
+                                                        <input id="option-{{ $organization->id }}-{{ $row->studentid }}"
+                                                        name="nameSchool" value="{{ $organization->id }}" type="checkbox"
+                                                        data-toggle="collapse"
+                                                        data-target="#collapse{{ $organization->id }}-{{ $row->studentid }}"
+                                                        aria-expanded="false"
+                                                        aria-controls="collapse{{ $organization->id }}-{{ $row->studentid }}"
+                                                        class="d-block position-relative text-dark collapsible-link py-2" />
+
+                                                        <label for="option-{{ $organization->id }}-{{ $row->studentid }}">
+                                                        <span style="font-size: 18px">{{ $loop->iteration }}.
+                                                            {{ $row->studentname  }}</span>
+                                                        <span> ( {{ $row->classname }} | Tarikh Daftar: {{ date('d/m/Y', strtotime($row->student_startdate)) }} )</span>
+                                                        <br>
+                                                        <span> {{ $row->nschool }} </span>
+                                                        <br>
+                                                        <span></span>
+                                                        </label>
+                                                    @endif
                                                 @else
                                                 <label for="option-{{ $organization->id }}-{{ $row->studentid }}" style=" color:gray;">
                                                     <span style="font-size: 18px;" >{{ $loop->iteration }}.
@@ -204,30 +224,76 @@
                                                                         class="collapse show">
                                                                         <div class="card-body pl-0 pr-0">
                                                                             {{-- display item --}}
-                                                                            @foreach($getfees_bystudent->where('studentid', $data->studentid)->where('category', $data->category)->where('organization_id', $organization->id) as $item)
-                                                                            <div class="inputGroup">
-                                                                                <input
-                                                                                    id="option-{{ $item->id }}-{{ $data->studentid }}"
-                                                                                    name="billcheck"
-                                                                                    value="{{ $item->totalAmount }}"
-                                                                                    onchange="checkD(this)"
-                                                                                    type="checkbox" />
+                                                                            @if($data->category != 'Kategori Berulang')
+                                                                                @foreach($getfees_bystudent->where('studentid', $data->studentid)->where('category', $data->category)->where('organization_id', $organization->id) as $item)
+                                                                                <div class="inputGroup">
+                                                                                    <input
+                                                                                        id="option-{{ $item->id }}-{{ $data->studentid }}"
+                                                                                        name="billcheck"
+                                                                                        value="{{ $item->totalAmount }}"
+                                                                                        onchange="checkD(this)"
+                                                                                        type="checkbox" />
 
-                                                                                <label for="option-{{ $item->id }}-{{ $data->studentid }}">
-                                                                                    <span style="font-size: 18px">{{ $item->name }}</span>
-                                                                                    <br>
-                                                                                    <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->totalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span>
-                                                                                </label>
+                                                                                    <label for="option-{{ $item->id }}-{{ $data->studentid }}">
+                                                                                        <span style="font-size: 18px">{{ $item->name }}</span>
+                                                                                        <br>
+                                                                                        <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->totalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span>
+                                                                                    </label>
 
-                                                                                {{-- hidden input checkbox second --}}
-                                                                                <input
-                                                                                    id="option-{{ $item->id }}-{{ $data->studentid }}-2"
-                                                                                    style="opacity: 0.0; position: absolute; left: -9999px"
-                                                                                    checked="checked" name="billcheck2"
-                                                                                    value="{{$data->studentid}}-{{ $item->id }}"
-                                                                                    type="checkbox" />
-                                                                            </div>
-                                                                            @endforeach
+                                                                                    {{-- hidden input checkbox second --}}
+                                                                                    <input
+                                                                                        id="option-{{ $item->id }}-{{ $data->studentid }}-2"
+                                                                                        style="opacity: 0.0; position: absolute; left: -9999px"
+                                                                                        checked="checked" name="billcheck2"
+                                                                                        value="{{$data->studentid}}-{{ $item->id }}"
+                                                                                        type="checkbox" />
+                                                                                </div>
+                                                                                @endforeach
+                                                                            @else
+                                                                                @foreach($getfees_bystudentSwasta->where('studentid', $data->studentid)->where('category', $data->category)->where('organization_id', $organization->id) as $item)
+                                                                                <div class="inputGroup">
+                                                                                    <input
+                                                                                        id="option-{{ $item->id }}-{{ $data->studentid }}"
+                                                                                        name="billcheck"
+                                                                                        value="{{ $item->finalAmount }}"
+                                                                                        onchange="checkD(this)"
+                                                                                        type="checkbox" />
+
+                                                                                    <label for="option-{{ $item->id }}-{{ $data->studentid }}">
+                                                                                        <span style="font-size: 18px">{{ $item->name }}</span>
+                                                                                        <br>
+                                                                                        <span style="font-size: 14px;font-weight:100;">{{ date('d/m/Y', strtotime($item->start_date)) }} - {{ date('d/m/Y', strtotime($item->end_date)) }} ({{ $item->totalDay }} hari)</span>
+                                                                                        <br>
+                                                                                        @if($item->totalAmount == $item->finalAmount)
+                                                                                            <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->finalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span>
+                                                                                        @else
+                                                                                            <div class="icons d-inline">
+                                                                                                <div class="fas fa-info-circle" 
+                                                                                                    data-toggle="tooltip" 
+                                                                                                    data-html=true
+                                                                                                    data-original-title="Jumlah Asal = RM{{  number_format((float)$item->totalAmount / $item->totalDay, 2, '.', '') }}/hari, <br>
+                                                                                                    Jumlah Terkini = RM{{  number_format((float)$item->finalAmount / $item->totalDay, 2, '.', '') }}/hari.">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <span class="d-inline" style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->finalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span>
+                                                                                        @endif
+                                                                                        {{-- <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->finalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span> --}}
+                                                                                        {{-- <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="Tooltip on right">
+                                                                                            i
+                                                                                        </button> --}}
+                                                                                    </label>
+
+                                                                                    {{-- hidden input checkbox second --}}
+                                                                                    <input
+                                                                                        id="option-{{ $item->id }}-{{ $data->studentid }}-2"
+                                                                                        style="opacity: 0.0; position: absolute; left: -9999px"
+                                                                                        checked="checked" name="billcheck2"
+                                                                                        value="{{$data->studentid}}-{{ $item->id }}"
+                                                                                        type="checkbox" />
+                                                                                </div>
+                                                                                @endforeach
+                                                                            @endif
+                                                                            
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -316,6 +382,7 @@
         if (result.value) {
             console.log(myCheckboxes);
             console.log(myCheckboxes_categoryA);
+            console.log(oid);
             // console.log(myCheckboxes.length());
             // window.location.href = "{{ route('billIndex')}}";
 
@@ -323,7 +390,8 @@
                 url: "{{ route('pay') }}",
                 data: { 
                     id: myCheckboxes,
-                    category: myCheckboxes_categoryA
+                    category: myCheckboxes_categoryA,
+                    org: oid
                 },
                 
             })

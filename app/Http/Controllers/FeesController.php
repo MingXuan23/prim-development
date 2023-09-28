@@ -13,7 +13,9 @@ use Illuminate\Http\Request;
 use Psy\Command\WhereamiCommand;
 use Yajra\DataTables\DataTables;
 use App\Exports\ExportYuranStatus;
+use App\Exports\ExportYuranStatusSwasta;
 use App\Exports\ExportJumlahBayaranIbuBapa;
+use App\Exports\ExportJumlahBayaranIbuBapaSwasta;
 use App\Exports\ExportYuranOverview;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -181,7 +183,9 @@ class FeesController extends AppBaseController
         $userId = Auth::id();
         if (Auth::user()->hasRole('Superadmin')) {
             return Organization::all();
-        } elseif (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Koop Admin')) {
+
+            //wan add pentadbir swasta
+        } elseif (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta') || Auth::user()->hasRole('Guru Swasta')) {
 
             // user role pentadbir n guru
             /* $temp_organs= Organization::whereHas('user', function ($query) use ($userId) {
@@ -197,7 +201,7 @@ class FeesController extends AppBaseController
                 ->select('o.*')
                 ->where('ou.user_id', $userId)
                 ->whereNull('o.deleted_at')
-                ->whereIn('ou.role_id', [4, 5 ,12])
+                ->whereIn('ou.role_id', [4, 5 ,12, 20, 21])
                 ->get();
 
             $organizations = [];
@@ -407,6 +411,41 @@ class FeesController extends AppBaseController
 
         return response()->json(['all_student' => $all_student, 'student_complete' => $student_complete, 'student_notcomplete' => $student_notcomplete, 'all_parent' => $all_parent, 'parent_complete' => $parent_complete, 'parent_notcomplete' => $parent_notcomplete]);
 
+    }
+
+    public function feesReportByClassId(Request $request)
+    {
+        //$organId = $request->oid;
+        $classId = $request->cid;
+        $feeId  = $request->fid;
+
+        $total_student = DB::table('class_student as cs')
+            ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+            ->join('student_fees_new as sfn', 'sfn.class_student_id', '=', 'cs.id')
+            //->where('co.organization_id', $organId)
+            ->where('co.class_id', $classId)
+            ->where('sfn.fees_id', $feeId)
+            ->count();
+
+        $total_student_paid = DB::table('class_student as cs')
+            ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+            ->join('student_fees_new as sfn', 'sfn.class_student_id', '=', 'cs.id')
+            //->where('co.organization_id', $organId)
+            ->where('co.class_id', $classId)
+            ->where('sfn.fees_id', $feeId)
+            ->where('sfn.status', 'Paid')
+            ->count();
+
+        $total_student_debt = DB::table('class_student as cs')
+            ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+            ->join('student_fees_new as sfn', 'sfn.class_student_id', '=', 'cs.id')
+            //->where('co.organization_id', $organId)
+            ->where('co.class_id', $classId)
+            ->where('sfn.fees_id', $feeId)
+            ->where('sfn.status', 'Debt')
+            ->count();
+
+        return response()->json(['total_student' => $total_student, 'total_student_paid' => $total_student_paid, 'total_student_debt' => $total_student_debt]);
     }
 
     public function reportByClass($type, $class_id)
@@ -746,6 +785,41 @@ class FeesController extends AppBaseController
                             }
                         }
                     }
+                } elseif($category == "Recurring") {
+                    $data     = DB::table('fees_new')
+                        ->where('organization_id', $oid)
+                        ->where('category', "Kategori Berulang")
+                        ->where('status', "1")
+                        ->get();
+                    
+                    foreach($data as $d)
+                    {
+                        $level = json_decode($d->target);
+                        if($level->data == "All_Level")
+                        {
+                            $d->target = "Semua Tahap";
+                        }
+                        elseif($level->data  == 1)
+                        {
+                            $d->target = "Kelas : Tahap 1";
+                        }
+                        elseif($level->data  == 2)
+                        {
+                            $d->target = "Kelas : Tahap 2";
+                        }
+                        elseif(is_array($level->data))
+                        {
+                            $classes = DB::table('classes')
+                                        ->whereIN('id', $level->data)
+                                        ->get();
+                            
+                            $d->target = "Kelas : ";
+                            foreach($classes as $i=>$class)
+                            {
+                                $d->target = $d->target .  $class->nama  . (sizeof($classes) - 1 == $i ? "" : ", ");
+                            }
+                        }
+                    }
                 }
             }
 
@@ -857,6 +931,46 @@ class FeesController extends AppBaseController
         }
     }
 
+    public function CategoryRecurring()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.recurring.index', compact('organization'));
+    }
+
+    public function createCategoryRecurring()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        return view('fee.recurring.add', compact('organization'));
+    }
+
+
+    public function StoreCategoryRecurring(Request $request)
+    {
+        $gender         = "";
+        $class          = $request->get('cb_class');
+        $level          = $request->get('level');
+        $year           = $request->get('year');
+        $name           = $request->get('name');
+        $price          = $request->get('price');
+        $quantity       = $request->get('quantity');
+        $desc           = $request->get('description');
+        $oid            = $request->get('organization');
+        $date_started   = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end       = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
+        $total          = $price * $quantity;
+        $category       = "Kategori Berulang";
+
+        if ($level == "All_Level") {
+            return $this->allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
+        } elseif ($year == "All_Year") {
+            return $this->allYear($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category);
+        } else {
+            return $this->allClasses($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $class, $gender, $category);
+        }
+    }
+
     public function fetchClassYear(Request $request)
     {
 
@@ -930,8 +1044,27 @@ class FeesController extends AppBaseController
                 'data' => $level,
                 'gender' => $gender
             );
-        } else {
-            $list = DB::table('class_organization')
+        } 
+        else 
+        {
+            if($category == "Kategori Berulang")
+            {
+                $list = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('class_student.id as class_student_id', 'class_student.start_date as class_student_start_date')
+                ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
+                ->where('classes.status', "1")
+                ->where('class_student.start_date', '<', $date_end)
+                ->get();
+
+                $data = array(
+                    'data' => $level
+                );
+            }
+            else
+            {
+                $list = DB::table('class_organization')
                 ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->select('class_student.id as class_student_id')
@@ -939,9 +1072,11 @@ class FeesController extends AppBaseController
                 ->where('classes.levelid','>',0)
                 ->where('classes.status', "1")
                 ->get();
-            $data = array(
-                'data' => $level
-            );
+
+                $data = array(
+                    'data' => $level
+                );
+            }
         }
 
         $target = json_encode($data);
@@ -967,17 +1102,58 @@ class FeesController extends AppBaseController
                 ->where('id', $list[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
             
-            DB::table('student_fees_new')->insert([
+            // DB::table('student_fees_new')->insert([
+            //     'status' => 'Debt',
+            //     'fees_id' => $fees,
+            //     'class_student_id' => $list[$i]->class_student_id,
+            // ]);
+
+            $student_fees_new = DB::table('student_fees_new')->insertGetId([
                 'status' => 'Debt',
                 'fees_id' => $fees,
                 'class_student_id' => $list[$i]->class_student_id,
             ]);
+            
+            if($category == "Kategori Berulang")
+            {
+                $datestarted = Carbon::parse($date_started); //back to original date without format (string to datetime)
+                $dateend = Carbon::parse($date_end);
+                $totalDay = ($datestarted->diffInDays($dateend)) + 1;
+                $cs_startdate = Carbon::parse($list[$i]->class_student_start_date);
+                $totalDayLeft = ($cs_startdate)->diffInDays($dateend);
+                if($totalDayLeft > $totalDay || $datestarted->day == $cs_startdate->day)
+                {
+                    $totalDayLeft = $totalDay;
+                }
+                $finalAmount = $total * ($totalDayLeft / $totalDay);
+                if($finalAmount > $total)
+                {
+                    $finalAmount = $total;
+                }
+
+                DB::table('fees_recurring')->insert([
+                    'student_fees_new_id' => $student_fees_new,
+                    'totalDay' => $totalDay,
+                    'totalDayLeft' => $totalDayLeft,
+                    'finalAmount' => $finalAmount,
+                    'desc' => 'RM' . $total . '*' . $totalDayLeft . '/' . $totalDay,
+                    'created_at' => now(),
+                ]);
+
+                //dd($total * ($totalDayLeft / $totalDay));
+            }
         }
+
+        // dd($list);
 
         if ($category == "Kategori B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
-        } else {
+        } 
+        else if($category == "Kategori C") {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
+        }
+        else {
+            return redirect('/fees/Recurring')->with('success', 'Yuran Kategori Berulang telah berjaya dimasukkan');
         }
     }
 
@@ -1001,7 +1177,24 @@ class FeesController extends AppBaseController
                 'gender' => $gender
             );
         } else {
-            $list = DB::table('class_organization')
+            if($category == "Kategori Berulang")
+            {
+                $list = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('class_student.id as class_student_id', 'class_student.start_date as class_student_start_date')
+                ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
+                ->where('classes.levelid', $level)
+                ->where('classes.status', "1")
+                ->where('class_student.start_date', '<', $date_end)
+                ->get();
+                $data = array(
+                    'data' => $level
+                );
+            }
+            else
+            {
+                $list = DB::table('class_organization')
                 ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->select('class_student.id as class_student_id')
@@ -1009,9 +1202,10 @@ class FeesController extends AppBaseController
                 ->where('classes.levelid', $level)
                 ->where('classes.status', "1")
                 ->get();
-            $data = array(
-                'data' => $level
-            );
+                $data = array(
+                    'data' => $level
+                );
+            }
         }
 
         $target = json_encode($data);
@@ -1037,17 +1231,56 @@ class FeesController extends AppBaseController
                 ->where('id', $list[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
 
-            DB::table('student_fees_new')->insert([
+            // DB::table('student_fees_new')->insert([
+            //     'status' => 'Debt',
+            //     'fees_id' => $fees,
+            //     'class_student_id' => $list[$i]->class_student_id,
+            // ]);
+
+            $student_fees_new = DB::table('student_fees_new')->insertGetId([
                 'status' => 'Debt',
                 'fees_id' => $fees,
                 'class_student_id' => $list[$i]->class_student_id,
             ]);
+            
+            if($category == "Kategori Berulang")
+            {
+                $datestarted = Carbon::parse($date_started); //back to original date without format (string to datetime)
+                $dateend = Carbon::parse($date_end);
+                $totalDay = ($datestarted->diffInDays($dateend)) + 1;
+                $cs_startdate = Carbon::parse($list[$i]->class_student_start_date);
+                $totalDayLeft = ($cs_startdate)->diffInDays($dateend);
+                if($totalDayLeft > $totalDay || $datestarted->day == $cs_startdate->day)
+                {
+                    $totalDayLeft = $totalDay;
+                }
+                $finalAmount = $total * ($totalDayLeft / $totalDay);
+                if($finalAmount > $total)
+                {
+                    $finalAmount = $total;
+                }
+
+                DB::table('fees_recurring')->insert([
+                    'student_fees_new_id' => $student_fees_new,
+                    'totalDay' => $totalDay,
+                    'totalDayLeft' => $totalDayLeft,
+                    'finalAmount' => $finalAmount,
+                    'desc' => 'RM' . $total . '*' . $totalDayLeft . '/' . $totalDay,
+                    'created_at' => now(),
+                ]);
+                
+                //dd($total * ($totalDayLeft / $totalDay));
+            }
         }
 
         if ($category == "Kategori B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
-        } else {
+        }
+        else if($category == "Kategori C") {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
+        }
+        else {
+            return redirect('/fees/Recurring')->with('success', 'Yuran Kategori Berulang telah berjaya dimasukkan');
         }
     }
 
@@ -1082,7 +1315,24 @@ class FeesController extends AppBaseController
                 'gender' => $gender
             );
         } else {
-            $list_student = DB::table('class_organization')
+            if($category == "Kategori Berulang")
+            {
+                $list_student = DB::table('class_organization')
+                ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('class_student.id as class_student_id', 'class_student.start_date as class_student_start_date')
+                ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
+                ->where('classes.status', "1")
+                ->whereIn('classes.id', $class)
+                ->where('class_student.start_date', '<', $date_end)
+                ->get();
+                $data = array(
+                    'data' => $class_arr
+                );
+            }
+            else
+            {
+                $list_student = DB::table('class_organization')
                 ->join('class_student', 'class_student.organclass_id', '=', 'class_organization.id')
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->select('class_student.id as class_student_id')
@@ -1090,9 +1340,11 @@ class FeesController extends AppBaseController
                 ->where('classes.status', "1")
                 ->whereIn('classes.id', $class)
                 ->get();
-            $data = array(
-                'data' => $class_arr
-            );
+                $data = array(
+                    'data' => $class_arr
+                );
+            }
+            
         }
 
         $target = json_encode($data);
@@ -1116,17 +1368,56 @@ class FeesController extends AppBaseController
                 ->where('id', $list_student[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
 
-            DB::table('student_fees_new')->insert([
+            // DB::table('student_fees_new')->insert([
+            //     'status' => 'Debt',
+            //     'fees_id' => $fees,
+            //     'class_student_id' => $list_student[$i]->class_student_id,
+            // ]);
+
+            $student_fees_new = DB::table('student_fees_new')->insertGetId([
                 'status' => 'Debt',
                 'fees_id' => $fees,
                 'class_student_id' => $list_student[$i]->class_student_id,
             ]);
+            
+            if($category == "Kategori Berulang")
+            {
+                $datestarted = Carbon::parse($date_started); //back to original date without format (string to datetime)
+                $dateend = Carbon::parse($date_end);
+                $totalDay = ($datestarted->diffInDays($dateend)) + 1;
+                $cs_startdate = Carbon::parse($list_student[$i]->class_student_start_date);
+                $totalDayLeft = ($cs_startdate)->diffInDays($dateend);
+                if($totalDayLeft > $totalDay || $datestarted->day == $cs_startdate->day)
+                {
+                    $totalDayLeft = $totalDay;
+                }
+                $finalAmount = $total * ($totalDayLeft / $totalDay);
+                if($finalAmount > $total)
+                {
+                    $finalAmount = $total;
+                }
+
+                DB::table('fees_recurring')->insert([
+                    'student_fees_new_id' => $student_fees_new,
+                    'totalDay' => $totalDay,
+                    'totalDayLeft' => $totalDayLeft,
+                    'finalAmount' => $finalAmount,
+                    'desc' => 'RM' . $total . '*' . $totalDayLeft . '/' . $totalDay,
+                    'created_at' => now(),
+                ]);
+                
+                //dd($total * ($totalDayLeft / $totalDay));
+            }
         }
         
         if ($category == "Kategori B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
-        } else {
+        } 
+        else if($category == "Kategori C") {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
+        }
+        else {
+            return redirect('/fees/Recurring')->with('success', 'Yuran Kategori Berulang telah berjaya dimasukkan');
         }
     }
 
@@ -1144,7 +1435,7 @@ class FeesController extends AppBaseController
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('organizations.id as oid', 'organizations.nama as nschool', 'organizations.parent_org as parent_org', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname','classes.levelid')
+            ->select('organizations.id as oid', 'organizations.nama as nschool', 'organizations.parent_org as parent_org', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname','classes.levelid', 'organizations.type_org as type_org', 'class_student.start_date as student_startdate')
             ->where('organization_user.user_id', $userid)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
@@ -1196,12 +1487,26 @@ class FeesController extends AppBaseController
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            //->join('fees_recurring as fr', 'fr.student_fees_new_id', '=', 'student_fees_new.id')
             ->select('fees_new.*', 'students.id as studentid')
             ->orderBy('fees_new.name')
             ->where('fees_new.status', 1)
             ->where('student_fees_new.status', 'Debt')
             ->whereIn('students.id', $list_dependent)
             ->get();
+
+        $getfees_bystudentSwasta = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->join('fees_recurring as fr', 'fr.student_fees_new_id', '=', 'student_fees_new.id')
+            ->select('fees_new.*', 'students.id as studentid', 'fr.*')
+            ->orderBy('fees_new.name')
+            ->where('fees_new.status', 1)
+            ->where('student_fees_new.status', 'Debt')
+            ->whereIn('students.id', $list_dependent)
+            ->get();
+
         //dd($getfees,$getfees_bystudent);
         // ************************* get fees category A  *******************************
         $getfees_category_A = DB::table('fees_new')
@@ -1231,7 +1536,7 @@ class FeesController extends AppBaseController
             ->get();
         //dd($list,$organizations,$getfees,$getfees_bystudent,$getfees_category_A,$getfees_category_A_byparent);
         //dd($getfees_category_A_byparent);
-        return view('fee.pay.index', compact('list', 'organizations', 'getfees', 'getfees_bystudent', 'getfees_category_A', 'getfees_category_A_byparent'));
+        return view('fee.pay.index', compact('list', 'organizations', 'getfees', 'getfees_bystudent', 'getfees_bystudentSwasta', 'getfees_category_A', 'getfees_category_A_byparent'));
     }
 
     public function student_fees(Request $request)
@@ -1291,6 +1596,22 @@ class FeesController extends AppBaseController
         return view('fee.report-search.index', compact('organization', 'listclass'));
     }
 
+    public function searchreportswasta()
+    {
+        $organization = $this->getOrganizationByUserId();
+
+        $listclass = DB::table('classes')
+            ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+            ->select('classes.id as id', 'classes.nama', 'classes.levelid')
+            ->where([
+                ['class_organization.organization_id', $organization[0]->id]
+            ])
+            ->orderBy('classes.nama')
+            ->get();
+
+        return view('fee.report-search-swasta.index', compact('organization', 'listclass'));
+    }
+
     public function getFeesReceiptDataTable(Request $request){
 
         if(Auth::user()->hasRole('Superadmin'))
@@ -1329,7 +1650,7 @@ class FeesController extends AppBaseController
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->get();
             }
-            else if(Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin'))
+            else if(Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta'))
             {
                 $listHisotry = DB::table('transactions as t')
                     ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
@@ -1344,7 +1665,7 @@ class FeesController extends AppBaseController
                     ->distinct('name')
                     ->get();
             }
-            else if(Auth::user()->hasRole('Guru'))
+            else if(Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Pentadbir Swasta') || Auth::user()->hasRole('Guru Swasta'))
             {
                 $listHisotry = DB::table('transactions as t')
                     ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
@@ -1434,13 +1755,19 @@ class FeesController extends AppBaseController
         return view('fee.categoryReport.index', compact('organization'));
     }
 
+    public function cetegoryReportIndexSwasta(){
+
+        $organization = $this->getOrganizationByUserId();
+        return view('fee.categoryReport-swasta.index', compact('organization'));
+    }
+
     public function fetchClassForCateYuran(Request $request)
     {
 
         // dd($request->get('schid'));
         $organ = Organization::find($request->get('oid'));
 
-        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin')) {
+        if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta')) {
 
             $list = DB::table('classes')
                 ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
@@ -1504,7 +1831,7 @@ class FeesController extends AppBaseController
 
             unset($lists[$key]);
         }
-        
+
         return response()->json(['success' => $lists]);
     }
 
@@ -1559,15 +1886,32 @@ class FeesController extends AppBaseController
             }
             else
             {
-                $data = DB::table('students as s')
+                if($fees->category != "Kategori Berulang")
+                {
+                    $data = DB::table('students as s')
+                        ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
+                        ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+                        ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                        ->where('sfn.fees_id', $fees->id)
+                        ->where('co.class_id', $request->classid)
+                        ->select('s.*', 'sfn.status')
+                        ->orderBy('s.nama')
+                        ->get();
+                }
+                else
+                {
+                    $data = DB::table('students as s')
                     ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
                     ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                     ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                    ->leftJoin('fees_recurring as fr', 'fr.student_fees_new_id', 'sfn.id')
                     ->where('sfn.fees_id', $fees->id)
                     ->where('co.class_id', $request->classid)
-                    ->select('s.*', 'sfn.status')
+                    ->select('s.*', 'sfn.status', 'cs.start_date as cs_startdate', 'fr.*')
                     ->orderBy('s.nama')
                     ->get();
+                }
+                
             }
 
             $table = Datatables::of($data);
@@ -1609,7 +1953,20 @@ class FeesController extends AppBaseController
             ->where('id', $request->yuranExport)
             ->first();
 
-        return Excel::download(new ExportYuranStatus($yuran), $yuran->name . '.xlsx');
+        $orgtypeSwasta = DB::table('organizations as o')
+            ->where('id', $request->organExport)
+            ->where('o.type_org', 15)
+            ->get();
+
+        if(!$orgtypeSwasta)
+        {
+            return Excel::download(new ExportYuranStatus($yuran), $yuran->name . '.xlsx');
+        }
+        else
+        {
+            return Excel::download(new ExportYuranStatusSwasta($yuran), $yuran->name . '.xlsx');
+        }
+        
     }
 
     public function ExportJumlahBayaranIbuBapa(Request $request)
@@ -1618,7 +1975,7 @@ class FeesController extends AppBaseController
         ->where('id',$request->organExport1)
         ->first();
 
-       if($request->yuranExport1!=0){
+       if($request->yuranExport1!=0){   
         $kelas= DB::table('classes')
         ->where('id', $request->yuranExport1)
         ->first();
@@ -1629,7 +1986,20 @@ class FeesController extends AppBaseController
 
         $filename = str_replace(['/', '\\'], '', $filename);
         $kelasId=$request->yuranExport1;
-        return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
+
+        $orgtypeSwasta = DB::table('organizations as o')
+            ->where('id', $request->organExport1)
+            ->where('o.type_org', 15)
+            ->get();
+
+        if(!$orgtypeSwasta)
+        {
+            return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
+        }
+        else
+        {
+            return Excel::download(new ExportJumlahBayaranIbuBapaSwasta($request->yuranExport1,$org ), $filename . '.xlsx');
+        }
     }
 
     public function exportYuranOverview(Request $request){

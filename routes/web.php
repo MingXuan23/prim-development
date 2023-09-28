@@ -127,6 +127,7 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/listparent', 'FeesController@getParentDatatable')->name('fees.getParentDatatable');
     Route::get('/report', 'FeesController@feesReport')->name('fees.report');
     Route::get('/reportByOid', 'FeesController@feesReportByOrganizationId')->name('fees.reportByOid');
+    Route::get('/reportByOid', 'FeesController@feesReportByClassId')->name('fees.feesReportByClassId');
     Route::get('/report/{type}/class/{class_id}', 'FeesController@reportByClass')->name('fees.reportByClass');
 
     Route::get('/A', 'FeesController@CategoryA')->name('fees.A');
@@ -141,6 +142,11 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/add/C', 'FeesController@createCategoryC')->name('fees.createC');
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
 
+    //wan add
+    Route::get('/Recurring', 'FeesController@CategoryRecurring')->name('fees.Recurring');
+    Route::get('/add/Recurring', 'FeesController@createCategoryRecurring')->name('fees.createRecurring');
+    Route::post('/store/Recurring', 'FeesController@StoreCategoryRecurring')->name('fees.storeRecurring');
+
     Route::get('/dependent_fees', 'FeesController@dependent_fees')->name('dependent_fees');
     Route::get('/pay', 'PayController@pay')->name('pay');
 
@@ -150,13 +156,16 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/dependent', 'FeesController@parent_dependent')->name('fees.parent_dependent');
 
     Route::get('/search-report', 'FeesController@searchreport')->name('fees.searchreport');
+    Route::get('/search-report-swasta', 'FeesController@searchreportswasta')->name('fees.searchreportswasta');
     Route::get('/list-student', 'StudentController@getStudentDatatableFees')->name('fees.getStudentDatatableFees');
+    Route::get('/list-student-swasta', 'StudentController@getStudentSwastaDatatableFees')->name('fees.getStudentSwastaDatatableFees');
     Route::get('/download-PDF', 'StudentController@generatePDFByClass')->name('fees.generatePDFByClass');
 
     Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
     Route::get('/list-receipt', 'FeesController@getFeesReceiptDataTable')->name('fees.getFeesReceiptDataTable');
 
     Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
+    Route::get('/category/report-swasta', 'FeesController@cetegoryReportIndexSwasta')->name('fees.category.report_swasta');
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 
     Route::post('/list-fetchYuranbyOrganId', 'FeesController@fecthYuranByOrganizationId')->name('fees.fetchYuranByOrganId');
@@ -367,6 +376,24 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         # Order details
         Route::get('order-details/{order_id}', 'OrderController@showList')->name('admin-reg.order-detail');
     });
+});
+
+//private school
+Route::group(['prefix' => 'private-school'], function () {
+    Route::get('teacher', 'TeacherController@indexSwasta')->name('private-school.teacher.index');
+    Route::get('teacher/create', 'TeacherController@createSwasta')->name('private-school.teacher.create');
+    Route::post('teacher/store', 'TeacherController@storeSwasta')->name('private-school.teacher.store');
+
+    Route::get('class', 'ClassController@indexSwasta')->name('private-school.class.index');
+    Route::get('class/create', 'ClassController@createSwasta')->name('private-school.class.create');
+    Route::post('class/store', 'ClassController@storeSwasta')->name('private-school.class.store');
+
+    Route::get('student', 'StudentController@indexSwasta')->name('private-school.student.index');
+    Route::get('student/create', 'StudentController@createSwasta')->name('private-school.student.create');
+    Route::post('student/store', 'StudentController@storeSwasta')->name('private-school.student.store');
+    
+    Route::get('parent', 'ParentController@index')->name('private-school.parent.index');
+    // Route::get('parent/create', 'ParentController@create')->name('private-school.parent.create');
 });
 
 

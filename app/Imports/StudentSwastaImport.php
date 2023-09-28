@@ -19,7 +19,7 @@ use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class StudentImport implements ToModel, WithValidation, WithHeadingRow
+class StudentSwastaImport implements ToModel, WithValidation, WithHeadingRow
 {
     public function __construct($class_id)
     {
@@ -49,9 +49,9 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
     {   //
         //dd(!isset($row['nama']) , !isset($row['nama_penjaga']) , !isset($row['jantina']) , !isset($row['no_tel_bimbit_penjaga']));
         //dd($row);
-        if(!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_ic_penjaga'])){
+        if(!isset($row['nama_pelajar']) || !isset($row['nama_penjaga']) || !isset($row['jantina_pelajar']) || !isset($row['ic_penjaga']) || !isset($row['email_penjaga'])){
             
-            if($row['nama']==null &&$row['nama_penjaga']==null &&$row['jantina']==null &&$row['no_ic_penjaga']==null){
+            if($row['nama_pelajar']==null &&$row['nama_penjaga']==null &&$row['jantina_pelajar']==null &&$row['ic_penjaga']==null &&$row['email_penjaga']==null){
                return null;
             }
             else{
@@ -60,9 +60,12 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
             }
         }
         //dd("Success");
-        $phone = trim((string)$row['no_ic_penjaga']);
+        $phone = trim((string)$row['ic_penjaga']);
         $phone = str_replace('-', '', $phone);
         $phone= preg_replace('/^\s+|\s+$/u', '',$phone);
+        $studentName=preg_replace('/^\s+|\s+$/u', '',trim(strtoupper($row["nama_pelajar"])));
+        $parentName=preg_replace('/^\s+|\s+$/u', '',trim(strtoupper($row['nama_penjaga'])));
+        $parentEmail=preg_replace('/^\s+|\s+$/u', '',trim(strtoupper($row['email_penjaga'])));
         
         if(!$this->startsWith($phone,"+60") && !$this->startsWith($phone,"60")){
             if(strlen($phone) == 10) {
@@ -97,7 +100,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         $class = ClassModel::find($this->class_id->class_id);
         
         // $gender = (int) substr($row["no_kp"], -1) % 2 == 0 ? "P" : "L";
-        $gender = $row["jantina"];
+        $gender = $row["jantina_pelajar"];
         if($gender!="L" && $gender!="P"){
             throw ValidationException::withMessages(["error" => "Invalid gender Information"]);
         }
@@ -192,9 +195,9 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
         $user->assignRole($rolename->nama);
         
         $student = new Student([
-            'nama'       => preg_replace('/^\s+|\s+$/u', '',trim(strtoupper($row["nama"]))),
+            'nama'       => preg_replace('/^\s+|\s+$/u', '',trim(strtoupper($row["nama_pelajar"]))),
             // 'icno'       => $row["no_kp"],
-            'gender'     => $row["jantina"],
+            'gender'     => $row["jantina_pelajar"],
             'email'      => isset($row['email']) ? $row['email'] : NULL,
         ]);
 
@@ -343,6 +346,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                             'totalDayLeft' => $totalDayLeft,
                             'finalAmount' => $finalAmount,
                             'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
+                            'created_at' => now(),
                         ]);
                     }
                     else if(is_array($target->data))
@@ -382,6 +386,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                                 'totalDayLeft' => $totalDayLeft,
                                 'finalAmount' => $finalAmount,
                                 'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
+                                'created_at' => now(),
                             ]);
                         }
                     }
@@ -525,6 +530,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                                 'totalDayLeft' => $totalDayLeft,
                                 'finalAmount' => $finalAmount,
                                 'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
+                                'created_at' => now(),
                             ]);
                         }
                         else if(is_array($target->data))
@@ -564,6 +570,7 @@ class StudentImport implements ToModel, WithValidation, WithHeadingRow
                                     'totalDayLeft' => $totalDayLeft,
                                     'finalAmount' => $finalAmount,
                                     'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
+                                    'created_at' => now(),
                                 ]);
                             }
                         }

@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('transactionstatus:cron')->everyFourHours();
+        $schedule->command('fees:reminder')->dailyAt('09:00');
     }
 
     /**
