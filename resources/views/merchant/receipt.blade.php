@@ -85,7 +85,7 @@
                                     <tr>
                                         <td class="py-3">Tarikh Pick-Up</td>
                                         <td class="py-2">:</td>
-                                        @if($row->pickup_date == "0001-01-01 00:00:00")
+                                        @if($order->pickup_date == "0001-01-01 00:00:00")
                                         <td class="py-2 w-50">Sila Tunggu Mesaj Dari Koperasi</td>
                                         @else
                                         <td class="py-2 w-50">{{ date_create($order->pickup_date)->format('j M Y H:i:s A') }}</td>
