@@ -30,9 +30,11 @@
   <div class="card-header">
     <i class="ti-clipboard mr-2"></i>Sejarah Pesanan Anda</div>
   <div class="card-body">
+  @if($koperasiList!="")
   <a href="#" class="btn btn-success" id="itemReport">Eksport Laporan Barang</a>
   <br>
   <br>
+  @endif
     <div class="table-responsive">
       
       
