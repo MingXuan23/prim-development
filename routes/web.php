@@ -420,7 +420,7 @@ Route::group(['middleware' => ['auth']], function () {
         'delivery'           => 'DeliveryController',
     ]);
 });
-
+Route::get('adminTestFpx', 'PayController@adminTestFpx')->name('adminTestFpx');
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
 Route::get('donateFromMobile', 'PayController@donateFromMobile');
 Route::post('trn', 'PayController@transaction')->name('trn');
