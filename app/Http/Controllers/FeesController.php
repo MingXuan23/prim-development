@@ -1992,7 +1992,8 @@ class FeesController extends AppBaseController
             ->where('o.type_org', 15)
             ->get();
 
-        if(!$orgtypeSwasta)
+           
+        if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
             return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
         }

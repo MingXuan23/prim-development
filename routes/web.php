@@ -127,7 +127,7 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/listparent', 'FeesController@getParentDatatable')->name('fees.getParentDatatable');
     Route::get('/report', 'FeesController@feesReport')->name('fees.report');
     Route::get('/reportByOid', 'FeesController@feesReportByOrganizationId')->name('fees.reportByOid');
-    Route::get('/reportByOid', 'FeesController@feesReportByClassId')->name('fees.feesReportByClassId');
+    Route::get('/reportByCid', 'FeesController@feesReportByClassId')->name('fees.feesReportByClassId');
     Route::get('/report/{type}/class/{class_id}', 'FeesController@reportByClass')->name('fees.reportByClass');
 
     Route::get('/A', 'FeesController@CategoryA')->name('fees.A');
