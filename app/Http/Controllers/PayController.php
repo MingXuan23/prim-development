@@ -1714,7 +1714,7 @@ class PayController extends AppBaseController
         return view('parent.fee.receipt');
     }
 
-    public function adminTestFpx($id){
+    public function adminTestFpx($id,$update){
         $transactions = DB::table('transactions')
             // ->whereIn('status', ['Pending', 'Failed'])
             // ->whereBetween('datetime_created', [now()->subDays(3), now()])
@@ -1862,7 +1862,10 @@ class PayController extends AppBaseController
                 {
                     continue;
                 }
-                return response()->json(['data'=>$response_value]);
+                if($update ==0){
+                    return response()->json(['data'=>$response_value]);
+                }
+               
                 if ($response_value['fpx_debitAuthCode'] == '00') {
                     switch ($fpx_productDesc) {
                         case 'School':
@@ -1974,11 +1977,6 @@ class PayController extends AppBaseController
               
             }
         }
-        $transactions = DB::table('transactions')
-        ->whereIn('status', ['Pending', 'Failed'])
-        ->whereBetween('datetime_created', [now()->subDays(3), now()])
-        ->where('transac_no',2309291032280512)
-        ->get();
-        return response()->json(['data'=>$transactions]);
+        return response()->json(['data'=>$response_value]);
     }
 }
