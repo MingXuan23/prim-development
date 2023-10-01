@@ -1862,7 +1862,7 @@ class PayController extends AppBaseController
                 {
                     continue;
                 }
-                return response()->json(['data'=>$response_value['fpx_debitAuthCode']]);
+                return response()->json(['data'=>$response_value]);
                 if ($response_value['fpx_debitAuthCode'] == '00') {
                     switch ($fpx_productDesc) {
                         case 'School':
