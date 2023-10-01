@@ -1718,7 +1718,7 @@ class PayController extends AppBaseController
         $transactions = DB::table('transactions')
             // ->whereIn('status', ['Pending', 'Failed'])
             // ->whereBetween('datetime_created', [now()->subDays(3), now()])
-            ->where('transac_no',$id)
+            ->where('id',$id)
             ->get();
 
         // $transaction = DB::table('transactions')
