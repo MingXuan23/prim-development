@@ -1714,11 +1714,11 @@ class PayController extends AppBaseController
         return view('parent.fee.receipt');
     }
 
-    public function adminTestFpx(){
+    public function adminTestFpx($id){
         $transactions = DB::table('transactions')
-            ->whereIn('status', ['Pending', 'Failed'])
-            ->whereBetween('datetime_created', [now()->subDays(3), now()])
-            ->where('transac_no',2309291032280512)
+            // ->whereIn('status', ['Pending', 'Failed'])
+            // ->whereBetween('datetime_created', [now()->subDays(3), now()])
+            ->where('transac_no',$id)
             ->get();
 
         // $transaction = DB::table('transactions')
