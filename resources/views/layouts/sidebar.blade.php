@@ -694,14 +694,14 @@
                 <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
                     <i class="mdi mdi-home-city-outline"></i>
-                    <span>Homestay</span>
+                    <span>Homestay/Hotel</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
                 @role('Homestay Admin')
                         <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
                             <i class="mdi mdi-room-service-outline"></i>
-                            <span>Urus Bilik</span>
+                            <span>Urus Homestay/Hotel</span>
                         </a>
                     </li>
                     <li>

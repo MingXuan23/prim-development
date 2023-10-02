@@ -615,7 +615,11 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
     Route::get('tambahbilik', 'HomestayController@tambahbilik')->name('homestay.tambahbilik');
     Route::post('addroom', 'HomestayController@addroom')->name('homestay.addroom');
-    Route::post('editroom/{id}', 'HomestayController@editroom');
+    // Route::post('editroom/{id}', 'HomestayController@editroom');
+    Route::get('edit-room/{id}', 'HomestayController@editRoomPage')->name('homestay.editRoomPage');
+    Route::post('update-room', 'HomestayController@updateRoom')->name('homestay.updateRoom');
+    Route::post('delete-room', 'HomestayController@deleteRoom')->name('homestay.deleteRoom');
+
     Route::get('bookinglist', 'HomestayController@bookinglist')->name('homestay.bookinglist');
     Route::get('bookhomestay/{id}', 'HomestayController@bookhomestay')->name('homestay.bookhomestay');
     Route::get('disabledateroom/{id}', 'HomestayController@disabledateroom');

@@ -13,6 +13,7 @@
             object-fit: cover;
             height: 150px;
             width: 200px;
+            cursor: pointer;
         }
         
         @media screen and (max-width:500px){
@@ -39,7 +40,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Tambah Homestay/Bilik</h4>
+            <h4 class="font-size-18">Edit Homestay/Bilik</h4>
         </div>
     </div>
 </div>
@@ -68,27 +69,21 @@
           @endif
           <div class="flash-message"></div>
 
-            <form method="post" action="{{route('homestay.addroom')}}" enctype="multipart/form-data"
+            <form method="post" action="{{route('homestay.updateRoom')}}" enctype="multipart/form-data"
                 class="form-validation">
                 {{csrf_field()}}
+                <input type="hidden" name="roomid" value={{$room->roomid}}>
                 <div class="card-body">
                     <div class="row">
-                            <div class="form-group required col-6">
-                                <label class="control-label">Homestay/Hotel <span style="color:#d00"> *</span></label>
-                                <select name="homestayid" id="homestayid" class="form-select"
-                                    data-parsley-required-message="Sila pilih status homestay" required>
-                                    <option selected disabled>Pilih Homestay/Hotel</option>
-                                    @foreach($data as $rows)
-                                    <option value="{{ $rows->id }}">{{ $rows->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group col-6">
-                                <label class="control-label"> Nama Homestay atau Bilik <span style="color:#d00"> *</span> </label>
-                                <input type="text" name="roomname" id="roomname" class="form-control" placeholder="Nama / Nombor Bilik"
-                                    data-parsley-required-message="Sila masukkan nama / nombor bilik" required>
-                                    
-                            </div>
+                        <div class="form-group col-6">
+                            <label class="control-label"> Nama Homestay atau Bilik <span style="color:#d00"> *</span> </label>
+                            <input type="text" name="roomname" id="roomname" class="form-control" placeholder="Nama / Nombor Bilik"
+                                data-parsley-required-message="Sila masukkan nama / nombor bilik" value="{{$room->roomname}}" required>
+                        </div>
+                        <div class="form-check col-6 d-flex align-items-center">
+                            <input type="checkbox" name="isAvailable" id="isAvailable" {{ ($room->status == "Available") ? 'checked' : '' }} class="form-check-input">
+                            <label for="isAvailable" class="form-check-label  mt-1">Dibuka Untuk Tempahan</label>
+                        </div>
                     </div>
                     
                     <div class="row">
@@ -96,13 +91,13 @@
                         <div class="col">
                             <div class="form-group required">
                                 <label class="control-label">Kapasiti Homestay atau Bilik(pax) <span style="color:#d00"> *</span></label>
-                                <input type="number" min="1" class="form-control" id="roompax" name="roompax" required>
+                                <input type="number"  class="form-control" id="roompax" name="roompax" value="{{$room->roompax}}" required>
                             </div>
                         </div>
                         <div class="col">
                             <div class="form-group required">
                                 <label class="control-label" for="price">Harga Per Malam (RM) <span style="color:#d00"> *</span></label>
-                                <input type="text"  class="form-control" id="price" name="price" required>
+                                <input type="text" min="1" class="form-control" id="price" name="price" value="{{$room->price}}" required>
                             </div>
                         </div>
 
@@ -111,20 +106,26 @@
                     <div class="row">
                             <div class="form-group col-6 ">
                                 <label for="details">Detail Homestay atau Bilik<span style="color:#d00"> *</span></label>
-                                <textarea rows="5" cols="30" name="details" id="details" class="form-control" placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required></textarea>                                  
+                                <textarea rows="5" cols="30" name="details" id="details" class="form-control"  placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required>{{$room->details}}</textarea>                                  
                             </div>
                             <div class="form-group col-6 ">
                                     <label for="address">Alamat Penuh <span style="color:#d00"> *</span></label>
-                                    <textarea rows="5" cols="30" name="address" id="address" class="form-control" placeholder="No.123, Hang Tuah Jaya, 76100 Durian Tunggal, Melaka" required></textarea>                                  
+                                    <textarea rows="5" cols="30" name="address" id="address" class="form-control"  placeholder="No.123, Hang Tuah Jaya, 76100 Durian Tunggal, Melaka" required>{{$room->address}}</textarea>                                  
                             </div>
                     </div>
 
-                   <div class="form-group d-flex justify-content-center align-items-center gap-2">
+                   {{-- <div class="form-group d-flex justify-content-center align-items-center gap-2">
                         <input type="file" name="images[]" id="images" multiple accept=".jpg,.jpeg,.png" class="form-control col-5" required>
                         <label for="images">Pilih gambar-gambar homestay/bilik(maximum 10 gambar)<span style="color:#d00"> *</span></label>
-                   </div>
+                   </div> --}}
                     <h3 class="text-center">Preview Images:</h3>
                     <div id="image-previews" class="d-flex justify-content-center align-items-center gap-1 flex-wrap mb-2">
+                        @foreach($images as $image)
+                            <div class="img-preview-container">
+                                <img src="../{{$image->image_path}}"  class="img-thumbnail" id="img-preview">
+                                <input type="file" name="image[]" id="{{$image->id}}" accept=".jpg,.jpeg,.png" hidden>
+                            </div>
+                        @endforeach
                     </div>
 
                     <div class="form-group mb-0">
@@ -156,14 +157,40 @@
 <script>
 
 $(document).ready(function () {
-        $.ajaxSetup({
+    $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
         $('.alert').delay(3000).fadeOut()
-        $('#homestayid option:nth-child(2)').prop('selected', true);
+        $('.img-thumbnail').on('click', function(){
+            $(this).next('input')[0].click();
+        });
+        $('input[type="file"]').on('change', function(){
+            const imagePreview = $(this).prev('img');
+            const imageFile = $(this).prop('files')[0];
+            if(imageFile && imageFile.type.includes('jpg')||imageFile.type.includes('jpeg')||imageFile.type.includes('png')){
+                const image = new Image();
+                image.src = URL.createObjectURL(imageFile);
+                image.onload = function () {
+                const maxWidth = 1280; // Maximum width allowed
+                const maxHeight = 1280; // Maximum height allowed
+                if (this.width > maxWidth || this.height > maxHeight) {
+                    $('.flash-message').html(`
+                        <div id="alert" class="alert alert-danger text-center">
+                            Gambar  melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                        </div>
+                    `);
+                    $('#alert').fadeOut(6000);
+                    $('#images').val('');
+                } else {
+                    // Display the image preview
+                    imagePreview.attr('src',`${image.src}`);
+                    } 
+                }      
+            }
 
+        });
         // for image inputs
         $('#images').on('change', function(e){
             $('#image-previews').empty();
