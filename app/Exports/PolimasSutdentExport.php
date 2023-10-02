@@ -43,7 +43,7 @@ class PolimasSutdentExport implements FromCollection, ShouldAutoSize, WithHeadin
         foreach ($liststudents as $key => $student) {
             # code...
             $student->telno = '`' . $student->telno;
-            $student->icno =  $student->icno ==null?$student->telno:$student->icno;
+            $student->icno =  $student->icno ==null?$student->telno: '`'.$student->icno;
 
             $isPaid = DB::table('student_fees_new as sfn')
                 ->leftJoin('fees_new as fn', 'fn.id', 'sfn.fees_id')
