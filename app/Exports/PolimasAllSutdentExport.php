@@ -15,7 +15,7 @@ class PolimasAllSutdentExport implements FromCollection, ShouldAutoSize, WithHea
     */
     public function collection()
     {
-        //
+        set_time_limit(1200);
         $liststudents = DB::table('organization_user_student as ous')
         ->join('students', 'students.id', '=', 'ous.student_id')
         ->join('class_student as cs', 'cs.student_id', '=', 'students.id')
@@ -36,7 +36,7 @@ class PolimasAllSutdentExport implements FromCollection, ShouldAutoSize, WithHea
         foreach ($liststudents as $key => $student) {
             # code...
             $student->telno = '`' . $student->telno;
-
+            $student->icno =  $student->icno ==null?$student->telno:$student->icno;
             $isPaid = DB::table('student_fees_new as sfn')
                 ->leftJoin('fees_new as fn', 'fn.id', 'sfn.fees_id')
                 ->where('sfn.status', 'Paid')
