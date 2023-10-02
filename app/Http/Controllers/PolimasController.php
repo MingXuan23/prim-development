@@ -328,8 +328,10 @@ class PolimasController extends Controller
         $class = DB::table('classes')
             ->where('id', $request->classExport)
             ->first();
+        
+        $filename = str_replace('/','',$class->nama);
 
-        return Excel::download(new PolimasSutdentExport($this->oid, $request->classExport), $class->nama . '.xlsx');
+        return Excel::download(new PolimasSutdentExport($this->oid, $request->classExport), $filename . '.xlsx');
     }
 
     public function AllStudentExport(Request $request)

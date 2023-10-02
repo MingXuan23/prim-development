@@ -1957,14 +1957,16 @@ class FeesController extends AppBaseController
             ->where('id', $request->organExport)
             ->where('o.type_org', 15)
             ->get();
+        $filename = str_replace('/','-',$yuran->name);
+        
 
-        if(!$orgtypeSwasta)
+        if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
-            return Excel::download(new ExportYuranStatus($yuran), $yuran->name . '.xlsx');
+            return Excel::download(new ExportYuranStatus($yuran),  $filename. '.xlsx');
         }
         else
         {
-            return Excel::download(new ExportYuranStatusSwasta($yuran), $yuran->name . '.xlsx');
+            return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
         }
         
     }
