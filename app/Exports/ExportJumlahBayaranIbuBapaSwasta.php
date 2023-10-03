@@ -56,6 +56,7 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
 
             $amount = 0;
             $fpxno = implode(',', $unique->pluck('transac_no')->all());
+            $transaction_date = implode(',', $unique->pluck('datetime_created')->all());
             $yuran = implode(",\n", $combined->pluck('yuran')->all());
             //dd($unique);
             //dd($combined);
@@ -82,6 +83,7 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
             // $data->amount = $amount == 0.00 ? 'RM 0.00' : 'RM ' . number_format($amount, 2, '.', '');
             $data->amount = number_format($amount, 2, '.', '');
             $data->fpxno = $fpxno == '' ? $fpxno : '`' . $fpxno;
+            $data->date = $transaction_date==''? $transaction_date:'`'. $transaction_date;
             $data->yuran=$yuran ;
 
             unset($data->userId);
@@ -153,6 +155,7 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
             'Nama Penjaga',
             'Jumlah Pembayaran Penjaga (RM)',
             'No Transaksi FPX',
+            'Tarikh Transaksi',
             'Yuran Yang Terlibat'
         ];
     }
