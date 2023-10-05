@@ -1957,6 +1957,8 @@ class FeesController extends AppBaseController
             ->where('id', $request->organExport)
             ->where('o.type_org', 15)
             ->get();
+            
+        $filename = str_replace('/','-',$yuran->name);
 
         if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
