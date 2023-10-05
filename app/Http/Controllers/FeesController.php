@@ -1958,13 +1958,15 @@ class FeesController extends AppBaseController
             ->where('o.type_org', 15)
             ->get();
 
-        if(!$orgtypeSwasta)
+        $filename = str_replace('/','-',$yuran->name);
+
+        if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
-            return Excel::download(new ExportYuranStatus($yuran), $yuran->name . '.xlsx');
+            return Excel::download(new ExportYuranStatus($yuran),  $filename. '.xlsx');
         }
         else
         {
-            return Excel::download(new ExportYuranStatusSwasta($yuran), $yuran->name . '.xlsx');
+            return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
         }
         
     }
@@ -1992,7 +1994,7 @@ class FeesController extends AppBaseController
             ->where('o.type_org', 15)
             ->get();
 
-        if(!$orgtypeSwasta)
+        if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
             return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
         }
