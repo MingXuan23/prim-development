@@ -1500,7 +1500,7 @@ class FeesController extends AppBaseController
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
             ->join('fees_recurring as fr', 'fr.student_fees_new_id', '=', 'student_fees_new.id')
-            ->select('fees_new.*', 'students.id as studentid', 'fr.*')
+            ->select('fees_new.*', 'students.id as studentid', 'fr.*', 'fees_new.id as feesnew_id')
             ->orderBy('fees_new.name')
             ->where('fees_new.status', 1)
             ->where('student_fees_new.status', 'Debt')
@@ -1957,16 +1957,14 @@ class FeesController extends AppBaseController
             ->where('id', $request->organExport)
             ->where('o.type_org', 15)
             ->get();
-        $filename = str_replace('/','-',$yuran->name);
-        
 
-        if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
+        if(!$orgtypeSwasta)
         {
-            return Excel::download(new ExportYuranStatus($yuran),  $filename. '.xlsx');
+            return Excel::download(new ExportYuranStatus($yuran), $yuran->name . '.xlsx');
         }
         else
         {
-            return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
+            return Excel::download(new ExportYuranStatusSwasta($yuran), $yuran->name . '.xlsx');
         }
         
     }
@@ -1994,8 +1992,7 @@ class FeesController extends AppBaseController
             ->where('o.type_org', 15)
             ->get();
 
-           
-        if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
+        if(!$orgtypeSwasta)
         {
             return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
         }

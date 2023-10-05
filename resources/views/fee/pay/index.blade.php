@@ -253,13 +253,13 @@
                                                                                 @foreach($getfees_bystudentSwasta->where('studentid', $data->studentid)->where('category', $data->category)->where('organization_id', $organization->id) as $item)
                                                                                 <div class="inputGroup">
                                                                                     <input
-                                                                                        id="option-{{ $item->id }}-{{ $data->studentid }}"
+                                                                                        id="option-{{ $item->feesnew_id }}-{{ $data->studentid }}"
                                                                                         name="billcheck"
                                                                                         value="{{ $item->finalAmount }}"
                                                                                         onchange="checkD(this)"
                                                                                         type="checkbox" />
 
-                                                                                    <label for="option-{{ $item->id }}-{{ $data->studentid }}">
+                                                                                    <label for="option-{{ $item->feesnew_id }}-{{ $data->studentid }}">
                                                                                         <span style="font-size: 18px">{{ $item->name }}</span>
                                                                                         <br>
                                                                                         <span style="font-size: 14px;font-weight:100;">{{ date('d/m/Y', strtotime($item->start_date)) }} - {{ date('d/m/Y', strtotime($item->end_date)) }} ({{ $item->totalDay }} hari)</span>
@@ -285,10 +285,10 @@
 
                                                                                     {{-- hidden input checkbox second --}}
                                                                                     <input
-                                                                                        id="option-{{ $item->id }}-{{ $data->studentid }}-2"
+                                                                                        id="option-{{ $item->feesnew_id }}-{{ $data->studentid }}-2"
                                                                                         style="opacity: 0.0; position: absolute; left: -9999px"
                                                                                         checked="checked" name="billcheck2"
-                                                                                        value="{{$data->studentid}}-{{ $item->id }}"
+                                                                                        value="{{$data->studentid}}-{{ $item->feesnew_id }}"
                                                                                         type="checkbox" />
                                                                                 </div>
                                                                                 @endforeach
