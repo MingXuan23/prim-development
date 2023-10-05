@@ -1962,11 +1962,11 @@ class FeesController extends AppBaseController
 
         if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
-            return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
+            return Excel::download(new ExportYuranStatus($yuran),  $filename. '.xlsx');
         }
         else
         {
-            return Excel::download(new ExportJumlahBayaranIbuBapaSwasta($request->yuranExport1,$org ), $filename . '.xlsx');
+            return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
         }
         
     }
