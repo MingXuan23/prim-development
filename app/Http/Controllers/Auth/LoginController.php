@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class LoginController extends Controller
 {
@@ -80,7 +81,12 @@ class LoginController extends Controller
         $phone = $request->get('email');
         
         if(is_numeric($request->get('email'))){
-            
+            $user = User::where('icno', $phone)->first();
+           
+            if ($user) {
+                //dd($user);
+                return ['icno' => $phone, 'password' => $request->get('password')];
+            }
             if(!$this->startsWith((string)$request->get('email'),"+60") && !$this->startsWith((string)$request->get('email'),"60")){
                 if(strlen((string)$request->get('email')) == 10)
                 {
@@ -101,6 +107,8 @@ class LoginController extends Controller
                 }   
             }
             return ['telno'=>$phone,'password'=>$request->get('password')];
+
+           
         }
         else if(strpos($request->get('email'), "@") !== false){
             return ['email' => $request->get('email'), 'password'=>$request->get('password')];
