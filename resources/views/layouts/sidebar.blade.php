@@ -698,31 +698,11 @@
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
-                @role('Homestay Admin')
-                        <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
-                            <i class="mdi mdi-room-service-outline"></i>
-                            <span>Urus Homestay/Hotel</span>
+                        <a href="{{ route('homestay.homePage') }}" class=" waves-effect">
+                            <i class="fas fa-home"></i>
+                            <span>Laman Utama</span>
                         </a>
                     </li>
-                    <li>
-                        <a href="{{ route('homestay.index') }}" class=" waves-effect">
-                            <i class="mdi mdi-percent"></i>
-                            <span>Set Promosi</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('homestay.urustempahan') }}" class=" waves-effect">
-                            <i class="ti-clipboard"></i>
-                            <span>Urus Tempahan</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('homestay.tunjuksales') }}" class=" waves-effect">
-                            <i class="mdi mdi-finance"></i>
-                            <span>Lihat Keuntungan</span>
-                        </a>
-                    </li>
-                    @endrole 
                     <li>
                         <a href="{{ route('homestay.bookinglist') }}" class=" waves-effect">
                             <i class="mdi mdi-book-search"></i>
@@ -741,6 +721,34 @@
                             <span>Sejarah Tempahan</span>
                         </a>
                     </li>
+                    <li>
+                        
+                @role('Homestay Admin')
+                        <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
+                            <i class="mdi mdi-room-service-outline"></i>
+                            <span>Urus Homestay/Hotel</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.promotionPage') }}" class=" waves-effect">
+                            <i class="mdi mdi-percent"></i>
+                            <span>Set Promosi</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.urustempahan') }}" class=" waves-effect">
+                            <i class="ti-clipboard"></i>
+                            <span>Urus Tempahan</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('homestay.tunjuksales') }}" class=" waves-effect">
+                            <i class="mdi mdi-finance"></i>
+                            <span>Lihat Keuntungan</span>
+                        </a>
+                    </li>
+                    @endrole 
+
                     <li>
                 </ul>  
             </li>

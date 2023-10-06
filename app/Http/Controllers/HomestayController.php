@@ -26,7 +26,76 @@ use DatePeriod;
 
 class HomestayController extends Controller
 {
-    public function index()
+    public function homePage(){
+        $roomsId = DB::table('rooms')
+        ->where([
+            'deleted_at' => null,
+        ]) 
+        ->orderBy('roomid')
+        ->pluck('roomid');
+        
+        // array to keep the room's data with its first room image
+        $roomsWithImage = [];
+        foreach($roomsId as $roomId){
+            $firstRow = DB::table('rooms')
+            ->join('homestay_images','homestay_images.room_id','rooms.roomid')
+            ->where([
+                'rooms.deleted_at' => null,
+                'rooms.roomid' => $roomId
+            ])
+            ->orderBy('roomid')
+            ->first();
+            array_push($roomsWithImage, $firstRow);
+        }
+        return view('homestay.home')->with(['rooms' => $roomsWithImage]);
+    }
+    public function showRoom($roomId){
+        $room = DB::table('rooms')
+        ->where([
+            'roomid' => $roomId,
+        ])
+        ->first();
+        $roomImages= DB::table('rooms')
+        ->join('homestay_images','homestay_images.room_id','rooms.roomid')
+        ->where([
+            'homestay_images.deleted_at' => null,
+            'rooms.roomid' => $roomId
+        ])
+        ->pluck('homestay_images.image_path');
+
+        return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages]);
+    }
+    public function fetchUnavailableDates(Request $request)
+    {   
+        $roomId = $request->roomId;
+        // Fetch all bookings for the specified room with status 'Booked' or 'Paid'
+        $bookings = Booking::where('roomid', $roomId)
+                           ->whereIn('status', ['Booked', 'Paid'])
+                           ->get();
+    
+        $disabledDates = [];
+    
+        foreach ($bookings as $booking) {
+            // Convert check-in and check-out dates to DateTime objects
+            $checkIn = new DateTime($booking->checkin);
+            $checkOut = new DateTime($booking->checkout);
+    
+            // Generate a range of dates between check-in and check-out (inclusive)
+            $interval = new DateInterval('P1D'); // 1 day interval
+            $period = new DatePeriod($checkIn, $interval, $checkOut);
+    
+            // Add each date in the range to the disabledDates array
+            foreach ($period as $date) {
+                $disabledDates[] = $date->format('d/m/Y');
+            }
+        }
+    
+        // Remove duplicates from the array (if any)
+        $disabledDates = array_unique($disabledDates);
+        return response()->json(['disabledDates' => $disabledDates]);
+    }
+    
+    public function promotionPage()
     {
         $userId = Auth::id();
         $data = Promotion::join('organizations', 'promotions.homestayid', '=', 'organizations.id')
@@ -118,6 +187,10 @@ public function addroom(Request $request)
         'details' => 'required',
         'price'=> 'numeric|min:1',
         'address' => 'required',
+        'state' => 'required',
+        'district' => 'required',
+        'area' => 'required',
+        'postcode' => 'required',
     ]);
     
     $status = 'Available';
@@ -130,6 +203,10 @@ public function addroom(Request $request)
     $room->price = $request->price;
     $room->status = $status;
     $room->address = $request->address;
+    $room->state = $request->state;
+    $room->district = $request->district;
+    $room->area = $request->area;
+    $room->postcode = $request->postcode;
     $room->created_at = Carbon::now();
     $result = $room->save();
     
@@ -277,7 +354,11 @@ public function editpromo(Request $request,$promotionid)
             ->where('to.nama', $orgtype)
             ->where('o.deleted_at', null)
             ->get();
-        return view('homestay.tambahbilik',compact('data'));
+
+        // get states
+        $states = Jajahan::negeri();
+
+        return view('homestay.tambahbilik',compact('data','states'));
     }
 
     // public function editroom(Request $request,$roomid)
@@ -326,8 +407,9 @@ public function editpromo(Request $request,$promotionid)
         ->join('homestay_images','homestay_images.room_id','rooms.roomid')
         ->select('homestay_images.id','homestay_images.image_path')
         ->get();
-
-        return view('homestay.editBilik')->with(['room'=>$room , 'images'=>$roomImages]);
+       // get states
+       $states = Jajahan::negeri();
+        return view('homestay.editBilik')->with(['room'=>$room , 'images'=>$roomImages,'states'=>$states]);
     }
     public function updateRoom(Request $request){
         // for updating images
@@ -383,6 +465,10 @@ public function editpromo(Request $request,$promotionid)
             'details' => $request->details,
             'status' => $isAvailable,
             'address' => $request->address,
+            'state' => $request->state,
+            'district' => $request->district,
+            'area' => $request->area,
+            'postcode' => $request->postcode,
             'updated_at' => Carbon::now(),
         ]);
     

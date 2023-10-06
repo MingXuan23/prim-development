@@ -6,47 +6,22 @@
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
 
 
-    <style>
-        #img-preview{
-            object-fit: cover;
-            height: 150px;
-            width: 200px;
-            cursor: pointer;
-        }
-        
-        @media screen and (max-width:500px){
-            #image-previews{
-                flex-wrap: nowrap!important;
-                justify-content: flex-start!important;
-                width:100%!important;
-                overflow-x: auto;
-            }
-            .content-container{
-                width: 100%!important;;
-            }
-            .card-body > div{
-                display: block;
-            }
-            .card-body > div > .col-6{
-               max-width: 100%;
-            }
-        }
-    </style>
 @endsection
 
 @section('content')
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Edit Homestay/Bilik</h4>
+            <h4 class="font-size-18 page-title color-purple"><span><a href="{{route('homestay.urusbilik')}}" class="color-dark-purple">Urus Homestay/Bilik >> </a></span>Edit Homestay/Bilik</h4>
         </div>
     </div>
 </div>
 <div class="content-container">
-    <div class="col-md-12">
-        <div class="card card-primary">
+    <div class="col-md-12 border-purple p-0">
+        <div class="card card-primary mb-0">
 
         @if(count($errors) > 0)
       <div class="alert alert-danger">
@@ -106,11 +81,43 @@
                     <div class="row">
                             <div class="form-group col-6 ">
                                 <label for="details">Detail Homestay atau Bilik<span style="color:#d00"> *</span></label>
-                                <textarea rows="5" cols="30" name="details" id="details" class="form-control"  placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required>{{$room->details}}</textarea>                                  
+                                <textarea rows="10" cols="30" name="details" id="details" class="form-control"  placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required>{{$room->details}}</textarea>                                  
                             </div>
-                            <div class="form-group col-6 ">
-                                    <label for="address">Alamat Penuh <span style="color:#d00"> *</span></label>
-                                    <textarea rows="5" cols="30" name="address" id="address" class="form-control"  placeholder="No.123, Hang Tuah Jaya, 76100 Durian Tunggal, Melaka" required>{{$room->address}}</textarea>                                  
+                            <div class="form-group col-6 row">
+                                <div class="form-group col-6 required">
+                                    <label class="control-label">Negeri <span style="color:#d00"> *</span></label>
+                                    <select name="state" id="state" class="form-select"
+                                        data-parsley-required-message="Sila masukkan negeri" required>
+                                        <option value="">Pilih Negeri</option>
+                                        @for ($i = 0; $i < count($states); $i++) 
+                                            <option id="{{ $states[$i]['id'] }}" {{ ucfirst(strtolower($states[$i]['name'])) == $room->state ? 'selected' : ''}}
+                                            value="{{ ucfirst(strtolower($states[$i]['name'])) }}">
+                                            {{ ucfirst(strtolower($states[$i]['name'])) }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group required">
+                                        <label class="control-label">Daerah <span style="color:#d00"> *</span></label>
+                                        <select name="district" id="district" class="form-select"
+                                            data-parsley-required-message="Sila masukkan daerah" data-original-district="{{$room->district}}" required>
+                                            <option value="">Pilih Daerah</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <label for="area" class="form-label">Bandar <span style="color:#d00"> *</label>
+                                    <input type="text" name="area" id="area" class="form-control" value="{{$room->area}}" required>
+                                </div>
+                                <div class="col-6">
+                                    <label for="postcode" class="form-label">Poskod <span style="color:#d00"> *</label>
+                                    <input type="text" name="postcode" id="postcode" class="form-control" value="{{$room->postcode}}" required>
+                                </div>
+                                <div>
+                                    <label for="address">Nombor Rumah, Bangunan, Nama Jalan <span style="color:#d00"> *</span></label>
+                                    <input type="text" name="address" id="address" class="form-control" placeholder="No.123, Taman Merdeka" value="{{$room->address}}" required></textarea>                                       
+                                </div>
+                               
                             </div>
                     </div>
 
@@ -240,6 +247,39 @@ $(document).ready(function () {
                 }
             }
         });
+    // to fetch district options based on selected state
+    function toTitleCase(str) {
+            var lcStr = str.toLowerCase();
+            return lcStr.replace(/(?:^|\s)\w/g, function(match) {
+                return match.toUpperCase();
+            });
+    }
+    $('#state').on('change', function() {
+            var state_id = $(this).children(":selected").attr("id");
+            $.ajax({
+                url: "{{ route('organization.get-district') }}",
+                type: "POST",
+                data: { 
+                    state_id: state_id
+                },
+                success: function(data) {
+                    const originalDistrict = $('#district').attr('data-original-district');
+                    $('#district').empty();
+                    for(var i = 0; i < data.length; i++){
+                        data.sort();
+                        let district = toTitleCase(data[i]);
+                        if(district == originalDistrict){
+                            $("#district").append("<option selected value='"+ district +"'>"+ district +"</option>");
+                        }else{
+                            $("#district").append("<option value='"+ district +"'>"+ district +"</option>");
+                        }
+                    }
+                }
+            })
+        });
+
+    $('#state').trigger('change');
+
 });
 
 </script>

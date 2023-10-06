@@ -3,26 +3,16 @@
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+<link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
 @include('layouts.datatable')
 
-<style>
-  .img-homestay{
-    height: 200px;
-    width: 250px;
-    object-fit: cover;
-    margin: 0 auto;
-  }
-  td{
-    text-align: center;
-  }
-</style>
 @endsection
 
 @section('content')
 <div class="row align-items-center">
   <div class="col-sm-6">
     <div class="page-title-box">
-      <h4 class="font-size-18">Homestay/Bilik Hotel</h4>
+      <h4 class="font-size-18 color-purple">Homestay/Bilik Hotel</h4>
       <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
@@ -45,7 +35,7 @@
       @endif
 
       {{csrf_field()}}
-      <div class="card-body">
+      <div class="card-body bg-purple">
         <div class="form-group">
           <label>Nama Homestay/Hotel</label>
           <select name="homestay" id="homestay" class="form-control">
@@ -60,14 +50,14 @@
     </div>
   </div>
 
-  <div class="col-md-12">
-    <div class="card">
+  <div class="col-md-12 border-purple p-0 ">
+    <div class="card mb-0">
       <div>
-        <a style="margin: 19px; float: right;" href="{{ route('homestay.tambahbilik')}}" class="btn btn-primary"> <i
+        <a style="margin: 19px; float: right;" href="{{ route('homestay.tambahbilik')}}" class="btn-purple"> <i
             class="fas fa-plus"></i> Tambah Homestay/Bilik</a>
       </div>
 
-      <div class="card-body">
+      <div class="card-body ">
 
       @if(Session::has('success'))
             <div class="alert alert-success">
@@ -84,12 +74,12 @@
         <div class="table-responsive">
           <table id="bilikTable" class="table table-bordered  table-striped dt-responsive"
             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-            <thead class="table-dark">
+            <thead class="bg-purple">
               <tr style="text-align:center">
                 <th hidden> Room ID </th>
-                <th style="width: 25%"> Nama Homestay/Bilik </th>
-                <th style="width: 5%"> Kapasiti </th>
+                <th style="width: 25%"> Nama Homestay/Bilik </th>                
                 <th style="width: 25%"> Gambar Homestay/Bilik </th>
+                <th style="width: 5%"> Kapasiti </th>
                 <th style="width: 15%"> Harga Semalam (RM) </th>
                 <th style="width: 10%"> Status</th>
                 <th style="width: 10%"> Action 1</th>
@@ -202,12 +192,7 @@ $(document).ready(function() {
                       data: 'roomname', 
                       orderable: true,
                       searchable: true,
-                    },
-                    { 
-                      data: 'roompax',
-                      orderable: true,
-                      searchable: true,
-                    },
+                    },                    
                     { 
                       data: 'roomid',
                         render: function(data, type, row) {
@@ -221,6 +206,12 @@ $(document).ready(function() {
                         searchable: false,
                     },
                     { 
+                      data: 'roompax',
+                      orderable: true,
+                      searchable: true,
+                    },
+
+                    { 
                       data: 'price', 
                       orderable: true,
                       searchable: true,
@@ -233,7 +224,7 @@ $(document).ready(function() {
                     { 
                       data: 'roomid', render: function(data) {
                         var editUrl = `{{ route('homestay.editRoomPage', ':roomid') }}`.replace(':roomid', data);
-                        return `<a class="btn btn-success" href="${editUrl}"  data-room-id="${data}">Edit</a>`;
+                        return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-room-id="${data}">Edit</a>`;
                       } 
                     },
                     {
