@@ -170,7 +170,7 @@
         $('.form-validation').parsley();
         $('.phone_no').mask('+600000000000');
         $('.postcode').mask('99999');
-        $('.icno').mask('000000-00-0000');
+        $('.icno').mask('000000000000');
 
         $.ajaxSetup({
             headers: {

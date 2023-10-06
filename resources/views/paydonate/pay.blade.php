@@ -160,7 +160,7 @@
                             <div class="form-group">
                                 <label>Nama</label>
                                 <input type="text" name="name" id="name" class="form-control text-left"
-                                    placeholder="Nama Pelajar" value="{{ !empty($user) ? $user->name : '' }}"
+                                    placeholder="Nama" value="{{ !empty($user) ? $user->name : '' }}"
                                     data-parsley-required-message="Sila masukkan nama penuh" required>
                             </div>
                             <div class="form-group">
