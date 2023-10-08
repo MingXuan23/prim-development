@@ -181,7 +181,7 @@ $(document).on('click', '#bookbutton', function(e) {
                 onSelect: function(selectedDate) {
                     $("#checkout").datepicker("option", "minDate", selectedDate);
                 }
-            });
+    });
 
             $("#checkout").datepicker({
                 minDate: 0,

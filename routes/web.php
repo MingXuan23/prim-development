@@ -606,16 +606,27 @@ Route::group(['prefix' => 'delivery'], function () {
    //Route::get('')
 });
 
-    Route::get('homestay', 'HomestayController@index')->name('homestay.index');
-    Route::get('setpromotion', 'HomestayController@setpromotion')->name('homestay.setpromotion');
-    Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
-    Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
-    Route::post('editpromo/{id}', 'HomestayController@editpromo');
+    // Homestay Customer
+    Route::get('homestay', 'HomestayController@homePage')->name('homestay.homePage');
+    Route::get('homestay/{id}_{name}', 'HomestayController@showRoom')->name('homestay.showRoom');
+    Route::get('fetch-unavailable-dates', 'HomestayController@fetchUnavailableDates')->name('homestay.fetchUnavailableDates');
+    // Homestay Management
     Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
     Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
     Route::get('tambahbilik', 'HomestayController@tambahbilik')->name('homestay.tambahbilik');
     Route::post('addroom', 'HomestayController@addroom')->name('homestay.addroom');
-    Route::post('editroom/{id}', 'HomestayController@editroom');
+    // Route::post('editroom/{id}', 'HomestayController@editroom');
+    Route::get('edit-room/{id}', 'HomestayController@editRoomPage')->name('homestay.editRoomPage');
+    Route::post('update-room', 'HomestayController@updateRoom')->name('homestay.updateRoom');
+    Route::post('delete-room', 'HomestayController@deleteRoom')->name('homestay.deleteRoom');
+    
+    //Homestay Promotion
+    Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');
+    Route::get('setpromotion', 'HomestayController@setpromotion')->name('homestay.setpromotion');
+    Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
+    Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
+    Route::post('editpromo/{id}', 'HomestayController@editpromo');
+
     Route::get('bookinglist', 'HomestayController@bookinglist')->name('homestay.bookinglist');
     Route::get('bookhomestay/{id}', 'HomestayController@bookhomestay')->name('homestay.bookhomestay');
     Route::get('disabledateroom/{id}', 'HomestayController@disabledateroom');

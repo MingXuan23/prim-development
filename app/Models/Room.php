@@ -15,8 +15,11 @@ class Room extends Model
         'details',
         'price',
         'status',
-        'homestayid'
-
+        'homestayid',
+        'address',
+        'homestay_image_id',
+        'created_at',
+        'updated_at',
     ];
 
     public $timestamps = false;

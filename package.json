@@ -79,7 +79,7 @@
         "simplebar": "^4.2.3",
         "socket.io": "^3.0.4",
         "summernote": "^0.8.18",
-        "sweetalert2": "^8.18.0",
+        "sweetalert2": "^8.19.1",
         "tinymce": "^5.6.2",
         "x-editable": "^1.5.1"
     }
