@@ -30,6 +30,7 @@ class HomestayController extends Controller
         $roomsId = DB::table('rooms')
         ->where([
             'deleted_at' => null,
+            'status' => 'Available',
         ]) 
         ->orderBy('roomid')
         ->pluck('roomid');
@@ -64,6 +65,25 @@ class HomestayController extends Controller
         ->pluck('homestay_images.image_path');
 
         return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages]);
+    }
+    public function searchRoom(Request $request){
+        $rooms = Room::search($request->searchRoom)->paginate(20);
+        $roomImage = [];
+        foreach($rooms as $room){
+            $roomId = $room->roomid;
+            $firstRow = DB::table('rooms')
+            ->join('homestay_images','homestay_images.room_id','rooms.roomid')
+            ->where([
+                'rooms.deleted_at' => null,
+                'rooms.roomid' => $roomId
+            ])
+            ->orderBy('roomid')
+            ->pluck('image_path')
+            ->first();
+
+            array_push($roomImage, $firstRow);
+        }
+        return view('homestay.searchResults')->with(['rooms' => $rooms,'roomImage' => $roomImage]);
     }
     public function fetchUnavailableDates(Request $request)
     {   
@@ -545,7 +565,36 @@ public function editpromo(Request $request,$promotionid)
 
     return response()->json(['disabledDates' => $disabledDates]);
     }
+    public function bookRoom(Request $request){
+        $roomId = $request->roomId;
+        $userId = Auth::user()->id;
+        $checkInDate = Carbon::createFromFormat('d/m/Y', $request->checkIn);
+        $checkOutDate = Carbon::createFromFormat('d/m/Y', $request->checkOut);
 
+        // check whether room is booked by others 
+        $availability = Booking::where('roomid', $roomId)
+        ->where(function ($query) use ($request) {
+        $query->where('checkin', '<', $request->checkOut)
+            ->where('checkout', '>', $request->checkIn);
+         })
+        ->get();
+
+        if($availability->isEmpty()){
+            DB::table('bookings')
+            ->insert([
+                'checkin' => $checkInDate,
+                'checkout' => $checkOutDate,
+                'status' => "Booked",
+                'totalprice' => $request->amount,
+                'customerid' => $userId,
+                'roomId' => $roomId,
+                'created_at' => Carbon::now(),
+            ]);
+            return back()->with('success','Tempahan telah berjaya dibuat');
+        }else{
+            return back()->with('error','Homestay/bilik telah ditempah oleh pengguna lain pada masa itu.');
+        }
+    }
     public function insertbooking(Request $request, $roomid, $price)
     {
         $request->validate([
@@ -587,7 +636,7 @@ public function editpromo(Request $request,$promotionid)
         ->where(function ($query) use ($request) {
         $query->where('checkin', '<', $request->checkout)
             ->where('checkout', '>', $request->checkin);
-    })
+         })
     ->get();
 
     if ($availability->isEmpty()) {

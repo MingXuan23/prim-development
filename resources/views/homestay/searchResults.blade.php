@@ -7,12 +7,6 @@
 @section('content')
 
     <section aria-label="Banner" class="mb-3">
-        <div id="banner-container">
-            <img src="homestay-image/home-banner-image.jpeg" alt="Banner Image" id="banner-image">
-            <div id="banner-content">
-                <h2>Cari penginapan idaman anda dengan tawaran yang menarik</h2>
-            </div>
-        </div>
         <div aria-label="Search Input" >
             <form action="{{route('homestay.searchRoom')}}" method="get" enctype="multipart/form-data" class="d-flex justify-content-center align-items-center mt-3" id="form-search">
                 @csrf            
@@ -24,24 +18,26 @@
                 </div>
             </form>
         </div>
+        <h5 class="color-purple">{{count($rooms)}} Penginapan Telah Dijumpa</h5>
     </section>
  
     <section aria-label="Homestays or Rooms Listings" >
         <div class="home-thumbnails-container">
-            @foreach($rooms as $room)
+            @for($i = 0; $i < count($rooms); $i++)
                 <div class="home-thumbnail-container">
-                    <a href="{{route('homestay.showRoom',['id' => $room->roomid, 'name' => $room->roomname])}}" target="_blank">
-                        <img src="{{$room->image_path}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      <div class="home-thumbnail-captions p-2">
-                            <h4 class="color-purple">{{$room->roomname}}</h4>
-                            <div class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->district}},{{$room->state}}</div>
-                            <h5 class="color-purple text-right">RM{{$room->price}}/malam</h5>
+                    <a href="{{route('homestay.showRoom',['id' => $rooms[$i]->roomid, 'name' => $rooms[$i]->roomname])}}" target="_blank">
+                        <img src="{{$roomImage[$i]}}" alt="{{$rooms[$i]->roomname}}'s Image" class="home-thumbnail-img">                      
+                        <div class="home-thumbnail-captions p-2">
+                            <h4 class="color-purple">{{$rooms[$i]->roomname}}</h4>
+                            <div class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$rooms[$i]->district}},{{$rooms[$i]->state}}</div>
+                            <h5 class="color-purple text-right">RM{{$rooms[$i]->price}}/malam</h5>
                         </div>                      
                     </a>
                 </div>
-            @endforeach            
+            @endfor           
         </div>
-
     </section>
+    {{$rooms->withQueryString()->links()}}
 @endsection
 
 
@@ -52,7 +48,7 @@
 <script>
 
 
-$(document).ready(function() {
+$(document).ready(function() {    
     $('#form-search').on('submit',function(e){
         if($('#search-room').val() == ''){
             e.preventDefault();

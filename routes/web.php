@@ -610,6 +610,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('homestay', 'HomestayController@homePage')->name('homestay.homePage');
     Route::get('homestay/{id}_{name}', 'HomestayController@showRoom')->name('homestay.showRoom');
     Route::get('fetch-unavailable-dates', 'HomestayController@fetchUnavailableDates')->name('homestay.fetchUnavailableDates');
+    Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
+    Route::get('search-room','HomestayController@searchRoom')->name('homestay.searchRoom');
     // Homestay Management
     Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
     Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
@@ -620,6 +622,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('update-room', 'HomestayController@updateRoom')->name('homestay.updateRoom');
     Route::post('delete-room', 'HomestayController@deleteRoom')->name('homestay.deleteRoom');
     
+
+
     //Homestay Promotion
     Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');
     Route::get('setpromotion', 'HomestayController@setpromotion')->name('homestay.setpromotion');

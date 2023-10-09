@@ -12,8 +12,6 @@
 
 @section('content')
     <section aria-label="Homestay or Room Details">
-        <input type="text" name="roomId" id="roomId" value={{$room->roomid}} hidden>
-        <input type="text" name="roomPrice" id="roomPrice" value={{$room->price}} hidden>
         <h3 class="color-purple"><span><a href="{{route('homestay.homePage')}}" class="color-dark-purple" target="_self">Laman Utama >> </a></span>{{$room->roomname}}</h3>
         <h5 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->address}}, {{$room->area}}, {{$room->postcode}}, {{$room->district}}, {{$room->state}}</h5>
             <div class="gallery-container">
@@ -37,23 +35,53 @@
                     <p class="room-details">
                     </p>
                 </div>
-                <div class="col-md-5 booking-container">
-                    <h5 class="text-white mb-2">RM{{$room->price}}/malam</h5>
-                    <div class="form-floating mb-2" >
-                        <input type="text" name="check-in" id="check-in" class="form-control" placeholder="12/12/2023">
-                        <label for="check-in">Daftar Masuk</span>
-                    </div>
-                    <div class="form-floating mb-2" >
-                        <input type="text"  name="check-out" id="check-out" class="form-control" placeholder="13/12/2023" disabled>
-                        <label for="check-out">Daftar Keluar</label>
-                    </div>
-                    <div class="text-white d-flex gap-2 align-items-center">
-                        <h5>Jumlah Harga: </h5>
-                        <div id="total-price"></div>
-                    </div>
-                    {{-- <form action="{{route('homestay')}}" method="post"></form> --}}
-                    <input type="text" name="amount" id="amount" hidden>
+                <div class="col-md-5">
+                    <form class="booking-container" action="{{route('homestay.bookRoom')}}" method="post" enctype="multipart/form-data" id="form-book">
+                        @if(Session::has('success'))
+                            <div class="alert alert-success text-center">
+                                <p>{{ Session::get('success') }}</p>
+                            </div>
+                        @elseif(Session::has('error'))
+                            <div class="alert alert-danger text-center">
+                                <p>{{ Session::get('error') }}</p>
+                            </div>
+                        @endif
+                        <input type="text" name="roomId" id="roomId" value={{$room->roomid}} hidden>
+                        <input type="text" name="roomPrice" id="roomPrice" value={{$room->price}} hidden>
+                        <h5 class="text-white mb-2">RM{{$room->price}}/malam</h5>
+                        <div class="form-floating mb-2" >
+                            <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder="12/12/2023">
+                            <label for="check-in">Daftar Masuk</span>
+                        </div>
+                        <div class="form-floating mb-2" >
+                            <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder="13/12/2023" disabled>
+                            <label for="check-out">Daftar Keluar</label>
+                        </div>
+                        <div class="text-white d-flex gap-2 align-items-center mb-2">
+                            <div id="total-price"></div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            @csrf
+                            <input type="text" name="amount" id="amount" value="0" hidden> 
+                            <button class="btn-book" type="submit">
+                                <span>Tempah Sekarang</span>
+                                <svg width="34" height="34" viewBox="0 0 74 74" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="37" cy="37" r="35.5" stroke="white" stroke-width="3"></circle>
+                                    <path d="M25 35.5C24.1716 35.5 23.5 36.1716 23.5 37C23.5 37.8284 24.1716 38.5 25 38.5V35.5ZM49.0607 38.0607C49.6464 37.4749 49.6464 36.5251 49.0607 35.9393L39.5147 26.3934C38.9289 25.8076 37.9792 25.8076 37.3934 26.3934C36.8076 26.9792 36.8076 27.9289 37.3934 28.5147L45.8787 37L37.3934 45.4853C36.8076 46.0711 36.8076 47.0208 37.3934 47.6066C37.9792 48.1924 38.9289 48.1924 39.5147 47.6066L49.0607 38.0607ZM25 38.5L48 38.5V35.5L25 35.5V38.5Z" fill="white"></path>
+                                </svg>
+                            </button>                            
+                        </div>
+                    </form>
                 </div>
+            </div>
+            <div>
+                <h3 class="color-dark-purple">Lokasi Penginapan</h3>
+                <iframe
+                width="100%"
+                height="400"
+                frameborder="0" style="border:0"
+                src="https://www.google.com/maps?q={{ urlencode($room->address.",".$room->area.",".$room->postcode.$room->district.",". $room->state) }}&output=embed" class="google-map">
+                </iframe>
             </div>
     </section>
     
@@ -147,7 +175,7 @@ $(document).ready(function() {
         const pricePerDay = $('#roomPrice').val();
         const totalPrice = (pricePerDay * daysDifference).toFixed(2);
         $('#total-price').html(`
-            <h5>RM${totalPrice}</h5>
+            <h5>Jumlah Harga: RM${totalPrice} (${daysDifference} malam)</h5>
         `);
         $('#amount').val(totalPrice);    
     }
@@ -245,8 +273,14 @@ $(document).ready(function() {
     }
     initializeCheckInOut();
 
+    $('#form-book').on('submit',function(e){
+        if($('#amount').val() == 0){
+            e.preventDefault();
+            Swal.fire('Sila pilih masa daftar masuk dan daftar keluar sebelum membuat tempahan');
+        }
+    });
 
-
+    $('.alert').delay(3000).fadeOut()
 });
 </script>
 @endsection
