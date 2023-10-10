@@ -8,7 +8,9 @@ use Symfony\Component\VarDumper\Cloner\Data;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportYuranStatusSwasta implements FromCollection, ShouldAutoSize, WithHeadings
+use Maatwebsite\Excel\Concerns\Exportable;
+
+class ExportYuranStatusSwasta implements WithMultipleSheets
 {
     public function __construct($yuran)
     {
@@ -18,8 +20,7 @@ class ExportYuranStatusSwasta implements FromCollection, ShouldAutoSize, WithHea
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function collection()
-    {
+    public function fetchdata($yuran){
         if($this->yuran->category == "Kategori A")
         {
             
@@ -82,6 +83,30 @@ class ExportYuranStatusSwasta implements FromCollection, ShouldAutoSize, WithHea
 
         return $data;
     }
+
+    public function sheets(): array
+    {
+        $sheets = [];
+        $heading = [
+            'Nama',
+            'Kelas',
+            'Jantina',
+            'Tarikh Daftar',
+            'Amaun Perlu Bayar (RM)',
+            'Rujukan',
+            'Status',
+        ];
+
+        foreach ($this->yuran as $yuranItem) {
+            $data = $this->fetchdata($yuranItem);
+           
+            $sheets[] = new Sheet($data, $heading,$yuranItem->name);
+            
+        }
+        //dd($sheets);
+        return $sheets;
+    }
+
 
     public function headings(): array
     {
