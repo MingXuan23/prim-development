@@ -1949,17 +1949,29 @@ class FeesController extends AppBaseController
 
     public function ExportAllYuranStatus(Request $request)
     {
-        $yuran = DB::table('fees_new')
+       
+        if($request->yuranExport==0){
+            $yuran = DB::table('fees_new')
+            ->where('organization_id', $request->organExport)
+            ->get();
+            $filename = "LaporanSemuaYuran";
+
+        }
+        else{
+            $yuran = DB::table('fees_new')
             ->where('id', $request->yuranExport)
-            ->first();
+            ->get();
+            $filename = str_replace('/','-',$yuran[0]->name);
+
+        }
+        
 
         $orgtypeSwasta = DB::table('organizations as o')
             ->where('id', $request->organExport)
             ->where('o.type_org', 15)
             ->get();
 
-        $filename = str_replace('/','-',$yuran->name);
-
+       
         if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
             return Excel::download(new ExportYuranStatus($yuran),  $filename. '.xlsx');
