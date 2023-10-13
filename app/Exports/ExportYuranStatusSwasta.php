@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\Exportable;
 
 class ExportYuranStatusSwasta implements WithMultipleSheets
@@ -21,11 +21,11 @@ class ExportYuranStatusSwasta implements WithMultipleSheets
     * @return \Illuminate\Support\Collection
     */
     public function fetchdata($yuran){
-        if($this->yuran->category == "Kategori A")
+        if($yuran->category == "Kategori A")
         {
             
             $org=DB::table('organizations as o')
-                    ->where('o.id',$this->yuran->organization_id)
+                    ->where('o.id',$yuran->organization_id)
                     ->first();
 
             $orgId=$org->id;
@@ -34,7 +34,7 @@ class ExportYuranStatusSwasta implements WithMultipleSheets
             }
             $feeStatus = DB::table('fees_new_organization_user as fou')
                     ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
-                    ->where('fou.fees_new_id', $this->yuran->id)
+                    ->where('fou.fees_new_id', $yuran->id)
                     ->select('ou.user_id','fou.status')
                     ->distinct('fou.id')
                     ->get();
@@ -70,7 +70,7 @@ class ExportYuranStatusSwasta implements WithMultipleSheets
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
                 ->leftJoin('fees_recurring as fr', 'fr.student_fees_new_id', 'sfn.id')
-                ->where('sfn.fees_id', $this->yuran->id)
+                ->where('sfn.fees_id', $yuran->id)
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', DB::raw("DATE_FORMAT(cs.start_date, '%d/%m/%Y') as cs_startdate"), DB::raw("ROUND(fr.finalAmount, 2) as finalAmount"), 'fr.desc', 'sfn.status')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
