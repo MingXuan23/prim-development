@@ -266,8 +266,8 @@ class PayController extends AppBaseController
                         ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
                         ->join('fees_recurring as fr', 'fr.student_fees_new_id', '=', 'student_fees_new.id')
                         ->select('student_fees_new.id')
-                        // ->where('fees_new.id', $feesid[$i])
-                        ->where('fr.id', $feesid[$i]) //fees_recurring id
+                        ->where('fees_new.id', $feesid[$i])
+                        // ->where('fr.id', $feesid[$i]) //fees_recurring id
                         ->where('students.id', $studentid[$i])
                         ->first();
 
