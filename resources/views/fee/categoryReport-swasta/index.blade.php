@@ -219,7 +219,7 @@
                 success:function(result)
                 {
                     $(yuranId).empty();
-                    $(yuranId).append("<option value='' disabled selected> Pilih Kelas</option>");
+                    $(yuranId).append("<option value='0' selected>Semua Yuran</option>");
                     jQuery.each(result.success, function(key, value){
                         $(yuranId).append("<option value='"+ value.id +"'>" + value.name + "</option>");
                     });

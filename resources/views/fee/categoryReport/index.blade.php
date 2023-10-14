@@ -114,7 +114,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Name Yuran</label>
+                        <label>Nama Yuran</label>
                         <select name="yuranExport" id="yuranExport" class="form-control">
 
                         </select>
@@ -190,7 +190,7 @@
                 success:function(result)
                 {
                     $(yuranId).empty();
-                    $(yuranId).append("<option value='' disabled selected> Pilih Kelas</option>");
+                    $(yuranId).append("<option value='0' selected>Semua Yuran</option>");
                     jQuery.each(result.success, function(key, value){
                         $(yuranId).append("<option value='"+ value.id +"'>" + value.name + "</option>");
                     });
@@ -251,7 +251,7 @@
                     success:function(result)
                     {
                         $('#fees').empty();
-                        $("#fees").append("<option value='0'> Pilih Yuran</option>");
+                        $("#fees").append("<option value='0'>Pilih Yuran</option>");
                         
                         jQuery.each(result.success, function(key, value){
                             $("#fees").append("<option value='"+ value.id +"'>" + value.name + "</option>");

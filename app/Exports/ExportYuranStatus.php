@@ -7,8 +7,11 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ExportYuranStatus implements FromCollection, ShouldAutoSize, WithHeadings
+use Maatwebsite\Excel\Concerns\Exportable;
+
+class ExportYuranStatus implements WithMultipleSheets
 {
     public function __construct($yuran)
     {
@@ -18,13 +21,13 @@ class ExportYuranStatus implements FromCollection, ShouldAutoSize, WithHeadings
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function collection()
-    {
-        if($this->yuran->category == "Kategori A")
+
+    public function fetchdata($yuran){
+        if($yuran->category == "Kategori A")
         {
             
             $org=DB::table('organizations as o')
-                    ->where('o.id',$this->yuran->organization_id)
+                    ->where('o.id',$yuran->organization_id)
                     ->first();
 
             $orgId=$org->id;
@@ -33,7 +36,7 @@ class ExportYuranStatus implements FromCollection, ShouldAutoSize, WithHeadings
             }
             $feeStatus = DB::table('fees_new_organization_user as fou')
                     ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
-                    ->where('fou.fees_new_id', $this->yuran->id)
+                    ->where('fou.fees_new_id', $yuran->id)
                     ->select('ou.user_id','fou.status')
                     ->distinct('fou.id')
                     ->get();
@@ -68,7 +71,7 @@ class ExportYuranStatus implements FromCollection, ShouldAutoSize, WithHeadings
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
-                ->where('sfn.fees_id', $this->yuran->id)
+                ->where('sfn.fees_id', $yuran->id)
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'sfn.status')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
@@ -80,6 +83,43 @@ class ExportYuranStatus implements FromCollection, ShouldAutoSize, WithHeadings
         }
 
         return $data;
+    }
+
+    // public function collection()
+    // {   
+    //     $sheets = [];
+    //     $heading =[
+    //         'Nama',
+    //         'Kelas',
+    //         'Jantina',
+    //         'Status',
+    //     ];
+    //     foreach( $this->yuran as $y){
+    //         $datas = $this->fetchdata($y);
+    //         $sheets[] = new Sheet($datas, $heading);
+    //     }
+    //     return $sheets;
+       
+    // }
+
+    public function sheets(): array
+    {
+        $sheets = [];
+        $heading = [
+            'Nama',
+            'Kelas',
+            'Jantina',
+            'Status',
+        ];
+
+        foreach ($this->yuran as $yuranItem) {
+            $data = $this->fetchdata($yuranItem);
+           
+            $sheets[] = new Sheet($data, $heading,$yuranItem->name);
+            
+        }
+        //dd($sheets);
+        return $sheets;
     }
 
     public function headings(): array
