@@ -605,9 +605,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('/index', 'DeliveryController@index')->name('delivery.parcelIndex');
    //Route::get('')
 });
-
     // Homestay Customer
-    Route::get('homestay', 'HomestayController@homePage')->name('homestay.homePage');
+    Route::get('booknstay', 'HomestayController@homePage')->name('homestay.homePage');
     Route::get('homestay/{id}_{name}', 'HomestayController@showRoom')->name('homestay.showRoom');
     Route::get('fetch-unavailable-dates', 'HomestayController@fetchUnavailableDates')->name('homestay.fetchUnavailableDates');
     Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
@@ -626,8 +625,14 @@ Route::group(['prefix' => 'delivery'], function () {
 
     //Homestay Promotion
     Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');
-    Route::get('setpromotion', 'HomestayController@setpromotion')->name('homestay.setpromotion');
+    Route::get('get-promotion-data', 'HomestayController@getPromotionData')->name('homestay.getPromotionData');
+    Route::get('setpromotion/{id}', 'HomestayController@setpromotion')->name('homestay.setpromotion');
+    Route::get('fetch-unavailable-promotion-dates', 'HomestayController@fetchUnavailablePromotionDates')->name('homestay.fetchUnavailablePromotionDates');
+    Route::get('edit-promotion','HomestayController@editPromotionPage')->name('homestay.editPromotionPage');
     Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
+
+
+
     Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
     Route::post('editpromo/{id}', 'HomestayController@editpromo');
 

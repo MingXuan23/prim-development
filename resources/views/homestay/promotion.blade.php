@@ -10,16 +10,16 @@
 
 @section('content')
     <div class="page-title-box d-flex justify-content-between align-items-center">
-      <h4 class="font-size-18 color-purple">Urus Homestay</h4>
+      <h4 class="font-size-18 color-purple">Urus Promosi</h4>
       <div class="nav-links">
-          <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple">Urus Promosi</a>
+          <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple">Urus Homestay</a>
       </div>
     </div>
 
 <div class="row">
 
   <div class="col-md-12">
-    <div class="card mx-auto card-primary card-org">
+    <div class="card  mx-auto card-primary card-org">
 
       @if(count($errors) > 0)
       <div class="alert alert-danger">
@@ -36,8 +36,8 @@
         <div class="form-group">
           <label>Nama Organisasi</label>
           <select name="homestay" id="homestay" class="form-control">
-            <option value="" selected disabled>Pilih Organisasi</option>
-            @foreach($data as $row)
+            <option value="" selected disabled>Pilih Homestay</option>
+            @foreach($organization as $row)
             <option value="{{ $row->id }}">{{ $row->nama }}</option>
             @endforeach
           </select>
@@ -50,8 +50,8 @@
   <div class="col-md-12 border-purple p-0 ">
     <div class="card mb-0">
       <div>
-        <a style="margin: 19px; float: right;" href="{{ route('homestay.tambahbilik')}}" class="btn-purple"> <i
-            class="fas fa-plus"></i> Tambah Homestay</a>
+        <a style="margin: 19px; float: right;" id="link-add-promotion" class="btn-purple"> <i
+            class="fas fa-plus"></i> Tambah Promosi</a>
       </div>
 
       <div class="card-body ">
@@ -69,16 +69,17 @@
         <div class="flash-message"></div>
 
         <div class="table-responsive">
-          <table id="bilikTable" class="table table-bordered  table-striped dt-responsive"
+          <table id="promotionTable" class="table table-bordered  table-striped"
             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead class="bg-purple">
               <tr style="text-align:center">
                 <th hidden> Room ID </th>
-                <th style="width: 25%"> Nama Homestay </th>                
-                <th style="width: 25%"> Gambar Homestay </th>
-                <th style="width: 5%"> Kapasiti </th>
-                <th style="width: 15%"> Harga Semalam (RM) </th>
-                <th style="width: 10%"> Status</th>
+                <th style="width: 15%"> Nama Homestay </th>                
+                <th style="width: 15%"> Nama Promosi</th>
+                <th style="width: 10%"> Jumlah Promosi</th>
+                <th style="width: 10%"> Harga Semalam Semasa Promosi(RM) </th>
+                <th style="width: 15%"> Tarikh Mula </th>
+                <th style="width: 15%"> Tarikh Berakhir </th>
                 <th style="width: 10%"> Action 1</th>
                 <th style="width: 10%"> Action 2</th>
               </tr>
@@ -143,35 +144,19 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-// function initializeData(rowData) {
-//     var roomid = rowData.roomid;
-//     var roomname = rowData.roomname;
-//     var roompax = rowData.roompax;
-//     var details = rowData.details;
-//     var price = rowData.price;
-
-//     $('#roomid').val(roomid);
-//     $('#roomname').val(roomname);
-//     $('#roompax').val(roompax);
-//     $('#details').val(details);
-//     $('#price').val(price);
-
-//     $('#roomform').attr('action', 'editroom/' + roomid);
-// }
-
 $(document).ready(function() {    
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    var dataTable = $('#bilikTable').DataTable({
+    var dataTable = $('#promotionTable').DataTable({
         // ... your DataTable configuration ...
     });
     function getData(){
       var homestayid = $("#homestay option:selected").val();
       $.ajax({
-            url: "{{ route('homestay.gettabledata') }}",
+            url: "{{ route('homestay.getPromotionData') }}",
             method: "GET",
             data: { homestayid: homestayid },
             success: function(result) {
@@ -181,53 +166,71 @@ $(document).ready(function() {
                 }
 
                 // Initialize the DataTable with the new data
-                dataTable = $('#bilikTable').DataTable({
-                data: result.rooms,
+                dataTable = $('#promotionTable').DataTable({
+                data: result.promotions,
                 columns: [
-                    { data: 'roomid', visible: false },
+                    { data: 'promotionid', visible: false },
                     { 
                       data: 'roomname', 
                       orderable: true,
                       searchable: true,
                     },                    
                     { 
-                      data: 'roomid',
-                        render: function(data, type, row) {
-                          for(var i = 0; i< result.roomImages.length; i++) {
-                            if(data == result.roomImages[i].roomid){
-                              return `<img src="${result.roomImages[i].image_path}" alt="Image of Homestay/Room" class="img-homestay">`;
-                            }
-                          }
-                        },
-                        orderable: false,
-                        searchable: false,
+                      data: 'promotionname',
+                      orderable: true,
+                      searchable: true,
                     },
                     { 
-                      data: 'roompax',
+                      data: 'promotion_type',
+                      render:function(data,type, row){
+                        if(data == "discount"){
+                            return `Diskaun ${row.discount}%`;
+                        }else if(data == "increase"){
+                            return `Naik ${row.increase}%`;
+                            }
+                      },
                       orderable: true,
                       searchable: true,
                     },
 
                     { 
                       data: 'price', 
+                      render: function(data,type,row){
+                        let actualPrice = 0;
+                        if(row.promotion_type == "discount"){
+                            actualPrice = data - (data*row.discount/100);
+                        }else if(row.promotion_type == "increase"){
+                            actualPrice = Number.parseFloat(data) + (data*row.increase/100);
+                        }
+                        return `${Number.parseFloat(actualPrice).toFixed(2)}`;
+                      },
                       orderable: true,
                       searchable: true,
                     },
                     { 
-                      data: 'status', 
+                      data: 'datefrom', 
                       orderable: true,
                       searchable: true,
                     },
                     { 
-                      data: 'roomid', render: function(data) {
-                        var editUrl = `{{ route('homestay.editRoomPage', ':roomid') }}`.replace(':roomid', data);
-                        return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-room-id="${data}">Edit</a>`;
-                      } 
+                      data: 'dateto', 
+                      orderable: true,
+                      searchable: true,
+                    },
+                    { 
+                      data: 'promotionid', render: function(data) {
+                        var editUrl = `{{ route('homestay.editPromotionPage', ':promotionidid') }}`.replace(':promotionid', data);
+                        return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-promotion-id="${data}">Edit</a>`;
+                      },
+                      orderable: false,
+                      searchable: false, 
                     },
                     {
-                      data: 'roomid', render: function(data) {
-                        return `<button class="btn btn-danger" id="btn-delete" data-room-id="${data}">Delete</a>`;
-                      }  
+                      data: 'promotionid', render: function(data) {
+                        return `<button class="btn btn-danger" id="btn-delete" data-promotion-id="${data}">Delete</a>`;
+                      },
+                      orderable: false,
+                      searchable: false,  
                     },
                 ],
                 columnDefs: [
@@ -236,6 +239,9 @@ $(document).ready(function() {
                         orderable: false, // Prevent sorting on these hidden columns
                         searchable: false // Prevent searching on these hidden columns
                     }
+                ],
+                order:[
+                    [1, 'asc']
                 ]
             });
 
@@ -244,8 +250,12 @@ $(document).ready(function() {
     }
     // Bind onchange event
     $('#homestay').change(function() {
+        const homestayId = $(this).val();
+        const linkAddPromotion = $('#link-add-promotion');
+        linkAddPromotion.attr('href', `{{ route('homestay.setpromotion', '') }}/${homestayId}`);
         getData();
     });
+
     $("#homestay option:nth-child(2)").prop("selected", true);
     $('#homestay').trigger('change');
     // Handle "Edit" button click

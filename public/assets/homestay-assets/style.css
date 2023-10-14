@@ -51,7 +51,7 @@ ul.pagination {
     border-color: var(--primary-color) !important;
 }
 .form-control:disabled {
-    background-color: #ffffff52 !important;
+    background-color: #b4b4b4 !important;
 }
 td {
     text-align: center;
@@ -87,7 +87,17 @@ td a {
     background-color: var(--secondary-color) !important;
     color: white !important;
 }
-
+.btn-dark-purple {
+    background-color: var(--secondary-color) !important;
+    color: white;
+    transition: all 0.2s ease;
+    border-radius: 0.75rem;
+    padding: 12px;
+}
+.btn-dark-purple:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
 /* the + button to show the hidden column of table */
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
@@ -111,13 +121,16 @@ table.dataTable.dtr-inline.collapsed
 .page-title {
     white-space: nowrap;
 }
-#img-preview {
+#img-preview,
+.img-preview-container {
     object-fit: cover;
     height: 150px;
     width: 200px;
     cursor: pointer;
 }
-
+.card-org {
+    width: 50%;
+}
 /* homepage */
 #banner-container {
     position: relative;
@@ -156,7 +169,7 @@ table.dataTable.dtr-inline.collapsed
     justify-content: center; /* Align input and SVG to the left */
 }
 .input {
-    width: 250px;
+    width: 200px;
     padding: 10px 0px 10px 40px;
     border-radius: 9999px;
     border: solid 2px var(--primary-color);
@@ -302,6 +315,10 @@ img.zoom {
     -o-transform: scale(1.1);
     transform: scale(1.1);
 }
+div#modal-gallery,
+div#modal-fullscreen {
+    background-color: rgba(0, 0, 0, 0.7);
+}
 #modal-gallery .modal-body,
 #modal-fullscreen .modal-body {
     display: flex;
@@ -398,13 +415,18 @@ html .ui-button.ui-state-disabled:active {
 .btn-book:active {
     transform: scale(0.95);
 }
+/* for add promotion */
+.promotion-container {
+    width: 50%;
+    margin: 0 auto;
+}
 /* for mobile responsive */
 @media screen and (max-width: 500px) {
     #image-previews {
         flex-wrap: nowrap !important;
         justify-content: flex-start !important;
         width: 100% !important;
-        overflow-x: auto;
+        overflow-x: auto !important;
     }
     .content-container {
         width: 100% !important;
@@ -415,7 +437,9 @@ html .ui-button.ui-state-disabled:active {
     .card-body > div > .col-6 {
         max-width: 100%;
     }
-
+    .card-org {
+        width: 90% !important;
+    }
     /* homepage */
     #banner-content > * {
         padding: 8px;
@@ -444,5 +468,12 @@ html .ui-button.ui-state-disabled:active {
     /* show page */
     .gallery-container {
         grid-template-columns: 100%;
+    }
+    #room-info {
+        padding: 12px !important;
+    }
+    /* promotion */
+    .promotion-container {
+        width: 100%;
     }
 }

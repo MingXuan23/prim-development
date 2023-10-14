@@ -694,7 +694,7 @@
                 <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
                     <i class="mdi mdi-home-city-outline"></i>
-                    <span>Homestay/Hotel</span>
+                    <span>Book&Stay</span>
                 </a>
                 <ul class="sub-menu mm-collapse" aria-expanded="false">
                     <li>
@@ -703,12 +703,12 @@
                             <span>Laman Utama</span>
                         </a>
                     </li>
-                    <li>
+                    {{-- <li>
                         <a href="{{ route('homestay.bookinglist') }}" class=" waves-effect">
                             <i class="mdi mdi-book-search"></i>
                             <span>Buat Tempahan</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li>
                         <a href="{{ route('homestay.tempahananda') }}" class=" waves-effect">
                             <i class="mdi mdi-cart"></i>
@@ -726,15 +726,15 @@
                 @role('Homestay Admin')
                         <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
                             <i class="mdi mdi-room-service-outline"></i>
-                            <span>Urus Homestay/Hotel</span>
+                            <span>Urus Homestay</span>
                         </a>
                     </li>
-                    <li>
+                    {{-- <li>
                         <a href="{{ route('homestay.promotionPage') }}" class=" waves-effect">
                             <i class="mdi mdi-percent"></i>
                             <span>Set Promosi</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li>
                         <a href="{{ route('homestay.urustempahan') }}" class=" waves-effect">
                             <i class="ti-clipboard"></i>

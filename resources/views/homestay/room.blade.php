@@ -50,11 +50,11 @@
                         <input type="text" name="roomPrice" id="roomPrice" value={{$room->price}} hidden>
                         <h5 class="text-white mb-2">RM{{$room->price}}/malam</h5>
                         <div class="form-floating mb-2" >
-                            <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder="12/12/2023">
+                            <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder=" ">
                             <label for="check-in">Daftar Masuk</span>
                         </div>
                         <div class="form-floating mb-2" >
-                            <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder="13/12/2023" disabled>
+                            <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder=" " disabled>
                             <label for="check-out">Daftar Keluar</label>
                         </div>
                         <div class="text-white d-flex gap-2 align-items-center mb-2">
@@ -72,6 +72,20 @@
                             </button>                            
                         </div>
                     </form>
+                </div>
+            </div>
+            <div>
+                <h3 class="color-dark-purple">Maklumat Penting</h3>
+                <div class="row text-center p-5" id="room-info">
+                    <div class="col-md-4">
+                        <h5>Daftar Masuk Selepas: <span class="color-purple">{{ date('H:i', strtotime($room->check_in_after)) }}</span></h5>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Daftar Keluar Sebelum: <span class="color-purple">{{ date('H:i', strtotime($room->check_out_before)) }}</span></h5>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Room Pax: <span class="color-purple">{{$room->roompax}}</span></h5>
+                    </div>
                 </div>
             </div>
             <div>
@@ -221,6 +235,7 @@ $(document).ready(function() {
                                 $('#total-price').empty();
                                 $('#amount').val(0);   
                                 Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay/bilik adalah kosong');
+                                $('#check-in').datepicker("setDate", null);
                                 $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
                             }
                  
@@ -241,7 +256,8 @@ $(document).ready(function() {
                         }else{
                             $('#total-price').empty();
                             $('#amount').val(0);   
-                            Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay/bilik tersebut adalah kosong');
+                            Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay tersebut adalah kosong');
+                            $('#check-in').datepicker("setDate", null);
                             $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
                         }
                     }
