@@ -15,7 +15,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18 page-title color-purple" ><span><a href="{{route('homestay.promotionPage')}}" class="color-dark-purple">Urus Promosi >> </a></span>Tambah Promosi</h4>
+            <h4 class="font-size-18 page-title color-purple" ><span><a href="{{route('homestay.promotionPage')}}" class="color-dark-purple">Urus Promosi >> </a></span>Edit Promosi</h4>
         </div>
     </div>
 </div>
@@ -43,39 +43,31 @@
             </div>
           @endif
           <div class="flash-message"></div>
-            <form method="post" action="{{route('homestay.insertpromotion')}}" enctype="multipart/form-data"
+            <form method="post" action="{{route('homestay.updatePromotion')}}" enctype="multipart/form-data"
                 class="form-validation" id="form-promotion">
                 {{csrf_field()}}
-                <input type="hidden" name="org_id" value="{{$orgId}}">
+                <input type="hidden" name="promotion_id" id="promotion_id" value="{{$promotion->promotionid}}">
+                <input type="hidden" name="homestay_id" id="homestay_id" value="{{$promotion->roomid}}">
+                <input type="hidden" name="homestay_price" id="homestay_price" value="{{$promotion->price}}">
                 <div class="card-body">
-                    @foreach($homestays as $homestay)
-                        <input type="hidden" value={{$homestay->price}} id="{{$homestay->roomid}}_price">
-                    @endforeach
                     <div class="mb-2">
-                        <label for="homestay_id">Nama Homestay</label>
-                        <select name="homestay_id" id="homestay_id" class="form-select" required>
-                            <option selected disabled>Pilih Homestay</option>
-                            <option value="all">Semua Homestay</option>
-                            @foreach($homestays as $homestay)
-                                <option value="{{$homestay->roomid}}">{{$homestay->roomname}}</option>                                
-                            @endforeach
-                        </select>
+                        <h3>{{$promotion->roomname}}</h3>
                     </div>
                     <div class="mb-2 text-center color-dark-purple" id="current-price">
 
                     </div>
                     <div class="mb-2">
                         <label for="promotion_name">Nama Promosi</label>
-                        <input type="text" name="promotion_name" id="promotion_name" class="form-control" required>
+                        <input type="text" name="promotion_name" id="promotion_name" value="{{$promotion->promotionname}}" class="form-control" required>
                     </div>
                     <div class="mb-2 row">
                         <div class="col-md-6">
                             <label for="promotion_start">Tarikh Mula</label>
-                            <input type="text" name="promotion_start" id="promotion_start" class="form-control" autocomplete="off" required>
+                            <input type="text" name="promotion_start" id="promotion_start" value="{{date('d/m/Y', strtotime($promotion->datefrom)) }}" class="form-control" autocomplete="off" required>
                         </div>
                         <div class="col-md-6">
                             <label for="promotion_end">Tarikh Berakhir</label>
-                            <input type="text" name="promotion_end" id="promotion_end" class="form-control" autocomplete="off" disabled required>
+                            <input type="text" name="promotion_end" id="promotion_end" value="{{date('d/m/Y' , strtotime($promotion->dateto))}}" class="form-control" autocomplete="off" required>
                         </div>
                     </div>
                     <div class="mb-2 row">
@@ -83,18 +75,18 @@
                             <label>Jenis Promosi</label>
                             <div class="form-check">
                                 <div>
-                                    <input type="radio" name="promotion_type" id="discount" value="discount" class="form-check-input" required>
+                                    <input type="radio" name="promotion_type"  id="discount" value="discount" {{ $promotion->promotion_type == 'discount' ? 'checked' : '' }} class="form-check-input" required>
                                     <label for="discount"  class="form-check-label">Diskaun</label>                                    
                                 </div>
                                 <div>
-                                    <input type="radio" name="promotion_type" id="increase" value="increase" class="form-check-input" required>
+                                    <input type="radio" name="promotion_type" id="increase" value="increase" {{ $promotion->promotion_type == 'increase' ? 'checked' : '' }} class="form-check-input" required>
                                     <label for="increase"  class="form-check-label">Naik Harga</label>                                    
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <label for="promotion_percentage">Peratusan Promosi(%)</label>
-                            <input type="text" name="promotion_percentage" id="promotion_percentage" class="form-control" required>
+                            <input type="text" name="promotion_percentage" id="promotion_percentage" value="{{$promotion->promotion_type == 'discount'? $promotion->discount : $promotion->increase}}" class="form-control" required>
                         </div>
                     </div>
                     <div class="mb-2 text-center color-dark-purple" id="actual-price">
@@ -137,23 +129,17 @@ $(document).ready(function () {
         }
     });    
     function calculatePrice(){
-        const homestayId = $('#homestay_id').val();
-        if(homestayId != "all"){
-            let oriPrice = Number.parseFloat($(`#${homestayId}_price`).val());
-            let price = 0;
-            if($('input[name="promotion_type"]:checked').val() == "discount"){
-                price = oriPrice - (oriPrice * Number.parseFloat($('#promotion_percentage').val())/100);
-            }else if($('input[name="promotion_type"]:checked').val() == "increase"){
-                price = oriPrice + (oriPrice * Number.parseFloat($('#promotion_percentage').val())/100);
-            }
-            $('#actual-price').empty();
-            $('#actual-price').html(`
-                <h5>Harga Semasa Promosi(per malam) = RM${price.toFixed(2)}</h5>
-            `);            
-        }else{
-            $('#actual-price').empty();
+        let oriPrice = Number.parseFloat($(`#homestay_price`).val());
+        let price = 0;
+        if($('input[name="promotion_type"]:checked').val() == "discount"){
+            price = oriPrice - (oriPrice * Number.parseFloat($('#promotion_percentage').val())/100);
+        }else if($('input[name="promotion_type"]:checked').val() == "increase"){
+            price = oriPrice + (oriPrice * Number.parseFloat($('#promotion_percentage').val())/100);
         }
-
+        $('#actual-price').empty();
+        $('#actual-price').html(`
+            <h5>Harga Semasa Promosi(per malam) = RM${price.toFixed(2)}</h5>
+        `);            
     }
     function resetForm(){
         $('#promotion_name').val('');
@@ -168,15 +154,23 @@ $(document).ready(function () {
         $('#actual-price').empty();
     }
     function initializeStartEnd(){
-        let roomId = $('#homestay_id').val();
+        let promotionId = $('#promotion_id').val();
+        let homestayId = $('#homestay_id').val();
+        const price =  Number.parseFloat($(`#homestay_price`).val());
+        $('#current-price').empty();
+        $('#current-price').html(`
+            <h5>Harga Asal(per malam) = RM${price}</h5>
+        `);    
         $.ajax({
-            url: "{{route('homestay.fetchUnavailablePromotionDates')}}",
+            url: "{{route('homestay.fetchUnavailableEditPromotionDates')}}",
             method: "GET",
             data: {
-                roomId: roomId,
+                promotionId: promotionId,
+                homestayId: homestayId,
             },
             success: function(result){
                 const disabledDates = result.disabledDates;
+                var startDate = $('#promotion_start').val();
                 // for check in datepicker
                 $('#promotion_start').datepicker({
                     dateFormat: 'dd/mm/yy',
@@ -198,7 +192,6 @@ $(document).ready(function () {
 
                         // Set the newMinDate as the minimum date for #promotion-end datepicker
                         $("#promotion_end").datepicker("option", "minDate", newMinDate);
-                        $("#promotion_end").datepicker("option", "disabled", false);
 
                         // if already selected a check in date and want to choose a different check in date
                         if($("#promotion_start").datepicker('getDate') != null &&  $('#promotion_end').datepicker('getDate') != null){
@@ -212,7 +205,7 @@ $(document).ready(function () {
                 });    
                 $('#promotion_end').datepicker({
                     dateFormat: 'dd/mm/yy',
-                    disabled: true,
+                    minDate: startDate,
                     beforeShowDay: function(date) {
                         var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
                         var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
@@ -252,21 +245,7 @@ $(document).ready(function () {
             }
         });
     }
-    $('#homestay_id').on('change',function(){
-        const homestayId = $(this).val();
-        if(homestayId != "all"){
-            const price = $(`#${homestayId}_price`).val();
-            $('#current-price').empty();
-            $('#current-price').html(`
-                <h5>Harga Asal(per malam) = RM${price}</h5>
-            `);            
-        }else{
-            $('#current-price').empty();
-        }
 
-        resetForm();
-        initializeStartEnd();
-    });
     $('input[name="promotion_type"]').on('change',function(){
         if($(this).prop('checked') && !$('#promotion_percentage').prop('disabled')){
             calculatePrice();
@@ -284,8 +263,8 @@ $(document).ready(function () {
             calculatePrice();
         }
     })
-    $("#homestay_id option:nth-child(3)").prop("selected", true);
-    $('#homestay_id').trigger('change');
+    initializeStartEnd(); 
+    calculatePrice();
     $('.alert').delay(3000).fadeOut()
 });
 

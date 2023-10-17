@@ -202,7 +202,7 @@ $(document).ready(function() {
                         }else if(row.promotion_type == "increase"){
                             actualPrice = Number.parseFloat(data) + (data*row.increase/100);
                         }
-                        return `${Number.parseFloat(actualPrice).toFixed(2)}`;
+                        return `${data} -> ${Number.parseFloat(actualPrice).toFixed(2)}`;
                       },
                       orderable: true,
                       searchable: true,
@@ -219,7 +219,7 @@ $(document).ready(function() {
                     },
                     { 
                       data: 'promotionid', render: function(data) {
-                        var editUrl = `{{ route('homestay.editPromotionPage', ':promotionidid') }}`.replace(':promotionid', data);
+                        var editUrl = `{{ route('homestay.editPromotionPage', ':promotionid') }}`.replace(':promotionid', data);
                         return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-promotion-id="${data}">Edit</a>`;
                       },
                       orderable: false,
@@ -241,7 +241,9 @@ $(document).ready(function() {
                     }
                 ],
                 order:[
-                    [1, 'asc']
+                    [1, 'asc'],
+                    [2, 'asc'],
+                    [3, 'asc'],
                 ]
             });
 
@@ -277,25 +279,25 @@ $(document).ready(function() {
         confirmButtonText: 'Yes, delete it!'
       }).then((result) => {
         if (result.isConfirmed) {
-          const roomId = $(this).attr('data-room-id');
+          const promotionId = $(this).attr('data-promotion-id');
           $.ajax({
-            url: "{{route('homestay.deleteRoom')}}",
+            url: "{{route('homestay.deletePromotion')}}",
             method: 'POST',
             dataType: 'json',
             data: {
-              roomId: roomId,
+              promotionId : promotionId ,
             },
             success: function(result){
               console.log(result.success);
               getData();
             },
             error:function(){
-              console.log('Delete Room Failed');
+              console.log('Delete Promotion Failed');
             }
           })
           Swal.fire(
             'Deleted!',
-            'Your file has been deleted.',
+            'This promotion has been deleted.',
             'success'
           )
         }

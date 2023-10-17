@@ -609,8 +609,12 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('booknstay', 'HomestayController@homePage')->name('homestay.homePage');
     Route::get('homestay/{id}_{name}', 'HomestayController@showRoom')->name('homestay.showRoom');
     Route::get('fetch-unavailable-dates', 'HomestayController@fetchUnavailableDates')->name('homestay.fetchUnavailableDates');
+    Route::get('fetch-discount-increase-dates', 'HomestayController@fetchDiscountIncreaseDates')->name('homestay.fetchDiscountIncreaseDates');
+    Route::get('calculate-total-price', 'HomestayController@calculateTotalPrice')->name('homestay.calculateTotalPrice');
     Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
     Route::get('search-room','HomestayController@searchRoom')->name('homestay.searchRoom');
+
+
     // Homestay Management
     Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
     Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
@@ -628,9 +632,11 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('get-promotion-data', 'HomestayController@getPromotionData')->name('homestay.getPromotionData');
     Route::get('setpromotion/{id}', 'HomestayController@setpromotion')->name('homestay.setpromotion');
     Route::get('fetch-unavailable-promotion-dates', 'HomestayController@fetchUnavailablePromotionDates')->name('homestay.fetchUnavailablePromotionDates');
-    Route::get('edit-promotion','HomestayController@editPromotionPage')->name('homestay.editPromotionPage');
     Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
-
+    Route::get('edit-promotion/{id}','HomestayController@editPromotionPage')->name('homestay.editPromotionPage');
+    Route::get('fetch-unavailable-edit-promotion-dates', 'HomestayController@fetchUnavailableEditPromotionDates')->name('homestay.fetchUnavailableEditPromotionDates');
+    Route::post('update-promotion', 'HomestayController@updatePromotion')->name('homestay.updatePromotion');
+    Route::post('delete-promotion', 'HomestayController@deletePromotion')->name('homestay.deletePromotion');
 
 
     Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');

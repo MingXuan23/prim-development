@@ -7,7 +7,19 @@
     <link rel="stylesheet" href="{{URL::asset('assets/homestay-assets/jquery-ui-datepicker.theme.min.css')}}">
     <link rel="stylesheet" href="{{URL::asset('assets/homestay-assets/jquery-ui-datepicker.structure.min.css')}}">
     <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
+    
+    <style>
+        /* add padding to the page's content*/
+        .page-content{
+            padding: 80px 10%!important;
+        }
 
+        @media screen and (max-width:500px){
+            .page-content{
+                padding: 80px 5%!important;
+            }
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -57,7 +69,7 @@
                             <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder=" " disabled>
                             <label for="check-out">Daftar Keluar</label>
                         </div>
-                        <div class="text-white d-flex gap-2 align-items-center mb-2">
+                        <div class="text-white text-center mb-2">
                             <div id="total-price"></div>
                         </div>
                         <div class="d-flex justify-content-end">
@@ -178,21 +190,106 @@ $(document).ready(function() {
 
     // for booking and datetimepickers
 
-    function calculateTotalPrice(){
-        const checkInDate = $('#check-in').datepicker('getDate');
-        const checkOutDate = $('#check-out').datepicker('getDate');
-        const checkInDateMoment = moment(checkInDate);
-        const checkOutDateMoment = moment(checkOutDate); // Parse check-out date using moment.js
+    // function calculateTotalPrice(){
+    //     const checkInDate = $('#check-in').datepicker('getDate');
+    //     const checkOutDate = $('#check-out').datepicker('getDate');
+    //     const checkInDateMoment = moment(checkInDate);
+    //     const checkOutDateMoment = moment(checkOutDate); // Parse check-out date using moment.js
 
-        // Calculate the difference in days
-        const daysDifference = checkOutDateMoment.diff(checkInDateMoment, 'days');
-        const pricePerDay = $('#roomPrice').val();
-        const totalPrice = (pricePerDay * daysDifference).toFixed(2);
-        $('#total-price').html(`
-            <h5>Jumlah Harga: RM${totalPrice} (${daysDifference} malam)</h5>
-        `);
-        $('#amount').val(totalPrice);    
+    //     // Calculate the difference in days
+    //     const daysDifference = checkOutDateMoment.diff(checkInDateMoment, 'days');
+    //     const pricePerDay = $('#roomPrice').val();
+    //     const totalPrice = (pricePerDay * daysDifference).toFixed(2);
+    //     $('#total-price').html(`
+    //         <h5>Jumlah Harga: RM${totalPrice} (${daysDifference} malam)</h5>
+    //     `);
+    //     $('#amount').val(totalPrice);    
+    // }
+    function calculateTotalPrice(){
+        const checkInDate = $('#check-in').val();
+        const checkOutDate = $('#check-out').val();
+        const roomId = $('#roomId').val();
+        $.ajax({
+            url: "{{ route('homestay.calculateTotalPrice') }}", 
+            method: "GET", 
+            data: {
+                checkInDate: checkInDate,
+                checkOutDate: checkOutDate,
+                roomId: roomId,
+            },
+            success: function(result) {
+                //for pricing with promotions
+                if(result.initialPrice != null){
+                    $('#total-price').html(`
+                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                            <h5>RM${result.roomPrice} x ${result.numberOfNights} malam</h5>
+                            <h5>RM${result.initialPrice}</h5>
+                        </div>
+                    `);
+                    if(result.discountTotal > 0){
+                        const discountDate  = result.discountDate.map(date => date + 'hb');                        
+                        $('#total-price').append(`
+                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                                <h5>Diskaun(${discountDate})</h5>
+                                <h5>-RM${result.discountTotal}</h5>
+                            </div>
+                        `);
+                    }
+
+                    if(result.increaseTotal > 0){
+                        const increaseDate  = result.increaseDate.map(date => date + 'hb');                        
+                        $('#total-price').append(`
+                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                                <h5>Penambahan Harga(${increaseDate})</h5>
+                                <h5>+RM${result.increaseTotal}</h5>
+                            </div>
+                        `);                        
+                    }
+
+                }else{
+                    $('#total-price').html(`
+                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                            <h5>RM${result.roomPrice} x ${result.numberOfNights} malam</h5>
+                            <h5>RM${result.initialPrice}</h5>
+                        </div>
+                    `);
+                }
+
+                $('#total-price').append(`
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                        <h5>Jumlah Harga: </h5>
+                        <h5>RM${result.totalPrice}</h5>
+                    </div>
+                `);     
+                //add border bottom to the div before the div of total price
+                $('#total-price div:nth-last-child(2)').addClass('border-bottom');
+                $('#amount').val(result.totalPrice);   
+            },
+            error: function(result) {
+                console.log('Error calculating total price');
+            }
+        });
+        
     }
+    let discountDates = increaseDates = [];
+    // to fetch  dates that have discount or increase price
+    function fetchDiscountOrIncrease(){
+        $.ajax({
+            url: "{{route('homestay.fetchDiscountIncreaseDates')}}",
+            method: "GET",
+            data:{
+                homestayId : $('#roomId').val(),
+            },
+            success: function(result){
+                discountDates = result.discountDates;
+                increaseDates = result.increaseDates;
+            },
+            error: function(){
+                console.log('Fetch discount and increase failed');
+            }
+        });
+    }
+
 
     function initializeCheckInOut(){
         let roomId = $('#roomId').val();
@@ -204,14 +301,26 @@ $(document).ready(function() {
             },
             success: function(result){
                 const disabledDates = result.disabledDates;
+                // to get max date that's 1 year from now
+                var currentDate = new Date();
+                var maxDate = new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), currentDate.getDate());
                 // for check in datepicker
                 $('#check-in').datepicker({
                     dateFormat: 'dd/mm/yy',
                     minDate: 0,
+                    maxDate: maxDate,
                     beforeShowDay: function(date) {
                         var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
                         var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
-                        return [!isDisabled];
+                        var cssClass = toolTip = '';
+                        if(discountDates.indexOf(formattedDate) !== -1){
+                            cssClass = 'discount-date';
+                            toolTip = "Terdapat diskaun pada hari tersebut";
+                        }else if(increaseDates.indexOf(formattedDate) !== -1){
+                            cssClass = 'increase-date';
+                            toolTip = "Terdapat penambahan harga pada hari tersebut";
+                        }
+                        return [!isDisabled,cssClass,toolTip];
                     },
                     onSelect: function(selectedDate) {
                         // Parse the selectedDate as a JavaScript Date object
@@ -245,10 +354,21 @@ $(document).ready(function() {
                 $('#check-out').datepicker({
                     dateFormat: 'dd/mm/yy',
                     disabled: true,
+                    maxDate: maxDate,
                     beforeShowDay: function(date) {
                         var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
                         var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
-                        return [!isDisabled];
+                        var cssClass = toolTip = '';
+                        if(isDisabled) {
+                            toolTip = 'Terdapat tempahan untuk hari tersebut'; 
+                        }else if(discountDates.indexOf(formattedDate) !== -1){
+                            cssClass = 'discount-date';
+                            toolTip = "Terdapat diskaun pada hari tersebut";
+                        }else if(increaseDates.indexOf(formattedDate) !== -1){
+                            cssClass = 'increase-date';
+                            toolTip = "Terdapat penambahan harga pada hari tersebut";
+                        }
+                        return [!isDisabled,cssClass,toolTip];
                     },
                     onSelect: function(checkOutDate) {
                         if(!checkDisabledDatesBetween()){
@@ -287,6 +407,7 @@ $(document).ready(function() {
             }
         });
     }
+    fetchDiscountOrIncrease();
     initializeCheckInOut();
 
     $('#form-book').on('submit',function(e){

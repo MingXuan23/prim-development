@@ -366,7 +366,59 @@ div#modal-fullscreen {
     border-radius: 0.25rem;
     padding: 12px;
 }
-.ui-state-highlight {
+/* .discount-date {
+    background-color: blue;
+}
+.increase-date {
+    background-color: red;
+} */
+
+/* Tooltip styles */
+.ui-datepicker td.discount-date a {
+    background-color: blue;
+    border: 1px solid blue;
+    position: relative;
+    cursor: pointer;
+}
+.ui-datepicker td.increase-date a {
+    background-color: rgb(255, 60, 106);
+    border: 1px solid rgb(255, 60, 106);
+    position: relative;
+    cursor: pointer;
+}
+.ui-datepicker td.discount-date a:hover,
+.ui-datepicker td.increase-date a:hover {
+    background-color: #ffffff;
+}
+
+/* To display tooltips */
+.ui-datepicker td span.ui-state-highlight {
+    position: relative;
+}
+
+.ui-datepicker td span.ui-state-highlight:after {
+    content: attr(title);
+    position: absolute;
+    bottom: -25px; /* Adjust the distance from the cell */
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    color: var(--primary-color);
+    text-align: center;
+    font-size: 12px;
+    padding: 5px;
+    border-radius: 5px;
+    display: none;
+}
+
+.ui-datepicker td span.ui-state-highlight:hover:after {
+    display: block;
+}
+.ui-state-active:hover {
+    color: var(--primary-color);
+    background-color: white;
+}
+.ui-state-highlight:not(.ui-state-active) {
     background-color: var(--secondary-color) !important;
     border-color: var(--secondary-color) !important;
 }
@@ -419,6 +471,9 @@ html .ui-button.ui-state-disabled:active {
 .promotion-container {
     width: 50%;
     margin: 0 auto;
+}
+.border-bottom {
+    border-bottom: 2px solid white;
 }
 /* for mobile responsive */
 @media screen and (max-width: 500px) {
