@@ -31,6 +31,9 @@ Route::get('/form', 'HomeController@form');
 Route::get('/activity-list', 'LandingPageController@activitylist');
 Route::get('/activity-details', 'LandingPageController@activitydetails');
 
+
+
+
 //wan add
 //landing page route
 Route::group(['prefix' => ''], function () {
