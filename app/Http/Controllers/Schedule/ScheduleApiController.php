@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Events\NewNotification;
 
 use App\User;
 
@@ -75,6 +76,12 @@ class ScheduleApiController extends Controller
      }
 
      public function getTimeOff(Request $request){
+        
+        $data = [
+            'header' => 'hello title',
+            'body' => 'hello body',
+        ];
+        event(new NewNotification($data));
         $datalist = [];
         $data = new stdClass();
         $data->slot = 11;
@@ -85,7 +92,7 @@ class ScheduleApiController extends Controller
         $data->slot = 5;
         $data->day=[4,5];
 
-        
+       
         array_push($datalist,$data);
         $data = new stdClass();
         $data->slot = 4;

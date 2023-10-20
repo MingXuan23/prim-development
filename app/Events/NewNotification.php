@@ -21,7 +21,7 @@ class NewNotification implements ShouldBroadcast
      */
 
      public $data;
-    public function __construct($data)
+    public function __construct(array  $data)
     {
         //
         $this->data=$data;
@@ -34,6 +34,6 @@ class NewNotification implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('channel-name');
+        return new Channel('GENERAL');
     }
 }
