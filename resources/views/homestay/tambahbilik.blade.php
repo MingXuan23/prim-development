@@ -135,14 +135,20 @@
                                 <label for="check-out-before">Daftar Keluar Sebelum <span style="color:#d00"> *</span></label>
                                 <input type="time" name="checkOutBefore" id="check-out-before" class="form-control"  required>
                             </div>
-                        </div>                        
+                        </div>  
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="form-check">
+                                <input type="checkbox" name="isAvailable" id="isAvailable" class="form-check-input">
+                                <label for="isAvailable" class="form-check-label">Dibuka Untuk Tempahan</label>
+                            </div>
+                        </div>                       
                     </div>
 
                 </div>
                     <div class="image-flash-message"></div>
                    <div class="form-group d-flex justify-content-center align-items-center flex-wrap gap-2">
                         <input type="file" name="images[]" id="images" multiple accept=".jpg,.jpeg,.png" class="form-control col-5" required>
-                        <label for="images">Pilih gambar-gambar homestay(min:5 gambar, max:10 gambar)<span style="color:#d00"> *</span></label>
+                        <label for="images">Pilih gambar-gambar homestay(min:5 gambar, max:20 gambar)<span style="color:#d00"> *</span></label>
                    </div>
                     <h3 class="text-center">Preview Images:</h3>
                     <div id="image-previews" class="d-flex justify-content-center align-items-center gap-1 flex-wrap mb-2">
@@ -189,7 +195,7 @@ $(document).ready(function () {
         $('#images').on('change', function(e){
             $('#image-previews').empty();
             const imageFiles = $(this).prop('files');
-            if(imageFiles.length > 10){
+            if(imageFiles.length > 20){
                 $('.image-flash-message').html(`
                     <div id="alert" class="alert alert-danger text-center">
                         Hanya dibenarkan muat naik maximum 10 gambar sahaja
@@ -213,23 +219,23 @@ $(document).ready(function () {
                         const image = new Image();
                         image.src = URL.createObjectURL(imageFiles[i]);
                         image.onload = function () {
-                        const maxWidth = 1280; // Maximum width allowed
-                        const maxHeight = 1280; // Maximum height allowed
-                        if (this.width > maxWidth || this.height > maxHeight) {
-                            $('.flash-message').html(`
-                                <div id="alert" class="alert alert-danger text-center">
-                                    Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
-                                </div>
-                            `);
-                            $('#alert').fadeOut(6000);
-                            $('#images').val('');
-                        } else {
+                        // const maxWidth = 1280; // Maximum width allowed
+                        // const maxHeight = 1280; // Maximum height allowed
+                        // if (this.width > maxWidth || this.height > maxHeight) {
+                        //     $('.flash-message').html(`
+                        //         <div id="alert" class="alert alert-danger text-center">
+                        //             Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                        //         </div>
+                        //     `);
+                        //     $('#alert').fadeOut(6000);
+                        //     $('#images').val('');
+                        // } else {
                             // Display the image preview
                             $('#image-previews').append(`
                                 <img src="${image.src}" class="img-thumbnail" id="img-preview">
                             `);
                             } 
-                        }                 
+                        // }                 
                     }else{
                         $('.flash-message').html(`
                             <div id="alert" class="alert alert-danger text-center">

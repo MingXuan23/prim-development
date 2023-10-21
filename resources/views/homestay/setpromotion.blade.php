@@ -70,11 +70,11 @@
                     </div>
                     <div class="mb-2 row">
                         <div class="col-md-6">
-                            <label for="promotion_start">Tarikh Mula</label>
+                            <label for="promotion_start">Hari Pertama</label>
                             <input type="text" name="promotion_start" id="promotion_start" class="form-control" autocomplete="off" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="promotion_end">Tarikh Berakhir</label>
+                            <label for="promotion_end">Hari Terakhir</label>
                             <input type="text" name="promotion_end" id="promotion_end" class="form-control" autocomplete="off" disabled required>
                         </div>
                     </div>

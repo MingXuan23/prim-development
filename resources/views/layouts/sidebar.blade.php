@@ -735,12 +735,12 @@
                             <span>Set Promosi</span>
                         </a>
                     </li> --}}
-                    <li>
+                    {{-- <li>
                         <a href="{{ route('homestay.urustempahan') }}" class=" waves-effect">
                             <i class="ti-clipboard"></i>
                             <span>Urus Tempahan</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li>
                         <a href="{{ route('homestay.tunjuksales') }}" class=" waves-effect">
                             <i class="mdi mdi-finance"></i>

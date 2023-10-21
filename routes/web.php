@@ -613,7 +613,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('calculate-total-price', 'HomestayController@calculateTotalPrice')->name('homestay.calculateTotalPrice');
     Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
     Route::get('search-room','HomestayController@searchRoom')->name('homestay.searchRoom');
-
+    
 
     // Homestay Management
     Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
@@ -624,8 +624,11 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('edit-room/{id}', 'HomestayController@editRoomPage')->name('homestay.editRoomPage');
     Route::post('update-room', 'HomestayController@updateRoom')->name('homestay.updateRoom');
     Route::post('delete-room', 'HomestayController@deleteRoom')->name('homestay.deleteRoom');
-    
-
+    Route::get('urustempahan', 'HomestayController@urustempahan')->name('homestay.urustempahan');
+    Route::get('get-booking-data', 'HomestayController@getBookingData')->name('homestay.getBookingData');
+    Route::post('checkout-homestay', 'HomestayController@checkoutHomestay')->name('homestay.checkoutHomestay');
+    Route::post('cancel-booking', 'HomestayController@cancelBooking')->name('homestay.cancelBooking');
+    Route::get('view-booking-history/{id}','HomestayController@viewBookingHistory')->name('homestay.viewBookingHistory');
 
     //Homestay Promotion
     Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');
@@ -648,7 +651,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('bookhomestay/insertbooking/{id}/{price}', 'HomestayController@insertbooking');
     Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
     Route::get('homestayresit/{id}', 'HomestayController@homestayresit')->name('homestay.homestayresit');
-    Route::get('urustempahan', 'HomestayController@urustempahan')->name('homestay.urustempahan');
+
     Route::post('tunjukpelanggan', 'HomestayController@tunjukpelanggan');
     Route::post('cancelpelanggan/{id}', 'HomestayController@cancelpelanggan');
     Route::get('userhistory', 'HomestayController@userhistory')->name('homestay.userhistory');

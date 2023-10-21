@@ -642,13 +642,12 @@ class PayController extends AppBaseController
             $homestay = Booking::find($request->bookingid);
             $user = User::find($homestay->customerid);
             $room = Room::find($homestay->roomid);
-            
             $request->amount = $homestay->totalprice;
             $bookingId = $request->bookingid;
 
             DB::table('bookings')->where('bookingid', $bookingId)->update([
                 'updated_at' => Carbon::now(),
-                'status' => 'Paid'
+                'status' => 'Pending',
             ]);
 
             $organization = Organization::find($room->homestayid);
@@ -1217,8 +1216,15 @@ class PayController extends AppBaseController
                         $transaction->status = "Success";
                         $transaction->save();
     
+                        // update booking table
+                        Booking::where('transactionid',$transaction_id)
+                        ->update([
+                            'status' => 'Booked',
+                            'updated_at' => Carbon::now(),
+                        ]);
+
                         $userid = $transaction->user_id;
-    
+                        
                         $booking = Booking::where('transactionid', '=', $transaction->id)->first();
                         $room = Room::find($booking->roomid);
                         $user = User::find($transaction->user_id);

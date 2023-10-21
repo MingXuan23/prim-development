@@ -9,10 +9,11 @@
 @endsection
 
 @section('content')
-    <div class="page-title-box d-flex justify-content-between align-items-center">
+    <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
       <h4 class="font-size-18 color-purple">Urus Homestay</h4>
-      <div class="nav-links">
-          <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple">Urus Promosi</a>
+      <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
+          <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple m-2">Urus Promosi</a>
+          <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2">Urus Tempahan Pelanggan</a>
       </div>
     </div>
 
@@ -183,6 +184,7 @@ $(document).ready(function() {
                 // Initialize the DataTable with the new data
                 dataTable = $('#bilikTable').DataTable({
                 data: result.rooms,
+                pageLength: 10,
                 columns: [
                     { data: 'roomid', visible: false },
                     { 

@@ -9,12 +9,13 @@
 @endsection
 
 @section('content')
-    <div class="page-title-box d-flex justify-content-between align-items-center">
-      <h4 class="font-size-18 color-purple">Urus Promosi</h4>
-      <div class="nav-links">
-          <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple">Urus Homestay</a>
-      </div>
-    </div>
+<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
+  <h4 class="font-size-18 color-purple">Urus Promosi</h4>
+  <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
+      <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2">Urus Homestay</a>
+      <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2">Urus Tempahan</a>
+  </div>
+</div>
 
 <div class="row">
 
@@ -36,7 +37,7 @@
         <div class="form-group">
           <label>Nama Organisasi</label>
           <select name="homestay" id="homestay" class="form-control">
-            <option value="" selected disabled>Pilih Homestay</option>
+            <option value="" selected disabled>Pilih Organisasi</option>
             @foreach($organization as $row)
             <option value="{{ $row->id }}">{{ $row->nama }}</option>
             @endforeach
@@ -47,10 +48,10 @@
     </div>
   </div>
 
-  <div class="col-md-12 border-purple p-0 ">
+  <div class="col-md-12 border-purple p-0">
     <div class="card mb-0">
       <div>
-        <a style="margin: 19px; float: right;" id="link-add-promotion" class="btn-purple"> <i
+        <a style="margin: 19px; float: right;cursor: pointer;" id="link-add-promotion" class="btn-purple"> <i
             class="fas fa-plus"></i> Tambah Promosi</a>
       </div>
 
@@ -142,6 +143,7 @@
 @section('script')
 {{-- sweet alert --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 <script>
 $(document).ready(function() {    
@@ -168,6 +170,7 @@ $(document).ready(function() {
                 // Initialize the DataTable with the new data
                 dataTable = $('#promotionTable').DataTable({
                 data: result.promotions,
+                pageLength: 10,
                 columns: [
                     { data: 'promotionid', visible: false },
                     { 
@@ -209,11 +212,17 @@ $(document).ready(function() {
                     },
                     { 
                       data: 'datefrom', 
+                      render: function(data,type,row){
+                        return `${moment(data,'YYYY-MM-DD').format('DD/MM/YYYY')}`;
+                      },
                       orderable: true,
                       searchable: true,
                     },
                     { 
-                      data: 'dateto', 
+                      data: 'dateto',
+                      render: function(data,type,row){
+                        return `${moment(data,'YYYY-MM-DD').format('DD/MM/YYYY')}`;
+                      },
                       orderable: true,
                       searchable: true,
                     },

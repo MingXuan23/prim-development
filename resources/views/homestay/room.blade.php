@@ -74,7 +74,13 @@
                         </div>
                         <div class="d-flex justify-content-end">
                             @csrf
-                            <input type="text" name="amount" id="amount" value="0" hidden> 
+                            <input type="text" name="amount" id="amount" value="0" hidden>
+                            <input type="text" name="discountAmount" id="discountAmount" value="0" hidden> 
+                            <input type="text" name="increaseAmount" id="increaseAmount" value="0" hidden> 
+                            <input type="text" name="discountDates" id="discountDates" value="" hidden> 
+                            <input type="text" name="increaseDates" id="increaseDates" value="" hidden> 
+                            <input type="number" name="nightCount" id="nightCount" value="0" hidden> 
+
                             <button class="btn-book" type="submit">
                                 <span>Tempah Sekarang</span>
                                 <svg width="34" height="34" viewBox="0 0 74 74" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -189,22 +195,6 @@ $(document).ready(function() {
 
 
     // for booking and datetimepickers
-
-    // function calculateTotalPrice(){
-    //     const checkInDate = $('#check-in').datepicker('getDate');
-    //     const checkOutDate = $('#check-out').datepicker('getDate');
-    //     const checkInDateMoment = moment(checkInDate);
-    //     const checkOutDateMoment = moment(checkOutDate); // Parse check-out date using moment.js
-
-    //     // Calculate the difference in days
-    //     const daysDifference = checkOutDateMoment.diff(checkInDateMoment, 'days');
-    //     const pricePerDay = $('#roomPrice').val();
-    //     const totalPrice = (pricePerDay * daysDifference).toFixed(2);
-    //     $('#total-price').html(`
-    //         <h5>Jumlah Harga: RM${totalPrice} (${daysDifference} malam)</h5>
-    //     `);
-    //     $('#amount').val(totalPrice);    
-    // }
     function calculateTotalPrice(){
         const checkInDate = $('#check-in').val();
         const checkOutDate = $('#check-out').val();
@@ -217,17 +207,27 @@ $(document).ready(function() {
                 checkOutDate: checkOutDate,
                 roomId: roomId,
             },
-            success: function(result) {
-                //for pricing with promotions
-                if(result.initialPrice != null){
-                    $('#total-price').html(`
+            success: function(result) {            
+                //reset input fields
+                $('#discountAmount').val(0);
+                $('#increaseAmount').val(0); 
+                $('#discountDates').val('');
+                $('#increaseDates').val('');
+
+                $('#total-price').html(`
                         <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
                             <h5>RM${result.roomPrice} x ${result.numberOfNights} malam</h5>
                             <h5>RM${result.initialPrice}</h5>
                         </div>
-                    `);
+                `);
+                $('#nightCount').val(result.numberOfNights);
+                //for pricing with promotions
+                if(result.initialPrice != null){
+
                     if(result.discountTotal > 0){
-                        const discountDate  = result.discountDate.map(date => date + 'hb');                        
+                        $('#discountAmount').val(result.discountTotal);
+                        const discountDate  = result.discountDate.map(date => date + 'hb');    
+                        $('#discountDates').val(discountDate);                    
                         $('#total-price').append(`
                             <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
                                 <h5>Diskaun(${discountDate})</h5>
@@ -237,7 +237,9 @@ $(document).ready(function() {
                     }
 
                     if(result.increaseTotal > 0){
-                        const increaseDate  = result.increaseDate.map(date => date + 'hb');                        
+                        $('#increaseAmount').val(result.increaseTotal);
+                        const increaseDate  = result.increaseDate.map(date => date + 'hb');  
+                        $('#increaseDates').val(increaseDate);                    
                         $('#total-price').append(`
                             <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
                                 <h5>Penambahan Harga(${increaseDate})</h5>
@@ -246,13 +248,6 @@ $(document).ready(function() {
                         `);                        
                     }
 
-                }else{
-                    $('#total-price').html(`
-                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
-                            <h5>RM${result.roomPrice} x ${result.numberOfNights} malam</h5>
-                            <h5>RM${result.initialPrice}</h5>
-                        </div>
-                    `);
                 }
 
                 $('#total-price').append(`

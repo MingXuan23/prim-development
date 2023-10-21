@@ -153,9 +153,8 @@ class HomestayController extends Controller
     public function fetchUnavailableDates(Request $request)
     {   
         $roomId = $request->roomId;
-        // Fetch all bookings for the specified room with status 'Booked' or 'Paid'
         $bookings = Booking::where('roomid', $roomId)
-                           ->whereIn('status', ['Booked', 'Paid'])
+                           ->whereIn('status', ['Booked', 'Completed'])
                            ->get();
     
         $disabledDates = [];
@@ -410,7 +409,7 @@ public function addroom(Request $request)
         'checkOutBefore' => 'required',
     ]);
     
-    $status = 'Available';
+    $status = $request->isAvailable == "" ? "Not Available" : "Available";
 
     $room = new Room();
     $room->homestayid = $request->homestayid;
@@ -825,7 +824,7 @@ public function deletePromotion(Request $request){
     }
 
     public function disabledateroom($roomid)
-    {
+    {               
         $bookings = Booking::where('roomid', $roomid)
                    ->where(function($query) {
                        $query->where('status', 'Booked')
@@ -862,93 +861,126 @@ public function deletePromotion(Request $request){
         ->get();
 
         if($availability->isEmpty()){
-            DB::table('bookings')
-            ->insert([
+            $floatTotalPrice = (float) str_replace(',', '', $request->amount);
+            $bookingId  = DB::table('bookings')
+            ->insertGetId([
                 'checkin' => $checkInDate,
                 'checkout' => $checkOutDate,
-                'status' => "Booked",
-                'totalprice' => $request->amount,
+                'status' => "Checkout",
+                'totalprice' => $floatTotalPrice,
                 'customerid' => $userId,
                 'roomId' => $roomId,
                 'created_at' => Carbon::now(),
             ]);
-            return back()->with('success','Tempahan telah berjaya dibuat');
+
+            
+            $homestay = DB::table('rooms')
+            ->where([
+                'roomid' => $request->roomId,
+                'deleted_at' => null,
+            ])
+            ->first();
+
+            $homestayImage = DB::table('homestay_images')
+            ->where([
+                'room_id' => $request->roomId,
+                'deleted_at' => null,
+            ]) 
+            ->pluck('image_path')
+            ->first();
+
+            $checkoutDetails = [
+                'checkInDate' => $request->checkIn,
+                'checkOutDate' => $request->checkOut,
+                'totalPrice' => $request->amount,
+                'discountAmount' => $request->discountAmount,
+                'discountDates' => $request->discountDates,
+                'increaseAmount' => $request->increaseAmount,
+                'increaseDates' => $request->increaseDates,
+                'nightCount' => $request->nightCount,
+                'homestay'=>$homestay,  
+                'homestayImage'=> $homestayImage, 
+                'bookingId' => $bookingId,             
+            ];
+            // dd($checkoutDetails);
+            // redirect to checkout page
+            return view('homestay.bookingCheckout')->with(['checkoutDetails' => $checkoutDetails]);
         }else{
             return back()->with('error','Homestay/bilik telah ditempah oleh pengguna lain pada masa itu.');
         }
     }
-    public function insertbooking(Request $request, $roomid, $price)
-    {
-        $request->validate([
-            'checkin' => 'required',
-            'checkout' => 'required',
-        ]);
+    // public function insertbooking(Request $request, $roomid, $price)
+    // {
+    //     $request->validate([
+    //         'checkin' => 'required',
+    //         'checkout' => 'required',
+    //     ]);
 
-        $userId = Auth::id();
-        $fkroom = $roomid;
-        $status = "Booked";
+    //     $userId = Auth::id();
+    //     $fkroom = $roomid;
+    //     $status = "Booked";
 
-        $homestay = Room::where('roomid', $fkroom)->first();
+    //     $homestay = Room::where('roomid', $fkroom)->first();
 
-        if (!$homestay) {
-            return back()->with('fail', 'Homestay not found!');
-        }
+    //     if (!$homestay) {
+    //         return back()->with('fail', 'Homestay not found!');
+    //     }
 
-        $homestayid = $homestay->homestayid;
+    //     $homestayid = $homestay->homestayid;
 
-        $checkinDate = Carbon::createFromFormat('Y-m-d', $request->checkin);
-        $checkoutDate = Carbon::createFromFormat('Y-m-d', $request->checkout);
-        $totalDays = $checkoutDate->diffInDays($checkinDate) + 1;
+    //     $checkinDate = Carbon::createFromFormat('Y-m-d', $request->checkin);
+    //     $checkoutDate = Carbon::createFromFormat('Y-m-d', $request->checkout);
+    //     $totalDays = $checkoutDate->diffInDays($checkinDate) + 1;
     
-    // Retrieve the applicable promotion based on check-in and check-out dates
-        $promotion = Promotion::where('datefrom', '<=', $request->checkin)
-        ->where('dateto', '>=', $request->checkout)
-        ->where('homestayid',$homestayid)
-        ->first();
+    // // Retrieve the applicable promotion based on check-in and check-out dates
+    //     $promotion = Promotion::where('datefrom', '<=', $request->checkin)
+    //     ->where('dateto', '>=', $request->checkout)
+    //     ->where('homestayid',$homestayid)
+    //     ->first();
     
-    // Calculate the total price with discount if a promotion is applicable
-        if ($promotion !== null) {
-            $discountedPrice = $price - ($price * $promotion->discount / 100);
-            $totalPrice = $discountedPrice * $totalDays;
-        } else {
-            $totalPrice = $price * $totalDays;
-        }
+    // // Calculate the total price with discount if a promotion is applicable
+    //     if ($promotion !== null) {
+    //         $discountedPrice = $price - ($price * $promotion->discount / 100);
+    //         $totalPrice = $discountedPrice * $totalDays;
+    //     } else {
+    //         $totalPrice = $price * $totalDays;
+    //     }
 
-        $availability = Booking::where('roomid', $fkroom)
-        ->where(function ($query) use ($request) {
-        $query->where('checkin', '<', $request->checkout)
-            ->where('checkout', '>', $request->checkin);
-         })
-    ->get();
+    //     $availability = Booking::where('roomid', $fkroom)
+    //     ->where(function ($query) use ($request) {
+    //     $query->where('checkin', '<', $request->checkout)
+    //         ->where('checkout', '>', $request->checkin);
+    //      })
+    // ->get();
 
-    if ($availability->isEmpty()) {
+    // if ($availability->isEmpty()) {
 
-            $booking = new Booking();
-            $booking->checkin = $request->checkin;
-            $booking->checkout = $request->checkout;
-            $booking->status = $status;
-            $booking->totalprice = $totalPrice;
-            $booking->customerid = $userId;
-            $booking->roomid = $fkroom;
+    //         $booking = new Booking();
+    //         $booking->checkin = $request->checkin;
+    //         $booking->checkout = $request->checkout;
+    //         $booking->status = $status;
+    //         $booking->totalprice = $totalPrice;
+    //         $booking->customerid = $userId;
+    //         $booking->roomid = $fkroom;
     
-            $result = $booking->save();
+    //         $result = $booking->save();
     
-            if($result)
-                {
-                    return back()->withInput()->with('success', 'Bilik Berjaya Ditempah');
-                }
-                else
-                {
-                    return back()->withInput()->with('error', 'Tempahan Gagal Dibuat');
+    //         if($result)
+    //             {
+    //                 return back()->withInput()->with('success', 'Bilik Berjaya Ditempah');
+    //             }
+    //             else
+    //             {
+    //                 return back()->withInput()->with('error', 'Tempahan Gagal Dibuat');
         
-                }
-        } else {
-            return back()->withInput()->with('error', 'Bilik Pada Tarikh Tersebut Telah Penuh');
-        }
+    //             }
+    //     } else {
+    //         return back()->withInput()->with('error', 'Bilik Pada Tarikh Tersebut Telah Penuh');
+    //     }
 
         
 
-    }
+    // }
 
     public function tempahananda()
     {
@@ -1002,48 +1034,90 @@ public function deletePromotion(Request $request){
 
         return view('homestay.urustempahan', compact('data'));
     }
+    public function getBookingData(Request $request){
+        $orgId = $request->homestayid;
+        $bookings = DB::table('rooms as r')
+        ->where([
+            'r.homestayid' => $orgId,
+            'r.deleted_at' => null
+        ])
+        ->join('bookings as b' , 'b.roomid' , 'r.roomid')
+        ->where([
+            'b.status' => 'Booked'
+        ])
+        ->join('users as u', 'u.id' ,'b.customerid')
+        ->orderBy('b.bookingid','desc')
+        ->get();
 
-    public function tunjukpelanggan(Request $request)
-    {
-        $homestayid = $request->input('homestayid');
-
-        $data = Booking::join('rooms', 'bookings.roomid', '=', 'rooms.roomid')
-        ->join('organizations', 'organizations.id', '=', 'rooms.homestayid')
-        ->join('users', 'bookings.customerid', '=', 'users.id')
-        ->where('organizations.id', $homestayid)
-        ->select(
-            'users.name',
-            'users.telno',
-            'bookings.checkin',
-            'bookings.checkout',
-            'bookings.bookingid',
-            'bookings.status',
-            'bookings.totalprice',
-            'rooms.roomname'
-    )
-    ->get();
-
-        return response()->json($data);
+        return response()->json(['bookings' => $bookings]);
     }
+    public function checkoutHomestay(Request $request){
+        $bookingId = $request->bookingId;
+        DB::table('bookings')
+        ->where([
+            'bookingid' => $bookingId,
+        ])
+        ->update([
+            'updated_at' => Carbon::now(),
+            'status' => 'Completed',
+        ]);
 
-    public function cancelpelanggan($bookingid)
-    {
-        $status = "Canceled";
-        $booking = Booking::find($bookingid);
-        $booking->status = $status;
+        return response()->json(['success' =>'Checked Out Successfully']);
+    }
+    public function cancelBooking(Request $request){
+        $bookingId = $request->bookingId;
+        DB::table('bookings')
+        ->where([
+            'bookingid' => $bookingId,
+        ])
+        ->update([
+            'updated_at' => Carbon::now(),
+            'status' => 'Cancelled',
+        ]);
 
-        $result = $booking->save();
+        return response()->json(['success' =>'Cancel Booking Successfully']);
+    }
+    // public function tunjukpelanggan(Request $request)
+    // {
+    //     $homestayid = $request->input('homestayid');
 
-        if($result)
-            {
-                return back()->withInput()->with('success', 'Tempahan Berjaya Dibatalkan');
-            }
-            else
-            {
-                return back()->withInput()->with('error', 'Tempahan Gagal Dibatalkan');
+    //     $data = Booking::join('rooms', 'bookings.roomid', '=', 'rooms.roomid')
+    //     ->join('organizations', 'organizations.id', '=', 'rooms.homestayid')
+    //     ->join('users', 'bookings.customerid', '=', 'users.id')
+    //     ->where('organizations.id', $homestayid)
+    //     ->select(
+    //         'users.name',
+    //         'users.telno',
+    //         'bookings.checkin',
+    //         'bookings.checkout',
+    //         'bookings.bookingid',
+    //         'bookings.status',
+    //         'bookings.totalprice',
+    //         'rooms.roomname'
+    // )
+    // ->get();
+
+    //     return response()->json($data);
+    // }
+
+    // public function cancelpelanggan($bookingid)
+    // {
+    //     $status = "Canceled";
+    //     $booking = Booking::find($bookingid);
+    //     $booking->status = $status;
+
+    //     $result = $booking->save();
+
+    //     if($result)
+    //         {
+    //             return back()->withInput()->with('success', 'Tempahan Berjaya Dibatalkan');
+    //         }
+    //         else
+    //         {
+    //             return back()->withInput()->with('error', 'Tempahan Gagal Dibatalkan');
     
-            }
-    }
+    //         }
+    // }
 
     public function userhistory()
     {
