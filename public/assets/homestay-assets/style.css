@@ -2,7 +2,9 @@
     --primary-color: #852aff;
     --secondary-color: #391582;
 }
-
+* {
+    box-sizing: border-box;
+}
 body {
     background-color: white !important;
 }
@@ -371,7 +373,6 @@ div#modal-fullscreen {
 .ui-datepicker td.discount-date a {
     background-color: blue !important;
     border: 1px solid blue;
-    position: relative;
     cursor: pointer;
 }
 .ui-datepicker td.discount-date a:hover {
@@ -381,7 +382,6 @@ div#modal-fullscreen {
 .ui-datepicker td.increase-date a {
     background-color: rgb(255, 60, 106) !important;
     border: 1px solid rgb(255, 60, 106);
-    position: relative;
     cursor: pointer;
 }
 .ui-datepicker td.increase-date a:hover {
@@ -433,9 +433,16 @@ div#modal-fullscreen {
 .ui-button,
 html .ui-button.ui-state-disabled:hover,
 html .ui-button.ui-state-disabled:active {
-    border-width: 5px !important;
-    border-radius: 2rem !important;
-    text-align: center !important;
+    padding: 6px !important;
+}
+.ui-datepicker {
+    width: 350px;
+}
+.ui-datepicker td {
+    width: 14.29% !important;
+}
+.price-text {
+    font-size: 11px;
 }
 /* for book button */
 .btn-book {
@@ -482,8 +489,21 @@ html .ui-button.ui-state-disabled:active {
 .border-white {
     border: 1px solid white;
     border-radius: 0.25rem;
-    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6);
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6) !important;
     padding: 12px;
+}
+
+/* for tempahan anda */
+.nav-tabs > li > a,
+.nav-pills > li > a {
+    color: var(--secondary-color) !important;
+}
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+    color: var(--primary-color) !important;
+}
+.tab-card {
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* for mobile responsive */
@@ -538,8 +558,16 @@ html .ui-button.ui-state-disabled:active {
     #room-info {
         padding: 12px !important;
     }
+    #ui-datepicker-div {
+        left: 50% !important;
+        transform: translate(-50%);
+    }
     /* promotion */
     .promotion-container {
         width: 100%;
+    }
+    /* tempahan anda */
+    #tab-container {
+        padding: 12px !important;
     }
 }

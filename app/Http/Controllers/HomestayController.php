@@ -195,15 +195,27 @@ class HomestayController extends Controller
             $period = new DatePeriod($promotionStart, $interval, $promotionEnd);
             if($promotion->promotion_type == "discount"){
                 foreach($period as $date){
-                    $discountDates[] =  $date->format('d/m/Y');
+                    $discountDates[] =  [
+                      'date' =>  $date->format('d/m/Y'),
+                      'percentage' => $promotion->discount,
+                    ];
                 }
                 // add the last date as well
-                $discountDates[] = $promotionEnd->format('d/m/Y');
+                $discountDates[] = [
+                    'date' => $promotionEnd->format('d/m/Y'),
+                    'percentage' => $promotion->discount,
+                ];
             }else if($promotion->promotion_type == "increase"){
                 foreach($period as $date){
-                    $increaseDates[] =  $date->format('d/m/Y');
+                    $increaseDates[] =  [
+                        'date' =>  $date->format('d/m/Y'),
+                        'percentage' => $promotion->increase,
+                    ];
                 }
-                $increaseDates[] = $promotionEnd->format('d/m/Y');
+                $increaseDates[] = [
+                    'date' =>  $promotionEnd->format('d/m/Y'),
+                    'percentage' => $promotion->increase,
+                ];
             }
         }
         return response()->json(['increaseDates' => $increaseDates , 'discountDates' => $discountDates]);
@@ -985,17 +997,72 @@ public function deletePromotion(Request $request){
     public function tempahananda()
     {
         $userId = Auth::id();
-        $status = 'Booked';
-        $data = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
-                ->join('bookings','rooms.roomid','=','bookings.roomid')
-                ->where('bookings.customerid', $userId)
-                ->where('bookings.status', $status) // Filter by the selected homestay
-                ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
-                ->get();
-
-        return view('homestay.tempahananda',compact('data'));
+        // data for checkout tab
+        $checkoutBookings = DB::table('bookings')
+        ->where([
+            'bookings.customerid' => $userId,
+            'bookings.status' => 'Booked',
+        ])
+        ->join('rooms','rooms.roomid','bookings.roomid')
+        ->join('organizations','organizations.id','rooms.homestayid')
+        ->orderBy('bookings.bookingid','desc')
+        ->get();
+        $checkoutImages = [];
+        foreach($checkoutBookings as $checkoutBooking){
+            $image = DB::table('homestay_images')
+            ->where([
+                'room_id' => $checkoutBooking->roomid,
+                'deleted_at' => null,
+            ])
+            ->pluck('image_path')
+            ->first();
+            array_push($checkoutImages,$image);
+        }
+        // data for completed tab
+        $completedBookings = DB::table('bookings')
+        ->where([
+            'bookings.customerid' => $userId,
+            'bookings.status' => 'Completed',
+        ])
+        ->join('rooms','rooms.roomid','bookings.roomid')
+        ->join('organizations','organizations.id','rooms.homestayid')
+        ->orderBy('bookings.bookingid','desc')
+        ->get();
+        $completedImages = [];
+        foreach($completedBookings as $completedBooking){
+            $image = DB::table('homestay_images')
+            ->where([
+                'room_id' => $completedBooking->roomid,
+                'deleted_at' => null,
+            ])
+            ->pluck('image_path')
+            ->first();
+            array_push($completedImages,$image);
+        }   
+        // data for cancelled tab
+        $cancelledBookings = DB::table('bookings')
+        ->where([
+            'bookings.customerid' => $userId,
+            'bookings.status' => 'Cancelled',
+        ])
+        ->join('rooms','rooms.roomid','bookings.roomid')
+        ->join('organizations','organizations.id','rooms.homestayid')
+        ->orderBy('bookings.bookingid','desc')
+        ->get();
+        $cancelledImages = [];
+        foreach($cancelledBookings as $cancelledBooking){
+            $image = DB::table('homestay_images')
+            ->where([
+                'room_id' => $cancelledBooking->roomid,
+                'deleted_at' => null,
+            ])
+            ->pluck('image_path')
+            ->first();
+            array_push($cancelledImages,$image);
+        }   
+        return view('homestay.tempahananda')
+        ->with(['checkoutBookings'=> $checkoutBookings, 'checkoutImages'=> $checkoutImages,'completedBookings'=> $completedBookings , 'completedImages'=> $completedImages,'cancelledBookings'=> $cancelledBookings,'cancelledImages'=> $cancelledImages,]);
     }
-
     public function homestayresit($bookingid)
     {
         $userId = Auth::id();

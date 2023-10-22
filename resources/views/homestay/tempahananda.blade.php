@@ -1,114 +1,93 @@
 @extends('layouts.master')
 
 @section('css')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-        <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-@include('layouts.datatable');
-
+<link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
+<style>
+  img{
+    object-fit: cover;
+  }
+</style>
 @endsection
 
 @section('content')
-<div class="row align-items-center">
-    <div class="col-sm-6">
-        <div class="page-title-box">
-            <h4 class="font-size-18">Tempahan Anda</h4>
+
+    {{-- bootstrap 5 tabs --}}
+    <div class="card mt-3 p-5 border-white" id="tab-container">
+      <h3 class="color-purple text-center">Tempahan Anda</h3>    
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+          <a class="nav-link active " id="checkout-tab" data-toggle="tab" href="#checkout" role="tab" aria-controls="checkout" aria-selected="true">Daftar Keluar</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " id="completed-tab" data-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false">Selesai</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link " id="cancelled-tab" data-toggle="tab" href="#cancelled" role="tab" aria-controls="cancelled" aria-selected="false">Batal</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="checkout" role="tabpanel" aria-labelledby="checkout-tab">
+            @for($i = 0 ; $i < count($checkoutBookings); $i++)
+              <div class="card tab-card my-3">
+                  <div class="card-body row">
+                    <a class="col-md-5" href="{{route('homestay.showRoom',['id' => $checkoutBookings[$i]->roomid, 'name' => $checkoutBookings[$i]->roomname])}}">
+                      <img src="{{$checkoutImages[$i]}}" alt="{{$checkoutBookings[$i]->roomname}}" class="img-fluid">
+                    </a>  
+                    <div class="col-md-7">
+                      <h4 class="color-purple">{{$checkoutBookings[$i]->roomname}}</h4>
+                      <h5 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$checkoutBookings[$i]->address}}, {{$checkoutBookings[$i]->area}}, {{$checkoutBookings[$i]->postcode}}, {{$checkoutBookings[$i]->district}}, {{$checkoutBookings[$i]->state}}</h5>
+                      <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i> Daftar Masuk: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($checkoutBookings[$i]->check_in_after))}}</h5>
+                      <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-out-alt"></i> Daftar Keluar: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkout))}}, sebelum {{date('H:i', strtotime($checkoutBookings[$i]->check_out_before))}}</h5>
+                      <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i> Jumlah Dibayar: </span>RM{{$checkoutBookings[$i]->totalprice}}</h5>
+                      <h5 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i> Nombor Telefon Organisasi: </span>{{$checkoutBookings[$i]->telno}}</h5>
+                    </div>
+                  </div>
+              </div>
+            @endfor
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-
-            <div class="card-body">
-
-            @if(count($errors) > 0)
-      <div class="alert alert-danger">
-        <ul>
-          @foreach($errors->all() as $error)
-          <li>{{$error}}</li>
-          @endforeach
-        </ul>
-      </div>
-      @endif
-
-            @if(Session::has('success'))
-            <div class="alert alert-success">
-              <p>{{ Session::get('success') }}</p>
-            </div>
-          @elseif(Session::has('error'))
-            <div class="alert alert-danger">
-              <p>{{ Session::get('error') }}</p>
-            </div>
-          @endif
-
-                <div class="flash-message"></div>
-                <div class="table-responsive">
-                    <table id="homestaytable" class="table table-bordered table-striped dt-responsive wrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                        <thead>
-                    <tr class="text-center">
-
-                      <th hidden>Booking ID</th>
-                      <th>Nama Homestay</th>
-                      <th>Nama Bilik</th>
-                      <th>Alamat</th>
-                      <th>Detail Bilik</th>
-                      <th>Tarikh Dari</th>
-                      <th>Tarikh Hingga</th>
-                      <th>Harga Keseluruhan (RM)</th>
-                      <th>Proses Bayaran</th>
-                    </tr>
-                </thead>
-                <tbody>
-                        @foreach($data as $record)
-                        <tr>
-                            <td hidden>{{ $record->bookingid }}</td>
-                            <td>{{ $record->nama }}</td>
-                            <td>{{ $record->roomname }}</td>
-                            <td>{{ $record->address }}</td>
-                            <td>{{ $record->details }}</td>
-                            <td>{{ $record->checkin }}</td>
-                            <td>{{ $record->checkout }}</td>
-                            <td>{{ $record->totalprice }}</td>
-                            <td><button class="btn btn-success bayar-button" data-booking-id="{{ $record->bookingid }}">Teruskan</button></td>
-                            </td>
-                    </tr>
-                    @endforeach
-                    </tbody>
-                    </table>
+        <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+          @for($i = 0 ; $i < count($completedBookings); $i++)
+            <div class="card tab-card my-3">
+                <div class="card-body row">
+                  <a class="col-md-5 d-flex align-items-center" href="{{route('homestay.showRoom',['id' => $completedBookings[$i]->roomid, 'name' => $completedBookings[$i]->roomname])}}">
+                    <img src="{{$completedImages[$i]}}" alt="{{$completedBookings[$i]->roomname}}" class="img-fluid">
+                  </a>  
+                  <div class="col-md-7">
+                    <h4 class="color-purple">{{$completedBookings[$i]->roomname}}</h4>
+                    <h5 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$completedBookings[$i]->address}}, {{$completedBookings[$i]->area}}, {{$completedBookings[$i]->postcode}}, {{$completedBookings[$i]->district}}, {{$completedBookings[$i]->state}}</h5>
+                    <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i> Daftar Masuk: </span>{{date('d/m/Y',strtotime($completedBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($completedBookings[$i]->check_in_after))}}</h5>
+                    <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-out-alt"></i> Daftar Keluar: </span>{{date('d/m/Y',strtotime($completedBookings[$i]->checkout))}}, sebelum {{date('H:i', strtotime($completedBookings[$i]->check_out_before))}}</h5>
+                    <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i> Jumlah Dibayar: </span>RM{{$completedBookings[$i]->totalprice}}</h5>
+                    <h5 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i> Nombor Telefon Organisasi: </span>{{$completedBookings[$i]->telno}}</h5>
+                  </div>
                 </div>
             </div>
+          @endfor
         </div>
-
+        <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+          @for($i = 0 ; $i < count($cancelledBookings); $i++)
+            <div class="card tab-card my-3">
+                <div class="card-body row">
+                  <a class="col-md-5 d-flex align-items-center" href="{{route('homestay.showRoom',['id' => $cancelledBookings[$i]->roomid, 'name' => $cancelledBookings[$i]->roomname])}}">
+                    <img src="{{$cancelledImages[$i]}}" alt="{{$cancelledBookings[$i]->roomname}}" class="img-fluid">
+                  </a>  
+                  <div class="col-md-7">
+                    <h4 class="color-purple">{{$cancelledBookings[$i]->roomname}}</h4>
+                    <h5 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$cancelledBookings[$i]->address}}, {{$cancelledBookings[$i]->area}}, {{$cancelledBookings[$i]->postcode}}, {{$cancelledBookings[$i]->district}}, {{$cancelledBookings[$i]->state}}</h5>
+                    <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i> Daftar Masuk: </span>{{date('d/m/Y',strtotime($cancelledBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($cancelledBookings[$i]->check_in_after))}}</h5>
+                    <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-out-alt"></i> Daftar Keluar: </span>{{date('d/m/Y',strtotime($cancelledBookings[$i]->checkout))}}, sebelum {{date('H:i', strtotime($cancelledBookings[$i]->check_out_before))}}</h5>
+                    <h5 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i> Jumlah Dibayar: </span>RM{{$cancelledBookings[$i]->totalprice}}</h5>
+                    <h5 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i> Nombor Telefon Organisasi: </span>{{$cancelledBookings[$i]->telno}}</h5>
+                  </div>
+                </div>
+            </div>
+          @endfor
+        </div>
+      </div>
     </div>
-</div>
-
 
 @endsection
 
+@section('scripts')
 
-@section('script')
-<!-- Peity chart-->
-<script src="{{ URL::asset('assets/libs/peity/peity.min.js')}}"></script>
-
-{{-- <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script> --}}
-
-<script>
-    $(document).ready(function() {
-    
-        $('#homestaytable').DataTable();
-
-        $('.bayar-button').click(function() {
-            var id = $(this).data('booking-id');
-            console.log(id);
-            window.location.href = '/homestayresit/' + id;
-             // Change '/book/' to your actual route
-        });
-
-$('.alert').delay(3000).fadeOut()
-});
-
-</script>
 @endsection

@@ -97,7 +97,6 @@
                                         <th style="width:20%">Nama Bilik</th>
                                         <th style="width:20%">Tarikh Dari</th>
                                         <th style="width:20%">Tarikh Hingga</th>
-                                        <th style="width:20%">Detail Bilik</th>
                                         <th style="width:20%">Amaun Semalam (RM)</th>
                                     </tr>
                                     @foreach ($booking_order as $item)
@@ -109,7 +108,6 @@
                                         <td style="text-align: center">{{ $item->roomname }}</td>
                                         <td style="text-align: center">{{ $item->checkin }}</td>
                                         <td style="text-align: center">{{ $item->checkout }}</td>
-                                        <td style="text-align: center">{{ $item->details }}</td>
                                         <td style="text-align: center">{{  $item->price  }}</td>
                                     </tr>
                                     @endforeach
@@ -149,7 +147,7 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count <= 0) {
-            window.location = '/home'; 
+            window.location = '/tempahananda'; 
         }
     },1000);
 </script>

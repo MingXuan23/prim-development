@@ -120,7 +120,7 @@
         <input type="hidden" name="bookingid" id = "bookingid" value="{{ $checkoutDetails['bookingId'] }}">
         <input type="hidden" name="amount" id="amount" value="{{ $checkoutDetails['totalPrice'] }}">
         <div class="row d-flex justify-content-center">
-          <div class="border-white col-md-6 mb-2 mx-2 mr-2">
+          <div class="border-white col-md-6 mb-3 mx-2 mr-2">
               <h4>{{$checkoutDetails['homestay']->roomname}}</h4>
               <div class="row">
                 <div class="col-md-4">
@@ -128,13 +128,13 @@
                 </div>
                 <div class="col-md-8">
                   <h6 class="color-dark-purple mb-1"><span><i class="fas fa-map-marker-alt"></i></span> {{$checkoutDetails['homestay']->address}}, {{$checkoutDetails['homestay']->area}}, {{$checkoutDetails['homestay']->postcode}}, {{$checkoutDetails['homestay']->district}}, {{$checkoutDetails['homestay']->state}}</h6>
-                  <h6><span class="color-dark-purple mb-1">Room Pax: </span>{{$checkoutDetails['homestay']->roompax}}</h6>
-                  <h6><span class="color-dark-purple mb-1">Daftar Masuk: </span>{{$checkoutDetails['checkInDate']}}, selepas {{date('H:i', strtotime($checkoutDetails['homestay']->check_in_after))}}</h6>
-                  <h6><span class="color-dark-purple mb-1">Daftar Keluar: </span>{{$checkoutDetails['checkOutDate']}}, sebelum {{date('H:i', strtotime($checkoutDetails['homestay']->check_out_before))}}</h6>
+                  <h6><span class="color-dark-purple mb-1"><i class="fas fa-user-friends"></i> Room Pax: </span>{{$checkoutDetails['homestay']->roompax}}</h6>
+                  <h6><span class="color-dark-purple mb-1"><i class="fas fa-sign-in-alt"></i> Daftar Masuk: </span>{{$checkoutDetails['checkInDate']}}, selepas {{date('H:i', strtotime($checkoutDetails['homestay']->check_in_after))}}</h6>
+                  <h6><span class="color-dark-purple mb-1"><i class="fas fa-sign-out-alt"></i> Daftar Keluar: </span>{{$checkoutDetails['checkOutDate']}}, sebelum {{date('H:i', strtotime($checkoutDetails['homestay']->check_out_before))}}</h6>
                 </div>
               </div>
           </div>    
-          <div class="border-white col-md-5 mb-2" id="checkout-price-container">
+          <div class="border-white col-md-5 mb-3" id="checkout-price-container">
             <h4>Butiran Harga</h4>
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-1">
               <h5 class="color-dark-purple">RM{{$checkoutDetails['homestay']->price}} x {{$checkoutDetails['nightCount']}} malam</h5>
@@ -159,7 +159,7 @@
           </div>        
         </div>
 
-      <div class="row d-flex justify-content-center mb-2">
+      <div class="row d-flex justify-content-center mb-3">
         <div class="col-md-6 border-white">
           <div class="form-group">
             <div id="invalid-bank-message">

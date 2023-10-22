@@ -166,7 +166,7 @@ $(document).ready(function() {
                     },
                     { 
                       data: 'bookingid', render: function(data) {
-                        return `<button class="btn btn-primary" id="btn-checkout" data-booking-id="${data}">Daftar Keluar</a>`;
+                        return `<button class="btn btn-primary" id="btn-checkout" data-booking-id="${data}">Checkout</a>`;
                       },
                       orderable: false,
                       searchable: false, 

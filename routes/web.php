@@ -613,7 +613,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('calculate-total-price', 'HomestayController@calculateTotalPrice')->name('homestay.calculateTotalPrice');
     Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
     Route::get('search-room','HomestayController@searchRoom')->name('homestay.searchRoom');
-    
+    Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
 
     // Homestay Management
     Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
@@ -649,7 +649,6 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('bookhomestay/{id}', 'HomestayController@bookhomestay')->name('homestay.bookhomestay');
     Route::get('disabledateroom/{id}', 'HomestayController@disabledateroom');
     Route::post('bookhomestay/insertbooking/{id}/{price}', 'HomestayController@insertbooking');
-    Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
     Route::get('homestayresit/{id}', 'HomestayController@homestayresit')->name('homestay.homestayresit');
 
     Route::post('tunjukpelanggan', 'HomestayController@tunjukpelanggan');

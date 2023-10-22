@@ -267,6 +267,9 @@ $(document).ready(function() {
         
     }
     let discountDates = increaseDates = [];
+    const discountMap = new Map();
+    const increaseMap = new Map();
+
     // to fetch  dates that have discount or increase price
     function fetchDiscountOrIncrease(){
         $.ajax({
@@ -276,8 +279,21 @@ $(document).ready(function() {
                 homestayId : $('#roomId').val(),
             },
             success: function(result){
-                discountDates = result.discountDates;
-                increaseDates = result.increaseDates;
+                discountDates = [];
+                $(result.discountDates).each((i, discount)=> {
+                    discountDates.push(discount.date);
+                })
+                increaseDates = [];
+                $(result.increaseDates).each((i, increase)=> {
+                    increaseDates.push(increase.date);
+                })
+                // create map key pairs
+                $(result.discountDates).each((i, discount)=>{
+                    discountMap.set(discount.date, discount.percentage);
+                });
+                $(result.increaseDates).each((i, increase)=>{
+                    increaseMap.set(increase.date, increase.percentage);
+                });
             },
             error: function(){
                 console.log('Fetch discount and increase failed');
@@ -315,7 +331,7 @@ $(document).ready(function() {
                             cssClass = 'increase-date';
                             toolTip = "Terdapat penambahan harga pada hari tersebut";
                         }
-                        return [!isDisabled,cssClass,toolTip];
+                         return [!isDisabled, cssClass, toolTip];
                     },
                     onSelect: function(selectedDate) {
                         // Parse the selectedDate as a JavaScript Date object
@@ -354,6 +370,7 @@ $(document).ready(function() {
                         var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
                         var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
                         var cssClass = toolTip = '';
+
                         if(isDisabled) {
                             toolTip = 'Terdapat tempahan untuk hari tersebut'; 
                         }else if(discountDates.indexOf(formattedDate) !== -1){
@@ -404,6 +421,35 @@ $(document).ready(function() {
     }
     fetchDiscountOrIncrease();
     initializeCheckInOut();
+    $('#check-in , #check-out').on('click focus',function(){
+        // reset all price text
+        $('.price-text').remove();
+        $(".ui-datepicker-calendar .ui-state-default").each(function() {
+            var currentDate = $(this).html() + "/" + (parseInt($(this).parent().attr('data-month'))+1) +"/" + parseInt($(this).parent().attr('data-year'));
+            // if the date is not disabled
+            if(!$(this).parent().hasClass('ui-datepicker-unselectable')){
+                //add custom text to date cell       
+                let percentage = priceAfterDiscount = 0;         
+                if(increaseMap.get(currentDate) != undefined){
+                    // if has increase promotion
+                    percentage = increaseMap.get(currentDate);
+                    priceAfterDiscount = parseInt($('#roomPrice').val()) + ( parseInt($('#roomPrice').val()) * percentage /100);
+                    $(this).after(`<div class="price-text">RM${priceAfterDiscount}</div>`);   
+                }else if(discountMap.get(currentDate) != undefined){
+                    // if has discount promotion
+                    percentage = discountMap.get(currentDate);
+                    priceAfterDiscount = parseInt($('#roomPrice').val()) - ( parseInt($('#roomPrice').val()) * percentage /100);
+                    $(this).after(`<div class="price-text">RM${priceAfterDiscount}</div>`);                
+
+                }else{
+                    $(this).after(`<div class="price-text">RM${parseInt($('#roomPrice').val())}</div>`);                
+                }
+            }else{
+                $(this).after(`<div class="price-text">&nbsp</div>`);                
+            }
+
+        });
+    })
 
     $('#form-book').on('submit',function(e){
         if($('#amount').val() == 0){
