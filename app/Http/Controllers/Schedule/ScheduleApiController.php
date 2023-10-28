@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Notifications\Notification;
 
-use Kreait\Firebase;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\ServiceAccount;
 
 
 use App\User;
@@ -153,25 +155,41 @@ class ScheduleApiController extends Controller
      }
 
      public function sendNotification($id)
-     {
+     {  $user =User::find($id);
 
-        $message = 'Hello, user!';
-        //$this->webSocketService->sendWebSocketMessage();
-        $FcmToken = auth()->user()->device_token;
-            $title = "Notification test";
-            $body = $message;
-            $message = CloudMessage::fromArray([
-            'token' => $FcmToken,
-            'notification' => [
-                'title' => $title,
-                'body' => $body
+       // dd($user);
+        if($user->device_token){
+            $accessToken = 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQD0HvLDejwk0RuM\nJzdceeF/ygASH/gWTZqTYN28VBD/hYIeheN3n9L9N6EuN7PgcMfEcHqtNSF+LPb1\nuvNum/+3rW6OhJNmPBR5k9MmDrVXr2hvdTsHTdzHCDTcHBRmK7boUXSCw21q2VL9\n5IhhLVziEP4jWfC9FgV0cAjfmndIzuGgzuher01k3kAo801nYvFlHjP3OvD4598X\ns/ndAhNb8btk65sRz2ImUtFVL+jiY9geyb8vsyabB6U5NZBXKRT6MoVeXV5pGsrt\n+MWVDEf8TuED4ZM7UlS6o8Sr0PHQDm6LDzaGj13oI6nk6rGWnlV9R9yNNOJ3ttv6\nytk/6apbAgMBAAECggEAEpk9A5mPdXqc76uZMylx/atlH/xhiUl2Sl4p5ow9E0qX\npD2tG9MIXxRa6kuCH8pX3eZ34jRXDebdFdGddELcU6EZ+C+vjy1qneyePJsIQ9rw\nSPWUfrT26g78//v/rd0MvVxfVQsQjgBqqz87CLRNDEghJI5Yof9IgRt8AZUiG2DJ\nhhbyqeEz9JNYxa25ttjknmDpZ7DnJwwAAPB0U7fIyOERd6nIv3+ySXfi0ZTm9wuH\n+6KbvbeKwRwg3ShO75ztyrwRwom7QPOSYdnLh6w0ogoL9GmlGLrCUszIeLx2KTye\nwc5Q5G/p3DIqpvJaFerAYwZdpUeXqcOxOM4ndfyaqQKBgQD7kvncg583dyPaSsQR\n8Smixh6+7UkBesGV/k5+BzakLxX6DsePrk8DgNZrH7ZZ8HA+pJiIikkV1/bHHdKR\nPuGpxRCspb24bqFH5TI/D17k+ncEqgWTcIrox89yu3BIAAxRyOIzG2FMEH4Uunzc\nhRdGaA2NzF8ErE6CpS12Otql9wKBgQD4amelHav12AZQR/vjmph+szkZBsAbfI1j\n9/64r5drPpsij8Hjo3dBGv3yxapXUWTooeXF/EETPamoqsj4o30hfvh/BATruWty\nPypvRacDbI5jetj/0v1ofBQWl0VKGoRyDYqmrkDfBsOivzgzSs53BbSBU06DBnRY\n5hRS3Kc1vQKBgHtzhGlRra/qJw3X4p9rWKMn1a6bglfXhWe1g48UuxuWf5JV7lfz\nkZKGhrHKvhEki/AxlShrs7GkaNUNLWdZFCPbMHOIYbE/mKVPM3j+cfKrdfwz8siH\nUaMpagNDN7YdT+5SRa4OoZBSB4zkdqFALku+g+gxge8pHt29cLGz79fBAoGAByzj\no4RQ5EACJq19nBxqDTbWDmAAioq1ds7B/8mqoQFk78GhQxcEqc/CyBFnkzAZrxKG\nFYrswkaEsQeF2JC4W5BUUy7liX2ImfszGZW0dkfbcQoqXHFWun7jAagK61IKw1Sa\nzae43fhPDFNjpy+g+RUkGpwyZ1x3Xd3/dklDVy0CgYEAj/E/GxPhbE6SaCz9XzV2\n2u+ISa7yGgF5Jx4sJeLW0SnrBp2hgfoJC9eoYgvt05Tv28KFOmOVs5olKJi9yaBJ\n1AcQfPbIJTw9KvBtFMZM6Ii6hfZNWlTZjiwUg6bqaTt9MT0/cE6ckTuKcLSmlp0u\nQy+tmc59MfUgPdfS9FfLVpE';
+            $fcmUrl = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send';
+    
+            $messageData = [
+                'message' => [
+                    'notification' => [
+                        'title' => 'FCM Message',
+                        'body' => 'This is an FCM Message',
+                    ],
+                    'token' => $user->device_token,
                 ],
-            ]);
-
-        $this->notification->send($message);
-        return response()->json(['message' => ' message sent.']);
-        // $onesignalUserAuth = env('ONESIGNAL_REST_API_KEY');
-        // $appID = env('ONESIGNAL_APP_ID');
+            ];
+    
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type' => 'application/json',
+            ])->post($fcmUrl, $messageData);
+    
+            if ($response->successful()) {
+                return 'FCM message sent successfully';
+            } else {
+                return 'Failed to send FCM message';
+            }
+    
+            return response()->json(['message'=>"Success"]);
+        }
+        
+       
+        return response()->json(['message'=>"Failed"]);
+        // Send the message to the specified device tokens
+        
         
 
         // $fields = [
