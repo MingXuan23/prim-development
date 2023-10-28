@@ -9,7 +9,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Events\NewNotification;
 
+
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Notifications\Notification;
+
+use Kreait\Firebase\Messaging\CloudMessage;
+
 use App\User;
+
+
 
 class ScheduleApiController extends Controller
 {
@@ -18,6 +27,14 @@ class ScheduleApiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+     protected $notification;
+
+    public function __construct(NewNotification $webSocketService)
+    {
+        $this->notification = Firebase::messaging();
+    }
+
 
      public function login(Request $request)
      {  
@@ -66,9 +83,16 @@ class ScheduleApiController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::User();
+            if($request->device_token){
+                $user->device_token =$request->device_token;
+                $user->save();
+            }
             return response()->json([
                 'id' => $user->id,
-                'name' => $user->name
+                'name' => $user->name,
+                'role'=> $user->organizationRole(),
+                
+
             ], 200);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
@@ -128,27 +152,82 @@ class ScheduleApiController extends Controller
         return response()->json(['timeoff'=>$msg]);
      }
 
-    public function sendNotification($id){
-        $user = User::where('id', $id)->first();
- 
-        $notification_id = $user->device_token;
-        $title = "Greeting Notification";
-        $message = "Have good day!";
-        $id = $user->id;
-        $type = "basic";
+     public function sendNotification($id)
+     {
+
+        $message = 'Hello, user!';
+        //$this->webSocketService->sendWebSocketMessage();
+        $FcmToken = auth()->user()->device_token;
+            $title = "Notification test";
+            $body = $message;
+            $message = CloudMessage::fromArray([
+            'token' => $FcmToken,
+            'notification' => [
+                'title' => $title,
+                'body' => $body
+                ],
+            ]);
+
+        $this->notification->send($message);
+        return response()->json(['message' => ' message sent.']);
+        // $onesignalUserAuth = env('ONESIGNAL_REST_API_KEY');
+        // $appID = env('ONESIGNAL_APP_ID');
         
-        $res = send_notification_FCM($notification_id, $title, $message, $id,$type);
+
+        // $fields = [
+        //     'app_id' => $appID,
+        //     'contents' => ['en' => 'Hello testings'],
+        //     'included_segments' => 'All',
+        // ];
         
-        if($res == 1){
+        // $url = 'https://onesignal.com/api/v1/notifications';
         
-            // success code
-            return response()->json(["Success"]);
+        // $ch = curl_init();
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         
-        }else{
+        // // Set the url, number of POST vars, POST data
+        // curl_setopt($ch, CURLOPT_URL, $url);
         
-            return response()->json(["failed"]);
-        }
+        // // Set cURL options
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        //     'Authorization: Basic ' . $onesignalUserAuth,
+        //     'Content-Type: application/json',
+        // ]);
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        // // Execute post
+        // $result = curl_exec($ch);
+        
+        // // Get the HTTP status code before closing the cURL handle
+        // $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+        // // Close connection
+        // curl_close($ch);
+        
+        // // Check the response for success or error handling
+        // if ($statusCode == 200) {
+        //     return response()->json(['message' => 'Notification sent successfully']);
+        // } else {
+        //     return response()->json(['error' => 'Notification failed: ' . $result], $statusCode);
+        // }
+        
+
+     }
+
+
+    public function isNoti($id){
+
+        
+        // if($id==3){
+        //     return response()->json(['title'=>'Alert','body'=>'You have a update']);
+        // }
+        // return response()->json(['title'=>'None']);
+       
     }
+
 
     public function index()
     {
