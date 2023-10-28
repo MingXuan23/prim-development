@@ -614,7 +614,11 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
     Route::get('search-room','HomestayController@searchRoom')->name('homestay.searchRoom');
     Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
-
+    Route::post('add-review', 'HomestayController@addReview')->name('homestay.addReview');
+    Route::get('booking-details/{id}','HomestayController@bookingDetails')->name('homestay.bookingDetails');
+    Route::get('generate-booking-details-pdf/{id}','HomestayController@generateBookingDetailsPdf')->name('homestay.generateBookingDetailsPdf');
+    Route::get('get-more-reviews','HomestayController@getMoreReviews')->name('homestay.getMoreReviews');
+    
     // Homestay Management
     Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
     Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
@@ -629,6 +633,10 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('checkout-homestay', 'HomestayController@checkoutHomestay')->name('homestay.checkoutHomestay');
     Route::post('cancel-booking', 'HomestayController@cancelBooking')->name('homestay.cancelBooking');
     Route::get('view-booking-history/{id}','HomestayController@viewBookingHistory')->name('homestay.viewBookingHistory');
+    Route::get('get-booking-history-data', 'HomestayController@getBookingHistoryData')->name('homestay.getBookingHistoryData');
+    Route::get('view-customers-reviews/{id}','HomestayController@viewCustomersReview')->name('homestay.viewCustomersReview');
+    Route::get('get-customers-review', 'HomestayController@getCustomersReview')->name('homestay.getCustomersReview');
+
 
     //Homestay Promotion
     Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');

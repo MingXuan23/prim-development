@@ -76,12 +76,17 @@ td a {
     border-radius: 0.25rem;
     box-shadow: 2px 2px 6px 3px rgb(90, 90, 90);
 }
+.btn {
+    padding: 12px !important;
+    border-radius: 0.75rem !important;
+}
 .btn-primary,
 .btn-purple {
     background-color: var(--primary-color) !important;
     color: white;
     transition: all 0.2s ease;
     border-radius: 0.75rem;
+    border: none;
     padding: 12px;
 }
 .btn-primary:hover,
@@ -94,6 +99,7 @@ td a {
     color: white;
     transition: all 0.2s ease;
     border-radius: 0.75rem;
+    border: none;
     padding: 12px;
 }
 .btn-dark-purple:hover {
@@ -492,7 +498,27 @@ html .ui-button.ui-state-disabled:active {
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6) !important;
     padding: 12px;
 }
-
+/* for review section */
+.review-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+.review-container > div {
+    padding: 12px 0;
+    flex-basis: 50%;
+    margin-bottom: 12px;
+}
+.review-container p {
+    text-align: justify;
+}
+.rated {
+    color: var(--primary-color);
+    font-size: 22px;
+}
+.unrated {
+    color: var(--primary-color);
+    font-size: 22px;
+}
 /* for tempahan anda */
 .nav-tabs > li > a,
 .nav-pills > li > a {
@@ -505,7 +531,93 @@ html .ui-button.ui-state-disabled:active {
 .tab-card {
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6) !important;
 }
+.tab-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+/* rating */
 
+.cross {
+    padding: 10px;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 23px;
+}
+
+.cross i {
+    margin-top: -5px;
+    cursor: pointer;
+}
+
+.comment-box {
+    padding: 5px;
+}
+
+.comment-area textarea {
+    resize: none;
+    border: 1px solid var(--primary-color);
+}
+
+.send {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.send:hover {
+    color: #fff;
+    background-color: #f50202;
+    border-color: #f50202;
+}
+
+.rating {
+    display: inline-flex;
+    margin-top: -10px;
+    flex-direction: row-reverse;
+}
+
+.rating > input {
+    display: none;
+}
+.rating > span {
+    color: var(--primary-color);
+    width: 22px;
+    font-size: 28px;
+}
+.rating > label {
+    position: relative;
+    width: 28px;
+    font-size: 35px;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+.rating > label::before {
+    content: "\2605";
+    position: absolute;
+    opacity: 0;
+}
+
+.rating > label:hover:before,
+.rating > label:hover ~ label:before {
+    opacity: 1 !important;
+}
+
+.rating > input:checked ~ label:before {
+    opacity: 1;
+}
+
+.rating:hover > input:checked ~ label:before {
+    opacity: 0.4;
+}
+#booking-details-container {
+    position: relative;
+}
+#booking-button-group {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
 /* for mobile responsive */
 @media screen and (max-width: 500px) {
     #image-previews {
@@ -561,6 +673,9 @@ html .ui-button.ui-state-disabled:active {
     #ui-datepicker-div {
         left: 50% !important;
         transform: translate(-50%);
+    }
+    .review-container > div {
+        flex-basis: 100%;
     }
     /* promotion */
     .promotion-container {

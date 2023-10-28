@@ -23,7 +23,7 @@ use Carbon\Carbon;
 use DateTime;
 use DateInterval;
 use DatePeriod;
-
+use PDF;
 class HomestayController extends Controller
 {
     public function homePage(){
@@ -48,6 +48,23 @@ class HomestayController extends Controller
             ->first();
             array_push($roomsWithImage, $firstRow);
         }
+        // get ratings for those rooms
+        foreach($roomsWithImage as $key => $room){
+            $ratings = DB::table('bookings')
+            ->where([
+                'roomid' => $room->roomid,
+            ])
+            ->where('review_star','!=', null)
+            ->pluck('review_star');
+
+            $overallRating = 0;
+            if(count($ratings) > 0 ){
+                $overallRating = number_format($ratings->sum() / $ratings->count(),2);
+            }
+            
+            $room->overallRating = $overallRating;
+        }
+
         return view('homestay.home')->with(['rooms' => $roomsWithImage]);
     }
     public function showRoom($roomId){
@@ -63,8 +80,44 @@ class HomestayController extends Controller
             'rooms.roomid' => $roomId
         ])
         ->pluck('homestay_images.image_path');
+            
+        $customerReviews = DB::table('bookings')
+        ->where([
+            'status' => 'Completed',
+            'roomid'=>$roomId,
+        ])
+        ->where('review_star' , '!=' , null)
+        ->join('users' , 'users.id' , 'bookings.customerid')
+        ->orderBy('bookings.updated_at', 'desc')
+        ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment' ,'users.name')
+        ->paginate(6);
+        
+        $customerReviewsRating = 0;
 
-        return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages]);
+        foreach($customerReviews as $review){
+            $customerStar = (int)$review->review_star;
+            $customerReviewsRating += $customerStar;
+        }
+
+        $customerReviewsRating = $customerReviewsRating != 0 ? number_format($customerReviewsRating / $customerReviews->count(),2) : 0;
+
+        return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages ,'customerReviews' => $customerReviews, 'customerReviewsRating' => $customerReviewsRating]);
+    }
+    public function getMoreReviews(Request $request){
+        if($request->ajax()){
+            $roomId = $request->roomId;
+            $customerReviews = DB::table('bookings')
+            ->where([
+                'status' => 'Completed',
+                'roomid'=>$roomId,
+            ])
+            ->where('review_star' , '!=' , null)
+            ->join('users' , 'users.id' , 'bookings.customerid')
+            ->orderBy('bookings.updated_at', 'desc')
+            ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment' ,'users.name')
+            ->paginate(6);
+            return view('homestay.review_data',compact('customerReviews'))->render();
+        }
     }
     public function calculateTotalPrice(Request $request){
         $checkInDate = Carbon::createFromFormat('d/m/Y', $request->checkInDate);
@@ -1005,7 +1058,7 @@ public function deletePromotion(Request $request){
         ])
         ->join('rooms','rooms.roomid','bookings.roomid')
         ->join('organizations','organizations.id','rooms.homestayid')
-        ->orderBy('bookings.bookingid','desc')
+        ->orderBy('bookings.updated_at','desc')
         ->get();
         $checkoutImages = [];
         foreach($checkoutBookings as $checkoutBooking){
@@ -1026,7 +1079,7 @@ public function deletePromotion(Request $request){
         ])
         ->join('rooms','rooms.roomid','bookings.roomid')
         ->join('organizations','organizations.id','rooms.homestayid')
-        ->orderBy('bookings.bookingid','desc')
+        ->orderBy('bookings.updated_at','desc')
         ->get();
         $completedImages = [];
         foreach($completedBookings as $completedBooking){
@@ -1047,7 +1100,7 @@ public function deletePromotion(Request $request){
         ])
         ->join('rooms','rooms.roomid','bookings.roomid')
         ->join('organizations','organizations.id','rooms.homestayid')
-        ->orderBy('bookings.bookingid','desc')
+        ->orderBy('bookings.updated_at','desc')
         ->get();
         $cancelledImages = [];
         foreach($cancelledBookings as $cancelledBooking){
@@ -1062,6 +1115,20 @@ public function deletePromotion(Request $request){
         }   
         return view('homestay.tempahananda')
         ->with(['checkoutBookings'=> $checkoutBookings, 'checkoutImages'=> $checkoutImages,'completedBookings'=> $completedBookings , 'completedImages'=> $completedImages,'cancelledBookings'=> $cancelledBookings,'cancelledImages'=> $cancelledImages,]);
+    }
+    public function addReview(Request $request){
+       $bookingId = $request->booking_id;
+       DB::table('bookings')
+       ->where([
+        'bookingid' => $bookingId
+       ])
+       ->update([
+        'updated_at' => Carbon::now(),
+        'review_star'=> $request->rating,
+        'review_comment'=> $request->review_comment,
+       ]);
+
+       return redirect()->route('homestay.tempahananda')->with(['success' => 'Berjaya Memberikan Nilaian, Terima Kasih']);
     }
     public function homestayresit($bookingid)
     {
@@ -1084,6 +1151,101 @@ public function deletePromotion(Request $request){
         return view('homestay.homestayresit',compact('data','bookingid','totalprice'));
     }
 
+    public function bookingDetails($bookingId){
+        $organization = DB::table('bookings')
+        ->join('rooms', 'rooms.roomid' , 'bookings.roomid')
+        ->join('organizations','organizations.id' ,'rooms.homestayid')
+        ->where([
+            'bookings.bookingid' => $bookingId,
+        ])
+        ->select('organizations.nama','organizations.email' ,'organizations.telno','organizations.organization_picture','organizations.address','organizations.postcode', 'organizations.city','organizations.state')
+        ->first();
+
+        $transaction = DB::table('bookings')
+        ->join('transactions' ,'transactions.id' ,'bookings.transactionid')
+        ->where([
+            'bookings.bookingid' => $bookingId,
+        ])
+        ->first();
+
+        $user = DB::table('bookings')
+        ->join('users' ,'users.id' ,'bookings.customerid')
+        ->where('bookings.bookingid', $bookingId)
+        ->first();    
+        
+        $homestay = DB::table('bookings')
+        ->join('rooms' ,'rooms.roomid' ,'bookings.roomid')
+        ->where([
+            'bookings.bookingid' => $bookingId,
+        ])
+        ->first();
+
+        $homestayImage = DB::table('homestay_images')
+        ->where([
+            'room_id' => $homestay->roomid,
+        ])
+        ->pluck('image_path')
+        ->first();
+
+        $checkInDate = Carbon::createFromFormat('Y-m-d' ,$transaction->checkin);
+        $checkOutDate =  Carbon::CreateFromFormat('Y-m-d' ,$transaction->checkout);
+
+        $numberOfNights = $checkInDate->diffInDays($checkOutDate);
+        return view('homestay.bookingDetails')->with(['organization' => $organization , 'transaction' => $transaction , 'user' => $user ,'homestay'=>$homestay ,'homestayImage' => $homestayImage ,'numberOfNights' => $numberOfNights]);
+    }
+    public function generateBookingDetailsPdf($bookingId){
+        $organization = DB::table('bookings')
+        ->join('rooms', 'rooms.roomid' , 'bookings.roomid')
+        ->join('organizations','organizations.id' ,'rooms.homestayid')
+        ->where([
+            'bookings.bookingid' => $bookingId,
+        ])
+        ->select('organizations.nama','organizations.email' ,'organizations.telno','organizations.organization_picture','organizations.address','organizations.postcode', 'organizations.city','organizations.state')
+        ->first();
+
+        $transaction = DB::table('bookings')
+        ->join('transactions' ,'transactions.id' ,'bookings.transactionid')
+        ->where([
+            'bookings.bookingid' => $bookingId,
+        ])
+        ->first();
+
+        $user = DB::table('bookings')
+        ->join('users' ,'users.id' ,'bookings.customerid')
+        ->where('bookings.bookingid', $bookingId)
+        ->first();    
+        
+        $homestay = DB::table('bookings')
+        ->join('rooms' ,'rooms.roomid' ,'bookings.roomid')
+        ->where([
+            'bookings.bookingid' => $bookingId,
+        ])
+        ->first();
+
+        $homestayImage = DB::table('homestay_images')
+        ->where([
+            'room_id' => $homestay->roomid,
+        ])
+        ->pluck('image_path');
+
+        $checkInDate = Carbon::createFromFormat('Y-m-d' ,$transaction->checkin);
+        $checkOutDate =  Carbon::CreateFromFormat('Y-m-d' ,$transaction->checkout);
+
+        $numberOfNights = $checkInDate->diffInDays($checkOutDate);
+        $data = [
+            'organization' => $organization,
+            'transaction' => $transaction,
+            'user' => $user,
+            'homestay' => $homestay,
+            'homestayImage' => $homestayImage,
+            'numberOfNights' => $numberOfNights,
+        ];
+        //return content of view as a string with render()
+        $html = view('homestay.bookingDetails' ,$data)->render();
+        //generate pdf
+        $pdf = PDF::loadHTML($html);
+        return $pdf->download('bookingDetails.pdf');
+    }
     public function urustempahan()
     {
         $orgtype = 'Homestay / Hotel';
@@ -1143,6 +1305,75 @@ public function deletePromotion(Request $request){
         ]);
 
         return response()->json(['success' =>'Cancel Booking Successfully']);
+    }
+    public function viewBookingHistory($orgId){
+        $organization = DB::table('organizations')
+        ->where([
+            'id' => $orgId,
+        ])
+        ->first();
+        return view('homestay.customersBookingHistory',compact('organization'));
+    }
+    public function getBookingHistoryData(Request $request){
+        $orgId = $request->organizationId;
+        $bookings = DB::table('rooms as r')
+        ->where([
+            'r.homestayid' => $orgId,
+            'r.deleted_at' => null
+        ])
+        ->join('bookings as b' , 'b.roomid' , 'r.roomid')
+        ->whereIn('b.status',['Cancelled','Completed'])
+        ->join('users as u', 'u.id' ,'b.customerid')
+        ->orderBy('b.updated_at','desc')
+        ->get();
+        return response()->json(['bookings' => $bookings]);
+    }
+    public function viewCustomersReview($orgId){
+        $organization = DB::table('organizations')
+        ->where([
+            'id' => $orgId,
+        ])
+        ->first();
+        $homestays = DB::table('rooms')
+        ->where([
+            'deleted_at' => null,
+            'homestayid' => $orgId,
+        ])
+        ->orderBy('roomid')
+        ->select('roomid','roomname')
+        ->get();
+        return view('homestay.customersReview',compact('organization','homestays'));
+    }
+    public function getCustomersReview(Request $request){
+        // fetch reviews for all homestays
+        $reviews = [];
+        if($request->homestayId == "all"){
+           $reviews =  DB::table('bookings')
+            ->where('review_star','!=',null)
+            ->join('rooms','rooms.roomid','bookings.roomid')
+            ->where([
+                'rooms.homestayid' => $request->organizationId,
+            ])
+            ->join('users' ,'users.id' ,'bookings.customerid')
+            ->orderBy('bookings.updated_at' ,'desc')
+            ->select('bookings.bookingid','bookings.updated_at' ,'bookings.review_star' ,'review_comment','users.id' ,'users.name' ,'rooms.roomname','rooms.roomid')
+            ->get();
+        }else{
+            // fetch reviews for a homestay
+            $reviews =  DB::table('bookings')
+            ->where('review_star','!=',null)
+            ->join('rooms','rooms.roomid','bookings.roomid')
+            ->where([
+                'bookings.roomid' => $request->homestayId,
+                'rooms.homestayid' => $request->organizationId,
+            ])
+            ->join('users' ,'users.id' ,'bookings.customerid')
+            ->orderBy('bookings.updated_at' ,'desc')
+            ->select('bookings.bookingid','bookings.updated_at' ,'bookings.review_star' ,'review_comment','users.id' ,'users.name' ,'rooms.roomname','rooms.roomid')
+            ->get();
+
+        }
+        return response()->json(['reviews' => $reviews]);
     }
     // public function tunjukpelanggan(Request $request)
     // {

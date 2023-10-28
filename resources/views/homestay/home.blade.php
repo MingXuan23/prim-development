@@ -2,6 +2,11 @@
 
 @section('css')
     <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
+    <style>
+        .rated{
+            font-size: 18px;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -32,9 +37,17 @@
                 <div class="home-thumbnail-container">
                     <a href="{{route('homestay.showRoom',['id' => $room->roomid, 'name' => $room->roomname])}}" target="_self">
                         <img src="{{$room->image_path}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      <div class="home-thumbnail-captions p-2">
-                            <h4 class="color-purple">{{$room->roomname}}</h4>
+                                <h4 class="color-purple">{{$room->roomname}}</h4>
                             <div class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->district}},{{$room->state}}</div>
-                            <h5 class="color-purple text-right">RM{{$room->price}}/malam</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                @if($room->overallRating > 0)
+                                    <span class="rated">{{$room->overallRating}}&#9733</span>
+                                @else
+                                    <span></span>
+                                @endif
+                                <h5 class="color-purple text-right">RM{{$room->price}}/malam</h5>                                
+                            </div>
+
                         </div>                      
                     </a>
                 </div>

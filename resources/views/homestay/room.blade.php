@@ -24,7 +24,7 @@
 
 @section('content')
     <section aria-label="Homestay or Room Details">
-        <h3 class="color-purple"><span><a href="{{route('homestay.homePage')}}" class="color-dark-purple" target="_self">Laman Utama >> </a></span>{{$room->roomname}}</h3>
+        <h3 class="color-purple"><span><a href="{{route('homestay.homePage')}}" class="color-dark-purple" target="_self"><i class="fas fa-home"></i> Laman Utama >> </a></span>{{$room->roomname}}</h3>
         <h5 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->address}}, {{$room->area}}, {{$room->postcode}}, {{$room->district}}, {{$room->state}}</h5>
             <div class="gallery-container">
                 <img src="../{{$roomImages[0]}}" id="first-gallery-image" alt="Room Image">
@@ -38,7 +38,7 @@
 
                 <div class="btn-gallery-container">
                     <button class="btn-gallery">
-                        <span class="btn-gallery-content">See all photos</span>
+                        <span class="btn-gallery-content">Lihat semua gambar</span>
                     </button>
                 </div>
             </div>
@@ -93,21 +93,24 @@
                 </div>
             </div>
             <div>
-                <h3 class="color-dark-purple">Maklumat Penting</h3>
+                <h3 class="color-dark-purple"><i class="fas fa-info"></i>&nbsp;&nbsp;Maklumat Penting</h3>
                 <div class="row text-center p-5" id="room-info">
                     <div class="col-md-4">
-                        <h5>Daftar Masuk Selepas: <span class="color-purple">{{ date('H:i', strtotime($room->check_in_after)) }}</span></h5>
+                        <h5><i class="fas fa-sign-in-alt"></i>&nbsp;Daftar Masuk Selepas: <span class="color-purple">{{ date('H:i', strtotime($room->check_in_after)) }}</span></h5>
                     </div>
                     <div class="col-md-4">
-                        <h5>Daftar Keluar Sebelum: <span class="color-purple">{{ date('H:i', strtotime($room->check_out_before)) }}</span></h5>
+                        <h5><i class="fas fa-sign-out-alt"></i>&nbsp;Daftar Keluar Sebelum: <span class="color-purple">{{ date('H:i', strtotime($room->check_out_before)) }}</span></h5>
                     </div>
                     <div class="col-md-4">
-                        <h5>Room Pax: <span class="color-purple">{{$room->roompax}}</span></h5>
+                        <h5><i class="fas fa-user-friends"></i>&nbsp;Room Pax: <span class="color-purple">{{$room->roompax}}</span></h5>
                     </div>
                 </div>
             </div>
+
+            @include('homestay.review_data')
+
             <div>
-                <h3 class="color-dark-purple">Lokasi Penginapan</h3>
+                <h3 class="color-dark-purple"><i class="fas fa-map"></i>&nbsp;&nbsp;Lokasi Penginapan</h3>
                 <iframe
                 width="100%"
                 height="400"
@@ -456,6 +459,29 @@ $(document).ready(function() {
             e.preventDefault();
             Swal.fire('Sila pilih masa daftar masuk dan daftar keluar sebelum membuat tempahan');
         }
+    });
+
+    // for review pagination
+    function getMoreReviews(page){
+        $.ajax({
+            url: "{{route('homestay.getMoreReviews')}}" + "?page=" + page,
+            method: 'GET',
+            data:{
+                roomId: $('#roomId').val(),
+            },
+            success: function(data){
+                $('#user-review').html(data);
+            },
+            error: function(){
+                console.log('Get More Review Error');
+            }
+        });
+    }
+    $(document).on('click','.pagination a' ,function(e){
+        e.preventDefault();
+        // get the page number 
+        var page = $(this).attr('href').split('page=')[1];
+        getMoreReviews(page);
     });
 
     $('.alert').delay(3000).fadeOut()
