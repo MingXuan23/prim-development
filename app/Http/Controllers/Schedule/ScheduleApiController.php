@@ -7,14 +7,14 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Events\NewNotification;
 
 
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Notifications\Notification;
 
-use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase;
+
 
 use App\User;
 
@@ -30,9 +30,9 @@ class ScheduleApiController extends Controller
 
      protected $notification;
 
-    public function __construct(NewNotification $webSocketService)
+    public function __construct()
     {
-        $this->notification = Firebase::messaging();
+        //$this->notification = Firebase::messaging();
     }
 
 
@@ -90,7 +90,7 @@ class ScheduleApiController extends Controller
             return response()->json([
                 'id' => $user->id,
                 'name' => $user->name,
-                'role'=> $user->organizationRole(),
+                'device_tokne'=>$user->device_token
                 
 
             ], 200);
@@ -105,7 +105,7 @@ class ScheduleApiController extends Controller
             'header' => 'hello title',
             'body' => 'hello body',
         ];
-        event(new NewNotification($data));
+       
         $datalist = [];
         $data = new stdClass();
         $data->slot = 11;
