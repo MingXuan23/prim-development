@@ -15,7 +15,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18 page-title color-purple"><span><a href="{{route('homestay.urusbilik')}}" class="color-dark-purple">Urus Homestay/Bilik >> </a></span>Edit Homestay/Bilik</h4>
+            <h4 class="font-size-18 page-title color-purple"><span><a href="{{route('homestay.urusbilik')}}" class="color-dark-purple">Urus Homestay >> </a></span>Edit Homestay</h4>
         </div>
     </div>
 </div>
@@ -51,7 +51,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-6">
-                            <label class="control-label"> Nama Homestay atau Bilik <span style="color:#d00"> *</span> </label>
+                            <label class="control-label"> Nama Homestay <span style="color:#d00"> *</span> </label>
                             <input type="text" name="roomname" id="roomname" class="form-control" placeholder="Nama / Nombor Bilik"
                                 data-parsley-required-message="Sila masukkan nama / nombor bilik" value="{{$room->roomname}}" required>
                         </div>
@@ -65,7 +65,7 @@
                         
                         <div class="col">
                             <div class="form-group required">
-                                <label class="control-label">Kapasiti Homestay atau Bilik(pax) <span style="color:#d00"> *</span></label>
+                                <label class="control-label">Kapasiti Homestay(pax) <span style="color:#d00"> *</span></label>
                                 <input type="number"  class="form-control" id="roompax" name="roompax" value="{{$room->roompax}}" required>
                             </div>
                         </div>
@@ -79,9 +79,9 @@
                     </div>
 
                     <div class="row">
-                            <div class="form-group col-6 ">
-                                <label for="details">Detail Homestay atau Bilik<span style="color:#d00"> *</span></label>
-                                <textarea rows="10" cols="30" name="details" id="details" class="form-control"  placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required>{{$room->details}}</textarea>                                  
+                            <div class="form-group col-6">
+                                <label for="details">Detail Homestay<span style="color:#d00"> *</span></label>
+                                <textarea rows="10" cols="30" name="details" id="details" class="form-control"  placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required>{{$room->details}}</textarea> 
                             </div>
                             <div class="form-group col-6 row">
                                 <div class="form-group col-6 required">
@@ -117,7 +117,20 @@
                                     <label for="address">Nombor Rumah, Bangunan, Nama Jalan <span style="color:#d00"> *</span></label>
                                     <input type="text" name="address" id="address" class="form-control" placeholder="No.123, Taman Merdeka" value="{{$room->address}}" required></textarea>                                       
                                 </div>
-                               
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="check-in-after">Daftar Masuk Selepas <span style="color:#d00"> *</span></label>    
+                                        <input type="time" name="checkInAfter" id="check-in-after" class="form-control" value="{{$room->check_in_after}}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="check-out-before">Daftar Keluar Sebelum <span style="color:#d00"> *</span></label>
+                                        <input type="time" name="checkOutBefore" id="check-out-before" class="form-control" value="{{$room->check_out_before}}" required>
+                                    </div>
+                                </div>                        
                             </div>
                     </div>
 
@@ -125,17 +138,16 @@
                         <input type="file" name="images[]" id="images" multiple accept=".jpg,.jpeg,.png" class="form-control col-5" required>
                         <label for="images">Pilih gambar-gambar homestay/bilik(maximum 10 gambar)<span style="color:#d00"> *</span></label>
                    </div> --}}
+                   <div class="image-flash-message"></div>
                     <h3 class="text-center">Preview Images:</h3>
                     <div id="image-previews" class="d-flex justify-content-center align-items-center gap-1 flex-wrap mb-2">
                         @foreach($images as $image)
-                            <div class="img-preview-container">
                                 <img src="../{{$image->image_path}}"  class="img-thumbnail" id="img-preview">
                                 <input type="file" name="image[]" id="{{$image->id}}" accept=".jpg,.jpeg,.png" hidden>
-                            </div>
                         @endforeach
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="form-group mb-2">
                         <div class="text-right">
                             <a type="button" href="{{route('homestay.urusbilik')}}"
                                 class="btn btn-secondary waves-effect waves-light mr-1">
@@ -159,7 +171,6 @@
 <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
-
 
 <script>
 
@@ -279,7 +290,6 @@ $(document).ready(function () {
         });
 
     $('#state').trigger('change');
-
 });
 
 </script>

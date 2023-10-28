@@ -7,14 +7,24 @@
     <link rel="stylesheet" href="{{URL::asset('assets/homestay-assets/jquery-ui-datepicker.theme.min.css')}}">
     <link rel="stylesheet" href="{{URL::asset('assets/homestay-assets/jquery-ui-datepicker.structure.min.css')}}">
     <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
+    
+    <style>
+        /* add padding to the page's content*/
+        .page-content{
+            padding: 80px 10%!important;
+        }
 
+        @media screen and (max-width:500px){
+            .page-content{
+                padding: 80px 5%!important;
+            }
+        }
+    </style>
 @endsection
 
 @section('content')
     <section aria-label="Homestay or Room Details">
-        <input type="text" name="roomId" id="roomId" value={{$room->roomid}} hidden>
-        <input type="text" name="roomPrice" id="roomPrice" value={{$room->price}} hidden>
-        <h3 class="color-purple"><span><a href="{{route('homestay.homePage')}}" class="color-dark-purple" target="_self">Laman Utama >> </a></span>{{$room->roomname}}</h3>
+        <h3 class="color-purple"><span><a href="{{route('homestay.homePage')}}" class="color-dark-purple" target="_self"><i class="fas fa-home"></i> Laman Utama >> </a></span>{{$room->roomname}}</h3>
         <h5 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->address}}, {{$room->area}}, {{$room->postcode}}, {{$room->district}}, {{$room->state}}</h5>
             <div class="gallery-container">
                 <img src="../{{$roomImages[0]}}" id="first-gallery-image" alt="Room Image">
@@ -28,7 +38,7 @@
 
                 <div class="btn-gallery-container">
                     <button class="btn-gallery">
-                        <span class="btn-gallery-content">See all photos</span>
+                        <span class="btn-gallery-content">Lihat semua gambar</span>
                     </button>
                 </div>
             </div>
@@ -37,23 +47,76 @@
                     <p class="room-details">
                     </p>
                 </div>
-                <div class="col-md-5 booking-container">
-                    <h5 class="text-white mb-2">RM{{$room->price}}/malam</h5>
-                    <div class="form-floating mb-2" >
-                        <input type="text" name="check-in" id="check-in" class="form-control" placeholder="12/12/2023">
-                        <label for="check-in">Daftar Masuk</span>
-                    </div>
-                    <div class="form-floating mb-2" >
-                        <input type="text"  name="check-out" id="check-out" class="form-control" placeholder="13/12/2023" disabled>
-                        <label for="check-out">Daftar Keluar</label>
-                    </div>
-                    <div class="text-white d-flex gap-2 align-items-center">
-                        <h5>Jumlah Harga: </h5>
-                        <div id="total-price"></div>
-                    </div>
-                    {{-- <form action="{{route('homestay')}}" method="post"></form> --}}
-                    <input type="text" name="amount" id="amount" hidden>
+                <div class="col-md-5">
+                    <form class="booking-container" action="{{route('homestay.bookRoom')}}" method="post" enctype="multipart/form-data" id="form-book">
+                        @if(Session::has('success'))
+                            <div class="alert alert-success text-center">
+                                <p>{{ Session::get('success') }}</p>
+                            </div>
+                        @elseif(Session::has('error'))
+                            <div class="alert alert-danger text-center">
+                                <p>{{ Session::get('error') }}</p>
+                            </div>
+                        @endif
+                        <input type="text" name="roomId" id="roomId" value={{$room->roomid}} hidden>
+                        <input type="text" name="roomPrice" id="roomPrice" value={{$room->price}} hidden>
+                        <h5 class="text-white mb-2">RM{{$room->price}}/malam</h5>
+                        <div class="form-floating mb-2" >
+                            <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder=" ">
+                            <label for="check-in">Daftar Masuk</span>
+                        </div>
+                        <div class="form-floating mb-2" >
+                            <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder=" " disabled>
+                            <label for="check-out">Daftar Keluar</label>
+                        </div>
+                        <div class="text-white text-center mb-2">
+                            <div id="total-price"></div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            @csrf
+                            <input type="text" name="amount" id="amount" value="0" hidden>
+                            <input type="text" name="discountAmount" id="discountAmount" value="0" hidden> 
+                            <input type="text" name="increaseAmount" id="increaseAmount" value="0" hidden> 
+                            <input type="text" name="discountDates" id="discountDates" value="" hidden> 
+                            <input type="text" name="increaseDates" id="increaseDates" value="" hidden> 
+                            <input type="number" name="nightCount" id="nightCount" value="0" hidden> 
+
+                            <button class="btn-book" type="submit">
+                                <span>Tempah Sekarang</span>
+                                <svg width="34" height="34" viewBox="0 0 74 74" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="37" cy="37" r="35.5" stroke="white" stroke-width="3"></circle>
+                                    <path d="M25 35.5C24.1716 35.5 23.5 36.1716 23.5 37C23.5 37.8284 24.1716 38.5 25 38.5V35.5ZM49.0607 38.0607C49.6464 37.4749 49.6464 36.5251 49.0607 35.9393L39.5147 26.3934C38.9289 25.8076 37.9792 25.8076 37.3934 26.3934C36.8076 26.9792 36.8076 27.9289 37.3934 28.5147L45.8787 37L37.3934 45.4853C36.8076 46.0711 36.8076 47.0208 37.3934 47.6066C37.9792 48.1924 38.9289 48.1924 39.5147 47.6066L49.0607 38.0607ZM25 38.5L48 38.5V35.5L25 35.5V38.5Z" fill="white"></path>
+                                </svg>
+                            </button>                            
+                        </div>
+                    </form>
                 </div>
+            </div>
+            <div>
+                <h3 class="color-dark-purple"><i class="fas fa-info"></i>&nbsp;&nbsp;Maklumat Penting</h3>
+                <div class="row text-center p-5" id="room-info">
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-sign-in-alt"></i>&nbsp;Daftar Masuk Selepas: <span class="color-purple">{{ date('H:i', strtotime($room->check_in_after)) }}</span></h5>
+                    </div>
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-sign-out-alt"></i>&nbsp;Daftar Keluar Sebelum: <span class="color-purple">{{ date('H:i', strtotime($room->check_out_before)) }}</span></h5>
+                    </div>
+                    <div class="col-md-4">
+                        <h5><i class="fas fa-user-friends"></i>&nbsp;Room Pax: <span class="color-purple">{{$room->roompax}}</span></h5>
+                    </div>
+                </div>
+            </div>
+
+            @include('homestay.review_data')
+
+            <div>
+                <h3 class="color-dark-purple"><i class="fas fa-map"></i>&nbsp;&nbsp;Lokasi Penginapan</h3>
+                <iframe
+                width="100%"
+                height="400"
+                frameborder="0" style="border:0"
+                src="https://www.google.com/maps?q={{ urlencode($room->address.",".$room->area.",".$room->postcode.$room->district.",". $room->state) }}&output=embed" class="google-map">
+                </iframe>
             </div>
     </section>
     
@@ -135,22 +198,112 @@ $(document).ready(function() {
 
 
     // for booking and datetimepickers
-
     function calculateTotalPrice(){
-        const checkInDate = $('#check-in').datepicker('getDate');
-        const checkOutDate = $('#check-out').datepicker('getDate');
-        const checkInDateMoment = moment(checkInDate);
-        const checkOutDateMoment = moment(checkOutDate); // Parse check-out date using moment.js
+        const checkInDate = $('#check-in').val();
+        const checkOutDate = $('#check-out').val();
+        const roomId = $('#roomId').val();
+        $.ajax({
+            url: "{{ route('homestay.calculateTotalPrice') }}", 
+            method: "GET", 
+            data: {
+                checkInDate: checkInDate,
+                checkOutDate: checkOutDate,
+                roomId: roomId,
+            },
+            success: function(result) {            
+                //reset input fields
+                $('#discountAmount').val(0);
+                $('#increaseAmount').val(0); 
+                $('#discountDates').val('');
+                $('#increaseDates').val('');
 
-        // Calculate the difference in days
-        const daysDifference = checkOutDateMoment.diff(checkInDateMoment, 'days');
-        const pricePerDay = $('#roomPrice').val();
-        const totalPrice = (pricePerDay * daysDifference).toFixed(2);
-        $('#total-price').html(`
-            <h5>RM${totalPrice}</h5>
-        `);
-        $('#amount').val(totalPrice);    
+                $('#total-price').html(`
+                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                            <h5>RM${result.roomPrice} x ${result.numberOfNights} malam</h5>
+                            <h5>RM${result.initialPrice}</h5>
+                        </div>
+                `);
+                $('#nightCount').val(result.numberOfNights);
+                //for pricing with promotions
+                if(result.initialPrice != null){
+
+                    if(result.discountTotal > 0){
+                        $('#discountAmount').val(result.discountTotal);
+                        const discountDate  = result.discountDate.map(date => date + 'hb');    
+                        $('#discountDates').val(discountDate);                    
+                        $('#total-price').append(`
+                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                                <h5>Diskaun(${discountDate})</h5>
+                                <h5>-RM${result.discountTotal}</h5>
+                            </div>
+                        `);
+                    }
+
+                    if(result.increaseTotal > 0){
+                        $('#increaseAmount').val(result.increaseTotal);
+                        const increaseDate  = result.increaseDate.map(date => date + 'hb');  
+                        $('#increaseDates').val(increaseDate);                    
+                        $('#total-price').append(`
+                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                                <h5>Penambahan Harga(${increaseDate})</h5>
+                                <h5>+RM${result.increaseTotal}</h5>
+                            </div>
+                        `);                        
+                    }
+
+                }
+
+                $('#total-price').append(`
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                        <h5>Jumlah Harga: </h5>
+                        <h5>RM${result.totalPrice}</h5>
+                    </div>
+                `);     
+                //add border bottom to the div before the div of total price
+                $('#total-price div:nth-last-child(2)').addClass('border-bottom');
+                $('#amount').val(result.totalPrice);   
+            },
+            error: function(result) {
+                console.log('Error calculating total price');
+            }
+        });
+        
     }
+    let discountDates = increaseDates = [];
+    const discountMap = new Map();
+    const increaseMap = new Map();
+
+    // to fetch  dates that have discount or increase price
+    function fetchDiscountOrIncrease(){
+        $.ajax({
+            url: "{{route('homestay.fetchDiscountIncreaseDates')}}",
+            method: "GET",
+            data:{
+                homestayId : $('#roomId').val(),
+            },
+            success: function(result){
+                discountDates = [];
+                $(result.discountDates).each((i, discount)=> {
+                    discountDates.push(discount.date);
+                })
+                increaseDates = [];
+                $(result.increaseDates).each((i, increase)=> {
+                    increaseDates.push(increase.date);
+                })
+                // create map key pairs
+                $(result.discountDates).each((i, discount)=>{
+                    discountMap.set(discount.date, discount.percentage);
+                });
+                $(result.increaseDates).each((i, increase)=>{
+                    increaseMap.set(increase.date, increase.percentage);
+                });
+            },
+            error: function(){
+                console.log('Fetch discount and increase failed');
+            }
+        });
+    }
+
 
     function initializeCheckInOut(){
         let roomId = $('#roomId').val();
@@ -162,14 +315,26 @@ $(document).ready(function() {
             },
             success: function(result){
                 const disabledDates = result.disabledDates;
+                // to get max date that's 1 year from now
+                var currentDate = new Date();
+                var maxDate = new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), currentDate.getDate());
                 // for check in datepicker
                 $('#check-in').datepicker({
                     dateFormat: 'dd/mm/yy',
                     minDate: 0,
+                    maxDate: maxDate,
                     beforeShowDay: function(date) {
                         var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
                         var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
-                        return [!isDisabled];
+                        var cssClass = toolTip = '';
+                        if(discountDates.indexOf(formattedDate) !== -1){
+                            cssClass = 'discount-date';
+                            toolTip = "Terdapat diskaun pada hari tersebut";
+                        }else if(increaseDates.indexOf(formattedDate) !== -1){
+                            cssClass = 'increase-date';
+                            toolTip = "Terdapat penambahan harga pada hari tersebut";
+                        }
+                         return [!isDisabled, cssClass, toolTip];
                     },
                     onSelect: function(selectedDate) {
                         // Parse the selectedDate as a JavaScript Date object
@@ -193,6 +358,7 @@ $(document).ready(function() {
                                 $('#total-price').empty();
                                 $('#amount').val(0);   
                                 Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay/bilik adalah kosong');
+                                $('#check-in').datepicker("setDate", null);
                                 $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
                             }
                  
@@ -202,10 +368,22 @@ $(document).ready(function() {
                 $('#check-out').datepicker({
                     dateFormat: 'dd/mm/yy',
                     disabled: true,
+                    maxDate: maxDate,
                     beforeShowDay: function(date) {
                         var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
                         var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
-                        return [!isDisabled];
+                        var cssClass = toolTip = '';
+
+                        if(isDisabled) {
+                            toolTip = 'Terdapat tempahan untuk hari tersebut'; 
+                        }else if(discountDates.indexOf(formattedDate) !== -1){
+                            cssClass = 'discount-date';
+                            toolTip = "Terdapat diskaun pada hari tersebut";
+                        }else if(increaseDates.indexOf(formattedDate) !== -1){
+                            cssClass = 'increase-date';
+                            toolTip = "Terdapat penambahan harga pada hari tersebut";
+                        }
+                        return [!isDisabled,cssClass,toolTip];
                     },
                     onSelect: function(checkOutDate) {
                         if(!checkDisabledDatesBetween()){
@@ -213,7 +391,8 @@ $(document).ready(function() {
                         }else{
                             $('#total-price').empty();
                             $('#amount').val(0);   
-                            Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay/bilik tersebut adalah kosong');
+                            Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay tersebut adalah kosong');
+                            $('#check-in').datepicker("setDate", null);
                             $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
                         }
                     }
@@ -243,10 +422,69 @@ $(document).ready(function() {
             }
         });
     }
+    fetchDiscountOrIncrease();
     initializeCheckInOut();
+    $('#check-in , #check-out').on('click focus',function(){
+        // reset all price text
+        $('.price-text').remove();
+        $(".ui-datepicker-calendar .ui-state-default").each(function() {
+            var currentDate = $(this).html() + "/" + (parseInt($(this).parent().attr('data-month'))+1) +"/" + parseInt($(this).parent().attr('data-year'));
+            // if the date is not disabled
+            if(!$(this).parent().hasClass('ui-datepicker-unselectable')){
+                //add custom text to date cell       
+                let percentage = priceAfterDiscount = 0;         
+                if(increaseMap.get(currentDate) != undefined){
+                    // if has increase promotion
+                    percentage = increaseMap.get(currentDate);
+                    priceAfterDiscount = parseInt($('#roomPrice').val()) + ( parseInt($('#roomPrice').val()) * percentage /100);
+                    $(this).after(`<div class="price-text">RM${priceAfterDiscount}</div>`);   
+                }else if(discountMap.get(currentDate) != undefined){
+                    // if has discount promotion
+                    percentage = discountMap.get(currentDate);
+                    priceAfterDiscount = parseInt($('#roomPrice').val()) - ( parseInt($('#roomPrice').val()) * percentage /100);
+                    $(this).after(`<div class="price-text">RM${priceAfterDiscount}</div>`);                
 
+                }else{
+                    $(this).after(`<div class="price-text">RM${parseInt($('#roomPrice').val())}</div>`);                
+                }
+            }else{
+                $(this).after(`<div class="price-text">&nbsp</div>`);                
+            }
 
+        });
+    })
 
+    $('#form-book').on('submit',function(e){
+        if($('#amount').val() == 0){
+            e.preventDefault();
+            Swal.fire('Sila pilih masa daftar masuk dan daftar keluar sebelum membuat tempahan');
+        }
+    });
+
+    // for review pagination
+    function getMoreReviews(page){
+        $.ajax({
+            url: "{{route('homestay.getMoreReviews')}}" + "?page=" + page,
+            method: 'GET',
+            data:{
+                roomId: $('#roomId').val(),
+            },
+            success: function(data){
+                $('#user-review').html(data);
+            },
+            error: function(){
+                console.log('Get More Review Error');
+            }
+        });
+    }
+    $(document).on('click','.pagination a' ,function(e){
+        e.preventDefault();
+        // get the page number 
+        var page = $(this).attr('href').split('page=')[1];
+        getMoreReviews(page);
+    });
+
+    $('.alert').delay(3000).fadeOut()
 });
 </script>
 @endsection

@@ -33,4 +33,8 @@ class Room extends Model
     {
         return $this->hasMany(Booking::class);
     }
+    // for seach function
+    public function scopeSearch($query, $term){
+        return $query->where('roomname','like','%' . $term . '%')->where('deleted_at',null);
+    }
 }
