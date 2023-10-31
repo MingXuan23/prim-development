@@ -13,6 +13,7 @@
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
       <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2">Urus Homestay</a>
       <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple m-2">Urus Promosi</a>
+      <a style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
   </div>
 </div>
 <div class="row">
@@ -34,7 +35,7 @@
       <div class="card-body bg-purple">
         <div class="form-group">
           <label>Nama Organisasi</label>
-          <select name="homestay" id="homestay" class="form-control">
+          <select name="org_id" id="org_id" class="form-control">
             <option value="" selected disabled>Pilih Organisasi</option>
             @foreach($data as $row)
             <option value="{{ $row->id }}">{{ $row->nama }}</option>
@@ -47,7 +48,13 @@
   </div>
   <div id="customerResults" class="col-md-12 border-purple p-0">
     <div class="card  mb-0">
-      <div>
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <label for="homestay_id" class="mx-2">Homestay: </label>
+          <select name="homestay_id" id="homestay_id" class="form-control">
+              <option value="all">Semua Homestay</option>
+          </select>            
+        </div>
         <a style="margin: 19px; float: right;cursor: pointer;" id="view-booking-history" class="btn-purple"> <i
             class="fas fa-history"></i> Sejarah Pesanan Pelanggan</a>
       </div>
@@ -106,14 +113,34 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-  var dataTable;
+  var dataTable,getDataCounter = 0;
   function getData(){
-      var homestayid = $("#homestay option:selected").val();
+      var orgid = $("#org_id option:selected").val();
       $.ajax({
             url: "{{ route('homestay.getBookingData') }}",
             method: "GET",
-            data: { homestayid: homestayid },
+            data: { 
+              orgid: orgid, 
+              homestayid: $('#homestay_id').val(),
+            },
             success: function(result) {
+                //only run this during the first request
+                if(getDataCounter == 0){
+                  //reset #homestay_id 
+                  $('#homestay_id').empty();
+                  // add option into #homestay_id
+                  $('#homestay_id').append(`
+                    <option value="all">Semua Homestay</option>
+                  `);
+                  $(result.homestays).each(function(i, homestay){
+                    $('#homestay_id').append(`
+                      <option value="${homestay.roomid}">${homestay.roomname}</option>
+                    `);
+                  });     
+                  
+                  getDataCounter++;
+                }
+
                 // Destroy the existing DataTable instance
                 if (dataTable !== undefined) {
                   dataTable.destroy();
@@ -204,15 +231,16 @@ $(document).ready(function() {
         });
     }
       // Bind onchange event
-  $('#homestay').change(function() {
-      const homestayId = $(this).val();
+  $('#org_id').change(function() {
+      const orgId = $(this).val();
+      $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview','')}}/${orgId}`);
       const viewBookingHistory = $('#view-booking-history');
-      viewBookingHistory.attr('href', `{{ route('homestay.viewBookingHistory', '') }}/${homestayId}`);
+      viewBookingHistory.attr('href', `{{ route('homestay.viewBookingHistory', '') }}/${orgId}`);
       getData();
   });
 
-  $("#homestay option:nth-child(2)").prop("selected", true);
-  $('#homestay').trigger('change');
+  $("#org_id option:nth-child(2)").prop("selected", true);
+  $('#org_id').trigger('change');
 
   $(document).on('click','#btn-checkout', function(){
     Swal.fire({
@@ -285,7 +313,9 @@ $(document).ready(function() {
         }
       })
   });
-
+  $('#homestay_id').on('change', function(){
+    getData();
+  });
   $('.alert').delay(3000).fadeOut();
 });
 </script>

@@ -89,6 +89,9 @@ td a {
     border: none;
     padding: 12px;
 }
+.hidden {
+    display: none;
+}
 .btn-primary:hover,
 .btn-purple:hover {
     background-color: var(--secondary-color) !important;
@@ -133,8 +136,45 @@ table.dataTable.dtr-inline.collapsed
 .img-preview-container {
     object-fit: cover;
     height: 150px;
-    width: 200px;
+    width: 200px !important;
     cursor: pointer;
+}
+.img-new {
+    border-color: var(--primary-color) !important;
+    border-width: 2px !important;
+}
+#image-previews > div {
+    position: relative;
+}
+
+#btn-delete-image {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    color: white !important;
+    background-color: var(--primary-color);
+    outline: none;
+    border: none;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+#btn-delete-image:hover {
+    opacity: 1;
+}
+button#btn-add-image {
+    height: 150px;
+    width: 200px;
+    font-size: 40px;
+    border-radius: 0.2rem;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    outline: none;
+    transition: all 0.2s ease;
+}
+button#btn-add-image:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(2px);
 }
 .card-org {
     width: 50%;
@@ -655,11 +695,13 @@ html .ui-button.ui-state-disabled:active {
         overflow-x: auto;
         justify-content: flex-start;
     }
-    #modal-gallery .modal-body::-webkit-scrollbar {
+    #modal-gallery .modal-body::-webkit-scrollbar,
+    #image-previews::-webkit-scrollbar {
         width: 25px;
         height: 10px;
     }
-    #modal-gallery .modal-body::-webkit-scrollbar-thumb {
+    #modal-gallery .modal-body::-webkit-scrollbar-thumb,
+    #image-previews::-webkit-scrollbar-thumb {
         background-color: var(--primary-color);
         border-radius: 0.25rem;
     }

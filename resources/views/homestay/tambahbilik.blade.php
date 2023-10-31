@@ -198,7 +198,7 @@ $(document).ready(function () {
             if(imageFiles.length > 20){
                 $('.image-flash-message').html(`
                     <div id="alert" class="alert alert-danger text-center">
-                        Hanya dibenarkan muat naik maximum 10 gambar sahaja
+                        Hanya dibenarkan muat naik maximum 20 gambar sahaja
                     </div>
                 `);
                 $('#alert').fadeOut(6000);
@@ -237,7 +237,7 @@ $(document).ready(function () {
                             } 
                         // }                 
                     }else{
-                        $('.flash-message').html(`
+                        $('.image-flash-message').html(`
                             <div id="alert" class="alert alert-danger text-center">
                                 Hanya dibenarkan muat naik gambar sahaja
                             </div>
