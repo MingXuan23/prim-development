@@ -8,6 +8,8 @@
 @endsection
 
 @section('content')
+<a href="{{url()->previous()}}" class="color-dark-purple" style="font-size: 20px;"><i class="mt-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
+
 <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Sejarah Tempahan ({{$organization->nama}}) </h4>
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
@@ -32,11 +34,21 @@
       @endif
 
       {{csrf_field()}}
+      <input type="hidden" name="org_id" id="org_id" value="{{$organization->id}}">
     </div>
   </div>
   <div id="customerResults" class="col-md-12 border-purple p-0">
     <div class="card  mb-0">
-      <div>
+      <div class="d-flex justify-content-between align-items-center"> 
+        <div class="d-flex align-items-center">
+          <label for="homestay_id" class="mx-2">Homestay: </label>
+          <select name="homestay_id" id="homestay_id" class="form-control">
+              <option value="all">Semua Homestay</option>
+              @foreach($homestays as $homestay)
+                  <option value="{{$homestay->roomid}}">{{$homestay->roomname}}</option>
+              @endforeach
+          </select>            
+        </div>
         <a style="margin: 19px; float: right;cursor: pointer;" href="{{route('homestay.viewCustomersReview',$organization->id)}}" id="view-booking-history" class="btn-purple"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
       </div>
       <div class="card-body">
@@ -100,7 +112,10 @@ $(document).ready(function() {
       $.ajax({
             url: "{{ route('homestay.getBookingHistoryData') }}",
             method: "GET",
-            data: { organizationId:organizationId },
+            data: { 
+              organizationId:organizationId,
+              homestayId: $('#homestay_id').val(), 
+            },
             success: function(result) {
                 // Destroy the existing DataTable instance
                 if (dataTable !== undefined) {
@@ -202,6 +217,9 @@ $(document).ready(function() {
         });
     }
   getData();
+  $('#homestay_id').on('change', function(){
+    getData();
+  });
   $('.alert').delay(3000).fadeOut();
 });
 </script>

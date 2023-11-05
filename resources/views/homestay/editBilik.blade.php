@@ -45,7 +45,7 @@
           <div class="flash-message"></div>
 
             <form method="post" action="{{route('homestay.updateRoom')}}" enctype="multipart/form-data"
-                class="form-validation">
+                class="form-validation" id="form-edit-homestay">
                 {{csrf_field()}}
                 <input type="hidden" name="roomid" value={{$room->roomid}}>
                 <div class="card-body">
@@ -142,11 +142,21 @@
                     <h3 class="text-center">Preview Images:</h3>
                     <div id="image-previews" class="d-flex justify-content-center align-items-center gap-1 flex-wrap mb-2">
                         @foreach($images as $image)
-                                <img src="../{{$image->image_path}}"  class="img-thumbnail" id="img-preview">
-                                <input type="file" name="image[]" id="{{$image->id}}" accept=".jpg,.jpeg,.png" hidden>
+                        <div>
+                            <button id="btn-delete-image" type="button"><i class="fas fa-times"></i></button>
+                            <img src="../{{$image->image_path}}"  class="img-thumbnail" id="img-preview">
+                            <input type="file" name="image[]" id="{{$image->id}}" class="original_images" accept=".jpg,.jpeg,.png" hidden>                            
+                        </div>
+                       
                         @endforeach
+                        <button id="btn-add-image" type="button"><i class="fas fa-plus"></i></button>
+                        <input type="file"  name="new_images[]" id="new_images" accept=".jpg,.jpeg,.png" multiple hidden>
+
                     </div>
 
+                    <input type="hidden" name="delete_id">
+                    <input type="hidden" name="edit_id">
+                    
                     <div class="form-group mb-2">
                         <div class="text-right">
                             <a type="button" href="{{route('homestay.urusbilik')}}"
@@ -191,32 +201,39 @@ $(document).ready(function () {
                 const image = new Image();
                 image.src = URL.createObjectURL(imageFile);
                 image.onload = function () {
-                const maxWidth = 1280; // Maximum width allowed
-                const maxHeight = 1280; // Maximum height allowed
-                if (this.width > maxWidth || this.height > maxHeight) {
-                    $('.flash-message').html(`
-                        <div id="alert" class="alert alert-danger text-center">
-                            Gambar  melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
-                        </div>
-                    `);
-                    $('#alert').fadeOut(6000);
-                    $('#images').val('');
-                } else {
+                // const maxWidth = 1280; // Maximum width allowed
+                // const maxHeight = 1280; // Maximum height allowed
+                // if (this.width > maxWidth || this.height > maxHeight) {
+                //     $('.image-flash-message').html(`
+                //         <div id="alert" class="alert alert-danger text-center">
+                //             Gambar  melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                //         </div>
+                //     `);
+                //     $('#alert').fadeOut(6000);
+                //     $('#images').val('');
+                // } else {
                     // Display the image preview
                     imagePreview.attr('src',`${image.src}`);
+                    imagePreview.addClass('img-new');
+
                     } 
-                }      
+                // }      
             }
+            const imageId = $(this).attr('id');
+            $('input[name="edit_id"]').val(function(index, value){
+                return (value ? value + ',' : '') + imageId;
+            });
 
         });
         // for image inputs
+
         $('#images').on('change', function(e){
             $('#image-previews').empty();
             const imageFiles = $(this).prop('files');
-            if(imageFiles.length > 10){
+            if(imageFiles.length > 20){
                 $('.flash-message').html(`
                     <div id="alert" class="alert alert-danger text-center">
-                        Hanya dibenarkan muat naik maximum 10 gambar sahaja
+                        Hanya dibenarkan muat naik maximum 20 gambar sahaja
                     </div>
                 `);
                 $('#alert').fadeOut(6000);
@@ -228,25 +245,25 @@ $(document).ready(function () {
                         const image = new Image();
                         image.src = URL.createObjectURL(imageFiles[i]);
                         image.onload = function () {
-                        const maxWidth = 1280; // Maximum width allowed
-                        const maxHeight = 1280; // Maximum height allowed
-                        if (this.width > maxWidth || this.height > maxHeight) {
-                            $('.flash-message').html(`
-                                <div id="alert" class="alert alert-danger text-center">
-                                    Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
-                                </div>
-                            `);
-                            $('#alert').fadeOut(6000);
-                            $('#images').val('');
-                        } else {
+                        // const maxWidth = 1280; // Maximum width allowed
+                        // const maxHeight = 1280; // Maximum height allowed
+                        // if (this.width > maxWidth || this.height > maxHeight) {
+                        //     $('.image-flash-message').html(`
+                        //         <div id="alert" class="alert alert-danger text-center">
+                        //             Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                        //         </div>
+                        //     `);
+                        //     $('#alert').fadeOut(6000);
+                        //     $('#images').val('');
+                        // } else {
                             // Display the image preview
                             $('#image-previews').append(`
-                                <img src="${image.src}" class="img-thumbnail" id="img-preview">
+                                <img src="${image.src}" class="img-thumbnail img-new" id="img-preview">
                             `);
                             } 
-                        }                 
+                        // }                 
                     }else{
-                        $('.flash-message').html(`
+                        $('.image-flash-message').html(`
                             <div id="alert" class="alert alert-danger text-center">
                                 Hanya dibenarkan muat naik gambar sahaja
                             </div>
@@ -258,6 +275,85 @@ $(document).ready(function () {
                 }
             }
         });
+        // insert new images
+        $('#btn-add-image').on('click', function(){
+            $('#new_images').click();
+        });
+        $('#new_images').on('change',function(e){
+            // reset new image previews
+            $('#image-previews > div ~ img').remove();
+            const imageFiles = $(this).prop('files');
+            // get the remaining number of images allowed to be uploaded
+            const remainingNumber= 20 - Object.keys($('.original_images')).length;
+            if(imageFiles.length > remainingNumber){
+                $('.image-flash-message').html(`
+                    <div id="alert" class="alert alert-danger text-center">
+                        Hanya dibenarkan muat naik maximum 20 gambar sahaja
+                    </div>
+                `);
+                $('#alert').fadeOut(6000);
+                $(this).val('');
+                return;
+            }else{
+                for(let i = 0;i < imageFiles.length;i++){
+                    if(imageFiles[i].type.includes('jpg')||imageFiles[i].type.includes('jpeg')||imageFiles[i].type.includes('png')){
+                        const image = new Image();
+                        image.src = URL.createObjectURL(imageFiles[i]);
+                        image.onload = function () {
+                        // const maxWidth = 1280; // Maximum width allowed
+                        // const maxHeight = 1280; // Maximum height allowed
+                        // if (this.width > maxWidth || this.height > maxHeight) {
+                        //     $('.image-flash-message').html(`
+                        //         <div id="alert" class="alert alert-danger text-center">
+                        //             Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                        //         </div>
+                        //     `);
+                        //     $('#alert').fadeOut(6000);
+                        //     $('#images').val('');
+                        // } else {
+                            // Display the image preview
+                            const images = `
+                                <img src="${image.src}" class="img-thumbnail img-new" id="img-preview">
+                            `;
+                            // insert after the last original image preview
+                            $(images).insertAfter($('#image-previews > div')[$('#image-previews > div').length- 1]);
+                            // } 
+                        }                 
+                    }else{
+                        $('.image-flash-message').html(`
+                            <div id="alert" class="alert alert-danger text-center">
+                                Hanya dibenarkan muat naik gambar sahaja
+                            </div>
+                        `);
+                        $('#alert').fadeOut(6000);
+                        $(this).val('');
+                        return;
+                    }
+                }
+            }
+        });
+        // for deleting images
+        $(document).on('click', '#btn-delete-image',function(){
+            $(this).next('#img-preview').remove();
+            const imageId = $(this).next().attr('id');
+            $(this).remove();
+            $('input[name="delete_id"]').val(function(index, value){
+                return (value ? value + ',' : '') + imageId;
+            });
+        });
+        $('#form-edit-homestay').on('submit',function(e){
+            if($('#image-previews img').length < 5){
+                e.preventDefault();
+                $('.image-flash-message').html(`
+                    <div id="alert" class="alert alert-danger text-center">
+                        Sila muat naik sekurang-kurangnya 5 gambar
+                    </div>
+                `);
+                $('#alert').fadeOut(6000);
+                $(this).val('');
+                return;
+            }
+        })
     // to fetch district options based on selected state
     function toTitleCase(str) {
             var lcStr = str.toLowerCase();
@@ -290,6 +386,8 @@ $(document).ready(function () {
         });
 
     $('#state').trigger('change');
+
+
 });
 
 </script>

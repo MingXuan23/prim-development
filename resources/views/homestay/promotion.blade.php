@@ -14,7 +14,8 @@
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
       <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2">Urus Homestay</a>
       <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2">Urus Tempahan</a>
-  </div>
+      <a style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
+    </div>
 </div>
 
 <div class="row">
@@ -50,11 +51,12 @@
 
   <div class="col-md-12 border-purple p-0">
     <div class="card mb-0">
-      <div>
-        <a style="margin: 19px; float: right;cursor: pointer;" id="link-add-promotion" class="btn-purple"> <i
+      <div class="d-flex justify-content-end m-2">        
+        <a style="cursor: pointer;" id="view-promotion-history" class="btn-purple m-1"> <i
+            class="fas fa-history"></i> Sejarah Promosi</a>
+        <a style="cursor: pointer;" id="link-add-promotion" class="btn-purple m-1"> <i
             class="fas fa-plus"></i> Tambah Promosi</a>
       </div>
-
       <div class="card-body ">
 
       @if(Session::has('success'))
@@ -262,6 +264,9 @@ $(document).ready(function() {
     // Bind onchange event
     $('#homestay').change(function() {
         const homestayId = $(this).val();
+
+        $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview','')}}/${homestayId}`);
+        $('#view-promotion-history').attr('href',`{{route('homestay.viewPromotionHistory','')}}/${homestayId}`);
         const linkAddPromotion = $('#link-add-promotion');
         linkAddPromotion.attr('href', `{{ route('homestay.setpromotion', '') }}/${homestayId}`);
         getData();

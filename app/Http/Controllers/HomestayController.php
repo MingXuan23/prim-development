@@ -293,8 +293,13 @@ class HomestayController extends Controller
         ->where([
             'rooms.deleted_at' => null,
             'promotions.deleted_at' => null,
-            'rooms.homestayid' => $request->homestayid
+            'rooms.homestayid' => $request->homestayid,
         ])
+        //fetch promotion with dateto equal or greater than today
+        ->where(function ($query) {
+            $query->whereDate('promotions.dateto', '>=', now())
+                ->orWhereDate('promotions.dateto', '=', now());
+        })
         ->orderBy('rooms.roomname')
         ->get();
         return response()->json(['promotions' => $promotions]);
@@ -609,6 +614,30 @@ public function deletePromotion(Request $request){
     ]);
     return response()->json(['success' => 'Promotion Berjaya Dibuang']);
 }
+public function viewPromotionHistory($orgId){
+    $organization = DB::table('organizations')
+    ->where([
+        'id' => $orgId,
+    ])
+    ->first();
+    return view('homestay.promotionHistory',compact('organization'));
+}
+public function getPromotionHistory(Request $request){
+    $promotions = DB::table('promotions')
+    ->join('rooms','rooms.roomid','promotions.homestay_id')
+    ->where([
+        'rooms.deleted_at' => null,
+        'promotions.deleted_at' => null,
+        'rooms.homestayid' => $request->orgId,
+    ])
+    //fetch promotion with dateto equal or greater than today
+    ->where(function ($query) {
+        $query->whereDate('promotions.dateto', '<', now());
+    })
+    ->orderBy('rooms.roomname')
+    ->get();
+    return response()->json(['promotions' => $promotions]);
+}
 // public function editpromo(Request $request,$promotionid)
 // {
 //     $request->validate([
@@ -768,7 +797,10 @@ public function deletePromotion(Request $request){
         ->first();
 
         $roomImages = DB::table('rooms')
-        ->where('room_id',$roomId)
+        ->where([
+            'rooms.roomid' => $roomId,
+            'homestay_images.deleted_at' => null,
+        ])
         ->join('homestay_images','homestay_images.room_id','rooms.roomid')
         ->select('homestay_images.id','homestay_images.image_path')
         ->get();
@@ -776,43 +808,95 @@ public function deletePromotion(Request $request){
        $states = Jajahan::negeri();
         return view('homestay.editBilik')->with(['room'=>$room , 'images'=>$roomImages,'states'=>$states]);
     }
-    public function updateRoom(Request $request){
-        // for updating images
-        if($request->file('image') != null){
-            $imageCounter = $imageKeyCounter = 0;
-            $newImages = $request->file('image');
-            $imagesKey = array_keys($newImages);
-            $imagesInDB = DB::table('homestay_images')
-                ->where([
-                    'room_id' => $request->roomid,
-                ])
-                ->orderBy('id')
-                ->get();
-        
-            foreach($imagesInDB as $image){
-                if(isset($imagesKey[$imageKeyCounter])){
-                    $currentImageKey = $imagesKey[$imageKeyCounter];
-                    if($imageCounter == $currentImageKey){
-                        // delete the old image at this position
-                        unlink(public_path($image->image_path));
-                        // place the new one
-                        $newImagePath = 'homestay-image/'.$request->roomid."(".$imageCounter.").".$newImages[$currentImageKey]->getClientOriginalExtension();
-                        $newImages[$currentImageKey]->move(public_path('homestay-image'),$newImagePath);
-        
-                        // update database
-                        DB::table('homestay_images')
-                            ->where([
-                                'image_path' => $image->image_path,
-                            ])
-                            ->update([
-                                'image_path' => $newImagePath,
-                                'updated_at' => Carbon::now(),
-                            ]);
-                        $imageKeyCounter++;
-                    }
-                }
-                $imageCounter++;
+    public function updateRoom(Request $request){            
+        // for delete
+        $deleteIds = $request->delete_id;
+        $deleteIdsArray = [];
+        if($deleteIds != null){
+            $deleteIdsArray = explode(',', $deleteIds);//like split
+            foreach($deleteIdsArray as $id){
+                DB::table('homestay_images')
+                ->where('id',$id)
+                ->update([
+                    'deleted_at' => Carbon::now(),
+                ]);
+                $deletePath =             
+                DB::table('homestay_images')
+                ->where('id',$id)
+                ->pluck('image_path')
+                ->first();
+                // delete the image
+                unlink(public_path($deletePath));
             }            
+        }
+
+        // for updating images
+        $editIds = $request->edit_id;
+        if($request->file('image') != null && $editIds != null){
+            $editIdsArray = explode(',', $editIds);//like split
+            sort($editIdsArray);
+            
+            $newImages = $request->file('image');
+            // reset the array keys
+            $newImages = array_values($newImages);
+            foreach($editIdsArray as $key=>$id){
+                // if the edit image is not deleted
+                if(!in_array($id , $deleteIdsArray)){
+                    $image = DB::table('homestay_images')
+                    ->where('id', $id)
+                    ->first();
+                    // delete the old image at this position
+                    unlink(public_path($image->image_path));
+                    // place the new one
+                    $pathInfo = pathinfo($image->image_path);
+                    $newImagePath = 'homestay-image/'.$pathInfo['filename'].".".$newImages[$key]->getClientOriginalExtension();
+                    $newImages[$key]->move(public_path('homestay-image'),$newImagePath);
+                }
+            }
+            // foreach($imagesInDB as $image){
+            //     if(isset($imagesKey[$imageKeyCounter])){
+            //         $currentImageKey = $imagesKey[$imageKeyCounter];
+            //         if($imageCounter == $currentImageKey){
+            //             // delete the old image at this position
+            //             unlink(public_path($image->image_path));
+            //             // place the new one
+            //             $newImagePath = 'homestay-image/'.$request->roomid."(".$imageCounter.").".$newImages[$currentImageKey]->getClientOriginalExtension();
+            //             $newImages[$currentImageKey]->move(public_path('homestay-image'),$newImagePath);
+        
+            //             // update database
+            //             DB::table('homestay_images')
+            //                 ->where([
+            //                     'image_path' => $image->image_path,
+            //                 ])
+            //                 ->update([
+            //                     'image_path' => $newImagePath,
+            //                     'updated_at' => Carbon::now(),
+            //                 ]);
+            //             $imageKeyCounter++;
+            //         }
+            //     }
+            //     $imageCounter++;
+            // }            
+        }
+        // for inserting new images
+        $freshImages = $request->file('new_images');
+        if($freshImages){
+            $latestID = DB::table('homestay_images')
+            ->where([
+                'room_id' => $request->roomid,
+            ])
+            ->count();
+            foreach($freshImages as $image){
+                $freshImagePath = "homestay-image/".$request->roomid."(".$latestID.").".$image->getClientOriginalExtension();
+                $image->move(public_path('homestay-image'),$freshImagePath);
+                DB::table('homestay_images')
+                ->insert([
+                    'image_path'=>$freshImagePath,
+                    'created_at' => Carbon::now(),
+                    'room_id'=>  $request->roomid,
+                ]);
+                $latestID++;
+            }
         }
         // for updating other information
         $request->validate([
@@ -1264,21 +1348,47 @@ public function deletePromotion(Request $request){
         return view('homestay.urustempahan', compact('data'));
     }
     public function getBookingData(Request $request){
-        $orgId = $request->homestayid;
-        $bookings = DB::table('rooms as r')
+        $orgId = $request->orgid;
+        $homestayId = $request->homestayid;
+        $bookings = [];
+        if($homestayId == "all"){
+            $bookings = DB::table('rooms as r')
+            ->where([
+                'r.homestayid' => $orgId,
+                'r.deleted_at' => null
+            ])
+            ->join('bookings as b' , 'b.roomid' , 'r.roomid')
+            ->where([
+                'b.status' => 'Booked'
+            ])
+            ->join('users as u', 'u.id' ,'b.customerid')
+            ->orderBy('b.bookingid','desc')
+            ->get();
+        }else{
+            $bookings = DB::table('rooms as r')
+            ->where([
+                'r.homestayid' => $orgId,
+                'r.deleted_at' => null,
+                'r.roomid' => $homestayId,
+            ])
+            ->join('bookings as b' , 'b.roomid' , 'r.roomid')
+            ->where([
+                'b.status' => 'Booked'
+            ])
+            ->join('users as u', 'u.id' ,'b.customerid')
+            ->orderBy('b.bookingid','desc')
+            ->get();
+        }
+        $homestays = DB::table('rooms')
         ->where([
-            'r.homestayid' => $orgId,
-            'r.deleted_at' => null
+            'homestayid' => $orgId,
+            'deleted_at' => null,
         ])
-        ->join('bookings as b' , 'b.roomid' , 'r.roomid')
-        ->where([
-            'b.status' => 'Booked'
-        ])
-        ->join('users as u', 'u.id' ,'b.customerid')
-        ->orderBy('b.bookingid','desc')
+        ->orderBy('roomname')
+        ->select('roomid','roomname')
         ->get();
 
-        return response()->json(['bookings' => $bookings]);
+        return response()->json(['bookings' => $bookings ,'homestays' => $homestays]);
     }
     public function checkoutHomestay(Request $request){
         $bookingId = $request->bookingId;
@@ -1312,20 +1422,45 @@ public function deletePromotion(Request $request){
             'id' => $orgId,
         ])
         ->first();
-        return view('homestay.customersBookingHistory',compact('organization'));
+
+        $homestays = DB::table('rooms')
+        ->where([
+            'deleted_at' => null,
+            'homestayid' => $orgId,
+        ])
+        ->orderBy('roomid')
+        ->select('roomid','roomname')
+        ->get();
+        return view('homestay.customersBookingHistory',compact('organization','homestays'));
     }
     public function getBookingHistoryData(Request $request){
         $orgId = $request->organizationId;
-        $bookings = DB::table('rooms as r')
-        ->where([
-            'r.homestayid' => $orgId,
-            'r.deleted_at' => null
-        ])
-        ->join('bookings as b' , 'b.roomid' , 'r.roomid')
-        ->whereIn('b.status',['Cancelled','Completed'])
-        ->join('users as u', 'u.id' ,'b.customerid')
-        ->orderBy('b.updated_at','desc')
-        ->get();
+        $homestayId = $request->homestayId;
+        $bookings = [];
+        if($homestayId == "all"){
+            $bookings = DB::table('rooms as r')
+            ->where([
+                'r.homestayid' => $orgId,
+                'r.deleted_at' => null
+            ])
+            ->join('bookings as b' , 'b.roomid' , 'r.roomid')
+            ->whereIn('b.status',['Cancelled','Completed'])
+            ->join('users as u', 'u.id' ,'b.customerid')
+            ->orderBy('b.updated_at','desc')
+            ->get();            
+        }else{
+            $bookings = DB::table('rooms as r')
+            ->where([
+                'r.homestayid' => $orgId,
+                'r.deleted_at' => null,
+                'r.roomid' => $homestayId,  
+            ])
+            ->join('bookings as b' , 'b.roomid' , 'r.roomid')
+            ->whereIn('b.status',['Cancelled','Completed'])
+            ->join('users as u', 'u.id' ,'b.customerid')
+            ->orderBy('b.updated_at','desc')
+            ->get();      
+        }
         return response()->json(['bookings' => $bookings]);
     }
     public function viewCustomersReview($orgId){

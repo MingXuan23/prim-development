@@ -651,6 +651,12 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('fetch-unavailable-edit-promotion-dates', 'HomestayController@fetchUnavailableEditPromotionDates')->name('homestay.fetchUnavailableEditPromotionDates');
     Route::post('update-promotion', 'HomestayController@updatePromotion')->name('homestay.updatePromotion');
     Route::post('delete-promotion', 'HomestayController@deletePromotion')->name('homestay.deletePromotion');
+    Route::get('view-promotion-history/{id}', 'HomestayController@viewPromotionHistory')->name('homestay.viewPromotionHistory');
+    Route::get('get-promotion-history', 'HomestayController@getPromotionHistory')->name('homestay.getPromotionHistory');
+
+
+
+
 
 
     Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
