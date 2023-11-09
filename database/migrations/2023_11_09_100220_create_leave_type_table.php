@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTeacherInfoTable extends Migration
+class CreateLeaveTypeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateTeacherInfoTable extends Migration
      */
     public function up()
     {
-        Schema::create('teacher_info', function (Blueprint $table) {
+        Schema::create('leave_type', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->json('subject_id')->nullable();
-            $table->unsignedBigInteger('maximum_slot')->nullable();
+            $table->string('type');
+            $table->boolean('status');
         });
     }
 
@@ -28,6 +27,6 @@ class CreateTeacherInfoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('teacher_info');
+        Schema::dropIfExists('leave_type');
     }
 }

@@ -74,5 +74,11 @@ Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
     Route::get('getTimeOff', 'ScheduleApiController@getTimeOff');
     Route::get('sendNotification/{id}', 'ScheduleApiController@sendNotification');
     Route::get('isNoti/{id}', 'ScheduleApiController@isNoti');
+    Route::get('getSchedule/{id}', 'ScheduleApiController@getSchedule');
+    Route::get('getTeacherInfo/{id}', 'ScheduleApiController@getTeacherInfo');
+    Route::any('submitLeave', 'ScheduleApiController@submitLeave');
+    
+    Route::get('getLeaveType', 'ScheduleApiController@getLeaveType');
+
     
 });

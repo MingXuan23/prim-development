@@ -19,12 +19,13 @@ class CreateTeacherLeaveTable extends Migration
             $table->json('period')->nullable();
             $table->date('date');
             $table->string('desc')->nullable();
-            //$table->unsignedBigInteger('replace_teacher_id')->nullable();
+            $table->boolean('status');
+            $table->unsignedBigInteger('teacher_id')->nullable();
             //$table->string('confirmation')->nullable();
             //$table->boolean('status');
 
             //$table->foreign('schedule_subject_id')->references('id')->on('schedule_subject')->onDelete('cascade');
-            //$table->foreign('replace_teacher_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('teacher_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

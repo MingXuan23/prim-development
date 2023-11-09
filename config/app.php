@@ -198,6 +198,8 @@ return [
 
         Yajra\Datatables\DatatablesServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+
+        Kawankoding\Fcm\FcmServiceProvider::class,
     ],
 
     /*
@@ -251,6 +253,7 @@ return [
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'Datatables' => Yajra\Datatables\Facades\Datatables::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        'Fcm' => Kawankoding\Fcm\FcmFacade::class,
     ],
 
     'date_format' => 'd/m/Y',

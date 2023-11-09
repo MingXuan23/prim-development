@@ -17,7 +17,8 @@ class CreateSubjectTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('code');
-            $table->json('class');
+            $table->unsignedBigInteger('organization_id');
+            $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
     }
 
