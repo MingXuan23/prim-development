@@ -7,8 +7,9 @@ use App\Models\Schedule;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
-
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Notifications\Notification;
@@ -92,7 +93,7 @@ class ScheduleApiController extends Controller
             return response()->json([
                 'id' => $user->id,
                 'name' => $user->name,
-                'device_tokne'=>$user->device_token
+                'device_token'=>$user->device_token
                 
 
             ], 200);
@@ -101,25 +102,288 @@ class ScheduleApiController extends Controller
          
      }
 
+     public function getSlotTime($schedule,$day,$slot){
+        $time_off = json_decode($schedule->time_off,true);
+
+        $timeOffSlot = array_filter($time_off, function ($breakSlot) use ($slot,$day) {
+                
+            return $slot > $breakSlot['slot'] && isset($breakSlot['duration']) && (!isset($breakSlot['day'])||in_array($day, $breakSlot['day']));
+        });
+
+        //dd($timeOffSlot);
+        $break_to_add=0;
+        foreach($timeOffSlot as $breakSlot){
+            $break_to_add = $breakSlot['duration'] -$schedule->time_of_slot;
+        }
+
+        $minutes_to_add = $schedule->time_of_slot * ($slot-1) + $break_to_add; // Adjust this value to the number of minutes you want to add
+        $time = \DateTime::createFromFormat('H:i:s',  $schedule->start_time);
+
+        // Add minutes to the DateTime instance
+        $time->add(new \DateInterval('PT' . $minutes_to_add . 'M'));
+        $result_time = $time->format('H:i:s');
+
+        $filteredTimeOff = collect($time_off)->first(function ($breakSlot) use ($day,$slot) {
+            return $breakSlot['slot'] == $slot && in_array($day, $breakSlot['day'] ?? []) && isset($breakSlot['duration']);
+        });
+        $duration = $schedule->time_of_slot;
+
+        if($filteredTimeOff)
+            $duration=$filteredTimeOff['duration'];
+
+        return ['time'=> $result_time,'duration'=>$duration];
+       
+     }
+
+     public function getSchedule($id){
+
+        //$user = User::find($request->userId);
+
+        $user = User::find($id);
+        if($user ==null){
+            return response()->json(['error' => 'This user did not exist'], 401);
+        }
+        $school =DB::table('organizations as o')
+            ->join('organization_user as ou','ou.organization_id','o.id')
+            ->where('ou.role_id',5)
+            ->where ('ou.user_id',$user->id)
+            ->select('o.*')
+            ->first();
+
+        if($school){
+            $schedule = DB::table('schedules as s')
+            ->leftJoin ('schedule_version as sv','sv.schedule_id','s.id')
+            ->leftJoin('schedule_subject as ss','ss.schedule_version_id','sv.id')
+            ->leftJoin('classes as c','c.id','ss.class_id')
+            ->leftJoin('subject as sub','sub.id','ss.subject_id')
+            ->where('s.organization_id',$school->id)
+            ->where('ss.teacher_in_charge',$user->id)
+            ->where('sv.status',1)
+            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day')
+            ->get();
+
+            
+            foreach($schedule as $s){
+                //if(isset($s->duration)){
+
+                    $s->category ="Normal";
+                    $time_info= $this->getSlotTime($s,$s->day,$s->slot);
+                    $s->time=$time_info['time'];
+                    $s->duration=$time_info['duration'];
+                   
+                    unset($s->time_off);
+                    unset($s->start_time);
+            }
+
+            $relief_schedule = DB::table('leave_relief as lr')
+            ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+            ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+            ->leftJoin('schedules as s','s.id','sv.schedule_id')
+            ->leftJoin('classes as c','c.id','ss.class_id')
+            ->leftJoin('subject as sub','sub.id','ss.subject_id')
+            ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+            ->where('s.organization_id',$school->id)
+            ->where('lr.replace_teacher_id',$user->id)
+            ->where('lr.confirmation','Confirmed')
+            ->where('sv.status',1)
+            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as originalTeacher')
+            ->get();
+            //dd($schedule);
+
+            foreach($relief_schedule as $r){
+                //if(isset($s->duration)){
+
+                    $r->category ="Relief";
+                    $time_info= $this->getSlotTime($r,$r->day,$r->slot);
+                    $r->time=$time_info['time'];
+                    $r->duration=$time_info['duration'];
+                    
+                   
+                    unset($r->time_off);
+                    unset($r->start_time);
+            }
+
+           return response()->json(['schedule'=>$schedule ,'relief'=>$relief_schedule]);
+
+           
+
+
+        }
+        
+        return response()->json(['error' => 'Invalid data provided'], 401);
+
+
+        //return response()->json(["error"=>"This user are not any teacher in any school"]);
+     }
+
+     public function getTeacherInfo($id){
+
+        $user = User::find($id);
+        if($user ==null){
+            return response()->json(["error"=>"This user did not exist"]);
+        }
+        $school =DB::table('organizations as o')
+            ->join('organization_user as ou','ou.organization_id','o.id')
+            ->where('ou.role_id',5)
+            ->where ('ou.user_id',$user->id)
+            ->select('o.*')
+            ->first();
+        
+        if($school){
+            return response()->json(['school_name'=>$school->nama,'school_id'=>$school->id]);
+        }
+        return response()->json(['school_name'=>'Tiada Sekolah Berkaitan','school_id'=>-1]);
+
+     }
+
+
+     public function getLeaveType(){
+        $type=DB::table('leave_type')
+            ->where('status',1)
+            ->get();
+        return response()->json(['type'=>$type]);
+     }
+
+     public function submitLeave(Request $request){
+
+        try{$method = $request->method();
+
+            if (!$request->isMethod('post')) {
+                $request->teacher_id = 15543;
+       
+        
+                $request->start_time= "09:30:00";
+                $request->end_time ="14:30:00";
+                $request->date='2023-11-09';
+               
+                $request->isLeaveFullDay =false;
+                $request->leave_type = "MC";
+                $request->desc = "Perut Sakit";
+                
+            }// this code should delete in production
+            
+            $period = new stdClass();
+            $date = Carbon::createFromDate($request->date);
+            
+            if($request->isLeaveFullDay){
+                $period->fullday=true;
+            }else{
+                $period->fullday=false;
+                $period->start_time= $request->start_time;
+                $period->end_time=$request->end_time;
+
+            }
+
+            $period = json_encode($period);
+            $user = User::find($request->teacher_id);
+
+            if($user){
+            
+            $existConflict =DB::table('teacher_leave')
+                    ->where('date',$date)
+                    ->where('status',1)
+                    ->where('teacher_id',$user->id)
+                    ->where(function ($query) use ($request) {
+                        $query->where(function ($query) use ($request) {
+                            $query->where('period->end_time', '>', $request->start_time)
+                                ->where('period->start_time', '<', $request->end_time);
+                        })->orWhere('period->fullday', true);
+                    })
+                    ->exists();
+
+            if($existConflict){
+                 return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
+            }
+            
+            
+            $leave_id =  DB::table('teacher_leave')->insertGetId([
+                
+                    'period'=>$period,
+                    'date'=>$date,
+                    'desc'=> $request->leave_type.":". $request->desc,
+                    'status'=>1,
+                    'teacher_id'=>$user->id
+        
+                ]);
+
+                
+                $classRelated = DB::table('schedule_subject as ss')
+                ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+                ->join('schedules as s','s.id','sv.schedule_id')
+                ->where('ss.day',$date->dayOfWeek)
+                ->where('ss.teacher_in_charge',$user->id)
+                ->where('s.status',1)
+                ->where('sv.status',1)
+                ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
+                ->get();
+                
+                foreach($classRelated as $c){
+                    if($request->isLeaveFullDay){
+                        $insert = DB::table('leave_relief')->insert([
+                            'teacher_leave_id'=>$leave_id,
+                            'schedule_subject_id'=>$c->schedule_subject_id
+                        ]);
+                    }else{
+                        $start = Carbon::createFromFormat('H:i:s', $request->start_time);
+                        $end = Carbon::createFromFormat('H:i:s', $request->end_time);
+                        $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                        $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+
+                        
+                        // check if the time is between start and end
+                        if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                            $insert = DB::table('leave_relief')->insert([
+                                'teacher_leave_id'=>$leave_id,
+                                'schedule_subject_id'=>$c->schedule_subject_id
+                            ]);
+                        } 
+                    }
+                }
+                $count = DB::table('leave_relief')->where('teacher_leave_id',$leave_id)->count();
+                return response()->json(['Success'=>'Leave Submit Sucessfully.Total '.$count.' classes affected.']);
+                
+            }
+            return response()->json(['error' => 'This user did not exist'], 401);
+
+        }catch (Exception $e) {
+            return response()->json(['error' => 'Server Error']);
+
+        }
+     }
+
      public function getTimeOff(Request $request){
         
-        $data = [
-            'header' => 'hello title',
-            'body' => 'hello body',
-        ];
+        
        
         $datalist = [];
+        // for($i=1;$i<=5;$i++){
+        //     array_push($datalist,$i);
+        // }
+
+        // $datalist =json_encode($datalist);
+        
+        // return response()->json(['timeoff'=>$datalist]);
+        // $data = new stdClass();
+        // $data->slot = 11;
+        // $data->duration=20;
+        // $data->desc="Self revision";
+        // array_push($datalist,$data);
         $data = new stdClass();
-        $data->slot = 11;
-        $data->duration=20;
-        $data->desc="Self revision";
-        array_push($datalist,$data);
-        $data = new stdClass();
-        $data->slot = 5;
+        $data->slot = 3;
         $data->day=[4,5];
 
        
         array_push($datalist,$data);
+        $data = new stdClass();
+        $data->slot = 2;
+        $data->duration=20;
+        array_push($datalist,$data);
+        $datalist =json_encode($datalist);
+
+        $update =DB::table('schedules')->where('id',1)->update([
+            'time_off'=>$datalist
+        ]);
+        return response()->json(['timeoff'=>$datalist]);
         $data = new stdClass();
         $data->slot = 4;
        
@@ -127,8 +391,6 @@ class ScheduleApiController extends Controller
        
         array_push($datalist,$data);
 
-        $json =json_encode($datalist);
-        dd($json);
         $result =json_decode($json);
         $msg=[];
         foreach($result as $r){
@@ -159,35 +421,55 @@ class ScheduleApiController extends Controller
 
        // dd($user);
         if($user->device_token){
-            $accessToken = 'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQD0HvLDejwk0RuM\nJzdceeF/ygASH/gWTZqTYN28VBD/hYIeheN3n9L9N6EuN7PgcMfEcHqtNSF+LPb1\nuvNum/+3rW6OhJNmPBR5k9MmDrVXr2hvdTsHTdzHCDTcHBRmK7boUXSCw21q2VL9\n5IhhLVziEP4jWfC9FgV0cAjfmndIzuGgzuher01k3kAo801nYvFlHjP3OvD4598X\ns/ndAhNb8btk65sRz2ImUtFVL+jiY9geyb8vsyabB6U5NZBXKRT6MoVeXV5pGsrt\n+MWVDEf8TuED4ZM7UlS6o8Sr0PHQDm6LDzaGj13oI6nk6rGWnlV9R9yNNOJ3ttv6\nytk/6apbAgMBAAECggEAEpk9A5mPdXqc76uZMylx/atlH/xhiUl2Sl4p5ow9E0qX\npD2tG9MIXxRa6kuCH8pX3eZ34jRXDebdFdGddELcU6EZ+C+vjy1qneyePJsIQ9rw\nSPWUfrT26g78//v/rd0MvVxfVQsQjgBqqz87CLRNDEghJI5Yof9IgRt8AZUiG2DJ\nhhbyqeEz9JNYxa25ttjknmDpZ7DnJwwAAPB0U7fIyOERd6nIv3+ySXfi0ZTm9wuH\n+6KbvbeKwRwg3ShO75ztyrwRwom7QPOSYdnLh6w0ogoL9GmlGLrCUszIeLx2KTye\nwc5Q5G/p3DIqpvJaFerAYwZdpUeXqcOxOM4ndfyaqQKBgQD7kvncg583dyPaSsQR\n8Smixh6+7UkBesGV/k5+BzakLxX6DsePrk8DgNZrH7ZZ8HA+pJiIikkV1/bHHdKR\nPuGpxRCspb24bqFH5TI/D17k+ncEqgWTcIrox89yu3BIAAxRyOIzG2FMEH4Uunzc\nhRdGaA2NzF8ErE6CpS12Otql9wKBgQD4amelHav12AZQR/vjmph+szkZBsAbfI1j\n9/64r5drPpsij8Hjo3dBGv3yxapXUWTooeXF/EETPamoqsj4o30hfvh/BATruWty\nPypvRacDbI5jetj/0v1ofBQWl0VKGoRyDYqmrkDfBsOivzgzSs53BbSBU06DBnRY\n5hRS3Kc1vQKBgHtzhGlRra/qJw3X4p9rWKMn1a6bglfXhWe1g48UuxuWf5JV7lfz\nkZKGhrHKvhEki/AxlShrs7GkaNUNLWdZFCPbMHOIYbE/mKVPM3j+cfKrdfwz8siH\nUaMpagNDN7YdT+5SRa4OoZBSB4zkdqFALku+g+gxge8pHt29cLGz79fBAoGAByzj\no4RQ5EACJq19nBxqDTbWDmAAioq1ds7B/8mqoQFk78GhQxcEqc/CyBFnkzAZrxKG\nFYrswkaEsQeF2JC4W5BUUy7liX2ImfszGZW0dkfbcQoqXHFWun7jAagK61IKw1Sa\nzae43fhPDFNjpy+g+RUkGpwyZ1x3Xd3/dklDVy0CgYEAj/E/GxPhbE6SaCz9XzV2\n2u+ISa7yGgF5Jx4sJeLW0SnrBp2hgfoJC9eoYgvt05Tv28KFOmOVs5olKJi9yaBJ\n1AcQfPbIJTw9KvBtFMZM6Ii6hfZNWlTZjiwUg6bqaTt9MT0/cE6ckTuKcLSmlp0u\nQy+tmc59MfUgPdfS9FfLVpE';
-            $fcmUrl = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send';
-    
-            $messageData = [
-                'message' => [
-                    'notification' => [
-                        'title' => 'FCM Message',
-                        'body' => 'This is an FCM Message',
-                    ],
-                    'token' => $user->device_token,
-                ],
-            ];
-    
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Content-Type' => 'application/json',
-            ])->post($fcmUrl, $messageData);
-    
-            if ($response->successful()) {
-                return 'FCM message sent successfully';
-            } else {
-                return 'Failed to send FCM message';
-            }
-    
-            return response()->json(['message'=>"Success"]);
+
+            $device_token =[];
+            $url = 'https://fcm.googleapis.com/fcm/send';
+            array_push($device_token,$user->device_token);
+        $serverKey = 'AAAALuuX55s:APA91bGTsq4OSEslvsXjMW8fIe73ro_e2ukWuOOhQCKQyVbKq5cP5uKn-MVLzkn_tuvSci7HsNyRMitsdjhjQ-An15he0R0fgywEXwwXUlVfvpoxyWwvFpYczqhQ_ZHdOqe0GRwHtp-9';
+
+        $data = [
+            "registration_ids" => $device_token,
+            "notification" => [
+                "title" => "test",
+                "body" =>"hello",
+            ]
+        ];
+
+        $encodedData = json_encode($data);
+
+        $headers = [
+            'Authorization:key='. $serverKey,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+
+        // Execute post
+        $result = curl_exec($ch);
+
+        if ($result === FALSE) {
+            die('Curl failed: '. curl_error($ch));
         }
-        
+
+        // Close connection
+        curl_close($ch);
+
+        // FCM response
+        dd($result);
+
+            return response()->json(["success"]);
+        }
+        return response()->json(["failed"]);
        
-        return response()->json(['message'=>"Failed"]);
+        
         // Send the message to the specified device tokens
         
         

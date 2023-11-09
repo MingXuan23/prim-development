@@ -15,7 +15,7 @@ class CreateSchedulesTable extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('name');
             $table->unsignedBigInteger('number_of_slot');
             $table->unsignedBigInteger('time_of_slot');
             $table->time('start_time');
@@ -23,6 +23,7 @@ class CreateSchedulesTable extends Migration
             $table->json('time_off');
             $table->json('target');
             $table->boolean('status');
+            $table->unsignedBigInteger('teacher_max_slot')->nullable();
             $table->unsignedBigInteger('organization_id');
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');
         });
