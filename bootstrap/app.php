@@ -43,7 +43,7 @@ $app->singleton(
 
 
 //$app->configure('laravel-fcm');
-$app->register(Kawankoding\Fcm\FcmServiceProvider::class);
+//$app->register(Kawankoding\Fcm\FcmServiceProvider::class);
 /*
 |--------------------------------------------------------------------------
 | Return The Application
