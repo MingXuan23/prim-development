@@ -741,9 +741,9 @@
                         </a>
                     </li> --}}
                     <li>
-                        <a href="{{ route('homestay.tunjuksales') }}" class=" waves-effect">
+                        <a href="{{ route('homestay.viewPerformanceReport') }}" class=" waves-effect">
                             <i class="mdi mdi-finance"></i>
-                            <span>Lihat Keuntungan</span>
+                            <span>Lihat Prestasi</span>
                         </a>
                     </li>
                     @endrole 

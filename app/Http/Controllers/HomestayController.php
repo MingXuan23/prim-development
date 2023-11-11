@@ -48,7 +48,7 @@ class HomestayController extends Controller
             ->first();
             array_push($roomsWithImage, $firstRow);
         }
-        // get ratings for those rooms
+        // get ratings and discounts for those rooms
         foreach($roomsWithImage as $key => $room){
             $ratings = DB::table('bookings')
             ->where([
@@ -63,8 +63,55 @@ class HomestayController extends Controller
             }
             
             $room->overallRating = $overallRating;
-        }
 
+            // get ongoing discount or nearest discount promo
+
+            $ongoingDiscount = DB::table('promotions')
+            ->where([
+                'deleted_at' => null,
+                'promotion_type' => 'discount',
+                'homestay_id' => $room->roomid,
+            ])
+            ->where(function($query){
+                $query->whereDate('datefrom', '<=', now())
+                ->WhereDate('dateto', '>=', now());
+            })
+            ->select('discount' , 'datefrom' , 'dateto')
+            ->first();
+
+            if($ongoingDiscount != null){
+                $room->ongoingDiscount = $ongoingDiscount->discount;
+                $room->ongoingDiscountStart = $ongoingDiscount->datefrom;
+                $room->ongoingDiscountLast = $ongoingDiscount->dateto;
+            }else{
+                $room->ongoingDiscount = null;
+            }
+            //a homestay either will has ongoing discount or future discount
+            if($ongoingDiscount == null){
+                $twoWeeksFromNow = now()->addDays(14);
+                $nearestFutureDiscount = DB::table('promotions') 
+                ->where([
+                    'deleted_at' => null,
+                    'promotion_type' => 'discount',
+                    'homestay_id' => $room->roomid,
+                ])
+                ->whereDate('datefrom', '>', now())
+                ->whereDate('datefrom', '<=', $twoWeeksFromNow)//get nearest discount within two weeks from now
+                ->orderBy('datefrom', 'asc')
+                ->select('discount' , 'datefrom' , 'dateto')
+                ->first();
+
+                if($nearestFutureDiscount != null){
+                    $room->nearestFutureDiscount = $nearestFutureDiscount->discount;
+                    $room->nearestFutureDiscountStart = $nearestFutureDiscount->datefrom;
+                    $room->nearestFutureDiscountLast = $nearestFutureDiscount->dateto;
+
+                }else{
+                    $room->nearestFutureDiscount = null;
+                }                
+            }
+
+        }
         return view('homestay.home')->with(['rooms' => $roomsWithImage]);
     }
     public function showRoom($roomId){
@@ -288,21 +335,49 @@ class HomestayController extends Controller
         return view('homestay.promotion',compact('organization'));
     }    
     public function getPromotionData(Request $request){
-        $promotions = DB::table('promotions')
-        ->join('rooms','rooms.roomid','promotions.homestay_id')
+        $promotions = [];
+        if($request->homestayId == "all"){
+            $promotions = DB::table('promotions')
+            ->join('rooms','rooms.roomid','promotions.homestay_id')
+            ->where([
+                'rooms.deleted_at' => null,
+                'promotions.deleted_at' => null,
+                'rooms.homestayid' => $request->orgId,
+            ])
+            //fetch promotion with dateto equal or greater than today
+            ->where(function ($query) {
+                $query->whereDate('promotions.dateto', '>=', now())
+                    ->orWhereDate('promotions.dateto', '=', now());
+            })
+            ->orderBy('rooms.roomname')
+            ->get();      
+        }else{
+            $promotions = DB::table('promotions')
+            ->join('rooms','rooms.roomid','promotions.homestay_id')
+            ->where([
+                'rooms.deleted_at' => null,
+                'promotions.deleted_at' => null,
+                'rooms.homestayid' => $request->orgId,
+                'rooms.roomid' =>$request->homestayId,
+            ])
+            //fetch promotion with dateto equal or greater than today
+            ->where(function ($query) {
+                $query->whereDate('promotions.dateto', '>=', now())
+                    ->orWhereDate('promotions.dateto', '=', now());
+            })
+            ->orderBy('rooms.roomname')
+            ->get();     
+        }
+        $homestays = DB::table('rooms')
         ->where([
-            'rooms.deleted_at' => null,
-            'promotions.deleted_at' => null,
-            'rooms.homestayid' => $request->homestayid,
+            'homestayid' => $request->orgId,
+            'deleted_at' => null,
         ])
-        //fetch promotion with dateto equal or greater than today
-        ->where(function ($query) {
-            $query->whereDate('promotions.dateto', '>=', now())
-                ->orWhereDate('promotions.dateto', '=', now());
-        })
-        ->orderBy('rooms.roomname')
+        ->orderBy('roomname')
+        ->select('roomid','roomname')
         ->get();
-        return response()->json(['promotions' => $promotions]);
+
+        return response()->json(['promotions' => $promotions , 'homestays' => $homestays]);
     }
     // public function promotionPage()
     // {
@@ -623,20 +698,46 @@ public function viewPromotionHistory($orgId){
     return view('homestay.promotionHistory',compact('organization'));
 }
 public function getPromotionHistory(Request $request){
-    $promotions = DB::table('promotions')
-    ->join('rooms','rooms.roomid','promotions.homestay_id')
+    $promotions = [];
+    if($request->homestayId == "all"){
+        $promotions = DB::table('promotions')
+        ->join('rooms','rooms.roomid','promotions.homestay_id')
+        ->where([
+            'rooms.deleted_at' => null,
+            'promotions.deleted_at' => null,
+            'rooms.homestayid' => $request->orgId,
+        ])
+        //fetch promotion with dateto equal or greater than today
+        ->where(function ($query) {
+            $query->whereDate('promotions.dateto', '<', now());
+        })
+        ->orderBy('rooms.roomname')
+        ->get();
+    }else{
+        $promotions = DB::table('promotions')
+        ->join('rooms','rooms.roomid','promotions.homestay_id')
+        ->where([
+            'rooms.deleted_at' => null,
+            'promotions.deleted_at' => null,
+            'rooms.homestayid' => $request->orgId,
+            'rooms.roomid' => $request->homestayId,
+        ])
+        //fetch promotion with dateto equal or greater than today
+        ->where(function ($query) {
+            $query->whereDate('promotions.dateto', '<', now());
+        })
+        ->orderBy('rooms.roomname')
+        ->get();
+    }
+    $homestays = DB::table('rooms')
     ->where([
-        'rooms.deleted_at' => null,
-        'promotions.deleted_at' => null,
-        'rooms.homestayid' => $request->orgId,
+        'homestayid' => $request->orgId,
+        'deleted_at' => null,
     ])
-    //fetch promotion with dateto equal or greater than today
-    ->where(function ($query) {
-        $query->whereDate('promotions.dateto', '<', now());
-    })
-    ->orderBy('rooms.roomname')
+    ->orderBy('roomname')
+    ->select('roomid','roomname')
     ->get();
-    return response()->json(['promotions' => $promotions]);
+    return response()->json(['promotions' => $promotions , 'homestays' => $homestays]);
 }
 // public function editpromo(Request $request,$promotionid)
 // {
@@ -1007,10 +1108,15 @@ public function getPromotionHistory(Request $request){
         $query->where('checkin', '<', $request->checkOut)
             ->where('checkout', '>', $request->checkIn);
          })
+         ->whereNotIn('status',['Booked','Completed'] )
         ->get();
 
         if($availability->isEmpty()){
             $floatTotalPrice = (float) str_replace(',', '', $request->amount);
+            $discountReceived = (float) str_replace(',', '', $request->discountAmount);
+            $discountReceived = $discountReceived > 0 ? $discountReceived : 0;
+            $increaseReceived = (float) str_replace(',', '', $request->increaseAmount);
+            $increaseReceived = $increaseReceived > 0 ? $increaseReceived : 0;
             $bookingId  = DB::table('bookings')
             ->insertGetId([
                 'checkin' => $checkInDate,
@@ -1020,6 +1126,8 @@ public function getPromotionHistory(Request $request){
                 'customerid' => $userId,
                 'roomId' => $roomId,
                 'created_at' => Carbon::now(),
+                'discount_received' => $discountReceived,
+                'increase_received' => $increaseReceived,
             ]);
 
             
@@ -1509,6 +1617,75 @@ public function getPromotionHistory(Request $request){
 
         }
         return response()->json(['reviews' => $reviews]);
+    }
+    public function viewPerformanceReport(){
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+        $organizations = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+        return view('homestay.performanceReport')->with(['organizations' => $organizations]);
+    }
+    public function getReportData(Request $request){
+        $startDate  = Carbon::createFromFormat('d/m/Y', $request->startDate);
+        $endDate  = Carbon::createFromFormat('d/m/Y', $request->endDate);
+        $orgId = $request->orgId;
+
+        // fetch the number of booked night for each homestay
+        $homestays = DB::table('rooms')
+        ->where([
+            'homestayid' => $orgId,
+            'deleted_at' => null,
+        ])
+        ->get();
+        foreach ($homestays as $key => $homestay){
+            $bookings = DB::table('bookings')
+            ->whereIn('status' ,['Completed','Booked'])
+            ->where([
+                'roomid' => $homestay->roomid,
+            ])
+            ->get();
+            
+            $numberOfNights = 0;
+            $totalEarnings = 0;
+            foreach($bookings as $booking){
+                $checkinDate = Carbon::createFromFormat('Y-m-d',$booking->checkin);
+                $checkoutDate = Carbon::createFromFormat('Y-m-d',$booking->checkout);
+                // Check if the booking overlaps with the specified date range
+                if ($checkinDate->lessThanOrEqualTo($endDate) && $checkoutDate->greaterThanOrEqualTo($startDate)) {
+                    // Adjust the check-in and checkout dates if necessary
+                    if ($checkinDate < $startDate) {
+                        $checkinDate = $startDate;
+                    }
+                    if ($checkoutDate > $endDate) {
+                        $checkoutDate = $endDate;
+                        if($checkoutDate == $checkinDate){
+                            $checkoutDate->addDay();//add 1 day if the new checkout date is the same as the checkin date
+                        }
+                    }
+
+                    // Calculate the number of nights within the date range
+                    $nightsForBooking = $checkoutDate->diffInDays($checkinDate);
+
+                    // Add the number of nights for this booking to the total
+                    $numberOfNights += $nightsForBooking;
+
+                    $totalEarnings += (float)$homestay->price * $nightsForBooking;
+                }
+
+                // add to total earnings for this homestay
+            }
+            $homestay->bookedNights = $numberOfNights;
+            $homestay->totalEarnings = $totalEarnings;
+        }
+        
+        return response()->json(['homestays' => $homestays]);
     }
     // public function tunjukpelanggan(Request $request)
     // {

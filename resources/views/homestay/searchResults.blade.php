@@ -7,6 +7,8 @@
 @section('content')
 
     <section aria-label="Banner" class="mb-3">
+        <a href="{{url()->previous()}}" class="color-dark-purple" style="font-size: 20px;"><i class="mt-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
+
         <div aria-label="Search Input" >
             <form action="{{route('homestay.searchRoom')}}" method="get" enctype="multipart/form-data" class="d-flex justify-content-center align-items-center mt-3" id="form-search">
                 @csrf            
@@ -18,6 +20,7 @@
                 </div>
             </form>
         </div>
+        
         <h5 class="color-purple">{{count($rooms)}} Penginapan Telah Dijumpa</h5>
     </section>
  

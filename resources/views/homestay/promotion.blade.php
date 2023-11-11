@@ -12,8 +12,8 @@
 <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Urus Promosi</h4>
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
-      <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2">Urus Homestay</a>
-      <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2">Urus Tempahan</a>
+      <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
+      <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan</a>
       <a style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
     </div>
 </div>
@@ -37,7 +37,7 @@
       <div class="card-body bg-purple">
         <div class="form-group">
           <label>Nama Organisasi</label>
-          <select name="homestay" id="homestay" class="form-control">
+          <select name="org_id" id="org_id" class="form-control">
             <option value="" selected disabled>Pilih Organisasi</option>
             @foreach($organization as $row)
             <option value="{{ $row->id }}">{{ $row->nama }}</option>
@@ -51,11 +51,20 @@
 
   <div class="col-md-12 border-purple p-0">
     <div class="card mb-0">
-      <div class="d-flex justify-content-end m-2">        
-        <a style="cursor: pointer;" id="view-promotion-history" class="btn-purple m-1"> <i
-            class="fas fa-history"></i> Sejarah Promosi</a>
-        <a style="cursor: pointer;" id="link-add-promotion" class="btn-purple m-1"> <i
-            class="fas fa-plus"></i> Tambah Promosi</a>
+      <div class="d-flex justify-content-between m-2 flex-wrap">
+        <div class="d-flex align-items-center m-2">
+          <label for="homestay_id" class="mx-2">Homestay: </label>
+          <select name="homestay_id" id="homestay_id" class="form-control">
+              <option value="all">Semua Homestay</option>
+          </select>            
+        </div>
+        <div class="my-4 d-flex justify-content-center flex-wrap">
+          <a style="cursor: pointer;" id="view-promotion-history" class="btn-purple m-1"> <i
+              class="fas fa-history"></i> Sejarah Promosi</a>
+          <a style="cursor: pointer;" id="link-add-promotion" class="btn-purple m-1"> <i
+              class="fas fa-plus"></i> Tambah Promosi</a>          
+        </div>        
+
       </div>
       <div class="card-body ">
 
@@ -157,13 +166,34 @@ $(document).ready(function() {
     var dataTable = $('#promotionTable').DataTable({
         // ... your DataTable configuration ...
     });
+    var getDataCounter = 0;
+
     function getData(){
-      var homestayid = $("#homestay option:selected").val();
+      var orgId = $("#org_id option:selected").val();
       $.ajax({
             url: "{{ route('homestay.getPromotionData') }}",
             method: "GET",
-            data: { homestayid: homestayid },
+            data: { 
+              orgId: orgId ,
+              homestayId: $("#homestay_id").val(), 
+            },
             success: function(result) {
+                //only run this during the first request
+                if(getDataCounter == 0){
+                  //reset #homestay_id 
+                  $('#homestay_id').empty();
+                  // add option into #homestay_id
+                  $('#homestay_id').append(`
+                    <option value="all">Semua Homestay</option>
+                  `);
+                  $(result.homestays).each(function(i, homestay){
+                    $('#homestay_id').append(`
+                      <option value="${homestay.roomid}">${homestay.roomname}</option>
+                    `);
+                  });     
+                  
+                  getDataCounter++;
+                }
                 // Destroy the existing DataTable instance
                 if (dataTable !== undefined) {
                     dataTable.destroy();
@@ -262,7 +292,7 @@ $(document).ready(function() {
         });
     }
     // Bind onchange event
-    $('#homestay').change(function() {
+    $('#org_id').change(function() {
         const homestayId = $(this).val();
 
         $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview','')}}/${homestayId}`);
@@ -272,8 +302,8 @@ $(document).ready(function() {
         getData();
     });
 
-    $("#homestay option:nth-child(2)").prop("selected", true);
-    $('#homestay').trigger('change');
+    $("#org_id option:nth-child(2)").prop("selected", true);
+    $('#org_id').trigger('change');
     // Handle "Edit" button click
     $('#btn-back').on('click',function(){
       $('#roommodal').modal('hide');
@@ -317,6 +347,9 @@ $(document).ready(function() {
         }
       })
     });
+    $("#homestay_id").on('change', function(){
+      getData();
+    })
 });
 </script>
 @endsection

@@ -5,7 +5,18 @@
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
 @include('layouts.datatable')
+<style>
+    .sort-homestay{
+      width: 25% !important;
+    }  
+  @media screen and (max-width: 768px){
+    .sort-homestay{
+      width: 100% !important;
+    }    
+  }
 
+
+</style>
 @endsection
 
 @section('content')
@@ -14,8 +25,8 @@
 <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Sejarah Promosi ({{$organization->nama}})</h4>
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
-      <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2">Urus Homestay</a>
-      <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2">Urus Tempahan</a>
+      <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
+      <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan</a>
       <a href="{{route('homestay.viewCustomersReview',$organization->id)}}" style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
     </div>
 </div>
@@ -42,6 +53,12 @@
 
   <div class="col-md-12 border-purple p-0">
     <div class="card mb-0">
+      <div class="d-flex align-items-center justify-content-center p-2 sort-homestay">
+        <label for="homestay_id" class="mx-2">Homestay: </label>
+        <select name="homestay_id" id="homestay_id" class="form-control">
+            <option value="all">Semua Homestay</option>
+        </select>            
+      </div>
       <div class="card-body ">
 
       @if(Session::has('success'))
@@ -99,13 +116,33 @@ $(document).ready(function() {
     var dataTable = $('#promotionTable').DataTable({
         // ... your DataTable configuration ...
     });
+    var getDataCounter = 0;
     function getData(){
         var orgId = $('#org_id').val();
       $.ajax({
             url: "{{ route('homestay.getPromotionHistory') }}",
             method: "GET",
-            data: { orgId: orgId },
+            data: { 
+              orgId: orgId,
+              homestayId: $('#homestay_id').val(),
+            },
             success: function(result) {
+                //only run this during the first request
+                if(getDataCounter == 0){
+                  //reset #homestay_id 
+                  $('#homestay_id').empty();
+                  // add option into #homestay_id
+                  $('#homestay_id').append(`
+                    <option value="all">Semua Homestay</option>
+                  `);
+                  $(result.homestays).each(function(i, homestay){
+                    $('#homestay_id').append(`
+                      <option value="${homestay.roomid}">${homestay.roomname}</option>
+                    `);
+                  });     
+                  
+                  getDataCounter++;
+                }
                 // Destroy the existing DataTable instance
                 if (dataTable !== undefined) {
                     dataTable.destroy();
@@ -187,6 +224,10 @@ $(document).ready(function() {
         });
     }
     getData();
+
+    $("#homestay_id").on('change', function(){
+      getData();
+    })
 });
 </script>
 @endsection

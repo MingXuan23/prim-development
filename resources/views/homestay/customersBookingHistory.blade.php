@@ -13,9 +13,9 @@
 <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Sejarah Tempahan ({{$organization->nama}}) </h4>
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
-      <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2">Urus Homestay</a>
-      <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple m-2">Urus Promosi</a>
-      <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2">Urus Tempahan Pelanggan</a>
+      <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
+      <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple m-2"><i class="fas fa-percentage"></i> Urus Promosi</a>
+      <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan Pelanggan</a>
   </div>
 </div>
 <div class="row">
@@ -39,7 +39,7 @@
   </div>
   <div id="customerResults" class="col-md-12 border-purple p-0">
     <div class="card  mb-0">
-      <div class="d-flex justify-content-between align-items-center"> 
+      <div class="d-flex justify-content-between align-items-center flex-wrap p-2"> 
         <div class="d-flex align-items-center">
           <label for="homestay_id" class="mx-2">Homestay: </label>
           <select name="homestay_id" id="homestay_id" class="form-control">
