@@ -202,8 +202,8 @@ class ScheduleApiController extends Controller
                     unset($r->time_off);
                     unset($r->start_time);
             }
-
-           return response()->json(['schedule'=>$schedule ,'relief'=>$relief_schedule]);
+            $schedule = $schedule->merge($relief_schedule);
+           return response()->json(['schedule'=>$schedule]);
 
            
 
@@ -232,7 +232,7 @@ class ScheduleApiController extends Controller
         if($school){
             return response()->json(['school_name'=>$school->nama,'school_id'=>$school->id]);
         }
-        return response()->json(['school_name'=>'Tiada Sekolah Berkaitan','school_id'=>-1]);
+        return response()->json(['school_name'=>'No related school','school_id'=>-1]);
 
      }
 
@@ -425,8 +425,10 @@ class ScheduleApiController extends Controller
             $device_token =[];
             $url = 'https://fcm.googleapis.com/fcm/send';
             array_push($device_token,$user->device_token);
-        $serverKey = 'AAAALuuX55s:APA91bGTsq4OSEslvsXjMW8fIe73ro_e2ukWuOOhQCKQyVbKq5cP5uKn-MVLzkn_tuvSci7HsNyRMitsdjhjQ-An15he0R0fgywEXwwXUlVfvpoxyWwvFpYczqhQ_ZHdOqe0GRwHtp-9';
-
+        $serverKey = getenv('FCM_SERVER_KEY');
+        //$serverKey = getenv('PRODUCTION_BE_URL');
+        
+       
         $data = [
             "registration_ids" => $device_token,
             "notification" => [
