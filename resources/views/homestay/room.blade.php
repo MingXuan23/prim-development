@@ -63,11 +63,11 @@
                         <h5 class="text-white mb-2">RM{{$room->price}}/malam</h5>
                         <div class="form-floating mb-2" >
                             <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder=" ">
-                            <label for="check-in">Daftar Masuk</span>
+                            <label for="check-in">Pilih Daftar Masuk</span>
                         </div>
                         <div class="form-floating mb-2" >
                             <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder=" " disabled>
-                            <label for="check-out">Daftar Keluar</label>
+                            <label for="check-out">Pilih Daftar Keluar</label>
                         </div>
                         <div class="text-white text-center mb-2">
                             <div id="total-price"></div>

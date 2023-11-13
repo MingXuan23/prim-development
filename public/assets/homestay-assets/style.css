@@ -79,6 +79,7 @@ td a {
 .btn {
     padding: 12px !important;
     border-radius: 0.75rem !important;
+    white-space: nowrap;
 }
 .btn-primary,
 .btn-purple {
@@ -204,6 +205,12 @@ button#btn-add-image:hover {
     align-items: center;
     background-color: rgba(0, 0, 0, 0.592);
 }
+.price-before-discount {
+    text-decoration-line: line-through;
+    color: var(--secondary-color);
+    font-size: 14px;
+    margin: auto 0;
+}
 /* new search */
 #search-icon {
     cursor: pointer;
@@ -249,9 +256,36 @@ button#btn-add-image:hover {
     border-radius: 0.25rem;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
     transition: all 0.2s ease;
+    position: relative;
 }
 .home-thumbnail-container:hover {
     transform: translate(2px, -8px);
+}
+
+.home-thumbnail-discount {
+    position: absolute;
+    top: -1px;
+    right: 0;
+    padding: 12px;
+    border-top-right-radius: 0.4rem;
+    color: white;
+    background-color: var(--primary-color);
+    font-size: 16px;
+}
+.home-thumbnail-nearest-discount {
+    position: absolute;
+    top: -1px;
+    right: 0;
+    padding: 12px;
+    border-top-right-radius: 0.4rem;
+    color: white;
+    background-color: var(--secondary-color);
+    font-size: 16px;
+}
+.home-thumbnail-discount > span,
+.home-thumbnail-nearest-discount > span {
+    font-weight: bold;
+    font-size: 18px;
 }
 .home-thumbnail-img {
     height: 250px;
@@ -657,6 +691,10 @@ html .ui-button.ui-state-disabled:active {
     position: absolute;
     right: 0;
     bottom: 0;
+}
+/* report */
+.label-chart {
+    font-size: 16px;
 }
 /* for mobile responsive */
 @media screen and (max-width: 500px) {

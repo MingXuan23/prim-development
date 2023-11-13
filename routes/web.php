@@ -608,6 +608,9 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('/index', 'DeliveryController@index')->name('delivery.parcelIndex');
    //Route::get('')
 });
+
+    //// *** Book & Stay ***//// 
+
     // Homestay Customer
     Route::get('booknstay', 'HomestayController@homePage')->name('homestay.homePage');
     Route::get('homestay/{id}_{name}', 'HomestayController@showRoom')->name('homestay.showRoom');
@@ -619,7 +622,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
     Route::post('add-review', 'HomestayController@addReview')->name('homestay.addReview');
     Route::get('booking-details/{id}','HomestayController@bookingDetails')->name('homestay.bookingDetails');
-    Route::get('generate-booking-details-pdf/{id}','HomestayController@generateBookingDetailsPdf')->name('homestay.generateBookingDetailsPdf');
+    // Route::get('generate-booking-details-pdf/{id}','HomestayController@generateBookingDetailsPdf')->name('homestay.generateBookingDetailsPdf');
     Route::get('get-more-reviews','HomestayController@getMoreReviews')->name('homestay.getMoreReviews');
     
     // Homestay Management
@@ -627,7 +630,6 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
     Route::get('tambahbilik', 'HomestayController@tambahbilik')->name('homestay.tambahbilik');
     Route::post('addroom', 'HomestayController@addroom')->name('homestay.addroom');
-    // Route::post('editroom/{id}', 'HomestayController@editroom');
     Route::get('edit-room/{id}', 'HomestayController@editRoomPage')->name('homestay.editRoomPage');
     Route::post('update-room', 'HomestayController@updateRoom')->name('homestay.updateRoom');
     Route::post('delete-room', 'HomestayController@deleteRoom')->name('homestay.deleteRoom');
@@ -639,6 +641,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('get-booking-history-data', 'HomestayController@getBookingHistoryData')->name('homestay.getBookingHistoryData');
     Route::get('view-customers-reviews/{id}','HomestayController@viewCustomersReview')->name('homestay.viewCustomersReview');
     Route::get('get-customers-review', 'HomestayController@getCustomersReview')->name('homestay.getCustomersReview');
+    Route::get('view-performance-report','HomestayController@viewPerformanceReport')->name('homestay.viewPerformanceReport');
+    Route::get('get-report-data', 'HomestayController@getReportData')->name('homestay.getReportData');
 
 
     //Homestay Promotion
@@ -653,7 +657,8 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('delete-promotion', 'HomestayController@deletePromotion')->name('homestay.deletePromotion');
     Route::get('view-promotion-history/{id}', 'HomestayController@viewPromotionHistory')->name('homestay.viewPromotionHistory');
     Route::get('get-promotion-history', 'HomestayController@getPromotionHistory')->name('homestay.getPromotionHistory');
-
+   
+    //// ***End of Book & Stay ***//// 
 
 
 

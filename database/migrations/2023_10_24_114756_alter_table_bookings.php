@@ -16,6 +16,8 @@ class AlterTableBookings extends Migration
         Schema::table('bookings',function($table){
             $table->integer('review_star')->nullable();
             $table->string('review_comment')->nullable();
+            $table->decimal('discount_received',8,2)->default(0)->nullable();
+            $table->decimal('increase_received',8,2)->default(0)->nullable();
         });
     }
 
@@ -29,6 +31,8 @@ class AlterTableBookings extends Migration
         Schema::table('bookings',function($table){
             $table->dropColumn('review_star');
             $table->dropColumn('review_comment');
+            $table->dropColumn('discount_received');
+            $table->dropColumn('increase_received');
         });
     }
 }
