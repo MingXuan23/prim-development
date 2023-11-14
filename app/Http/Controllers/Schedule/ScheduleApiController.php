@@ -165,11 +165,33 @@ class ScheduleApiController extends Controller
             
             foreach($schedule as $s){
                 //if(isset($s->duration)){
-
-                    $s->category ="Normal";
                     $time_info= $this->getSlotTime($s,$s->day,$s->slot);
                     $s->time=$time_info['time'];
                     $s->duration=$time_info['duration'];
+
+
+                    $onLeave =DB::table('teacher_leave as tl')
+                    ->join('leave_relief as lr','lr.teacher_leave_id','tl.id')
+                    ->leftJoin('users as u','u.id','lr.replace_teacher_id')
+                    ->where('lr.schedule_subject_id',$s->id)
+                    ->whereBetween('tl.date', [Carbon::now()->format('Y-m-d'), Carbon::now()->addDays(7)->format('Y-m-d')])
+                    ->where('tl.teacher_id',$id)
+                    //->where('lr.confirmation','Confirmed')
+                    ->select('lr.id','u.name as replaceTeacherName','lr.confirmation')
+                    ->get();
+                    //dd($onLeave);
+                    if(count($onLeave)>0){
+                        $s->category="Leave";
+                        $confirmedRelief = $onLeave->where('confirmation', 'Confirmed')->first();
+                        if($confirmedRelief){
+                            $s->replaceTeacher = $confirmedRelief->replaceTeacherName;
+                        }else{
+                            $s->replaceTeacher = 'No teacher';
+                        }
+                        
+                    }else{
+                        $s->category="Normal";
+                    }
                    
                     unset($s->time_off);
                     unset($s->start_time);
@@ -246,22 +268,8 @@ class ScheduleApiController extends Controller
 
      public function submitLeave(Request $request){
 
-        try{$method = $request->method();
+        try{
 
-            if (!$request->isMethod('post')) {
-                $request->teacher_id = 15543;
-       
-        
-                $request->start_time= "09:30:00";
-                $request->end_time ="14:30:00";
-                $request->date='2023-11-09';
-               
-                $request->isLeaveFullDay =false;
-                $request->leave_type = "MC";
-                $request->desc = "Perut Sakit";
-                
-            }// this code should delete in production
-            
             $period = new stdClass();
             $date = Carbon::createFromDate($request->date);
             
@@ -276,6 +284,10 @@ class ScheduleApiController extends Controller
 
             $period = json_encode($period);
             $user = User::find($request->teacher_id);
+
+            if(! DB::table('leave_type')->where('id',$request->leave_type)->exists()){
+                return response()->json(['error' => 'Leave Type value error'], 401);
+            }
 
             if($user){
             
@@ -300,7 +312,7 @@ class ScheduleApiController extends Controller
                 
                     'period'=>$period,
                     'date'=>$date,
-                    'desc'=> $request->leave_type.":". $request->desc,
+                    'desc'=>  $request->desc,
                     'status'=>1,
                     'teacher_id'=>$user->id
         
