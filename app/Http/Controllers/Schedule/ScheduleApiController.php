@@ -184,9 +184,9 @@ class ScheduleApiController extends Controller
                         $s->category="Leave";
                         $confirmedRelief = $onLeave->where('confirmation', 'Confirmed')->first();
                         if($confirmedRelief){
-                            $s->replaceTeacher = $confirmedRelief->replaceTeacherName;
+                            $s->relatedTeacher = $confirmedRelief->replaceTeacherName;
                         }else{
-                            $s->replaceTeacher = 'No teacher';
+                            $s->relatedTeacher = 'No teacher';
                         }
                         
                     }else{
@@ -208,7 +208,7 @@ class ScheduleApiController extends Controller
             ->where('lr.replace_teacher_id',$user->id)
             ->where('lr.confirmation','Confirmed')
             ->where('sv.status',1)
-            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as originalTeacher')
+            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher')
             ->get();
             //dd($schedule);
 
