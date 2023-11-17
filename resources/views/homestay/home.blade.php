@@ -2,6 +2,11 @@
 
 @section('css')
     <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
+    <style>
+        .rated{
+            font-size: 18px;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -31,10 +36,35 @@
             @foreach($rooms as $room)
                 <div class="home-thumbnail-container">
                     <a href="{{route('homestay.showRoom',['id' => $room->roomid, 'name' => $room->roomname])}}" target="_self">
-                        <img src="{{$room->image_path}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      <div class="home-thumbnail-captions p-2">
-                            <h4 class="color-purple">{{$room->roomname}}</h4>
+                        @if($room->ongoingDiscount != null || $room->nearestFutureDiscount != null)
+                            @if($room->ongoingDiscount != null)
+                                <div class="home-thumbnail-discount">
+                                    <span>-{{$room->ongoingDiscount}}%</span>, {{date('d/m',strtotime($room->ongoingDiscountStart))}}  {{$room->ongoingDiscountLast != $room->ongoingDiscountStart ? ' - '.date('d/m',strtotime($room->ongoingDiscountLast)) : ''}}
+                                </div>
+                            @else
+                                <div class="home-thumbnail-nearest-discount">
+                                    <span>-{{$room->nearestFutureDiscount}}%</span>, {{date('d/m',strtotime($room->nearestFutureDiscountStart))}}  {{$room->nearestFutureDiscountLast != $room->nearestFutureDiscountStart ? ' - '.date('d/m',strtotime($room->nearestFutureDiscountLast)) : ''}}
+                                </div>
+                            @endif
+                        @endif
+                        <img src="{{$room->image_path}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      
+                        <div class="home-thumbnail-captions p-2">
+                                <h4 class="color-purple">{{$room->roomname}}</h4>
                             <div class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->district}},{{$room->state}}</div>
-                            <h5 class="color-purple text-right">RM{{$room->price}}/malam</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                @if($room->overallRating > 0)
+                                    <span class="rated">{{$room->overallRating}}&#9733</span>
+                                @else
+                                    <span></span>
+                                @endif
+                                @if($room->ongoingDiscount != null)
+                                    <h5 class="color-purple text-right"><span class="price-before-discount">RM{{$room->price}}</span> RM{{number_format(($room->price - ($room->price * $room->ongoingDiscount / 100)) , 2 )}}/malam</h5>  
+                                
+                                @else
+                                    <h5 class="color-purple text-right">RM{{$room->price}}/malam</h5>  
+                                @endif
+                            </div>
+
                         </div>                      
                     </a>
                 </div>

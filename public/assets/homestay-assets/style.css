@@ -76,13 +76,22 @@ td a {
     border-radius: 0.25rem;
     box-shadow: 2px 2px 6px 3px rgb(90, 90, 90);
 }
+.btn {
+    padding: 12px !important;
+    border-radius: 0.75rem !important;
+    white-space: nowrap;
+}
 .btn-primary,
 .btn-purple {
     background-color: var(--primary-color) !important;
     color: white;
     transition: all 0.2s ease;
     border-radius: 0.75rem;
+    border: none;
     padding: 12px;
+}
+.hidden {
+    display: none;
 }
 .btn-primary:hover,
 .btn-purple:hover {
@@ -94,6 +103,7 @@ td a {
     color: white;
     transition: all 0.2s ease;
     border-radius: 0.75rem;
+    border: none;
     padding: 12px;
 }
 .btn-dark-purple:hover {
@@ -127,8 +137,45 @@ table.dataTable.dtr-inline.collapsed
 .img-preview-container {
     object-fit: cover;
     height: 150px;
-    width: 200px;
+    width: 200px !important;
     cursor: pointer;
+}
+.img-new {
+    border-color: var(--primary-color) !important;
+    border-width: 2px !important;
+}
+#image-previews > div {
+    position: relative;
+}
+
+#btn-delete-image {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    color: white !important;
+    background-color: var(--primary-color);
+    outline: none;
+    border: none;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+#btn-delete-image:hover {
+    opacity: 1;
+}
+button#btn-add-image {
+    height: 150px;
+    width: 200px;
+    font-size: 40px;
+    border-radius: 0.2rem;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    outline: none;
+    transition: all 0.2s ease;
+}
+button#btn-add-image:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(2px);
 }
 .card-org {
     width: 50%;
@@ -157,6 +204,12 @@ table.dataTable.dtr-inline.collapsed
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.592);
+}
+.price-before-discount {
+    text-decoration-line: line-through;
+    color: var(--secondary-color);
+    font-size: 14px;
+    margin: auto 0;
 }
 /* new search */
 #search-icon {
@@ -203,9 +256,36 @@ table.dataTable.dtr-inline.collapsed
     border-radius: 0.25rem;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
     transition: all 0.2s ease;
+    position: relative;
 }
 .home-thumbnail-container:hover {
     transform: translate(2px, -8px);
+}
+
+.home-thumbnail-discount {
+    position: absolute;
+    top: -1px;
+    right: 0;
+    padding: 12px;
+    border-top-right-radius: 0.4rem;
+    color: white;
+    background-color: var(--primary-color);
+    font-size: 16px;
+}
+.home-thumbnail-nearest-discount {
+    position: absolute;
+    top: -1px;
+    right: 0;
+    padding: 12px;
+    border-top-right-radius: 0.4rem;
+    color: white;
+    background-color: var(--secondary-color);
+    font-size: 16px;
+}
+.home-thumbnail-discount > span,
+.home-thumbnail-nearest-discount > span {
+    font-weight: bold;
+    font-size: 18px;
 }
 .home-thumbnail-img {
     height: 250px;
@@ -492,7 +572,27 @@ html .ui-button.ui-state-disabled:active {
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6) !important;
     padding: 12px;
 }
-
+/* for review section */
+.review-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+.review-container > div {
+    padding: 12px 0;
+    flex-basis: 50%;
+    margin-bottom: 12px;
+}
+.review-container p {
+    text-align: justify;
+}
+.rated {
+    color: var(--primary-color);
+    font-size: 22px;
+}
+.unrated {
+    color: var(--primary-color);
+    font-size: 22px;
+}
 /* for tempahan anda */
 .nav-tabs > li > a,
 .nav-pills > li > a {
@@ -505,7 +605,97 @@ html .ui-button.ui-state-disabled:active {
 .tab-card {
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6) !important;
 }
+.tab-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+/* rating */
 
+.cross {
+    padding: 10px;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 23px;
+}
+
+.cross i {
+    margin-top: -5px;
+    cursor: pointer;
+}
+
+.comment-box {
+    padding: 5px;
+}
+
+.comment-area textarea {
+    resize: none;
+    border: 1px solid var(--primary-color);
+}
+
+.send {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.send:hover {
+    color: #fff;
+    background-color: #f50202;
+    border-color: #f50202;
+}
+
+.rating {
+    display: inline-flex;
+    margin-top: -10px;
+    flex-direction: row-reverse;
+}
+
+.rating > input {
+    display: none;
+}
+.rating > span {
+    color: var(--primary-color);
+    width: 22px;
+    font-size: 28px;
+}
+.rating > label {
+    position: relative;
+    width: 28px;
+    font-size: 35px;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+.rating > label::before {
+    content: "\2605";
+    position: absolute;
+    opacity: 0;
+}
+
+.rating > label:hover:before,
+.rating > label:hover ~ label:before {
+    opacity: 1 !important;
+}
+
+.rating > input:checked ~ label:before {
+    opacity: 1;
+}
+
+.rating:hover > input:checked ~ label:before {
+    opacity: 0.4;
+}
+#booking-details-container {
+    position: relative;
+}
+#booking-button-group {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+/* report */
+.label-chart {
+    font-size: 16px;
+}
 /* for mobile responsive */
 @media screen and (max-width: 500px) {
     #image-previews {
@@ -543,11 +733,13 @@ html .ui-button.ui-state-disabled:active {
         overflow-x: auto;
         justify-content: flex-start;
     }
-    #modal-gallery .modal-body::-webkit-scrollbar {
+    #modal-gallery .modal-body::-webkit-scrollbar,
+    #image-previews::-webkit-scrollbar {
         width: 25px;
         height: 10px;
     }
-    #modal-gallery .modal-body::-webkit-scrollbar-thumb {
+    #modal-gallery .modal-body::-webkit-scrollbar-thumb,
+    #image-previews::-webkit-scrollbar-thumb {
         background-color: var(--primary-color);
         border-radius: 0.25rem;
     }
@@ -561,6 +753,9 @@ html .ui-button.ui-state-disabled:active {
     #ui-datepicker-div {
         left: 50% !important;
         transform: translate(-50%);
+    }
+    .review-container > div {
+        flex-basis: 100%;
     }
     /* promotion */
     .promotion-container {
