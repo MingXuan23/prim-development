@@ -6,3 +6,4 @@ yarn-error.log
 .gitattributes
 composer.lock
 .idea
+firebase_credentials.json

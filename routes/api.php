@@ -68,3 +68,17 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::post('yuranTransaction', 'MobileAPI\YuranController@pay');
     });
 });
+
+Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
+    Route::post('login', 'ScheduleApiController@login');
+    Route::get('getTimeOff', 'ScheduleApiController@getTimeOff');
+    Route::get('sendNotification/{id}', 'ScheduleApiController@sendNotification');
+    Route::get('isNoti/{id}', 'ScheduleApiController@isNoti');
+    Route::get('getSchedule/{id}', 'ScheduleApiController@getSchedule');
+    Route::get('getTeacherInfo/{id}', 'ScheduleApiController@getTeacherInfo');
+    Route::any('submitLeave', 'ScheduleApiController@submitLeave');
+    
+    Route::get('getLeaveType', 'ScheduleApiController@getLeaveType');
+
+    
+});
