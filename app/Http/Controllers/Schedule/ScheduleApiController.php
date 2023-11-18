@@ -176,6 +176,7 @@ class ScheduleApiController extends Controller
                     ->where('lr.schedule_subject_id',$s->id)
                     ->whereBetween('tl.date', [Carbon::now()->format('Y-m-d'), Carbon::now()->addDays(7)->format('Y-m-d')])
                     ->where('tl.teacher_id',$id)
+                    ->where('tl.status',1)
                     //->where('lr.confirmation','Confirmed')
                     ->select('lr.id','u.name as replaceTeacherName','lr.confirmation')
                     ->get();
