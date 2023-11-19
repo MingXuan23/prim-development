@@ -8,12 +8,14 @@
 @endsection
 
 @section('content')
+<a href="{{url()->previous()}}" class="color-dark-purple" style="font-size: 20px;"><i class="mt-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
+
 <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
-  <h4 class="font-size-18 color-purple">Urus Tempahan Pelanggan</h4>
+  <h4 class="font-size-18 color-purple">Sejarah Tempahan ({{$organization->nama}}) </h4>
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
       <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
       <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple m-2"><i class="fas fa-percentage"></i> Urus Promosi</a>
-      <a style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
+      <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan Pelanggan</a>
   </div>
 </div>
 <div class="row">
@@ -32,31 +34,22 @@
       @endif
 
       {{csrf_field()}}
-      <div class="card-body bg-purple">
-        <div class="form-group">
-          <label>Nama Organisasi</label>
-          <select name="org_id" id="org_id" class="form-control">
-            <option value="" selected disabled>Pilih Organisasi</option>
-            @foreach($data as $row)
-            <option value="{{ $row->id }}">{{ $row->nama }}</option>
-            @endforeach
-          </select>
-        </div>
-      </div>
-
+      <input type="hidden" name="org_id" id="org_id" value="{{$organization->id}}">
     </div>
   </div>
   <div id="customerResults" class="col-md-12 border-purple p-0">
     <div class="card  mb-0">
-      <div class="d-flex justify-content-between align-items-center flex-wrap p-2">
+      <div class="d-flex justify-content-between align-items-center flex-wrap p-2"> 
         <div class="d-flex align-items-center">
           <label for="homestay_id" class="mx-2">Homestay: </label>
           <select name="homestay_id" id="homestay_id" class="form-control">
               <option value="all">Semua Homestay</option>
+              @foreach($homestays as $homestay)
+                  <option value="{{$homestay->roomid}}">{{$homestay->roomname}}</option>
+              @endforeach
           </select>            
         </div>
-        <a style="margin: 19px; float: right;cursor: pointer;" id="view-booking-history" class="btn-purple"> <i
-            class="fas fa-history"></i> Sejarah Pesanan Pelanggan</a>
+        <a style="margin: 19px; float: right;cursor: pointer;" href="{{route('homestay.viewCustomersReview',$organization->id)}}" id="view-booking-history" class="btn-purple"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
       </div>
       <div class="card-body">
 
@@ -71,7 +64,7 @@
       @endif
 
         <div class="flash-message"></div>
-
+        <input type="hidden" name="organization_id" id="organization_id" value="{{$organization->id}}">
         <div class="table-responsive">
           <table id="bookingTable" class="table table-bordered table-striped dt-responsive"
             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -84,9 +77,9 @@
                     <th>Daftar Keluar</th>
                     <th>Nama Homestay</th>
                     <th>Jumlah Dibayar (RM)</th>
+                    <th>Status</th>
+                    <th>Nilaian</th>
                     <th>Action 01</th>
-                    <th>Action 02</th>
-                    <th>Action 03</th>
               </tr>
             </thead>
             <tbody>
@@ -113,34 +106,17 @@ $(document).ready(function() {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-  var dataTable,getDataCounter = 0;
+  var dataTable;
   function getData(){
-      var orgid = $("#org_id option:selected").val();
+      var organizationId = $("#organization_id").val();
       $.ajax({
-            url: "{{ route('homestay.getBookingData') }}",
+            url: "{{ route('homestay.getBookingHistoryData') }}",
             method: "GET",
             data: { 
-              orgid: orgid, 
-              homestayid: $('#homestay_id').val(),
+              organizationId:organizationId,
+              homestayId: $('#homestay_id').val(), 
             },
             success: function(result) {
-                //only run this during the first request
-                if(getDataCounter == 0){
-                  //reset #homestay_id 
-                  $('#homestay_id').empty();
-                  // add option into #homestay_id
-                  $('#homestay_id').append(`
-                    <option value="all">Semua Homestay</option>
-                  `);
-                  $(result.homestays).each(function(i, homestay){
-                    $('#homestay_id').append(`
-                      <option value="${homestay.roomid}">${homestay.roomname}</option>
-                    `);
-                  });     
-                  
-                  getDataCounter++;
-                }
-
                 // Destroy the existing DataTable instance
                 if (dataTable !== undefined) {
                   dataTable.destroy();
@@ -193,26 +169,36 @@ $(document).ready(function() {
                       searchable: true,
                     },
                     { 
-                      data: 'bookingid', render: function(data) {
-                        return `<button class="btn btn-primary" id="btn-checkout" data-booking-id="${data}">Daftar Keluar</a>`;
-                      },
-                      orderable: false,
-                      searchable: false, 
+                      data: 'status',
+                      orderable: true,
+                      searchable: true, 
                     },
                     { 
+                      data: 'review_star', render: function(data) {
+                        if(data != null){
+                            var rating ='';
+                            for(var i = 0; i < data; i++){
+                                if(i < data){
+                                    rating += `<span class="rated">&#9733</span>`;
+                                }else{
+                                    rating += `<span class="unrated">☆</span>`;  
+                                }
+                            }
+                            return rating;
+                        }else{
+                            return `Tiada nilaian diberikan`;
+                        }
+                      },
+                      orderable: true,
+                      searchable: false, 
+                    },
+                   { 
                       data: 'bookingid', render: function(data) {
                         var detailUrl = `{{route('homestay.bookingDetails', ':bookingData')}}`.replace(':bookingData' ,data);
                         return `<a class="text-white" href="${detailUrl}"><button class="btn-dark-purple btn-detail">Butiran<?button></a>`;
                       },
                       orderable: false,
                       searchable: false, 
-                    },
-                    {
-                      data: 'bookingid', render: function(data) {
-                        return `<button class="btn btn-danger" id="btn-cancel-booking" data-booking-id="${data}">Batal</a>`;
-                      },
-                      orderable: false,
-                      searchable: false,  
                     },
                 ],
                 columnDefs: [
@@ -230,89 +216,7 @@ $(document).ready(function() {
             }
         });
     }
-      // Bind onchange event
-  $('#org_id').change(function() {
-      const orgId = $(this).val();
-      $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview','')}}/${orgId}`);
-      const viewBookingHistory = $('#view-booking-history');
-      viewBookingHistory.attr('href', `{{ route('homestay.viewBookingHistory', '') }}/${orgId}`);
-      getData();
-  });
-
-  $("#org_id option:nth-child(2)").prop("selected", true);
-  $('#org_id').trigger('change');
-
-  $(document).on('click','#btn-checkout', function(){
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to finish this booking?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, checkout user from the homestay!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const bookingId = $(this).attr('data-booking-id');
-          $.ajax({
-            url: "{{route('homestay.checkoutHomestay')}}",
-            method: 'POST',
-            dataType: 'json',
-            data: {
-              bookingId: bookingId,
-            },
-            success: function(result){
-              console.log(result.success);
-              getData();
-            },
-            error:function(){
-              console.log('Checkout Room Failed');
-            }
-          })
-          Swal.fire(
-            'Booking Completed!',
-            'This user has been checked out from the homestay',
-            'success'
-          )
-        }
-      })
-  });
-
-  $(document).on('click','#btn-cancel-booking', function(){
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You have to arrange proper refund for this customer",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, cancel the booking!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          const bookingId = $(this).attr('data-booking-id');
-          $.ajax({
-            url: "{{route('homestay.cancelBooking')}}",
-            method: 'POST',
-            dataType: 'json',
-            data: {
-              bookingId: bookingId,
-            },
-            success: function(result){
-              console.log(result.success);
-              getData();
-            },
-            error:function(){
-              console.log('Cancel Booking Failed');
-            }
-          })
-          Swal.fire(
-            'Booking Cancelled!',
-            'This booking has been canceled',
-            'success'
-          )
-        }
-      })
-  });
+  getData();
   $('#homestay_id').on('change', function(){
     getData();
   });

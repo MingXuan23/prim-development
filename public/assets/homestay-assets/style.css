@@ -2,7 +2,9 @@
     --primary-color: #852aff;
     --secondary-color: #391582;
 }
-
+* {
+    box-sizing: border-box;
+}
 body {
     background-color: white !important;
 }
@@ -18,13 +20,28 @@ tbody > tr > td {
     padding-left: 0 !important;
     padding-right: 0 !important;
 } */
+
+/* to hide default search section */
+.search-wide {
+    display: none !important;
+}
+.search-short {
+    display: none !important;
+}
+ul.pagination {
+    justify-content: center;
+    margin-top: 20px;
+}
 .img-homestay {
     height: 200px;
     width: 250px;
     object-fit: cover;
     margin: 0 auto;
 }
-
+.alert > p {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
 .form-control,
 .form-select {
     border: 2px solid var(--secondary-color) !important;
@@ -35,8 +52,8 @@ tbody > tr > td {
 .form-select:hover {
     border-color: var(--primary-color) !important;
 }
-.form-control:disabled{
-    background-color: #ffffff52!important;
+.form-control:disabled {
+    background-color: #b4b4b4 !important;
 }
 td {
     text-align: center;
@@ -59,20 +76,40 @@ td a {
     border-radius: 0.25rem;
     box-shadow: 2px 2px 6px 3px rgb(90, 90, 90);
 }
+.btn {
+    padding: 12px !important;
+    border-radius: 0.75rem !important;
+    white-space: nowrap;
+}
 .btn-primary,
 .btn-purple {
     background-color: var(--primary-color) !important;
     color: white;
     transition: all 0.2s ease;
     border-radius: 0.75rem;
+    border: none;
     padding: 12px;
+}
+.hidden {
+    display: none;
 }
 .btn-primary:hover,
 .btn-purple:hover {
     background-color: var(--secondary-color) !important;
     color: white !important;
 }
-
+.btn-dark-purple {
+    background-color: var(--secondary-color) !important;
+    color: white;
+    transition: all 0.2s ease;
+    border-radius: 0.75rem;
+    border: none;
+    padding: 12px;
+}
+.btn-dark-purple:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
 /* the + button to show the hidden column of table */
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
@@ -96,13 +133,53 @@ table.dataTable.dtr-inline.collapsed
 .page-title {
     white-space: nowrap;
 }
-#img-preview {
+#img-preview,
+.img-preview-container {
     object-fit: cover;
     height: 150px;
-    width: 200px;
+    width: 200px !important;
     cursor: pointer;
 }
+.img-new {
+    border-color: var(--primary-color) !important;
+    border-width: 2px !important;
+}
+#image-previews > div {
+    position: relative;
+}
 
+#btn-delete-image {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    color: white !important;
+    background-color: var(--primary-color);
+    outline: none;
+    border: none;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+#btn-delete-image:hover {
+    opacity: 1;
+}
+button#btn-add-image {
+    height: 150px;
+    width: 200px;
+    font-size: 40px;
+    border-radius: 0.2rem;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    outline: none;
+    transition: all 0.2s ease;
+}
+button#btn-add-image:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(2px);
+}
+.card-org {
+    width: 50%;
+}
 /* homepage */
 #banner-container {
     position: relative;
@@ -128,6 +205,46 @@ table.dataTable.dtr-inline.collapsed
     align-items: center;
     background-color: rgba(0, 0, 0, 0.592);
 }
+.price-before-discount {
+    text-decoration-line: line-through;
+    color: var(--secondary-color);
+    font-size: 14px;
+    margin: auto 0;
+}
+/* new search */
+#search-icon {
+    cursor: pointer;
+}
+.search-container-input {
+    width: 100%;
+    margin-top: 20px;
+    position: relative;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Align input and SVG to the left */
+}
+.input {
+    width: 200px;
+    padding: 10px 0px 10px 40px;
+    border-radius: 9999px;
+    border: solid 2px var(--primary-color);
+    transition: all 0.2s ease-in-out;
+    outline: none;
+    opacity: 0.8;
+}
+.search-container-input svg {
+    /* position: absolute; */
+    top: 10px;
+    position: inherit;
+    left: -40px;
+    /* right: 100px; */
+    transform: translate(0, -50%);
+}
+.input:focus {
+    opacity: 1;
+    width: 450px;
+}
+/*end of new search  */
 .home-thumbnails-container {
     display: flex;
     justify-content: center;
@@ -139,9 +256,36 @@ table.dataTable.dtr-inline.collapsed
     border-radius: 0.25rem;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
     transition: all 0.2s ease;
+    position: relative;
 }
 .home-thumbnail-container:hover {
     transform: translate(2px, -8px);
+}
+
+.home-thumbnail-discount {
+    position: absolute;
+    top: -1px;
+    right: 0;
+    padding: 12px;
+    border-top-right-radius: 0.4rem;
+    color: white;
+    background-color: var(--primary-color);
+    font-size: 16px;
+}
+.home-thumbnail-nearest-discount {
+    position: absolute;
+    top: -1px;
+    right: 0;
+    padding: 12px;
+    border-top-right-radius: 0.4rem;
+    color: white;
+    background-color: var(--secondary-color);
+    font-size: 16px;
+}
+.home-thumbnail-discount > span,
+.home-thumbnail-nearest-discount > span {
+    font-weight: bold;
+    font-size: 18px;
 }
 .home-thumbnail-img {
     height: 250px;
@@ -253,6 +397,10 @@ img.zoom {
     -o-transform: scale(1.1);
     transform: scale(1.1);
 }
+div#modal-gallery,
+div#modal-fullscreen {
+    background-color: rgba(0, 0, 0, 0.7);
+}
 #modal-gallery .modal-body,
 #modal-fullscreen .modal-body {
     display: flex;
@@ -296,13 +444,65 @@ img.zoom {
 }
 /* for datepicker - jquery ui */
 .booking-container {
-    background-color: #7205ff;
+    background-color: #7145ff;
     border-radius: 0.25rem;
     padding: 12px;
 }
-.ui-state-highlight {
-    background-color: var(--secondary-color) !important;
-    border-color: var(--secondary-color) !important;
+
+/* Tooltip styles */
+.ui-datepicker td.discount-date a {
+    background-color: blue !important;
+    border: 1px solid blue;
+    cursor: pointer;
+}
+.ui-datepicker td.discount-date a:hover {
+    color: blue;
+    background-color: white !important;
+}
+.ui-datepicker td.increase-date a {
+    background-color: rgb(255, 60, 106) !important;
+    border: 1px solid rgb(255, 60, 106);
+    cursor: pointer;
+}
+.ui-datepicker td.increase-date a:hover {
+    color: rgb(255, 60, 106);
+    background-color: white !important;
+}
+
+/* To display tooltips */
+.ui-datepicker td span.ui-state-highlight {
+    position: relative;
+}
+
+.ui-datepicker td span.ui-state-highlight:after {
+    content: attr(title);
+    position: absolute;
+    bottom: -25px; /* Adjust the distance from the cell */
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    color: var(--primary-color);
+    text-align: center;
+    font-size: 12px;
+    padding: 5px;
+    border-radius: 5px;
+    display: none;
+}
+
+.ui-datepicker td span.ui-state-highlight:hover:after {
+    display: block;
+}
+.ui-state-active {
+    color: white;
+    background-color: var(--secondary-color);
+}
+.ui-state-active:hover {
+    color: var(--primary-color);
+    background-color: white;
+}
+.ui-state-highlight:not(.ui-state-active) {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
 }
 .ui-datepicker {
     padding: 0 !important;
@@ -313,9 +513,188 @@ img.zoom {
 .ui-button,
 html .ui-button.ui-state-disabled:hover,
 html .ui-button.ui-state-disabled:active {
-    border-width: 5px !important;
-    border-radius: 2rem !important;
-    text-align: center !important;
+    padding: 6px !important;
+}
+.ui-datepicker {
+    width: 350px;
+}
+.ui-datepicker td {
+    width: 14.29% !important;
+}
+.price-text {
+    font-size: 11px;
+}
+/* for book button */
+.btn-book {
+    cursor: pointer;
+    font-weight: 700;
+    font-family: Helvetica, "sans-serif";
+    transition: all 0.2s;
+    padding: 10px 20px;
+    border-radius: 100px;
+    color: white;
+    background: var(--secondary-color);
+    border: 1px solid white;
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+}
+.btn-book:hover {
+    background: var(--primary-color);
+}
+
+.btn-book > svg {
+    width: 34px;
+    margin-left: 10px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.btn-book:hover svg {
+    transform: translateX(5px);
+}
+
+.btn-book:active {
+    transform: scale(0.95);
+}
+/* for add promotion */
+.promotion-container {
+    width: 50%;
+    margin: 0 auto;
+}
+.border-bottom {
+    border-bottom: 2px solid white;
+}
+
+/* for booking checkout */
+.border-white {
+    border: 1px solid white;
+    border-radius: 0.25rem;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6) !important;
+    padding: 12px;
+}
+/* for review section */
+.review-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+.review-container > div {
+    padding: 12px 0;
+    flex-basis: 50%;
+    margin-bottom: 12px;
+}
+.review-container p {
+    text-align: justify;
+}
+.rated {
+    color: var(--primary-color);
+    font-size: 22px;
+}
+.unrated {
+    color: var(--primary-color);
+    font-size: 22px;
+}
+/* for tempahan anda */
+.nav-tabs > li > a,
+.nav-pills > li > a {
+    color: var(--secondary-color) !important;
+}
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+    color: var(--primary-color) !important;
+}
+.tab-card {
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.6) !important;
+}
+.tab-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+/* rating */
+
+.cross {
+    padding: 10px;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 23px;
+}
+
+.cross i {
+    margin-top: -5px;
+    cursor: pointer;
+}
+
+.comment-box {
+    padding: 5px;
+}
+
+.comment-area textarea {
+    resize: none;
+    border: 1px solid var(--primary-color);
+}
+
+.send {
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.send:hover {
+    color: #fff;
+    background-color: #f50202;
+    border-color: #f50202;
+}
+
+.rating {
+    display: inline-flex;
+    margin-top: -10px;
+    flex-direction: row-reverse;
+}
+
+.rating > input {
+    display: none;
+}
+.rating > span {
+    color: var(--primary-color);
+    width: 22px;
+    font-size: 28px;
+}
+.rating > label {
+    position: relative;
+    width: 28px;
+    font-size: 35px;
+    color: var(--primary-color);
+    cursor: pointer;
+}
+.rating > label::before {
+    content: "\2605";
+    position: absolute;
+    opacity: 0;
+}
+
+.rating > label:hover:before,
+.rating > label:hover ~ label:before {
+    opacity: 1 !important;
+}
+
+.rating > input:checked ~ label:before {
+    opacity: 1;
+}
+
+.rating:hover > input:checked ~ label:before {
+    opacity: 0.4;
+}
+#booking-details-container {
+    position: relative;
+}
+#booking-button-group {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+/* report */
+.label-chart {
+    font-size: 16px;
 }
 /* for mobile responsive */
 @media screen and (max-width: 500px) {
@@ -323,7 +702,7 @@ html .ui-button.ui-state-disabled:active {
         flex-wrap: nowrap !important;
         justify-content: flex-start !important;
         width: 100% !important;
-        overflow-x: auto;
+        overflow-x: auto !important;
     }
     .content-container {
         width: 100% !important;
@@ -334,11 +713,19 @@ html .ui-button.ui-state-disabled:active {
     .card-body > div > .col-6 {
         max-width: 100%;
     }
-
+    .card-org {
+        width: 90% !important;
+    }
     /* homepage */
     #banner-content > * {
         padding: 8px;
         font-size: 20px !important;
+    }
+    .input {
+        width: 70%;
+    }
+    .input:focus {
+        width: 100%;
     }
     #modal-gallery .modal-body {
         flex-wrap: nowrap;
@@ -346,16 +733,36 @@ html .ui-button.ui-state-disabled:active {
         overflow-x: auto;
         justify-content: flex-start;
     }
-    #modal-gallery .modal-body::-webkit-scrollbar {
+    #modal-gallery .modal-body::-webkit-scrollbar,
+    #image-previews::-webkit-scrollbar {
         width: 25px;
         height: 10px;
     }
-    #modal-gallery .modal-body::-webkit-scrollbar-thumb {
+    #modal-gallery .modal-body::-webkit-scrollbar-thumb,
+    #image-previews::-webkit-scrollbar-thumb {
         background-color: var(--primary-color);
         border-radius: 0.25rem;
     }
     /* show page */
     .gallery-container {
         grid-template-columns: 100%;
+    }
+    #room-info {
+        padding: 12px !important;
+    }
+    #ui-datepicker-div {
+        left: 50% !important;
+        transform: translate(-50%);
+    }
+    .review-container > div {
+        flex-basis: 100%;
+    }
+    /* promotion */
+    .promotion-container {
+        width: 100%;
+    }
+    /* tempahan anda */
+    #tab-container {
+        padding: 12px !important;
     }
 }

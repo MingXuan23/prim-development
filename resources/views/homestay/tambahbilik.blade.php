@@ -13,7 +13,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18 page-title color-purple" ><span><a href="{{route('homestay.urusbilik')}}" class="color-dark-purple">Urus Homestay/Bilik >> </a></span>Tambah Homestay/Bilik</h4>
+            <h4 class="font-size-18 page-title color-purple" ><span><a href="{{route('homestay.urusbilik')}}" class="color-dark-purple">Urus Homestay >> </a></span>Tambah Homestay</h4>
         </div>
     </div>
 </div>
@@ -48,17 +48,17 @@
                 <div class="card-body">
                     <div class="row">
                             <div class="form-group required col-6">
-                                <label class="control-label">Homestay/Hotel <span style="color:#d00"> *</span></label>
+                                <label class="control-label">Organisasi <span style="color:#d00"> *</span></label>
                                 <select name="homestayid" id="homestayid" class="form-select"
                                     data-parsley-required-message="Sila pilih status homestay" required>
-                                    <option selected disabled>Pilih Homestay/Hotel</option>
+                                    <option selected disabled>Pilih Organisasi</option>
                                     @foreach($data as $rows)
                                     <option value="{{ $rows->id }}">{{ $rows->nama }}</option>
                                     @endforeach
                                 </select>
                             </div>
                             <div class="form-group col-6">
-                                <label class="control-label"> Nama Homestay atau Bilik <span style="color:#d00"> *</span> </label>
+                                <label class="control-label"> Nama Homestay <span style="color:#d00"> *</span> </label>
                                 <input type="text" name="roomname" id="roomname" class="form-control" placeholder="Nama / Nombor Bilik"
                                     data-parsley-required-message="Sila masukkan nama / nombor bilik" required>
                                     
@@ -69,7 +69,7 @@
                         
                         <div class="col">
                             <div class="form-group required">
-                                <label class="control-label">Kapasiti Homestay atau Bilik(pax) <span style="color:#d00"> *</span></label>
+                                <label class="control-label">Kapasiti Homestay(pax) <span style="color:#d00"> *</span></label>
                                 <input type="number" min="1" class="form-control" id="roompax" name="roompax" required>
                             </div>
                         </div>
@@ -84,7 +84,7 @@
 
                     <div class="row">
                             <div class="form-group col-6 ">
-                                <label for="details">Detail Homestay atau Bilik<span style="color:#d00"> *</span></label>
+                                <label for="details">Detail Homestay<span style="color:#d00"> *</span></label>
                                 <textarea rows="10" cols="30" name="details" id="details" class="form-control" placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required></textarea>                                  
                             </div>
                             <div class="form-group col-6 row">
@@ -123,16 +123,38 @@
                                
                             </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="check-in-after">Daftar Masuk Selepas <span style="color:#d00"> *</span></label>    
+                                <input type="time" name="checkInAfter" id="check-in-after" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="check-out-before">Daftar Keluar Sebelum <span style="color:#d00"> *</span></label>
+                                <input type="time" name="checkOutBefore" id="check-out-before" class="form-control"  required>
+                            </div>
+                        </div>  
+                        <div class="col-md-6 d-flex align-items-center">
+                            <div class="form-check">
+                                <input type="checkbox" name="isAvailable" id="isAvailable" class="form-check-input">
+                                <label for="isAvailable" class="form-check-label">Dibuka Untuk Tempahan</label>
+                            </div>
+                        </div>                       
+                    </div>
 
-                   <div class="form-group d-flex justify-content-center align-items-center gap-2">
+                </div>
+                    <div class="image-flash-message"></div>
+                   <div class="form-group d-flex justify-content-center align-items-center flex-wrap gap-2">
                         <input type="file" name="images[]" id="images" multiple accept=".jpg,.jpeg,.png" class="form-control col-5" required>
-                        <label for="images">Pilih gambar-gambar homestay/bilik(min:5 gambar, max:10 gambar)<span style="color:#d00"> *</span></label>
+                        <label for="images">Pilih gambar-gambar homestay(min:5 gambar, max:20 gambar)<span style="color:#d00"> *</span></label>
                    </div>
                     <h3 class="text-center">Preview Images:</h3>
                     <div id="image-previews" class="d-flex justify-content-center align-items-center gap-1 flex-wrap mb-2">
                     </div>
 
-                    <div class="form-group mb-0">
+                    <div class="form-group mb-2">
                         <div class="text-right">
                             <a type="button" href="{{route('homestay.urusbilik')}}"
                                 class="btn btn-secondary waves-effect waves-light mr-1">
@@ -173,17 +195,17 @@ $(document).ready(function () {
         $('#images').on('change', function(e){
             $('#image-previews').empty();
             const imageFiles = $(this).prop('files');
-            if(imageFiles.length > 10){
-                $('.flash-message').html(`
+            if(imageFiles.length > 20){
+                $('.image-flash-message').html(`
                     <div id="alert" class="alert alert-danger text-center">
-                        Hanya dibenarkan muat naik maximum 10 gambar sahaja
+                        Hanya dibenarkan muat naik maximum 20 gambar sahaja
                     </div>
                 `);
                 $('#alert').fadeOut(6000);
                 $(this).val('');
                 return;
             }else if(imageFiles.length < 5){
-                $('.flash-message').html(`
+                $('.image-flash-message').html(`
                     <div id="alert" class="alert alert-danger text-center">
                         Sila muat naik sekurang-kurangnya 5 gambar
                     </div>
@@ -197,25 +219,25 @@ $(document).ready(function () {
                         const image = new Image();
                         image.src = URL.createObjectURL(imageFiles[i]);
                         image.onload = function () {
-                        const maxWidth = 1280; // Maximum width allowed
-                        const maxHeight = 1280; // Maximum height allowed
-                        if (this.width > maxWidth || this.height > maxHeight) {
-                            $('.flash-message').html(`
-                                <div id="alert" class="alert alert-danger text-center">
-                                    Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
-                                </div>
-                            `);
-                            $('#alert').fadeOut(6000);
-                            $('#images').val('');
-                        } else {
+                        // const maxWidth = 1280; // Maximum width allowed
+                        // const maxHeight = 1280; // Maximum height allowed
+                        // if (this.width > maxWidth || this.height > maxHeight) {
+                        //     $('.flash-message').html(`
+                        //         <div id="alert" class="alert alert-danger text-center">
+                        //             Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                        //         </div>
+                        //     `);
+                        //     $('#alert').fadeOut(6000);
+                        //     $('#images').val('');
+                        // } else {
                             // Display the image preview
                             $('#image-previews').append(`
                                 <img src="${image.src}" class="img-thumbnail" id="img-preview">
                             `);
                             } 
-                        }                 
+                        // }                 
                     }else{
-                        $('.flash-message').html(`
+                        $('.image-flash-message').html(`
                             <div id="alert" class="alert alert-danger text-center">
                                 Hanya dibenarkan muat naik gambar sahaja
                             </div>

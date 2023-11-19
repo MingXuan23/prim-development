@@ -15,7 +15,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18 page-title color-purple"><span><a href="{{route('homestay.urusbilik')}}" class="color-dark-purple">Urus Homestay/Bilik >> </a></span>Edit Homestay/Bilik</h4>
+            <h4 class="font-size-18 page-title color-purple"><span><a href="{{route('homestay.urusbilik')}}" class="color-dark-purple">Urus Homestay >> </a></span>Edit Homestay</h4>
         </div>
     </div>
 </div>
@@ -45,13 +45,13 @@
           <div class="flash-message"></div>
 
             <form method="post" action="{{route('homestay.updateRoom')}}" enctype="multipart/form-data"
-                class="form-validation">
+                class="form-validation" id="form-edit-homestay">
                 {{csrf_field()}}
                 <input type="hidden" name="roomid" value={{$room->roomid}}>
                 <div class="card-body">
                     <div class="row">
                         <div class="form-group col-6">
-                            <label class="control-label"> Nama Homestay atau Bilik <span style="color:#d00"> *</span> </label>
+                            <label class="control-label"> Nama Homestay <span style="color:#d00"> *</span> </label>
                             <input type="text" name="roomname" id="roomname" class="form-control" placeholder="Nama / Nombor Bilik"
                                 data-parsley-required-message="Sila masukkan nama / nombor bilik" value="{{$room->roomname}}" required>
                         </div>
@@ -65,7 +65,7 @@
                         
                         <div class="col">
                             <div class="form-group required">
-                                <label class="control-label">Kapasiti Homestay atau Bilik(pax) <span style="color:#d00"> *</span></label>
+                                <label class="control-label">Kapasiti Homestay(pax) <span style="color:#d00"> *</span></label>
                                 <input type="number"  class="form-control" id="roompax" name="roompax" value="{{$room->roompax}}" required>
                             </div>
                         </div>
@@ -79,9 +79,9 @@
                     </div>
 
                     <div class="row">
-                            <div class="form-group col-6 ">
-                                <label for="details">Detail Homestay atau Bilik<span style="color:#d00"> *</span></label>
-                                <textarea rows="10" cols="30" name="details" id="details" class="form-control"  placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required>{{$room->details}}</textarea>                                  
+                            <div class="form-group col-6">
+                                <label for="details">Detail Homestay<span style="color:#d00"> *</span></label>
+                                <textarea rows="10" cols="30" name="details" id="details" class="form-control"  placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required>{{$room->details}}</textarea> 
                             </div>
                             <div class="form-group col-6 row">
                                 <div class="form-group col-6 required">
@@ -117,7 +117,20 @@
                                     <label for="address">Nombor Rumah, Bangunan, Nama Jalan <span style="color:#d00"> *</span></label>
                                     <input type="text" name="address" id="address" class="form-control" placeholder="No.123, Taman Merdeka" value="{{$room->address}}" required></textarea>                                       
                                 </div>
-                               
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="check-in-after">Daftar Masuk Selepas <span style="color:#d00"> *</span></label>    
+                                        <input type="time" name="checkInAfter" id="check-in-after" class="form-control" value="{{$room->check_in_after}}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="check-out-before">Daftar Keluar Sebelum <span style="color:#d00"> *</span></label>
+                                        <input type="time" name="checkOutBefore" id="check-out-before" class="form-control" value="{{$room->check_out_before}}" required>
+                                    </div>
+                                </div>                        
                             </div>
                     </div>
 
@@ -125,17 +138,26 @@
                         <input type="file" name="images[]" id="images" multiple accept=".jpg,.jpeg,.png" class="form-control col-5" required>
                         <label for="images">Pilih gambar-gambar homestay/bilik(maximum 10 gambar)<span style="color:#d00"> *</span></label>
                    </div> --}}
+                   <div class="image-flash-message"></div>
                     <h3 class="text-center">Preview Images:</h3>
                     <div id="image-previews" class="d-flex justify-content-center align-items-center gap-1 flex-wrap mb-2">
                         @foreach($images as $image)
-                            <div class="img-preview-container">
-                                <img src="../{{$image->image_path}}"  class="img-thumbnail" id="img-preview">
-                                <input type="file" name="image[]" id="{{$image->id}}" accept=".jpg,.jpeg,.png" hidden>
-                            </div>
+                        <div>
+                            <button id="btn-delete-image" type="button"><i class="fas fa-times"></i></button>
+                            <img src="../{{$image->image_path}}"  class="img-thumbnail" id="img-preview">
+                            <input type="file" name="image[]" id="{{$image->id}}" class="original_images" accept=".jpg,.jpeg,.png" hidden>                            
+                        </div>
+                       
                         @endforeach
+                        <button id="btn-add-image" type="button"><i class="fas fa-plus"></i></button>
+                        <input type="file"  name="new_images[]" id="new_images" accept=".jpg,.jpeg,.png" multiple hidden>
+
                     </div>
 
-                    <div class="form-group mb-0">
+                    <input type="hidden" name="delete_id">
+                    <input type="hidden" name="edit_id">
+                    
+                    <div class="form-group mb-2">
                         <div class="text-right">
                             <a type="button" href="{{route('homestay.urusbilik')}}"
                                 class="btn btn-secondary waves-effect waves-light mr-1">
@@ -160,7 +182,6 @@
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 
-
 <script>
 
 $(document).ready(function () {
@@ -180,32 +201,39 @@ $(document).ready(function () {
                 const image = new Image();
                 image.src = URL.createObjectURL(imageFile);
                 image.onload = function () {
-                const maxWidth = 1280; // Maximum width allowed
-                const maxHeight = 1280; // Maximum height allowed
-                if (this.width > maxWidth || this.height > maxHeight) {
-                    $('.flash-message').html(`
-                        <div id="alert" class="alert alert-danger text-center">
-                            Gambar  melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
-                        </div>
-                    `);
-                    $('#alert').fadeOut(6000);
-                    $('#images').val('');
-                } else {
+                // const maxWidth = 1280; // Maximum width allowed
+                // const maxHeight = 1280; // Maximum height allowed
+                // if (this.width > maxWidth || this.height > maxHeight) {
+                //     $('.image-flash-message').html(`
+                //         <div id="alert" class="alert alert-danger text-center">
+                //             Gambar  melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                //         </div>
+                //     `);
+                //     $('#alert').fadeOut(6000);
+                //     $('#images').val('');
+                // } else {
                     // Display the image preview
                     imagePreview.attr('src',`${image.src}`);
+                    imagePreview.addClass('img-new');
+
                     } 
-                }      
+                // }      
             }
+            const imageId = $(this).attr('id');
+            $('input[name="edit_id"]').val(function(index, value){
+                return (value ? value + ',' : '') + imageId;
+            });
 
         });
         // for image inputs
+
         $('#images').on('change', function(e){
             $('#image-previews').empty();
             const imageFiles = $(this).prop('files');
-            if(imageFiles.length > 10){
+            if(imageFiles.length > 20){
                 $('.flash-message').html(`
                     <div id="alert" class="alert alert-danger text-center">
-                        Hanya dibenarkan muat naik maximum 10 gambar sahaja
+                        Hanya dibenarkan muat naik maximum 20 gambar sahaja
                     </div>
                 `);
                 $('#alert').fadeOut(6000);
@@ -217,25 +245,25 @@ $(document).ready(function () {
                         const image = new Image();
                         image.src = URL.createObjectURL(imageFiles[i]);
                         image.onload = function () {
-                        const maxWidth = 1280; // Maximum width allowed
-                        const maxHeight = 1280; // Maximum height allowed
-                        if (this.width > maxWidth || this.height > maxHeight) {
-                            $('.flash-message').html(`
-                                <div id="alert" class="alert alert-danger text-center">
-                                    Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
-                                </div>
-                            `);
-                            $('#alert').fadeOut(6000);
-                            $('#images').val('');
-                        } else {
+                        // const maxWidth = 1280; // Maximum width allowed
+                        // const maxHeight = 1280; // Maximum height allowed
+                        // if (this.width > maxWidth || this.height > maxHeight) {
+                        //     $('.image-flash-message').html(`
+                        //         <div id="alert" class="alert alert-danger text-center">
+                        //             Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                        //         </div>
+                        //     `);
+                        //     $('#alert').fadeOut(6000);
+                        //     $('#images').val('');
+                        // } else {
                             // Display the image preview
                             $('#image-previews').append(`
-                                <img src="${image.src}" class="img-thumbnail" id="img-preview">
+                                <img src="${image.src}" class="img-thumbnail img-new" id="img-preview">
                             `);
                             } 
-                        }                 
+                        // }                 
                     }else{
-                        $('.flash-message').html(`
+                        $('.image-flash-message').html(`
                             <div id="alert" class="alert alert-danger text-center">
                                 Hanya dibenarkan muat naik gambar sahaja
                             </div>
@@ -247,6 +275,85 @@ $(document).ready(function () {
                 }
             }
         });
+        // insert new images
+        $('#btn-add-image').on('click', function(){
+            $('#new_images').click();
+        });
+        $('#new_images').on('change',function(e){
+            // reset new image previews
+            $('#image-previews > div ~ img').remove();
+            const imageFiles = $(this).prop('files');
+            // get the remaining number of images allowed to be uploaded
+            const remainingNumber= 20 - Object.keys($('.original_images')).length;
+            if(imageFiles.length > remainingNumber){
+                $('.image-flash-message').html(`
+                    <div id="alert" class="alert alert-danger text-center">
+                        Hanya dibenarkan muat naik maximum 20 gambar sahaja
+                    </div>
+                `);
+                $('#alert').fadeOut(6000);
+                $(this).val('');
+                return;
+            }else{
+                for(let i = 0;i < imageFiles.length;i++){
+                    if(imageFiles[i].type.includes('jpg')||imageFiles[i].type.includes('jpeg')||imageFiles[i].type.includes('png')){
+                        const image = new Image();
+                        image.src = URL.createObjectURL(imageFiles[i]);
+                        image.onload = function () {
+                        // const maxWidth = 1280; // Maximum width allowed
+                        // const maxHeight = 1280; // Maximum height allowed
+                        // if (this.width > maxWidth || this.height > maxHeight) {
+                        //     $('.image-flash-message').html(`
+                        //         <div id="alert" class="alert alert-danger text-center">
+                        //             Gambar ke-${i + 1} melebihi saiz maksimum yang dibenarkan (${maxWidth}x${maxHeight} piksel).
+                        //         </div>
+                        //     `);
+                        //     $('#alert').fadeOut(6000);
+                        //     $('#images').val('');
+                        // } else {
+                            // Display the image preview
+                            const images = `
+                                <img src="${image.src}" class="img-thumbnail img-new" id="img-preview">
+                            `;
+                            // insert after the last original image preview
+                            $(images).insertAfter($('#image-previews > div')[$('#image-previews > div').length- 1]);
+                            // } 
+                        }                 
+                    }else{
+                        $('.image-flash-message').html(`
+                            <div id="alert" class="alert alert-danger text-center">
+                                Hanya dibenarkan muat naik gambar sahaja
+                            </div>
+                        `);
+                        $('#alert').fadeOut(6000);
+                        $(this).val('');
+                        return;
+                    }
+                }
+            }
+        });
+        // for deleting images
+        $(document).on('click', '#btn-delete-image',function(){
+            $(this).next('#img-preview').remove();
+            const imageId = $(this).next().attr('id');
+            $(this).remove();
+            $('input[name="delete_id"]').val(function(index, value){
+                return (value ? value + ',' : '') + imageId;
+            });
+        });
+        $('#form-edit-homestay').on('submit',function(e){
+            if($('#image-previews img').length < 5){
+                e.preventDefault();
+                $('.image-flash-message').html(`
+                    <div id="alert" class="alert alert-danger text-center">
+                        Sila muat naik sekurang-kurangnya 5 gambar
+                    </div>
+                `);
+                $('#alert').fadeOut(6000);
+                $(this).val('');
+                return;
+            }
+        })
     // to fetch district options based on selected state
     function toTitleCase(str) {
             var lcStr = str.toLowerCase();
@@ -279,6 +386,7 @@ $(document).ready(function () {
         });
 
     $('#state').trigger('change');
+
 
 });
 
