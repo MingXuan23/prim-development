@@ -168,31 +168,7 @@ class ScheduleApiController extends Controller
                     $time_info= $this->getSlotTime($s,$s->day,$s->slot);
                     $s->time=$time_info['time'];
                     $s->duration=$time_info['duration'];
-
-
-                    $onLeave =DB::table('teacher_leave as tl')
-                    ->join('leave_relief as lr','lr.teacher_leave_id','tl.id')
-                    ->leftJoin('users as u','u.id','lr.replace_teacher_id')
-                    ->where('lr.schedule_subject_id',$s->id)
-                    ->whereBetween('tl.date', [Carbon::now()->format('Y-m-d'), Carbon::now()->addDays(7)->format('Y-m-d')])
-                    ->where('tl.teacher_id',$id)
-                    ->where('tl.status',1)
-                    //->where('lr.confirmation','Confirmed')
-                    ->select('lr.id','u.name as replaceTeacherName','lr.confirmation')
-                    ->get();
-                    //dd($onLeave);
-                    if(count($onLeave)>0){
-                        $s->category="Leave";
-                        $confirmedRelief = $onLeave->where('confirmation', 'Confirmed')->first();
-                        if($confirmedRelief){
-                            $s->relatedTeacher = $confirmedRelief->replaceTeacherName;
-                        }else{
-                            $s->relatedTeacher = 'No teacher';
-                        }
-                        
-                    }else{
-                        $s->category="Normal";
-                    }
+                    $s->category="Normal";
                    
                     unset($s->time_off);
                     unset($s->start_time);
@@ -205,14 +181,31 @@ class ScheduleApiController extends Controller
             ->leftJoin('classes as c','c.id','ss.class_id')
             ->leftJoin('subject as sub','sub.id','ss.subject_id')
             ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
             ->where('s.organization_id',$school->id)
             ->where('lr.replace_teacher_id',$user->id)
             ->where('lr.confirmation','Confirmed')
+            ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
             ->where('sv.status',1)
-            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher')
+            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
             //dd($schedule);
+            $onLeave_schedule = DB::table('leave_relief as lr')
+            ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+            ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+            ->leftJoin('schedules as s','s.id','sv.schedule_id')
+            ->leftJoin('classes as c','c.id','ss.class_id')
+            ->leftJoin('subject as sub','sub.id','ss.subject_id')
+            ->leftJoin('users as u','u.id','lr.replace_teacher_id')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            ->where('s.organization_id',$school->id)
+            ->where('tl.teacher_id',$user->id)
+            ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
+            ->where('sv.status',1)
+            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
+            ->get();
 
+            //dd($relief_schedule);
             foreach($relief_schedule as $r){
                 //if(isset($s->duration)){
 
@@ -225,8 +218,20 @@ class ScheduleApiController extends Controller
                     unset($r->time_off);
                     unset($r->start_time);
             }
-            $schedule = $schedule->merge($relief_schedule);
-           return response()->json(['schedule'=>$schedule]);
+            
+            foreach($onLeave_schedule as $r){
+                //if(isset($s->duration)){
+
+                    $r->category ="Leave";
+                    $time_info= $this->getSlotTime($r,$r->day,$r->slot);
+                    $r->time=$time_info['time'];
+                    $r->duration=$time_info['duration'];
+                    
+                   
+                    unset($r->time_off);
+                    unset($r->start_time);
+            }
+            return response()->json(['schedule'=>$schedule,'leave'=>$onLeave_schedule,'relief'=>$relief_schedule]);
 
            
 
