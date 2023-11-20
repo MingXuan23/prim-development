@@ -202,7 +202,7 @@ class ScheduleApiController extends Controller
             ->where('tl.teacher_id',$user->id)
             ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
             ->where('sv.status',1)
-            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
+            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date','lr.confirmation')
             ->get();
 
             //dd($relief_schedule);
@@ -213,7 +213,7 @@ class ScheduleApiController extends Controller
                     $time_info= $this->getSlotTime($r,$r->day,$r->slot);
                     $r->time=$time_info['time'];
                     $r->duration=$time_info['duration'];
-                    
+                   
                    
                     unset($r->time_off);
                     unset($r->start_time);
@@ -226,7 +226,10 @@ class ScheduleApiController extends Controller
                     $time_info= $this->getSlotTime($r,$r->day,$r->slot);
                     $r->time=$time_info['time'];
                     $r->duration=$time_info['duration'];
-                    
+                    if($r->confirmation !="Confirmed")
+                        $r->relatedTeacher ="No Teacher";
+
+                    unset($r->confirmation);
                    
                     unset($r->time_off);
                     unset($r->start_time);
