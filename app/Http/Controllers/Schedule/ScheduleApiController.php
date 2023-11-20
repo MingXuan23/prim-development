@@ -261,7 +261,14 @@ class ScheduleApiController extends Controller
             ->first();
         
         if($school){
-            return response()->json(['school_name'=>$school->nama,'school_id'=>$school->id]);
+            $pendingReliefCount = DB::table('leave_relief as lr')
+                ->join('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                ->where('lr.replace_teacher_id',$user->id)
+                ->where('lr.confirmation',"Pending")
+                ->where('tl.status',1)
+                ->where('tl.date','>=',Carbon::today())
+                ->count();
+            return response()->json(['school_name'=>$school->nama,'school_id'=>$school->id,'pendingReliefCount'=>$pendingReliefCount]);
         }
         return response()->json(['school_name'=>'No related school','school_id'=>-1]);
 
