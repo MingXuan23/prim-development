@@ -187,6 +187,7 @@ class ScheduleApiController extends Controller
             ->where('lr.confirmation','Confirmed')
             ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
             ->where('sv.status',1)
+            ->where('tl.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
             //dd($schedule);
@@ -202,6 +203,7 @@ class ScheduleApiController extends Controller
             ->where('tl.teacher_id',$user->id)
             ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
             ->where('sv.status',1)
+            ->where('tl.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date','lr.confirmation')
             ->get();
 
