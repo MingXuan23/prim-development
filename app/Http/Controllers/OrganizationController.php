@@ -85,7 +85,7 @@ class OrganizationController extends Controller
         Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($type_org->nama , $organization->id)]);
         
         //attach foreign key to pivot table
-        $organization->user()->attach(Auth::id(), ['role_id' => 2]);
+        $organization->user()->attach(Auth::id(), ['role_id' => 2,'start_date' => now(), 'status' => 1]);
 
         $user = Auth::user();
         $user->assignRole('Admin');

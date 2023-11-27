@@ -462,6 +462,7 @@ Route::post('directpayIndex', 'DirectpayController@directpayIndex')->name('direc
 
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
 Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
+Route::post('directpayReceipt', 'DirectPayController@directpayReceipt')->name('directpayReceipt');
 Route::get('successpay', 'PayController@successPay')->name('successpay');
 Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
 Route::get('feespay', 'PayController@fees_pay')->name('feespay');
