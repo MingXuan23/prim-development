@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Auth::routes();
+
 Route::get('registerAdmin', 'Auth\RegisterController@AdminRegisterIndex')->name('register.admin');
 //Route::post('registerAdmin', 'Auth\RegisterController@registerAdmin');
 // Auth::routes(['register' => false]);
@@ -103,6 +104,28 @@ Route::group(['prefix' => 'teacher'], function () {
     Route::post('updateperanan/{id}', 'TeacherController@perananupdate')->name('teacher.perananupdate');
     Route::post('destroyperanan/{id}/{role_id}', 'TeacherController@peranandestroy')->name('teacher.peranandestroy');
 });
+
+// Relief System
+Route::group(['prefix' => 'subject'], function () {
+    Route::get('getSubjectDatatable', 'SubjectController@getSubjectDatatable')->name('subject.getSubjectDatatable');
+    Route::delete('/destroysubject/{id}', 'SubjectController@subjectdestroy')->name('subject.subjectdestroy');
+});
+Route::post('importSubject', 'SubjectController@subjectImport')->name('importSubject');
+
+Route::group(['prefix' => 'schedule'], function () {
+
+});
+
+
+Route::group(['prefix' => 'manage_relief'], function () {
+
+});
+
+
+Route::group(['prefix' => 'relief_report'], function () {
+
+});
+
 
 Route::group(['prefix' => 'class'], function () {
     Route::get('list', 'ClassController@getClassesDatatable')->name('class.getClassesDatatable');
@@ -405,7 +428,11 @@ Route::group(['middleware' => ['auth']], function () {
         'school'             => 'SchoolController',
         'teacher'            => 'TeacherController',
         'class'              => 'ClassController',
-        'student'            => 'StudentController',
+        'student'            => 'StudentController', 
+        'subject'            => 'SubjectController',
+        'schedule'           => 'Schedule\ScheduleController',
+        'manage_relief'      => 'ManageReliefController',
+        'relief_report'      => 'ReliefReportController',
         'category'           => 'CategoryController',
         'fees'               => 'FeesController',
         'details'            => 'DetailsController',
@@ -773,3 +800,7 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::get('/konvoChart','PolimasController@konvoChart')->name('polimas.student.konvoChart');
     });
 });
+
+
+
+
