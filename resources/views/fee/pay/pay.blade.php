@@ -165,9 +165,7 @@
                     <label for="sel1">Sila Pilih Bank:</label>
                     <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
                         <option value="">Pilih bank</option>
-                        @foreach ($banklists as $key => $value)
-                        <option value="{{ $value['code'] }}">{{ $value['nama'] }}</option>
-                        @endforeach
+                       
                     </select>
                 </div>
 
@@ -220,20 +218,21 @@
 </html>
 
 <script>
-    function checkBank() {
-        var t = jQuery('#bankid').val();
-        var a = parseFloat(jQuery('#amount').val());
-        if (t === '' || t === null) {
-            alert('Please select a bank');
-            return false;
-        }
-        if (a < 1.00) {
-            alert('Transaction Amount is Lower than the Minimum Limit RM1.00 for B2C');
-            return false;
-        }
-        else if (a > 30000.00) {
-            alert('Transaction Amount Limit Exceeded RM30,000.00 for B2C');
-            return false;
-        }
-    }
+    // function checkBank() {
+    //     var t = jQuery('#bankid').val();
+    //     var a = parseFloat(jQuery('#amount').val());
+    //     if (t === '' || t === null) {
+    //         alert('Please select a bank');
+    //         return false;
+    //     }
+    //     if (a < 1.00) {
+    //         alert('Transaction Amount is Lower than the Minimum Limit RM1.00 for B2C');
+    //         return false;
+    //     }
+    //     else if (a > 30000.00) {
+    //         alert('Transaction Amount Limit Exceeded RM30,000.00 for B2C');
+    //         return false;
+    //     }
+    // }
+
 </script>

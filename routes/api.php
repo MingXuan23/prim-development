@@ -79,6 +79,10 @@ Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
     Route::any('submitLeave', 'ScheduleApiController@submitLeave');
     
     Route::get('getLeaveType', 'ScheduleApiController@getLeaveType');
+    Route::post('getPendingRelief','ScheduleApiController@getPendingRelief');
+
+    Route::post('submitReliefResponse','ScheduleApiController@submitReliefResponse');
+    Route::get('getHistory/{id}','ScheduleApiController@getHistory');
 
     
 });

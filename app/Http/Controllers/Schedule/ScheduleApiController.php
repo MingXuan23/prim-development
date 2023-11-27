@@ -255,14 +255,11 @@ class ScheduleApiController extends Controller
         if($user ==null){
             return response()->json(["error"=>"This user did not exist"]);
         }
-        $school =DB::table('organizations as o')
-            ->join('organization_user as ou','ou.organization_id','o.id')
-            ->where('ou.role_id',5)
-            ->where ('ou.user_id',$user->id)
-            ->select('o.*')
-            ->first();
+        $school =$this->getSchools($user->id)->first();
         
         if($school){
+            $isAdmin = $this->checkAdmin($user->id,$school->id);
+            $allcount=0;
             $pendingReliefCount = DB::table('leave_relief as lr')
                 ->join('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                 ->where('lr.replace_teacher_id',$user->id)
@@ -270,7 +267,25 @@ class ScheduleApiController extends Controller
                 ->where('tl.status',1)
                 ->where('tl.date','>=',Carbon::today())
                 ->count();
-            return response()->json(['school_name'=>$school->nama,'school_id'=>$school->id,'pendingReliefCount'=>$pendingReliefCount]);
+
+            if($isAdmin){
+                $allcount = DB::table('organizations as o')
+                    ->leftJoin('schedules as s','s.organization_id','o.id')
+                    ->leftJoin('schedule_version as sv','sv.schedule_id','s.id')
+                    ->leftJoin('schedule_subject as ss','ss.schedule_version_id','sv.id')
+                    ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
+                    ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                    ->where('lr.confirmation','!=','Confirmed')
+                    ->where('o.id',$school->id)
+                    ->where('sv.status',1)
+                    ->where('s.status',1)
+                    ->where('tl.status',1)
+                    ->where('tl.date','>=',Carbon::today())
+                    ->select('lr.id')  // Select the id column to make unique method work
+                    ->distinct()       // Use distinct instead of unique
+                    ->count();
+            }
+            return response()->json(['school_name'=>$school->nama,'school_id'=>$school->id,'pendingReliefCount'=>$pendingReliefCount,'isAdmin'=>$isAdmin,'allCount'=>$allcount]);
         }
         return response()->json(['school_name'=>'No related school','school_id'=>-1]);
 
@@ -381,70 +396,28 @@ class ScheduleApiController extends Controller
         }
      }
 
-     public function getTimeOff(Request $request){
-        
-        
-       
-        $datalist = [];
-        // for($i=1;$i<=5;$i++){
-        //     array_push($datalist,$i);
-        // }
-
-        // $datalist =json_encode($datalist);
-        
-        // return response()->json(['timeoff'=>$datalist]);
-        // $data = new stdClass();
-        // $data->slot = 11;
-        // $data->duration=20;
-        // $data->desc="Self revision";
-        // array_push($datalist,$data);
-        $data = new stdClass();
-        $data->slot = 3;
-        $data->day=[4,5];
-
-       
-        array_push($datalist,$data);
-        $data = new stdClass();
-        $data->slot = 2;
-        $data->duration=20;
-        array_push($datalist,$data);
-        $datalist =json_encode($datalist);
-
-        $update =DB::table('schedules')->where('id',1)->update([
-            'time_off'=>$datalist
-        ]);
-        return response()->json(['timeoff'=>$datalist]);
-        $data = new stdClass();
-        $data->slot = 4;
-       
-       
-       
-        array_push($datalist,$data);
-
-        $result =json_decode($json);
-        $msg=[];
-        foreach($result as $r){
-            $m="time off when slot ".$r->slot;
-            if(isset($r->day)){
-                $days = implode(",", $r->day);
-                $m =$m." at ".$days;
-            }
-            else{
-                $m =$m." at every day";
-            }
-
-            if(isset($r->duration)){
-                $m =$m." is ".$r->duration." minutes";
-            }
-            if(isset($r->desc)){
-                $m=$m." for ".$r->desc;
-            }
-
-            array_push($msg,$m);
-            
-        }
-        return response()->json(['timeoff'=>$msg]);
+     //make sure the school id is validate before
+     public function checkAdmin($userId,$schoolId){
+        return DB::table('organizations as o')
+                ->join('organization_user as ou','ou.organization_id','o.id')
+                ->whereIn('ou.role_id',[2,4])
+                ->where('o.id',$schoolId)
+                ->where('ou.status',1)
+                ->where('ou.user_id',$userId)
+                ->exists();
      }
+
+     public function getSchools($user_id){
+        return DB::table('organizations as o')
+            ->join('organization_user as ou','ou.organization_id','o.id')
+            ->whereIn('ou.role_id',[2,4,5])
+            ->where ('ou.user_id',$user_id)
+            ->whereIn('o.type_org',[1,2,3])
+            ->where('ou.status',1)
+            ->select('o.*')
+            ->get();
+     }
+
 
      public function sendNotification($id)
      {  $user =User::find($id);
@@ -500,64 +473,79 @@ class ScheduleApiController extends Controller
             return response()->json(["success"]);
         }
         return response()->json(["failed"]);
-       
-        
-        // Send the message to the specified device tokens
-        
-        
-
-        // $fields = [
-        //     'app_id' => $appID,
-        //     'contents' => ['en' => 'Hello testings'],
-        //     'included_segments' => 'All',
-        // ];
-        
-        // $url = 'https://onesignal.com/api/v1/notifications';
-        
-        // $ch = curl_init();
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        
-        // // Set the url, number of POST vars, POST data
-        // curl_setopt($ch, CURLOPT_URL, $url);
-        
-        // // Set cURL options
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        //     'Authorization: Basic ' . $onesignalUserAuth,
-        //     'Content-Type: application/json',
-        // ]);
-        // curl_setopt($ch, CURLOPT_POST, true);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        
-        // // Execute post
-        // $result = curl_exec($ch);
-        
-        // // Get the HTTP status code before closing the cURL handle
-        // $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
-        // // Close connection
-        // curl_close($ch);
-        
-        // // Check the response for success or error handling
-        // if ($statusCode == 200) {
-        //     return response()->json(['message' => 'Notification sent successfully']);
-        // } else {
-        //     return response()->json(['error' => 'Notification failed: ' . $result], $statusCode);
-        // }
-        
-
      }
 
 
-    public function isNoti($id){
+    public function getPendingRelief(Request $request){
+        $user = User::find($request->user_id);
 
+        if($user ==null){
+            return response()->json(["error"=>"This user did not exist"]);
+        }
+        $school =$this->getSchools($user->id)->first();
+        //return response()->json(["error"=>$school]);
+        if($school){
+            $pendingRelief = DB::table('leave_relief as lr')
+                ->join('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                ->where('lr.replace_teacher_id',$user->id)
+                ->where('lr.confirmation',"Pending")
+                ->where('tl.status',1)
+                ->where('tl.date','>=',Carbon::today())
+                ->get();
+
+            $allPending=false;
+            if($request->isAdmin&&$this->checkAdmin($user->id,$school->id)){
+                $allPending = DB::table('organizations as o')
+                ->join('schedules as s','s.organization_id','o.id')
+                ->join('schedule_version as sv','sv.schedule_id','s.id')
+                ->join('schedule_subject as ss','ss.schedule_version_id','sv.id')
+                ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
+                ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                ->leftJoin('subject as sub','sub.id','ss.subject_id')
+                ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+                ->leftJoin('users as ur','ur.id','lr.replace_teacher_id')
+                ->leftJoin('classes as c','c.id','ss.class_id')
+                ->where('lr.confirmation','<>',"Confirmed")
+                ->where('sv.status',1)
+                ->where('s.status',1)
+                ->where('tl.status',1)
+                ->where('tl.date','>=',Carbon::today())
+                ->select('lr.id as leave_relief_id','ss.id as schedule_subject_id','c.nama as class','sub.name as subject',
+                's.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as leaveTeacher','ur.name as reliefTeacher','tl.date')
+                ->get();
+
+                foreach($allPending as $a){
+                    //if(isset($s->duration)){
+                        $time_info= $this->getSlotTime($a,$a->day,$a->slot);
+                        $a->time=$time_info['time'];
+                        $a->duration=$time_info['duration'];
+             
+                        unset($a->time_off);
+                        unset($a->start_time);
+                }
+            }
+            return response()->json(['pendingRelief'=>$pendingRelief,'allPending'=>$allPending]);
+        }
+        return response()->json(["error"=>"You have not any school"]);
+
+    }
+
+    public function submitReliefResponse(Request $request){
+        $user = User::find($request->user_id);
+
+        $update =DB::table('leave_relief')
+                ->where('id',$request->leave_relief_id)
+                ->where('replace_teacher_id',$user->id)
+                ->update([
+                    'Confirmation'=>$request->response,
+                    'desc'=>$request->desc
+                ]);
+
+        return response()->json(['result',$update]);
+    }
+
+    public function getHistory($user_id){
         
-        // if($id==3){
-        //     return response()->json(['title'=>'Alert','body'=>'You have a update']);
-        // }
-        // return response()->json(['title'=>'None']);
-       
     }
 
 

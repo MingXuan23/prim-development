@@ -47,10 +47,11 @@
             </div>
         </div>
 
-        <input type=hidden value="{{ $fpx_buyerName }}" name="fpx_buyerName">
-        <input type=hidden value="{{ $fpx_buyerEmail }}" name="fpx_buyerEmail">
-        <input type=hidden value="{{$private_key}}" name="privateKey">
-        <input type=hidden value="{{ $fpx_txnAmount }}" name="fpx_txnAmount">
+        <input type=hidden value="{{ $fpx_buyerName }}" name="BuyerName">
+        <input type=hidden value="{{ $fpx_buyerEmail }}" name="BuyerEmail">
+        <input type=hidden value="{{$private_key}}" name="PrivateKey">
+        <input type=hidden value="{{ $fpx_txnAmount }}" name="Amount">
+        <input type=hidden value="{{$fpx_sellerExOrderNo}}" name="SellerOrderNo">
        
         @if (substr($fpx_sellerExOrderNo, 0, 1) == 'S')
 
