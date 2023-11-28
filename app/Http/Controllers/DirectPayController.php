@@ -43,23 +43,23 @@ use League\CommonMark\Inline\Parser\EscapableParser;
 
 class DirectPayController extends Controller
 {
-    // 
-    // private $donation;
-    // private $user;
-    // private $organization;
-    // private $transaction;
+    
+    private $donation;
+    private $user;
+    private $organization;
+    private $transaction;
 
-    // public function __construct(Donation $donation, User $user, Organization $organization, Transaction $transaction)
-    // {
-    //     $this->donation = $donation;
-    //     $this->user = $user;
-    //     $this->organization = $organization;
-    //     $this->transaction = $transaction;
-    // }
+    public function __construct(Donation $donation, User $user, Organization $organization, Transaction $transaction)
+    {
+        $this->donation = $donation;
+        $this->user = $user;
+        $this->organization = $organization;
+        $this->transaction = $transaction;
+    }
 
     public function directpayIndex(Request $request)
     {
-        return response()->json(['success'=>'success','private_key'=>$request->parent_fees_id]);
+       
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
         $user=null;
@@ -85,7 +85,7 @@ class DirectPayController extends Controller
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
 
             $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            return response()->json(['success'=>'success','private_key'=>$organization->private_key]);
+            
             $private_key= $organization->private_key;
            // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
@@ -103,7 +103,7 @@ class DirectPayController extends Controller
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
-            return response()->json(['success'=>'success','private_key'=>$organization->private_key]);
+            
 
             $private_key= $organization->private_key;
             //$fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
