@@ -458,7 +458,7 @@ Route::post('trn-dev', 'PayController@transactionDev')->name('trn-dev');
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
 
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
-Route::post('directpayIndex', 'DirectpayController@directpayIndex')->name('directpayIndex');
+Route::post('directpayIndex', 'DirectPayController@directpayIndex')->name('directpayIndex');
 
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
 Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
