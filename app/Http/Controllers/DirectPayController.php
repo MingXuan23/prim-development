@@ -59,11 +59,12 @@ class DirectPayController extends Controller
 
     public function directpayIndex(Request $request)
     {
+        return response()->json(['success'=>'success','private_key'=>$request->parent_fees_id]);
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
         $user=null;
         $prefixCode="";
-        return response()->json(['success'=>'success','private_key'=>$request]);
+       
         if ($request->desc == 'Donation') {
             $user = User::find(Auth::id());
             $organization = $this->organization->getOrganizationByDonationId($request->d_id);
