@@ -56,6 +56,7 @@ class DirectPayController extends Controller
         $this->organization = $organization;
         $this->transaction = $transaction;
     }
+
     public function directpayIndex(Request $request)
     {
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
@@ -385,6 +386,8 @@ class DirectPayController extends Controller
         }
         //dd('fpxsellerOrderNo:'.$fpx_sellerOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo),'fpx_sellerExOrderNo:'.$fpx_sellerExOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo));
         $private_key = '9BB6D047-2FB3-4B7A-9199-09441E7F4B0C';
+
+        return response()->json(['success'=>'success']);
         //dd($pos,$fpx_sellerOrderNo);
         return view('directpay.index',compact(
             'fpx_buyerEmail',

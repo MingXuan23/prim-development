@@ -192,7 +192,7 @@
                     </li>
                 </ul>
                 {{ csrf_field() }}
-                <input type="hidden" name="amount" id="amount" value={{ $i + $getorganization->fixed_charges }}>
+                <input type="hidden" name="amount" id="amount" value="{{ $i + $getorganization->fixed_charges }}">
                 <input type="hidden" name="o_id" id="o_id" value="{{ $getorganization->id }}">
                 <input type="hidden" name="desc" id="desc" value="School_Fees">
                 <div class="float-right">
@@ -218,21 +218,42 @@
 </html>
 
 <script>
-    // function checkBank() {
-    //     var t = jQuery('#bankid').val();
-    //     var a = parseFloat(jQuery('#amount').val());
-    //     if (t === '' || t === null) {
-    //         alert('Please select a bank');
-    //         return false;
-    //     }
-    //     if (a < 1.00) {
-    //         alert('Transaction Amount is Lower than the Minimum Limit RM1.00 for B2C');
-    //         return false;
-    //     }
-    //     else if (a > 30000.00) {
-    //         alert('Transaction Amount Limit Exceeded RM30,000.00 for B2C');
-    //         return false;
-    //     }
-    // }
+    function checkBank() {
+        var t = jQuery('#bankid').val();
+        var a = parseFloat(jQuery('#amount').val());
+        if (t === '' || t === null) {
+            alert('Please select a bank');
+            return false;
+        }
+        if (a < 1.00) {
+            alert('Transaction Amount is Lower than the Minimum Limit RM1.00 for B2C');
+            return false;
+        }
+        else if (a > 30000.00) {
+            alert('Transaction Amount Limit Exceeded RM30,000.00 for B2C');
+            return false;
+        }
+    }
+
+    $(document).ready(function () {
+        $.ajax({
+        type: 'GET',
+        dataType: 'json',
+        url: "/fpx/getBankList",
+        success: function(data) {
+            jQuery.each(data.data, function(key, value){
+                arr.push(key);
+            });
+            for(var i = 0; i < arr.length; i++){
+                arr.sort();
+                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
+            }
+
+        },
+        error: function (data) {
+            // console.log(data);
+        }
+    });
+    });
 
 </script>
