@@ -44,18 +44,18 @@ use League\CommonMark\Inline\Parser\EscapableParser;
 class DirectPayController extends Controller
 {
     // 
-    private $donation;
-    private $user;
-    private $organization;
-    private $transaction;
+    // private $donation;
+    // private $user;
+    // private $organization;
+    // private $transaction;
 
-    public function __construct(Donation $donation, User $user, Organization $organization, Transaction $transaction)
-    {
-        $this->donation = $donation;
-        $this->user = $user;
-        $this->organization = $organization;
-        $this->transaction = $transaction;
-    }
+    // public function __construct(Donation $donation, User $user, Organization $organization, Transaction $transaction)
+    // {
+    //     $this->donation = $donation;
+    //     $this->user = $user;
+    //     $this->organization = $organization;
+    //     $this->transaction = $transaction;
+    // }
 
     public function directpayIndex(Request $request)
     {
