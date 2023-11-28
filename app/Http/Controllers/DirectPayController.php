@@ -83,6 +83,7 @@ class DirectPayController extends Controller
             $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
 
             $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            return response()->json(['success'=>'success','private_key'=>$organization->private_key]);
             $private_key= $organization->private_key;
            // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
 
@@ -100,6 +101,8 @@ class DirectPayController extends Controller
             $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
             $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
             $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
+            return response()->json(['success'=>'success','private_key'=>$organization->private_key]);
+
             $private_key= $organization->private_key;
             //$fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
             //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -387,7 +390,7 @@ class DirectPayController extends Controller
         //dd('fpxsellerOrderNo:'.$fpx_sellerOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo),'fpx_sellerExOrderNo:'.$fpx_sellerExOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo));
         $private_key = '9BB6D047-2FB3-4B7A-9199-09441E7F4B0C';
 
-        return response()->json(['success'=>'success']);
+        
         //dd($pos,$fpx_sellerOrderNo);
         return view('directpay.index',compact(
             'fpx_buyerEmail',
