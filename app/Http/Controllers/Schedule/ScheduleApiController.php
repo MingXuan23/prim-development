@@ -544,8 +544,37 @@ class ScheduleApiController extends Controller
         return response()->json(['result',$update]);
     }
 
-    public function getHistory($user_id){
+    public function getHistory($user_id)
+    {
+        $school = $this->getSchools($user_id)->first();
+        $isAdmin =$this->checkAdmin($user_id,$school->id);
+
+        $report = new stdClass();
+
+        $report->leaveCount = DB::table('teacher_leave as tl')
+                ->where('tl.teacher_id',$user_id)
+                ->count();
+
+        $report->reliefCount = DB::table('leave_relief')
+            ->where('replace_teacher_id',$user_id)
+            ->count();
+        if($isAdmin){
+            $adminReport =new stdClass();
+
+            $adminReport->totalReliefCount = DB::table('teacher_leave as tl')
+            ->join('organization_user as ou','ou.user_id','tl.teacher_id')
+            ->where('ou.organization_id',$school->id)
+            ->count(); 
+
+            $adminReport->totalLeavefCount = DB::table('leave_relief as lr')
+            ->join('organization_user as ou','ou.user_id','lr.replace_teacher_id')
+            ->where('ou.organization_id',$school->id)
+            ->count(); 
+
+            return response()->json(['report'=>$report,'report'=>$adminReport]);
+        }
         
+        return response()->json(['report'=>$report]);
     }
 
 

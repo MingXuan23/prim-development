@@ -27,7 +27,7 @@ class VerifyCsrfToken extends Middleware
         'https://dev.prim.my/devtrans',
         'https://prim.my/mobile/*',
         'https://dev.prim.my/mobile/*',
-        'http://127.0.0.1:8000/directpayReceipt',
+        'https://prim.my/directpayReceipt',
         
 
     ];
