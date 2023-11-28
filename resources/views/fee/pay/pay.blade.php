@@ -234,6 +234,7 @@
             return false;
         }
     }
+    var arr = [];
 
     $(document).ready(function () {
         $.ajax({
