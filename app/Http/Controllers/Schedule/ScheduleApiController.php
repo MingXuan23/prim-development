@@ -486,13 +486,22 @@ class ScheduleApiController extends Controller
         //return response()->json(["error"=>$school]);
         if($school){
             $pendingRelief = DB::table('leave_relief as lr')
-                ->join('teacher_leave as tl','tl.id','lr.teacher_leave_id')
-                ->where('lr.replace_teacher_id',$user->id)
-                ->where('lr.confirmation',"Pending")
-                ->where('tl.status',1)
-                ->where('tl.date','>=',Carbon::today())
-                ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
-                ->get();
+            ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+            ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+            ->leftJoin('schedules as s','s.id','sv.schedule_id')
+            ->leftJoin('classes as c','c.id','ss.class_id')
+            ->leftJoin('subject as sub','sub.id','ss.subject_id')
+            ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            ->where('s.organization_id',$school->id)
+            ->where('lr.replace_teacher_id',$user->id)
+            ->where('lr.confirmation',"Pending")
+            ->where('tl.date','>=',Carbon::today())
+            ->where('sv.status',1)
+            ->where('tl.status',1)
+            ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
+            ->get();
+
 
                 foreach($pendingRelief as $r){
                     //if(isset($s->duration)){
