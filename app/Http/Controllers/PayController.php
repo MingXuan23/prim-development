@@ -1861,6 +1861,7 @@ class PayController extends AppBaseController
                     list($key1,$value1) = explode("=", $token);
                     $value1 = urldecode($value1);
                     $response_value[$key1] = $value1;
+                    dd($response_value);
                     $token = strtok("&");
                 }
 
