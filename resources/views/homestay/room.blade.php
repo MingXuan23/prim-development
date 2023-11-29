@@ -60,13 +60,34 @@
                         @endif
                         <input type="text" name="roomId" id="roomId" value={{$room->roomid}} hidden>
                         <input type="text" name="roomPrice" id="roomPrice" value={{$room->price}} hidden>
-                        <h5 class="text-white mb-2">RM{{$room->price}}/malam</h5>
+
+                        {{-- for booking type = room --}}
+                        @if($room->booking_type == 'room')
+                        <h5 class="text-white mb-2">RM{{$room->price}}/malam untuk 1 unit</h5>
+                        <div>
                         <div class="form-floating mb-2" >
-                            <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder=" ">
+                            <input type="number" min="1" max="{{$room->room_no}}" autocomplete="off" name="bookRoom" id="book-room" class="form-control" placeholder=" "  required>
+                            <label for="book-room">Masukkan Jumlah Unit (Maksimum: {{$room->room_no}})</span>
+                        </div>   
+                        <div class="d-flex justify-content-center align-items-center mb-2">
+                            <button type="button" id="btn-fetch-dates">
+                                <span id="btn-fetch-dates-content">Cari Slot Tempahan</span> 
+                            </button>                             
+                        </div>
+                           
+                        </div>
+
+                        @else
+                        <h5 class="text-white mb-2">RM{{$room->price}}/malam</h5>
+
+                        @endif
+
+                        <div class="form-floating mb-2" >
+                            <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder=" " {{$room->booking_type == "room" ? 'disabled' : ''}} >
                             <label for="check-in">Pilih Daftar Masuk</span>
                         </div>
                         <div class="form-floating mb-2" >
-                            <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder=" " disabled>
+                            <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder=" " disabled >
                             <label for="check-out">Pilih Daftar Keluar</label>
                         </div>
                         <div class="text-white text-center mb-2">
@@ -195,13 +216,66 @@ $(document).ready(function() {
     });
     // need to put the details by this way or else there will be indentations
     $('.room-details').html($('#details').val());
-
+    // book-room
+    function resetFields(){
+        $('#check-in').val('');
+        $('#check-out').val('');
+        $('#check-in').prop('disabled', true);
+        $('#check-out').prop('disabled', true);
+        //reset input fields
+        $('#discountAmount').val(0);
+        $('#increaseAmount').val(0); 
+        $('#discountDates').val('');
+        $('#increaseDates').val('');
+        $('#total-price').html('');
+    }
+    let delayTimer;
+    $('#book-room').on('input', function(){
+        resetFields();
+    })
+    $('#btn-fetch-dates').on('click', function() {
+        var bookRoomInput = parseInt($('#book-room').val());
+        var checkInInput = $('#check-in');
+        var checkOutInput = $('#check-out');
+        resetFields();
+        console.log(bookRoomInput);
+        if (isNaN(bookRoomInput)||bookRoomInput === '' || bookRoomInput > $('#book-room').attr('max') || bookRoomInput < 1) {
+            checkInInput.prop('disabled', true);
+            checkOutInput.prop('disabled', true);
+            Swal.fire(`Sila pastikan jumlah unit yang ingin ditempah adalah antara ${1} dan ${$('#book-room').attr('max')}`);
+        } else {
+            // // Clear previous timeout to avoid multiple AJAX calls
+            // clearTimeout(delayTimer);
+            
+            // // Add a delay before destroying and initializing datepickers
+            // delayTimer = setTimeout(function() {
+            //     if ($('#check-in').hasClass('hasDatepicker')) {
+            //         $('#check-in').datepicker('destroy');
+            //     }
+            //     if ($('#check-out').hasClass('hasDatepicker')) {
+            //         $('#check-out').datepicker('destroy');
+            //     }
+            //     fetchDiscountOrIncrease();
+            //     initializeCheckInOut();
+            // }, 300); // Adjust the delay time as needed (in milliseconds)
+                if ($('#check-in').hasClass('hasDatepicker')) {
+                    $('#check-in').datepicker('destroy');
+                }
+                if ($('#check-out').hasClass('hasDatepicker')) {
+                    $('#check-out').datepicker('destroy');
+                }
+                fetchDiscountOrIncrease();
+                initializeCheckInOut();
+                checkInInput.prop('disabled', false);
+        }
+    });
 
     // for booking and datetimepickers
     function calculateTotalPrice(){
         const checkInDate = $('#check-in').val();
         const checkOutDate = $('#check-out').val();
         const roomId = $('#roomId').val();
+        const roomNo = parseInt($('#book-room').val());
         $.ajax({
             url: "{{ route('homestay.calculateTotalPrice') }}", 
             method: "GET", 
@@ -209,6 +283,7 @@ $(document).ready(function() {
                 checkInDate: checkInDate,
                 checkOutDate: checkOutDate,
                 roomId: roomId,
+                roomNo: roomNo,
             },
             success: function(result) {            
                 //reset input fields
@@ -216,13 +291,22 @@ $(document).ready(function() {
                 $('#increaseAmount').val(0); 
                 $('#discountDates').val('');
                 $('#increaseDates').val('');
+                if(!isNaN(roomNo)){
+                    $('#total-price').html(`
+                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                                <h5>RM${result.roomPrice} x ${result.numberOfNights} malam x ${$('#book-room').val()} unit</h5>
+                                <h5>RM${result.initialPrice}</h5>
+                            </div>
+                    `);                    
+                }else{
+                    $('#total-price').html(`
+                            <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                                <h5>RM${result.roomPrice} x ${result.numberOfNights} malam</h5>
+                                <h5>RM${result.initialPrice}</h5>
+                            </div>
+                    `);       
+                }
 
-                $('#total-price').html(`
-                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
-                            <h5>RM${result.roomPrice} x ${result.numberOfNights} malam</h5>
-                            <h5>RM${result.initialPrice}</h5>
-                        </div>
-                `);
                 $('#nightCount').val(result.numberOfNights);
                 //for pricing with promotions
                 if(result.initialPrice != null){
@@ -297,125 +381,134 @@ $(document).ready(function() {
                 $(result.increaseDates).each((i, increase)=>{
                     increaseMap.set(increase.date, increase.percentage);
                 });
+
             },
             error: function(){
                 console.log('Fetch discount and increase failed');
             }
         });
     }
+    function initializeDatepickers(disabledDates){
+        // to get max date that's 1 year from now
+        var currentDate = new Date();
+        var maxDate = new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), currentDate.getDate());
 
+        // for check in datepicker
+        $('#check-in').datepicker({
+            dateFormat: 'dd/mm/yy',
+            minDate: 0,
+            maxDate: maxDate,
+            beforeShowDay: function(date) {
+                var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
+                // console.log(disabledDates);
 
+                var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
+                var cssClass = toolTip = '';
+                if(discountDates.indexOf(formattedDate) !== -1){
+                    cssClass = 'discount-date';
+                    toolTip = "Terdapat diskaun pada hari tersebut";
+                }else if(increaseDates.indexOf(formattedDate) !== -1){
+                    cssClass = 'increase-date';
+                    toolTip = "Terdapat penambahan harga pada hari tersebut";
+                }
+                    return [!isDisabled, cssClass, toolTip];
+            },
+            onSelect: function(selectedDate) {
+                // Parse the selectedDate as a JavaScript Date object
+                var selectedDateObject = $.datepicker.parseDate('dd/mm/yy', selectedDate);
+
+                // Add one day to the selectedDate
+                selectedDateObject.setDate(selectedDateObject.getDate() + 1);
+                
+                // Format the new date as 'dd/mm/yy'
+                var newMinDate = $.datepicker.formatDate('dd/mm/yy', selectedDateObject);
+
+                // Set the newMinDate as the minimum date for #check-out datepicker
+                $("#check-out").datepicker("option", "minDate", newMinDate);
+                $("#check-out").datepicker("option", "disabled", false);
+
+                // if already selected a check in date and want to choose a different check in date
+                if($('#check-in').datepicker('getDate') != null &&  $('#check-out').datepicker('getDate') != null){
+                    if(!checkDisabledDatesBetween()){
+                        calculateTotalPrice();
+                    }else{
+                        $('#total-price').empty();
+                        $('#amount').val(0);   
+                        Swal.fire('Sila pastikan masa slot tempahan daftar masuk dan daftar keluar homestay adalah kosong.');
+                        $('#check-in').datepicker("setDate", null);
+                        $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
+                    }
+            
+                }
+            }
+        });    
+        $('#check-out').datepicker({
+            dateFormat: 'dd/mm/yy',
+            disabled: true,
+            maxDate: maxDate,
+            beforeShowDay: function(date) {
+                var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
+                var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
+                var cssClass = toolTip = '';
+                if(isDisabled) {
+                    toolTip = 'Terdapat tempahan untuk hari tersebut'; 
+                }else if(discountDates.indexOf(formattedDate) !== -1){
+                    cssClass = 'discount-date';
+                    toolTip = "Terdapat diskaun pada hari tersebut";
+                }else if(increaseDates.indexOf(formattedDate) !== -1){
+                    cssClass = 'increase-date';
+                    toolTip = "Terdapat penambahan harga pada hari tersebut";
+                }
+                return [!isDisabled,cssClass,toolTip];
+            },
+            onSelect: function(checkOutDate) {
+                if(!checkDisabledDatesBetween()){
+                        calculateTotalPrice();
+                }else{
+                    $('#total-price').empty();
+                    $('#amount').val(0);   
+                    Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay tersebut adalah kosong');
+                    $('#check-in').datepicker("setDate", null);
+                    $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
+                }
+            }
+        });
+        // Function to check for disabled dates between check-in and check-out
+        function checkDisabledDatesBetween() {
+            var checkInDate = $('#check-in').datepicker('getDate');
+            var checkOutDate = $('#check-out').datepicker('getDate');
+
+            var currentDate = new Date(checkInDate);
+            checkOutDate = new Date(checkOutDate);
+            var isDisabledFound = false;
+
+            while (currentDate <= checkOutDate) {
+                var formattedCurrentDate = $.datepicker.formatDate('dd/mm/yy', currentDate);
+                if (disabledDates.indexOf(formattedCurrentDate) !== -1) {
+                    isDisabledFound = true;
+                    break;
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return isDisabledFound;
+        }
+    }
     function initializeCheckInOut(){
         let roomId = $('#roomId').val();
+        let roomNo = $('#book-room').val();
+
         $.ajax({
             url: "{{route('homestay.fetchUnavailableDates')}}",
             method: "GET",
             data: {
                 roomId: roomId,
+                roomNo: roomNo,
             },
             success: function(result){
-                const disabledDates = result.disabledDates;
-                // to get max date that's 1 year from now
-                var currentDate = new Date();
-                var maxDate = new Date(currentDate.getFullYear() + 1, currentDate.getMonth(), currentDate.getDate());
-                // for check in datepicker
-                $('#check-in').datepicker({
-                    dateFormat: 'dd/mm/yy',
-                    minDate: 0,
-                    maxDate: maxDate,
-                    beforeShowDay: function(date) {
-                        var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
-                        var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
-                        var cssClass = toolTip = '';
-                        if(discountDates.indexOf(formattedDate) !== -1){
-                            cssClass = 'discount-date';
-                            toolTip = "Terdapat diskaun pada hari tersebut";
-                        }else if(increaseDates.indexOf(formattedDate) !== -1){
-                            cssClass = 'increase-date';
-                            toolTip = "Terdapat penambahan harga pada hari tersebut";
-                        }
-                         return [!isDisabled, cssClass, toolTip];
-                    },
-                    onSelect: function(selectedDate) {
-                        // Parse the selectedDate as a JavaScript Date object
-                        var selectedDateObject = $.datepicker.parseDate('dd/mm/yy', selectedDate);
+                var disabledDates = result.disabledDates;
+                initializeDatepickers(disabledDates);
 
-                        // Add one day to the selectedDate
-                        selectedDateObject.setDate(selectedDateObject.getDate() + 1);
-                        
-                        // Format the new date as 'dd/mm/yy'
-                        var newMinDate = $.datepicker.formatDate('dd/mm/yy', selectedDateObject);
 
-                        // Set the newMinDate as the minimum date for #check-out datepicker
-                        $("#check-out").datepicker("option", "minDate", newMinDate);
-                        $("#check-out").datepicker("option", "disabled", false);
-
-                        // if already selected a check in date and want to choose a different check in date
-                        if($('#check-in').datepicker('getDate') != null &&  $('#check-out').datepicker('getDate') != null){
-                            if(!checkDisabledDatesBetween()){
-                                calculateTotalPrice();
-                            }else{
-                                $('#total-price').empty();
-                                $('#amount').val(0);   
-                                Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay/bilik adalah kosong');
-                                $('#check-in').datepicker("setDate", null);
-                                $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
-                            }
-                 
-                        }
-                    }
-                });    
-                $('#check-out').datepicker({
-                    dateFormat: 'dd/mm/yy',
-                    disabled: true,
-                    maxDate: maxDate,
-                    beforeShowDay: function(date) {
-                        var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
-                        var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
-                        var cssClass = toolTip = '';
-
-                        if(isDisabled) {
-                            toolTip = 'Terdapat tempahan untuk hari tersebut'; 
-                        }else if(discountDates.indexOf(formattedDate) !== -1){
-                            cssClass = 'discount-date';
-                            toolTip = "Terdapat diskaun pada hari tersebut";
-                        }else if(increaseDates.indexOf(formattedDate) !== -1){
-                            cssClass = 'increase-date';
-                            toolTip = "Terdapat penambahan harga pada hari tersebut";
-                        }
-                        return [!isDisabled,cssClass,toolTip];
-                    },
-                    onSelect: function(checkOutDate) {
-                        if(!checkDisabledDatesBetween()){
-                                calculateTotalPrice();
-                        }else{
-                            $('#total-price').empty();
-                            $('#amount').val(0);   
-                            Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay tersebut adalah kosong');
-                            $('#check-in').datepicker("setDate", null);
-                            $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
-                        }
-                    }
-                });
-                // Function to check for disabled dates between check-in and check-out
-                function checkDisabledDatesBetween() {
-                    var checkInDate = $('#check-in').datepicker('getDate');
-                    var checkOutDate = $('#check-out').datepicker('getDate');
-
-                    var currentDate = new Date(checkInDate);
-                    checkOutDate = new Date(checkOutDate);
-                    var isDisabledFound = false;
-
-                    while (currentDate <= checkOutDate) {
-                        var formattedCurrentDate = $.datepicker.formatDate('dd/mm/yy', currentDate);
-                        if (disabledDates.indexOf(formattedCurrentDate) !== -1) {
-                            isDisabledFound = true;
-                            break;
-                        }
-                        currentDate.setDate(currentDate.getDate() + 1);
-                    }
-                    return isDisabledFound;
-                }
             },
             error: function(result){
                 console.log('Fetch Disabled Dates Error');
@@ -428,24 +521,26 @@ $(document).ready(function() {
         // reset all price text
         $('.price-text').remove();
         $(".ui-datepicker-calendar .ui-state-default").each(function() {
-            var currentDate = $(this).html() + "/" + (parseInt($(this).parent().attr('data-month'))+1) +"/" + parseInt($(this).parent().attr('data-year'));
+            var currentDay = $(this).html() < 10 ? '0' + $(this).html()  :$(this).html();
+            var currentMonth = (parseInt($(this).parent().attr('data-month'))+1) < 10 ?'0'+(parseInt($(this).parent().attr('data-month'))+1) :(parseInt($(this).parent().attr('data-month'))+1)
+            var currentDate = currentDay + "/" + currentMonth +"/" + parseInt($(this).parent().attr('data-year'));
             // if the date is not disabled
             if(!$(this).parent().hasClass('ui-datepicker-unselectable')){
-                //add custom text to date cell       
-                let percentage = priceAfterDiscount = 0;         
+                //add custom text to date cell   
+                let percentage = priceAfterDiscount = 0;  
                 if(increaseMap.get(currentDate) != undefined){
                     // if has increase promotion
                     percentage = increaseMap.get(currentDate);
-                    priceAfterDiscount = parseInt($('#roomPrice').val()) + ( parseInt($('#roomPrice').val()) * percentage /100);
-                    $(this).after(`<div class="price-text">RM${priceAfterDiscount}</div>`);   
+                    priceAfterDiscount = parseFloat($('#roomPrice').val()) + ( parseFloat($('#roomPrice').val()) * percentage /100);
+                    $(this).after(`<div class="price-text">RM${Math.round(priceAfterDiscount)}</div>`);   
                 }else if(discountMap.get(currentDate) != undefined){
                     // if has discount promotion
                     percentage = discountMap.get(currentDate);
-                    priceAfterDiscount = parseInt($('#roomPrice').val()) - ( parseInt($('#roomPrice').val()) * percentage /100);
-                    $(this).after(`<div class="price-text">RM${priceAfterDiscount}</div>`);                
+                    priceAfterDiscount = parseFloat($('#roomPrice').val()) - ( parseFloat($('#roomPrice').val()) * percentage /100);
+                    $(this).after(`<div class="price-text">RM${Math.round(priceAfterDiscount)}</div>`);                
 
                 }else{
-                    $(this).after(`<div class="price-text">RM${parseInt($('#roomPrice').val())}</div>`);                
+                    $(this).after(`<div class="price-text">RM${Math.round(parseFloat($('#roomPrice').val()))}</div>`);                
                 }
             }else{
                 $(this).after(`<div class="price-text">&nbsp</div>`);                
@@ -455,7 +550,7 @@ $(document).ready(function() {
     })
 
     $('#form-book').on('submit',function(e){
-        if($('#amount').val() == 0){
+        if($('#amount').val() == 0 || $('#check-in').val() == '' || $('#check-out').val() == ''){
             e.preventDefault();
             Swal.fire('Sila pilih masa daftar masuk dan daftar keluar sebelum membuat tempahan');
         }

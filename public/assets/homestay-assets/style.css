@@ -110,6 +110,14 @@ td a {
     background-color: var(--primary-color) !important;
     color: white !important;
 }
+a .btn-dark-purple:active {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+.admin-active {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
 /* the + button to show the hidden column of table */
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
@@ -338,7 +346,8 @@ button#btn-add-image:hover {
     bottom: 12px;
     right: 12px;
 }
-.btn-gallery {
+.btn-gallery,
+#btn-fetch-dates {
     position: relative;
     overflow: hidden;
     height: 3rem;
@@ -350,16 +359,19 @@ button#btn-add-image:hover {
     border: none;
 }
 
-.btn-gallery:hover::before {
+.btn-gallery:hover::before,
+#btn-fetch-dates:hover::before {
     transform: scaleX(1);
 }
 
-.btn-gallery-content {
+.btn-gallery-content,
+#btn-fetch-dates-content {
     position: relative;
     z-index: 1;
 }
 
-.btn-gallery::before {
+.btn-gallery::before,
+#btn-fetch-dates::before {
     content: "";
     position: absolute;
     top: 0;

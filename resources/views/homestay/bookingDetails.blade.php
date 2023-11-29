@@ -79,7 +79,11 @@
                                         <td style="text-align: center">{{ date('d/m/Y', strtotime($transaction->checkin)) }}, selepas({{date('h:i a', strtotime($homestay->check_in_after))}})</td>
                                         <td style="text-align: center">{{ date('d/m/Y', strtotime($transaction->checkout)) }}, sebelum({{date('h:i a', strtotime($homestay->check_out_before))}})</td>
                                         <td style="text-align: center">{{  $numberOfNights }}</td>
-                                        <td style="text-align: center">{{  $homestay->price  }}</td>
+                                        @if($transaction->booked_rooms == null)
+                                            <td style="text-align: center">{{  $pricePerNight }}</td>
+                                        @else
+                                            <td style="text-align: center">{{  $pricePerNight }} <br> (x {{$transaction->booked_rooms}} Unit)</td>
+                                        @endif
                                     </tr>
                                     @if($transaction->discount_received > 0)
                                         <tr>

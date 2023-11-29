@@ -8,10 +8,33 @@
 <link rel="stylesheet" href="{{URL::asset('assets/homestay-assets/jquery-ui-datepicker.structure.min.css')}}">
 <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
 @include('layouts.datatable')
+
+<style>
+    /* style for print */
+    @media print{
+        /* set margin for the print page */
+        @page{
+            margin: 1px 1px 2.5px 2.5px!important;
+        }
+        body > *{
+            visibility: hidden;
+        }
+        .report, .report * {
+            visibility: visible;
+        }
+        .report {
+            position: relative;
+            left: 0;
+            top: -300px;
+            margin: 2.5px;
+        }
+        
+    }
+</style>
 @endsection
 
 @section('content')
-<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
+{{-- <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Laporan Prestasi</h4>
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
       <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
@@ -19,7 +42,8 @@
       <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan Pelanggan</a>
       <a style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
   </div>
-</div>
+</div> --}}
+@include('homestay.adminNavBar')
 <div class="row">
 
   <div class="col-md-12">
@@ -65,19 +89,33 @@
                 <button class="btn-purple" id="btn-generate-report">Hasilkan Report</button>
             </div>
         </div>
-      <div id="report-title" class="text-center mb-4">
+      <div id="report-title" class="text-center mb-4 report">
 
       </div>
       {{-- charts --}}        
-      <div class="row">
+      <div class="row report">
         <div class="col-sm-5 col-sm-offset-3 text-center">
             <label class="label label-chart">Jumlah Malam Ditempah</label>
-           <div id="pie-chart" class="chart"></div>
+           <div id="pie-chart-nights-booked" class="chart"></div>
         </div>
         <div class="col-sm-7 col-sm-offset-3 text-center">
-            <label class="label label-chart">Jumlah Pendapatan Dijana(Tidak Termasuk Promosi)</label>
-           <div id="bar-chart" class="chart"></div>
+            <label class="label label-chart">Jumlah Pendapatan Dijana</label>
+           <div id="bar-chart-homestay-earnings" class="chart"></div>
         </div>
+      </div>
+
+      <h4 class="text-center mb-4 color-dark-purple report">
+        Pendapatan Bulananan Secara Kesuluruhan
+        <div id="line-chart-monthly-earnings" class="chart"></div>
+      </h4>
+
+      <h4 class="text-center mb-4 color-dark-purple report">
+        Purata Nilaian Bulananan 
+        <div id="line-chart-monthly-ratings" class="chart"></div>
+      </h4>
+
+      <div class="my-2 d-flex justify-content-center align-items-center">
+            <button class="btn-purple" id="btn-download-report">Muat Turun</button>
       </div>
 @endsection
 
@@ -169,35 +207,99 @@ $(document).ready(function() {
                 });
                 // If there are 0 bookings from all homestays
                 if(noBookings){
-                    $('#pie-chart').html(`
+                    $('#pie-chart-nights-booked').html(`
                         <div>Tiada tempahan diterima untuk mana-mana penginapan</div>
                     `);
-                    $('#bar-chart').html(`
+                    $('#bar-chart-homestay-earnings').html(`
                         <div>Tiada pendapatan dijana daripada mana-mana penginapan</div>
                     `);
                 }else{
-                    $('#pie-chart').prev().append(`
+                    $('#pie-chart-nights-booked').prev().append(`
                         <div class="color-purple label-chart-description">${totalBookedNights} malam</div>
                     `);
-                    $('#bar-chart').prev().append(`
+                    $('#bar-chart-homestay-earnings').prev().append(`
                         <div class="color-purple label-chart-description">RM${totalEarnings.toFixed(2)}</div>
                     `);
                     Morris.Donut({
-                        element: 'pie-chart',
+                        element: 'pie-chart-nights-booked',
                         data: donutData
                     });  
                     Morris.Bar({
-                        element: 'bar-chart',
+                        element: 'bar-chart-homestay-earnings',
                         data: barData,
                         xkey: 'y',
                         ykeys: ['value'],
-                        labels: ['Total Earnings'],        
+                        labels: ['Jumlah Pendapatan'],    
+                        hideHover: true,    
                         hoverCallback: function (index, options, content, row) {
-                            return `Total Earnings: RM${row.value.toFixed(2)}`;
+                            return `Jumlah Pendapatan: RM${row.value.toFixed(2)}`;
                         }
                     });    
+
                 }
 
+                // for monthly earnings
+                const monthlyEarnings = result.earningsPerMonth;
+                // adjust monthlyEarnings value by adding remaining earnings for next month
+                const lineData = monthlyEarnings.map(function(monthlyEarning , i) {
+                    var earnings = 0;
+                    // if there is remainingEarnings from last month
+                    if(i > 0 && monthlyEarnings[i-1].remainingEarningsForNextMonth > 0){
+                        earnings = monthlyEarning.earnings + monthlyEarnings[i-1].remainingEarningsForNextMonth;
+                    }else{
+                        earnings = monthlyEarning.earnings;
+                    }
+                    
+                    return {
+                        label: monthlyEarning.month,
+                        value: parseFloat(earnings.toFixed(2)),
+                    };
+                }); 
+                Morris.Line({
+                    element: 'line-chart-monthly-earnings',
+                    data: lineData,
+                    xkey: 'label',
+                    ykeys: ['value'],
+                    labels: ['Jumlah Pendapatan'],   
+                    parseTime: false,     
+                    hideHover: true,
+                    hoverCallback: function (index, options, content, row) {
+                        return `Jumlah Pendapatan: RM${row.value}`;
+                    }
+                });  
+
+                // for monthly ratings
+                const monthlyRatings = result.ratings;
+                var lineRatingData = [],homestayNames = [];
+                if(monthlyEarnings != null){
+                    lineRatingData = monthlyRatings.map(item =>{
+                        const result = {month: item.month};
+                        Object.keys(item.ratings).forEach(key => {
+                            !homestayNames.includes(key) ? homestayNames.push(key) : '';
+                            result[key] = item.ratings[key];
+                        })
+                        return result;
+                    });
+                }else{
+                    $('#line-chart-monthly-ratings').html(`Tiada nilaian diterima`);
+                }
+
+                console.log(lineRatingData);
+                console.log(homestayNames); 
+                
+                Morris.Line({
+                    element: 'line-chart-monthly-ratings',
+                    data: lineRatingData,
+                    xkey: 'month',
+                    ykeys: homestayNames,  
+                    labels: homestayNames,     
+                    parseTime: false,     
+                    hideHover:'auto',
+                    ymax: [5],
+                    axes: true, // Show axis lines
+                    numLines: 6, // Adjust the number of gridlines on the y-axis (6 lines will give you step size of 1 if the ymax is set to 5)
+                }); 
+                
             },
             error: function(){
                 console.log('Fetch Report Data Failed');
@@ -207,7 +309,7 @@ $(document).ready(function() {
     // Bind onchange event
     $('#org_id').change(function() {
         const homestayId = $(this).val();
-        $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview','')}}/${homestayId}`);
+        $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview')}}`);
     });
 
     $("#org_id option:nth-child(2)").prop("selected", true);
@@ -256,6 +358,23 @@ $(document).ready(function() {
             Swal.fire('Sila pastikan tarikh mula dan berakhir tidak dibiarkan kosong');
         }
     })
+
+    $('#btn-download-report').on('click',function(){
+        window.print();
+    });
+                    // to add .active to the link for current page in navbar
+    // Get the current URL path
+    var currentPath = window.location.pathname;
+
+    // Loop through each anchor tag in the navigation
+    $('.admin-nav-links a').each(function() {
+        var linkPath = $(this).attr('href');
+        // Check if the link's path matches the current URL path
+        if (linkPath.includes(currentPath)) {
+            // Add a class to highlight the active link
+            $(this).addClass('admin-active');
+        }
+    });
 });
 </script>
 @endsection

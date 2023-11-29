@@ -55,7 +55,10 @@
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Daftar Masuk: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($checkoutBookings[$i]->check_in_after))}}</h6>
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Daftar Keluar: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkout))}}, sebelum {{date('H:i', strtotime($checkoutBookings[$i]->check_out_before))}}</h6>
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Jumlah Dibayar: </span>RM{{$checkoutBookings[$i]->totalprice}}</h6>
-                      <h6 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i>&nbsp;&nbsp;&nbsp;Nombor Telefon Organisasi: </span>{{$checkoutBookings[$i]->telno}}</h6>                    
+                      <h6 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i>&nbsp;&nbsp;&nbsp;Nombor Telefon Organisasi: </span>{{$checkoutBookings[$i]->telno}}</h6>    
+                      @if($checkoutBookings[$i]->booked_rooms != null)
+                      <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-door-closed"></i>&nbsp;Jumlah Unit Ditempah: </span>{{$checkoutBookings[$i]->booked_rooms}}</h6>   
+                      @endif
                       <div id="booking-button-group" class="d-flex justify-content-end align-items-center flex-wrap gap-3">
                         <button class="btn-purple mx-2 btn-checkout-room" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Daftar Keluar</button>
                         <a href="{{route('homestay.bookingDetails',$checkoutBookings[$i]->bookingid)}}" class="btn-dark-purple mx-2 btn-detail">Butiran</a>
