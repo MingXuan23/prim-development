@@ -491,7 +491,21 @@ class ScheduleApiController extends Controller
                 ->where('lr.confirmation',"Pending")
                 ->where('tl.status',1)
                 ->where('tl.date','>=',Carbon::today())
+                ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
                 ->get();
+
+                foreach($pendingRelief as $r){
+                    //if(isset($s->duration)){
+    
+                        $r->category ="PendingRelief";
+                        $time_info= $this->getSlotTime($r,$r->day,$r->slot);
+                        $r->time=$time_info['time'];
+                        $r->duration=$time_info['duration'];
+                       
+                       
+                        unset($r->time_off);
+                        unset($r->start_time);
+                }
 
             $allPending=false;
             if($request->isAdmin&&$this->checkAdmin($user->id,$school->id)){
