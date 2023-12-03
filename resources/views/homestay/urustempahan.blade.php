@@ -109,6 +109,9 @@
 
 <script>
 $(document).ready(function() {
+  $('.navbar-header > div:first-child()').after(`
+        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+    `);
   $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

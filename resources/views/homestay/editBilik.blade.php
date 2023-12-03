@@ -197,6 +197,9 @@
 <script>
 
 $(document).ready(function () {
+    $('.navbar-header > div:first-child()').after(`
+        <img src="../assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+    `);
     // function toggleRoomNoInput() {
     //         if ($('#room').is(':checked')) {
     //             $('#roomNo').prop('disabled', false);

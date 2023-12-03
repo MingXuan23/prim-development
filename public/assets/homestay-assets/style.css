@@ -32,6 +32,9 @@ ul.pagination {
     justify-content: center;
     margin-top: 20px;
 }
+#img-bns-logo {
+    height: 70px;
+}
 .img-homestay {
     height: 200px;
     width: 250px;
@@ -221,6 +224,7 @@ button#btn-add-image:hover {
 }
 /* new search */
 #search-icon {
+    z-index: 999;
     cursor: pointer;
 }
 .search-container-input {
@@ -232,7 +236,7 @@ button#btn-add-image:hover {
     justify-content: center; /* Align input and SVG to the left */
 }
 .input {
-    width: 200px;
+    width: 230px;
     padding: 10px 0px 10px 40px;
     border-radius: 9999px;
     border: solid 2px var(--primary-color);
@@ -250,7 +254,17 @@ button#btn-add-image:hover {
 }
 .input:focus {
     opacity: 1;
-    width: 450px;
+    width: 400px;
+}
+/* for search autocomplete dropdown list */
+.typeahead li.active {
+    background-color: var(--primary-color);
+}
+.typeahead .active > a {
+    color: white !important;
+}
+.typeahead li a:hover {
+    background-color: var(--primary-color);
 }
 /*end of new search  */
 .home-thumbnails-container {
@@ -265,6 +279,8 @@ button#btn-add-image:hover {
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
     transition: all 0.2s ease;
     position: relative;
+    height: 350px;
+    width: 300px;
 }
 .home-thumbnail-container:hover {
     transform: translate(2px, -8px);
@@ -358,7 +374,9 @@ button#btn-add-image:hover {
     color: #fff;
     border: none;
 }
-
+#btn-fetch-dates {
+    border-radius: 0.25rem;
+}
 .btn-gallery:hover::before,
 #btn-fetch-dates:hover::before {
     transform: scaleX(1);
@@ -734,7 +752,7 @@ html .ui-button.ui-state-disabled:active {
         font-size: 20px !important;
     }
     .input {
-        width: 70%;
+        width: 75%;
     }
     .input:focus {
         width: 100%;

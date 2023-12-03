@@ -147,7 +147,7 @@
                   <div class="card-body">
                     <div id="rating-message">
                     </div> 
-                    <img src="homestay-image/review-icon.png" height="100" width="100" class="d-block mx-auto">
+                    <img src="assets/homestay-assets/images/review-icon.png" height="100" width="100" class="d-block mx-auto">
                     <form action="{{route('homestay.addReview')}}" method="POST" enctype="multipart/form-data" id="form-review">
                       @csrf
                       <input type="hidden" value="" id="booking_id" name="booking_id">
@@ -178,6 +178,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script>
     $(document).ready(function(){
+    $('.navbar-header > div:first-child()').after(`
+        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+    `);
       // for redirecting tab
       const switchTab =JSON.parse(localStorage.getItem('switchTab'));
       if(switchTab == 'completedTab'){

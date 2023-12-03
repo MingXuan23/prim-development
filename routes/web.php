@@ -645,6 +645,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('fetch-discount-increase-dates', 'HomestayController@fetchDiscountIncreaseDates')->name('homestay.fetchDiscountIncreaseDates');
     Route::get('calculate-total-price', 'HomestayController@calculateTotalPrice')->name('homestay.calculateTotalPrice');
     Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
+    Route::get('autocomplete-search', 'HomestayController@autocompleteSearch')->name('homestay.autocompleteSearch');
     Route::get('search-room','HomestayController@searchRoom')->name('homestay.searchRoom');
     Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
     Route::post('add-review', 'HomestayController@addReview')->name('homestay.addReview');

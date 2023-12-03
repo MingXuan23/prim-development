@@ -135,6 +135,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script>
     $(document).ready(function(){
+        $('.navbar-header > div:first-child()').after(`
+        <img src="../assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        `);
         $('#btn-download-receipt').on('click', function(){
             window.print();
         })

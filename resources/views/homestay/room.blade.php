@@ -67,7 +67,7 @@
                         <div>
                         <div class="form-floating mb-2" >
                             <input type="number" min="1" max="{{$room->room_no}}" autocomplete="off" name="bookRoom" id="book-room" class="form-control" placeholder=" "  required>
-                            <label for="book-room">Masukkan Jumlah Unit (Maksimum: {{$room->room_no}})</span>
+                            <label for="book-room">Masukkan Jumlah Unit (Max: {{$room->room_no}})</span>
                         </div>   
                         <div class="d-flex justify-content-center align-items-center mb-2">
                             <button type="button" id="btn-fetch-dates">
@@ -185,6 +185,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script>
 $(document).ready(function() {    
+    $('.navbar-header > div:first-child()').after(`
+        <img src="../assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+    `);
     $(".fancybox").fancybox({
         openEffect: "none",
         closeEffect: "none"
@@ -238,7 +241,6 @@ $(document).ready(function() {
         var checkInInput = $('#check-in');
         var checkOutInput = $('#check-out');
         resetFields();
-        console.log(bookRoomInput);
         if (isNaN(bookRoomInput)||bookRoomInput === '' || bookRoomInput > $('#book-room').attr('max') || bookRoomInput < 1) {
             checkInInput.prop('disabled', true);
             checkOutInput.prop('disabled', true);
@@ -266,7 +268,10 @@ $(document).ready(function() {
                 }
                 fetchDiscountOrIncrease();
                 initializeCheckInOut();
-                checkInInput.prop('disabled', false);
+                // put some delay
+                setTimeout(() => {
+                 checkInInput.prop('disabled', false);
+                }, 200);
         }
     });
 
