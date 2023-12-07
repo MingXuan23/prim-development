@@ -428,7 +428,8 @@ img.zoom {
     transform: scale(1.1);
 }
 div#modal-gallery,
-div#modal-fullscreen {
+div#modal-fullscreen,
+#modal-review-image {
     background-color: rgba(0, 0, 0, 0.7);
 }
 #modal-gallery .modal-body,
@@ -442,18 +443,21 @@ div#modal-fullscreen {
     padding: 0;
 }
 #modal-gallery .modal-header,
-#modal-fullscreen .modal-header {
+#modal-fullscreen .modal-header,
+#modal-review-image .modal-header {
     display: flex;
     justify-content: end;
     border-color: transparent;
 }
 #modal-gallery .modal-content,
-#modal-fullscreen .modal-content {
+#modal-fullscreen .modal-content,
+#modal-review-image .modal-content {
     background-color: transparent !important;
     border-color: transparent !important;
 }
 #btn-close-gallery,
-#btn-close-image {
+#btn-close-image,
+#btn-close-review-image {
     background-color: transparent !important;
     color: white;
     border: none !important;
@@ -608,7 +612,7 @@ html .ui-button.ui-state-disabled:active {
     flex-wrap: wrap;
 }
 .review-container > div {
-    padding: 12px 0;
+    padding: 12px 12px 12px 0px;
     flex-basis: 50%;
     margin-bottom: 12px;
 }
@@ -622,6 +626,38 @@ html .ui-button.ui-state-disabled:active {
 .unrated {
     color: var(--primary-color);
     font-size: 22px;
+}
+.img-review-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+.img-review {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.img-review:hover {
+    filter: brightness(0.5);
+}
+.img-modal-review-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+.img-modal-review {
+    max-width: 100%;
+    max-height: 450px;
+    transition: all 0.2s ease;
+}
+.btn-slideshow {
+    background-color: transparent !important;
+    color: white;
+    border: none !important;
+    font-size: 26px;
 }
 /* for tempahan anda */
 .nav-tabs > li > a,

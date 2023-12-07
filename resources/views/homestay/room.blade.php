@@ -11,7 +11,7 @@
     <style>
         /* add padding to the page's content*/
         .page-content{
-            padding: 80px 10%!important;
+            padding: 80px 5%!important;
         }
 
         @media screen and (max-width:500px){
@@ -128,7 +128,35 @@
                 </div>
             </div>
 
-            @include('homestay.review_data')
+            <section aria-labelledby="Review Section">
+                <h3 class="color-dark-purple mb-1"><i class="fas fa-comments"></i>&nbsp;&nbsp;Nilaian Pelanggan</h3>
+                @if($customerReviewsCount > 0)
+                    <h4 class="color-dark-purple">            <span class="rated">
+                            {{$customerReviewsRating}} &#9733
+                        </span>({{$customerReviewsCount}} Nilaian)
+            
+                    </h4>
+                @endif
+                <div id="user-review">
+                    @include('homestay.review_data')
+                </div>
+            </section>
+
+            <div class="modal" tabindex="-1" id="modal-review-image">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" id="btn-close-review-image"><i class="far fa-times-circle"></i></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="img-modal-review-container">
+                                <button type="button" class="btn-slideshow" id="btn-previous-image"><i class="far fa-arrow-alt-circle-left"></i></button>
+                                <button type="button" class="btn-slideshow" id="btn-next-image"><i class="far fa-arrow-alt-circle-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div>
                 <h3 class="color-dark-purple"><i class="fas fa-map"></i>&nbsp;&nbsp;Lokasi Penginapan</h3>
@@ -563,6 +591,7 @@ $(document).ready(function() {
 
     // for review pagination
     function getMoreReviews(page){
+        
         $.ajax({
             url: "{{route('homestay.getMoreReviews')}}" + "?page=" + page,
             method: 'GET',
@@ -572,8 +601,9 @@ $(document).ready(function() {
             success: function(data){
                 $('#user-review').html(data);
             },
-            error: function(){
-                console.log('Get More Review Error');
+            error: function(xhr, status, error) {
+                var errorMessage = xhr.status + ': ' + xhr.statusText;
+                console.log('Get More Review Error: ' + errorMessage);
             }
         });
     }
@@ -583,7 +613,52 @@ $(document).ready(function() {
         var page = $(this).attr('href').split('page=')[1];
         getMoreReviews(page);
     });
+    // for review images
+    var reviewImagesSrc = [];
+    var currentImageIndex = totalImages = 0;
+    $(document).on('click','.img-review',function(){
+        $('.img-modal-review-container img.img-modal-review').remove();
+        // get all the images for a review
+        var images = $(this).parent('.img-review-container').children('.img-review');
+        reviewImagesSrc = images.map((i,img) =>{
+            return img.src;
+        });
+        totalImages = images.length;
+        currentImageIndex = $(this).attr('data-counter');
+        $('.img-modal-review-container #btn-next-image').before(`
+            <img src="${$(this).attr('src')}" class="img-modal-review">
+        `);
+        $('#modal-review-image').modal('show');
+    });
+    $('#btn-next-image').on('click',function(){
+        currentImageIndex++;
+        if(currentImageIndex >= totalImages){
+            currentImageIndex = 0;
+        }
+        currentImageSrc = reviewImagesSrc[currentImageIndex];
 
+        $('.img-modal-review').remove();
+        $('.img-modal-review-container #btn-next-image').before(`
+             <img src="${currentImageSrc}" class="img-modal-review">
+        `);
+    });
+    $('#btn-previous-image').on('click',function(){
+        currentImageIndex--;
+        if(currentImageIndex < 0){
+            currentImageIndex = totalImages - 1;
+        }
+        currentImageSrc = reviewImagesSrc[currentImageIndex];
+
+        $('.img-modal-review').remove();
+        $('.img-modal-review-container #btn-next-image').before(`
+             <img src="${currentImageSrc}" class="img-modal-review">
+        `);
+    });
+    $('#btn-close-review-image').on('click',function(){
+        reviewImages = [];
+        currentImageIndex =  totalImages = 0;
+        $(this).parents('.modal').modal('hide');
+    });
     $('.alert').delay(3000).fadeOut()
 });
 </script>

@@ -24,6 +24,7 @@ use DateTime;
 use DateInterval;
 use DatePeriod;
 use PDF;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class HomestayController extends Controller
 {
@@ -94,40 +95,38 @@ class HomestayController extends Controller
         }
     }
     public function homePage(){
-        $roomsId = DB::table('rooms')
-        ->where([
+        $rooms = Room::where([
             'deleted_at' => null,
             'status' => 'Available',
-        ]) 
-        ->orderBy('roomid')
-        ->pluck('roomid');
+        ]) ->get();
+        $this->getRatingDiscount($rooms);
+        $sortedRooms = $rooms->sortByDesc('overallRating');
         
-        // array to keep the room's data with its first room image
-        $roomsWithImage = [];
-        foreach($roomsId as $roomId){
-            $firstRow = DB::table('rooms')
-            ->join('homestay_images','homestay_images.room_id','rooms.roomid')
-            ->where([
-                'rooms.deleted_at' => null,
-                'rooms.roomid' => $roomId
-            ])
-            ->orderBy('roomid')
-            ->first();
-            array_push($roomsWithImage, $firstRow);
-        }
-        $this->getRatingDiscount($roomsWithImage);  // get ratings and discounts for those rooms
-        // sort by overallRating
-        usort($roomsWithImage, function($roomA , $roomB){
-            $ratingRoomA = floatval($roomA->overallRating);
-            $ratingRoomB = floatval($roomB->overallRating);
-            if($ratingRoomA == $ratingRoomB){
-                return 0;
+        // for pagination on collection
+        $perPage = 20;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+        $currentItems = $sortedRooms->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        
+        $roomsPaginated = new LengthAwarePaginator($currentItems, $sortedRooms->count(), $perPage, $currentPage, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
+
+        return view('homestay.home')->with(['rooms' => $roomsPaginated]);
+    }
+    public function getRating($roomId){
+        $ratings = Booking::where('roomid' ,$roomId)
+        ->where('review_star','!=' , null)
+        ->pluck('review_star');
+
+        $overallRating = 0;
+        if($ratings){
+            foreach($ratings as $rating){
+               $rating != null ? $overallRating += $rating:'';
             }
-
-            return ($ratingRoomA < $ratingRoomB)? 1 : -1;
-        });
-
-        return view('homestay.home')->with(['rooms' => $roomsWithImage]);
+        }
+        $overallRating =  $overallRating != 0 ? number_format($overallRating/count($ratings),2) : 0;
+        return ['overallRating' => $overallRating , 'ratingCount' => count($ratings)];
     }
     public function showRoom($roomId){
         $room = DB::table('rooms')
@@ -151,19 +150,12 @@ class HomestayController extends Controller
         ->where('review_star' , '!=' , null)
         ->join('users' , 'users.id' , 'bookings.customerid')
         ->orderBy('bookings.updated_at', 'desc')
-        ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment' ,'users.name')
-        ->paginate(6);
-        
-        $customerReviewsRating = 0;
-
-        foreach($customerReviews as $review){
-            $customerStar = (int)$review->review_star;
-            $customerReviewsRating += $customerStar;
-        }
-
-        $customerReviewsRating = $customerReviewsRating != 0 ? number_format($customerReviewsRating / $customerReviews->count(),2) : 0;
-
-        return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages ,'customerReviews' => $customerReviews, 'customerReviewsRating' => $customerReviewsRating]);
+        ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment','bookings.review_images' ,'users.name')
+        ->paginate(4);
+        $ratings = $this->getRating($roomId);
+        $customerReviewsRating = $ratings['overallRating'];
+        $customerReviewsCount = $ratings['ratingCount'];
+        return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages ,'customerReviews' => $customerReviews, 'customerReviewsRating' => $customerReviewsRating,'customerReviewsCount' => $customerReviewsCount]);
     }
     public function getMoreReviews(Request $request){
         if($request->ajax()){
@@ -176,8 +168,8 @@ class HomestayController extends Controller
             ->where('review_star' , '!=' , null)
             ->join('users' , 'users.id' , 'bookings.customerid')
             ->orderBy('bookings.updated_at', 'desc')
-            ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment' ,'users.name')
-            ->paginate(6);
+            ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment','bookings.review_images' ,'users.name')
+            ->paginate(4);
             return view('homestay.review_data',compact('customerReviews'))->render();
         }
     }
@@ -275,35 +267,23 @@ class HomestayController extends Controller
         return response()->json($filteredLocations);
     }
     public function searchRoom(Request $request){
-        $rooms = Room::search($request->searchRoom)->paginate(20);
+        $rooms = Room::search($request->searchRoom)->get();
+        $this->getRatingDiscount($rooms);
+    
+        // Sort the collection by overallRating
+        $sortedRooms = $rooms->sortByDesc('overallRating');
+        $roomCount =count($sortedRooms);
+    
+        // for pagination on collection
+        $perPage = 20;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+        $currentItems = $sortedRooms->slice(($currentPage - 1) * $perPage, $perPage)->all();
         
-        // array to keep the room's data with its first room image
-        // $roomsWithImage = [];
-        // foreach($rooms as $room){
-        //     $firstRow = DB::table('rooms')
-        //     ->join('homestay_images','homestay_images.room_id','rooms.roomid')
-        //     ->where([
-        //         'rooms.deleted_at' => null,
-        //         'rooms.roomid' => $room->roomid
-        //     ])
-        //     ->orderBy('roomid')
-        //     ->first();
-        //     array_push($roomsWithImage, $firstRow);
-        // }
-        // $this->getRatingDiscount($roomsWithImage);  // get ratings and discounts for those rooms
-       
-        // // sort by overallRating
-        // usort($roomsWithImage, function($roomA , $roomB){
-        //     $ratingRoomA = floatval($roomA->overallRating);
-        //     $ratingRoomB = floatval($roomB->overallRating);
-        //     if($ratingRoomA == $ratingRoomB){
-        //         return 0;
-        //     }
-
-        //     return ($ratingRoomA < $ratingRoomB)? 1 : -1;
-        // });
-        // dd($roomsWithImage);
-        return view('homestay.searchResults')->with(['rooms' => $rooms]);
+        $roomsPaginated = new LengthAwarePaginator($currentItems, $sortedRooms->count(), $perPage, $currentPage, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
+        return view('homestay.searchResults')->with(['rooms' => $roomsPaginated ,'roomCount' => $roomCount]);
     }
     public function fetchUnavailableDates(Request $request)
     {   
@@ -1428,6 +1408,18 @@ public function getPromotionHistory(Request $request){
     }
     public function addReview(Request $request){
        $bookingId = $request->booking_id;
+       $reviewImages = $request->file('review_images') != null ? $request->file('review_images') : null;
+       $reviewImagePaths = [];
+       if($reviewImages != null){
+        foreach ($reviewImages as $image){
+            $imagePath = 'homestay-review-image/'. $bookingId."(". date('YmdHis')."-".uniqid().").".$image->getClientOriginalExtension();
+            $image->move(public_path('homestay-review-image'),$imagePath);
+            $reviewImagePaths[] = $imagePath;
+            
+        }
+       }else{
+        $reviewImagePaths = null;
+       }
        DB::table('bookings')
        ->where([
         'bookingid' => $bookingId
@@ -1436,6 +1428,7 @@ public function getPromotionHistory(Request $request){
         'updated_at' => Carbon::now(),
         'review_star'=> $request->rating,
         'review_comment'=> $request->review_comment,
+        'review_images'=> $reviewImagePaths,
        ]);
 
        return redirect()->route('homestay.tempahananda')->with(['success' => 'Berjaya Memberikan Nilaian, Terima Kasih']);

@@ -47,7 +47,7 @@
                                 </div>
                             @endif
                         @endif
-                        <img src="{{$room->image_path}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      
+                        <img src="{{$room->homestayImage->first()->image_path}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      
                         <div class="home-thumbnail-captions p-2">
                                 <h4 class="color-purple">{{$room->roomname}}</h4>
                             <div class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->district}},{{$room->state}}</div>
@@ -68,10 +68,11 @@
                         </div>                      
                     </a>
                 </div>
-            @endforeach            
+            @endforeach          
         </div>
 
     </section>
+    {{ $rooms->appends(request()->query())->links() }}
 @endsection
 
 
