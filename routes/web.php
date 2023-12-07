@@ -456,9 +456,13 @@ Route::get('donateFromMobile', 'PayController@donateFromMobile');
 Route::post('trn', 'PayController@transaction')->name('trn');
 Route::post('trn-dev', 'PayController@transactionDev')->name('trn-dev');
 Route::post('payment', 'PayController@paymentProcess')->name('payment');
+
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
+Route::post('directpayIndex', 'DirectPayController@directpayIndex')->name('directpayIndex');
+
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
 Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
+Route::post('directpayReceipt', 'DirectPayController@directpayReceipt')->name('directpayReceipt');
 Route::get('successpay', 'PayController@successPay')->name('successpay');
 Route::get('billIndex', 'PayController@billIndex')->name('billIndex');
 Route::get('feespay', 'PayController@fees_pay')->name('feespay');
