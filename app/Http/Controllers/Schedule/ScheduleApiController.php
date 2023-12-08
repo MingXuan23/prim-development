@@ -391,7 +391,8 @@ class ScheduleApiController extends Controller
                         if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$leave_id,
-                                'schedule_subject_id'=>$c->schedule_subject_id
+                                'schedule_subject_id'=>$c->schedule_subject_id,
+                                'status'=>1
                             ]);
                         } 
                     }
@@ -482,7 +483,7 @@ class ScheduleApiController extends Controller
         // FCM response
         //dd($result);
 
-            return response()->json(["success"]);
+            return response()->json(["success"=>$result,'key'=>$serverKey]);
         }
         return response()->json(["failed"]);
      }
@@ -601,12 +602,12 @@ class ScheduleApiController extends Controller
                     $msg =$msg .'with reason '.$request->desc;
                 }
                 //dd($msg);
-                $this->sendNotification($a->user_id,'Your action is required',$msg );
+                $notification =$this->sendNotification($a->user_id,'Your action is required',$msg );
             }
 
         }
 
-        return response()->json(['result'=>$update]);
+        return response()->json(['result'=>$update,'noti'=>$notification]);
     }
 
     public function getHistory($user_id)
