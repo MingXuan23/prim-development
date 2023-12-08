@@ -346,7 +346,7 @@ class ScheduleApiController extends Controller
                 
                 $extension =  $request->image->extension();
                 $storagePath  =    $request->image ->move(public_path('schedule_leave_image'), $str . '.' . $extension);
-                $file_name = basename($storagePath);
+                $filename = basename($storagePath);
                 //dd($request->image);
 
             }
