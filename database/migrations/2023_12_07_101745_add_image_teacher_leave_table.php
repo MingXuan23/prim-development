@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddColumnToLeaveRelief extends Migration
+class AddImageTeacherLeaveTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class AddColumnToLeaveRelief extends Migration
      */
     public function up()
     {
-        Schema::table('leave_relief', function (Blueprint $table) {
+        Schema::table('teacher_leave', function (Blueprint $table) {
             //
-            $table->string('desc')->nullable();
-            $table->boolean('status')->nullable();
+            $table->string('image')->nullable();
         });
     }
 
@@ -27,9 +26,9 @@ class AddColumnToLeaveRelief extends Migration
      */
     public function down()
     {
-        Schema::table('leave_relief', function (Blueprint $table) {
-            $table->dropColumn('desc');
-           $table->dropColumn('status');
+        Schema::table('teacher_leave', function (Blueprint $table) {
+            //
+            $table->dropColumn('image');
         });
     }
 }
