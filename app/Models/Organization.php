@@ -94,4 +94,15 @@ class Organization extends Model
     {
         return $this->hasMany(Bus::class);
     }
+
+    public function classes()
+    {
+        return $this->belongsToMany(ClassModel::class, 'class_organization', 'organization_id', 'class_id')
+        ->orderBy('nama');;
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
 }

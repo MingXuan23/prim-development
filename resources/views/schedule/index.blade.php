@@ -31,12 +31,20 @@
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
                     </select>
+
+                    <!-- <label>Versi Jadual Waktu</label>
+                    <input type="text" name="version" id="version" class="form-control" readonly value=""> -->
+                    <!-- <select name="version" id="version" class="form-control">
+                        <option value="" selected disabled>Pilih Versi</option>
+                        
+                    </select> -->
+
                     <label>Kelas</label>
                     <select name="class" id="class" class="form-control">
                         <option value="" selected disabled>Pilih Kelas</option>
-                        <!-- @foreach($organization as $row)
+                        @foreach($classes as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
-                        @endforeach -->
+                        @endforeach
                     </select>
                 </div>
 
@@ -56,8 +64,9 @@
         <div class="card">
             {{-- <div class="card-header">List Of Applications</div> --}}
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
-                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Tambah Jadual</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Import</a>
+                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Export</a>
                 <!-- <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a> -->
                 <!-- <a style="margin: 19px; float: right;" href="{{ route('subject.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Subjek</a> -->
@@ -88,9 +97,10 @@
                 <div class="flash-message"></div>
 
                 <div class="table-responsive">
-                    <table id="subjectTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="scheduleTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
+                                <th></th>
                                 <th>Slot 1</th>
                                 <th>Slot 2</th>
                                 <th>Slot 3</th>
@@ -100,14 +110,24 @@
                                 <th>Slot 7</th>
                                 <th>Slot 8</th>
                                 <th>Slot 9</th>
+                                <th>Slot 10</th>
+                                <th>Slot 11</th>
+                                <th>Slot 12</th>
                             </tr>
+                            <tbody>
+                            <tr><th>Isnin</th></tr>
+                            <tr><th>Selasa</th></tr>
+                            <tr><th>Rabu</th></tr>
+                            <tr><th>Khamis</th></tr>
+                            <tr><th>Jumaat</th></tr>
+                            </tbody>
                         </thead>
                     </table>
                 </div>
             </div>
         </div>
 
-        {{-- confirmation delete modal --}}
+        <!-- {{-- confirmation delete modal --}}
         <div id="deleteConfirmationModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -124,7 +144,7 @@
                 </div>
             </div>
         </div>
-        {{-- end confirmation delete modal --}}
+        {{-- end confirmation delete modal --}} -->
 
         <!-- <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -161,23 +181,123 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Subjek</h5>
+                        <h5 class="modal-title">Import Maklumat Jadual</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('importSubject') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('importSchedule') }}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
                             <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
+                                <label>Name</label>
+                                <input type="text" name="name" id="name" class="form-control">
                             </div>
+                            <div class="form-group">
+                                <label>Number Of Slot</label>
+                                <input type="number" name="no_of_slot" id="no_of_slot" min=0 class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Time Of Slot (Minutes)</label>
+                                <input type="number" name="time_of_slot" id="time_of_slot" min=0 class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Start Time</label>
+                                <input type="time" name="starttime" id="starttime" class="form-control">
+                            </div>
+                            <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <div>
+                                <label>Day Of Week</label>
+                                </div>
+                            </div>
+                                <div class="form-group col-md-4">
+                                    <input type="checkbox" id="select-all-days">
+                                    <label for="select-all-days">Select All</label>
+                                <div class="form-control">
+                                    <input type="checkbox" name="day[]" id="monday" value ="1" >
+                                    <label for="monday">Monday</label>
+                                </div>
+                                <div class="form-control">
+                                    <input type="checkbox" name="day[]" id="tuesday" value ="2">
+                                    <label for="tuesday">Tuesday</label>
+                                </div>
+                                <div class="form-control">
+                                    <input type="checkbox" name="day[]" id="wednesday" value ="3">
+                                    <label for="wednesday">Wednesday</label>
+                                </div>
+                                <div class="form-control">
+                                    <input type="checkbox" name="day[]" id="thursday" value ="4">
+                                    <label for="thursday">Thursday</label>
+                                </div>
+                                <div class="form-control">
+                                    <input type="checkbox" name="day[]" id="friday" value ="5">
+                                    <label for="friday">Friday</label>
+                                </div>
+                                <div class="form-control">
+                                    <input type="checkbox" name="day[]" id="saturday" value ="6">
+                                    <label for="saturday">Saturday</label>
+                                </div>
+                                <div class="form-control">
+                                    <input type="checkbox" name="day[]" id="sunday" value ="7">
+                                    <label for="sunday">Sunday</label>
+                                </div>
+                            </div>
+                            </div>
+                            <!-- <div class="form-group">
+                                <label>Time Off</label>
+                                <input type="time" name="offtime" id="offtime">
+                            </div> -->
+                            <div class="form-group">
+                                <label>Teacher Maximum Slot</label>
+                                <input type="number" name="maxslot" id="maxslot" min=0 class="form-control">
+                            </div>
+                            <input type="hidden" name="organization_id" class="organization_id" value="0">
+
+                            <!-- <div class="form-group">
+                                <input type="file" name="file" required>
+                            </div> -->
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal 1-->
+<div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId1" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Import Jadual</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('importScheduleSubject') }}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                            <label>Choose Schedule Name</label>
+                            <select name="schedule_id" id="schedule_id" class="form-control">
+                                <option value="" selected disabled>Choose Schedule Name</option>
+                                @foreach($schedule as $row)
+                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @endforeach
+                            </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea class="form-control" name="desc" id="desc" cols="30" rows="3" placeholder="Description"></textarea>
+                            </div>
+                            <input type="hidden" name="organization_id" class="organization_id" value="0">
                             <div class="form-group">
                                 <input type="file" name="file" required>
                             </div>
@@ -210,105 +330,123 @@
 <script>
     $(document).ready(function() {
 
-        // var subjectTable;
+        var scheduleTable;
+        
+        if ($("#organization").val() != "") {
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+            fetch_data($("#organization").val());
+        }
 
-        // if ($("#organization").val() != "") {
-        //     $("#organization").prop("selectedIndex", 1).trigger('change');
-        //     fetch_data($("#organization").val());
-        // }
+        $('#organization').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            $('.organization_id').val(organizationid);
+            var urlLink = '{{ route("schedule.getVersion", ":organizationid") }}';
+            urlLink = urlLink.replace(':organizationid', organizationid);
+            $.ajax({
+                url: urlLink,
+                type: 'GET',
+                success: function(response) {
+                    var versions = response.versionList;
+                    console.log(versions);
+                    // // Clear existing options
+                    // $('#version').empty();
 
-        // function fetch_data(oid = '') {
-        //     subjectTable = $('#subjectTable').DataTable({
-        //         processing: true,
-        //         serverSide: false,
-        //         ajax: {
-        //             url: "{{ route('subject.getSubjectDatatable') }}",
-        //             data: {
-        //                 oid: oid,
-        //             },
-        //             type: 'GET',
+                    // // Add a default option
+                    // $('#version').append('<option value="" selected disabled>Pilih Versi</option>');
 
-        //         },
-        //         'columnDefs': [{
-        //             "targets": [0], // your case first column
-        //             "className": "text-center",
-        //             "width": "2%"
-        //         }, {
-        //             "targets": [3], // your case first column
-        //             "className": "text-center",
-        //         }, ],
-        //         order: [
-        //             [1, 'asc']
-        //         ],
-        //         columns: [{
-        //             "data": null,
-        //             searchable: false,
-        //             "sortable": false,
-        //             render: function(data, type, row, meta) {
-        //                 return meta.row + meta.settings._iDisplayStart + 1;
-        //             }
-        //         }, {
-        //             data: "name",
-        //             name: 'name'
-        //         }, {
-        //             data: "code",
-        //             name: 'code'
-        //         }, {
-        //             data: 'action',
-        //             name: 'action',
-        //             orderable: false,
-        //             searchable: false
-        //         }, ]
-        //     });
-        // }
+                    // // Add options based on the response
+                    // versions.forEach(function(version) {
+                    //     $('#version').append('<option value="' + version.version_id + '">' + version.code + '</option>');
+                    // });
 
-        // $('#organization').change(function() {
-        //     var organizationid = $("#organization option:selected").val();
-        //     $('#subjectTable').DataTable().destroy();
-        //     // console.log(organizationid);
-        //     fetch_data(organizationid);
-        // });
+                    // // Refresh the styling of the select (if you're using a library like Select2)
+                    // $('#version').trigger('change');
+                },
+                error: function(xhr, status, error) {
+                console.log(error);
+                }
+            });
+        });
 
-        // // csrf token for ajax
-        // $.ajaxSetup({
-        //     headers: {
-        //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        //     }
-        // });
+        $('#class').change(function() {
+        var class_id = $("#class option:selected").val();
+        var urlLink = '{{ route("schedule.getScheduleView", ":classId") }}';
+        urlLink = urlLink.replace(':classId', class_id);
 
-        // var subjectId;
+    $.ajax({
+        url: urlLink,
+        type: 'GET',
+        success: function(response) {
+            var slots = response.slots;
+            var timeoff = response.time_off;
+            console.log(timeoff);
+            var maxDay = Math.max(...slots.map(slot => slot.day));
+            var minDay = Math.min(...slots.map(slot => slot.day));
+            var maxSlot = Math.max(...slots.map(slot => slot.slot));
+            var minSlot = Math.min(...slots.map(slot => slot.slot));
+            var weekday = [
+                'AHAD', 'ISNIN', 'SELASA', 'RABU', 'KHAMIS', 'JUMAAT', 'SABTU', 'AHAD',
+            ];
 
-        // $(document).on('click', '.btn-danger', function() {
-        //     subjectId = $(this).attr('id');
-        //     $('#deleteConfirmationModal').modal('show');
-        // });
+            $('#scheduleTable tbody').empty();
 
-        // $('#delete').click(function() {
-        //     $.ajax({
-        //         type: 'POST',
-        //         dataType: 'html',
-        //         data: {
-        //             "_token": "{{ csrf_token() }}",
-        //             _method: 'DELETE'
-        //         },
-        //         url: "/subject/" + subjectId,
-        //         success: function(data) {
-        //             setTimeout(function() {
-        //                 $('#confirmModal').modal('hide');
-        //             }, 2000);
+            // Create rows for each day
+            for (var dayIndex = minDay; dayIndex <= maxDay; dayIndex++) {
+                var row = $('<tr></tr>');
+                var daycell = $('<td></td>');
+                daycell.text(weekday[dayIndex]);
+                row.append(daycell);
+                // Create cells for each slot
+                for (var slotIndex = minSlot; slotIndex <= maxSlot; slotIndex++) {
+                    var cell = $('<td></td>');
+                    var slot = slots.find(s => s.day === dayIndex && s.slot === slotIndex);
+                    var isBreak = timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day.find(d=>d ==dayIndex))) !== undefined;
+                    //console.log(isBreak); 
+                    if (slot) {
+                        cell.text(slot.subject + ' - ' + slot.teacher);
+                    }
+                    else if(isBreak){
+                        
+                        var text ='REHAT';
+                        var break1 =timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day ==dayIndex));
+                        if(break1?.desc){
+                            text = break1.desc;
+                        }
+                        if(break1?.duration){
+                            text += '\n'+break1.duration+' min'
+                        }
+                        
+                        cell.text(text);
+                    }
 
-        //             $('div.flash-message').html(data);
+                    row.append(cell);
+                }
 
-        //             subjectTable.ajax.reload();
-        //         },
-        //         error: function(data) {
-        //             $('div.flash-message').html(data);
-        //         }
-        //     })
-        // });
+                $('#scheduleTable tbody').append(row);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+        }
+    });
+});
 
-        $('.alert').delay(3000).fadeOut();
+// Rest of your code...
+    });
 
+    document.getElementById('select-all-days').addEventListener('change', function () {
+        var checkboxes = document.querySelectorAll('[name^="day"]');
+        checkboxes.forEach(function (checkbox) {
+            checkbox.checked = document.getElementById('select-all-days').checked;
+        });
+    });
+
+    // Listen for changes in individual checkboxes to uncheck "Select All" if needed
+    var dayCheckboxes = document.querySelectorAll('[name^="day"]');
+    dayCheckboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            document.getElementById('select-all-days').checked = false;
+        });
     });
 </script>
 @endsection

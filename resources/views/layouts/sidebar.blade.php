@@ -173,13 +173,13 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('manage_relief.index') }}" class=" waves-effect">
+                                    <a href="{{ route('schedule.manageRelief') }}" class=" waves-effect">
                                         <i class="fas fa-tasks"></i>
                                         <span>Pengurusan Guru Ganti</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('relief_report.index') }}" class=" waves-effect">
+                                    <a href="{{ route('schedule.reliefReport') }}" class=" waves-effect">
                                         <i class="fas fa-clipboard"></i>
                                         <span>Laporan</span>
                                     </a>

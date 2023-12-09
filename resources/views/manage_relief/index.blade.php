@@ -1,7 +1,10 @@
 @extends('layouts.master')
 
 @section('css')
-<link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
+{{-- <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet"> --}}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 @include('layouts.datatable')
 @endsection
 
@@ -10,9 +13,6 @@
     <div class="col-sm-6">
         <div class="page-title-box">
             <h4 class="font-size-18">Relief Management</h4>
-            <!-- <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-            </ol> -->
         </div>
     </div>
 </div>
@@ -33,7 +33,21 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label>Auto Suggestion Sort By:</label>
+                    <select name="sort" id="sort" class="form-control">
+                        <option value="" selected disabled>Sort By</option>
+                        <option value="workload">Beban Guru</option>
+                        <option value="class">Kelas</option>
+                    </select>
+                </div>
 
+                <div class="form-group">
+                    <label>Tarikh</label>
+                    <input type="text" value="" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
+                </div>
+
+                <a style="margin: 19px; float: right;" onclick="autoSuggest()" class="btn btn-primary"> <i class="fas fa-plus"></i> Auto Suggestion</a>
             </div>
 
             {{-- <div class="">
@@ -47,15 +61,6 @@
 
     <div class="col-md-12">
         <div class="card">
-            {{-- <div class="card-header">List Of Applications</div> --}}
-            <div>
-                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Import</a>
-                <!-- <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a> -->
-                <!-- <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
-                        class="fas fa-plus"></i> Export</a> -->
-                <a style="margin: 19px; float: right;" href="{{ route('subject.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Subjek</a>
-            </div>
-
             <div class="card-body">
 
                 @if(count($errors) > 0)
@@ -81,106 +86,94 @@
                 <div class="flash-message"></div>
 
                 <div class="table-responsive">
-                    <table id="subjectTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="reliefTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
-                                <th> No. </th>
-                                <th>Nama Subjek</th>
-                                <th>Kod Subjek</th>
-                                {{-- <th>Nombor Kad pengenalan</th> --}}
-                                <th>Tindakan</th>
-                                
+                                <th>No </th>
+                                <th>Kelas</th>
+                                <th>Subjek</th>
+                                <th>Guru Asal</th>
+                                <th>Alasan</th>
+                                <th>Guru Ganti</th>
                             </tr>
                         </thead>
+                        <tbody>
+
+                        </tbody>
                     </table>
                 </div>
+
+                <div class="row">
+                    <a style="margin: 19px;" href="#" class="btn btn-primary ml-auto" data-toggle="modal" data-target="#modelId">
+                        <i class="fas fa-plus"></i> Add Row
+                    </a>
+                </div>
+                <div class="row">
+                    <a style="margin: 10px;" class="btn btn-danger">
+                        <i class="fas fa-plus"></i> Discard
+                    </a>
+                    <a style="margin: 10px;" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Confirm
+                    </a>
+                </div>
+
             </div>
         </div>
-
-        {{-- confirmation delete modal --}}
-        <div id="deleteConfirmationModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Padam Subjek</h4>
-                    </div>
-                    <div class="modal-body">
-                        Adakah anda pasti?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- end confirmation delete modal --}}
-
-        <!-- <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Export Subjek</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {{-- {{ route('exportteacher') }} --}}
-                    <form action="{{ route('exportteacher') }}" method="post">
-                        <div class="modal-body">
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> -->
 
         <!-- Modal -->
         <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Subjek</h5>
+                        <h5 class="modal-title">Add Row</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('importSubject') }}" method="post" enctype="multipart/form-data">
+                    <form action="" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
                             <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
+                            <div class="form-group">
+                                <label>Time of Leave</label>
+                                <input type="radio" name="timeOfLeave" id="fullday" onclick="displaySelectTime()" checked> Full Day
+                                <input type="radio" name="timeOfLeave" id="period" onclick="displaySelectTime()"> Period
+                            </div>
+                            
+                            <div id="selectTime" style="display: none;">
+                                <div class="form-group">
+                                    <label>Start Time</label>
+                                    <input type="time" name="starttime" id="starttime" class="form-control">
+                                </div>
+                                <div class="form-group" >
+                                    <label>End Time</label>
+                                    <input type="time" name="starttime" id="endtime" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="reason">Reason</label>
+                                <select name="reason" id="reason" class="form-control">
+                                    <option value="mc">MC</option>
+                                    <option value="event">Event</option>
                                 </select>
                             </div>
+
                             <div class="form-group">
-                                <input type="file" name="file" required>
+                                <label for="note">Note</label>
+                                <input type="text" name="note" id="note" placeholder="Enter your note here..." class="form-control">
                             </div>
 
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
+                                <button type="submit" class="btn btn-primary">Add</button>
                             </div>
                         </div>
-
                     </form>
                 </div>
             </div>
-        </div>
+        </div> 
+
     </div>
 </div>
 
@@ -196,67 +189,23 @@
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
--=
-<script>
-    $(document).ready(function() {
 
-        var subjectTable;
+<script>   
+    var dates = []
+    $(document).ready(function() {
+        $("#datepicker").datepicker("setDate", new Date());
+        dateOnChange();
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetch_data($("#organization").val());
-        }
-
-        function fetch_data(oid = '') {
-            subjectTable = $('#subjectTable').DataTable({
-                processing: true,
-                serverSide: false,
-                ajax: {
-                    url: "{{ route('subject.getSubjectDatatable') }}",
-                    data: {
-                        oid: oid,
-                    },
-                    type: 'GET',
-
-                },
-                'columnDefs': [{
-                    "targets": [0], // your case first column
-                    "className": "text-center",
-                    "width": "2%"
-                }, {
-                    "targets": [3], // your case first column
-                    "className": "text-center",
-                }, ],
-                order: [
-                    [1, 'asc']
-                ],
-                columns: [{
-                    "data": null,
-                    searchable: false,
-                    "sortable": false,
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                }, {
-                    data: "name",
-                    name: 'name'
-                }, {
-                    data: "code",
-                    name: 'code'
-                }, {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                }, ]
-            });
+            // fetch_data($("#organization").val());
         }
 
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#subjectTable').DataTable().destroy();
+            $('#reliefTable').DataTable().destroy();
             // console.log(organizationid);
-            fetch_data(organizationid);
+            // fetch_data(organizationid);
         });
 
         // csrf token for ajax
@@ -266,39 +215,173 @@
             }
         });
 
-        var subjectId;
-
-        $(document).on('click', '.btn-danger', function() {
-            subjectId = $(this).attr('id');
-            $('#deleteConfirmationModal').modal('show');
-        });
-
-        $('#delete').click(function() {
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    _method: 'DELETE'
-                },
-                url: "/subject/" + subjectId,
-                success: function(data) {
-                    setTimeout(function() {
-                        $('#confirmModal').modal('hide');
-                    }, 2000);
-
-                    $('div.flash-message').html(data);
-
-                    subjectTable.ajax.reload();
-                },
-                error: function(data) {
-                    $('div.flash-message').html(data);
-                }
-            })
-        });
-
         $('.alert').delay(3000).fadeOut();
 
-    });
+        $('#datepicker').change(function() {
+        //    dateOnChange();
+           fetchReliefData();
+        })
+        
+        
+
+        // Function to display relief data in the table
+       
+        // var table = $('#reliefTable');
+        // console.log(table);
+
+        // Initial fetch when the page loads
+        fetchReliefData();
+
+        });
+
+        $("#datepicker").datepicker({
+            minDate: 0,
+            maxDate: '+1m',
+            dateFormat: 'yy-mm-dd',
+            dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
+            beforeShowDay: editDays,
+            defaultDate: 0, 
+        })
+
+        function fetchReliefData() {
+            let date_val = $('#datepicker').val();
+            // If date is empty, set it to today
+            if (!date_val) {
+                date_val = $.datepicker.formatDate('yy-mm-dd', new Date());
+                $('#datepicker').datepicker('setDate', date_val); // Update datepicker value
+            }
+            console.log(date_val);
+            $.ajax({
+                url: '{{ route("schedule.getPendingRelief") }}',
+                type: 'POST',
+                data: {
+                    organization: $('#organization option:selected').val(), 
+                    date: date_val,
+                    // Replace with your organization ID
+                },
+                success: function (response) {
+                    console.log(response); // Log the pending relief data
+                    //console.log(response.available_teachers); // Log the available teachers data 
+                    displayRelief(response.pending_relief);
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function displayRelief(reliefData) {
+            var tableBody = $('#reliefTable tbody');
+            tableBody.empty(); // Clear existing data
+
+            // Iterate through reliefData and append rows
+            reliefData.forEach(function (relief, index) {
+                var row = $('<tr></tr>');
+                row.append('<td>' + (index + 1) + '</td>');
+                row.append('<td>' + relief.class_name + '</td>');
+                row.append('<td>' + relief.subject + '</td>');
+                row.append('<td>' + relief.leave_teacher + '</td>');
+                row.append('<td>' + relief.desc + '</td>');
+                // row.append('<td><select class="form-control assign_teacher"><option>' + relief.relief_teacher + '</option></select></td>');
+
+                var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id+'-'+relief.schedule_subject_id + '"><option>' + relief.relief_teacher + '</option></select></td>');
+                row.append(selectColumn);
+
+                tableBody.append(row);
+            });
+            tableBody.on('mousedown', '.assign_teacher', function () {
+                var selectedIndex = $(this).data('index');
+                var resultArray = selectedIndex.split('-');
+                var schedule_subject_id = resultArray[0];
+                var selectedTeacher = $(this).val();
+                // Call your function before the value changes
+                assignTeacher(schedule_subject_id, selectedTeacher);
+            });
+
+        }
+
+        function assignTeacher(schedule_subject_id, teacher) {
+            console.log('Selected teacher for row ' + (schedule_subject_id ) + ': ' + teacher);
+            $.ajax({
+                url: "{{route('schedule.getFreeTeacher')}}",
+                type: 'POST',
+                data: {
+                    organization: $('#organization option:selected').val(), 
+                    date:  $('#datepicker').val(),
+                    schedule_subject_id:schedule_subject_id
+
+                },
+                success: function(response) {
+                    console.log(response); //update the combo box that select the teacher
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+            // Add your logic to handle the selected teacher here
+            // You can make an AJAX request to update the server or perform other actions
+        }
+
+        function autoSuggest(){
+        var organization = $("#organization option:selected").val();
+        var pendingRelief = ['1-1','2-2']; //get from each row and format it, 'leave_relief_id-schedule_subject_id'
+        var criteria = 'class_in_week'; //drop down select
+       
+        $.ajax({
+                url: "{{route('schedule.autoSuggestRelief')}}",
+                type: 'POST',
+                data: {
+                    organization: organization, 
+                    pendingRelief: pendingRelief, 
+                    criteria: criteria
+                },
+                success: function(response) {
+                    console.log(response); //update the combo box that select the teacher
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function dateOnChange() {
+        let date_val = $('#datepicker').val(), timePicker = $('#timepicker'), timeRange = $('.time-range')
+        let org_id = $('#organization option:selected').val()
+        // console.log(date_val)
+        if(date_val != '') {
+            $('.pickup-time-div').removeAttr('hidden')
+        } else {
+            $('.pickup-time-div').attr('hidden', true)
+        }
+        }
+
+    var disabledDates = dates
+    
+    function editDays(date) {
+      for (var i = 0; i < disabledDates.length; i++) {
+        if (new Date(disabledDates[i]).toString() == date.toString()) {             
+          return [false];
+        }
+      }
+      return [true];
+    }
+
+    function displaySelectTime(){
+        var selectTimeDiv = document.getElementById('selectTime');
+        var periodRadio = document.getElementById('period');
+        var fulldayRadio = document.getElementById('fullday');
+
+        if (periodRadio.checked) {
+            selectTimeDiv.style.display = 'block';
+        } else {
+            selectTimeDiv.style.display = 'none';
+        }
+
+        if (fulldayRadio.checked) {
+            selectTimeDiv.style.display = 'none';
+        } else {
+            selectTimeDiv.style.display = 'block';
+        }
+    }
 </script>
 @endsection
