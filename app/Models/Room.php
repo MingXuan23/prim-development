@@ -17,7 +17,6 @@ class Room extends Model
         'status',
         'homestayid',
         'address',
-        'homestay_image_id',
         'created_at',
         'updated_at',
     ];
@@ -33,8 +32,15 @@ class Room extends Model
     {
         return $this->hasMany(Booking::class);
     }
+    public function homestayImage(){
+        return $this->hasMany(HomestayImage::class, 'room_id', 'roomid');// 2nd parameter: foreign key for Room in HomestayImage,3rd parameter: primary key for Room
+    }
     // for seach function
     public function scopeSearch($query, $term){
-        return $query->where('roomname','like','%' . $term . '%')->where('deleted_at',null);
+        return $query->where('deleted_at', null)
+        ->where(function ($query) use ($term) {
+            $query->where('state', 'like', '%' . $term . '%')
+                ->orWhere('district', 'like', '%' . $term . '%');
+        });
     }
 }

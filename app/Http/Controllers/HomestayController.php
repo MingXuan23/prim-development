@@ -24,32 +24,13 @@ use DateTime;
 use DateInterval;
 use DatePeriod;
 use PDF;
+use Illuminate\Pagination\LengthAwarePaginator;
+
 class HomestayController extends Controller
 {
-    public function homePage(){
-        $roomsId = DB::table('rooms')
-        ->where([
-            'deleted_at' => null,
-            'status' => 'Available',
-        ]) 
-        ->orderBy('roomid')
-        ->pluck('roomid');
-        
-        // array to keep the room's data with its first room image
-        $roomsWithImage = [];
-        foreach($roomsId as $roomId){
-            $firstRow = DB::table('rooms')
-            ->join('homestay_images','homestay_images.room_id','rooms.roomid')
-            ->where([
-                'rooms.deleted_at' => null,
-                'rooms.roomid' => $roomId
-            ])
-            ->orderBy('roomid')
-            ->first();
-            array_push($roomsWithImage, $firstRow);
-        }
+    public function getRatingDiscount($rooms){
         // get ratings and discounts for those rooms
-        foreach($roomsWithImage as $key => $room){
+        foreach($rooms as $key => $room){
             $ratings = DB::table('bookings')
             ->where([
                 'roomid' => $room->roomid,
@@ -112,7 +93,40 @@ class HomestayController extends Controller
             }
 
         }
-        return view('homestay.home')->with(['rooms' => $roomsWithImage]);
+    }
+    public function homePage(){
+        $rooms = Room::where([
+            'deleted_at' => null,
+            'status' => 'Available',
+        ]) ->get();
+        $this->getRatingDiscount($rooms);
+        $sortedRooms = $rooms->sortByDesc('overallRating');
+        
+        // for pagination on collection
+        $perPage = 20;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+        $currentItems = $sortedRooms->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        
+        $roomsPaginated = new LengthAwarePaginator($currentItems, $sortedRooms->count(), $perPage, $currentPage, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
+
+        return view('homestay.home')->with(['rooms' => $roomsPaginated]);
+    }
+    public function getRating($roomId){
+        $ratings = Booking::where('roomid' ,$roomId)
+        ->where('review_star','!=' , null)
+        ->pluck('review_star');
+
+        $overallRating = 0;
+        if($ratings){
+            foreach($ratings as $rating){
+               $rating != null ? $overallRating += $rating:'';
+            }
+        }
+        $overallRating =  $overallRating != 0 ? number_format($overallRating/count($ratings),2) : 0;
+        return ['overallRating' => $overallRating , 'ratingCount' => count($ratings)];
     }
     public function showRoom($roomId){
         $room = DB::table('rooms')
@@ -136,19 +150,12 @@ class HomestayController extends Controller
         ->where('review_star' , '!=' , null)
         ->join('users' , 'users.id' , 'bookings.customerid')
         ->orderBy('bookings.updated_at', 'desc')
-        ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment' ,'users.name')
-        ->paginate(6);
-        
-        $customerReviewsRating = 0;
-
-        foreach($customerReviews as $review){
-            $customerStar = (int)$review->review_star;
-            $customerReviewsRating += $customerStar;
-        }
-
-        $customerReviewsRating = $customerReviewsRating != 0 ? number_format($customerReviewsRating / $customerReviews->count(),2) : 0;
-
-        return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages ,'customerReviews' => $customerReviews, 'customerReviewsRating' => $customerReviewsRating]);
+        ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment','bookings.review_images' ,'users.name')
+        ->paginate(4);
+        $ratings = $this->getRating($roomId);
+        $customerReviewsRating = $ratings['overallRating'];
+        $customerReviewsCount = $ratings['ratingCount'];
+        return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages ,'customerReviews' => $customerReviews, 'customerReviewsRating' => $customerReviewsRating,'customerReviewsCount' => $customerReviewsCount]);
     }
     public function getMoreReviews(Request $request){
         if($request->ajax()){
@@ -161,8 +168,8 @@ class HomestayController extends Controller
             ->where('review_star' , '!=' , null)
             ->join('users' , 'users.id' , 'bookings.customerid')
             ->orderBy('bookings.updated_at', 'desc')
-            ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment' ,'users.name')
-            ->paginate(6);
+            ->select('bookings.bookingid', 'bookings.updated_at' ,'bookings.review_star' , 'bookings.review_comment','bookings.review_images' ,'users.name')
+            ->paginate(4);
             return view('homestay.review_data',compact('customerReviews'))->render();
         }
     }
@@ -172,6 +179,8 @@ class HomestayController extends Controller
 
 
         $roomId = $request->roomId;
+        $bookRooms = $request->roomNo;
+        $bookRooms = $bookRooms > 1 ? $bookRooms : 1;//if $bookRooms is null, it means that booking type is whole homestay not book by room, so just initialize it as 1
 
         $roomPrice = DB::table('rooms')
         ->where([
@@ -193,7 +202,7 @@ class HomestayController extends Controller
         ->orderBy('datefrom')
         ->get();
         // Initialize the total price
-        $totalPrice = $roomPrice * $numberOfNights;
+        $totalPrice = $roomPrice * $numberOfNights * $bookRooms;
         $initialPrice = $totalPrice;
         $discountTotal = $increaseTotal =  0;
         $discountDate = $increaseDate = [];
@@ -211,13 +220,13 @@ class HomestayController extends Controller
                     if ($currentDate->greaterThanOrEqualTo($startDate) && $currentDate->lessThanOrEqualTo($endDate)) {
                         if ($promotion->promotion_type === 'discount') {
                             // Calculate the discount amount
-                            $discountAmount = $roomPrice * ($promotion->discount / 100);
-                            $discountTotal += $discountAmount;
+                            $discountAmount = $roomPrice * $bookRooms * ($promotion->discount / 100);
+                            $discountTotal += $discountAmount ;
                             array_push($discountDate,$currentDate->format('d'));
                             $totalPrice -= $discountAmount;
                         } elseif ($promotion->promotion_type === 'increase') {
                             // Calculate the price increase
-                            $priceIncrease = $roomPrice * ($promotion->increase / 100);
+                            $priceIncrease = $roomPrice * $bookRooms * ($promotion->increase / 100);
                             $increaseTotal += $priceIncrease;
                             array_push($increaseDate,$currentDate->format('d'));
                             $totalPrice += $priceIncrease;
@@ -231,49 +240,114 @@ class HomestayController extends Controller
             return response()->json(['totalPrice' =>number_format($totalPrice,2),'numberOfNights'=>$numberOfNights, 'roomPrice'=> $roomPrice,'initialPrice'=>number_format($initialPrice,2)]);
         }
     }
-    public function searchRoom(Request $request){
-        $rooms = Room::search($request->searchRoom)->paginate(20);
-        $roomImage = [];
-        foreach($rooms as $room){
-            $roomId = $room->roomid;
-            $firstRow = DB::table('rooms')
-            ->join('homestay_images','homestay_images.room_id','rooms.roomid')
-            ->where([
-                'rooms.deleted_at' => null,
-                'rooms.roomid' => $roomId
-            ])
-            ->orderBy('roomid')
-            ->pluck('image_path')
-            ->first();
+    public function autocompleteSearch(Request $request){
+        $query = $request->input('query'); 
+        $statesDetails = Jajahan::negeri();//get all states
 
-            array_push($roomImage, $firstRow);
+        $districts = [];//get all districts
+        foreach($statesDetails as $state){
+            $districtsInState = Jajahan::daerah($state['id']);
+            $districts = array_merge($districts,$districtsInState);//merge two arrays
         }
-        return view('homestay.searchResults')->with(['rooms' => $rooms,'roomImage' => $roomImage]);
+
+        $states = [];//to store states name
+        foreach($statesDetails as $state){
+            array_push($states , $state['name']);//push the name of the state
+        }
+
+        $locations = array_merge($states,$districts);
+        // Filter the locations array based on the query
+        $filteredLocations= array_filter($locations, function($location) use ($query) {
+            // Perform a case-insensitive search for states containing the query string in their name
+            return stripos($location, $query) !== false;
+        });
+
+
+        // Return the filtered results as JSON response
+        return response()->json($filteredLocations);
+    }
+    public function searchRoom(Request $request){
+        $rooms = Room::search($request->searchRoom)->get();
+        $this->getRatingDiscount($rooms);
+    
+        // Sort the collection by overallRating
+        $sortedRooms = $rooms->sortByDesc('overallRating');
+        $roomCount =count($sortedRooms);
+    
+        // for pagination on collection
+        $perPage = 20;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+        $currentItems = $sortedRooms->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        
+        $roomsPaginated = new LengthAwarePaginator($currentItems, $sortedRooms->count(), $perPage, $currentPage, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => 'page',
+        ]);
+        return view('homestay.searchResults')->with(['rooms' => $roomsPaginated ,'roomCount' => $roomCount]);
     }
     public function fetchUnavailableDates(Request $request)
     {   
         $roomId = $request->roomId;
+        $roomNo = $request->roomNo;
         $bookings = Booking::where('roomid', $roomId)
                            ->whereIn('status', ['Booked', 'Completed'])
                            ->get();
-    
+        
         $disabledDates = [];
-    
-        foreach ($bookings as $booking) {
-            // Convert check-in and check-out dates to DateTime objects
-            $checkIn = new DateTime($booking->checkin);
-            $checkOut = new DateTime($booking->checkout);
-    
-            // Generate a range of dates between check-in and check-out (inclusive)
-            $interval = new DateInterval('P1D'); // 1 day interval
-            $period = new DatePeriod($checkIn, $interval, $checkOut);
-    
-            // Add each date in the range to the disabledDates array
-            foreach ($period as $date) {
-                $disabledDates[] = $date->format('d/m/Y');
+        // for booking type whole
+        if($roomNo == null){
+            foreach ($bookings as $booking) {
+                // Convert check-in and check-out dates to DateTime objects
+                $checkIn = new DateTime($booking->checkin);
+                $checkOut = new DateTime($booking->checkout);
+        
+                // Generate a range of dates between check-in and check-out (inclusive)
+                $interval = new DateInterval('P1D'); // 1 day interval
+                $period = new DatePeriod($checkIn, $interval, $checkOut);
+        
+                // Add each date in the range to the disabledDates array
+                foreach ($period as $date) {
+                    $disabledDates[] = $date->format('d/m/Y');
+                }
+            }            
+        }else{
+            //for booking by rooms
+            $roomMaxNo = DB::table('rooms')
+                ->where('roomid', $roomId)
+                ->pluck('room_no')
+                ->first();
+
+            $bookedRoomCounts = [];
+
+            foreach ($bookings as $booking) {
+                // Convert check-in and check-out dates to DateTime objects
+                $checkIn = new DateTime($booking->checkin);
+                $checkOut = (new DateTime($booking->checkout))->modify('-1 day'); // Remove the last day as checkout date is not included
+                
+                // Check each date within the booking period
+                while ($checkIn <= $checkOut) {
+                    $dateKey = $checkIn->format('Y-m-d');
+
+                    // Track the total number of rooms booked for each date
+                    $bookedRoomCounts[$dateKey] = isset($bookedRoomCounts[$dateKey])
+                        ? $bookedRoomCounts[$dateKey] + (int)$booking->booked_rooms
+                        : (int)$booking->booked_rooms;
+
+                    //Number of rooms available during the date 
+                    $remainingRooms = $roomMaxNo - $bookedRoomCounts[$dateKey];
+
+                    // Add dates where the requested room count exceeds the available rooms
+                    if ($remainingRooms < $roomNo) {
+                        $disabledDates[] = $checkIn->format('d/m/Y');
+                    }
+
+                    // Move to the next date
+                    $checkIn->modify('+1 day');
+                }
             }
         }
-    
+
+        
         // Remove duplicates from the array (if any)
         $disabledDates = array_unique($disabledDates);
         return response()->json(['disabledDates' => $disabledDates]);
@@ -552,6 +626,7 @@ public function addroom(Request $request)
         'postcode' => 'required',
         'checkInAfter' => 'required',
         'checkOutBefore' => 'required',
+        'bookingType' => 'required',
     ]);
     
     $status = $request->isAvailable == "" ? "Not Available" : "Available";
@@ -570,6 +645,8 @@ public function addroom(Request $request)
     $room->postcode = $request->postcode;
     $room->check_in_after = Carbon::parse($request->checkInAfter)->format('H:i');
     $room->check_out_before = Carbon::parse($request->checkOutBefore)->format('H:i');
+    $room->booking_type = $request->bookingType;
+    $room->room_no = $request->roomNo;
     $room->created_at = Carbon::now();
     $result = $room->save();
     
@@ -580,9 +657,10 @@ public function addroom(Request $request)
     
     $images = $request->file('images');
     if($images){
-        $i = 0;
         foreach ($images as $image){
-            $imagePath = "homestay-image/".$latestRoomID."(".$i.").".$image->getClientOriginalExtension();
+            $currentDateTime = date('YmdHis');
+            $randomString = uniqid();
+            $imagePath = "homestay-image/".$latestRoomID."(".$currentDateTime."-".$randomString.").".$image->getClientOriginalExtension();
             $image->move(public_path('homestay-image'),$imagePath);
             DB::table('homestay_images')
             ->insert([
@@ -590,7 +668,6 @@ public function addroom(Request $request)
                 'created_at' => Carbon::now(),
                 'room_id'=> $latestRoomID,
             ]);
-            $i++;
         }
     }
 
@@ -813,7 +890,7 @@ public function getPromotionHistory(Request $request){
                     'organizations.id'=> $homestayid,
                     'rooms.deleted_at'=> null,
                 ]) // Filter by the selected homestay
-                ->select('organizations.id', 'rooms.roomid', 'rooms.roomname', 'rooms.roompax', 'rooms.price', 'rooms.status')
+                ->select('organizations.id', 'rooms.roomid', 'rooms.roomname', 'rooms.roompax', 'rooms.price', 'rooms.status', 'rooms.room_no')
                 ->get();
         $allRoomImages = DB::table('rooms')
         ->join('homestay_images','homestay_images.room_id','rooms.roomid')
@@ -915,12 +992,7 @@ public function getPromotionHistory(Request $request){
         $deleteIdsArray = [];
         if($deleteIds != null){
             $deleteIdsArray = explode(',', $deleteIds);//like split
-            foreach($deleteIdsArray as $id){
-                DB::table('homestay_images')
-                ->where('id',$id)
-                ->update([
-                    'deleted_at' => Carbon::now(),
-                ]);
+            foreach($deleteIdsArray as $id){                
                 $deletePath =             
                 DB::table('homestay_images')
                 ->where('id',$id)
@@ -928,6 +1000,10 @@ public function getPromotionHistory(Request $request){
                 ->first();
                 // delete the image
                 unlink(public_path($deletePath));
+                DB::table('homestay_images')
+                ->where('id',$id)
+                ->delete();
+
             }            
         }
 
@@ -942,7 +1018,7 @@ public function getPromotionHistory(Request $request){
             $newImages = array_values($newImages);
             foreach($editIdsArray as $key=>$id){
                 // if the edit image is not deleted
-                if(!in_array($id , $deleteIdsArray)){
+                if(!in_array($id , $deleteIdsArray) && $id != "new_images"){
                     $image = DB::table('homestay_images')
                     ->where('id', $id)
                     ->first();
@@ -952,43 +1028,22 @@ public function getPromotionHistory(Request $request){
                     $pathInfo = pathinfo($image->image_path);
                     $newImagePath = 'homestay-image/'.$pathInfo['filename'].".".$newImages[$key]->getClientOriginalExtension();
                     $newImages[$key]->move(public_path('homestay-image'),$newImagePath);
+
+                    DB::table('homestay_images')
+                    ->where('id',$id)
+                    ->update([
+                        'updated_at' => Carbon::now(),
+                    ]);
                 }
             }
-            // foreach($imagesInDB as $image){
-            //     if(isset($imagesKey[$imageKeyCounter])){
-            //         $currentImageKey = $imagesKey[$imageKeyCounter];
-            //         if($imageCounter == $currentImageKey){
-            //             // delete the old image at this position
-            //             unlink(public_path($image->image_path));
-            //             // place the new one
-            //             $newImagePath = 'homestay-image/'.$request->roomid."(".$imageCounter.").".$newImages[$currentImageKey]->getClientOriginalExtension();
-            //             $newImages[$currentImageKey]->move(public_path('homestay-image'),$newImagePath);
-        
-            //             // update database
-            //             DB::table('homestay_images')
-            //                 ->where([
-            //                     'image_path' => $image->image_path,
-            //                 ])
-            //                 ->update([
-            //                     'image_path' => $newImagePath,
-            //                     'updated_at' => Carbon::now(),
-            //                 ]);
-            //             $imageKeyCounter++;
-            //         }
-            //     }
-            //     $imageCounter++;
-            // }            
         }
         // for inserting new images
         $freshImages = $request->file('new_images');
         if($freshImages){
-            $latestID = DB::table('homestay_images')
-            ->where([
-                'room_id' => $request->roomid,
-            ])
-            ->count();
             foreach($freshImages as $image){
-                $freshImagePath = "homestay-image/".$request->roomid."(".$latestID.").".$image->getClientOriginalExtension();
+                $currentDateTime = date('YmdHis');
+                $randomString = uniqid();
+                $freshImagePath = "homestay-image/".$request->roomid."(".$currentDateTime."-".$randomString.").".$image->getClientOriginalExtension();
                 $image->move(public_path('homestay-image'),$freshImagePath);
                 DB::table('homestay_images')
                 ->insert([
@@ -996,12 +1051,22 @@ public function getPromotionHistory(Request $request){
                     'created_at' => Carbon::now(),
                     'room_id'=>  $request->roomid,
                 ]);
-                $latestID++;
             }
         }
         // for updating other information
         $request->validate([
+            'roomname' => 'required',
+            'roompax' => 'required',
+            'details' => 'required',
             'price'=> 'numeric|min:1',
+            'address' => 'required',
+            'state' => 'required',
+            'district' => 'required',
+            'area' => 'required',
+            'postcode' => 'required',
+            'checkInAfter' => 'required',
+            'checkOutBefore' => 'required',
+            'bookingType' => 'required',
         ]);
         $isAvailable = $request->isAvailable == "" ? "Not Available" : "Available";
         DB::table('rooms')
@@ -1021,6 +1086,8 @@ public function getPromotionHistory(Request $request){
             'postcode' => $request->postcode,
             'check_in_after' => $request->checkInAfter,
             'check_out_before' => $request->checkOutBefore,
+            'booking_type' => $request->bookingType,
+            'room_no' => $request->roomNo,
             'updated_at' => Carbon::now(),
         ]);
     
@@ -1099,19 +1166,49 @@ public function getPromotionHistory(Request $request){
     }
     public function bookRoom(Request $request){
         $roomId = $request->roomId;
+        $bookedRooms = $request->bookRoom  ? $request->bookRoom : null;
         $userId = Auth::user()->id;
-        $checkInDate = Carbon::createFromFormat('d/m/Y', $request->checkIn);
-        $checkOutDate = Carbon::createFromFormat('d/m/Y', $request->checkOut);
-        // check whether room is booked by others 
-        $availability = Booking::where('roomid', $roomId)
-        ->where(function ($query) use ($request) {
-        $query->where('checkin', '<', $request->checkOut)
-            ->where('checkout', '>', $request->checkIn);
-         })
-         ->whereNotIn('status',['Booked','Completed'] )
-        ->get();
+        $checkInDate = Carbon::createFromFormat('d/m/Y', $request->checkIn)->format('Y-m-d');
+        $checkOutDate = Carbon::createFromFormat('d/m/Y', $request->checkOut)->format('Y-m-d');
 
-        if($availability->isEmpty()){
+        // check whether room is booked by others 
+        if($bookedRooms == null){
+            // for booking type whole homestay
+            $availability = Booking::where('roomid', $roomId)
+            ->where('checkin', '<', $checkOutDate)
+            ->where('checkout', '>', $checkInDate)
+            ->whereIn('status', ['Booked', 'Completed'])
+            ->get();       
+        }else{
+             // for booking type book by rooms
+             $availability = Booking::where('roomid', $roomId)
+             ->where('checkin', '<', $checkOutDate)
+             ->where('checkout', '>', $checkInDate)
+             ->whereIn('status', ['Booked', 'Completed'])
+             ->get();
+
+             $maxRoomsNo = DB::table('rooms')
+             ->where('roomid', $roomId)
+             ->pluck('room_no')
+             ->first();
+
+             $isAvailable = true;
+             foreach($availability as $booking){
+                // check whether there are enough rooms available
+                $remainingRooms = $maxRoomsNo - $booking->booked_rooms;
+
+                if($remainingRooms >= $bookedRooms){
+                    continue; 
+                }else{
+                    $isAvailable = false;
+                    exit;
+                }
+             }
+            //  if there are enough rooms available we assign empty array, while if not enough do nothing
+            $availability = $isAvailable ? []:$availability ;
+
+        }
+        if($availability== [] || $availability->isEmpty()){
             $floatTotalPrice = (float) str_replace(',', '', $request->amount);
             $discountReceived = (float) str_replace(',', '', $request->discountAmount);
             $discountReceived = $discountReceived > 0 ? $discountReceived : 0;
@@ -1128,6 +1225,7 @@ public function getPromotionHistory(Request $request){
                 'created_at' => Carbon::now(),
                 'discount_received' => $discountReceived,
                 'increase_received' => $increaseReceived,
+                'booked_rooms' => $bookedRooms,
             ]);
 
             
@@ -1157,9 +1255,9 @@ public function getPromotionHistory(Request $request){
                 'nightCount' => $request->nightCount,
                 'homestay'=>$homestay,  
                 'homestayImage'=> $homestayImage, 
-                'bookingId' => $bookingId,             
+                'bookingId' => $bookingId,    
+                'bookedRooms' => $bookedRooms,         
             ];
-            // dd($checkoutDetails);
             // redirect to checkout page
             return view('homestay.bookingCheckout')->with(['checkoutDetails' => $checkoutDetails]);
         }else{
@@ -1310,6 +1408,18 @@ public function getPromotionHistory(Request $request){
     }
     public function addReview(Request $request){
        $bookingId = $request->booking_id;
+       $reviewImages = $request->file('review_images') != null ? $request->file('review_images') : null;
+       $reviewImagePaths = [];
+       if($reviewImages != null){
+        foreach ($reviewImages as $image){
+            $imagePath = 'homestay-review-image/'. $bookingId."(". date('YmdHis')."-".uniqid().").".$image->getClientOriginalExtension();
+            $image->move(public_path('homestay-review-image'),$imagePath);
+            $reviewImagePaths[] = $imagePath;
+            
+        }
+       }else{
+        $reviewImagePaths = null;
+       }
        DB::table('bookings')
        ->where([
         'bookingid' => $bookingId
@@ -1318,6 +1428,7 @@ public function getPromotionHistory(Request $request){
         'updated_at' => Carbon::now(),
         'review_star'=> $request->rating,
         'review_comment'=> $request->review_comment,
+        'review_images'=> $reviewImagePaths,
        ]);
 
        return redirect()->route('homestay.tempahananda')->with(['success' => 'Berjaya Memberikan Nilaian, Terima Kasih']);
@@ -1383,7 +1494,10 @@ public function getPromotionHistory(Request $request){
         $checkOutDate =  Carbon::CreateFromFormat('Y-m-d' ,$transaction->checkout);
 
         $numberOfNights = $checkInDate->diffInDays($checkOutDate);
-        return view('homestay.bookingDetails')->with(['organization' => $organization , 'transaction' => $transaction , 'user' => $user ,'homestay'=>$homestay ,'homestayImage' => $homestayImage ,'numberOfNights' => $numberOfNights]);
+        // need to calculate for price per night based on total price payed 
+        $pricePerNight = ($transaction->totalprice + $transaction->discount_received - $transaction->increase_received) / $numberOfNights;
+        $pricePerNight = number_format($pricePerNight,2);
+        return view('homestay.bookingDetails')->with(['organization' => $organization , 'transaction' => $transaction , 'user' => $user ,'homestay'=>$homestay ,'homestayImage' => $homestayImage ,'numberOfNights' => $numberOfNights , 'pricePerNight' => $pricePerNight]);
     }
     public function generateBookingDetailsPdf($bookingId){
         $organization = DB::table('bookings')
@@ -1571,21 +1685,32 @@ public function getPromotionHistory(Request $request){
         }
         return response()->json(['bookings' => $bookings]);
     }
-    public function viewCustomersReview($orgId){
-        $organization = DB::table('organizations')
-        ->where([
-            'id' => $orgId,
-        ])
-        ->first();
-        $homestays = DB::table('rooms')
-        ->where([
-            'deleted_at' => null,
-            'homestayid' => $orgId,
-        ])
-        ->orderBy('roomid')
-        ->select('roomid','roomname')
-        ->get();
-        return view('homestay.customersReview',compact('organization','homestays'));
+    public function viewCustomersReview(){
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+        $organizations = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+        // $organization = DB::table('organizations')
+        // ->where([
+        //     'id' => $orgId,
+        // ])
+        // ->first();
+        // $homestays = DB::table('rooms')
+        // ->where([
+        //     'deleted_at' => null,
+        //     'homestayid' => $orgId,
+        // ])
+        // ->orderBy('roomid')
+        // ->select('roomid','roomname')
+        // ->get();
+        return view('homestay.customersReview',compact('organizations'));
     }
     public function getCustomersReview(Request $request){
         // fetch reviews for all homestays
@@ -1616,7 +1741,15 @@ public function getPromotionHistory(Request $request){
             ->get();
 
         }
-        return response()->json(['reviews' => $reviews]);
+        $homestays = DB::table('rooms')
+        ->where([
+            'homestayid' => $request->organizationId,
+            'deleted_at' => null,
+        ])
+        ->orderBy('roomname')
+        ->select('roomid','roomname')
+        ->get();
+        return response()->json(['reviews' => $reviews , 'homestays' => $homestays]);
     }
     public function viewPerformanceReport(){
         $orgtype = 'Homestay / Hotel';
@@ -1651,12 +1784,13 @@ public function getPromotionHistory(Request $request){
                 'roomid' => $homestay->roomid,
             ])
             ->get();
-            
-            $numberOfNights = 0;
+
+            $bookedNights = [];//store booked dates for a homestay
             $totalEarnings = 0;
             foreach($bookings as $booking){
                 $checkinDate = Carbon::createFromFormat('Y-m-d',$booking->checkin);
                 $checkoutDate = Carbon::createFromFormat('Y-m-d',$booking->checkout);
+                $numberOfNightsBetweenCheckinCheckout = $checkoutDate->diffInDays($checkinDate);
                 // Check if the booking overlaps with the specified date range
                 if ($checkinDate->lessThanOrEqualTo($endDate) && $checkoutDate->greaterThanOrEqualTo($startDate)) {
                     // Adjust the check-in and checkout dates if necessary
@@ -1669,23 +1803,119 @@ public function getPromotionHistory(Request $request){
                             $checkoutDate->addDay();//add 1 day if the new checkout date is the same as the checkin date
                         }
                     }
-
+                    // Get the dates for booked nights for a booking
+                    $currentDate = $checkinDate->copy();
+                    while($currentDate->lessThan($checkoutDate)){
+                        $bookedNights[] = $currentDate->format('Y-m-d');
+                        $currentDate->addDay(); // Move to the next day
+                    }
                     // Calculate the number of nights within the date range
                     $nightsForBooking = $checkoutDate->diffInDays($checkinDate);
 
-                    // Add the number of nights for this booking to the total
-                    $numberOfNights += $nightsForBooking;
 
-                    $totalEarnings += (float)$homestay->price * $nightsForBooking;
+                    // to calculate earnings 
+                    // for bookings with checkin and checkout dates within the date range
+                    if($nightsForBooking == $numberOfNightsBetweenCheckinCheckout){
+                        $totalEarnings+= $booking->totalprice;
+                    }else{
+                        //for bookings with checkin or checkout dates that's outside of the date range 
+                        // need to divide
+                        $totalEarnings += $booking->totalprice/ $numberOfNightsBetweenCheckinCheckout * $nightsForBooking; 
+                    }
                 }
 
-                // add to total earnings for this homestay
             }
-            $homestay->bookedNights = $numberOfNights;
+            $bookedNights = array_unique($bookedNights);//remove duplicated dates
+            $homestay->bookedNights = count($bookedNights);
             $homestay->totalEarnings = $totalEarnings;
-        }
+
+            // to get earnings for each months
+            $earningsPerMonth = $homestays->flatMap(function ($homestay) {
+                return DB::table('bookings')
+                    ->whereIn('status', ['Completed', 'Booked'])
+                    ->where('roomid', $homestay->roomid)
+                    ->get();
+            })->mapToGroups(function ($booking) {
+                $checkinDate = Carbon::createFromFormat('Y-m-d', $booking->checkin);
+                $checkoutDate = Carbon::createFromFormat('Y-m-d', $booking->checkout);
         
-        return response()->json(['homestays' => $homestays]);
+                $monthYear = $checkinDate->format('Y-m');
+        
+                return [
+                    $monthYear => [
+                        'checkin' => $checkinDate,
+                        'checkout' => $checkoutDate,
+                        'totalprice' => (float)$booking->totalprice,
+                    ],
+                ];
+            })->map(function ($bookings, $month) {
+                $totalEarnings = 0;
+                $remainingEarnings = 0;
+                foreach ($bookings as $booking) {
+                    $checkinDate = $booking['checkin'];
+                    $checkoutDate = $booking['checkout'];
+                    $totalprice = $booking['totalprice'];
+                
+                    $daysInMonth = (int)$checkinDate->format('t');
+                
+                    // Calculate earnings based on partial months
+                    if ($checkoutDate->format('m') !== $checkinDate->format('m')) {
+                        $daysUntilEndOfMonth = $checkinDate->copy()->endOfMonth()->diffInDays($checkinDate) + 1;
+                        $partialMonthEarnings = ($totalprice / $checkoutDate->diffInDays($checkinDate)) * $daysUntilEndOfMonth;
+                        $totalEarnings += $partialMonthEarnings;
+
+                        // remaining earnings for next month
+                        $remainingEarnings = ($totalprice / $checkoutDate->diffInDays($checkinDate)) *($checkoutDate->diffInDays($checkinDate) - $daysUntilEndOfMonth);
+                    } else {
+                        $totalEarnings += $totalprice;
+                    }
+                }
+        
+                return [
+                    'month' => $month,
+                    'earnings' => $totalEarnings,
+                    'remainingEarningsForNextMonth' => $remainingEarnings,
+                ];
+            })->values();
+
+            // to get monthly reviews for homestays
+            $startMonth = DB::table('bookings')
+            ->where('review_star','!=',null)
+            ->orderBy('updated_at')
+            ->select('updated_at')
+            ->first();
+            $ratings = [];
+            // if there are reviews
+            if($startMonth){
+                $startMonth = Carbon::createFromFormat('Y-m-d H:i:s', $startMonth->updated_at)->startOfMonth();
+                $startMonth = $startMonth->format('Y-m');      
+                $endMonth = Carbon::now()->startOfMonth()->format('Y-m'); 
+            
+                while ($startMonth <= $endMonth) {
+                    $ratingsForMonth = [];
+                    
+                    foreach ($homestays as $homestay) {
+                        $monthlyRating = DB::table('bookings')
+                            ->where('roomid', $homestay->roomid)
+                            ->whereNotNull('review_star')
+                            ->whereYear('checkin', substr($startMonth, 0, 4)) // Filter by year
+                            ->whereMonth('checkin', substr($startMonth, 5, 2)) // Filter by month
+                            ->avg('review_star');
+                        $ratingsForMonth[$homestay->roomname] = round($monthlyRating, 1) ?: null;
+                    }
+            
+                    $ratings[] = [
+                        'month' => $startMonth,
+                        'ratings' => $ratingsForMonth,
+                    ];
+            
+                    $startMonth = Carbon::createFromFormat('Y-m', $startMonth)->addMonth()->format('Y-m');
+                }
+            }else{
+                $startMonth = 0;
+            }
+        }
+        return response()->json(['homestays' => $homestays ,'earningsPerMonth' => $earningsPerMonth , 'ratings' => $ratings]);
     }
     // public function tunjukpelanggan(Request $request)
     // {

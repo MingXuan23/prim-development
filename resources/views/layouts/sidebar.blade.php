@@ -15,14 +15,14 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga'))
+                {{-- @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga')) --}}
                 <li>
                     <a href="{{ route('organization.index') }}" class=" waves-effect">
                         <i class="mdi mdi-account-group"></i>
                         <span>Organisasi</span>
                     </a>
                 </li>
-                @endunless
+                {{-- @endunless --}}
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -777,12 +777,12 @@
                             <span>Urus Tempahan</span>
                         </a>
                     </li> --}}
-                    <li>
+                    {{-- <li>
                         <a href="{{ route('homestay.viewPerformanceReport') }}" class=" waves-effect">
                             <i class="mdi mdi-finance"></i>
                             <span>Lihat Prestasi</span>
                         </a>
-                    </li>
+                    </li> --}}
                     @endrole 
 
                     <li>

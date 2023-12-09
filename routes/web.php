@@ -649,6 +649,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('fetch-discount-increase-dates', 'HomestayController@fetchDiscountIncreaseDates')->name('homestay.fetchDiscountIncreaseDates');
     Route::get('calculate-total-price', 'HomestayController@calculateTotalPrice')->name('homestay.calculateTotalPrice');
     Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
+    Route::get('autocomplete-search', 'HomestayController@autocompleteSearch')->name('homestay.autocompleteSearch');
     Route::get('search-room','HomestayController@searchRoom')->name('homestay.searchRoom');
     Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
     Route::post('add-review', 'HomestayController@addReview')->name('homestay.addReview');
@@ -670,7 +671,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('cancel-booking', 'HomestayController@cancelBooking')->name('homestay.cancelBooking');
     Route::get('view-booking-history/{id}','HomestayController@viewBookingHistory')->name('homestay.viewBookingHistory');
     Route::get('get-booking-history-data', 'HomestayController@getBookingHistoryData')->name('homestay.getBookingHistoryData');
-    Route::get('view-customers-reviews/{id}','HomestayController@viewCustomersReview')->name('homestay.viewCustomersReview');
+    Route::get('view-customers-reviews','HomestayController@viewCustomersReview')->name('homestay.viewCustomersReview');
     Route::get('get-customers-review', 'HomestayController@getCustomersReview')->name('homestay.getCustomersReview');
     Route::get('view-performance-report','HomestayController@viewPerformanceReport')->name('homestay.viewPerformanceReport');
     Route::get('get-report-data', 'HomestayController@getReportData')->name('homestay.getReportData');
