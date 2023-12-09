@@ -483,7 +483,7 @@ class ScheduleApiController extends Controller
         // FCM response
         //dd($result);
 
-            return response()->json(["success"=>$result,'key'=>$serverKey]);
+            return response()->json(["success"=>$result]);
         }
         return response()->json(["failed"]);
      }
@@ -624,6 +624,63 @@ class ScheduleApiController extends Controller
         $report->reliefCount = DB::table('leave_relief')
             ->where('replace_teacher_id',$user_id)
             ->count();
+
+        $report->reliefList =  DB::table('leave_relief as lr')
+        ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+        ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+        ->leftJoin('schedules as s','s.id','sv.schedule_id')
+        ->leftJoin('classes as c','c.id','ss.class_id')
+        ->leftJoin('subject as sub','sub.id','ss.subject_id')
+        ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+        ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+        ->where('s.organization_id',$school->id)
+        ->where('lr.replace_teacher_id',$user_id)
+        ->where('lr.confirmation',"Confirmed")
+        ->where ('tl.date','>=',Carbon::today()->subDays(30))
+        ->where('tl.status',1)
+        ->where('lr.status',1)
+        ->select('lr.id as leave_relief_id','c.nama as class','sub.name as subject','ss.slot','u.name as relatedTeacher','tl.date')
+        ->get();
+
+        $report->leave_list = DB::table('teacher_leave as tl')
+        ->leftJoin('users as u','u.id','tl.teacher_id')
+        ->where('tl.teacher_id',$user_id)
+        ->where ('tl.date','>=',Carbon::today()->subDays(30))
+        ->where('tl.status',1)
+        //->where('lr.status',1)
+        ->select('tl.id','tl.date','tl.image')
+        ->orderBy('tl.date','desc')
+        ->get();
+
+
+        foreach( $report->leave_list as $r){
+            //if(isset($s->duration)){
+
+                //$relief_info =[];
+
+                $relief = DB::table('leave_relief as lr')
+                        ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+                        ->leftJoin('classes as c','c.id','ss.class_id')
+                        ->leftJoin('users as u','u.id','lr.replace_teacher_id')
+                        ->leftJoin('subject as s','s.id','ss.subject_id')
+                        ->where('lr.teacher_leave_id',$r->id)
+                        ->where('lr.status',1)
+                        //->where('lr.confirmation','<>','Rejected')
+                        ->select('u.name as relief_teacher','s.name as subject','c.nama as class','ss.slot','lr.confirmation')
+                        ->get()
+                        ->map(function ($item) {
+                            // Check if confirmation is not confirmed
+                            if ($item->confirmation != 'Confirmed') {
+                                // Update the relief_teacher to 'No teacher'
+                                $item->relief_teacher = 'No teacher';
+                            }
+                    
+                            return $item;
+                        })->toArray();
+               $r->relief_info = $relief;
+        }
+
+       // dd( $report->leave_list,$report->reliefList);
         if($isAdmin){
             $adminReport =new stdClass();
 
