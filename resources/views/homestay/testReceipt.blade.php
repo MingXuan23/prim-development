@@ -161,12 +161,12 @@
 </body>
 <script>
     var count = 5;
-    setInterval(function(){
-        count--;
-        document.getElementById('time').innerHTML = count;
-        if (count <= 0) {
-            window.location = '/tempahananda'; 
-        }
-    },1000);
+    // setInterval(function(){
+    //     count--;
+    //     document.getElementById('time').innerHTML = count;
+    //     if (count <= 0) {
+    //         window.location = '/tempahananda'; 
+    //     }
+    // },1000);
 </script>
 </html>

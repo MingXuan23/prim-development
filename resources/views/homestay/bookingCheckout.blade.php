@@ -114,7 +114,7 @@
           @endif
  
         
-      <form action="{{ route('fpxIndex') }}" method="POST" enctype="multipart/form-data" id="form-checkout">
+      <form action="{{ route('directpayIndex') }}" method="POST" enctype="multipart/form-data" id="form-checkout">
         @csrf
         <input type="hidden" name="desc" id="desc" value="Homestay">
         <input type="hidden" name="bookingid" id = "bookingid" value="{{ $checkoutDetails['bookingId'] }}">

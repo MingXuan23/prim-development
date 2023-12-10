@@ -21,18 +21,19 @@ class HomestayReceipt extends Mailable
      *
      * @return void
      */
-    public function __construct(Booking $booking, Organization $organization, Transaction $transaction, User $user)
+    public function __construct(Room $room , Booking $booking, Organization $organization, Transaction $transaction, User $user)
     {
         $this->booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
         ->join('bookings','rooms.roomid','=','bookings.roomid')
         ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
-        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
+        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms')
         ->get();
 
         $this->booking = $booking;
         $this->organization = $organization;
         $this->transaction = $transaction;
         $this->user = $user;
+        $this->room = $room;
     }
 
     /**
@@ -46,7 +47,7 @@ class HomestayReceipt extends Mailable
         $organization = $this->organization;
         $transaction = $this->transaction;
         $user = $this->user;
-
-        return $this->view('homestay.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
+        $room = $this->room;
+        return $this->view('homestay.receipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
     }
 }
