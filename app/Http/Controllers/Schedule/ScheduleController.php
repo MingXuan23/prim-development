@@ -55,10 +55,11 @@ class ScheduleController extends Controller
         $oid = $request->organization;
         $teachers='';
         $date =$request->date;
-        //dd($request);
+        // dd($request);
         $relief =$this->getAllRelief($oid, $date);
-        //$teachers = $this->getAvailableTeacherListForTable($oid); // New method to get available teachers
-        return response()->json(['pending_relief' => $relief]);
+        // dd($relief);
+        $teachers = $this->getFreeTeacher($request); // New method to get available teachers
+        return response()->json(['pending_relief' => $relief, 'available_teachers' => $teachers]);
 
         //return response()->json(['pending_relief' => $relief, 'available_teachers' => $teachers]);
     }
@@ -89,7 +90,6 @@ class ScheduleController extends Controller
             ->select('lr.id as leave_relief_id','lr.confirmation','ss.id as schedule_subject_id','tl.date','tl.desc'
             ,'sub.name as subject','u1.name as leave_teacher','u2.name as relief_teacher','ss.slot','ss.day','s.time_of_slot','s.start_time','s.time_off','c.nama as class_name')
             ->get();
-
 
             foreach($relief as $r){
                 $result=$this->getSlotTime($r,$r->day,$r->slot);

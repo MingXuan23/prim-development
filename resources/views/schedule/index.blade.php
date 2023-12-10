@@ -334,7 +334,6 @@
         
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
-            fetch_data($("#organization").val());
         }
 
         $('#organization').change(function() {
