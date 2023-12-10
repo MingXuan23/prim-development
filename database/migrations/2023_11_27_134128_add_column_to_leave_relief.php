@@ -16,6 +16,7 @@ class AddColumnToLeaveRelief extends Migration
         Schema::table('leave_relief', function (Blueprint $table) {
             //
             $table->string('desc')->nullable();
+            $table->boolean('status')->nullable();
         });
     }
 
@@ -28,6 +29,7 @@ class AddColumnToLeaveRelief extends Migration
     {
         Schema::table('leave_relief', function (Blueprint $table) {
             $table->dropColumn('desc');
+           $table->dropColumn('status');
         });
     }
 }

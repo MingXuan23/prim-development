@@ -112,20 +112,21 @@ Route::group(['prefix' => 'subject'], function () {
 });
 Route::post('importSubject', 'SubjectController@subjectImport')->name('importSubject');
 
-Route::group(['prefix' => 'schedule'], function () {
+Route::group(['prefix' => 'schedule','namespace' => 'Schedule'], function () {
+    Route::get('getVersion/{oid}','ScheduleController@getVersion')->name('schedule.getVersion');
+    Route::get('getScheduleView/{class_id}','ScheduleController@getScheduleView')->name('schedule.getScheduleView');
+    
+    Route::get('manageRelief','ScheduleController@manageReliefIndex')->name('schedule.manageRelief');
+    Route::post('getPendingRelief','ScheduleController@getPendingRelief')->name('schedule.getPendingRelief');
 
+    Route::any('getFreeTeacher','ScheduleController@getFreeTeacher')->name('schedule.getFreeTeacher');
+    Route::post('autoSuggestRelief','ScheduleController@autoSuggestRelief')->name('schedule.autoSuggestRelief');
+
+    Route::get('reliefReport','ScheduleController@reliefReportIndex')->name('schedule.reliefReport');
+    Route::post('getReliefReport','ScheduleController@getReliefReport')->name('schedule.getReliefReport');
 });
-
-
-Route::group(['prefix' => 'manage_relief'], function () {
-
-});
-
-
-Route::group(['prefix' => 'relief_report'], function () {
-
-});
-
+Route::post('importSchedule', 'Schedule\ScheduleController@scheduleImport')->name('importSchedule');
+Route::post('importScheduleSubject', 'Schedule\ScheduleController@scheduleSubjectImport')->name('importScheduleSubject');
 
 Route::group(['prefix' => 'class'], function () {
     Route::get('list', 'ClassController@getClassesDatatable')->name('class.getClassesDatatable');
@@ -431,8 +432,8 @@ Route::group(['middleware' => ['auth']], function () {
         'student'            => 'StudentController', 
         'subject'            => 'SubjectController',
         'schedule'           => 'Schedule\ScheduleController',
-        'manage_relief'      => 'ManageReliefController',
-        'relief_report'      => 'ReliefReportController',
+        'manage_relief'      => 'Schedule\ScheduleController',
+        'relief_report'      => 'Schedule\ScheduleController',
         'category'           => 'CategoryController',
         'fees'               => 'FeesController',
         'details'            => 'DetailsController',

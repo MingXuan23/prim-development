@@ -323,7 +323,7 @@ class ScheduleApiController extends Controller
             }
 
             if($user){
-            
+                //dd($request->start_time);
             $existConflict =DB::table('teacher_leave')
                     ->where('date',$date)
                     ->where('status',1)
@@ -335,11 +335,22 @@ class ScheduleApiController extends Controller
                         })->orWhere('period->fullday', true);
                     })
                     ->exists();
-
+           
             if($existConflict){
                  return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
             }
-            
+           // $image = $request->input('image');
+           $str ='Image';
+           $filename = null;
+            if (!is_null($request->image)) {
+                
+                $extension =  $request->image->extension();
+                $storagePath  =    $request->image ->move(public_path('schedule_leave_image'), $str . '.' . $extension);
+                $filename = basename($storagePath);
+                //dd($request->image);
+
+            }
+        
             
             $leave_id =  DB::table('teacher_leave')->insertGetId([
                 
@@ -347,7 +358,8 @@ class ScheduleApiController extends Controller
                     'date'=>$date,
                     'desc'=>  $request->desc,
                     'status'=>1,
-                    'teacher_id'=>$user->id
+                    'teacher_id'=>$user->id,
+                    'image'=>$filename 
         
                 ]);
 
@@ -379,7 +391,8 @@ class ScheduleApiController extends Controller
                         if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$leave_id,
-                                'schedule_subject_id'=>$c->schedule_subject_id
+                                'schedule_subject_id'=>$c->schedule_subject_id,
+                                'status'=>1
                             ]);
                         } 
                     }
@@ -400,7 +413,7 @@ class ScheduleApiController extends Controller
      public function checkAdmin($userId,$schoolId){
         return DB::table('organizations as o')
                 ->join('organization_user as ou','ou.organization_id','o.id')
-                ->whereIn('ou.role_id',[2,4])
+                ->whereIn('ou.role_id',[2,4,7,20])
                 ->where('o.id',$schoolId)
                 ->where('ou.status',1)
                 ->where('ou.user_id',$userId)
@@ -410,7 +423,7 @@ class ScheduleApiController extends Controller
      public function getSchools($user_id){
         return DB::table('organizations as o')
             ->join('organization_user as ou','ou.organization_id','o.id')
-            ->whereIn('ou.role_id',[2,4,5])
+            ->whereIn('ou.role_id',[2,4,5,7,20])
             ->where ('ou.user_id',$user_id)
             ->whereIn('o.type_org',[1,2,3])
             ->where('ou.status',1)
@@ -419,7 +432,7 @@ class ScheduleApiController extends Controller
      }
 
 
-     public function sendNotification($id)
+     public function sendNotification($id,$title,$message)
      {  $user =User::find($id);
 
        // dd($user);
@@ -435,8 +448,8 @@ class ScheduleApiController extends Controller
         $data = [
             "registration_ids" => $device_token,
             "notification" => [
-                "title" => "test",
-                "body" =>"hello",
+                "title" => $title,
+                "body" =>$message,
             ]
         ];
 
@@ -463,14 +476,14 @@ class ScheduleApiController extends Controller
         if ($result === FALSE) {
             die('Curl failed: '. curl_error($ch));
         }
-
+       
         // Close connection
         curl_close($ch);
 
         // FCM response
-        dd($result);
+        //dd($result);
 
-            return response()->json(["success"]);
+            return response()->json(["success"=>$result]);
         }
         return response()->json(["failed"]);
      }
@@ -563,8 +576,38 @@ class ScheduleApiController extends Controller
                     'Confirmation'=>$request->response,
                     'desc'=>$request->desc
                 ]);
+        if($request->response =='Rejected'){
+            $duplicate_row = DB::table('leave_relief')->where('id',$request->leave_relief_id)->first();
+            $insert = DB::table('leave_relief')->insert([
+                'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
+                'schedule_subject_id'=>$duplicate_row->schedule_subject_id
+            ]); //generate new record for admin
 
-        return response()->json(['result'=>$update]);
+            $organization =DB::table('schedule_subject as ss')
+                            ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+                            ->join('schedules as s','s.id','sv.schedule_id')
+                            ->where('ss.id',$duplicate_row->schedule_subject_id)
+                            ->select('s.organization_id as id')->first();
+
+            $admin_id =DB::table('organization_user as ou')
+                        ->where('ou.organization_id',$organization->id)
+                        ->whereIn('ou.role_id',[2,4,7,20])
+                        ->select('ou.user_id')
+                        ->distinct()
+                        ->get();
+            //dd($admin_id);
+            foreach($admin_id as $a){
+                $msg =$user->name.' rejected the relief ';
+                if($request->desc){
+                    $msg =$msg .'with reason '.$request->desc;
+                }
+                //dd($msg);
+                $notification =$this->sendNotification($a->user_id,'Your action is required',$msg );
+            }
+
+        }
+
+        return response()->json(['result'=>$update,'noti'=>$notification]);
     }
 
     public function getHistory($user_id)
@@ -581,6 +624,63 @@ class ScheduleApiController extends Controller
         $report->reliefCount = DB::table('leave_relief')
             ->where('replace_teacher_id',$user_id)
             ->count();
+
+        $report->reliefList =  DB::table('leave_relief as lr')
+        ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+        ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+        ->leftJoin('schedules as s','s.id','sv.schedule_id')
+        ->leftJoin('classes as c','c.id','ss.class_id')
+        ->leftJoin('subject as sub','sub.id','ss.subject_id')
+        ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+        ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+        ->where('s.organization_id',$school->id)
+        ->where('lr.replace_teacher_id',$user_id)
+        ->where('lr.confirmation',"Confirmed")
+        ->where ('tl.date','>=',Carbon::today()->subDays(30))
+        ->where('tl.status',1)
+        ->where('lr.status',1)
+        ->select('lr.id as leave_relief_id','c.nama as class','sub.name as subject','ss.slot','u.name as relatedTeacher','tl.date')
+        ->get();
+
+        $report->leave_list = DB::table('teacher_leave as tl')
+        ->leftJoin('users as u','u.id','tl.teacher_id')
+        ->where('tl.teacher_id',$user_id)
+        ->where ('tl.date','>=',Carbon::today()->subDays(30))
+        ->where('tl.status',1)
+        //->where('lr.status',1)
+        ->select('tl.id','tl.date','tl.image')
+        ->orderBy('tl.date','desc')
+        ->get();
+
+
+        foreach( $report->leave_list as $r){
+            //if(isset($s->duration)){
+
+                //$relief_info =[];
+
+                $relief = DB::table('leave_relief as lr')
+                        ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+                        ->leftJoin('classes as c','c.id','ss.class_id')
+                        ->leftJoin('users as u','u.id','lr.replace_teacher_id')
+                        ->leftJoin('subject as s','s.id','ss.subject_id')
+                        ->where('lr.teacher_leave_id',$r->id)
+                        ->where('lr.status',1)
+                        //->where('lr.confirmation','<>','Rejected')
+                        ->select('u.name as relief_teacher','s.name as subject','c.nama as class','ss.slot','lr.confirmation')
+                        ->get()
+                        ->map(function ($item) {
+                            // Check if confirmation is not confirmed
+                            if ($item->confirmation != 'Confirmed') {
+                                // Update the relief_teacher to 'No teacher'
+                                $item->relief_teacher = 'No teacher';
+                            }
+                    
+                            return $item;
+                        })->toArray();
+               $r->relief_info = $relief;
+        }
+
+       // dd( $report->leave_list,$report->reliefList);
         if($isAdmin){
             $adminReport =new stdClass();
 
