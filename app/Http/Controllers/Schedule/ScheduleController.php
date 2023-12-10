@@ -58,8 +58,8 @@ class ScheduleController extends Controller
         // dd($request);
         $relief =$this->getAllRelief($oid, $date);
         // dd($relief);
-        $teachers = $this->getFreeTeacher($request); // New method to get available teachers
-        return response()->json(['pending_relief' => $relief, 'available_teachers' => $teachers]);
+       // $teachers = $this->getFreeTeacher($request); // New method to get available teachers
+        return response()->json(['pending_relief' => $relief]);
 
         //return response()->json(['pending_relief' => $relief, 'available_teachers' => $teachers]);
     }
@@ -228,15 +228,14 @@ class ScheduleController extends Controller
 
     //get free teacher, call in ajax and the result show in a combobox for each row
     public function getFreeTeacher(Request $request){
-        //$data =json_decode($this->getAllRelief(161)->data);
-        $request->organization =161;
-        //$request->criteria ='class_in_week';
-        $request->schedule_subject_id = 1;
-        //$request->date = Carbon::today();
-        $date =  $request->date;
-        $schedule_subject = DB::table('schedule_subject')->where('id',$request->schedule_subject_id)->first();
+
+        $schedule_subject = DB::table('schedule_subject as ss')
+                ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
+                ->where('lr.id',$request->leave_relief_id)
+                ->select('ss.*')
+                ->first();
        
-        $teacher_list = $this->getAvailableTeacherList($schedule_subject,$date,$request->organization);
+        $teacher_list = $this->getAvailableTeacherList($schedule_subject,$request->date,$request->organization);
 
         return response()->json(['free_teacher_list'=>$teacher_list]);
 
@@ -462,6 +461,7 @@ class ScheduleController extends Controller
             'starttime' => 'required|date_format:H:i',
             'day' => 'required|array',
             'maxslot' => 'required|integer|min:0',
+            'organization_id'=>'required'
             // Add other validation rules for your fields
         ]);
 
@@ -509,24 +509,92 @@ class ScheduleController extends Controller
         $request->validate([
             'schedule_id' => 'required',
             'file' => 'required|mimes:xlsx,xls',
+            //'organization_id'=>'required'
         ]);
-        
-        $organizationId = $request->organization_id;
+
+        $organizationId = Schedule::find($request->schedule_id)->organization_id;
+    
+        //dd($request->new_version,$request->autoInsert,$organizationId);
         $file = $request->file('file');
 
         $exists_version =DB::table('schedule_version')->where('schedule_id',$request->schedule_id)->where('status',1)->exists();
-        $version_id = DB::table('schedule_version')->insertGetId([
-            'desc'=>$request->desc,
-            'schedule_id'=>$request->schedule_id,
-            'status'=>$exists_version?0:1,
-            'created_at'=>Carbon::now(),
-            'updated_at'=>Carbon::now()
-        ]);
 
-        Excel::import(new ScheduleImport($version_id,$organizationId,true), $file);
+        if($request->new_version=="0" && $exists_version ){
+            $version_id =DB::table('schedule_version')->where('schedule_id',$request->schedule_id)->where('status',1)->first()->id;
+        }
+        else {
+
+            $update =DB::table('schedule_version')->where('schedule_id',$request->schedule_id)->where('status',1)->update([
+                'status'=>0
+            ]);
+
+            $version_id = DB::table('schedule_version')->insertGetId([
+                'desc'=>$request->desc,
+                'schedule_id'=>$request->schedule_id,
+                'status'=>1,
+                'created_at'=>Carbon::now(),
+                'updated_at'=>Carbon::now()
+            ]);
+        }
+       
+        $autoInsert = $request->autoInsert=="on" ;
+        Excel::import(new ScheduleImport($version_id,$organizationId,$autoInsert), $file);
     
+
+        $teacherLeave =DB::table('teacher_leave as tl')
+                        ->leftJoin('organization_user as ou','ou.user_id','tl.teacher_id')
+                        ->where('ou.organization_id',$organizationId)
+                        ->where('tl.date','>',Carbon::today())
+                        ->where('tl.status',1)
+                        ->select('tl.*','tl.period->fullday as isLeaveFullDay')
+                        ->get();
+       //dd($teacherLeave);
+        foreach($teacherLeave as $leave){
+            DB::table('leave_relief')->where('teacher_leave_id',$leave->id)->update(['status'=>0]);
+            $this->regenerateLeaveRelief($leave);
+        }
         return redirect()->back()->with('success', 'Schedules imported successfully!');
 
+    }
+
+    public function regenerateLeaveRelief($leave){
+       
+        $classRelated = DB::table('schedule_subject as ss')
+                ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+                ->join('schedules as s','s.id','sv.schedule_id')
+                ->where('ss.day',Carbon::parse($leave->date)->dayOfWeek)
+                ->where('ss.teacher_in_charge',$leave->teacher_id)
+                ->where('s.status',1)
+                ->where('sv.status',1)
+                ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
+                ->get();
+                
+                foreach($classRelated as $c){
+                    if($leave->isLeaveFullDay == "true"){
+                        //dd('true');
+                        $insert = DB::table('leave_relief')->insert([
+                            'teacher_leave_id'=>$leave->id,
+                            'schedule_subject_id'=>$c->schedule_subject_id,
+                            'status'=>1
+                        ]);
+                    }else{
+                        //dd('false');
+                        $start = Carbon::createFromFormat('H:i:s', $request->start_time);
+                        $end = Carbon::createFromFormat('H:i:s', $request->end_time);
+                        $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                        $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+
+                        
+                        // check if the time is between start and end
+                        if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                            $insert = DB::table('leave_relief')->insert([
+                                'teacher_leave_id'=>$leave_id,
+                                'schedule_subject_id'=>$c->schedule_subject_id,
+                                'status'=>1
+                            ]);
+                        } 
+                    }
+                }
     }
 
 }

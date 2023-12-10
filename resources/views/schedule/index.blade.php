@@ -297,9 +297,19 @@
                                 <label>Description</label>
                                 <textarea class="form-control" name="desc" id="desc" cols="30" rows="3" placeholder="Description"></textarea>
                             </div>
-                            <input type="hidden" name="organization_id" class="organization_id" value="0">
+
                             <div class="form-group">
-                                <input type="file" name="file" required>
+                            <input type="radio"  name="new_version" value="1" checked>
+                            <label for="html">Add as new version</label><br>
+                            <input type="radio"  name="new_version" value="0">
+                            <label for="css">Continue with current version (Exist data will not be overwritten)</label><br>
+
+                           
+                            </div>
+                            <div class="form-group">
+                                <input type="file" name="file" required><br>
+                                <input type="checkbox"  name="autoInsert">
+                            <label >Automatic insert data of class, teacher and subject if not exist</label>
                             </div>
 
                             <div class="modal-footer">
@@ -388,7 +398,21 @@
             ];
 
             $('#scheduleTable tbody').empty();
+            $('#scheduleTable thead').empty();
 
+            var newHeader = $('<tr></tr>');
+            var slotHeader = $('<th></th>');
+            newHeader.append(slotHeader);
+
+            for (var slotIndex = minSlot; slotIndex <= maxSlot; slotIndex++) {
+                var slotHeader = $('<th></th>');
+                slotHeader.text('Slot ' + slotIndex); // Use the + operator for concatenation
+                newHeader.append(slotHeader);
+
+                //newHeader.find('tr').append(slotHeader);
+            }
+
+            $('#scheduleTable thead').append(newHeader);
             // Create rows for each day
             for (var dayIndex = minDay; dayIndex <= maxDay; dayIndex++) {
                 var row = $('<tr></tr>');
