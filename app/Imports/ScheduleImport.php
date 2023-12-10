@@ -41,6 +41,7 @@ class ScheduleImport implements ToCollection, WithHeadingRow, WithChunkReading, 
     public function collection(Collection $rows)
     {
         //dd($this->classId);
+        set_time_limit(300);
         $class = DB::table('classes as c')
             ->join('class_organization as oc','oc.class_id','c.id')
             ->where('c.nama',$this->classId)

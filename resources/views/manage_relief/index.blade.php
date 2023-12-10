@@ -280,8 +280,8 @@
 
         // }
 
-        function assignTeacher(schedule_subject_id, teacher) {
-            console.log('Selected teacher for row ' + (schedule_subject_id) + ': ' + teacher);
+        function assignTeacher(leave_relief_id) {
+           // console.log('Selected teacher for row ' + (schedule_subject_id) + ': ' + teacher);
 
             // Make an AJAX request to get available teachers for the selected slot
             $.ajax({
@@ -290,13 +290,13 @@
                 data: {
                     organization: $('#organization option:selected').val(),
                     date: $('#datepicker').val(),
-                    schedule_subject_id: schedule_subject_id
+                    leave_relief_id: leave_relief_id
                 },
                 success: function (response) {
                     console.log(response);
 
                     // Update the combo box that selects the teacher
-                    updateTeacherComboBox(schedule_subject_id, response.free_teacher_list);
+                    updateTeacherComboBox(leave_relief_id, response.free_teacher_list);
                     // console.log(response.free_teacher_list);
                     // Additional logic if needed
                 },
@@ -309,40 +309,46 @@
             // You can make an AJAX request to update the server or perform other actions
         }
 
-        function displayRelief(reliefData, response) {
-    console.log('Relief Data:', reliefData);
-    console.log('Available Teachers:', response);
+        function displayRelief(reliefData) {
+        console.log('Relief Data:', reliefData);
 
-    var tableBody = $('#reliefTable tbody');
-    tableBody.empty();
+        var tableBody = $('#reliefTable tbody');
+        tableBody.empty();
 
-    reliefData.forEach(function (relief, index) {
-        var row = $('<tr></tr>');
-        row.append('<td>' + (index + 1) + '</td>');
-        row.append('<td>' + relief.class_name + '</td>');
-        row.append('<td>' + relief.subject + '</td>');
-        row.append('<td>' + relief.slot + '</td>');
-        row.append('<td>' + relief.leave_teacher + '</td>');
-        row.append('<td>' + relief.desc + '</td>');
+        reliefData.forEach(function (relief, index) {
+            var row = $('<tr></tr>');
+            row.append('<td>' + (index + 1) + '</td>');
+            row.append('<td>' + relief.class_name + '</td>');
+            row.append('<td>' + relief.subject + '</td>');
+            row.append('<td>' + relief.slot + '</td>');
+            row.append('<td>' + relief.leave_teacher + '</td>');
+            row.append('<td>' + relief.desc + '</td>');
 
-        // Append the select box with options
-        var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + index + '"></select></td>');
-        var selectElement = selectColumn.find('select');
-
-        // Call the updated function to populate the select box options
-        updateTeacherComboBox(index, response.original.free_teacher_list);
-
+            // Append the select box with options
+            var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id + '"></select></td>');
         row.append(selectColumn);
         tableBody.append(row);
     });
 
-    tableBody.on('mousedown', '.assign_teacher', function () {
-        var selectedIndex = $(this).data('index');
+    var assignTeacherElements = tableBody.find('.assign_teacher');
+
+// Loop through each found element
+assignTeacherElements.each(function(index, element) {
+    var selectedIndex = $(this).attr('data-index');
     // Use direct property access instead of split
-    var schedule_subject_id = selectedIndex;
-    var selectedTeacher = $(this).val();
-    assignTeacher(schedule_subject_id, selectedTeacher);
-    });
+    var leave_relief_id = selectedIndex;
+    assignTeacher(leave_relief_id);
+    
+    // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
+});
+
+    // tableBody.on('mousedown', '.assign_teacher', function () {
+    //     var selectedIndex = $(this).data('index');
+    // // Use direct property access instead of split
+    // var schedule_subject_id = selectedIndex;
+    // var selectedTeacher = $(this).val();
+    // assignTeacher(schedule_subject_id, selectedTeacher);
+    // });
 }
 
 // Call fetchReliefData with the corrected success function
@@ -363,7 +369,7 @@ function fetchReliefData() {
         },
         success: function (response) {
             console.log(response);
-            displayRelief(response.pending_relief, response.available_teachers);
+            displayRelief(response.pending_relief);
         },
         error: function (xhr, status, error) {
             console.error(error);
@@ -372,16 +378,16 @@ function fetchReliefData() {
 }
 
 
-function updateTeacherComboBox(schedule_subject_id, availableTeachers) {
-    console.log('Received availableTeachers:', availableTeachers);
+function updateTeacherComboBox(leave_relief_id,availableTeachers) {
 
     // Find the select box associated with the given schedule_subject_id
-    var selectBox = $('.assign_teacher[data-index="' + schedule_subject_id + '"]');
+    var selectBox = $('.assign_teacher[data-index="' + leave_relief_id + '"]');
 
     // Clear existing options
     selectBox.empty();
 
-    // Check if availableTeachers is defined
+    //Check if availableTeachers is defined
+    selectBox.append('<option selected disabled >No Teacher</option>');
     if (availableTeachers) {
         // If availableTeachers is an object, extract the array
         var teachersArray = Array.isArray(availableTeachers) ? availableTeachers : availableTeachers.free_teacher_list;
@@ -393,10 +399,6 @@ function updateTeacherComboBox(schedule_subject_id, availableTeachers) {
                 selectBox.append('<option value="' + teacher.id + '">' + teacher.name + '</option>');
             });
         }
-    } else {
-        selectBox.append('<option selected>No Teacher</option>');
-        console.warn('The availableTeachers object is empty or not in the expected format:', availableTeachers);
-        // Log a warning or handle the empty case as needed
     }
 }
 
