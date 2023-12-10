@@ -123,6 +123,7 @@ Route::group(['prefix' => 'schedule','namespace' => 'Schedule'], function () {
     Route::post('autoSuggestRelief','ScheduleController@autoSuggestRelief')->name('schedule.autoSuggestRelief');
 
     Route::get('reliefReport','ScheduleController@reliefReportIndex')->name('schedule.reliefReport');
+    Route::post('getReliefReport','ScheduleController@getReliefReport')->name('schedule.getReliefReport');
 });
 Route::post('importSchedule', 'Schedule\ScheduleController@scheduleImport')->name('importSchedule');
 Route::post('importScheduleSubject', 'Schedule\ScheduleController@scheduleSubjectImport')->name('importScheduleSubject');

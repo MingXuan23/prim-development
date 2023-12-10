@@ -101,6 +101,53 @@ class ScheduleController extends Controller
         }
     }
 
+    public function getReliefReport(Request $request){
+        $oid = $request->organization;
+        $date =$request->date;
+        // dd($request);
+        $relief =$this->getAllReliefForReport($oid, $date);
+        // dd($relief);
+        return response()->json(['relief_report' => $relief]);
+
+    }
+
+    public function getAllReliefForReport($oid, $date){
+        $organization = $this->getOrganizationByUserId();
+        
+        if($organization->contains('id', $oid)){
+            $relief = DB::table('leave_relief as lr')
+            ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+            ->leftJoin('classes as c','c.id','class_id')
+            ->leftJoin('subject as sub','sub.id','ss.subject_id','sub.id')
+            ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+            ->leftJoin('schedules as s','s.id','sv.schedule_id')
+            ->leftJoin('users as u1','u1.id','ss.teacher_in_charge')
+            ->leftJoin('users as u2','lr.replace_teacher_id','u2.id')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            ->where(function ($query) {
+                $query->where('lr.confirmation', 'Rejected')
+                    ->orWhere('lr.confirmation', 'Confirmed')
+                    ->orWhere('lr.confirmation', 'Pending');
+            })
+            ->where('lr.status',1)
+            ->where('s.organization_id',$oid)
+            ->where('sv.status',1)
+            ->where('tl.date',$date)
+            ->orderBy('lr.confirmation')
+            ->select('lr.id as leave_relief_id','lr.confirmation','ss.id as schedule_subject_id','tl.date','tl.desc'
+            ,'sub.name as subject','u1.name as leave_teacher','u2.name as relief_teacher','ss.slot','ss.day','s.time_of_slot','s.start_time','s.time_off','c.nama as class_name')
+            ->get();
+
+            foreach($relief as $r){
+                $result=$this->getSlotTime($r,$r->day,$r->slot);
+                $r->time = $result['time'];
+                $r->duration =$result['duration'];
+                unset($r->time_of_slot,$r->start_time,$r->time_off);
+            }
+            return $relief;
+        }
+    }
+
     //to get the teacher burden information
     public function getTeacherInfo($teacher_id,$organization_id,$schedule_subject,$date){
         $teacher =new stdClass();
@@ -351,31 +398,39 @@ class ScheduleController extends Controller
         // $time_off =json_encode($time_off);
         // DB::table('schedules')->update(['time_off'=>$time_off]);
         // dd($time_off);
-        $slot = DB::table('schedule_subject as ss')
-            ->leftJoin ('schedule_version as sv','ss.schedule_version_id','sv.id')
-            ->leftJoin('schedules as s','s.id','sv.schedule_id')
-            ->leftJoin('classes as c','c.id','ss.class_id')
-            ->leftJoin('users as u','u.id','ss.teacher_in_charge')
-            ->leftJoin('subject as sub','sub.id','ss.subject_id')
-            ->where('ss.class_id',$class_id)
-            ->where('sv.status',1)
-            ->where('s.status',1)
-            ->select('ss.id','s.id as schedule_id','c.nama as class','sub.code as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as teacher')
-            ->get();
+        $slots = DB::table('schedule_subject as ss')
+        ->leftJoin('schedule_version as sv', 'ss.schedule_version_id', 'sv.id')
+        ->leftJoin('schedules as s', 's.id', 'sv.schedule_id')
+        ->leftJoin('classes as c', 'c.id', 'ss.class_id')
+        ->leftJoin('users as u', 'u.id', 'ss.teacher_in_charge')
+        ->leftJoin('subject as sub', 'sub.id', 'ss.subject_id')
+        ->where('ss.class_id', $class_id)
+        ->where('sv.status', 1)
+        ->where('s.status', 1)
+        ->select('ss.id', 's.id as schedule_id', 'c.nama as class', 'sub.code as subject', 's.start_time', 's.time_of_slot', 'ss.slot', 's.time_off', 'ss.day', 'u.name as teacher')
+        ->get();
+
+    if (count($slots) > 0) {
+        $timeOff = [];
+        foreach ($slots as $slot) {
+            $slot->time = $this->getSlotTime($slot, $slot->day, $slot->slot)['time'];
+            unset($slot->start_time);
+            unset($slot->time_off);
+            // unset($slot->time_of_slot);
+
+            // Fetch the corresponding schedule_id for each slot
+            $schedule = Schedule::find($slot->schedule_id);
             
-        if(count($slot)>0){
-            $schedule =Schedule::find($slot->first()->schedule_id);
-            foreach($slot as $s){
-                $s->time = $this->getSlotTime($s,$s->day,$s->slot)['time'];
-                unset($s->start_time);
-                unset($s->time_off);
-                unset($s->time_of_slot);
+            // Add time_off data to the $timeOff array
+            if ($schedule && $schedule->time_off) {
+                $timeOff = json_decode($schedule->time_off);
             }
-            
-            return response()->json(['slots'=>$slot,'time_off'=>json_decode($schedule->time_off)]);
         }
-        
-        return response()->json(['slots'=>$slot,'time_off'=>'']);
+
+        return response()->json(['slots' => $slots, 'time_off' => $timeOff]);
+    }
+
+    return response()->json(['slots' => $slots, 'time_off' => '']);
        
     }
     public function getVersion($oid){

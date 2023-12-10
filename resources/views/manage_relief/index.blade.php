@@ -310,40 +310,44 @@
         }
 
         function displayRelief(reliefData, response) {
-    console.log('Relief Data:', reliefData);
-    console.log('Available Teachers:', response);
+            console.log('Relief Data:', reliefData);
+            console.log('Available Teachers:', response);
 
-    var tableBody = $('#reliefTable tbody');
-    tableBody.empty();
+            var tableBody = $('#reliefTable tbody');
+            tableBody.empty();
 
-    reliefData.forEach(function (relief, index) {
-        var row = $('<tr></tr>');
-        row.append('<td>' + (index + 1) + '</td>');
-        row.append('<td>' + relief.class_name + '</td>');
-        row.append('<td>' + relief.subject + '</td>');
-        row.append('<td>' + relief.slot + '</td>');
-        row.append('<td>' + relief.leave_teacher + '</td>');
-        row.append('<td>' + relief.desc + '</td>');
+            reliefData.forEach(function (relief, index) {
+                var row = $('<tr></tr>');
+                row.append('<td>' + (index + 1) + '</td>');
+                row.append('<td>' + relief.class_name + '</td>');
+                row.append('<td>' + relief.subject + '</td>');
+                row.append('<td>' + relief.slot + '</td>');
+                row.append('<td>' + relief.leave_teacher + '</td>');
+                if (relief.desc !== null) {
+                    row.append('<td>' + relief.desc + '</td>');
+                }else{
+                    row.append('<td></td>');
+                }
 
-        // Append the select box with options
-        var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + index + '"></select></td>');
-        var selectElement = selectColumn.find('select');
+                // Append the select box with options
+                var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + index + '"></select></td>');
+                var selectElement = selectColumn.find('select');
 
-        // Call the updated function to populate the select box options
-        updateTeacherComboBox(index, response.original.free_teacher_list);
+                // Call the updated function to populate the select box options
+                updateTeacherComboBox(index, response.original.free_teacher_list);
 
-        row.append(selectColumn);
-        tableBody.append(row);
-    });
+                row.append(selectColumn);
+                tableBody.append(row);
+            });
 
-    tableBody.on('mousedown', '.assign_teacher', function () {
-        var selectedIndex = $(this).data('index');
-    // Use direct property access instead of split
-    var schedule_subject_id = selectedIndex;
-    var selectedTeacher = $(this).val();
-    assignTeacher(schedule_subject_id, selectedTeacher);
-    });
-}
+            tableBody.on('mousedown', '.assign_teacher', function () {
+                var selectedIndex = $(this).data('index');
+            // Use direct property access instead of split
+            var schedule_subject_id = selectedIndex;
+            var selectedTeacher = $(this).val();
+            assignTeacher(schedule_subject_id, selectedTeacher);
+            });
+        }
 
 // Call fetchReliefData with the corrected success function
 function fetchReliefData() {

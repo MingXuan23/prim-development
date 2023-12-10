@@ -75,6 +75,12 @@
 
                 <div class="flash-message"></div>
 
+                <div class="total_report">
+                    <div class="total_confirmed"></div>
+                    <div class="total_pending"></div>
+                    <div class="total_rejected"></div>
+                </div>
+
                 <div class="table-responsive">
                     <table id="reliefTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
@@ -243,7 +249,7 @@
             }
             console.log(date_val);
             $.ajax({
-                url: '{{ route("schedule.getPendingRelief") }}',
+                url: '{{ route("schedule.getReliefReport") }}',
                 type: 'POST',
                 data: {
                     organization: $('#organization option:selected').val(), 
@@ -253,7 +259,7 @@
                 success: function (response) {
                     console.log(response); // Log the pending relief data
                     //console.log(response.available_teachers); // Log the available teachers data 
-                    displayRelief(response.pending_relief);
+                    displayRelief(response.relief_report);
                 },
                 error: function (xhr, status, error) {
                     console.error(error);
@@ -265,6 +271,11 @@
             var tableBody = $('#reliefTable tbody');
             tableBody.empty(); // Clear existing data
 
+            // Initialize counters for each status
+            var totalConfirmed = 0;
+            var totalPending = 0;
+            var totalRejected = 0;
+
             // Iterate through reliefData and append rows
             reliefData.forEach(function (relief, index) {
                 var row = $('<tr></tr>');
@@ -273,18 +284,22 @@
                 row.append('<td>' + relief.subject + '</td>');
                 row.append('<td>' + relief.slot + '</td>');
                 row.append('<td>' + relief.leave_teacher + '</td>');
-                row.append('<td>' + relief.desc + '</td>');
-                  // Set color based on status
+                row.append('<td>' + relief.relief_teacher + '</td>');
+
+                // Set color based on status
                 var statusColor;
                 switch (relief.confirmation) {
                     case 'Rejected':
                         statusColor = 'red';
+                        totalRejected++; // Increment rejected count
                         break;
                     case 'Confirmed':
                         statusColor = 'green';
+                        totalConfirmed++; // Increment confirmed count
                         break;
                     case 'Pending':
-                        statusColor = 'yellow';
+                        statusColor = 'orange'; // Change 'yellow' to 'orange'
+                        totalPending++; // Increment pending count
                         break;
                     default:
                         statusColor = 'black'; // Default color for unknown status
@@ -294,10 +309,13 @@
                 // Append status column with the specified color
                 row.append('<td style="color: ' + statusColor + ';">' + relief.confirmation + '</td>');
 
-
                 tableBody.append(row);
             });
 
+            // Update the total blocks with the counts
+            $('.total_confirmed').text('Total Confirmed: ' + totalConfirmed);
+            $('.total_pending').text('Total Pending: ' + totalPending);
+            $('.total_rejected').text('Total Rejected: ' + totalRejected);
         }
 
         function autoSuggest(){
