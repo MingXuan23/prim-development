@@ -421,6 +421,20 @@ $(document).ready(function() {
             }
         });
     }
+    function isAvailableCheckOutDate(currentDate, checkinDate) {
+        var nextDate = new Date(checkinDate.getTime()); // Start from the check-in date
+
+        while (nextDate <= currentDate) {
+            nextDate.setDate(nextDate.getDate() + 1); // Move to the next day
+            var formattedNextDate = $.datepicker.formatDate('dd/mm/yy', nextDate);
+
+            if (disabledDates.indexOf(formattedNextDate) === -1) {
+                return true; // Found an available check-out date
+            }
+        }
+
+        return false; // No available check-out date found
+    }
     function initializeDatepickers(disabledDates){
         // to get max date that's 1 year from now
         var currentDate = new Date();
@@ -433,7 +447,6 @@ $(document).ready(function() {
             maxDate: maxDate,
             beforeShowDay: function(date) {
                 var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
-                // console.log(disabledDates);
 
                 var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
                 var cssClass = toolTip = '';
@@ -474,14 +487,36 @@ $(document).ready(function() {
             
                 }
             }
-        });    
+        }); 
+        function findNearestDisabledDate(checkinDate) {
+            var checkinTimestamp = checkinDate.getTime(); // Convert checkinDate to timestamp for comparison
+
+            var disabledDatesAfterCheckIn = disabledDates
+                .filter(function(disabledDate) {
+                    var parts = disabledDate.split('/');
+                    var disabledTimestamp = new Date(parts[2], parts[1] - 1, parts[0]).getTime(); // Construct date for comparison
+                    return disabledTimestamp >= checkinTimestamp;
+                })
+                .sort(function(a, b) {
+                    var dateA = a.split('/').reverse().join('-'); // Reformat for proper sorting
+                    var dateB = b.split('/').reverse().join('-');
+                    return new Date(dateA) - new Date(dateB);
+                });
+
+            if (disabledDatesAfterCheckIn.length > 0) {
+                return disabledDatesAfterCheckIn[0]; // Return the first disabled date after or on check-in date
+            }
+            
+            return null; // If no disabled date is found after or on check-in date
+        }
         $('#check-out').datepicker({
             dateFormat: 'dd/mm/yy',
             disabled: true,
             maxDate: maxDate,
             beforeShowDay: function(date) {
                 var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
-                var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
+                var checkinDateObject = $('#check-in').datepicker('getDate');
+                var isDisabled = (disabledDates.indexOf(formattedDate) !== -1 && checkinDateObject != null && formattedDate != findNearestDisabledDate(checkinDateObject));//even if the next day is disabled, still can checkout
                 var cssClass = toolTip = '';
                 if(isDisabled) {
                     toolTip = 'Terdapat tempahan untuk hari tersebut'; 
@@ -492,6 +527,7 @@ $(document).ready(function() {
                     cssClass = 'increase-date';
                     toolTip = "Terdapat penambahan harga pada hari tersebut";
                 }
+
                 return [!isDisabled,cssClass,toolTip];
             },
             onSelect: function(checkOutDate) {
@@ -517,7 +553,7 @@ $(document).ready(function() {
 
             while (currentDate <= checkOutDate) {
                 var formattedCurrentDate = $.datepicker.formatDate('dd/mm/yy', currentDate);
-                if (disabledDates.indexOf(formattedCurrentDate) !== -1) {
+                if (disabledDates.indexOf(formattedCurrentDate) !== -1 && formattedCurrentDate != findNearestDisabledDate(checkInDate)) { //even if the next day is disabled, still can checkout
                     isDisabledFound = true;
                     break;
                 }

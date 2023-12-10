@@ -129,7 +129,7 @@ $(document).ready(function() {
             },
             success: function(result) {
                 //only run this during the first request
-                if(getDataCounter == 0){
+                if(getDataCounter == 0 && result.homestays.length > 0){
                   //reset #homestay_id 
                   $('#homestay_id').empty();
                   // add option into #homestay_id

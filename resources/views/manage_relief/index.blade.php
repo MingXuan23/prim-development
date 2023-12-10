@@ -312,31 +312,40 @@
         function displayRelief(reliefData) {
         console.log('Relief Data:', reliefData);
 
-        var tableBody = $('#reliefTable tbody');
-        tableBody.empty();
+                var tableBody = $('#reliefTable tbody');
+                tableBody.empty();
 
-        reliefData.forEach(function (relief, index) {
-            var row = $('<tr></tr>');
-            row.append('<td>' + (index + 1) + '</td>');
-            row.append('<td>' + relief.class_name + '</td>');
-            row.append('<td>' + relief.subject + '</td>');
-            row.append('<td>' + relief.slot + '</td>');
-            row.append('<td>' + relief.leave_teacher + '</td>');
-            row.append('<td>' + relief.desc + '</td>');
+                reliefData.forEach(function (relief, index) {
+                    var row = $('<tr></tr>');
+                    row.append('<td>' + (index + 1) + '</td>');
+                    row.append('<td>' + relief.class_name + '</td>');
+                    row.append('<td>' + relief.subject + '</td>');
+                    row.append('<td>' + relief.slot + '</td>');
+                    row.append('<td>' + relief.leave_teacher + '</td>');
+                    if (relief.desc !== null) {
+                    row.append('<td>' + relief.desc + '</td>');
+                }else{
+                    row.append('<td></td>');
+                }
 
-            // Append the select box with options
-            var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id + '"></select></td>');
+        // Append the select box with options
+        var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  + '"></select></td>');
+        var selectElement = selectColumn.find('select');
+
+        // Call the updated function to populate the select box options
+        updateTeacherComboBox(index, response.original.free_teacher_list);
+
         row.append(selectColumn);
         tableBody.append(row);
     });
 
-    var assignTeacherElements = tableBody.find('.assign_teacher');
+            var assignTeacherElements = tableBody.find('.assign_teacher');
 
 // Loop through each found element
 assignTeacherElements.each(function(index, element) {
-    var selectedIndex = $(this).attr('data-index');
-    // Use direct property access instead of split
-    var leave_relief_id = selectedIndex;
+            var selectedIndex = $(this).attr('data-index');
+            // Use direct property access instead of split
+            var leave_relief_id = selectedIndex;
     assignTeacher(leave_relief_id);
     
     // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
@@ -346,10 +355,10 @@ assignTeacherElements.each(function(index, element) {
     //     var selectedIndex = $(this).data('index');
     // // Use direct property access instead of split
     // var schedule_subject_id = selectedIndex;
-    // var selectedTeacher = $(this).val();
-    // assignTeacher(schedule_subject_id, selectedTeacher);
-    // });
-}
+            // var selectedTeacher = $(this).val();
+            // assignTeacher(schedule_subject_id, selectedTeacher);
+            // });
+        }
 
 // Call fetchReliefData with the corrected success function
 function fetchReliefData() {
