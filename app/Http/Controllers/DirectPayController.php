@@ -179,7 +179,7 @@ class DirectPayController extends Controller
     
                 DB::table('bookings')->where('bookingid', $bookingId)->update([
                     'updated_at' => Carbon::now(),
-                    'status' => 'Paid'
+                    'status' => 'Pending',
                 ]);
     
                 $organization = Organization::find($room->homestayid);
@@ -765,16 +765,16 @@ class DirectPayController extends Controller
                         $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
                         ->join('bookings','rooms.roomid','=','bookings.roomid')
                         ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
-                        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice')
+                        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms')
                         ->get();
 
                         if($transaction->email != NULL)
                         {
-                            Mail::to($transaction->email)->send(new HomestayReceipt($booking, $organization, $transaction, $user));
+                            Mail::to($transaction->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to customer
                         }
-                        
+                        Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to homestay admin
     
-                        return view('homestay.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
+                        return view('homestay.receipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
     
                         break;
 

@@ -33,7 +33,7 @@
  
     <section aria-label="Homestays or Rooms Listings" >
         <div class="home-thumbnails-container">
-            @foreach($rooms as $room)
+            @forelse($rooms as $room)
                 <div class="home-thumbnail-container">
                     <a href="{{route('homestay.showRoom',['id' => $room->roomid, 'name' => $room->roomname])}}" target="_self">
                         @if($room->ongoingDiscount != null || $room->nearestFutureDiscount != null)
@@ -68,7 +68,10 @@
                         </div>                      
                     </a>
                 </div>
-            @endforeach          
+            
+            @empty
+                    
+            @endforelse         
         </div>
 
     </section>

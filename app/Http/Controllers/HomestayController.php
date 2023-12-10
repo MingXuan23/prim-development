@@ -18,6 +18,9 @@ use App\Models\OrganizationRole;
 use App\Models\Promotion;
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Transaction;
+use App\User;
+
 use View;
 use Carbon\Carbon;
 use DateTime;
@@ -28,6 +31,23 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class HomestayController extends Controller
 {
+    public function testReceipt(){
+        $transaction = Transaction::find(29103);
+        $booking = Booking::where('transactionid', '=', 29103)->first();
+        $room = Room::find(13);
+        $user = User::find(18399);
+        $organization = Organization::find($room->homestayid);
+        
+        $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+        ->join('bookings','rooms.roomid','=','bookings.roomid')
+        ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
+        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms')
+        ->get();
+
+
+          
+        return view('homestay.testReceipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
+    }
     public function getRatingDiscount($rooms){
         // get ratings and discounts for those rooms
         foreach($rooms as $key => $room){
@@ -99,20 +119,26 @@ class HomestayController extends Controller
             'deleted_at' => null,
             'status' => 'Available',
         ]) ->get();
-        $this->getRatingDiscount($rooms);
-        $sortedRooms = $rooms->sortByDesc('overallRating');
-        
-        // for pagination on collection
-        $perPage = 20;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
-        $currentItems = $sortedRooms->slice(($currentPage - 1) * $perPage, $perPage)->all();
-        
-        $roomsPaginated = new LengthAwarePaginator($currentItems, $sortedRooms->count(), $perPage, $currentPage, [
-            'path' => LengthAwarePaginator::resolveCurrentPath(),
-            'pageName' => 'page',
-        ]);
+        if(!$rooms->isEmpty()){
+            $this->getRatingDiscount($rooms);
+            $sortedRooms = $rooms->sortByDesc('overallRating');
+            
+            // for pagination on collection
+            $perPage = 20;
+            $currentPage = LengthAwarePaginator::resolveCurrentPage('page');
+            $currentItems = $sortedRooms->slice(($currentPage - 1) * $perPage, $perPage)->all();
+            
+            $roomsPaginated = new LengthAwarePaginator($currentItems, $sortedRooms->count(), $perPage, $currentPage, [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]);
+            return view('homestay.home')->with(['rooms' => $roomsPaginated]);
 
-        return view('homestay.home')->with(['rooms' => $roomsPaginated]);
+        }else{
+            return view('homestay.home')->with(['rooms' => null]);
+        }
+
+
     }
     public function getRating($roomId){
         $ratings = Booking::where('roomid' ,$roomId)
@@ -1351,16 +1377,19 @@ public function getPromotionHistory(Request $request){
         ->orderBy('bookings.updated_at','desc')
         ->get();
         $checkoutImages = [];
-        foreach($checkoutBookings as $checkoutBooking){
-            $image = DB::table('homestay_images')
-            ->where([
-                'room_id' => $checkoutBooking->roomid,
-                'deleted_at' => null,
-            ])
-            ->pluck('image_path')
-            ->first();
-            array_push($checkoutImages,$image);
+        if(!$checkoutBookings->isEmpty()){
+            foreach($checkoutBookings as $checkoutBooking){
+                $image = DB::table('homestay_images')
+                ->where([
+                    'room_id' => $checkoutBooking->roomid,
+                    'deleted_at' => null,
+                ])
+                ->pluck('image_path')
+                ->first();
+                array_push($checkoutImages,$image);
+            }            
         }
+
         // data for completed tab
         $completedBookings = DB::table('bookings')
         ->where([
@@ -1372,16 +1401,18 @@ public function getPromotionHistory(Request $request){
         ->orderBy('bookings.updated_at','desc')
         ->get();
         $completedImages = [];
-        foreach($completedBookings as $completedBooking){
-            $image = DB::table('homestay_images')
-            ->where([
-                'room_id' => $completedBooking->roomid,
-                'deleted_at' => null,
-            ])
-            ->pluck('image_path')
-            ->first();
-            array_push($completedImages,$image);
-        }   
+        if(!$completedBookings->isEmpty()){
+            foreach($completedBookings as $completedBooking){
+                $image = DB::table('homestay_images')
+                ->where([
+                    'room_id' => $completedBooking->roomid,
+                    'deleted_at' => null,
+                ])
+                ->pluck('image_path')
+                ->first();
+                array_push($completedImages,$image);
+            }  
+        }
         // data for cancelled tab
         $cancelledBookings = DB::table('bookings')
         ->where([
@@ -1393,16 +1424,18 @@ public function getPromotionHistory(Request $request){
         ->orderBy('bookings.updated_at','desc')
         ->get();
         $cancelledImages = [];
-        foreach($cancelledBookings as $cancelledBooking){
-            $image = DB::table('homestay_images')
-            ->where([
-                'room_id' => $cancelledBooking->roomid,
-                'deleted_at' => null,
-            ])
-            ->pluck('image_path')
-            ->first();
-            array_push($cancelledImages,$image);
-        }   
+        if(!$cancelledBookings->isEmpty()){
+            foreach($cancelledBookings as $cancelledBooking){
+                $image = DB::table('homestay_images')
+                ->where([
+                    'room_id' => $cancelledBooking->roomid,
+                    'deleted_at' => null,
+                ])
+                ->pluck('image_path')
+                ->first();
+                array_push($cancelledImages,$image);
+            } 
+        }
         return view('homestay.tempahananda')
         ->with(['checkoutBookings'=> $checkoutBookings, 'checkoutImages'=> $checkoutImages,'completedBookings'=> $completedBookings , 'completedImages'=> $completedImages,'cancelledBookings'=> $cancelledBookings,'cancelledImages'=> $cancelledImages,]);
     }
