@@ -79,7 +79,11 @@
                                         <td style="text-align: center">{{ date('d/m/Y', strtotime($transaction->checkin)) }}, selepas({{date('h:i a', strtotime($homestay->check_in_after))}})</td>
                                         <td style="text-align: center">{{ date('d/m/Y', strtotime($transaction->checkout)) }}, sebelum({{date('h:i a', strtotime($homestay->check_out_before))}})</td>
                                         <td style="text-align: center">{{  $numberOfNights }}</td>
-                                        <td style="text-align: center">{{  $homestay->price  }}</td>
+                                        @if($transaction->booked_rooms == null)
+                                            <td style="text-align: center">{{  $pricePerNight }}</td>
+                                        @else
+                                            <td style="text-align: center">{{  $pricePerNight }} <br> (x {{$transaction->booked_rooms}} Unit)</td>
+                                        @endif
                                     </tr>
                                     @if($transaction->discount_received > 0)
                                         <tr>
@@ -131,6 +135,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script>
     $(document).ready(function(){
+        $('.navbar-header > div:first-child()').after(`
+        <img src="../assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        `);
         $('#btn-download-receipt').on('click', function(){
             window.print();
         })

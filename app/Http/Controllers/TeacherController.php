@@ -207,7 +207,7 @@ class TeacherController extends Controller
 
         // teacher active when first time login then will change status
         DB::table('organization_user')->insert([
-            '21943'   => $request->get('organization'),
+            'organization_id'   => $request->get('organization'),
             'user_id'           => $newteacher->id,
             'role_id'           => 5,
             'start_date'        => now(),

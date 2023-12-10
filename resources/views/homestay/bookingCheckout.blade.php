@@ -129,6 +129,9 @@
                 <div class="col-md-8">
                   <h6 class="color-dark-purple mb-1"><span><i class="fas fa-map-marker-alt"></i></span> {{$checkoutDetails['homestay']->address}}, {{$checkoutDetails['homestay']->area}}, {{$checkoutDetails['homestay']->postcode}}, {{$checkoutDetails['homestay']->district}}, {{$checkoutDetails['homestay']->state}}</h6>
                   <h6><span class="color-dark-purple mb-1"><i class="fas fa-user-friends"></i> Room Pax: </span>{{$checkoutDetails['homestay']->roompax}}</h6>
+                  @if($checkoutDetails['bookedRooms'] != null)
+                  <h6><span class="color-dark-purple mb-1"><i class="fas fa-door-closed"></i> Jumlah Unit: </span>{{$checkoutDetails['bookedRooms']}}</h6>
+                  @endif
                   <h6><span class="color-dark-purple mb-1"><i class="fas fa-sign-in-alt"></i> Daftar Masuk: </span>{{$checkoutDetails['checkInDate']}}, selepas {{date('H:i', strtotime($checkoutDetails['homestay']->check_in_after))}}</h6>
                   <h6><span class="color-dark-purple mb-1"><i class="fas fa-sign-out-alt"></i> Daftar Keluar: </span>{{$checkoutDetails['checkOutDate']}}, sebelum {{date('H:i', strtotime($checkoutDetails['homestay']->check_out_before))}}</h6>
                 </div>
@@ -137,8 +140,13 @@
           <div class="border-white col-md-5 mb-3" id="checkout-price-container">
             <h4>Butiran Harga</h4>
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-1">
-              <h5 class="color-dark-purple">RM{{$checkoutDetails['homestay']->price}} x {{$checkoutDetails['nightCount']}} malam</h5>
-              <h5 class="color-purple">RM{{number_format($checkoutDetails['homestay']->price * $checkoutDetails['nightCount'],2)}}</h5>
+              @if($checkoutDetails['bookedRooms'] != null)
+                <h5 class="color-dark-purple">RM{{$checkoutDetails['homestay']->price}} x {{$checkoutDetails['nightCount']}} malam x {{$checkoutDetails['bookedRooms']}} Unit</h5>
+                <h5 class="color-purple">RM{{number_format($checkoutDetails['homestay']->price * $checkoutDetails['nightCount'],2) * $checkoutDetails['bookedRooms']}} </h5>
+              @else
+                <h5 class="color-dark-purple">RM{{$checkoutDetails['homestay']->price}} x {{$checkoutDetails['nightCount']}} malam</h5>
+                <h5 class="color-purple">RM{{number_format($checkoutDetails['homestay']->price * $checkoutDetails['nightCount'],2)}} </h5>
+              @endif
             </div>
             @if($checkoutDetails['discountAmount'] > 0)
               <div class="d-flex justify-content-between align-items-center flex-wrap mb-1">
@@ -193,7 +201,9 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   $(document).ready(function(){
-
+    $('.navbar-header > div:first-child()').after(`
+        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+    `);
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

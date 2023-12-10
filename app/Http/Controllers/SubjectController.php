@@ -70,10 +70,10 @@ class SubjectController extends Controller
         }
     }
     
-    public function subjectExport(Request $request)
-    {
-        return Excel::download(new SubjectExport($request->organ), 'subject.xlsx');
-    }
+    // public function subjectExport(Request $request)
+    // {
+    //     return Excel::download(new SubjectExport($request->organ), 'subject.xlsx');
+    // }
 
     public function subjectImport(Request $request)
     {

@@ -43,7 +43,7 @@
           <div class="flash-message"></div>
 
             <form method="post" action="{{route('homestay.addroom')}}" enctype="multipart/form-data"
-                class="form-validation">
+                class="form-validation p-4" >
                 {{csrf_field()}}
                 <div class="card-body">
                     <div class="row">
@@ -67,19 +67,30 @@
                     
                     <div class="row">
                         
-                        <div class="col">
+                        <div class="col-md-3">
                             <div class="form-group required">
-                                <label class="control-label">Kapasiti Homestay(pax) <span style="color:#d00"> *</span></label>
-                                <input type="number" min="1" class="form-control" id="roompax" name="roompax" required>
+                                <label class="control-label">Kapasiti Homestay <span style="color:#d00"> *</span></label>
+                                <input type="number" min="1" class="form-control" placeholder="Per Homestay/Bilik" id="roompax" name="roompax" required>
                             </div>
+
                         </div>
-                        <div class="col">
+                        <div class="col-md-3">
                             <div class="form-group required">
                                 <label class="control-label" for="price">Harga Per Malam (RM) <span style="color:#d00"> *</span></label>
                                 <input type="text"  class="form-control" id="price" name="price" required>
                             </div>
                         </div>
-
+                        <div class="col-md-3 form-group required">
+                            <div class="form-label"><b>Jenis Tempahan <span style="color:#d00"> *</span></b></div>
+                            <label for="whole" style="font-weight: normal">Keseluruhan Homestay</label>
+                            <input type="radio" name="bookingType" id="whole" value="whole" class="mr-2" checked required>
+                            <label for="room" style="font-weight: normal">Unit</label>
+                            <input type="radio" name="bookingType" id="room" value="room" required>
+                        </div>
+                        <div class="col-md-3 form-group required">
+                            <label for="roomNo" class="form-label">Jumlah Unit</label>
+                            <input type="number" min="1" name="roomNo" id="roomNo" class="form-control" disabled required>
+                        </div>
                     </div>
 
                     <div class="row">
@@ -87,7 +98,7 @@
                                 <label for="details">Detail Homestay<span style="color:#d00"> *</span></label>
                                 <textarea rows="10" cols="30" name="details" id="details" class="form-control" placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required></textarea>                                  
                             </div>
-                            <div class="form-group col-6 row">
+                            <div class="form-group col-6 row mx-0 px-0">
                                 <div class="form-group col-6 required">
                                     <label class="control-label">Negeri <span style="color:#d00"> *</span></label>
                                     <select name="state" id="state" class="form-select"
@@ -136,7 +147,7 @@
                                 <input type="time" name="checkOutBefore" id="check-out-before" class="form-control"  required>
                             </div>
                         </div>  
-                        <div class="col-md-6 d-flex align-items-center">
+                        <div class="col-md-3 d-flex align-items-center">
                             <div class="form-check">
                                 <input type="checkbox" name="isAvailable" id="isAvailable" class="form-check-input">
                                 <label for="isAvailable" class="form-check-label">Dibuka Untuk Tempahan</label>
@@ -183,11 +194,30 @@
 <script>
 
 $(document).ready(function () {
-        $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    $('.navbar-header > div:first-child()').after(`
+        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+    `);
+        function toggleRoomNoInput() {
+            if ($('#room').is(':checked')) {
+                $('#roomNo').prop('disabled', false);
+            } else {
+                $('#roomNo').prop('disabled', true);
+                $('#roomNo').val('');
+            }
         }
-    });
+
+        // Initial state check
+        toggleRoomNoInput();
+
+        // Event listeners for radio buttons
+        $('#room, #whole').on('change', function() {
+            toggleRoomNoInput();
+        });
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
         $('.alert').delay(3000).fadeOut()
         $('#homestayid option:nth-child(2)').prop('selected', true);
 
@@ -276,6 +306,7 @@ $(document).ready(function () {
             })
         });
         
+
 });
 
 </script>

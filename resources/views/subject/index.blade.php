@@ -87,7 +87,6 @@
                                 <th> No. </th>
                                 <th>Nama Subjek</th>
                                 <th>Kod Subjek</th>
-                                {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Tindakan</th>
                                 
                             </tr>
@@ -115,36 +114,6 @@
             </div>
         </div>
         {{-- end confirmation delete modal --}}
-
-        <!-- <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Export Subjek</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {{-- {{ route('exportteacher') }} --}}
-                    <form action="{{ route('exportteacher') }}" method="post">
-                        <div class="modal-body">
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                                <label>Organisasi</label>
-                                <select name="organ" id="organ" class="form-control">
-                                    @foreach($organization as $row)
-                                    <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="modal-footer">
-                                <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> -->
 
         <!-- Modal -->
         <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">

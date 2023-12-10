@@ -15,7 +15,13 @@ class Booking extends Model
         'totalprice',
         'customerid',
         'roomid',
-        'transactionid'
+        'transactionid',
+        'review_star',
+        'review_comment',
+        'discount_received',
+        'increase_received',
+        'booked_rooms',
+        'review_images',
     ];
 
     public function users()
@@ -30,4 +36,5 @@ class Booking extends Model
     {
         return $this->belongsTo(Transaction::class);
     }
+    
 }

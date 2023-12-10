@@ -3,7 +3,13 @@
 @section('css')
 <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
 <style>
-  
+  #btn-add-image,#image-previews > img{
+    width: 100px!important;
+    height: 75px!important;
+  }
+  .img-thumbnail{
+    padding: 0.15rem!important;
+  }
   @media screen and (max-width: 700px){
     #booking-button-group{
       position: relative;
@@ -55,7 +61,10 @@
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Daftar Masuk: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($checkoutBookings[$i]->check_in_after))}}</h6>
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Daftar Keluar: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkout))}}, sebelum {{date('H:i', strtotime($checkoutBookings[$i]->check_out_before))}}</h6>
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Jumlah Dibayar: </span>RM{{$checkoutBookings[$i]->totalprice}}</h6>
-                      <h6 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i>&nbsp;&nbsp;&nbsp;Nombor Telefon Organisasi: </span>{{$checkoutBookings[$i]->telno}}</h6>                    
+                      <h6 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i>&nbsp;&nbsp;&nbsp;Nombor Telefon Organisasi: </span>{{$checkoutBookings[$i]->telno}}</h6>    
+                      @if($checkoutBookings[$i]->booked_rooms != null)
+                      <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-door-closed"></i>&nbsp;Jumlah Unit Ditempah: </span>{{$checkoutBookings[$i]->booked_rooms}}</h6>   
+                      @endif
                       <div id="booking-button-group" class="d-flex justify-content-end align-items-center flex-wrap gap-3">
                         <button class="btn-purple mx-2 btn-checkout-room" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Daftar Keluar</button>
                         <a href="{{route('homestay.bookingDetails',$checkoutBookings[$i]->bookingid)}}" class="btn-dark-purple mx-2 btn-detail">Butiran</a>
@@ -144,7 +153,7 @@
                   <div class="card-body">
                     <div id="rating-message">
                     </div> 
-                    <img src="homestay-image/review-icon.png" height="100" width="100" class="d-block mx-auto">
+                    <img src="assets/homestay-assets/images/review-icon.png" height="100" width="100" class="d-block mx-auto">
                     <form action="{{route('homestay.addReview')}}" method="POST" enctype="multipart/form-data" id="form-review">
                       @csrf
                       <input type="hidden" value="" id="booking_id" name="booking_id">
@@ -158,7 +167,20 @@
                           <input type="radio" name="rating" value="1" id="1" ><label for="1">☆</label> 
                         </div>
                         <div class="comment-area"> <textarea name="review_comment" class="form-control" placeholder="Beri pandangan tentang penginapan anda.(tidak wajib)" rows="4"></textarea> </div>
-                        <div class="text-center mt-4"> <button type="submit" class="btn-purple send px-5">Hantar Nilaian &nbsp;<i class="fas fa-long-arrow-alt-right ml-1"></i></button>
+                        {{-- for review images --}}
+                        <div class="mt-2" >
+                          <div class="mb-1">Upload gambar-gambar ulasan untuk penginapan ini jika ingin<br><b>(Maximum 4 gambar)</b></div>
+                          <div class="d-flex flex-wrap justify-content-center">
+                            <div id="image-previews" class="d-flex justify-content-center align-items-center gap-1 flex-wrap">                          
+                            </div>                           
+                              <button id="btn-add-image" type="button"><i class="fas fa-images"></i></button>
+                              <input type="file"  name="review_images[]" id="review_images" accept=".jpg,.jpeg,.png" multiple hidden>                               
+                          </div>
+                      
+                        </div>
+
+
+                        <div class="text-center mt-2"> <button type="submit" class="btn-purple send px-5">Hantar Nilaian &nbsp;<i class="fas fa-long-arrow-alt-right ml-1"></i></button>
                         </div>
                     </form>
 
@@ -175,6 +197,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script>
     $(document).ready(function(){
+    $('.navbar-header > div:first-child()').after(`
+        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+    `);
       // for redirecting tab
       const switchTab =JSON.parse(localStorage.getItem('switchTab'));
       if(switchTab == 'completedTab'){
@@ -237,6 +262,7 @@
         $('#booking_id').val('');
         $('input[name = "rating"]').prop('checked', false);
         $('#review_comment').val('');
+        $('#review_images').val('');
         $('#modal-review').modal('hide');
       })
 
@@ -253,7 +279,48 @@
       });
      $('.alert').delay(3000).fadeOut()
     }); 
+    // for review images
+    $('#btn-add-image').on('click', function(){
+      $('#review_images').click();
+    });
 
+    $('#review_images').on('change',function(){
+      $('#image-previews').empty();
+            const imageFiles = $(this).prop('files');
+            if(imageFiles.length > 4){
+                $('#rating-message').html(`
+                    <div id="alert" class="alert alert-danger text-center">
+                        Hanya dibenarkan muat naik maximum 4 gambar sahaja
+                    </div>
+                `);
+                $('#alert').fadeOut(6000);
+                $(this).val('');
+                return;
+            }else{
+                for(let i = 0;i < imageFiles.length;i++){
+                    if(imageFiles[i].type.includes('jpg')||imageFiles[i].type.includes('jpeg')||imageFiles[i].type.includes('png')){
+                        const image = new Image();
+                        image.src = URL.createObjectURL(imageFiles[i]);
+                        image.onload = function () {
+                            // Display the image preview
+                            $('#image-previews').append(`
+                                <img src="${image.src}" class="img-thumbnail img-new" id="img-preview">
+                            `);
+                            } 
+                        // }                 
+                    }else{
+                        $('#rating-message').html(`
+                            <div id="alert" class="alert alert-danger text-center">
+                                Hanya dibenarkan muat naik gambar sahaja
+                            </div>
+                        `);
+                        $('#alert').fadeOut(6000);
+                        $(this).val('');
+                        return;
+                    }
+                }
+            }
+    });
 
     // for booking cancellation
     $('.btn-cancel-booking').on('click',function(){

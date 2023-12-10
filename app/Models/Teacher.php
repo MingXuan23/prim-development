@@ -18,7 +18,7 @@ class Teacher extends Model
             $query->where("users.id", $id);
         })->get();
 
-        dd($oid);
+        //dd($oid);
         return $oid;
     }
 }
