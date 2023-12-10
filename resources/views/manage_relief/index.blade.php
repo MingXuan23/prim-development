@@ -92,6 +92,7 @@
                                 <th>No </th>
                                 <th>Kelas</th>
                                 <th>Subjek</th>
+                                <th>Slot</th>
                                 <th>Guru Asal</th>
                                 <th>Alasan</th>
                                 <th>Guru Ganti</th>
@@ -243,84 +244,165 @@
             defaultDate: 0, 
         })
 
-        function fetchReliefData() {
-            let date_val = $('#datepicker').val();
-            // If date is empty, set it to today
-            if (!date_val) {
-                date_val = $.datepicker.formatDate('yy-mm-dd', new Date());
-                $('#datepicker').datepicker('setDate', date_val); // Update datepicker value
-            }
-            console.log(date_val);
-            $.ajax({
-                url: '{{ route("schedule.getPendingRelief") }}',
-                type: 'POST',
-                data: {
-                    organization: $('#organization option:selected').val(), 
-                    date: date_val,
-                    // Replace with your organization ID
-                },
-                success: function (response) {
-                    console.log(response); // Log the pending relief data
-                    //console.log(response.available_teachers); // Log the available teachers data 
-                    displayRelief(response.pending_relief);
-                },
-                error: function (xhr, status, error) {
-                    console.error(error);
-                }
-            });
-        }
+        // function displayRelief(reliefData) {
+        //     var tableBody = $('#reliefTable tbody');
+        //     tableBody.empty(); // Clear existing data
 
-        function displayRelief(reliefData) {
-            var tableBody = $('#reliefTable tbody');
-            tableBody.empty(); // Clear existing data
+        //     // Iterate through reliefData and append rows
+        //     reliefData.forEach(function (relief, index) {
+        //         var row = $('<tr></tr>');
+        //         row.append('<td>' + (index + 1) + '</td>');
+        //         row.append('<td>' + relief.class_name + '</td>');
+        //         row.append('<td>' + relief.subject + '</td>');
+        //         row.append('<td>' + relief.slot + '</td>');
+        //         row.append('<td>' + relief.leave_teacher + '</td>');
+        //         row.append('<td>' + relief.desc + '</td>');
+        //         // row.append('<td><select class="form-control assign_teacher"><option>' + relief.relief_teacher + '</option></select></td>');
+                
+        //         // Check if relief_teacher is null, display "No Teacher" as the option
+        //         var reliefTeacherOption = relief.relief_teacher ? relief.relief_teacher : 'No Teacher';
 
-            // Iterate through reliefData and append rows
-            reliefData.forEach(function (relief, index) {
-                var row = $('<tr></tr>');
-                row.append('<td>' + (index + 1) + '</td>');
-                row.append('<td>' + relief.class_name + '</td>');
-                row.append('<td>' + relief.subject + '</td>');
-                row.append('<td>' + relief.leave_teacher + '</td>');
-                row.append('<td>' + relief.desc + '</td>');
-                // row.append('<td><select class="form-control assign_teacher"><option>' + relief.relief_teacher + '</option></select></td>');
+        //         // Use the ternary operator to set the selected attribute based on the condition
+        //         var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id+'-'+relief.schedule_subject_id + '"><option selected>' + reliefTeacherOption + '</option></select></td>');
 
-                var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id+'-'+relief.schedule_subject_id + '"><option>' + relief.relief_teacher + '</option></select></td>');
-                row.append(selectColumn);
+        //         row.append(selectColumn);
 
-                tableBody.append(row);
-            });
-            tableBody.on('mousedown', '.assign_teacher', function () {
-                var selectedIndex = $(this).data('index');
-                var resultArray = selectedIndex.split('-');
-                var schedule_subject_id = resultArray[0];
-                var selectedTeacher = $(this).val();
-                // Call your function before the value changes
-                assignTeacher(schedule_subject_id, selectedTeacher);
-            });
+        //         tableBody.append(row);
+        //     });
+        //     tableBody.on('mousedown', '.assign_teacher', function () {
+        //         var selectedIndex = $(this).data('index');
+        //         var resultArray = selectedIndex.split('-');
+        //         var schedule_subject_id = resultArray[0];
+        //         var selectedTeacher = $(this).val();
+        //         // Call your function before the value changes
+        //         assignTeacher(schedule_subject_id, selectedTeacher);
+        //     });
 
-        }
+        // }
 
         function assignTeacher(schedule_subject_id, teacher) {
-            console.log('Selected teacher for row ' + (schedule_subject_id ) + ': ' + teacher);
+            console.log('Selected teacher for row ' + (schedule_subject_id) + ': ' + teacher);
+
+            // Make an AJAX request to get available teachers for the selected slot
             $.ajax({
-                url: "{{route('schedule.getFreeTeacher')}}",
+                url: "{{ route('schedule.getFreeTeacher') }}",
                 type: 'POST',
                 data: {
-                    organization: $('#organization option:selected').val(), 
-                    date:  $('#datepicker').val(),
-                    schedule_subject_id:schedule_subject_id
+                    organization: $('#organization option:selected').val(),
+                    date: $('#datepicker').val(),
+                    schedule_subject_id: schedule_subject_id
+                },
+                success: function (response) {
+                    console.log(response);
 
+                    // Update the combo box that selects the teacher
+                    updateTeacherComboBox(schedule_subject_id, response.free_teacher_list);
+                    // console.log(response.free_teacher_list);
+                    // Additional logic if needed
                 },
-                success: function(response) {
-                    console.log(response); //update the combo box that select the teacher
-                },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.log(error);
                 }
             });
+
             // Add your logic to handle the selected teacher here
             // You can make an AJAX request to update the server or perform other actions
         }
+
+        function displayRelief(reliefData, response) {
+    console.log('Relief Data:', reliefData);
+    console.log('Available Teachers:', response);
+
+    var tableBody = $('#reliefTable tbody');
+    tableBody.empty();
+
+    reliefData.forEach(function (relief, index) {
+        var row = $('<tr></tr>');
+        row.append('<td>' + (index + 1) + '</td>');
+        row.append('<td>' + relief.class_name + '</td>');
+        row.append('<td>' + relief.subject + '</td>');
+        row.append('<td>' + relief.slot + '</td>');
+        row.append('<td>' + relief.leave_teacher + '</td>');
+        row.append('<td>' + relief.desc + '</td>');
+
+        // Append the select box with options
+        var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + index + '"></select></td>');
+        var selectElement = selectColumn.find('select');
+
+        // Call the updated function to populate the select box options
+        updateTeacherComboBox(index, response.original.free_teacher_list);
+
+        row.append(selectColumn);
+        tableBody.append(row);
+    });
+
+    tableBody.on('mousedown', '.assign_teacher', function () {
+        var selectedIndex = $(this).data('index');
+    // Use direct property access instead of split
+    var schedule_subject_id = selectedIndex;
+    var selectedTeacher = $(this).val();
+    assignTeacher(schedule_subject_id, selectedTeacher);
+    });
+}
+
+// Call fetchReliefData with the corrected success function
+function fetchReliefData() {
+    let date_val = $('#datepicker').val();
+
+    if (!date_val) {
+        date_val = $.datepicker.formatDate('yy-mm-dd', new Date());
+        $('#datepicker').datepicker('setDate', date_val);
+    }
+
+    $.ajax({
+        url: '{{ route("schedule.getPendingRelief") }}',
+        type: 'POST',
+        data: {
+            organization: $('#organization option:selected').val(),
+            date: date_val,
+        },
+        success: function (response) {
+            console.log(response);
+            displayRelief(response.pending_relief, response.available_teachers);
+        },
+        error: function (xhr, status, error) {
+            console.error(error);
+        }
+    });
+}
+
+
+function updateTeacherComboBox(schedule_subject_id, availableTeachers) {
+    console.log('Received availableTeachers:', availableTeachers);
+
+    // Find the select box associated with the given schedule_subject_id
+    var selectBox = $('.assign_teacher[data-index="' + schedule_subject_id + '"]');
+
+    // Clear existing options
+    selectBox.empty();
+
+    // Check if availableTeachers is defined
+    if (availableTeachers) {
+        // If availableTeachers is an object, extract the array
+        var teachersArray = Array.isArray(availableTeachers) ? availableTeachers : availableTeachers.free_teacher_list;
+
+        // Check if the extracted array is not empty
+        if (Array.isArray(teachersArray) && teachersArray.length > 0) {
+            // Iterate over the array and add options
+            teachersArray.forEach(function (teacher) {
+                selectBox.append('<option value="' + teacher.id + '">' + teacher.name + '</option>');
+            });
+        }
+    } else {
+        selectBox.append('<option selected>No Teacher</option>');
+        console.warn('The availableTeachers object is empty or not in the expected format:', availableTeachers);
+        // Log a warning or handle the empty case as needed
+    }
+}
+
+
+
+
 
         function autoSuggest(){
         var organization = $("#organization option:selected").val();

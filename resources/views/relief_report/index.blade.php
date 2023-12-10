@@ -82,6 +82,7 @@
                                 <th>No </th>
                                 <th>Kelas</th>
                                 <th>Subjek</th>
+                                <th>Slot</th>
                                 <th>Guru Asal</th>
                                 <th>Guru Ganti</th>
                                 <th>Status</th>
@@ -270,6 +271,7 @@
                 row.append('<td>' + (index + 1) + '</td>');
                 row.append('<td>' + relief.class_name + '</td>');
                 row.append('<td>' + relief.subject + '</td>');
+                row.append('<td>' + relief.slot + '</td>');
                 row.append('<td>' + relief.leave_teacher + '</td>');
                 row.append('<td>' + relief.desc + '</td>');
                   // Set color based on status
