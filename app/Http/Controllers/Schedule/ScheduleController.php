@@ -79,8 +79,7 @@ class ScheduleController extends Controller
             ->leftJoin('users as u2','lr.replace_teacher_id','u2.id')
             ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
             ->where(function ($query) {
-                $query->where('lr.confirmation', 'Rejected')
-                    ->orWhereNull('lr.confirmation');
+                $query->whereNull('lr.confirmation');
             })
             ->where('lr.status',1)
             ->where('s.organization_id',$oid)
@@ -128,7 +127,7 @@ class ScheduleController extends Controller
              ]);
 
              $user =User::find($data[1]);
-             $msg =$msg . $this->sendNotification($data[1],'Hi, '.$user->name,'You have a new pending relief. Please check the latest pending relief in APP').PHP_EOL;
+             $msg =$msg . $this->sendNotification($data[1],'Hi, '.$user->name,'You have a new pending relief. Please check the latest pending relief in APP');;
        }
        return redirect()->back()->with('success', $msg);
     }
@@ -768,7 +767,7 @@ class ScheduleController extends Controller
         curl_close($ch);
 
         // FCM response
-        //dd($result);
+       //dd($result);
 
             return 'Success Send Notification to'.$user->name;
         }
