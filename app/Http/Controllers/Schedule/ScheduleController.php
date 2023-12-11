@@ -111,6 +111,28 @@ class ScheduleController extends Controller
 
     }
 
+    public function saveRelief(Request $request){
+        $reliefs = $request -> commitRelief;
+        if(!$this->checkAdmin(Auth::User()->id,$request->organization)){
+            return redirect()->back()->with('success', '401 Error');
+        }
+        $commitRelief = json_decode($request->commitRelief, true);
+
+        $msg ='';
+       foreach($commitRelief as $cr){
+             $data =explode('-', $cr);
+             $update = DB::table('leave_relief')->where('id',$data[0])->update([
+                'replace_teacher_id'=>$data[1],
+                'confirmation'=>'Pending',
+                'status'=>1
+             ]);
+
+             $user =User::find($data[1]);
+             $msg =$msg . $this->sendNotification($data[1],'Hi, '.$user->name,'You have a new pending relief. Please check the latest pending relief in APP').PHP_EOL;
+       }
+       return redirect()->back()->with('success', $msg);
+    }
+
     public function getAllReliefForReport($oid, $date){
         $organization = $this->getOrganizationByUserId();
         
@@ -131,7 +153,7 @@ class ScheduleController extends Controller
             })
             ->where('lr.status',1)
             ->where('s.organization_id',$oid)
-            ->where('sv.status',1)
+            //->where('sv.status',1)
             ->where('tl.date',$date)
             ->orderBy('lr.confirmation')
             ->select('lr.id as leave_relief_id','lr.confirmation','ss.id as schedule_subject_id','tl.date','tl.desc'
@@ -149,7 +171,7 @@ class ScheduleController extends Controller
     }
 
     //to get the teacher burden information
-    public function getTeacherInfo($teacher_id,$organization_id,$schedule_subject,$date){
+    public function getTeacherInfo($teacher_id,$date){
         $teacher =new stdClass();
         $teacher->id =$teacher_id;
         $teacher->name = User::find($teacher_id)->name;
@@ -159,8 +181,8 @@ class ScheduleController extends Controller
                         ->where('ss.teacher_in_charge',$teacher_id)
                         ->count('ss.id');
 
-        $date = '2023-12-06';
-
+        //$date = '2023-12-06';
+        //dd($date);
         // Split the date string into year, month, and day
         list($year, $month, $day) = explode('-', $date);
         
@@ -185,29 +207,59 @@ class ScheduleController extends Controller
                     ->whereBetween('tl.date',[$weekStartDate,$weekEndDate])
                     ->count('lr.id');
        
-
-        return $teacher;
+        return $teacher ->normal_class  - $teacher->leave_class + $teacher->relief_class;
+        //return $teacher;
 
     }
 
     //to auto suggesstion
     public function autoSuggestRelief(Request $request){
         
-        $request->date = Carbon::now();
+        //$request->date = Carbon::now();
         $pendingRelief = $request -> pendingRelief;
         $date = $request->date;
         $organization =$request->organization;
         $criteria = $request->criteria;
-
+        //dd($criteria);
         $relief_draft =[];
+        if($pendingRelief == null){
+            return response()->json(['relief_draft'=>$relief_draft]);
+        }
+        $teachers = DB::table('organization_user as ou')
+        ->leftJoin('users as u','u.id','ou.user_id')
+        ->where('ou.organization_id',$organization)
+        ->where('ou.role_id',5)
+        ->select('ou.user_id as id','u.name')
+        ->get()
+        ->toArray();
+
+        $assignedTeachers = [];
+        //dd($pendingRelief);
         foreach($pendingRelief as $p){
             $data =explode('-', $p);
             $leave_relief_id =$data[0];
             $schedule_subject = DB::table('schedule_subject')->where('id',$data[1])->first();
-            $teacherList = $this->getAvailableTeacherList($schedule_subject,$date,$organization);
+            $teacherList = $this->getAvailableTeacherList($schedule_subject,$date,$organization,$teachers);
+ // criteria
             
-            // criteria
+            
+            switch($criteria){
+                case 'Beban Guru':
+                    usort($teacherList, function ($a, $b) use( $date) {
+                        // Your custom comparison logic here
+                        return $this->getTeacherInfo($a->id, $date) - $this->getTeacherInfo($b->id, $date);
+                    });
+                    break;
+                case 'Class':
+
+                    break;
+            }
+
+           // dd($before,$teacherList);
+           //dd(count( $assignedTeachers),$assignedTeachers);
             foreach($teacherList as $t){
+                if(in_array($t->id,$assignedTeachers) &&   count($teacherList)>count( $assignedTeachers) )
+                    continue;
                 $draft = new stdClass();
                 $draft->teacher_id = $t->id;
                 $draft->teacher_name =$t->name;
@@ -215,6 +267,7 @@ class ScheduleController extends Controller
                 $draft->schedule_subject_id=$schedule_subject->id;
                 $draft->leave_relief_id = $leave_relief_id;
                 array_push($relief_draft, $draft);
+                $assignedTeachers[] = $t->id;
                 break;
             }
 
@@ -226,19 +279,21 @@ class ScheduleController extends Controller
     }
 
     //get all teacher available for the moment
-    public function getAvailableTeacherList($schedule_subject,$date,$organization){
-        $teachers = DB::table('organization_user as ou')
-        ->where('ou.organization_id',$organization)
-        ->where('ou.role_id',5)
-        ->select('ou.user_id')
-        ->get()
-        ->toArray();
+    public function getAvailableTeacherList($schedule_subject,$date,$organization,$teachers){
+        if($teachers == null){
+            $teachers = DB::table('organization_user as ou')
+            ->leftJoin('users as u','u.id','ou.user_id')
+            ->where('ou.organization_id',$organization)
+            ->where('ou.role_id',5)
+            ->select('ou.user_id as id','u.name')
+            ->get()
+            ->toArray();
+        }
 
-       
         $teacher_info =[];
         //dd($teachers);
         for($i =0;$i<count($teachers);$i++){
-
+           //dd( $teachers[$i]->id);
             $isBusy = DB::table('schedule_subject as ss')
                     ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
                     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
@@ -246,18 +301,18 @@ class ScheduleController extends Controller
                     ->where('sv.status',1)
                     ->where(function ($query) use ($teachers,$schedule_subject,$i, $date){
                         $query->where(function ($query) use ($teachers,$schedule_subject,$i, $date) {
-                            $query->where('lr.replace_teacher_id', $teachers[$i]->user_id)
+                            $query->where('lr.replace_teacher_id', $teachers[$i]->id)
                                 ->where('tl.status',1)
                                 ->where('tl.date',$date)
                                 ->where('ss.slot',$schedule_subject->slot)
                                 ->where('ss.day',$schedule_subject->day); 
                         })->orWhere(function ($query) use ($teachers,$i, $date){
-                            $query->where('tl.teacher_id', $teachers[$i]->user_id)
+                            $query->where('tl.teacher_id', $teachers[$i]->id)
                             ->where('tl.date',$date)
                             ->where('tl.status',1);
                                 
                         })->orWhere(function ($query) use ($teachers,$schedule_subject,$i){
-                            $query->where('ss.teacher_in_charge', $teachers[$i]->user_id)
+                            $query->where('ss.teacher_in_charge', $teachers[$i]->id)
                                 ->where('ss.slot',$schedule_subject->slot)
                                 ->where('ss.day',$schedule_subject->day); 
                         }) ;     
@@ -266,7 +321,8 @@ class ScheduleController extends Controller
 
             if($isBusy)
                 continue;
-            $info =$this->getTeacherInfo($teachers[$i]->user_id, $organization,$schedule_subject,$date);
+            //dd($date);
+            $info = $teachers[$i];
             array_push($teacher_info,$info);
         }
 
@@ -282,7 +338,7 @@ class ScheduleController extends Controller
                 ->select('ss.*')
                 ->first();
        
-        $teacher_list = $this->getAvailableTeacherList($schedule_subject,$request->date,$request->organization);
+        $teacher_list = $this->getAvailableTeacherList($schedule_subject,$request->date,$request->organization,null);
 
         return response()->json(['free_teacher_list'=>$teacher_list]);
 
@@ -652,4 +708,70 @@ class ScheduleController extends Controller
                 }
     }
 
+    public function checkAdmin($userId,$schoolId){
+        return DB::table('organizations as o')
+                ->join('organization_user as ou','ou.organization_id','o.id')
+                ->whereIn('ou.role_id',[2,4,7,20])
+                ->where('o.id',$schoolId)
+                ->where('ou.status',1)
+                ->where('ou.user_id',$userId)
+                ->exists();
+     }
+
+     public function sendNotification($id,$title,$message)
+     {  
+        $user =User::find($id);
+
+       // dd($user);
+        if($user->device_token){
+
+            $device_token =[];
+            $url = 'https://fcm.googleapis.com/fcm/send';
+            array_push($device_token,$user->device_token);
+        $serverKey = getenv('FCM_SERVER_KEY');
+        //$serverKey = getenv('PRODUCTION_BE_URL');
+        
+       
+        $data = [
+            "registration_ids" => $device_token,
+            "notification" => [
+                "title" => $title,
+                "body" =>$message,
+            ]
+        ];
+
+        $encodedData = json_encode($data);
+
+        $headers = [
+            'Authorization:key='. $serverKey,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+
+        // Execute post
+        $result = curl_exec($ch);
+
+        if ($result === FALSE) {
+            die('Curl failed: '. curl_error($ch));
+        }
+        //dd($result);
+        // Close connection
+        curl_close($ch);
+
+        // FCM response
+        //dd($result);
+
+            return 'Success Send Notification to'.$user->name;
+        }
+        return 'Failed Send Notification to'.$user->name;
+     }
 }
