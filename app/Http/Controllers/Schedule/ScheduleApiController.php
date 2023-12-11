@@ -579,22 +579,24 @@ class ScheduleApiController extends Controller
                     'desc'=>$request->desc
                 ]);
 
-
-        $organization =DB::table('schedule_subject as ss')
-                    ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
-                    ->join('schedules as s','s.id','sv.schedule_id')
-                    ->where('ss.id',$duplicate_row->schedule_subject_id)
-                    ->select('s.organization_id as id')->first();
-
-
+                $duplicate_row = DB::table('leave_relief')->where('id',$request->leave_relief_id)->first();
+                $organization =DB::table('schedule_subject as ss')
+                ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+                ->join('schedules as s','s.id','sv.schedule_id')
+                ->where('ss.id',$duplicate_row->schedule_subject_id)
+                ->select('s.organization_id as id')->first();
+                
         $admin_id =DB::table('organization_user as ou')
         ->where('ou.organization_id',$organization->id)
         ->whereIn('ou.role_id',[2,4,7,20])
         ->select('ou.user_id')
         ->distinct()
         ->get();
+
+       
+
         if($request->response =='Rejected'){
-            $duplicate_row = DB::table('leave_relief')->where('id',$request->leave_relief_id)->first();
+           
             $insert = DB::table('leave_relief')->insert([
                 'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
                 'schedule_subject_id'=>$duplicate_row->schedule_subject_id
