@@ -600,7 +600,9 @@ class ScheduleApiController extends Controller
            
             $insert = DB::table('leave_relief')->insert([
                 'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
-                'schedule_subject_id'=>$duplicate_row->schedule_subject_id
+                'schedule_subject_id'=>$duplicate_row->schedule_subject_id,
+                'status'=>1
+
             ]); //generate new record for admin
 
             //dd($admin_id);
