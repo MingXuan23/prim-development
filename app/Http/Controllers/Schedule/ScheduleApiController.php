@@ -593,8 +593,9 @@ class ScheduleApiController extends Controller
         ->distinct()
         ->get();
 
-       
-
+       //dd($admin_id);
+        $notification='';
+        //dd($notification,$request->repsonse);
         if($request->response =='Rejected'){
            
             $insert = DB::table('leave_relief')->insert([
@@ -611,15 +612,18 @@ class ScheduleApiController extends Controller
                 //dd($msg);
                 $notification =$this->sendNotification($a->user_id,'Your action is required',$msg );
             }
+            //dd($notification);
 
         }
-        else if ($request->repsonse == "Confirmed"){
+        else if ($request->response == "Confirmed"){
+
+           // dd($notification,$request->repsonse);
 
             $count = DB::table('leave_relief as lr')
             ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                     ->leftJoin ('schedule_subject as ss','ss.id','lr.schedule_subject_id')
                     ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
-                    ->leftJoin('schdeules as s','s,id','sv.schedule_id')
+                    ->leftJoin('schedules as s','s.id','sv.schedule_id')
                     ->where('lr.confirmation','Pending')
                     ->where('lr.status',1)
                     ->where('sv.status',1)
@@ -635,9 +639,10 @@ class ScheduleApiController extends Controller
                 //dd($msg);
                 $notification =$this->sendNotification($a->user_id,$user->name.' accept the relief.',$msg );
             }
+           // dd($notification);
         }
 
-        return response()->json(['result'=>$update,'noti'=>$notification]);
+        return response()->json(['result'=>$update]);
     }
 
     public function getHistory($user_id)
