@@ -42,6 +42,20 @@ class ScheduleController extends Controller
         return view('manage_relief.index', compact('organization', 'classes'));
     }
 
+    public function getTeacherOfOrg(Request $request){
+        $teachers = DB::table('users as u')
+                    ->leftJoin('organization_user as ou','ou.user_id','u.id')
+                    ->where('ou.organization_id',$request->organization)
+                    ->where('ou.role_id',5)
+                    ->select('u.id as teacher_id','u.name as name')
+                    ->get();
+
+        $leaveType =DB::table('leave_type')
+                    ->where('status',1)
+                    ->get();
+        return response()->json(['teachers'=>$teachers,'leaveType'=>$leaveType]);
+    }
+
     public function reliefReportIndex()
     {
         $organization = $this->getOrganizationByUserId();
@@ -718,8 +732,7 @@ class ScheduleController extends Controller
      }
 
      public function sendNotification($id,$title,$message)
-     {  
-        $user =User::find($id);
+     {  $user =User::find($id);
 
        // dd($user);
         if($user->device_token){
@@ -762,15 +775,124 @@ class ScheduleController extends Controller
         if ($result === FALSE) {
             die('Curl failed: '. curl_error($ch));
         }
-        //dd($result);
+       
         // Close connection
         curl_close($ch);
 
-        // FCM response
-       //dd($result);
+        // FCM responsemana
+        //dd($result);
 
-            return 'Success Send Notification to'.$user->name;
+        return 'Success Send Notification to'.$user->name;
+    }
+    return 'Failed Send Notification to'.$user->name;
+     }
+
+     public function addTeacherLeave(Request $request){
+        $period = new stdClass();
+        $date = Carbon::createFromDate($request->date);
+        //dd($date,$request->isLeaveFullDay);
+        if($request->isLeaveFullDay == "on"){
+            $period->fullday=true;
+            
+        }else{
+            $period->fullday=false;
+            $period->start_time= $request->starttime;
+            $period->end_time=$request->endtime;
+
         }
-        return 'Failed Send Notification to'.$user->name;
+
+        $period = json_encode($period);
+        $user = User::find($request->selectedTeacher);
+
+        if(! DB::table('leave_type')->where('id',$request->reason)->exists()){
+            return response()->json(['error' => 'Leave Type value error'], 401);
+        }
+
+        if($user){
+            //dd($request->start_time);
+        $existConflict =DB::table('teacher_leave')
+                ->where('date',$date)
+                ->where('status',1)
+                ->where('teacher_id',$user->id)
+                ->where(function ($query) use ($request) {
+                    $query->where('period->fullday',true)
+                    ->orWhere(function ($query) use ($request) {
+
+                        $query->where('period->fullday',false)
+                            // ->where('period->end_time', '>', $request->starttime)
+                            // ->where('period->start_time', '<', $request->endtime)
+                            ;
+                    });
+                })
+                ->exists();
+       
+        if($existConflict){
+             return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
+        }
+       // $image = $request->input('image');
+       $str = $user->name .Carbon::today()->format('Y-m-d') ;
+       $filename = null;
+        if (!is_null($request->image)) {
+            
+            $extension =  $request->image->extension();
+            $storagePath  =    $request->image ->move(public_path('schedule_leave_image'), $str . '.' . $extension);
+            $filename = basename($storagePath);
+            //dd($request->image);
+
+        }
+    
+        
+        $leave_id =  DB::table('teacher_leave')->insertGetId([
+            
+                'period'=>$period,
+                'date'=>$date,
+                'desc'=>  $request->note,
+                'status'=>1,
+                'teacher_id'=>$user->id,
+                'image'=>$filename ,
+                'leave_type_id'=>$request->reason
+    
+            ]);
+
+            
+            $classRelated = DB::table('schedule_subject as ss')
+            ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+            ->join('schedules as s','s.id','sv.schedule_id')
+            ->where('ss.day',$date->dayOfWeek)
+            ->where('ss.teacher_in_charge',$user->id)
+            ->where('s.status',1)
+            ->where('sv.status',1)
+            ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
+            ->get();
+            
+            foreach($classRelated as $c){
+                if($request->isLeaveFullDay){
+                    $insert = DB::table('leave_relief')->insert([
+                        'teacher_leave_id'=>$leave_id,
+                        'schedule_subject_id'=>$c->schedule_subject_id,
+                        'status'=>1
+                    ]);
+                }else{
+                    $start = Carbon::createFromFormat('H:i:s', $request->start_time);
+                    $end = Carbon::createFromFormat('H:i:s', $request->end_time);
+                    $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+
+                    
+                    // check if the time is between start and end
+                    if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                        $insert = DB::table('leave_relief')->insert([
+                            'teacher_leave_id'=>$leave_id,
+                            'schedule_subject_id'=>$c->schedule_subject_id,
+                            'status'=>1
+                        ]);
+                    } 
+                }
+            }
+            $count = DB::table('leave_relief')->where('teacher_leave_id',$leave_id)->count();
+            return redirect()->back()->with('success','TeacherLeaveSuccess');
+            
+        }
+        return response()->json(['error' => 'This user did not exist'], 401);
      }
 }

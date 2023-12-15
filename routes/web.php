@@ -126,6 +126,8 @@ Route::group(['prefix' => 'schedule','namespace' => 'Schedule'], function () {
     Route::post('getReliefReport','ScheduleController@getReliefReport')->name('schedule.getReliefReport');
 
     Route::post('saveRelief','ScheduleController@saveRelief')->name('schedule.saveRelief');
+    Route::post('addTeacherLeave','ScheduleController@addTeacherLeave')->name('schedule.addTeacherLeave');
+    Route::post('getTeacherOfOrg','ScheduleController@getTeacherOfOrg')->name('schedule.getTeacherOfOrg');
 });
 Route::post('importSchedule', 'Schedule\ScheduleController@scheduleImport')->name('importSchedule');
 Route::post('importScheduleSubject', 'Schedule\ScheduleController@scheduleSubjectImport')->name('importScheduleSubject');

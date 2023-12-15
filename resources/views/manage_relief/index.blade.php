@@ -142,15 +142,24 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="" method="post" enctype="multipart/form-data">
+                    <form action="{{route('schedule.addTeacherLeave')}}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
+
+                            
                             <div class="form-group">
+
+                            <div class="form-group">
+                            <label>Teacher Name</label>
+                            <select name="selectedTeacher" id="selectedTeacher" class="form-control">
+                              
+                            </select>
+                            </div>
                             <div class="form-group">
                                 <label>Time of Leave</label>
-                                <input type="radio" name="timeOfLeave" id="fullday" onclick="displaySelectTime()" checked> Full Day
-                                <input type="radio" name="timeOfLeave" id="period" onclick="displaySelectTime()"> Period
+                                <input type="radio" name="isLeaveFullDay" id="fullday" onclick="displaySelectTime()" checked> Full Day
+                                <input type="radio" name="isLeaveFullDay2" id="period" onclick="displaySelectTime()"> Period
                             </div>
                             
                             <div id="selectTime" style="display: none;">
@@ -160,15 +169,14 @@
                                 </div>
                                 <div class="form-group" >
                                     <label>End Time</label>
-                                    <input type="time" name="starttime" id="endtime" class="form-control">
+                                    <input type="time" name="endtime" id="endtime" class="form-control">
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="reason">Reason</label>
                                 <select name="reason" id="reason" class="form-control">
-                                    <option value="mc">MC</option>
-                                    <option value="event">Event</option>
+                                
                                 </select>
                             </div>
 
@@ -205,31 +213,55 @@
 <script>   
     var dates = []
     $(document).ready(function() {
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
         $("#datepicker").datepicker("setDate", new Date());
         dateOnChange();
+
+        
+
+        $('#organization').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#reliefTable').DataTable().destroy();
+
+            $.ajax({
+                url: "{{ route('schedule.getTeacherOfOrg') }}",
+                type: 'POST',
+                data: {
+                    organization: $('#organization option:selected').val(),
+                },
+                success: function (response) {
+                    response.teachers.forEach(function(teacher){
+                        $('#selectedTeacher').append('<option value="' + teacher.teacher_id + '">' + teacher.name + '</option>');
+                    });
+
+                    response.leaveType.forEach(function(type){
+                        $('#reason').append('<option value="' + type.id + '">' + type.type + '</option>');
+                    });
+                }
+            });
+
+
+            // console.log(organizationid);
+            // fetch_data(organizationid);
+        });
 
         if ($("#organization").val() != "") {
             $("#organization").prop("selectedIndex", 1).trigger('change');
             // fetch_data($("#organization").val());
         }
 
-        $('#organization').change(function() {
-            var organizationid = $("#organization option:selected").val();
-            $('#reliefTable').DataTable().destroy();
-            // console.log(organizationid);
-            // fetch_data(organizationid);
-        });
-
         $('#sort').on('change', function () {
             autoSuggest();
         });
 
         // csrf token for ajax
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+       
 
         $('.alert').delay(3000).fadeOut();
 
