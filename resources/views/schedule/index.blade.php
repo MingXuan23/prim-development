@@ -343,10 +343,6 @@
 
         var scheduleTable;
         
-        if ($("#organization").val() != "") {
-            $("#organization").prop("selectedIndex", 1).trigger('change');
-        }
-
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('.organization_id').val(organizationid);
@@ -378,73 +374,11 @@
             });
         });
 
-//         $('#class').change(function() {
-//         var class_id = $("#class option:selected").val();
-//         var urlLink = '{{ route("schedule.getScheduleView", ":classId") }}';
-//         urlLink = urlLink.replace(':classId', class_id);
+        if ($("#organization").val() != "") {
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+        }
 
-//     $.ajax({
-//         url: urlLink,
-//         type: 'GET',
-//         success: function(response) {
-//             var slots = response.slots;
-//             var timeoff = response.time_off;
-//             console.log(timeoff);
-//             var maxDay = Math.max(...slots.map(slot => slot.day));
-//             var minDay = Math.min(...slots.map(slot => slot.day));
-//             var maxSlot = Math.max(...slots.map(slot => slot.slot));
-//             var minSlot = Math.min(...slots.map(slot => slot.slot));
-//             var weekday = [
-//                 'AHAD', 'ISNIN', 'SELASA', 'RABU', 'KHAMIS', 'JUMAAT', 'SABTU', 'AHAD',
-//             ];
-
-//             $('#scheduleTable tbody').empty();
-
-//             // Create rows for each day
-//             for (var dayIndex = minDay; dayIndex <= maxDay; dayIndex++) {
-//                 var row = $('<tr></tr>');
-//                 var daycell = $('<td></td>');
-//                 daycell.text(weekday[dayIndex]);
-//                 row.append(daycell);
-//                 // Create cells for each slot
-//                 for (var slotIndex = minSlot; slotIndex <= maxSlot; slotIndex++) {
-//                     var cell = $('<td></td>');
-//                     var slot = slots.find(s => s.day === dayIndex && s.slot === slotIndex);
-//                     var isBreak = timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day.find(d=>d ==dayIndex))) !== undefined;
-//                     //console.log(isBreak); 
-//                     if (slot) {
-//                         cell.text(slot.subject + ' - ' + slot.teacher);
-//                     }
-//                     else if(isBreak){
-                        
-//                         var text ='REHAT';
-//                         var break1 =timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day ==dayIndex));
-//                         if(break1?.desc){
-//                             text = break1.desc;
-//                         }
-//                         if(break1?.duration){
-//                             text += '\n'+break1.duration+' min'
-//                         }
-                        
-//                         cell.text(text);
-//                     }
-
-//                     row.append(cell);
-//                 }
-
-//                 $('#scheduleTable tbody').append(row);
-//             }
-//         },
-//         error: function(xhr, status, error) {
-//             console.log(error);
-//         }
-//     });
-// });
-
-$(document).ready(function () {
-    // ... (Your existing code)
-
-    $('#class').change(function () {
+        $('#class').change(function () {
         var class_id = $("#class option:selected").val();
         var urlLink = '{{ route("schedule.getScheduleView", ":classId") }}';
         urlLink = urlLink.replace(':classId', class_id);
@@ -530,13 +464,70 @@ $(document).ready(function () {
         return '';
     }
 
-});
+//         $('#class').change(function() {
+//         var class_id = $("#class option:selected").val();
+//         var urlLink = '{{ route("schedule.getScheduleView", ":classId") }}';
+//         urlLink = urlLink.replace(':classId', class_id);
 
+//     $.ajax({
+//         url: urlLink,
+//         type: 'GET',
+//         success: function(response) {
+//             var slots = response.slots;
+//             var timeoff = response.time_off;
+//             console.log(timeoff);
+//             var maxDay = Math.max(...slots.map(slot => slot.day));
+//             var minDay = Math.min(...slots.map(slot => slot.day));
+//             var maxSlot = Math.max(...slots.map(slot => slot.slot));
+//             var minSlot = Math.min(...slots.map(slot => slot.slot));
+//             var weekday = [
+//                 'AHAD', 'ISNIN', 'SELASA', 'RABU', 'KHAMIS', 'JUMAAT', 'SABTU', 'AHAD',
+//             ];
 
+//             $('#scheduleTable tbody').empty();
 
-    });
+//             // Create rows for each day
+//             for (var dayIndex = minDay; dayIndex <= maxDay; dayIndex++) {
+//                 var row = $('<tr></tr>');
+//                 var daycell = $('<td></td>');
+//                 daycell.text(weekday[dayIndex]);
+//                 row.append(daycell);
+//                 // Create cells for each slot
+//                 for (var slotIndex = minSlot; slotIndex <= maxSlot; slotIndex++) {
+//                     var cell = $('<td></td>');
+//                     var slot = slots.find(s => s.day === dayIndex && s.slot === slotIndex);
+//                     var isBreak = timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day.find(d=>d ==dayIndex))) !== undefined;
+//                     //console.log(isBreak); 
+//                     if (slot) {
+//                         cell.text(slot.subject + ' - ' + slot.teacher);
+//                     }
+//                     else if(isBreak){
+                        
+//                         var text ='REHAT';
+//                         var break1 =timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day ==dayIndex));
+//                         if(break1?.desc){
+//                             text = break1.desc;
+//                         }
+//                         if(break1?.duration){
+//                             text += '\n'+break1.duration+' min'
+//                         }
+                        
+//                         cell.text(text);
+//                     }
 
-    document.getElementById('select-all-days').addEventListener('change', function () {
+//                     row.append(cell);
+//                 }
+
+//                 $('#scheduleTable tbody').append(row);
+//             }
+//         },
+//         error: function(xhr, status, error) {
+//             console.log(error);
+//         }
+//     });
+// });
+
+document.getElementById('select-all-days').addEventListener('change', function () {
         var checkboxes = document.querySelectorAll('[name^="day"]');
         checkboxes.forEach(function (checkbox) {
             checkbox.checked = document.getElementById('select-all-days').checked;
@@ -550,5 +541,9 @@ $(document).ready(function () {
             document.getElementById('select-all-days').checked = false;
         });
     });
+
+
+    });
+
 </script>
 @endsection
