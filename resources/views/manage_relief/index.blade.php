@@ -158,7 +158,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Time of Leave</label>
-                                <input type="radio" name="isLeaveFullDay" id="fullday" onclick="displaySelectTime()" checked> Full Day
+                                <input type="radio" name="isLeaveFullDay" id="fullday" onclick="displaySelectTimeFull()" checked> Full Day
                                 <input type="radio" name="isLeaveFullDay2" id="period" onclick="displaySelectTime()"> Period
                             </div>
                             
@@ -179,7 +179,7 @@
                                 
                                 </select>
                             </div>
-
+                            <input type="hidden" name="date" value="" id="rowdate">
                             <div class="form-group">
                                 <label for="note">Note</label>
                                 <input type="text" name="note" id="note" placeholder="Enter your note here..." class="form-control">
@@ -266,7 +266,7 @@
         $('.alert').delay(3000).fadeOut();
 
         $('#datepicker').change(function() {
-        //    dateOnChange();
+            dateOnChange();
            fetchReliefData();
         })
         
@@ -456,10 +456,6 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
     
 }
 
-
-
-
-
     function autoSuggest(){
         var organization = $("#organization option:selected").val();
         var tableBody = $('#reliefTable tbody');
@@ -504,9 +500,12 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
         function dateOnChange() {
             let date_val = $('#datepicker').val(), timePicker = $('#timepicker'), timeRange = $('.time-range')
             let org_id = $('#organization option:selected').val()
-            // console.log(date_val)
+            
+             console.log(date_val)
+            $('#rowdate').val(date_val);
             if(date_val != '') {
                 $('.pickup-time-div').removeAttr('hidden')
+               
             } else {
                 $('.pickup-time-div').attr('hidden', true)
             }
@@ -527,15 +526,24 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
         var selectTimeDiv = document.getElementById('selectTime');
         var periodRadio = document.getElementById('period');
         var fulldayRadio = document.getElementById('fullday');
-
+        
         if (periodRadio.checked) {
             selectTimeDiv.style.display = 'block';
+            fulldayRadio.checked = false;
         } else {
             selectTimeDiv.style.display = 'none';
         }
 
+    }
+
+    function displaySelectTimeFull(){
+        var selectTimeDiv = document.getElementById('selectTime');
+        var periodRadio = document.getElementById('period');
+        var fulldayRadio = document.getElementById('fullday');
+
         if (fulldayRadio.checked) {
             selectTimeDiv.style.display = 'none';
+            periodRadio.checked = false;
         } else {
             selectTimeDiv.style.display = 'block';
         }
