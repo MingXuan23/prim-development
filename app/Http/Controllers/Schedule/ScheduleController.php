@@ -703,8 +703,9 @@ class ScheduleController extends Controller
                         ]);
                     }else{
                         //dd('false');
-                        $start = Carbon::createFromFormat('H:i:s', $request->start_time);
-                        $end = Carbon::createFromFormat('H:i:s', $request->end_time);
+                        $period = json_decode($leave->period);
+                        $start = Carbon::createFromFormat('H:i:s', $period->start_time);
+                        $end = Carbon::createFromFormat('H:i:s', $period->end_time);
                         $time_info=$this->getSlotTime($c,$c->day,$c->slot);
                         $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
 
@@ -712,7 +713,7 @@ class ScheduleController extends Controller
                         // check if the time is between start and end
                         if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
-                                'teacher_leave_id'=>$leave_id,
+                                'teacher_leave_id'=>$leave->id,
                                 'schedule_subject_id'=>$c->schedule_subject_id,
                                 'status'=>1
                             ]);
@@ -790,6 +791,8 @@ class ScheduleController extends Controller
      public function addTeacherLeave(Request $request){
         $period = new stdClass();
         $date = Carbon::createFromDate($request->date);
+
+        // dd($date,$request);
         //dd($date,$request->isLeaveFullDay);
         if($request->isLeaveFullDay == "on"){
             $period->fullday=true;
@@ -809,27 +812,29 @@ class ScheduleController extends Controller
         if(! DB::table('leave_type')->where('id',$request->reason)->exists()){
             return response()->json(['error' => 'Leave Type value error'], 401);
         }
-
+        //dd($request->starttime);
         if($user){
             //dd($request->start_time);
-        $existConflict =DB::table('teacher_leave')
-                ->where('date',$date)
-                ->where('status',1)
-                ->where('teacher_id',$user->id)
-                ->where(function ($query) use ($request) {
-                    $query->where('period->fullday',true)
+            $existConflict = DB::table('teacher_leave')
+            ->where('date', $date)
+            ->where('status', 1)
+            ->where('teacher_id', $user->id)
+            ->where(function ($query) use ($request) {
+                $query->where('period->fullday', true)
                     ->orWhere(function ($query) use ($request) {
-
-                        $query->where('period->fullday',false)
-                            // ->where('period->end_time', '>', $request->starttime)
-                            // ->where('period->start_time', '<', $request->endtime)
-                            ;
+                        if($request->starttime !=null && $request->endtime!=null){
+                            $query->where('period->fullday', false)
+                            ->where('period->end_time', '>', $request->starttime)
+                            ->where('period->start_time', '<', $request->endtime);
+                        }
+                       
                     });
-                })
-                ->exists();
+            })
+            ->exists();
        
         if($existConflict){
-             return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
+            return redirect()->back()->with('error','The selected time is conflict with the record before');
+            // return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
         }
        // $image = $request->input('image');
        $str = $user->id.'_' .Carbon::now()->toDateTimeString();
@@ -860,13 +865,13 @@ class ScheduleController extends Controller
             $classRelated = DB::table('schedule_subject as ss')
             ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
             ->join('schedules as s','s.id','sv.schedule_id')
-            ->where('ss.day',$date->dayOfWeek)
+            ->where('ss.day',$date->dayOfWeek==0?7:$date->dayOfWeek)
             ->where('ss.teacher_in_charge',$user->id)
             ->where('s.status',1)
             ->where('sv.status',1)
             ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
             ->get();
-            
+            //dd($classRelated,$date->dayOfWeek);
             foreach($classRelated as $c){
                 if($request->isLeaveFullDay){
                     $insert = DB::table('leave_relief')->insert([
@@ -875,8 +880,11 @@ class ScheduleController extends Controller
                         'status'=>1
                     ]);
                 }else{
-                    $start = Carbon::createFromFormat('H:i:s', $request->start_time);
-                    $end = Carbon::createFromFormat('H:i:s', $request->end_time);
+                    //dd($start, $end);
+
+                   //dd($request->starttime,$request->endtime);
+                    $start = Carbon::createFromFormat('H:i', $request->starttime);
+                    $end = Carbon::createFromFormat('H:i', $request->endtime);
                     $time_info=$this->getSlotTime($c,$c->day,$c->slot);
                     $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
 
