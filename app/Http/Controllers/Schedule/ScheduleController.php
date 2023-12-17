@@ -793,6 +793,8 @@ class ScheduleController extends Controller
         //dd($date,$request->isLeaveFullDay);
         if($request->isLeaveFullDay == "on"){
             $period->fullday=true;
+            $period->start_time= "";
+            $period->end_time="";
             
         }else{
             $period->fullday=false;
@@ -830,7 +832,7 @@ class ScheduleController extends Controller
              return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
         }
        // $image = $request->input('image');
-       $str = $user->name .Carbon::today()->format('Y-m-d') ;
+       $str = $user->id.'_' .Carbon::now()->toDateTimeString();
        $filename = null;
         if (!is_null($request->image)) {
             

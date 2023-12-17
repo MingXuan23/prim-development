@@ -342,7 +342,7 @@ class ScheduleApiController extends Controller
                  return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
             }
            // $image = $request->input('image');
-           $str = $user->name.'_' .Carbon::now()->toDateTimeString();
+           $str = $user->id.'_' .Carbon::now()->toDateTimeString();
            $filename = null;
             if (!is_null($request->image)) {
                 
