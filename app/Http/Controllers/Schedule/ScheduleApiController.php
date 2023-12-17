@@ -666,7 +666,7 @@ class ScheduleApiController extends Controller
 
         $report->reliefList =  DB::table('leave_relief as lr')
         ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
-        ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+        ->leftJoin ('schedule_version as sv','sv.id','ss.schedule_version_id')
         ->leftJoin('schedules as s','s.id','sv.schedule_id')
         ->leftJoin('classes as c','c.id','ss.class_id')
         ->leftJoin('subject as sub','sub.id','ss.subject_id')
