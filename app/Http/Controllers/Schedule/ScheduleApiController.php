@@ -308,6 +308,8 @@ class ScheduleApiController extends Controller
             
             if($request->isLeaveFullDay == "true"){
                 $period->fullday=true;
+                $period->start_time= "";
+                $period->end_time="";
             }else{
                 $period->fullday=false;
                 $period->start_time= $request->start_time;
@@ -340,7 +342,7 @@ class ScheduleApiController extends Controller
                  return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
             }
            // $image = $request->input('image');
-           $str = $user->name .Carbon::today()->format('Y-m-d') ;
+           $str = $user->name.'_' .Carbon::now()->toDateTimeString();
            $filename = null;
             if (!is_null($request->image)) {
                 
