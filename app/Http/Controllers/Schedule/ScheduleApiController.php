@@ -264,7 +264,7 @@ class ScheduleApiController extends Controller
                 ->join('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                 ->where('lr.replace_teacher_id',$user->id)
                 ->where('lr.confirmation',"Pending")
-                ->where('tl.status',1)
+                ->where('lr.status',1)
                 ->where('tl.date','>=',Carbon::today())
                 ->count();
 
@@ -306,8 +306,10 @@ class ScheduleApiController extends Controller
             $period = new stdClass();
             $date = Carbon::createFromDate($request->date);
             
-            if($request->isLeaveFullDay){
+            if($request->isLeaveFullDay == "true"){
                 $period->fullday=true;
+                $period->start_time= "";
+                $period->end_time="";
             }else{
                 $period->fullday=false;
                 $period->start_time= $request->start_time;
@@ -340,7 +342,7 @@ class ScheduleApiController extends Controller
                  return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
             }
            // $image = $request->input('image');
-           $str ='Image';
+           $str = $user->id.'_' .Carbon::now()->toDateTimeString();
            $filename = null;
             if (!is_null($request->image)) {
                 
@@ -359,7 +361,8 @@ class ScheduleApiController extends Controller
                     'desc'=>  $request->desc,
                     'status'=>1,
                     'teacher_id'=>$user->id,
-                    'image'=>$filename 
+                    'image'=>$filename ,
+                    'leave_type_id'=>$request->leave_type
         
                 ]);
 
@@ -378,7 +381,8 @@ class ScheduleApiController extends Controller
                     if($request->isLeaveFullDay){
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
-                            'schedule_subject_id'=>$c->schedule_subject_id
+                            'schedule_subject_id'=>$c->schedule_subject_id,
+                            'status'=>1
                         ]);
                     }else{
                         $start = Carbon::createFromFormat('H:i:s', $request->start_time);
@@ -500,11 +504,11 @@ class ScheduleApiController extends Controller
         if($school){
             $pendingRelief = DB::table('leave_relief as lr')
             ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
-            ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+            ->leftJoin ('schedule_version as sv','sv.id','ss.schedule_version_id')
             ->leftJoin('schedules as s','s.id','sv.schedule_id')
             ->leftJoin('classes as c','c.id','ss.class_id')
             ->leftJoin('subject as sub','sub.id','ss.subject_id')
-            ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+            ->leftJoin('users as u','u.id','lr.replace_teacher_id')
             ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
             ->where('s.organization_id',$school->id)
             ->where('lr.replace_teacher_id',$user->id)
@@ -514,7 +518,7 @@ class ScheduleApiController extends Controller
             ->where('tl.status',1)
             ->select('lr.id as leave_relief_id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
-
+            //dd($pendingRelief);
 
                 foreach($pendingRelief as $r){
                     //if(isset($s->duration)){
@@ -576,25 +580,33 @@ class ScheduleApiController extends Controller
                     'Confirmation'=>$request->response,
                     'desc'=>$request->desc
                 ]);
+
+                $duplicate_row = DB::table('leave_relief')->where('id',$request->leave_relief_id)->first();
+                $organization =DB::table('schedule_subject as ss')
+                ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+                ->join('schedules as s','s.id','sv.schedule_id')
+                ->where('ss.id',$duplicate_row->schedule_subject_id)
+                ->select('s.organization_id as id')->first();
+                
+        $admin_id =DB::table('organization_user as ou')
+        ->where('ou.organization_id',$organization->id)
+        ->whereIn('ou.role_id',[2,4,7,20])
+        ->select('ou.user_id')
+        ->distinct()
+        ->get();
+
+       //dd($admin_id);
+        $notification='';
+        //dd($notification,$request->repsonse);
         if($request->response =='Rejected'){
-            $duplicate_row = DB::table('leave_relief')->where('id',$request->leave_relief_id)->first();
+           
             $insert = DB::table('leave_relief')->insert([
                 'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
-                'schedule_subject_id'=>$duplicate_row->schedule_subject_id
+                'schedule_subject_id'=>$duplicate_row->schedule_subject_id,
+                'status'=>1
+
             ]); //generate new record for admin
 
-            $organization =DB::table('schedule_subject as ss')
-                            ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
-                            ->join('schedules as s','s.id','sv.schedule_id')
-                            ->where('ss.id',$duplicate_row->schedule_subject_id)
-                            ->select('s.organization_id as id')->first();
-
-            $admin_id =DB::table('organization_user as ou')
-                        ->where('ou.organization_id',$organization->id)
-                        ->whereIn('ou.role_id',[2,4,7,20])
-                        ->select('ou.user_id')
-                        ->distinct()
-                        ->get();
             //dd($admin_id);
             foreach($admin_id as $a){
                 $msg =$user->name.' rejected the relief ';
@@ -604,10 +616,37 @@ class ScheduleApiController extends Controller
                 //dd($msg);
                 $notification =$this->sendNotification($a->user_id,'Your action is required',$msg );
             }
+            //dd($notification);
 
         }
+        else if ($request->response == "Confirmed"){
 
-        return response()->json(['result'=>$update,'noti'=>$notification]);
+           // dd($notification,$request->repsonse);
+
+            $count = DB::table('leave_relief as lr')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                    ->leftJoin ('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+                    ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+                    ->leftJoin('schedules as s','s.id','sv.schedule_id')
+                    ->where('lr.confirmation','Pending')
+                    ->where('lr.status',1)
+                    ->where('sv.status',1)
+                    ->where('s.status',1)
+                    ->where('s.organization_id',$organization->id)
+                    ->where('tl.date',Carbon::today())
+                    ->distinct()
+                    ->count('lr.id');
+
+            foreach($admin_id as $a){
+                $msg ='There is '.$count.' pending relief not been resolved yet.';
+               
+                //dd($msg);
+                $notification =$this->sendNotification($a->user_id,$user->name.' accept the relief.',$msg );
+            }
+           // dd($notification);
+        }
+
+        return response()->json(['result'=>$update]);
     }
 
     public function getHistory($user_id)
@@ -667,6 +706,7 @@ class ScheduleApiController extends Controller
                         ->where('lr.status',1)
                         //->where('lr.confirmation','<>','Rejected')
                         ->select('u.name as relief_teacher','s.name as subject','c.nama as class','ss.slot','lr.confirmation')
+                        ->orderBy('ss.slot')
                         ->get()
                         ->map(function ($item) {
                             // Check if confirmation is not confirmed

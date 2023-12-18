@@ -34,20 +34,22 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Auto Suggestion Sort By:</label>
-                    <select name="sort" id="sort" class="form-control">
-                        <option value="" selected disabled>Sort By</option>
-                        <option value="workload">Beban Guru</option>
-                        <option value="class">Kelas</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
                     <label>Tarikh</label>
                     <input type="text" value="" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
                 </div>
 
-                <a style="margin: 19px; float: right;" onclick="autoSuggest()" class="btn btn-primary"> <i class="fas fa-plus"></i> Auto Suggestion</a>
+                <div class="form-group">
+                    <label>Auto Suggestion Sort By:</label>
+                    <select name="sort" id="sort" class="form-control">
+                        <option value="0" selected disabled>Sort By</option>
+                        <option value="Beban Guru">Beban Guru</option>
+                        <option value="Kelas">Kelas</option>
+                    </select>
+                </div>
+
+               
+
+                <!-- <a style="margin: 19px; float: right;" onclick="autoSuggest()" class="btn btn-primary"> <i class="fas fa-plus"></i> Auto Suggestion</a> -->
             </div>
 
             {{-- <div class="">
@@ -109,13 +111,22 @@
                         <i class="fas fa-plus"></i> Add Row
                     </a>
                 </div>
+
+               
                 <div class="row">
-                    <a style="margin: 10px;" class="btn btn-danger">
+                    <!-- <a style="margin: 10px;" class="btn btn-danger">
                         <i class="fas fa-plus"></i> Discard
-                    </a>
-                    <a style="margin: 10px;" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Confirm
-                    </a>
+                    </a> -->
+
+                    <form action="{{route('schedule.saveRelief')}}" method="post" id="commitReliefForm">
+                        @csrf 
+                        <input type="hidden" name="commitRelief" id="commitReliefInput">
+                        <input type="hidden" name="organization" id="commitReliefOrg">
+                        <a style="margin: 10px;" class="btn btn-success" onclick="saveRelief()">
+                            <i class="fas fa-plus"></i> Confirm and Notify Related Teachers
+                        </a>
+                    </form>
+                   
                 </div>
 
             </div>
@@ -131,15 +142,24 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="" method="post" enctype="multipart/form-data">
+                    <form action="{{route('schedule.addTeacherLeave')}}" method="post" enctype="multipart/form-data">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
+
+                            
                             <div class="form-group">
+
+                            <div class="form-group">
+                            <label>Teacher Name</label>
+                            <select name="selectedTeacher" id="selectedTeacher" class="form-control">
+                              
+                            </select>
+                            </div>
                             <div class="form-group">
                                 <label>Time of Leave</label>
-                                <input type="radio" name="timeOfLeave" id="fullday" onclick="displaySelectTime()" checked> Full Day
-                                <input type="radio" name="timeOfLeave" id="period" onclick="displaySelectTime()"> Period
+                                <input type="radio" name="isLeaveFullDay" id="fullday" onclick="displaySelectTimeFull()" checked> Full Day
+                                <input type="radio" name="isLeaveFullDay2" id="period" onclick="displaySelectTime()"> Period
                             </div>
                             
                             <div id="selectTime" style="display: none;">
@@ -149,18 +169,17 @@
                                 </div>
                                 <div class="form-group" >
                                     <label>End Time</label>
-                                    <input type="time" name="starttime" id="endtime" class="form-control">
+                                    <input type="time" name="endtime" id="endtime" class="form-control">
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="reason">Reason</label>
                                 <select name="reason" id="reason" class="form-control">
-                                    <option value="mc">MC</option>
-                                    <option value="event">Event</option>
+                                
                                 </select>
                             </div>
-
+                            <input type="hidden" name="date" value="" id="rowdate">
                             <div class="form-group">
                                 <label for="note">Note</label>
                                 <input type="text" name="note" id="note" placeholder="Enter your note here..." class="form-control">
@@ -194,32 +213,60 @@
 <script>   
     var dates = []
     $(document).ready(function() {
-        $("#datepicker").datepicker("setDate", new Date());
-        dateOnChange();
 
-        if ($("#organization").val() != "") {
-            $("#organization").prop("selectedIndex", 1).trigger('change');
-            // fetch_data($("#organization").val());
-        }
-
-        $('#organization').change(function() {
-            var organizationid = $("#organization option:selected").val();
-            $('#reliefTable').DataTable().destroy();
-            // console.log(organizationid);
-            // fetch_data(organizationid);
-        });
-
-        // csrf token for ajax
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
 
+        $("#datepicker").datepicker("setDate", new Date());
+        dateOnChange();
+
+        
+
+        $('#organization').change(function() {
+            var organizationid = $("#organization option:selected").val();
+            $('#reliefTable').DataTable().destroy();
+
+            $.ajax({
+                url: "{{ route('schedule.getTeacherOfOrg') }}",
+                type: 'POST',
+                data: {
+                    organization: $('#organization option:selected').val(),
+                },
+                success: function (response) {
+                    response.teachers.forEach(function(teacher){
+                        $('#selectedTeacher').append('<option value="' + teacher.teacher_id + '">' + teacher.name + '</option>');
+                    });
+
+                    response.leaveType.forEach(function(type){
+                        $('#reason').append('<option value="' + type.id + '">' + type.type + '</option>');
+                    });
+                }
+            });
+
+
+            // console.log(organizationid);
+            // fetch_data(organizationid);
+        });
+
+        if ($("#organization").val() != "") {
+            $("#organization").prop("selectedIndex", 1).trigger('change');
+            // fetch_data($("#organization").val());
+        }
+
+        $('#sort').on('change', function () {
+            autoSuggest();
+        });
+
+        // csrf token for ajax
+       
+
         $('.alert').delay(3000).fadeOut();
 
         $('#datepicker').change(function() {
-        //    dateOnChange();
+            dateOnChange();
            fetchReliefData();
         })
         
@@ -244,44 +291,10 @@
             defaultDate: 0, 
         })
 
-        // function displayRelief(reliefData) {
-        //     var tableBody = $('#reliefTable tbody');
-        //     tableBody.empty(); // Clear existing data
+       
 
-        //     // Iterate through reliefData and append rows
-        //     reliefData.forEach(function (relief, index) {
-        //         var row = $('<tr></tr>');
-        //         row.append('<td>' + (index + 1) + '</td>');
-        //         row.append('<td>' + relief.class_name + '</td>');
-        //         row.append('<td>' + relief.subject + '</td>');
-        //         row.append('<td>' + relief.slot + '</td>');
-        //         row.append('<td>' + relief.leave_teacher + '</td>');
-        //         row.append('<td>' + relief.desc + '</td>');
-        //         // row.append('<td><select class="form-control assign_teacher"><option>' + relief.relief_teacher + '</option></select></td>');
-                
-        //         // Check if relief_teacher is null, display "No Teacher" as the option
-        //         var reliefTeacherOption = relief.relief_teacher ? relief.relief_teacher : 'No Teacher';
-
-        //         // Use the ternary operator to set the selected attribute based on the condition
-        //         var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id+'-'+relief.schedule_subject_id + '"><option selected>' + reliefTeacherOption + '</option></select></td>');
-
-        //         row.append(selectColumn);
-
-        //         tableBody.append(row);
-        //     });
-        //     tableBody.on('mousedown', '.assign_teacher', function () {
-        //         var selectedIndex = $(this).data('index');
-        //         var resultArray = selectedIndex.split('-');
-        //         var schedule_subject_id = resultArray[0];
-        //         var selectedTeacher = $(this).val();
-        //         // Call your function before the value changes
-        //         assignTeacher(schedule_subject_id, selectedTeacher);
-        //     });
-
-        // }
-
-        function assignTeacher(schedule_subject_id, teacher) {
-            console.log('Selected teacher for row ' + (schedule_subject_id) + ': ' + teacher);
+        function assignTeacher(leave_relief_id) {
+           // console.log('Selected teacher for row ' + (schedule_subject_id) + ': ' + teacher);
 
             // Make an AJAX request to get available teachers for the selected slot
             $.ajax({
@@ -290,13 +303,14 @@
                 data: {
                     organization: $('#organization option:selected').val(),
                     date: $('#datepicker').val(),
-                    schedule_subject_id: schedule_subject_id
+                    leave_relief_id: leave_relief_id
                 },
                 success: function (response) {
                     console.log(response);
 
                     // Update the combo box that selects the teacher
-                    updateTeacherComboBox(schedule_subject_id, response.free_teacher_list);
+                    updateTeacherComboBox(leave_relief_id, response.free_teacher_list);
+                    
                     // console.log(response.free_teacher_list);
                     // Additional logic if needed
                 },
@@ -309,44 +323,85 @@
             // You can make an AJAX request to update the server or perform other actions
         }
 
-        function displayRelief(reliefData, response) {
-            console.log('Relief Data:', reliefData);
-            console.log('Available Teachers:', response);
 
+        function saveRelief(){
             var tableBody = $('#reliefTable tbody');
-            tableBody.empty();
+            var assignTeacherElements = tableBody.find('.assign_teacher');
 
-            reliefData.forEach(function (relief, index) {
-                var row = $('<tr></tr>');
-                row.append('<td>' + (index + 1) + '</td>');
-                row.append('<td>' + relief.class_name + '</td>');
-                row.append('<td>' + relief.subject + '</td>');
-                row.append('<td>' + relief.slot + '</td>');
-                row.append('<td>' + relief.leave_teacher + '</td>');
-                if (relief.desc !== null) {
+            let commitRelief = []; 
+            assignTeacherElements.each(function(index, element) {
+                        var leave_relief = $(this).attr('data-index');
+                        // Use direct property access instead of split
+                        var teacher = $(this).val();
+                        if(teacher == 0 || teacher ==null) 
+                            return true;
+                            commitRelief.push(leave_relief+'-'+teacher);
+                    });
+
+            if(commitRelief.length ==0)
+            {
+                alert('No update be make');
+                return;
+            }
+            console.log(commitRelief);
+            let commitReliefOrg = $('#organization option:selected').val();
+            $('#commitReliefInput').val(JSON.stringify(commitRelief));
+            $('#commitReliefOrg').val(commitReliefOrg);
+            $('#commitReliefForm').submit();
+        }
+
+
+        function displayRelief(reliefData) {
+        console.log('Relief Data:', reliefData);
+
+                var tableBody = $('#reliefTable tbody');
+                tableBody.empty();
+
+                reliefData.forEach(function (relief, index) {
+                    var row = $('<tr></tr>');
+                    row.append('<td>' + (index + 1) + '</td>');
+                    row.append('<td>' + relief.class_name + '</td>');
+                    row.append('<td>' + relief.subject + '</td>');
+                    row.append('<td>' + relief.slot + '</td>');
+                    row.append('<td>' + relief.leave_teacher + '</td>');
+                    if (relief.desc !== null) {
                     row.append('<td>' + relief.desc + '</td>');
                 }else{
                     row.append('<td></td>');
                 }
 
-                // Append the select box with options
-                var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + index + '"></select></td>');
-                var selectElement = selectColumn.find('select');
+        // Append the select box with options
+        var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  + '" schedule_subject_id="'+relief.schedule_subject_id+'"></select></td>');
 
-                // Call the updated function to populate the select box options
-                updateTeacherComboBox(index, response.original.free_teacher_list);
+        var selectElement = selectColumn.find('select');
 
-                row.append(selectColumn);
-                tableBody.append(row);
-            });
+        // Call the updated function to populate the select box options
+       //git  updateTeacherComboBox(index, response.original.free_teacher_list);
 
-            tableBody.on('mousedown', '.assign_teacher', function () {
-                var selectedIndex = $(this).data('index');
+        row.append(selectColumn);
+        tableBody.append(row);
+    });
+
+            var assignTeacherElements = tableBody.find('.assign_teacher');
+
+// Loop through each found element
+assignTeacherElements.each(function(index, element) {
+            var selectedIndex = $(this).attr('data-index');
             // Use direct property access instead of split
-            var schedule_subject_id = selectedIndex;
-            var selectedTeacher = $(this).val();
-            assignTeacher(schedule_subject_id, selectedTeacher);
-            });
+            var leave_relief_id = selectedIndex;
+            assignTeacher(leave_relief_id);
+    
+    // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
+});
+autoSuggest();
+
+    // tableBody.on('mousedown', '.assign_teacher', function () {
+    //     var selectedIndex = $(this).data('index');
+    // // Use direct property access instead of split
+    // var schedule_subject_id = selectedIndex;
+            // var selectedTeacher = $(this).val();
+            // assignTeacher(schedule_subject_id, selectedTeacher);
+            // });
         }
 
 // Call fetchReliefData with the corrected success function
@@ -367,7 +422,7 @@ function fetchReliefData() {
         },
         success: function (response) {
             console.log(response);
-            displayRelief(response.pending_relief, response.available_teachers);
+            displayRelief(response.pending_relief);
         },
         error: function (xhr, status, error) {
             console.error(error);
@@ -376,16 +431,16 @@ function fetchReliefData() {
 }
 
 
-function updateTeacherComboBox(schedule_subject_id, availableTeachers) {
-    console.log('Received availableTeachers:', availableTeachers);
+function updateTeacherComboBox(leave_relief_id,availableTeachers) {
 
     // Find the select box associated with the given schedule_subject_id
-    var selectBox = $('.assign_teacher[data-index="' + schedule_subject_id + '"]');
+    var selectBox = $('.assign_teacher[data-index="' + leave_relief_id + '"]');
 
     // Clear existing options
     selectBox.empty();
 
-    // Check if availableTeachers is defined
+    //Check if availableTeachers is defined
+    selectBox.append('<option selected disabled >No Teacher</option>');
     if (availableTeachers) {
         // If availableTeachers is an object, extract the array
         var teachersArray = Array.isArray(availableTeachers) ? availableTeachers : availableTeachers.free_teacher_list;
@@ -397,21 +452,25 @@ function updateTeacherComboBox(schedule_subject_id, availableTeachers) {
                 selectBox.append('<option value="' + teacher.id + '">' + teacher.name + '</option>');
             });
         }
-    } else {
-        selectBox.append('<option selected>No Teacher</option>');
-        console.warn('The availableTeachers object is empty or not in the expected format:', availableTeachers);
-        // Log a warning or handle the empty case as needed
     }
+    
 }
 
-
-
-
-
-        function autoSuggest(){
+    function autoSuggest(){
         var organization = $("#organization option:selected").val();
-        var pendingRelief = ['1-1','2-2']; //get from each row and format it, 'leave_relief_id-schedule_subject_id'
-        var criteria = 'class_in_week'; //drop down select
+        var tableBody = $('#reliefTable tbody');
+        var assignTeacherCombobox = tableBody.find('.assign_teacher');
+        let pendingRelief = []; 
+        assignTeacherCombobox.each(function (index, relief){
+        // There's a typo in 'schedule_subvject_id'. It should be 'schedule_subject_id'
+            var ss_id = $(relief).attr('schedule_subject_id');
+            var lr_id = $(relief).attr('data-index');
+
+            // There's a typo in 'ss.id'. It should be 'ss_id'
+            pendingRelief.push(lr_id+'-'+ss_id);
+        });
+        console.log(pendingRelief)//get from each row and format it, 'leave_relief_id-schedule_subject_id'
+        var criteria =  $('#sort').val();
        
         $.ajax({
                 url: "{{route('schedule.autoSuggestRelief')}}",
@@ -419,10 +478,18 @@ function updateTeacherComboBox(schedule_subject_id, availableTeachers) {
                 data: {
                     organization: organization, 
                     pendingRelief: pendingRelief, 
-                    criteria: criteria
+                    criteria: criteria,
+                    date: $('#datepicker').val(),
                 },
                 success: function(response) {
-                    console.log(response); //update the combo box that select the teacher
+                    console.log(response);
+                     response.relief_draft.forEach(function(draft,index){
+                        //var combobox = assignTeacherCombobox.has("[data-index='"+draft.leave_relief_id+"']");
+                        var combobox = $('.assign_teacher[data-index="'+draft.leave_relief_id+'"]');
+                        //combobox.val('17478');
+                        combobox.val(draft.teacher_id)
+                        console.log(draft.teacher_id)
+                     })
                 },
                 error: function(xhr, status, error) {
                     console.log(error);
@@ -431,14 +498,17 @@ function updateTeacherComboBox(schedule_subject_id, availableTeachers) {
         }
 
         function dateOnChange() {
-        let date_val = $('#datepicker').val(), timePicker = $('#timepicker'), timeRange = $('.time-range')
-        let org_id = $('#organization option:selected').val()
-        // console.log(date_val)
-        if(date_val != '') {
-            $('.pickup-time-div').removeAttr('hidden')
-        } else {
-            $('.pickup-time-div').attr('hidden', true)
-        }
+            let date_val = $('#datepicker').val(), timePicker = $('#timepicker'), timeRange = $('.time-range')
+            let org_id = $('#organization option:selected').val()
+            
+             console.log(date_val)
+            $('#rowdate').val(date_val);
+            if(date_val != '') {
+                $('.pickup-time-div').removeAttr('hidden')
+               
+            } else {
+                $('.pickup-time-div').attr('hidden', true)
+            }
         }
 
     var disabledDates = dates
@@ -456,15 +526,24 @@ function updateTeacherComboBox(schedule_subject_id, availableTeachers) {
         var selectTimeDiv = document.getElementById('selectTime');
         var periodRadio = document.getElementById('period');
         var fulldayRadio = document.getElementById('fullday');
-
+        
         if (periodRadio.checked) {
             selectTimeDiv.style.display = 'block';
+            fulldayRadio.checked = false;
         } else {
             selectTimeDiv.style.display = 'none';
         }
 
+    }
+
+    function displaySelectTimeFull(){
+        var selectTimeDiv = document.getElementById('selectTime');
+        var periodRadio = document.getElementById('period');
+        var fulldayRadio = document.getElementById('fullday');
+
         if (fulldayRadio.checked) {
             selectTimeDiv.style.display = 'none';
+            periodRadio.checked = false;
         } else {
             selectTimeDiv.style.display = 'block';
         }

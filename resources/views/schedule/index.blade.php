@@ -298,9 +298,19 @@
                                 <label>Description</label>
                                 <textarea class="form-control" name="desc" id="desc" cols="30" rows="3" placeholder="Description"></textarea>
                             </div>
-                            <input type="hidden" name="organization_id" class="organization_id" value="0">
+
                             <div class="form-group">
-                                <input type="file" name="file" required>
+                            <input type="radio"  name="new_version" value="1" checked>
+                            <label for="html">Add as new version</label><br>
+                            <input type="radio"  name="new_version" value="0">
+                            <label for="css">Continue with current version (Exist data will not be overwritten)</label><br>
+
+                           
+                            </div>
+                            <div class="form-group">
+                                <input type="file" name="file" required><br>
+                                <input type="checkbox"  name="autoInsert">
+                            <label >Automatic insert data of class, teacher and subject if not exist</label>
                             </div>
 
                             <div class="modal-footer">
@@ -463,35 +473,36 @@ $(document).ready(function () {
                 }
                 $('#scheduleTable thead').append(timeRow);
 
-                $('#scheduleTable tbody').empty();
-                // Create rows for each day
-                for (var dayIndex = minDay; dayIndex <= maxDay; dayIndex++) {
-                    var row = $('<tr></tr>');
-                    var daycell = $('<td></td>');
-                    daycell.text(weekday[dayIndex]);
-                    row.append(daycell);
-                    // Create cells for each slot
-                    for (var slotIndex = minSlot; slotIndex <= maxSlot; slotIndex++) {
-                        var cell = $('<td></td>');
-                        var slot = slots.find(s => s.day === dayIndex && s.slot === slotIndex);
-                        var isBreak = timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day.find(d=>d ==dayIndex))) !== undefined;
-                        //console.log(isBreak); 
-                        if (slot) {
-                            cell.text(slot.subject + ' - ' + slot.teacher);
+            $('#scheduleTable tbody').empty();
+
+            // Create rows for each day
+            for (var dayIndex = minDay; dayIndex <= maxDay; dayIndex++) {
+                var row = $('<tr></tr>');
+                var daycell = $('<td></td>');
+                daycell.text(weekday[dayIndex]);
+                row.append(daycell);
+                // Create cells for each slot
+                for (var slotIndex = minSlot; slotIndex <= maxSlot; slotIndex++) {
+                    var cell = $('<td></td>');
+                    var slot = slots.find(s => s.day === dayIndex && s.slot === slotIndex);
+                    var isBreak = timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day.find(d=>d ==dayIndex))) !== undefined;
+                    //console.log(isBreak); 
+                    if (slot) {
+                        cell.text(slot.subject + ' - ' + slot.teacher);
+                    }
+                    else if(isBreak){
+                        
+                        var text ='REHAT';
+                        var break1 =timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day ==dayIndex));
+                        if(break1?.desc){
+                            text = break1.desc;
                         }
-                        else if(isBreak){
-                            
-                            var text ='REHAT';
-                            var break1 =timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day ==dayIndex));
-                            if(break1?.desc){
-                                text = break1.desc;
-                            }
-                            if(break1?.duration){
-                                text += '\n'+break1.duration+' min'
-                            }
-                            
-                            cell.text(text);
+                        if(break1?.duration){
+                            text += '\n'+break1.duration+' min'
                         }
+                        
+                        cell.text(text);
+                    }
 
                         row.append(cell);
                     }
