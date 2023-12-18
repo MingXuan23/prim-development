@@ -66,7 +66,7 @@ $fields = array(
 						'fpx_version' => urlencode($fpx_version)
 				);
 $response_value=array();
-dd($fields);
+
 try{
 //url-ify the data for the POST
 foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
