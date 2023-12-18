@@ -156,7 +156,7 @@
 
 $(document).ready(function() {    
   $('.navbar-header > div:first-child()').after(`
-        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
     `);
     $.ajaxSetup({
         headers: {
@@ -195,7 +195,7 @@ $(document).ready(function() {
                         render: function(data, type, row) {
                           for(var i = 0; i< result.roomImages.length; i++) {
                             if(data == result.roomImages[i].roomid){
-                              return `<img src="${result.roomImages[i].image_path}" alt="Image of Homestay/Room" class="img-homestay">`;
+                              return `<img src=" {{URL('${result.roomImages[i].image_path}')}}" alt="Image of Homestay/Room" class="img-homestay">`;
                             }
                           }
                         },

@@ -156,7 +156,7 @@
                         @foreach($images as $image)
                         <div>
                             <button id="btn-delete-image" type="button"><i class="fas fa-times"></i></button>
-                            <img src="../{{$image->image_path}}"  class="img-thumbnail" id="img-preview">
+                            <img src="{{URL('../'.$image->image_path)}}"  class="img-thumbnail" id="img-preview">
                             <input type="file" name="image[]" id="{{$image->id}}" class="original_images" accept=".jpg,.jpeg,.png" hidden>                            
                         </div>
                        
@@ -198,7 +198,7 @@
 
 $(document).ready(function () {
     $('.navbar-header > div:first-child()').after(`
-        <img src="../assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
     `);
     // function toggleRoomNoInput() {
     //         if ($('#room').is(':checked')) {

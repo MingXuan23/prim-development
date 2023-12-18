@@ -27,11 +27,11 @@
         <h3 class="color-purple"><span><a href="{{route('homestay.homePage')}}" class="color-dark-purple" target="_self"><i class="fas fa-home"></i> Laman Utama >> </a></span>{{$room->roomname}}</h3>
         <h5 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->address}}, {{$room->area}}, {{$room->postcode}}, {{$room->district}}, {{$room->state}}</h5>
             <div class="gallery-container">
-                <img src="../{{$roomImages[0]}}" id="first-gallery-image" alt="Room Image">
+                <img src="{{URL('../' . $roomImages[0])}}" id="first-gallery-image" alt="Room Image">
                 <div class="inner-gallery-container">
                     @for ($i = 1; $i < 5; $i++)
                         @if($roomImages[$i] != null)
-                                <img src="../{{$roomImages[$i]}}" alt="Room Image">
+                                <img src="{{URL('../' . $roomImages[$i])}}" alt="Room Image">
                         @endif
                     @endfor                    
                 </div>
@@ -70,8 +70,8 @@
                             <label for="book-room">Masukkan Jumlah Unit (Max: {{$room->room_no}})</span>
                         </div>   
                         <div class="d-flex justify-content-center align-items-center mb-2">
-                            <button type="button" id="btn-fetch-dates">
-                                <span id="btn-fetch-dates-content">Cari Slot Tempahan</span> 
+                            <button type="button" class="btn-gallery" id="btn-fetch-dates">
+                                <span class="btn-gallery-content">Cari Slot Tempahan</span> 
                             </button>                             
                         </div>
                            
@@ -180,8 +180,8 @@
                 <div class="modal-body">
                     @foreach($roomImages as $roomImage)
                     <div class="thumb">
-                        <a href="../{{$roomImage}}" class="fancybox" rel="lightbox">
-                            <img  src="../{{$roomImage}}" class="zoom"  alt="">
+                        <a href="{{URL('../'. $roomImage)}}" class="fancybox" rel="lightbox">
+                            <img  src="{{URL('../'. $roomImage)}}" class="zoom"  alt="">
                         </a>
                     </div>
                     @endforeach
@@ -214,7 +214,7 @@
 <script>
 $(document).ready(function() {    
     $('.navbar-header > div:first-child()').after(`
-        <img src="../assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
     `);
     $(".fancybox").fancybox({
         openEffect: "none",

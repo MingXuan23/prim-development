@@ -110,7 +110,7 @@
 <script>
 $(document).ready(function() {
   $('.navbar-header > div:first-child()').after(`
-        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
     `);
   $.ajaxSetup({
         headers: {
@@ -205,7 +205,7 @@ $(document).ready(function() {
                     },
                     { 
                       data: 'bookingid', render: function(data) {
-                        return `<button class="btn btn-primary" id="btn-checkout" data-booking-id="${data}">Daftar Keluar</a>`;
+                        return `<button class="btn btn-primary" id="btn-checkout" data-booking-id="${data}">Daftar Keluar</button>`;
                       },
                       orderable: false,
                       searchable: false, 

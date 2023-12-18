@@ -195,7 +195,7 @@
 
 $(document).ready(function () {
     $('.navbar-header > div:first-child()').after(`
-        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
     `);
         function toggleRoomNoInput() {
             if ($('#room').is(':checked')) {

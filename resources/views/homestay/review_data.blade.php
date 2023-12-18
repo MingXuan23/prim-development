@@ -17,7 +17,7 @@
                 @if($customerReview->review_images != null)
                     <div class="img-review-container">
                         @foreach(json_decode($customerReview->review_images) as $key => $reviewImage)
-                            <img src="../{{$reviewImage}}" alt="Customer Review Image" class="img-review" data-counter="{{$key}}">
+                            <img src="{{URL('../'.$reviewImage)}}" alt="Customer Review Image" class="img-review" data-counter="{{$key}}">
                         @endforeach
                     </div>
                 @endif

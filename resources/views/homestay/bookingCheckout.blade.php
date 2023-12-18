@@ -124,7 +124,7 @@
               <h4>{{$checkoutDetails['homestay']->roomname}}</h4>
               <div class="row">
                 <div class="col-md-4">
-                  <img src="{{$checkoutDetails['homestayImage']}}" alt="Image Thumbnail" class="img-fluid d-block mx-auto">
+                  <img src="{{URL($checkoutDetails['homestayImage'])}}" alt="Image Thumbnail" class="img-fluid d-block mx-auto">
                 </div>
                 <div class="col-md-8">
                   <h6 class="color-dark-purple mb-1"><span><i class="fas fa-map-marker-alt"></i></span> {{$checkoutDetails['homestay']->address}}, {{$checkoutDetails['homestay']->area}}, {{$checkoutDetails['homestay']->postcode}}, {{$checkoutDetails['homestay']->district}}, {{$checkoutDetails['homestay']->state}}</h6>
@@ -202,7 +202,7 @@
 <script>
   $(document).ready(function(){
     $('.navbar-header > div:first-child()').after(`
-        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
     `);
     $.ajaxSetup({
       headers: {
