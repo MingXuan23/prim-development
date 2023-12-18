@@ -40,7 +40,7 @@
                                 </div>
                             @endif
                         @endif
-                        <img src="{{$room->homestayImage->first()->image_path}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      
+                        <img src="{{URL($room->homestayImage->first()->image_path)}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      
                         <div class="home-thumbnail-captions p-2">
                                 <h4 class="color-purple">{{$room->roomname}}</h4>
                             <div class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->district}},{{$room->state}}</div>
@@ -78,7 +78,7 @@
 
 $(document).ready(function() {    
     $('.navbar-header > div:first-child()').after(`
-        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
     `);
 
     // for autocomplete search

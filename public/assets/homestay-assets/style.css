@@ -236,7 +236,7 @@ button#btn-add-image:hover {
     justify-content: center; /* Align input and SVG to the left */
 }
 .input {
-    width: 230px;
+    width: 220px;
     padding: 10px 0px 10px 40px;
     border-radius: 9999px;
     border: solid 2px var(--primary-color);
@@ -362,8 +362,7 @@ button#btn-add-image:hover {
     bottom: 12px;
     right: 12px;
 }
-.btn-gallery,
-#btn-fetch-dates {
+.btn-gallery {
     position: relative;
     overflow: hidden;
     height: 3rem;
@@ -377,19 +376,16 @@ button#btn-add-image:hover {
 #btn-fetch-dates {
     border-radius: 0.25rem;
 }
-.btn-gallery:hover::before,
-#btn-fetch-dates:hover::before {
+.btn-gallery:hover::after {
     transform: scaleX(1);
 }
 
-.btn-gallery-content,
-#btn-fetch-dates-content {
+.btn-gallery-content {
     position: relative;
     z-index: 1;
 }
 
-.btn-gallery::before,
-#btn-fetch-dates::before {
+.btn-gallery::after {
     content: "";
     position: absolute;
     top: 0;

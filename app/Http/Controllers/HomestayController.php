@@ -118,7 +118,8 @@ class HomestayController extends Controller
         $rooms = Room::where([
             'deleted_at' => null,
             'status' => 'Available',
-        ]) ->get();
+        ]) 
+        ->get();
         if(!$rooms->isEmpty()){
             $this->getRatingDiscount($rooms);
             $sortedRooms = $rooms->sortByDesc('overallRating');

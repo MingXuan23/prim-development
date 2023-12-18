@@ -32,7 +32,7 @@
                     <div class="card-body py-5">
                         <div class="row">
                             <div class="col-lg-6 col-sm-12 p-0 d-flex align-items-center flex-wrap">
-                                <img src="{{ $room->homestayImage[0]->image_path }}" height="100" width="150"/>
+                                <img src="{{URL($room->homestayImage[0]->image_path ) }}" height="100" width="150"/>
                                 <div>
                                     <h4>{{ $room->roomname }}</h4>
                                     <p>{{ $room->address }}, {{ $room->area }},
