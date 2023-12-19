@@ -110,7 +110,7 @@
 <script>
 $(document).ready(function() {
   $('.navbar-header > div:first-child()').after(`
-        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
     `);
   $.ajaxSetup({
         headers: {
@@ -205,7 +205,7 @@ $(document).ready(function() {
                     },
                     { 
                       data: 'bookingid', render: function(data) {
-                        return `<button class="btn btn-primary" id="btn-checkout" data-booking-id="${data}">Daftar Keluar</button>`;
+                        return '<button class="btn btn-primary" id="btn-checkout" data-booking-id="' +data + '">Daftar Keluar</button>';
                       },
                       orderable: false,
                       searchable: false, 
@@ -213,14 +213,14 @@ $(document).ready(function() {
                     { 
                       data: 'bookingid', render: function(data) {
                         var detailUrl = `{{route('homestay.bookingDetails', ':bookingData')}}`.replace(':bookingData' ,data);
-                        return `<a class="text-white" href="${detailUrl}"><button class="btn-dark-purple btn-detail">Butiran<?button></a>`;
+                        return `<a class="text-white" href="${detailUrl}"><button class="btn-dark-purple btn-detail">Butiran</button></a>`;
                       },
                       orderable: false,
                       searchable: false, 
                     },
                     {
                       data: 'bookingid', render: function(data) {
-                        return `<button class="btn btn-danger" id="btn-cancel-booking" data-booking-id="${data}">Batal</a>`;
+                        return `<button class="btn btn-danger" id="btn-cancel-booking" data-booking-id="${data}">Batal</button>`;
                       },
                       orderable: false,
                       searchable: false,  

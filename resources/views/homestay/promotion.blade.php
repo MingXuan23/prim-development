@@ -159,7 +159,7 @@
 <script>
 $(document).ready(function() { 
   $('.navbar-header > div:first-child()').after(`
-        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
     `);
     $.ajaxSetup({
         headers: {
@@ -271,7 +271,7 @@ $(document).ready(function() {
                     },
                     {
                       data: 'promotionid', render: function(data) {
-                        return `<button class="btn btn-danger" id="btn-delete" data-promotion-id="${data}">Padam</a>`;
+                        return `<button class="btn btn-danger" id="btn-delete" data-promotion-id="${data}">Padam</button>`;
                       },
                       orderable: false,
                       searchable: false,  
@@ -317,13 +317,13 @@ $(document).ready(function() {
     // for delete functionality
     $(document).on('click','#btn-delete',function(){
       Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: 'Adakah anda pasti?',
+        text: "Anda tidak akan dapat mengembalikannya!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Ya, padamkan promosi ini!'
       }).then((result) => {
         if (result.isConfirmed) {
           const promotionId = $(this).attr('data-promotion-id');
@@ -343,8 +343,8 @@ $(document).ready(function() {
             }
           })
           Swal.fire(
-            'Deleted!',
-            'This promotion has been deleted.',
+            'Padam!',
+            'Promosi ini telah dipadamkan',
             'success'
           )
         }
