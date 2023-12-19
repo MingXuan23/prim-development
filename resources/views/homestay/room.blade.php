@@ -36,9 +36,9 @@
                     @endfor                    
                 </div>
 
-                <div class="btn-gallery-container">
-                    <button class="btn-gallery">
-                        <span class="btn-gallery-content">Lihat semua gambar</span>
+                <div class="btn-fancy-container">
+                    <button class="btn-fancy" id="btn-gallery">
+                        <span class="btn-fancy-content">Lihat semua gambar</span>
                     </button>
                 </div>
             </div>
@@ -70,8 +70,8 @@
                             <label for="book-room">Masukkan Jumlah Unit (Max: {{$room->room_no}})</span>
                         </div>   
                         <div class="d-flex justify-content-center align-items-center mb-2">
-                            <button type="button" class="btn-gallery" id="btn-fetch-dates">
-                                <span class="btn-gallery-content">Cari Slot Tempahan</span> 
+                            <button type="button" class="btn-fancy" id="btn-fetch-dates" style="border-radius: 0.25rem;">
+                                <span class="btn-fancy-content">Cari Slot Tempahan</span> 
                             </button>                             
                         </div>
                            
@@ -214,7 +214,7 @@
 <script>
 $(document).ready(function() {    
     $('.navbar-header > div:first-child()').after(`
-        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
     `);
     $(".fancybox").fancybox({
         openEffect: "none",
@@ -228,7 +228,7 @@ $(document).ready(function() {
         
 		$(this).removeClass('transition');
 	});
-    $('.btn-gallery').on('click', function(){
+    $('#btn-gallery').on('click', function(){
         $('#modal-gallery').modal('show');
     })
     $('#btn-close-gallery').on('click', function(){

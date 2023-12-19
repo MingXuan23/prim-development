@@ -89,7 +89,7 @@
 
 $(document).ready(function() {
     $('.navbar-header > div:first-child()').after(`
-        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" height="70px">
     `);
     // for autocomplete search
     $('#search-room').typeahead({

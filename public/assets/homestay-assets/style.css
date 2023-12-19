@@ -32,9 +32,6 @@ ul.pagination {
     justify-content: center;
     margin-top: 20px;
 }
-#img-bns-logo {
-    height: 70px;
-}
 .img-homestay {
     height: 200px;
     width: 250px;
@@ -102,18 +99,15 @@ td a {
     color: white !important;
 }
 .btn-dark-purple {
-    background-color: var(--secondary-color) !important;
+    background-color: var(--secondary-color);
     color: white;
     transition: all 0.2s ease;
     border-radius: 0.75rem;
     border: none;
     padding: 12px;
 }
+
 .btn-dark-purple:hover {
-    background-color: var(--primary-color) !important;
-    color: white !important;
-}
-a .btn-dark-purple:active {
     background-color: var(--primary-color) !important;
     color: white !important;
 }
@@ -357,12 +351,12 @@ button#btn-add-image:hover {
     max-height: 165px;
 }
 /* gallery button */
-.btn-gallery-container {
+.btn-fancy-container {
     position: absolute;
     bottom: 12px;
     right: 12px;
 }
-.btn-gallery {
+.btn-fancy {
     position: relative;
     overflow: hidden;
     height: 3rem;
@@ -373,19 +367,16 @@ button#btn-add-image:hover {
     color: #fff;
     border: none;
 }
-#btn-fetch-dates {
-    border-radius: 0.25rem;
-}
-.btn-gallery:hover::after {
+.btn-fancy:hover::after {
     transform: scaleX(1);
 }
 
-.btn-gallery-content {
+.btn-fancy-content {
     position: relative;
     z-index: 1;
 }
 
-.btn-gallery::after {
+.btn-fancy::after {
     content: "";
     position: absolute;
     top: 0;
@@ -782,12 +773,6 @@ html .ui-button.ui-state-disabled:active {
     #banner-content > * {
         padding: 8px;
         font-size: 20px !important;
-    }
-    .input {
-        width: 75%;
-    }
-    .input:focus {
-        width: 100%;
     }
     #modal-gallery .modal-body {
         flex-wrap: nowrap;

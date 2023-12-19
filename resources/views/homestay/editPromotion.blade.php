@@ -124,7 +124,7 @@
 
 $(document).ready(function () {
     $('.navbar-header > div:first-child()').after(`
-        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
     `);
     $.ajaxSetup({
         headers: {
@@ -256,16 +256,29 @@ $(document).ready(function () {
         $('#promotion_percentage').prop('disabled', false);
     });
     $('#promotion_percentage').on('blur',function(){
-        if(isNaN($(this).val())){
+        if(isNaN($('#promotion_percentage').val())){
             Swal.fire('Sila masukkan nilai yang betul');
             return;
-        }else if( $(this).val() <= 0 || $(this).val() > 100){
+        }else if( $('#promotion_percentage').val() <= 0 || $('#promotion_percentage').val() > 100){
             Swal.fire('Sila masukkan nilai peratusan antara 0 - 100');
             return;
         }else{
             calculatePrice();
         }
     })
+    $('#form-promotion').on('submit',function(e){
+        if(isNaN($('#promotion_percentage').val())){
+            Swal.fire('Sila masukkan nilai yang betul');
+            e.preventDefault();
+            return;
+        }else if( $('#promotion_percentage').val() <= 0 || $('#promotion_percentage').val() > 100){
+            Swal.fire('Sila masukkan nilai peratusan antara 0 - 100');
+            e.preventDefault();
+            return;
+        }else{
+            calculatePrice();
+        }
+    });
     initializeStartEnd(); 
     calculatePrice();
     $('.alert').delay(3000).fadeOut()
