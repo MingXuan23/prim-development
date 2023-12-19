@@ -451,7 +451,7 @@ class DirectPayController extends Controller
                     break;
 
                 case 'Donation':
-                    Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Success']);
+                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Success']);
 
                     $request->fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
                     \Log::channel('PRIM_transaction')->info("Transaction Callback : " .  $request->fpx_sellerExOrderNo . " , " . $status);
@@ -468,7 +468,7 @@ class DirectPayController extends Controller
                     break;
             }
         } else {
-            Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
+            Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
         }
     }
 
@@ -596,8 +596,8 @@ class DirectPayController extends Controller
                     break;
                     
                 case 'Food':
-                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                    $transaction->transac_no = $request->Fpx_FpxTxnId;
                     $transaction->status = "Success";
                     $transaction->save();
 
@@ -621,8 +621,8 @@ class DirectPayController extends Controller
                     break;
                 
                 case 'Merchant':
-                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                    $transaction->transac_no = $request->Fpx_FpxTxnId;
                     $transaction->status = "Success";
                     $transaction->save();
                     
@@ -684,8 +684,8 @@ class DirectPayController extends Controller
                     break;
 
                 case 'Koperasi':
-                    $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                    $transaction->transac_no = $request->fpx_fpxTxnId;
+                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                    $transaction->transac_no = $request->Fpx_FpxTxnId;
                     $transaction->status = "Success";
                     $transaction->save();
 
@@ -743,8 +743,8 @@ class DirectPayController extends Controller
                     break;
 
                     case 'Homestay':
-                        $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                        $transaction->transac_no = $request->fpx_fpxTxnId;
+                        $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                        $transaction->transac_no = $request->Fpx_FpxTxnId;
                         $transaction->status = "Success";
                         $transaction->save();
     
@@ -779,8 +779,8 @@ class DirectPayController extends Controller
                         break;
 
                     case 'Grab Student':
-                            $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                            $transaction->transac_no = $request->fpx_fpxTxnId;
+                            $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                            $transaction->transac_no = $request->Fpx_FpxTxnId;
                             $transaction->status = "Success";
                             $transaction->save();
         
@@ -816,8 +816,8 @@ class DirectPayController extends Controller
         
                             break;
                     case 'Bus':
-                            $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                            $transaction->transac_no = $request->fpx_fpxTxnId;
+                            $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                            $transaction->transac_no = $request->Fpx_FpxTxnId;
                             $transaction->status = "Success";
                             $transaction->save();
         
@@ -850,8 +850,8 @@ class DirectPayController extends Controller
         
                             break;
                     case 'OrderS':
-                        $transaction = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
-                        $transaction->transac_no = $request->fpx_fpxTxnId;
+                        $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                        $transaction->transac_no = $request->Fpx_FpxTxnId;
                         $transaction->status = "Success";
                         $transaction->save();
     
@@ -887,9 +887,14 @@ class DirectPayController extends Controller
             return view('errors.500');
         } 
         else {
-            Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->fpx_fpxTxnId, 'status' => 'Failed']);
-            $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+
+            Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
+            $user = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
             return view('fpx.transactionFailed', compact('request', 'user'));
+            
+            // Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
+            // $user = Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->first();
+            // return view('fpx.transactionFailed', compact('request', 'user'));
         }
     }
 

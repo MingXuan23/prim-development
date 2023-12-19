@@ -82,7 +82,7 @@
     setInterval(function(){
         count--;
         document.getElementById('time').innerHTML = count;
-        if (count <= 0) {
+        if (count == 0) {
             $('#form1').submit();
         }
     },1000);
