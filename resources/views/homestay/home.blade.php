@@ -10,7 +10,6 @@
 @endsection
 
 @section('content')
-
     <section aria-label="Banner" class="mb-3">
         <div id="banner-container">
             <img src="{{URL('assets/homestay-assets/images/home-banner-image.jpeg')}}" alt="Banner Image" id="banner-image">

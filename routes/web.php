@@ -698,7 +698,7 @@ Route::group(['prefix' => 'delivery'], function () {
             Route::get('get-promotion-history', 'HomestayController@getPromotionHistory')->name('homestay.getPromotionHistory');
         });
     });
-
+    // Route::post('test-payment', 'HomestayController@testPayment')->name('homestay.testPayment');
 
    
     //// ***End of Book & Stay ***//// 

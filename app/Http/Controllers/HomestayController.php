@@ -20,6 +20,8 @@ use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Transaction;
 use App\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\HomestayReceipt;
 
 use View;
 use Carbon\Carbon;
@@ -31,6 +33,40 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class HomestayController extends Controller
 {
+    public function testPayment(){
+        $transaction = Transaction::where('nama', '=', 'Homestay_20231219193450')->first();
+        $transaction->transac_no = 'test';
+        $transaction->status = "Success";
+        $transaction->save();
+
+        // update booking table
+        Booking::where('transactionid',$transaction->id)
+        ->update([
+            'status' => 'Booked',
+            'updated_at' => Carbon::now(),
+        ]);
+
+        $userid = $transaction->user_id;
+        
+        $booking = Booking::where('transactionid', '=', $transaction->id)->first();
+        $room = Room::find($booking->roomid);
+        $user = User::find($transaction->user_id);
+        $organization = Organization::find($room->homestayid);
+        
+        $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+        ->join('bookings','rooms.roomid','=','bookings.roomid')
+        ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
+        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms')
+        ->get();
+
+        if($transaction->email != NULL)
+        {
+            Mail::to($transaction->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to customer
+        }
+        Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to homestay admin
+
+        return view('homestay.receipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
+    }
     public function testReceipt(){
         $transaction = Transaction::find(29103);
         $booking = Booking::where('transactionid', '=', 29103)->first();

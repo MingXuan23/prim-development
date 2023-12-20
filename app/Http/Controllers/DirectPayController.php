@@ -749,7 +749,7 @@ class DirectPayController extends Controller
                         $transaction->save();
     
                         // update booking table
-                        Booking::where('transactionid',$transaction_id)
+                        Booking::where('transactionid',$transaction->id)
                         ->update([
                             'status' => 'Booked',
                             'updated_at' => Carbon::now(),

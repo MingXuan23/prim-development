@@ -167,7 +167,7 @@
           </div>        
         </div>
 
-      <div class="row d-flex justify-content-center mb-3">
+      {{-- <div class="row d-flex justify-content-center mb-3">
         <div class="col-md-6 border-white">
           <div class="form-group">
             <div id="invalid-bank-message">
@@ -180,7 +180,7 @@
           </div>          
         </div>
       </div>
-        
+         --}}
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
             <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2" style="color:#391582;">KEMBALI</a>
@@ -212,31 +212,12 @@
 
     var arr = [];
     
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: "/fpx/getBankList",
-        success: function(data) {
-            jQuery.each(data.data, function(key, value){
-                arr.push(key);
-            });
-            for(var i = 0; i < arr.length; i++){
-                arr.sort();
-                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-            }
-
-        },
-        error: function (data) {
-            // console.log(data);
-        }
-    });
 
     // add border bottom before amount to pay
     $('#checkout-price-container > div:nth-last-child(2)').addClass('border-bottom')
 
     $('button[type="submit"]').on('click', function(e){
       e.preventDefault();
-      if($('#bankid').val() != null){
         Swal.fire({
           title: 'Are you sure?',
           text: "You will be redirected to website of the selected online banking",
@@ -250,11 +231,6 @@
             $('#form-checkout').submit();
           }
         })        
-      }else{
-        $('#invalid-bank-message').html(`
-          <div class="alert alert-danger text-center">Sila Pilih Bank</div>
-        `);
-      }
     })
 
     $('.alert-success').delay(2000).fadeOut()
