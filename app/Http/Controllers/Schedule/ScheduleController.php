@@ -160,17 +160,7 @@ class ScheduleController extends Controller
                 ->leftJoin('users as u1', 'u1.id', 'ss.teacher_in_charge')
                 ->leftJoin('users as u2', 'lr.replace_teacher_id', 'u2.id')
                 ->leftJoin('teacher_leave as tl', 'tl.id', 'lr.teacher_leave_id')
-                // ->where(function ($query) use ($startDate, $endDate) {
-                //     $query->where('lr.confirmation', 'Rejected')
-                //         ->orWhere('lr.confirmation', 'Confirmed')
-                //         ->orWhere('lr.confirmation', 'Pending');
-    
-                //     if ($endDate == null) {
-                //         $query->where('tl.date', $startDate);
-                //     } else {
-                //         $query->whereBetween('tl.date', [$startDate, $endDate]);
-                //     }
-                // })
+            
                 ->where(function ($query) {
                     $query->where('lr.confirmation', 'Rejected')
                         ->orWhere('lr.confirmation', 'Confirmed')
@@ -191,49 +181,52 @@ class ScheduleController extends Controller
                 $r->duration = $result['duration'];
                 unset($r->time_of_slot, $r->start_time, $r->time_off);
             }
-    
+           // dd($relief);
             return $relief;
         }
     }    
 
     //to get the teacher burden information
-    public function getTeacherInfo($teacher_id,$date){
+    public function getTeacherInfo($teacher_id,$start_date,$end_date ,$isDetail){
+        $startDate = Carbon::parse($start_date)->startOfWeek();
+        $endDate = Carbon::parse($end_date)->endOfWeek();
+        $numberOfWeeks = $startDate->diffInWeeks($endDate) +1;
+
         $teacher =new stdClass();
         $teacher->id =$teacher_id;
         $teacher->name = User::find($teacher_id)->name;
         $teacher->normal_class = DB::table('schedule_subject as ss' )
-                        ->leftJoin('schedule_version as sv','sv.id','schedule_version_id')
+                        ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
                         ->where('sv.status',1)
                         ->where('ss.teacher_in_charge',$teacher_id)
                         ->count('ss.id');
 
-        //$date = '2023-12-06';
-        //dd($date);
-        // Split the date string into year, month, and day
-        list($year, $month, $day) = explode('-', $date);
-        
-        // Create a Carbon instance
-        $now = Carbon::createFromDate($year, $month, $day);
-        
-        $weekStartDate = $now->startOfWeek()->format('Y-m-d H:i');
-        $weekEndDate = $now->endOfWeek()->format('Y-m-d H:i');
-
-        //dd($weekStartDate,$weekEndDate,$now);
         $teacher->relief_class = DB::table('leave_relief as lr')
                                 ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                                 ->where('lr.status',1)
                                 ->where('lr.replace_teacher_id',$teacher_id)
-                                ->whereBetween('tl.date',[$weekStartDate,$weekEndDate])
+                                ->whereBetween('tl.date',[$startDate,$endDate])
                                 ->count('lr.id');
         
         $teacher->leave_class =DB::table('leave_relief as lr')
                     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                     ->where('lr.status',1)
                     ->where('tl.teacher_id',$teacher_id)
-                    ->whereBetween('tl.date',[$weekStartDate,$weekEndDate])
+                    ->whereBetween('tl.date',[$startDate,$endDate])
                     ->count('lr.id');
        
-        return $teacher ->normal_class  - $teacher->leave_class + $teacher->relief_class;
+        if(!$isDetail){
+            return $teacher ->normal_class  - $teacher->leave_class + $teacher->relief_class;
+        }else{
+            $teacher->maxSlot = DB::table('schedules as s' )
+                                ->leftJoin('schedule_version as sv','sv.schedule_id','s.id')
+                                ->where('sv.status',1)
+                                ->select('s.teacher_max_slot')
+                                ->first();
+             $teacher->maxSlot = $teacher->maxSlot ==null?0:   $teacher->maxSlot->teacher_max_slot    
+                                ;
+            return $teacher;
+        }
         //return $teacher;
 
     }
@@ -273,7 +266,7 @@ class ScheduleController extends Controller
                 case 'Beban Guru':
                     usort($teacherList, function ($a, $b) use( $date) {
                         // Your custom comparison logic here
-                        return $this->getTeacherInfo($a->id, $date) - $this->getTeacherInfo($b->id, $date);
+                        return $this->getTeacherInfo($a->id, $date,$date,false) - $this->getTeacherInfo($b->id, $date,$date,false);
                     });
                     break;
                 case 'Class':
@@ -917,5 +910,25 @@ class ScheduleController extends Controller
             
         }
         return response()->json(['error' => 'This user did not exist'], 401);
+     }
+
+     public function getTeacherSlot(Request $request){
+        $teachers = DB::table('users as u')
+        ->leftJoin('organization_user as ou','ou.user_id','u.id')
+        ->where('ou.organization_id',$request->organization)
+        ->where('ou.role_id',5)
+        ->where('u.name','LIKE','%'.$request->teacher_name.'%')
+        ->select('u.id as teacher_id','u.name as name')
+        ->get();
+
+        $array = [];
+        foreach($teachers as $t){
+            array_push($array,$this->getTeacherInfo($t->teacher_id,$request->start_date,$request->end_date,true));
+        }
+
+        $startDate = Carbon::parse($request->start_date)->startOfWeek();
+        $endDate = Carbon::parse($request->end_date)->endOfWeek();
+        $numberOfWeeks = $startDate->diffInWeeks($endDate) +1;
+        return response()->json(['teachers'=>$array,'NumberOfWeek'=>$numberOfWeeks]);
      }
 }

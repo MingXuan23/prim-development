@@ -133,6 +133,7 @@
                         <label>Select Teacher:</label>
                         <input type="text" name="select_teacher" id="select_teacher" class="form-control">
                     </div>
+                    <p></p>
                     <div class="table-responsive">
                     <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
@@ -252,6 +253,22 @@
         });
 
         $('.alert').delay(3000).fadeOut();
+
+        var delayTimer; // Variable to store the timer ID
+        var isDelayActive = false;
+        $('#select_teacher').on('change', function () {
+            if (!isDelayActive) {
+                displayTeacher();
+
+                // Set the delay and update the flag
+                isDelayActive = true;
+                delayTimer = setTimeout(function () {
+                    isDelayActive = false;
+                    displayTeacher();
+                }, 1000); // 2000 milliseconds (2 seconds)
+            }
+         
+        });
 
         $('#datepicker_start').change(function() {
         //    dateOnChange();
@@ -496,6 +513,7 @@
             } else if (mode === 'lr_teacher') {
                 $('#choose-date').hide();
                 $('#lr-teacher-section').show();
+                displayTeacher();
             }
         }
 
@@ -533,6 +551,45 @@
         }
 
         function displayTeacher() {
+            var teacher_name = $('#select_teacher').val();
+            $.ajax({
+            url: '{{ route("schedule.getTeacherSlot") }}',
+            type: 'POST',
+            data: {
+                organization: $('#organization option:selected').val(),
+                start_date: $('#datepicker_start').val(),
+                end_date: $('#datepicker_end').val(),
+                teacher_name:teacher_name
+            },
+            success: function (response) {
+                console.log(response); 
+               // Log the pending relief data
+                var table = $('#teacherTable tbody');
+                table.empty();
+               
+                // Create a new row using the newRowData
+                $('#lr-teacher-section p').text('Result for '+response.NumberOfWeek+' week');
+                response.teachers.forEach(function(teacher,i){
+                    var newRow = $('<tr>');
+                    var fullSlot =teacher.maxSlot*response.NumberOfWeek;
+                    // Assuming you have some data properties in newRowData
+                    var busy =teacher.normal_class*response.NumberOfWeek + teacher.relief_class - teacher.leave_class;
+                    newRow.append($('<td>').text(i+1));
+                    newRow.append($('<td>').text(teacher.name));
+                    newRow.append($('<td>').text(busy));
+                    newRow.append($('<td>').text(Math.max(fullSlot- busy,0)));
+
+                    // Add more columns as needed
+
+                    // Append the new row to the table
+                    table.append(newRow);
+                });
+              
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        });
 
         }
 
