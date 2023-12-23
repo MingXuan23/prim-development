@@ -5,6 +5,8 @@
 {{-- <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet"> --}}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @include('layouts.datatable')
 @endsection
 
@@ -33,11 +35,26 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label>Tarikh</label>
                     <input type="text" value="" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
-                </div>
+                </div> -->
 
+                <div class="form-group">
+                        <label>Start Time:</label>
+                        <input type="text" value="" class="form-control" name="pickup_date" id="datepicker_start"  placeholder="Pilih tarikh" readonly required>
+                        <label>End Time:</label>
+                        <input type="text" value="" class="form-control" name="pickup_date" id="datepicker_end"  placeholder="Pilih tarikh" readonly required>
+                    </div>
+
+                <div>
+                    <label>Report Type: </label>
+                    <div>
+                    <button type="button" id="chart" name="chart" class="btn btn-primary">Daily Status (Default)</button>
+                    <button type="button" id="lr_teacher" name="lr_teacher" class="btn btn-primary">Leave and Relief Teacher</button>
+                    </div>
+                </div>
+                
             </div>
 
             {{-- <div class="">
@@ -75,17 +92,25 @@
 
                 <div class="flash-message"></div>
 
+                <div id="choose-date">
+                <button type="button" id="details" name="details" class="btn btn-primary">Show Details</button>
+            <div id="chart-section">
                 <div class="total_report">
-                    <div class="total_confirmed"></div>
+                    <!-- <div class="total_confirmed"></div>
                     <div class="total_pending"></div>
-                    <div class="total_rejected"></div>
+                    <div class="total_rejected"></div> -->
+                    
+                    <canvas id="barChart" width="300" height="100"></canvas>
                 </div>
+            </div>
 
+            <div id="details-section">
                 <div class="table-responsive">
                     <table id="reliefTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th>No </th>
+                                <th>Tarikh</th>
                                 <th>Kelas</th>
                                 <th>Subjek</th>
                                 <th>Slot</th>
@@ -99,20 +124,33 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
 
-                <!-- <div class="row">
-                    <a style="margin: 19px;" href="#" class="btn btn-primary ml-auto" data-toggle="modal" data-target="#modelId">
-                        <i class="fas fa-plus"></i> Add Row
-                    </a>
                 </div>
-                <div class="row">
-                    <a style="margin: 10px;" class="btn btn-danger">
-                        <i class="fas fa-plus"></i> Discard
-                    </a>
-                    <a style="margin: 10px;" class="btn btn-success">
-                        <i class="fas fa-plus"></i> Confirm
-                    </a>
-                </div> -->
+            
+                <div id="lr-teacher-section" style="display: none;">
+                    <div class="form-group">
+                        <label>Select Teacher:</label>
+                        <input type="text" name="select_teacher" id="select_teacher" class="form-control">
+                    </div>
+                    <div class="table-responsive">
+                    <table id="teacherTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th>No </th>
+                                <th>Nama Guru</th>
+                                <th>Slot ganti yg telah ambil</th>
+                                <th>Slot ganti yg tinggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                    <div class="total_report">
+                        <canvas id="lrTeacherChart" width="300" height="100"></canvas>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -190,7 +228,8 @@
 <script>   
         var dates = []
     $(document).ready(function() {
-        $("#datepicker").datepicker("setDate", new Date());
+        $("#datepicker_start").datepicker("setDate", new Date());
+        $("#datepicker_end").datepicker("setDate", new Date());
         dateOnChange();
 
         if ($("#organization").val() != "") {
@@ -214,58 +253,93 @@
 
         $('.alert').delay(3000).fadeOut();
 
-        $('#datepicker').change(function() {
+        $('#datepicker_start').change(function() {
         //    dateOnChange();
-           fetchReliefData();
-        })
-        
-        
+        fetchReliefData($('#datepicker_start').val(), $('#datepicker_end').val());
+        console.log($('#datepicker_start').val(), $('#datepicker_end').val());
 
-        // Function to display relief data in the table
-       
-        // var table = $('#reliefTable');
-        // console.log(table);
+        })
 
         // Initial fetch when the page loads
-        fetchReliefData();
-
+        fetchReliefData($('#datepicker_start').val(), $('#datepicker_end').val());
+        console.log($('#datepicker_start').val(), $('#datepicker_end').val());
         });
 
-        $("#datepicker").datepicker({
+        $("#datepicker_start").datepicker({
             minDate: '-1m',
             maxDate: '+1m',
             dateFormat: 'yy-mm-dd',
             dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
             beforeShowDay: editDays,
             defaultDate: 0, 
-        })
+        });
 
-        function fetchReliefData() {
-            let date_val = $('#datepicker').val();
-            // If date is empty, set it to today
-            if (!date_val) {
-                date_val = $.datepicker.formatDate('yy-mm-dd', new Date());
-                $('#datepicker').datepicker('setDate', date_val); // Update datepicker value
+        $("#datepicker_end").datepicker({
+            dateFormat: 'yy-mm-dd',
+            dayNamesMin: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            onSelect: function(selectedDate) {
+                // Trigger the change event when a date is selected
+                $('#datepicker_end').trigger('change');
             }
-            console.log(date_val);
-            $.ajax({
-                url: '{{ route("schedule.getReliefReport") }}',
-                type: 'POST',
-                data: {
-                    organization: $('#organization option:selected').val(), 
-                    date: date_val,
-                    // Replace with your organization ID
-                },
-                success: function (response) {
-                    console.log(response); // Log the pending relief data
-                    //console.log(response.available_teachers); // Log the available teachers data 
-                    displayRelief(response.relief_report);
-                },
-                error: function (xhr, status, error) {
-                    console.error(error);
-                }
-            });
-        }
+        });
+
+        // function fetchReliefData() {
+        //     let date_val = $('#datepicker_start').val();
+        //     // If date is empty, set it to today
+        //     if (!date_val) {
+        //         date_val = $.datepicker.formatDate('yy-mm-dd', new Date());
+        //         $('#datepicker_start').datepicker('setDate', date_val); // Update datepicker value
+        //     }
+        //     console.log(date_val);
+        //     $.ajax({
+        //         url: '{{ route("schedule.getReliefReport") }}',
+        //         type: 'POST',
+        //         data: {
+        //             organization: $('#organization option:selected').val(), 
+        //             date: date_val,
+        //             // Replace with your organization ID
+        //         },
+        //         success: function (response) {
+        //             console.log(response); // Log the pending relief data
+        //             //console.log(response.available_teachers); // Log the available teachers data 
+        //             displayRelief(response.relief_report);
+        //         },
+        //         error: function (xhr, status, error) {
+        //             console.error(error);
+        //         }
+        //     });
+        // }
+
+        $('#datepicker_end').change(function() {
+            // Additional logic when datepicker_end changes
+            // You can add any custom logic here
+            fetchReliefData($('#datepicker_start').val(), $(this).val());
+            console.log($('#datepicker_start').val(), $('#datepicker_end').val());
+        });
+
+        function fetchReliefData(start_date, end_date) {
+            if (end_date === null) {
+                // If date_end is null, set end_date to start_date
+                end_date = start_date;
+            }
+        $.ajax({
+            url: '{{ route("schedule.getReliefReport") }}',
+            type: 'POST',
+            data: {
+                organization: $('#organization option:selected').val(),
+                start_date: start_date,
+                end_date: end_date,
+            },
+            success: function (response) {
+                console.log(response); // Log the pending relief data
+                displayRelief(response.relief_report);
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            }
+        });
+    }
+
 
         function displayRelief(reliefData) {
             var tableBody = $('#reliefTable tbody');
@@ -280,6 +354,7 @@
             reliefData.forEach(function (relief, index) {
                 var row = $('<tr></tr>');
                 row.append('<td>' + (index + 1) + '</td>');
+                row.append('<td>' + relief.date + '</td>');
                 row.append('<td>' + relief.class_name + '</td>');
                 row.append('<td>' + relief.subject + '</td>');
                 row.append('<td>' + relief.slot + '</td>');
@@ -304,19 +379,63 @@
                     default:
                         statusColor = 'black'; // Default color for unknown status
                         break;
-                }
+                    }
 
-                // Append status column with the specified color
                 row.append('<td style="color: ' + statusColor + ';">' + relief.confirmation + '</td>');
 
                 tableBody.append(row);
             });
 
             // Update the total blocks with the counts
-            $('.total_confirmed').text('Total Confirmed: ' + totalConfirmed);
-            $('.total_pending').text('Total Pending: ' + totalPending);
-            $('.total_rejected').text('Total Rejected: ' + totalRejected);
+            // $('.total_confirmed').text('Total Confirmed: ' + totalConfirmed);
+            // $('.total_pending').text('Total Pending: ' + totalPending);
+            // $('.total_rejected').text('Total Rejected: ' + totalRejected);
+
+            // Update the bar chart
+            updateBarChart(totalConfirmed, totalPending, totalRejected);
         }
+
+        var barChart; // Declare the chart variable globally
+
+        function updateBarChart(confirmed, pending, rejected) {
+            var total = confirmed + pending + rejected;
+            var ctx = document.getElementById('barChart').getContext('2d');
+
+            // Destroy the existing chart if it exists
+            if (barChart) {
+                barChart.destroy();
+            }
+
+            barChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Confirmed', 'Pending', 'Rejected'],
+                    datasets: [{
+                        label: 'Total Report (' + total + ')',
+                        data: [confirmed, pending, rejected],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(255, 99, 132, 0.2)',
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(255, 99, 132, 1)',
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
 
         function autoSuggest(){
         var organization = $("#organization option:selected").val();
@@ -341,7 +460,7 @@
         }
 
         function dateOnChange() {
-        let date_val = $('#datepicker').val(), timePicker = $('#timepicker'), timeRange = $('.time-range')
+        let date_val = $('#datepicker_start').val(), timePicker = $('#timepicker'), timeRange = $('.time-range')
         let org_id = $('#organization option:selected').val()
         // console.log(date_val)
         if(date_val != '') {
@@ -361,5 +480,61 @@
       }
       return [true];
     }
+
+    var displayMode = 'chart';
+
+        // Function to switch between 'details' and 'lr_teacher' modes
+        function switchDisplayMode(mode) {
+            if (mode === 'details') {
+                $('#chart-section').hide();
+                $('#details-section').show();
+                $('#lr-teacher-section').hide();
+            } else if (mode === 'chart') {
+                $('#chart-section').show();
+                $('#details-section').hide();
+                $('#lr-teacher-section').hide();
+            } else if (mode === 'lr_teacher') {
+                $('#choose-date').hide();
+                $('#lr-teacher-section').show();
+            }
+        }
+
+        // Initial setup
+        switchDisplayMode(displayMode);
+
+        $('#chart').click(function() {
+            displayMode = 'chart';
+            switchDisplayMode(displayMode);
+        });
+
+        // Event handler for 'details' button
+        $('#details').click(function() {
+            // Toggle the text of the button based on the current mode
+            if (displayMode === 'details') {
+                displayMode = 'chart';
+                $(this).text('Show Details');
+            } else {
+                displayMode = 'details';
+                $(this).text('Show Chart');
+            }
+
+            switchDisplayMode(displayMode);
+        });
+
+        // Event handler for 'lr_teacher' button
+        $('#lr_teacher').click(function() {
+            displayMode = 'lr_teacher';
+            switchDisplayMode(displayMode);
+            displayTeacher();
+        });
+        
+        function fetchTeacher(){
+            
+        }
+
+        function displayTeacher() {
+
+        }
+
 </script>
 @endsection
