@@ -85,8 +85,8 @@ class ScheduleController extends Controller
         if($organization->contains('id', $oid)){
             $relief = DB::table('leave_relief as lr')
             ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
-            ->leftJoin('classes as c','c.id','class_id')
-            ->leftJoin('subject as sub','sub.id','ss.subject_id','sub.id')
+            ->leftJoin('classes as c','c.id','ss.class_id')
+            ->leftJoin('subject as sub','sub.id','ss.subject_id')
             ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
             ->leftJoin('schedules as s','s.id','sv.schedule_id')
             ->leftJoin('users as u1','u1.id','ss.teacher_in_charge')
@@ -116,12 +116,12 @@ class ScheduleController extends Controller
 
     public function getReliefReport(Request $request){
         $oid = $request->organization;
-        $date =$request->date;
-        // dd($request);
-        $relief =$this->getAllReliefForReport($oid, $date);
-        // dd($relief);
-        return response()->json(['relief_report' => $relief]);
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
 
+        $relief = $this->getAllReliefForReport($oid, $startDate, $endDate);
+
+        return response()->json(['relief_report' => $relief]);
     }
 
     public function saveRelief(Request $request){
@@ -146,42 +146,55 @@ class ScheduleController extends Controller
        return redirect()->back()->with('success', $msg);
     }
 
-    public function getAllReliefForReport($oid, $date){
+    public function getAllReliefForReport($oid, $startDate, $endDate)
+    {
         $organization = $this->getOrganizationByUserId();
-        
-        if($organization->contains('id', $oid)){
-            $relief = DB::table('leave_relief as lr')
-            ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
-            ->leftJoin('classes as c','c.id','class_id')
-            ->leftJoin('subject as sub','sub.id','ss.subject_id','sub.id')
-            ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
-            ->leftJoin('schedules as s','s.id','sv.schedule_id')
-            ->leftJoin('users as u1','u1.id','ss.teacher_in_charge')
-            ->leftJoin('users as u2','lr.replace_teacher_id','u2.id')
-            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
-            ->where(function ($query) {
-                $query->where('lr.confirmation', 'Rejected')
-                    ->orWhere('lr.confirmation', 'Confirmed')
-                    ->orWhere('lr.confirmation', 'Pending');
-            })
-            ->where('lr.status',1)
-            ->where('s.organization_id',$oid)
-            //->where('sv.status',1)
-            ->where('tl.date',$date)
-            ->orderBy('lr.confirmation')
-            ->select('lr.id as leave_relief_id','lr.confirmation','ss.id as schedule_subject_id','tl.date','tl.desc'
-            ,'sub.name as subject','u1.name as leave_teacher','u2.name as relief_teacher','ss.slot','ss.day','s.time_of_slot','s.start_time','s.time_off','c.nama as class_name')
-            ->get();
-
-            foreach($relief as $r){
-                $result=$this->getSlotTime($r,$r->day,$r->slot);
+    
+        if ($organization->contains('id', $oid)) {
+            $query = DB::table('leave_relief as lr')
+                ->leftJoin('schedule_subject as ss', 'ss.id', 'lr.schedule_subject_id')
+                ->leftJoin('classes as c', 'c.id', 'ss.class_id')
+                ->leftJoin('subject as sub', 'sub.id', 'ss.subject_id')
+                ->leftJoin('schedule_version as sv', 'sv.id', 'ss.schedule_version_id')
+                ->leftJoin('schedules as s', 's.id', 'sv.schedule_id')
+                ->leftJoin('users as u1', 'u1.id', 'ss.teacher_in_charge')
+                ->leftJoin('users as u2', 'lr.replace_teacher_id', 'u2.id')
+                ->leftJoin('teacher_leave as tl', 'tl.id', 'lr.teacher_leave_id')
+                // ->where(function ($query) use ($startDate, $endDate) {
+                //     $query->where('lr.confirmation', 'Rejected')
+                //         ->orWhere('lr.confirmation', 'Confirmed')
+                //         ->orWhere('lr.confirmation', 'Pending');
+    
+                //     if ($endDate == null) {
+                //         $query->where('tl.date', $startDate);
+                //     } else {
+                //         $query->whereBetween('tl.date', [$startDate, $endDate]);
+                //     }
+                // })
+                ->where(function ($query) {
+                    $query->where('lr.confirmation', 'Rejected')
+                        ->orWhere('lr.confirmation', 'Confirmed')
+                        ->orWhere('lr.confirmation', 'Pending');
+                })
+                ->whereBetween('tl.date', [$startDate, $endDate])
+                ->where('lr.status', 1)
+                ->where('s.organization_id', $oid)
+                ->where('sv.status', 1)
+                ->orderBy('tl.date')
+                ->select('lr.id as leave_relief_id', 'lr.confirmation', 'ss.id as schedule_subject_id', 'tl.date', 'tl.desc', 'sub.name as subject', 'u1.name as leave_teacher', 'u2.name as relief_teacher', 'ss.slot', 'ss.day', 's.time_of_slot', 's.start_time', 's.time_off', 'c.nama as class_name');
+    
+            $relief = $query->get();
+                    // dd($endDate);
+            foreach ($relief as $r) {
+                $result = $this->getSlotTime($r, $r->day, $r->slot);
                 $r->time = $result['time'];
-                $r->duration =$result['duration'];
-                unset($r->time_of_slot,$r->start_time,$r->time_off);
+                $r->duration = $result['duration'];
+                unset($r->time_of_slot, $r->start_time, $r->time_off);
             }
+    
             return $relief;
         }
-    }
+    }    
 
     //to get the teacher burden information
     public function getTeacherInfo($teacher_id,$date){
