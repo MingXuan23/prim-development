@@ -24,7 +24,7 @@
                     <div class="card-body py-5">
                         <div class="row">
                             <div class="col-4 p-2 d-flex align-items-center">
-                                    <img src="{{ asset($homestayImage) }}" class="img-fluid"
+                                    <img src="{{URL($homestayImage) }}" class="img-fluid"
                                         alt="Homestay Image" />
                             </div>
                             <div class="col-4 p-2">
@@ -136,8 +136,8 @@
   <script>
     $(document).ready(function(){
         $('.navbar-header > div:first-child()').after(`
-        <img src="../assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
-        `);
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
+         `);
         $('#btn-download-receipt').on('click', function(){
             window.print();
         })

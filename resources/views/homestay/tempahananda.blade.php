@@ -53,7 +53,7 @@
               <div class="card tab-card my-3">
                   <div class="card-body row">
                     <a class="col-md-5" href="{{route('homestay.showRoom',['id' => $checkoutBookings[$i]->roomid, 'name' => $checkoutBookings[$i]->roomname])}}">
-                      <img src="{{$checkoutImages[$i]}}" alt="{{$checkoutBookings[$i]->roomname}}" >
+                      <img src="{{URL($checkoutImages[$i])}}" alt="{{$checkoutBookings[$i]->roomname}}" >
                     </a>  
                     <div id="booking-details-container" class="col-md-7">
                       <h4 class="color-purple">{{$checkoutBookings[$i]->roomname}}</h4>
@@ -86,7 +86,7 @@
             <div class="card tab-card my-3">
                 <div class="card-body row">
                   <a class="col-md-5 d-flex align-items-center" href="{{route('homestay.showRoom',['id' => $completedBookings[$i]->roomid, 'name' => $completedBookings[$i]->roomname])}}">
-                    <img src="{{$completedImages[$i]}}" alt="{{$completedBookings[$i]->roomname}}" class="img-fluid">
+                    <img src="{{URL($completedImages[$i])}}" alt="{{$completedBookings[$i]->roomname}}" class="img-fluid">
                   </a>  
                   <div id="booking-details-container" class="col-md-7">
                     <h4 class="color-purple">{{$completedBookings[$i]->roomname}}</h4>
@@ -125,7 +125,7 @@
             <div class="card tab-card my-3">
                 <div class="card-body row">
                   <a class="col-md-5 d-flex align-items-center" href="{{route('homestay.showRoom',['id' => $cancelledBookings[$i]->roomid, 'name' => $cancelledBookings[$i]->roomname])}}">
-                    <img src="{{$cancelledImages[$i]}}" alt="{{$cancelledBookings[$i]->roomname}}" class="img-fluid">
+                    <img src="{{URL($cancelledImages[$i])}}" alt="{{$cancelledBookings[$i]->roomname}}" class="img-fluid">
                   </a>  
                   <div id="booking-details-container" class="col-md-7">
                     <h4 class="color-purple">{{$cancelledBookings[$i]->roomname}}</h4>
@@ -153,7 +153,7 @@
                   <div class="card-body">
                     <div id="rating-message">
                     </div> 
-                    <img src="assets/homestay-assets/images/review-icon.png" height="100" width="100" class="d-block mx-auto">
+                    <img src="{{URL('assets/homestay-assets/images/review-icon.png')}}" height="100" width="100" class="d-block mx-auto">
                     <form action="{{route('homestay.addReview')}}" method="POST" enctype="multipart/form-data" id="form-review">
                       @csrf
                       <input type="hidden" value="" id="booking_id" name="booking_id">
@@ -197,8 +197,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <script>
     $(document).ready(function(){
-    $('.navbar-header > div:first-child()').after(`
-        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+      $('.navbar-header > div:first-child()').after(`
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
     `);
       // for redirecting tab
       const switchTab =JSON.parse(localStorage.getItem('switchTab'));

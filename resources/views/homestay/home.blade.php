@@ -10,10 +10,9 @@
 @endsection
 
 @section('content')
-
     <section aria-label="Banner" class="mb-3">
         <div id="banner-container">
-            <img src="homestay-image/home-banner-image.jpeg" alt="Banner Image" id="banner-image">
+            <img src="{{URL('assets/homestay-assets/images/home-banner-image.jpeg')}}" alt="Banner Image" id="banner-image">
             <div id="banner-content">
                 <h2>Cari penginapan idaman anda dengan tawaran yang menarik</h2>
             </div>
@@ -47,7 +46,7 @@
                                 </div>
                             @endif
                         @endif
-                        <img src="{{$room->homestayImage->first()->image_path}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      
+                        <img src="{{URL($room->homestayImage->first()->image_path)}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      
                         <div class="home-thumbnail-captions p-2">
                                 <h4 class="color-purple">{{$room->roomname}}</h4>
                             <div class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->district}},{{$room->state}}</div>
@@ -89,7 +88,7 @@
 
 $(document).ready(function() {
     $('.navbar-header > div:first-child()').after(`
-        <img src="assets/homestay-assets/images/book-n-stay-logo(transparent).png" id="img-bns-logo">
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" height="70px">
     `);
     // for autocomplete search
     $('#search-room').typeahead({
