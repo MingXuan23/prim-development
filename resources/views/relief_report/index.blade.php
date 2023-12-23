@@ -140,7 +140,8 @@
                             <tr style="text-align:center">
                                 <th>No </th>
                                 <th>Nama Guru</th>
-                                <th>Slot ganti yg telah ambil</th>
+                                <th>Slot yg telah ambil</th>
+                                <th>Slot Ganti yg telah ambil</th>
                                 <th>Slot ganti yg tinggal</th>
                             </tr>
                         </thead>
@@ -577,6 +578,7 @@
                     newRow.append($('<td>').text(i+1));
                     newRow.append($('<td>').text(teacher.name));
                     newRow.append($('<td>').text(busy));
+                    newRow.append($('<td>').text(teacher.relief_class));
                     newRow.append($('<td>').text(Math.max(fullSlot- busy,0)));
 
                     // Add more columns as needed

@@ -517,7 +517,7 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-4 p-3 text-sm-center align-self-center">
                             <div class="p-3">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px" loading="lazy">
                             </div>
                             <div class="pt-3">
                                 <h4>Yahya Bin Ibrahim</h4>
@@ -527,7 +527,7 @@
 
                         <div class="col-lg-4 p-3 text-sm-center align-self-center">
                             <div class="p-3">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px" loading="lazy">
                             </div>
                             <div class="pt-3">
                                 <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>
@@ -537,7 +537,7 @@
 
                         <div class="col-lg-4 p-3 text-sm-center align-self-center">
                             <div class="p-3">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">
+                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px" loading="lazy">
                             </div>
                             <div class="pt-3">
                                 <h4>Muhammad 'Ammar Muhammad Sani</h4>
