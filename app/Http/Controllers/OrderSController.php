@@ -404,4 +404,378 @@ class OrderSController extends Controller
 
         return view('orders.trackorder',compact('data'));
     }
+
+    public function testData(Request $request){
+        $data = DB::table('users as u')
+            ->where('name', 'SALAM BIN ISNIN')
+            ->get();
+        return response()->json($data);
+        //return $data;
+        //return response()->json(['name' => "SALAM"]);
+    }
+
+    public function login(Request $request)
+    {  
+       $credentials = $request->only('email', 'password');
+       $phone = $request->get('email');
+       //return response()->json(['user',$credentials],200);
+       if(is_numeric($request->get('email'))){
+           $user = User::where('icno', $phone)->first();
+          
+           if ($user) {
+               //dd($user);
+               //return ['icno' => $phone, 'password' => $request->get('password')];
+               $credentials = ['icno'=>$phone, 'password' => $request->get('password')];
+           }
+           else{
+               if(!$this->startsWith((string)$request->get('email'),"+60") && !$this->startsWith((string)$request->get('email'),"60")){
+                   if(strlen((string)$request->get('email')) == 10)
+                   {
+                       $phone = str_pad($request->get('email'), 12, "+60", STR_PAD_LEFT);
+                   } 
+                   elseif(strlen((string)$request->get('email')) == 11)
+                   {
+                       $phone = str_pad($request->get('email'), 13, "+60", STR_PAD_LEFT);
+                   }   
+               } else if($this->startsWith((string)$request->get('email'),"60")){
+                   if(strlen((string)$request->get('email')) == 11)
+                   {
+                       $phone = str_pad($request->get('email'), 12, "+", STR_PAD_LEFT);
+                   } 
+                   elseif(strlen((string)$request->get('email')) == 12)
+                   {
+                       $phone = str_pad($request->get('email'), 13, "+", STR_PAD_LEFT);
+                   }   
+               }
+               $credentials = ['telno'=>$phone,'password'=>$request->get('password')];
+           }
+       }
+       else if(strpos($request->get('email'), "@") !== false){
+           $credentials = ['email'=>$phone,'password'=>$request->get('password')];
+       }
+       else{
+           $credentials =['telno' => $phone, 'password'=>$request->get('password')];
+
+       }
+
+
+       if (Auth::attempt($credentials)) {
+           $user = Auth::User();
+
+           $organization_user = DB::table('organization_user as ou')
+            ->where('ou.user_id', $user->id)
+            ->where('ou.role_id', 17)
+            ->get();
+
+
+            if(count($organization_user) > 0) {
+                //if user is orders admin
+                $exist = 1;
+            } else {
+                $exist = 0;
+            }
+
+           return response()->json([
+               'id' => $user->id,
+               'name' => $user->name,
+               'exist' => $exist
+           ], 200);
+       }
+       return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    
+    public function isUserOrderSAdmin(Request $request) {
+        $user_id = $request->get('user_id');
+
+        $data = DB::table('organization_user as ou')
+            ->where('ou.user_id', $user_id)
+            ->where('ou.role_id', 17)
+            ->get();
+
+        // if(count($data) > 0) {
+        //     //if user is orders admin
+        //     return response()->json(['respo' => 'admin']);
+        // } else {
+        //     return response()->json(['respo' => 'not admin']);
+        // }
+        return response()->json($data);
+    }
+
+    public function randomDishes() {
+        $data = DB::table('dishes as d')
+            ->join('organizations as o', 'd.organ_id', '=', 'o.id')
+            ->select('d.*', 'o.nama as o_nama')
+            ->inRandomOrder()
+            ->limit(1)
+            ->get();
+
+            return response()->json($data);
+    }
+
+    public function listDishes(){
+        $data = DB::table('dishes as d')
+            ->join('organizations as o', 'd.organ_id', '=', 'o.id')
+            ->select('d.*', 'o.nama as o_nama')
+            ->get();
+
+        return response()->json($data);
+    }
+
+    public function listShops(){
+        $data = DB::table('organizations as o')
+            ->where('type_org', 8) //kedai makanan
+            ->orWhere('type_org', 12) //OrderS
+            //->where('nama', 'like', '%MAAHAD TAHFIZ SAINS DARUL AMAN%')
+            //->limit(30)
+            ->get();
+
+        return response()->json($data);  
+    }
+
+    public function listDishesByShop(Request $request) {
+        $org_id = $request->get('organ_id');
+        
+        $data = DB::table('dishes as d')
+            ->join('organizations as o', 'd.organ_id', '=', 'o.id')
+            ->where('o.id', $org_id)
+            ->select('d.*')
+            ->get();
+
+        $count = DB::table('dishes')    
+                    ->select('dishes.id', 'dishes.name', DB::raw('COUNT(order_available.dish_id) as totalOrderAvailable'))
+                    ->leftJoin('order_available', 'dishes.id', '=', 'order_available.dish_id')
+                    ->where('dishes.organ_id', $org_id)
+                    //->where('order_available.quantity', '>', 0)
+                    ->groupBy('dishes.id', 'dishes.name')
+                    ->orderBy('dishes.id')
+                    ->get();
+
+        // return response()->json($data);
+        return response()->json(['data'=>$data,'count'=>$count]);
+    }
+
+    public function listDishAvailable(Request $request) {
+        $dish_id = $request->get('dish_id');
+
+        // $dateList = DB::table('dish_available as da')
+        //     ->distinct()
+        //     ->select('da.date')
+        //     ->where('da.dish_id', $dish_id)
+        //     ->get();
+
+        $data = DB::table('dish_available as da')
+            ->where('da.dish_id', $dish_id)
+            ->get();
+            
+        return response()->json($data);  
+        // return response()->json(['dateList'=>$dateList,'data'=>$data]);  
+    }
+
+    public function listOrderAvailable(Request $request) {
+        $organ_id = $request->get('organ_id');
+
+        $data = DB::table('order_available as oa')
+            ->select('oa.*')
+            ->join('dishes as d', 'd.id', '=', 'oa.dish_id')
+            ->where('d.organ_id', $organ_id)
+            ->where('oa.quantity', '>', 0)
+            // ->where('oa.dish_id', $dish_id)
+            ->get();
+            
+        return response()->json($data);  
+    }
+
+    public function getOrderCart(Request $request) {
+        $user_id = $request->get('user_id');
+        $organ_id = $request->get('organ_id');
+
+        $cart = DB::table('order_cart')
+                    ->where('order_status', 'checkout-pending')
+                    ->where('user_id', $user_id)
+                    ->where('organ_id', $organ_id)
+                    ->first();
+
+        // $cart_id = $cart->id;
+        // dd($cart_id);
+        
+        // if($cart->isEmpty()) {
+        if(!$cart) {
+            $cart_id = DB::table('order_cart')->insertGetId([
+                'order_status' => 'checkout-pending',
+                'totalamount' => 0,
+                'created_at' => now(),
+                'user_id' => $user_id,
+                'organ_id' => $organ_id,
+            ]);
+
+            $cart = DB::table('order_cart')
+                    ->where('id', $cart_id)
+                    ->first();
+        }
+
+        $order_available_dish = DB::table('order_available_dish as oad')
+                                    ->where('order_cart_id', $cart->id)
+                                    ->get();
+
+        // return response()->json($order_available_dish);
+        return response()->json(['order_available_dish'=>$order_available_dish,'cart'=>$cart]);
+    }
+
+    public function createOrderCart(Request $request) {
+        $quantity = $request->get('quantity');
+        $totalprice = $request->get('totalprice');
+        $order_available_id = $request->get('order_available_id');
+        $order_cart_id = $request->get('order_cart_id');
+
+        if(count($request->all()) >= 1) {
+            DB::table('order_cart')
+            ->where('id', $order_cart_id)
+            ->update([
+                'order_status' => 'order-pending',
+                'created_at' => now(),
+            ]);
+
+            DB::table('order_available')
+            ->where('id', $order_available_id)
+            ->decrement('quantity', $quantity);
+
+            DB::table('order_available_dish')->insert([
+                'quantity' => $quantity,
+                'totalprice' => $totalprice,
+                'delivery_status' => 'order-pending',
+                'order_available_id' => $order_available_id,
+                'order_cart_id' => $order_cart_id
+            ]);
+            return response()->json(['response' => 'Order Created Successfully']);
+        } else {
+            return response()->json(['response' => 'Order Failed']);
+        }
+    }
+
+    public function getOrderAvailableDish(Request $request) {
+        $user_id = $request->get('user_id');
+        $option = $request->get('option');
+
+        // $data = DB::table('order_available_dish as oad')
+        //             ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+        //             ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+        //             ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+        //             ->where('oc.user_id', '=', $user_id)
+        //             ->where('oa.delivery_date', '>', now())
+        //             ->select('oad.* as order_available_dish', 'oc.* as order_cart', 'oa.* as order_available', 'd.* as dishes')
+        //             ->get();
+
+        if(count($request->all()) >= 1) {
+
+            if($option == 0) {
+                $order_available_dish = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '>', now())
+                    ->select('oad.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+
+                $order_cart = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '>', now())
+                    ->select('oc.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+
+                $order_available = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '>', now())
+                    ->select('oa.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+
+                $dishes = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '>', now())
+                    ->select('d.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+
+                $organizations = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->join('organizations as o', 'o.id', '=', 'oc.organ_id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '>', now())
+                    ->select('o.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+                    
+            } else if($option == 1) {
+                $order_available_dish = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '<', now())
+                    ->select('oad.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+
+                $order_cart = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '<', now())
+                    ->select('oc.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+
+                $order_available = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '<', now())
+                    ->select('oa.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+
+                $dishes = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '<', now())
+                    ->select('d.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+
+                $organizations = DB::table('order_available_dish as oad')
+                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                    ->join('organizations as o', 'o.id', '=', 'oc.organ_id')
+                    ->where('oc.user_id', '=', $user_id)
+                    ->where('oa.delivery_date', '<', now())
+                    ->select('o.*')
+                    ->orderBy('oa.delivery_date', 'asc')
+                    ->get();
+            }
+        }
+        
+        return response()->json(['order_available_dish'=>$order_available_dish, 'order_cart'=>$order_cart, 'order_available'=>$order_available, 'dishes'=>$dishes, 'organizations'=>$organizations]);
+        // return response()->json($order_available_dish);
+    }
+
+    
 }
