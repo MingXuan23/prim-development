@@ -99,14 +99,19 @@ td a {
     color: white !important;
 }
 .btn-dark-purple {
-    background-color: var(--secondary-color) !important;
+    background-color: var(--secondary-color);
     color: white;
     transition: all 0.2s ease;
     border-radius: 0.75rem;
     border: none;
     padding: 12px;
 }
+
 .btn-dark-purple:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+.admin-active {
     background-color: var(--primary-color) !important;
     color: white !important;
 }
@@ -213,6 +218,7 @@ button#btn-add-image:hover {
 }
 /* new search */
 #search-icon {
+    z-index: 999;
     cursor: pointer;
 }
 .search-container-input {
@@ -224,7 +230,7 @@ button#btn-add-image:hover {
     justify-content: center; /* Align input and SVG to the left */
 }
 .input {
-    width: 200px;
+    width: 220px;
     padding: 10px 0px 10px 40px;
     border-radius: 9999px;
     border: solid 2px var(--primary-color);
@@ -242,7 +248,17 @@ button#btn-add-image:hover {
 }
 .input:focus {
     opacity: 1;
-    width: 450px;
+    width: 400px;
+}
+/* for search autocomplete dropdown list */
+.typeahead li.active {
+    background-color: var(--primary-color);
+}
+.typeahead .active > a {
+    color: white !important;
+}
+.typeahead li a:hover {
+    background-color: var(--primary-color);
 }
 /*end of new search  */
 .home-thumbnails-container {
@@ -257,6 +273,8 @@ button#btn-add-image:hover {
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.6);
     transition: all 0.2s ease;
     position: relative;
+    height: 350px;
+    width: 300px;
 }
 .home-thumbnail-container:hover {
     transform: translate(2px, -8px);
@@ -333,12 +351,12 @@ button#btn-add-image:hover {
     max-height: 165px;
 }
 /* gallery button */
-.btn-gallery-container {
+.btn-fancy-container {
     position: absolute;
     bottom: 12px;
     right: 12px;
 }
-.btn-gallery {
+.btn-fancy {
     position: relative;
     overflow: hidden;
     height: 3rem;
@@ -349,17 +367,16 @@ button#btn-add-image:hover {
     color: #fff;
     border: none;
 }
-
-.btn-gallery:hover::before {
+.btn-fancy:hover::after {
     transform: scaleX(1);
 }
 
-.btn-gallery-content {
+.btn-fancy-content {
     position: relative;
     z-index: 1;
 }
 
-.btn-gallery::before {
+.btn-fancy::after {
     content: "";
     position: absolute;
     top: 0;
@@ -398,7 +415,8 @@ img.zoom {
     transform: scale(1.1);
 }
 div#modal-gallery,
-div#modal-fullscreen {
+div#modal-fullscreen,
+#modal-review-image {
     background-color: rgba(0, 0, 0, 0.7);
 }
 #modal-gallery .modal-body,
@@ -412,18 +430,21 @@ div#modal-fullscreen {
     padding: 0;
 }
 #modal-gallery .modal-header,
-#modal-fullscreen .modal-header {
+#modal-fullscreen .modal-header,
+#modal-review-image .modal-header {
     display: flex;
     justify-content: end;
     border-color: transparent;
 }
 #modal-gallery .modal-content,
-#modal-fullscreen .modal-content {
+#modal-fullscreen .modal-content,
+#modal-review-image .modal-content {
     background-color: transparent !important;
     border-color: transparent !important;
 }
 #btn-close-gallery,
-#btn-close-image {
+#btn-close-image,
+#btn-close-review-image {
     background-color: transparent !important;
     color: white;
     border: none !important;
@@ -578,7 +599,7 @@ html .ui-button.ui-state-disabled:active {
     flex-wrap: wrap;
 }
 .review-container > div {
-    padding: 12px 0;
+    padding: 12px 12px 12px 0px;
     flex-basis: 50%;
     margin-bottom: 12px;
 }
@@ -592,6 +613,38 @@ html .ui-button.ui-state-disabled:active {
 .unrated {
     color: var(--primary-color);
     font-size: 22px;
+}
+.img-review-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+.img-review {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.img-review:hover {
+    filter: brightness(0.5);
+}
+.img-modal-review-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+.img-modal-review {
+    max-width: 100%;
+    max-height: 450px;
+    transition: all 0.2s ease;
+}
+.btn-slideshow {
+    background-color: transparent !important;
+    color: white;
+    border: none !important;
+    font-size: 26px;
 }
 /* for tempahan anda */
 .nav-tabs > li > a,
@@ -720,12 +773,6 @@ html .ui-button.ui-state-disabled:active {
     #banner-content > * {
         padding: 8px;
         font-size: 20px !important;
-    }
-    .input {
-        width: 70%;
-    }
-    .input:focus {
-        width: 100%;
     }
     #modal-gallery .modal-body {
         flex-wrap: nowrap;

@@ -45,7 +45,7 @@
           <div class="flash-message"></div>
 
             <form method="post" action="{{route('homestay.updateRoom')}}" enctype="multipart/form-data"
-                class="form-validation" id="form-edit-homestay">
+                class="form-validation p-4" id="form-edit-homestay">
                 {{csrf_field()}}
                 <input type="hidden" name="roomid" value={{$room->roomid}}>
                 <div class="card-body">
@@ -63,19 +63,31 @@
                     
                     <div class="row">
                         
-                        <div class="col">
+                        <div class="col-md-3">
                             <div class="form-group required">
                                 <label class="control-label">Kapasiti Homestay(pax) <span style="color:#d00"> *</span></label>
                                 <input type="number"  class="form-control" id="roompax" name="roompax" value="{{$room->roompax}}" required>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col-md-3">
                             <div class="form-group required">
                                 <label class="control-label" for="price">Harga Per Malam (RM) <span style="color:#d00"> *</span></label>
                                 <input type="text" min="1" class="form-control" id="price" name="price" value="{{$room->price}}" required>
                             </div>
                         </div>
-
+                        <div class="col-md-3 form-group required d-none">
+                            <div class="form-label"><b>Jenis Tempahan <span style="color:#d00"> *</span></b></div>
+                            <label for="whole">Keseluruhan Homestay</label>
+                            <input type="radio" name="bookingType" id="whole" value="whole" class="mr-2" {{$room->booking_type == "whole" ? 'checked' : ''}} hidden>
+                            <label for="room">Bilik</label>
+                            <input type="radio" name="bookingType" id="room" value="room" {{$room->booking_type == "room" ? 'checked' : ''}} hidden>
+                        </div>
+                        @if($room->booking_type == "room")
+                            <div class="col-md-3 form-group required">
+                                <label for="roomNo" class="form-label">Jumlah Unit</label>
+                                <input type="number" min="1" name="roomNo" id="roomNo" class="form-control" value = "{{$room->room_no}}" required>
+                            </div>
+                        @endif
                     </div>
 
                     <div class="row">
@@ -83,8 +95,8 @@
                                 <label for="details">Detail Homestay<span style="color:#d00"> *</span></label>
                                 <textarea rows="10" cols="30" name="details" id="details" class="form-control"  placeholder="Contoh : 2 Bilik 1 Bilik Air Wifi Disediakan Tempat Parking Banyak" required>{{$room->details}}</textarea> 
                             </div>
-                            <div class="form-group col-6 row">
-                                <div class="form-group col-6 required">
+                            <div class="form-group col-6 row mx-0 px-0">
+                                <div class="form-group col-6 required mb-0">
                                     <label class="control-label">Negeri <span style="color:#d00"> *</span></label>
                                     <select name="state" id="state" class="form-select"
                                         data-parsley-required-message="Sila masukkan negeri" required>
@@ -144,7 +156,7 @@
                         @foreach($images as $image)
                         <div>
                             <button id="btn-delete-image" type="button"><i class="fas fa-times"></i></button>
-                            <img src="../{{$image->image_path}}"  class="img-thumbnail" id="img-preview">
+                            <img src="{{URL('../'.$image->image_path)}}"  class="img-thumbnail" id="img-preview">
                             <input type="file" name="image[]" id="{{$image->id}}" class="original_images" accept=".jpg,.jpeg,.png" hidden>                            
                         </div>
                        
@@ -185,6 +197,25 @@
 <script>
 
 $(document).ready(function () {
+    $('.navbar-header > div:first-child()').after(`
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
+    `);
+    // function toggleRoomNoInput() {
+    //         if ($('#room').is(':checked')) {
+    //             $('#roomNo').prop('disabled', false);
+    //         } else {
+    //             $('#roomNo').prop('disabled', true);
+    //             $('#roomNo').val('');
+    //         }
+    //     }
+
+    //     // Initial state check
+    //     toggleRoomNoInput();
+
+    //     // Event listeners for radio buttons
+    //     $('#room, #whole').on('change', function() {
+    //         toggleRoomNoInput();
+    //     });
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -64,7 +64,7 @@
                         <a href="#">Perniagaan</a>
                         <ul class="sub-menu">
                             <li><a href="/merchant/product">Get&Go</a></li>
-                            <li><a href="">Homestay</a></li>
+                            <li><a href="{{route('homestay.homePage')}}">Homestay</a></li>
                             <li><a href="">Bus</a></li>
                         </ul>
                     </li>

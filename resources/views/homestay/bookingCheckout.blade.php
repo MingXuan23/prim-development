@@ -114,7 +114,7 @@
           @endif
  
         
-      <form action="{{ route('fpxIndex') }}" method="POST" enctype="multipart/form-data" id="form-checkout">
+      <form action="{{ route('directpayIndex') }}" method="POST" enctype="multipart/form-data" id="form-checkout">
         @csrf
         <input type="hidden" name="desc" id="desc" value="Homestay">
         <input type="hidden" name="bookingid" id = "bookingid" value="{{ $checkoutDetails['bookingId'] }}">
@@ -124,11 +124,14 @@
               <h4>{{$checkoutDetails['homestay']->roomname}}</h4>
               <div class="row">
                 <div class="col-md-4">
-                  <img src="{{$checkoutDetails['homestayImage']}}" alt="Image Thumbnail" class="img-fluid d-block mx-auto">
+                  <img src="{{URL($checkoutDetails['homestayImage'])}}" alt="Image Thumbnail" class="img-fluid d-block mx-auto">
                 </div>
                 <div class="col-md-8">
                   <h6 class="color-dark-purple mb-1"><span><i class="fas fa-map-marker-alt"></i></span> {{$checkoutDetails['homestay']->address}}, {{$checkoutDetails['homestay']->area}}, {{$checkoutDetails['homestay']->postcode}}, {{$checkoutDetails['homestay']->district}}, {{$checkoutDetails['homestay']->state}}</h6>
                   <h6><span class="color-dark-purple mb-1"><i class="fas fa-user-friends"></i> Room Pax: </span>{{$checkoutDetails['homestay']->roompax}}</h6>
+                  @if($checkoutDetails['bookedRooms'] != null)
+                  <h6><span class="color-dark-purple mb-1"><i class="fas fa-door-closed"></i> Jumlah Unit: </span>{{$checkoutDetails['bookedRooms']}}</h6>
+                  @endif
                   <h6><span class="color-dark-purple mb-1"><i class="fas fa-sign-in-alt"></i> Daftar Masuk: </span>{{$checkoutDetails['checkInDate']}}, selepas {{date('H:i', strtotime($checkoutDetails['homestay']->check_in_after))}}</h6>
                   <h6><span class="color-dark-purple mb-1"><i class="fas fa-sign-out-alt"></i> Daftar Keluar: </span>{{$checkoutDetails['checkOutDate']}}, sebelum {{date('H:i', strtotime($checkoutDetails['homestay']->check_out_before))}}</h6>
                 </div>
@@ -137,8 +140,13 @@
           <div class="border-white col-md-5 mb-3" id="checkout-price-container">
             <h4>Butiran Harga</h4>
             <div class="d-flex justify-content-between align-items-center flex-wrap mb-1">
-              <h5 class="color-dark-purple">RM{{$checkoutDetails['homestay']->price}} x {{$checkoutDetails['nightCount']}} malam</h5>
-              <h5 class="color-purple">RM{{number_format($checkoutDetails['homestay']->price * $checkoutDetails['nightCount'],2)}}</h5>
+              @if($checkoutDetails['bookedRooms'] != null)
+                <h5 class="color-dark-purple">RM{{$checkoutDetails['homestay']->price}} x {{$checkoutDetails['nightCount']}} malam x {{$checkoutDetails['bookedRooms']}} Unit</h5>
+                <h5 class="color-purple">RM{{number_format($checkoutDetails['homestay']->price * $checkoutDetails['nightCount'],2) * $checkoutDetails['bookedRooms']}} </h5>
+              @else
+                <h5 class="color-dark-purple">RM{{$checkoutDetails['homestay']->price}} x {{$checkoutDetails['nightCount']}} malam</h5>
+                <h5 class="color-purple">RM{{number_format($checkoutDetails['homestay']->price * $checkoutDetails['nightCount'],2)}} </h5>
+              @endif
             </div>
             @if($checkoutDetails['discountAmount'] > 0)
               <div class="d-flex justify-content-between align-items-center flex-wrap mb-1">
@@ -159,7 +167,7 @@
           </div>        
         </div>
 
-      <div class="row d-flex justify-content-center mb-3">
+      {{-- <div class="row d-flex justify-content-center mb-3">
         <div class="col-md-6 border-white">
           <div class="form-group">
             <div id="invalid-bank-message">
@@ -172,7 +180,7 @@
           </div>          
         </div>
       </div>
-        
+         --}}
         <div class="row mb-2">
           <div class="col d-flex justify-content-end">
             <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2" style="color:#391582;">KEMBALI</a>
@@ -193,7 +201,9 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   $(document).ready(function(){
-
+    $('.navbar-header > div:first-child()').after(`
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}" height="70px">
+    `);
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -202,31 +212,12 @@
 
     var arr = [];
     
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: "/fpx/getBankList",
-        success: function(data) {
-            jQuery.each(data.data, function(key, value){
-                arr.push(key);
-            });
-            for(var i = 0; i < arr.length; i++){
-                arr.sort();
-                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-            }
-
-        },
-        error: function (data) {
-            // console.log(data);
-        }
-    });
 
     // add border bottom before amount to pay
     $('#checkout-price-container > div:nth-last-child(2)').addClass('border-bottom')
 
     $('button[type="submit"]').on('click', function(e){
       e.preventDefault();
-      if($('#bankid').val() != null){
         Swal.fire({
           title: 'Are you sure?',
           text: "You will be redirected to website of the selected online banking",
@@ -240,11 +231,6 @@
             $('#form-checkout').submit();
           }
         })        
-      }else{
-        $('#invalid-bank-message').html(`
-          <div class="alert alert-danger text-center">Sila Pilih Bank</div>
-        `);
-      }
     })
 
     $('.alert-success').delay(2000).fadeOut()

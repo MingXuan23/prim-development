@@ -670,8 +670,8 @@ class FeesController extends AppBaseController
                         ->where('c.levelid','>',0)
                         ->where('ous.organization_user_id',$parent_id[$i]->id)
                         ->select('s.id')
-                        ->distinct();
-
+                        ->distinct()
+                        ->get();
                 if(count($activeChildren)>0){
                     $fees_parent = DB::table('organization_user')
                     ->where('id', )

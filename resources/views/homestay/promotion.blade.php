@@ -9,15 +9,15 @@
 @endsection
 
 @section('content')
-<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
+{{-- <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Urus Promosi</h4>
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
       <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
       <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan</a>
       <a style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
     </div>
-</div>
-
+</div> --}}
+@include('homestay.adminNavBar')
 <div class="row">
 
   <div class="col-md-12">
@@ -92,8 +92,8 @@
                 <th style="width: 10%"> Harga Semalam Semasa Promosi(RM) </th>
                 <th style="width: 15%"> Tarikh Mula </th>
                 <th style="width: 15%"> Tarikh Berakhir </th>
-                <th style="width: 10%"> Action 1</th>
-                <th style="width: 10%"> Action 2</th>
+                <th style="width: 10%"> Tindakan 1</th>
+                <th style="width: 10%"> Tindakan 2</th>
               </tr>
             </thead>
             <tbody>
@@ -157,7 +157,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 <script>
-$(document).ready(function() {    
+$(document).ready(function() { 
+  $('.navbar-header > div:first-child()').after(`
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
+    `);
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -261,14 +264,14 @@ $(document).ready(function() {
                     { 
                       data: 'promotionid', render: function(data) {
                         var editUrl = `{{ route('homestay.editPromotionPage', ':promotionid') }}`.replace(':promotionid', data);
-                        return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-promotion-id="${data}">Edit</a>`;
+                        return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-promotion-id="${data}">Sunting</a>`;
                       },
                       orderable: false,
                       searchable: false, 
                     },
                     {
                       data: 'promotionid', render: function(data) {
-                        return `<button class="btn btn-danger" id="btn-delete" data-promotion-id="${data}">Delete</a>`;
+                        return `<button class="btn btn-danger" id="btn-delete" data-promotion-id="${data}">Padam</button>`;
                       },
                       orderable: false,
                       searchable: false,  
@@ -295,7 +298,7 @@ $(document).ready(function() {
     $('#org_id').change(function() {
         const homestayId = $(this).val();
 
-        $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview','')}}/${homestayId}`);
+        $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview')}}`);
         $('#view-promotion-history').attr('href',`{{route('homestay.viewPromotionHistory','')}}/${homestayId}`);
         const linkAddPromotion = $('#link-add-promotion');
         linkAddPromotion.attr('href', `{{ route('homestay.setpromotion', '') }}/${homestayId}`);
@@ -314,13 +317,13 @@ $(document).ready(function() {
     // for delete functionality
     $(document).on('click','#btn-delete',function(){
       Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: 'Adakah anda pasti?',
+        text: "Anda tidak akan dapat mengembalikannya!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Ya, padamkan promosi ini!'
       }).then((result) => {
         if (result.isConfirmed) {
           const promotionId = $(this).attr('data-promotion-id');
@@ -340,8 +343,8 @@ $(document).ready(function() {
             }
           })
           Swal.fire(
-            'Deleted!',
-            'This promotion has been deleted.',
+            'Padam!',
+            'Promosi ini telah dipadamkan',
             'success'
           )
         }
@@ -350,6 +353,19 @@ $(document).ready(function() {
     $("#homestay_id").on('change', function(){
       getData();
     })
+            // to add .active to the link for current page in navbar
+    // Get the current URL path
+    var currentPath = window.location.pathname;
+
+    // Loop through each anchor tag in the navigation
+    $('.admin-nav-links a').each(function() {
+        var linkPath = $(this).attr('href');
+        // Check if the link's path matches the current URL path
+        if (linkPath.includes(currentPath)) {
+            // Add a class to highlight the active link
+            $(this).addClass('admin-active');
+        }
+    });
 });
 </script>
 @endsection

@@ -8,14 +8,15 @@
 @endsection
 
 @section('content')
-<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
+{{-- <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Urus Tempahan Pelanggan</h4>
   <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
       <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
       <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple m-2"><i class="fas fa-percentage"></i> Urus Promosi</a>
       <a style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
   </div>
-</div>
+</div> --}}
+@include('homestay.adminNavBar')
 <div class="row">
 
   <div class="col-md-12">
@@ -84,9 +85,9 @@
                     <th>Daftar Keluar</th>
                     <th>Nama Homestay</th>
                     <th>Jumlah Dibayar (RM)</th>
-                    <th>Action 01</th>
-                    <th>Action 02</th>
-                    <th>Action 03</th>
+                    <th>Tindakan 01</th>
+                    <th>Tindakan 02</th>
+                    <th>Tindakan 03</th>
               </tr>
             </thead>
             <tbody>
@@ -108,6 +109,9 @@
 
 <script>
 $(document).ready(function() {
+  $('.navbar-header > div:first-child()').after(`
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
+    `);
   $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -125,7 +129,7 @@ $(document).ready(function() {
             },
             success: function(result) {
                 //only run this during the first request
-                if(getDataCounter == 0){
+                if(getDataCounter == 0 && result.homestays.length > 0){
                   //reset #homestay_id 
                   $('#homestay_id').empty();
                   // add option into #homestay_id
@@ -183,6 +187,13 @@ $(document).ready(function() {
                       data: 'roomname',
                       orderable: true,
                       searchable: true,
+                      render: function(data,type, row){
+                        if(row.booked_rooms == null){
+                          return data;
+                        }else{
+                          return `${data}<br>(x ${row.booked_rooms} Unit)`;
+                        }
+                      }
                     },                    
                     { 
                       data: 'totalprice', 
@@ -194,7 +205,7 @@ $(document).ready(function() {
                     },
                     { 
                       data: 'bookingid', render: function(data) {
-                        return `<button class="btn btn-primary" id="btn-checkout" data-booking-id="${data}">Daftar Keluar</a>`;
+                        return '<button class="btn btn-primary" id="btn-checkout" data-booking-id="' +data + '">Daftar Keluar</button>';
                       },
                       orderable: false,
                       searchable: false, 
@@ -202,14 +213,14 @@ $(document).ready(function() {
                     { 
                       data: 'bookingid', render: function(data) {
                         var detailUrl = `{{route('homestay.bookingDetails', ':bookingData')}}`.replace(':bookingData' ,data);
-                        return `<a class="text-white" href="${detailUrl}"><button class="btn-dark-purple btn-detail">Butiran<?button></a>`;
+                        return `<a class="text-white" href="${detailUrl}"><button class="btn-dark-purple btn-detail">Butiran</button></a>`;
                       },
                       orderable: false,
                       searchable: false, 
                     },
                     {
                       data: 'bookingid', render: function(data) {
-                        return `<button class="btn btn-danger" id="btn-cancel-booking" data-booking-id="${data}">Batal</a>`;
+                        return `<button class="btn btn-danger" id="btn-cancel-booking" data-booking-id="${data}">Batal</button>`;
                       },
                       orderable: false,
                       searchable: false,  
@@ -233,7 +244,7 @@ $(document).ready(function() {
       // Bind onchange event
   $('#org_id').change(function() {
       const orgId = $(this).val();
-      $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview','')}}/${orgId}`);
+      $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview')}}`);
       const viewBookingHistory = $('#view-booking-history');
       viewBookingHistory.attr('href', `{{ route('homestay.viewBookingHistory', '') }}/${orgId}`);
       getData();
@@ -244,13 +255,13 @@ $(document).ready(function() {
 
   $(document).on('click','#btn-checkout', function(){
     Swal.fire({
-        title: 'Are you sure?',
-        text: "You want to finish this booking?",
+        title: 'Adakah anda pasti?',
+        text: "Anda mahu selesaikan tempahan ini?",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, checkout user from the homestay!'
+        confirmButtonText: 'Ya, daftar keluar guest ini!'
       }).then((result) => {
         if (result.isConfirmed) {
           const bookingId = $(this).attr('data-booking-id');
@@ -270,8 +281,8 @@ $(document).ready(function() {
             }
           })
           Swal.fire(
-            'Booking Completed!',
-            'This user has been checked out from the homestay',
+            'Tempahan Selesai!',
+            'Guest ini telah didaftar keluar daripada homestay',
             'success'
           )
         }
@@ -280,13 +291,13 @@ $(document).ready(function() {
 
   $(document).on('click','#btn-cancel-booking', function(){
     Swal.fire({
-        title: 'Are you sure?',
-        text: "You have to arrange proper refund for this customer",
+        title: 'Adakah anda pasti?',
+        text: "Anda diwajibkan menjalankan pemulangan duit tempahan kepada guest ini",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, cancel the booking!'
+        confirmButtonText: 'Ya, batalkan tempahan ini!'
       }).then((result) => {
         if (result.isConfirmed) {
           const bookingId = $(this).attr('data-booking-id');
@@ -306,8 +317,8 @@ $(document).ready(function() {
             }
           })
           Swal.fire(
-            'Booking Cancelled!',
-            'This booking has been canceled',
+            'Tempahan dibatalkan!',
+            'Tempahan ini berjaya dibatalkan',
             'success'
           )
         }
@@ -317,6 +328,19 @@ $(document).ready(function() {
     getData();
   });
   $('.alert').delay(3000).fadeOut();
+            // to add .active to the link for current page in navbar
+  // Get the current URL path
+  var currentPath = window.location.pathname;
+
+  // Loop through each anchor tag in the navigation
+  $('.admin-nav-links a').each(function() {
+      var linkPath = $(this).attr('href');
+      // Check if the link's path matches the current URL path
+      if (linkPath.includes(currentPath)) {
+          // Add a class to highlight the active link
+          $(this).addClass('admin-active');
+      }
+  });
 });
 </script>
 @endsection

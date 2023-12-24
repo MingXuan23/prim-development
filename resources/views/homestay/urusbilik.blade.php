@@ -9,14 +9,7 @@
 @endsection
 
 @section('content')
-    <div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
-      <h4 class="font-size-18 color-purple">Urus Homestay</h4>
-      <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
-          <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple m-2"><i class="fas fa-percentage"></i> Urus Promosi</a>
-          <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan Pelanggan</a>
-          <a style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
-      </div>
-    </div>
+  @include('homestay.adminNavBar')
 
 <div class="row">
 
@@ -81,8 +74,8 @@
                 <th style="width: 5%"> Kapasiti </th>
                 <th style="width: 15%"> Harga Semalam (RM) </th>
                 <th style="width: 10%"> Status</th>
-                <th style="width: 10%"> Action 1</th>
-                <th style="width: 10%"> Action 2</th>
+                <th style="width: 10%"> Tindakan 1</th>
+                <th style="width: 10%"> Tindakan 2</th>
               </tr>
             </thead>
             <tbody>
@@ -162,11 +155,15 @@
 // }
 
 $(document).ready(function() {    
+  $('.navbar-header > div:first-child()').after(`
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
+    `);
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+
     var dataTable = $('#bilikTable').DataTable({
         // ... your DataTable configuration ...
     });
@@ -198,7 +195,7 @@ $(document).ready(function() {
                         render: function(data, type, row) {
                           for(var i = 0; i< result.roomImages.length; i++) {
                             if(data == result.roomImages[i].roomid){
-                              return `<img src="${result.roomImages[i].image_path}" alt="Image of Homestay/Room" class="img-homestay">`;
+                              return `<img src=" {{URL('${result.roomImages[i].image_path}')}}" alt="Image of Homestay/Room" class="img-homestay">`;
                             }
                           }
                         },
@@ -209,6 +206,13 @@ $(document).ready(function() {
                       data: 'roompax',
                       orderable: true,
                       searchable: true,
+                      render: function(data, type, row) {
+                        if(row.room_no != null){
+                          return `${data} pax (${row.room_no} unit)`;
+                        }else{
+                          return `${data} pax `;
+                        }
+                      }
                     },
 
                     { 
@@ -220,16 +224,23 @@ $(document).ready(function() {
                       data: 'status', 
                       orderable: true,
                       searchable: true,
+                      render: function(data){
+                        if(data == "Available"){
+                          return "Tempahan Dibuka";
+                        }else{
+                          return "Tempahan Ditutup";
+                        }
+                      }
                     },
                     { 
                       data: 'roomid', render: function(data) {
                         var editUrl = `{{ route('homestay.editRoomPage', ':roomid') }}`.replace(':roomid', data);
-                        return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-room-id="${data}">Edit</a>`;
+                        return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-room-id="${data}">Sunting</a>`;
                       } 
                     },
                     {
                       data: 'roomid', render: function(data) {
-                        return `<button class="btn btn-danger" id="btn-delete" data-room-id="${data}">Delete</a>`;
+                        return `<button class="btn btn-danger" id="btn-delete" data-room-id="${data}">Padam</a>`;
                       }  
                     },
                 ],
@@ -248,7 +259,7 @@ $(document).ready(function() {
     // Bind onchange event
     $('#homestay').change(function() {
         var orgId = $(this).val();
-        $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview','')}}/${orgId}`);
+        $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview')}}`);
         getData();
     });
     $("#homestay option:nth-child(2)").prop("selected", true);
@@ -263,13 +274,13 @@ $(document).ready(function() {
     // for delete functionality
     $(document).on('click','#btn-delete',function(){
       Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
+        title: 'Adakah anda pasti?',
+        text: "Anda tidak akan dapat mengembalikannya!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Ya, padamkan homestay ini!'
       }).then((result) => {
         if (result.isConfirmed) {
           const roomId = $(this).attr('data-room-id');
@@ -289,12 +300,25 @@ $(document).ready(function() {
             }
           })
           Swal.fire(
-            'Deleted!',
-            'This room has been deleted.',
+            'Padam!',
+            'Homestay ini telah dipadamkan',
             'success'
           )
         }
       })
+    });
+        // to add .active to the link for current page in navbar
+    // Get the current URL path
+    var currentPath = window.location.pathname;
+
+    // Loop through each anchor tag in the navigation
+    $('.admin-nav-links a').each(function() {
+        var linkPath = $(this).attr('href');
+        // Check if the link's path matches the current URL path
+        if (linkPath.includes(currentPath)) {
+            // Add a class to highlight the active link
+            $(this).addClass('admin-active');
+        }
     });
 });
 </script>

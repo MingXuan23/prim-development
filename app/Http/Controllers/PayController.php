@@ -422,9 +422,9 @@ class PayController extends AppBaseController
                 ->get();
         }
 
-        $banklists = FPXController::getStaticBankList();
+        //$banklists = FPXController::getStaticBankList();
 
-        return view('fee.pay.pay', compact('getstudent', 'getorganization', 'getfees', 'getfees_bystudent', 'getstudentfees', 'getfees_category_A', 'getfees_category_A_byparent', 'get_fees_by_parent', 'banklists'))->render();
+        return view('fee.pay.pay', compact('getstudent', 'getorganization', 'getfees', 'getfees_bystudent', 'getstudentfees', 'getfees_category_A', 'getfees_category_A_byparent', 'get_fees_by_parent'))->render();
     }
 
     public function billIndex()
@@ -1861,6 +1861,7 @@ class PayController extends AppBaseController
                     list($key1,$value1) = explode("=", $token);
                     $value1 = urldecode($value1);
                     $response_value[$key1] = $value1;
+                    dd($response_value);
                     $token = strtok("&");
                 }
 

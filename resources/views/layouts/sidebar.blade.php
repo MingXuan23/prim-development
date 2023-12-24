@@ -15,14 +15,14 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga'))
+                {{-- @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga')) --}}
                 <li>
                     <a href="{{ route('organization.index') }}" class=" waves-effect">
                         <i class="mdi mdi-account-group"></i>
                         <span>Organisasi</span>
                     </a>
                 </li>
-                @endunless
+                {{-- @endunless --}}
 
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -131,7 +131,6 @@
                         </li>
                         @endrole
 
-
                         @role('Superadmin|Pentadbir|Guru')
                         <li>
                             <a href="{{ route('student.index') }}" class=" waves-effect">
@@ -150,8 +149,46 @@
                             </a>
                         </li>
 
-                        @endrole
+                        @endrole 
+                        <!-- Relief System -->
+                        @role('Superadmin|Pentadbir|Guru|Warden|Guard') 
+                        <li>
+                            <a href="javascript: void(0);" class="has-arrow waves-effect">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Jadual Waktu</span>
+                            </a>
 
+                            <ul class="sub-menu mm-collapse" aria-expanded="false">
+                                @role('Superadmin|Pentadbir')
+                                <li>
+                                    <a href="{{ route('subject.index') }}" class=" waves-effect">
+                                        <i class="fas fa-book"></i>
+                                        <span>Subjek</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('schedule.index') }}" class=" waves-effect">
+                                        <i class="fas fa-clock"></i>
+                                        <span>Jadual</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('schedule.manageRelief') }}" class=" waves-effect">
+                                        <i class="fas fa-tasks"></i>
+                                        <span>Pengurusan Guru Ganti</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('schedule.reliefReport') }}" class=" waves-effect">
+                                        <i class="fas fa-clipboard"></i>
+                                        <span>Laporan</span>
+                                    </a>
+                                </li>
+                                @endrole
+                            </ul>
+                        </li>
+                        @endrole
+                        
                         @if(Auth::id() == 5529 || Auth::id() == 5527 || Auth::id() == 5528 || Auth::user()->hasRole('Warden') || Auth::user()->hasRole('Guard'))
                             @role('Superadmin|Pentadbir|Penjaga|Warden|Guard')
                             <li>
@@ -740,12 +777,12 @@
                             <span>Urus Tempahan</span>
                         </a>
                     </li> --}}
-                    <li>
+                    {{-- <li>
                         <a href="{{ route('homestay.viewPerformanceReport') }}" class=" waves-effect">
                             <i class="mdi mdi-finance"></i>
                             <span>Lihat Prestasi</span>
                         </a>
-                    </li>
+                    </li> --}}
                     @endrole 
 
                     <li>

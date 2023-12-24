@@ -8,16 +8,18 @@
 @endsection
 
 @section('content')
-<a href="{{url()->previous()}}" class="color-dark-purple" style="font-size: 20px;"><i class="mt-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
+<a href="{{url()->previous()}}" class="color-dark-purple" style="font-size: 20px;"><i class="my-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
 
-<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
+<div class="d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Sejarah Tempahan ({{$organization->nama}}) </h4>
-  <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
+  {{-- <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
       <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
       <a href="{{route('homestay.promotionPage')}}" class="btn-dark-purple m-2"><i class="fas fa-percentage"></i> Urus Promosi</a>
       <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan Pelanggan</a>
-  </div>
+  </div> --}}
 </div>
+@include('homestay.adminNavBar')
+
 <div class="row">
 
   <div class="col-md-12">
@@ -49,7 +51,6 @@
               @endforeach
           </select>            
         </div>
-        <a style="margin: 19px; float: right;cursor: pointer;" href="{{route('homestay.viewCustomersReview',$organization->id)}}" id="view-booking-history" class="btn-purple"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
       </div>
       <div class="card-body">
 
@@ -101,6 +102,9 @@
 
 <script>
 $(document).ready(function() {
+  $('.navbar-header > div:first-child()').after(`
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
+    `);
   $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -179,14 +183,14 @@ $(document).ready(function() {
                             var rating ='';
                             for(var i = 0; i < data; i++){
                                 if(i < data){
-                                    rating += `<span class="rated">&#9733</span>`;
+                                    rating += '<span class="rated">&#9733</span>';
                                 }else{
-                                    rating += `<span class="unrated">☆</span>`;  
+                                    rating += '<span class="unrated">☆</span>';  
                                 }
                             }
                             return rating;
                         }else{
-                            return `Tiada nilaian diberikan`;
+                            return 'Tiada nilaian diberikan';
                         }
                       },
                       orderable: true,
@@ -195,7 +199,7 @@ $(document).ready(function() {
                    { 
                       data: 'bookingid', render: function(data) {
                         var detailUrl = `{{route('homestay.bookingDetails', ':bookingData')}}`.replace(':bookingData' ,data);
-                        return `<a class="text-white" href="${detailUrl}"><button class="btn-dark-purple btn-detail">Butiran<?button></a>`;
+                        return '<a class="text-white" href="'+detailUrl+'"><button class="btn-dark-purple btn-detail">Butiran</button></a>';
                       },
                       orderable: false,
                       searchable: false, 

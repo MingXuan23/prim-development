@@ -20,16 +20,18 @@
 @endsection
 
 @section('content')
-<a href="{{url()->previous()}}" class="color-dark-purple" style="font-size: 20px;"><i class="mt-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
 
-<div class="page-title-box d-flex justify-content-between align-items-center flex-wrap">
+<a href="{{url()->previous()}}" class="color-dark-purple" style="font-size: 20px;"><i class="my-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap">
   <h4 class="font-size-18 color-purple">Sejarah Promosi ({{$organization->nama}})</h4>
-  <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
+  {{-- <div class="nav-links d-flex justify-content-center align-items-center flex-wrap">
       <a href="{{route('homestay.urusbilik')}}" class="btn-dark-purple m-2"><i class="mdi mdi-home-city-outline"></i> Urus Homestay</a>
       <a href="{{route('homestay.urustempahan')}}" class="btn-dark-purple m-2"><i class="fas fa-concierge-bell"></i> Urus Tempahan</a>
       <a href="{{route('homestay.viewCustomersReview',$organization->id)}}" style="cursor: pointer;" id="view-customers-review" class="btn-dark-purple m-2"> <i class="fas fa-comments"></i> Nilaian Pelanggan</a>
-    </div>
+    </div> --}}
 </div>
+@include('homestay.adminNavBar')
 
 <div class="row">
 
@@ -107,7 +109,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 <script>
-$(document).ready(function() {    
+$(document).ready(function() {  
+  $('.navbar-header > div:first-child()').after(`
+        <img src="{{URL('assets/homestay-assets/images/book-n-stay-logo(transparent).png')}}"  height="70px">
+    `);
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

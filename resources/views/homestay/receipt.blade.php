@@ -24,25 +24,26 @@
 </head>
 
 <body>
-    <div>You are being redirected to our homepage in <span id="time">5</span> seconds</div>
+    <div class="d-flex justify-content-center mt-4">You are being redirected to our homepage in&nbsp;<span id="time"> 5 </span> &nbsp;seconds</div>
     <div class="container">
         <div class="row mt-3">
             <div class="col-12">
                 <div class="card mb-1">
                     <div class="card-body py-5">
                         <div class="row">
-                            <div class="col-lg-2 col-sm-12 p-0">
-                                <center>
-                                    <img src="{{ URL::asset('/organization-picture/'. $organization->organization_picture) }}" height="80"
-                                        alt="" />
-                                </center>
-                            </div>
-                            <div class="col-lg-6 col-sm-12 p-0">
-                                <h4>{{ $organization->nama }}</h4>
-                                <p>{{ $organization->address }},
-                                    <br />
-                                    {{ $organization->postcode }} {{ $organization->city }}, {{ $organization->state }}
-                                </p>
+                            <div class="col-lg-6 col-sm-12 p-0 d-flex align-items-center flex-wrap">
+                                <img src="{{URL($room->homestayImage[0]->image_path ) }}" height="100" width="150"/>
+                                <div>
+                                    <h4>{{ $room->roomname }}</h4>
+                                    <p>{{ $room->address }}, {{ $room->area }},
+                                        <br />
+                                        {{ $room->postcode }}, {{$room->district}},{{ $room->state }}
+                                    </p>
+                                    <div>Organisasi: {{ $organization->nama }}</div>
+                                    <div>Tel No: {{$organization->telno}}</div>
+                                    <div>Email: {{$organization->email}}</div>
+                                </div>
+
                             </div>
                             <div class="col-lg-4 col-sm-12">
                                 <table style="width: 100%">
@@ -71,10 +72,10 @@
                                         <td class="py-2">:</td>
                                         <td class="py-2 w-50">{{ $user->name }}</td>
                                         <td class="py-2" colspan="3"></td>
-                                        <td class="py-2">No. Kad Pengenalan
+                                        <td class="py-2">Tel No.
                                         </td>
                                         <td class="py-2">:</td>
-                                        <td class="py-2">{{ $user->icno }}</td>
+                                        <td class="py-2">{{ $user->telno }}</td>
                                     </tr>
                                     <tr style="background-color:#e9ecef">
                                         <th colspan="9" class="text-center">Maklumat Tempahan</th>
@@ -90,11 +91,10 @@
                                     
                                 </div>
 
-                                <table class="table table-bordered table-striped" style="">
+                                <table class="table table-bordered table-striped table-responsive" style="overflow-x:auto;">
                                     <tr style="text-align: center">
                                         <th style="width:3%">Bil.</th>
                                         <th style="width:10%">Nama Homestay</th>
-                                        <th style="width:20%">Nama Bilik</th>
                                         <th style="width:20%">Tarikh Dari</th>
                                         <th style="width:20%">Tarikh Hingga</th>
                                         <th style="width:20%">Amaun Semalam (RM)</th>
@@ -102,22 +102,40 @@
                                     @foreach ($booking_order as $item)
                                     <tr>
                                         <td style="text-align: center"> {{ $loop->iteration }}.</td>
-                                        <td>
-                                            <div class="pl-2"> {{ $item->nama }} </div>
-                                        </td>
                                         <td style="text-align: center">{{ $item->roomname }}</td>
                                         <td style="text-align: center">{{ $item->checkin }}</td>
                                         <td style="text-align: center">{{ $item->checkout }}</td>
-                                        <td style="text-align: center">{{  $item->price  }}</td>
+                                        @if($booking_order[0]->booked_rooms == null)
+                                            <td style="text-align: center">{{  $item->price  }}</td>
+                                        @else
+                                            <td style="text-align: center">{{  number_format($item->price * $booking_order[0]->booked_rooms , 2) }} (x{{$booking_order[0]->booked_rooms}} unit) </td>
+                                        @endif
+
                                     </tr>
                                     @endforeach
-
+                                    @if($booking_order[0]->discount_received  > 0)
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="3" style="text-align:center"><b>Diskaun Diterima</b> </td>
+                                        <td style="text-align:center">
+                                            <b>-{{ $booking_order[0]->discount_received  }}</b>
+                                        </td>
+                                    </tr>
+                                    @endif
+                                    @if($booking_order[0]->increase_received  > 0)
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="3" style="text-align:center"><b>Penambahan Diterima</b> </td>
+                                        <td style="text-align:center">
+                                            <b>+{{ $booking_order[0]->increase_received  }}</b>
+                                        </td>
+                                    </tr>
+                                    @endif
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
                                         <td style="text-align:center">
                                             <b>{{ $item->totalprice  }}</b>
-
                                         </td>
                                     </tr>
 
@@ -147,7 +165,7 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count <= 0) {
-            window.location = '/tempahananda'; 
+            window.location = '/booknstay/tempahananda'; 
         }
     },1000);
 </script>

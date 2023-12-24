@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('api.fpxIndex');
+Route::post('directpayIndex', 'DirectpayController@directpayIndex')->name('api.directpayIndex');
 
 Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
 
@@ -72,13 +73,17 @@ Route::group(['prefix' => 'mobile'], function () {
 Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
     Route::post('login', 'ScheduleApiController@login');
     Route::get('getTimeOff', 'ScheduleApiController@getTimeOff');
-    Route::get('sendNotification/{id}', 'ScheduleApiController@sendNotification');
+    Route::get('sendNotification/{id}/{title}/{message}', 'ScheduleApiController@sendNotification');
     Route::get('isNoti/{id}', 'ScheduleApiController@isNoti');
     Route::get('getSchedule/{id}', 'ScheduleApiController@getSchedule');
     Route::get('getTeacherInfo/{id}', 'ScheduleApiController@getTeacherInfo');
     Route::any('submitLeave', 'ScheduleApiController@submitLeave');
     
     Route::get('getLeaveType', 'ScheduleApiController@getLeaveType');
+    Route::post('getPendingRelief','ScheduleApiController@getPendingRelief');
+
+    Route::post('submitReliefResponse','ScheduleApiController@submitReliefResponse');
+    Route::get('getHistory/{id}','ScheduleApiController@getHistory');
 
     
 });

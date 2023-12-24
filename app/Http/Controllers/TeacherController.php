@@ -211,7 +211,7 @@ class TeacherController extends Controller
             'user_id'           => $newteacher->id,
             'role_id'           => 5,
             'start_date'        => now(),
-            'status'            => 0,
+            'status'            => 1,
         ]);
 
         $user = User::find($newteacher->id);
