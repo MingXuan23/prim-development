@@ -97,7 +97,7 @@
                     <label>Poster Derma</label>
                     <form action="#" class="dropzone">
                         <div class="fallback">
-                            <input name="donation_poster" type="file">
+                            <input name="donation_poster" type="file" id ="donation_poster">
                         </div>
                     </form>
                 </div>
@@ -144,7 +144,32 @@
             todayHighlight:true,
             format: 'dd/mm/yyyy',
             orientation: 'bottom'
+
+            
         });
+
+    //     $("#donation_poster").on("change", function() {
+    //     if (this.files[0].size > 1048576) {
+    //         alert("Please compress image less than 1MB.");
+    //         $(this).val("");
+    //     }
+    // });
+
+    $('#donation_poster').on('change', function(event) {
+        const target = event.target;
+        if (target.files && target.files[0]) {
+
+            // Maximum allowed size in bytes
+            // 1MB Example, change the value for your needs
+            const maxAllowedSize = 1 * 1024 * 1024;
+
+            if (target.files[0].size > maxAllowedSize) {
+                // Here you can ask your users to load the correct file
+                alert('Please compress your poster below than 1MB')
+                $(this).val('');
+            }
+        }
+    });
         
     });
 </script>
