@@ -534,36 +534,36 @@ class ScheduleApiController extends Controller
                 }
 
             $allPending=false;
-            if($request->isAdmin&&$this->checkAdmin($user->id,$school->id)){
-                $allPending = DB::table('organizations as o')
-                ->join('schedules as s','s.organization_id','o.id')
-                ->join('schedule_version as sv','sv.schedule_id','s.id')
-                ->join('schedule_subject as ss','ss.schedule_version_id','sv.id')
-                ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
-                ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
-                ->leftJoin('subject as sub','sub.id','ss.subject_id')
-                ->leftJoin('users as u','u.id','ss.teacher_in_charge')
-                ->leftJoin('users as ur','ur.id','lr.replace_teacher_id')
-                ->leftJoin('classes as c','c.id','ss.class_id')
-                ->where('lr.confirmation','<>',"Confirmed")
-                ->where('sv.status',1)
-                ->where('s.status',1)
-                ->where('tl.status',1)
-                ->where('tl.date','>=',Carbon::today())
-                ->select('lr.id as leave_relief_id','ss.id as schedule_subject_id','c.nama as class','sub.name as subject',
-                's.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as leaveTeacher','ur.name as reliefTeacher','tl.date')
-                ->get();
+            // if($request->isAdmin&&$this->checkAdmin($user->id,$school->id)){
+            //     $allPending = DB::table('organizations as o')
+            //     ->join('schedules as s','s.organization_id','o.id')
+            //     ->join('schedule_version as sv','sv.schedule_id','s.id')
+            //     ->join('schedule_subject as ss','ss.schedule_version_id','sv.id')
+            //     ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
+            //     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            //     ->leftJoin('subject as sub','sub.id','ss.subject_id')
+            //     ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+            //     ->leftJoin('users as ur','ur.id','lr.replace_teacher_id')
+            //     ->leftJoin('classes as c','c.id','ss.class_id')
+            //     ->where('lr.confirmation','<>',"Confirmed")
+            //     ->where('sv.status',1)
+            //     ->where('s.status',1)
+            //     ->where('tl.status',1)
+            //     ->where('tl.date','>=',Carbon::today())
+            //     ->select('lr.id as leave_relief_id','ss.id as schedule_subject_id','c.nama as class','sub.name as subject',
+            //     's.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as leaveTeacher','ur.name as reliefTeacher','tl.date')
+            //     ->get();
 
-                foreach($allPending as $a){
-                    //if(isset($s->duration)){
-                        $time_info= $this->getSlotTime($a,$a->day,$a->slot);
-                        $a->time=$time_info['time'];
-                        $a->duration=$time_info['duration'];
+            //     foreach($allPending as $a){
+            //         //if(isset($s->duration)){
+            //             $time_info= $this->getSlotTime($a,$a->day,$a->slot);
+            //             $a->time=$time_info['time'];
+            //             $a->duration=$time_info['duration'];
              
-                        unset($a->time_off);
-                        unset($a->start_time);
-                }
-            }
+            //             unset($a->time_off);
+            //             unset($a->start_time);
+            //     }
+            // }
             return response()->json(['pendingRelief'=>$pendingRelief,'allPending'=>$allPending]);
         }
         return response()->json(["error"=>"You have not any school"]);
@@ -721,21 +721,21 @@ class ScheduleApiController extends Controller
         }
 
        // dd( $report->leave_list,$report->reliefList);
-        if($isAdmin){
-            $adminReport =new stdClass();
+        // if($isAdmin){
+        //     $adminReport =new stdClass();
 
-            $adminReport->totalReliefCount = DB::table('teacher_leave as tl')
-            ->join('organization_user as ou','ou.user_id','tl.teacher_id')
-            ->where('ou.organization_id',$school->id)
-            ->count(); 
+        //     $adminReport->totalReliefCount = DB::table('teacher_leave as tl')
+        //     ->join('organization_user as ou','ou.user_id','tl.teacher_id')
+        //     ->where('ou.organization_id',$school->id)
+        //     ->count(); 
 
-            $adminReport->totalLeavefCount = DB::table('leave_relief as lr')
-            ->join('organization_user as ou','ou.user_id','lr.replace_teacher_id')
-            ->where('ou.organization_id',$school->id)
-            ->count(); 
+        //     $adminReport->totalLeavefCount = DB::table('leave_relief as lr')
+        //     ->join('organization_user as ou','ou.user_id','lr.replace_teacher_id')
+        //     ->where('ou.organization_id',$school->id)
+        //     ->count(); 
 
-            return response()->json(['report'=>$report,'report'=>$adminReport]);
-        }
+        //     return response()->json(['report'=>$report,'report'=>$adminReport]);
+        // }
         
         return response()->json(['report'=>$report]);
     }
