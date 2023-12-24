@@ -112,7 +112,7 @@ Route::group(['prefix' => 'subject'], function () {
 });
 Route::post('importSubject', 'SubjectController@subjectImport')->name('importSubject');
 
-Route::group(['prefix' => 'schedule','namespace' => 'Schedule'], function () {
+Route::group(['prefix' => 'schedule','namespace' => 'Schedule','middleware' => ['auth']], function () {
     Route::get('getVersion/{oid}','ScheduleController@getVersion')->name('schedule.getVersion');
     Route::get('getScheduleView/{class_id}','ScheduleController@getScheduleView')->name('schedule.getScheduleView');
     
