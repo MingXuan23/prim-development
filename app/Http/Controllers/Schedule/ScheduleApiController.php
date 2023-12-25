@@ -159,6 +159,7 @@ class ScheduleApiController extends Controller
             ->where('s.organization_id',$school->id)
             ->where('ss.teacher_in_charge',$user->id)
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day')
             ->get();
 
@@ -187,6 +188,7 @@ class ScheduleApiController extends Controller
             ->where('lr.confirmation','Confirmed')
             ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->where('tl.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
@@ -203,6 +205,7 @@ class ScheduleApiController extends Controller
             ->where('tl.teacher_id',$user->id)
             ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->where('tl.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date','lr.confirmation')
             ->get();
@@ -278,6 +281,7 @@ class ScheduleApiController extends Controller
                     ->where('lr.confirmation','!=','Confirmed')
                     ->where('o.id',$school->id)
                     ->where('sv.status',1)
+                    ->where('ss.status',1)
                     ->where('s.status',1)
                     ->where('tl.status',1)
                     ->where('tl.date','>=',Carbon::today())
@@ -374,6 +378,7 @@ class ScheduleApiController extends Controller
                 ->where('ss.teacher_in_charge',$user->id)
                 ->where('s.status',1)
                 ->where('sv.status',1)
+                ->where('ss.status',1)
                 ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
                 ->get();
                 
@@ -515,6 +520,7 @@ class ScheduleApiController extends Controller
             ->where('lr.confirmation',"Pending")
             ->where('tl.date','>=',Carbon::today())
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->where('tl.status',1)
             ->select('lr.id as leave_relief_id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
@@ -631,6 +637,7 @@ class ScheduleApiController extends Controller
                     ->where('lr.confirmation','Pending')
                     ->where('lr.status',1)
                     ->where('sv.status',1)
+                    ->where('ss.status',1)
                     ->where('s.status',1)
                     ->where('s.organization_id',$organization->id)
                     ->where('tl.date',Carbon::today())
@@ -658,10 +665,19 @@ class ScheduleApiController extends Controller
 
         $report->leaveCount = DB::table('teacher_leave as tl')
                 ->where('tl.teacher_id',$user_id)
+                ->where('tl.status',1)
                 ->count();
 
         $report->reliefCount = DB::table('leave_relief')
             ->where('replace_teacher_id',$user_id)
+            ->where('status',1)
+            ->where('confirmation','Confirmed')
+            ->count();
+
+        $report->rejectCount = DB::table('leave_relief')
+            ->where('replace_teacher_id',$user_id)
+            ->where('status',1)
+            ->where('confirmation','Rejected')
             ->count();
 
         $report->reliefList =  DB::table('leave_relief as lr')

@@ -251,7 +251,11 @@
                                 <input type="time" name="offtime" id="offtime">
                             </div> -->
                             <div class="form-group">
-                                <label>Teacher Maximum Slot</label>
+                                <label>Time Off Slot</label>
+                                <input type="text" name="time_off" id="time_off_text" placeholder= "1,2,4..." class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Teacher Maximum Slot Per Week</label>
                                 <input type="number" name="maxslot" id="maxslot" min=0 class="form-control">
                             </div>
                             <input type="hidden" name="organization_id" class="organization_id" value="0">

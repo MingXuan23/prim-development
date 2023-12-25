@@ -98,6 +98,7 @@ class ScheduleController extends Controller
             ->where('lr.status',1)
             ->where('s.organization_id',$oid)
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->where('tl.date',$date)
             ->orderBy('lr.confirmation')
             ->select('lr.id as leave_relief_id','lr.confirmation','ss.id as schedule_subject_id','tl.date','tl.desc'
@@ -168,6 +169,7 @@ class ScheduleController extends Controller
                 })
                 ->whereBetween('tl.date', [$startDate, $endDate])
                 ->where('lr.status', 1)
+                ->where('ss.status',1)
                 ->where('s.organization_id', $oid)
                 ->where('sv.status', 1)
                 ->orderBy('tl.date')
@@ -198,6 +200,7 @@ class ScheduleController extends Controller
         $teacher->normal_class = DB::table('schedule_subject as ss' )
                         ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
                         ->where('sv.status',1)
+                        ->where('ss.status',1)
                         ->where('ss.teacher_in_charge',$teacher_id)
                         ->count('ss.id');
 
@@ -317,6 +320,7 @@ class ScheduleController extends Controller
                     ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
                     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                     ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+                    ->where('ss.status',1)
                     ->where('sv.status',1)
                     ->where(function ($query) use ($teachers,$schedule_subject,$i, $date){
                         $query->where(function ($query) use ($teachers,$schedule_subject,$i, $date) {
@@ -354,6 +358,7 @@ class ScheduleController extends Controller
         $schedule_subject = DB::table('schedule_subject as ss')
                 ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
                 ->where('lr.id',$request->leave_relief_id)
+                ->where('ss.status',1)
                 ->select('ss.*')
                 ->first();
        
@@ -480,6 +485,7 @@ class ScheduleController extends Controller
         ->leftJoin('subject as sub', 'sub.id', 'ss.subject_id')
         ->where('ss.class_id', $class_id)
         ->where('sv.status', 1)
+        ->where('ss.status',1)
         ->where('s.status', 1)
         ->select('ss.id', 's.id as schedule_id', 'c.nama as class', 'sub.code as subject', 's.start_time', 's.time_of_slot', 'ss.slot', 's.time_off', 'ss.day', 'u.name as teacher')
         ->get();
@@ -595,24 +601,24 @@ class ScheduleController extends Controller
             // Add other validation rules for your fields
         ]);
 
-        // $dayOfWeekMapping = [
-        //     'monday' => 1,
-        //     'tuesday' => 2,
-        //     'wednesday' => 3,
-        //     'thursday' => 4,
-        //     'friday' => 5,
-        //     'saturday' => 6,
-        //     'sunday' => 7,
-        // ];
+        $time_off =[];
 
-        // // Get selected days from the request
-        // $selectedDays = $request->input('day', []);
+        if($request->time_off != ''){
+            $slots =explode(',',$request->time_off);
+            foreach ($slots as $slot) {
+               if(!is_numeric($slot)){
+                    return redirect()->back()->with('error', 'Invalid Format');
+               }
+               $t = new stdClass();
+               $t->slot = floatval($slot);
 
-        // // Map selected days to their numeric representation
-        // $numericDays = array_map(function ($day) use ($dayOfWeekMapping) {
-        //     return $dayOfWeekMapping[$day];
-        // }, $selectedDays);
-        // $organizations = $this->getOrganizationByUserId();
+               if($t->slot>$request->no_of_slot || $t->slot<=0){
+                    return redirect()->back()->with('error', 'Invalid Time off value');
+               }
+                array_push($time_off,$t);
+
+            }
+        }
         $days = array_map('intval', $request->day);
         // Create a new Schedule instance and fill it with form data
         $schedule = new Schedule([
@@ -625,9 +631,11 @@ class ScheduleController extends Controller
             'target' => '{"data": "ALL"}',
             'status' => 1,
             'organization_id' => $request->organization_id,
-            'time_off' => json_encode([]),
+            'time_off' => json_encode($time_off),
             // Add other fields
         ]);
+
+        //dd($time_off,json_encode($time_off));
 
         // Save the schedule to the database
         $schedule->save();
@@ -696,6 +704,7 @@ class ScheduleController extends Controller
                 ->where('ss.teacher_in_charge',$leave->teacher_id)
                 ->where('s.status',1)
                 ->where('sv.status',1)
+                ->where('ss.status',1)
                 ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
                 ->get();
                 
@@ -874,6 +883,7 @@ class ScheduleController extends Controller
             ->where('ss.day',$date->dayOfWeek==0?7:$date->dayOfWeek)
             ->where('ss.teacher_in_charge',$user->id)
             ->where('s.status',1)
+            ->where('ss.status',1)
             ->where('sv.status',1)
             ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
             ->get();

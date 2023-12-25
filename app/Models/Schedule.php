@@ -32,7 +32,7 @@ class Schedule extends Model
         'time_of_slot',
         'start_time',
         'day_of_week',
-        // 'time_off',
+        'time_off',
         'target',
         'status',
         'teacher_max_slot',
