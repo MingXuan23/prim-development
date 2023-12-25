@@ -24,9 +24,9 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
+                    <label>Organization Name</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
+                        <option value="" selected disabled>Choose Organization</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
@@ -34,7 +34,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Tarikh</label>
+                    <label>Date</label>
                     <input type="text" value="" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
                 </div>
 
@@ -92,12 +92,12 @@
                         <thead>
                             <tr style="text-align:center">
                                 <th>No </th>
-                                <th>Kelas</th>
-                                <th>Subjek</th>
+                                <th>Class</th>
+                                <th>Subject</th>
                                 <th>Slot</th>
-                                <th>Guru Asal</th>
-                                <th>Alasan</th>
-                                <th>Guru Ganti</th>
+                                <th>Orginal Teacher</th>
+                                <th>Reason</th>
+                                <th>Substitute Teacher</th>
                             </tr>
                         </thead>
                         <tbody>

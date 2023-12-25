@@ -8,9 +8,9 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Subjek</h4>
+            <h4 class="font-size-18">Subject</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Subjek >> Edit Subjek</li>
+                <li class="breadcrumb-item active">Subject >> Edit Subject</li>
             </ol>
         </div>
     </div>
