@@ -67,8 +67,17 @@ class ScheduleImport implements ToCollection, WithHeadingRow, WithChunkReading, 
             else{
                 throw ValidationException::withMessages(["error" => "Some classes is not in the records"]);
             }
+        } 
+        $existInVerison = DB::table('schedule_subject')
+                            ->where('schedule_version_id',$this->version_id)
+                            ->where('class_id',$class->id)->exists();
+        if($existInVerison)
+        {
+             return;
+        }else{
+            DB::table('schedule_subject')->where('class_id',$class->id)->update(['status'=>0]);
         }
-        
+
         foreach ($rows as $rowIndex =>$row) {
 
             $day = (int) $row->first();
