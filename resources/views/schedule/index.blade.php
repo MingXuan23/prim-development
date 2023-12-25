@@ -10,7 +10,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Jadual</h4>
+            <h4 class="font-size-18">Schedule</h4>
             <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
@@ -25,9 +25,9 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
+                    <label>Organization Name</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
+                        <option value="" selected disabled>Choose Organization</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
@@ -40,9 +40,9 @@
                         
                     </select> -->
 
-                    <label>Kelas</label>
+                    <label>Class</label>
                     <select name="class" id="class" class="form-control">
-                        <option value="" selected disabled>Pilih Kelas</option>
+                        <option value="" selected disabled>Choose Class</option>
                         @foreach($classes as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
@@ -65,9 +65,9 @@
         <div class="card">
             {{-- <div class="card-header">List Of Applications</div> --}}
             <div>
-                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Tambah Jadual</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Add Schedule</a>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Import</a>
-                <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Export</a>
+                <!-- <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Export</a> -->
                 <!-- <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a> -->
                 <!-- <a style="margin: 19px; float: right;" href="{{ route('subject.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Subjek</a> -->
@@ -116,11 +116,11 @@
                                 <th>Slot 12</th>
                             </tr>
                             <tbody>
-                            <tr><th>Isnin</th></tr>
-                            <tr><th>Selasa</th></tr>
-                            <tr><th>Rabu</th></tr>
-                            <tr><th>Khamis</th></tr>
-                            <tr><th>Jumaat</th></tr>
+                            <tr><th>Monday</th></tr>
+                            <tr><th>Tuesday</th></tr>
+                            <tr><th>Wednesday</th></tr>
+                            <tr><th>Thursday</th></tr>
+                            <tr><th>Friday</th></tr>
                             </tbody>
                         </thead>
                     </table>
@@ -281,7 +281,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Jadual</h5>
+                        <h5 class="modal-title">Import Schedule</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -398,7 +398,7 @@
                 var maxSlot = Math.max(...slots.map(slot => slot.slot));
                 var minSlot = Math.min(...slots.map(slot => slot.slot));
                 var weekday = [
-                    'AHAD', 'ISNIN', 'SELASA', 'RABU', 'KHAMIS', 'JUMAAT', 'SABTU', 'AHAD',
+                    'SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY',
                 ];
 
                 $('#scheduleTable thead').empty(); // Clear existing thead
@@ -430,7 +430,7 @@
                     }
                     else if(isBreak){
                         
-                        var text ='REHAT';
+                        var text ='BREAK';
                         var break1 =timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day ==dayIndex));
                         if(break1?.desc){
                             text = break1.desc;

@@ -9,7 +9,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Subjek</h4>
+            <h4 class="font-size-18">Subject</h4>
             <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
@@ -24,9 +24,9 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
+                    <label>Organization Name</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
+                        <option value="" selected disabled>Choose Organization</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
@@ -53,7 +53,7 @@
                 <!-- <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Export</a> -->
                 <!-- <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a> -->
-                <a style="margin: 19px; float: right;" href="{{ route('subject.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Subjek</a>
+                <a style="margin: 19px; float: right;" href="{{ route('subject.create') }}" class="btn btn-primary"> <i class="fas fa-plus"></i> Add Subject</a>
             </div>
 
             <div class="card-body">
@@ -84,10 +84,10 @@
                     <table id="subjectTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
-                                <th> No. </th>
-                                <th>Nama Subjek</th>
-                                <th>Kod Subjek</th>
-                                <th>Tindakan</th>
+                                <th>No. </th>
+                                <th>Subject Name</th>
+                                <th>Subject Code</th>
+                                <th>Action</th>
                                 
                             </tr>
                         </thead>
@@ -101,14 +101,14 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Padam Subjek</h4>
+                        <h4 class="modal-title">Delete Subject</h4>
                     </div>
                     <div class="modal-body">
-                        Adakah anda pasti?
+                        Are you sure to delete this subject?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Padam</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete" name="delete">Delete</button>
+                        <button type="button" data-dismiss="modal" class="btn">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -120,7 +120,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Subjek</h5>
+                        <h5 class="modal-title">Import Subject</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -130,7 +130,7 @@
 
                             {{ csrf_field() }}
                             <div class="form-group">
-                                <label>Organisasi</label>
+                                <label>Organization Name</label>
                                 <select name="organ" id="organ" class="form-control">
                                     @foreach($organization as $row)
                                     <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>

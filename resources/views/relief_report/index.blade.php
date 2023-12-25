@@ -26,9 +26,9 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
+                    <label>Organization Name:</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
+                        <option value="" selected disabled>Choose Organization</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
@@ -92,9 +92,10 @@
 
                 <div class="flash-message"></div>
 
-                <div id="choose-date">
+                <div id="btn-details">
                 <button type="button" id="details" name="details" class="btn btn-primary">Show Details</button>
-            <div id="chart-section">
+                </div>
+                <div id="chart-section">
                 <div class="total_report">
                     <!-- <div class="total_confirmed"></div>
                     <div class="total_pending"></div>
@@ -110,12 +111,12 @@
                         <thead>
                             <tr style="text-align:center">
                                 <th>No </th>
-                                <th>Tarikh</th>
-                                <th>Kelas</th>
-                                <th>Subjek</th>
+                                <th>Date</th>
+                                <th>Class</th>
+                                <th>Subject</th>
                                 <th>Slot</th>
-                                <th>Guru Asal</th>
-                                <th>Guru Ganti</th>
+                                <th>Original Teacher</th>
+                                <th>Substitute Teacher</th>
                                 <th>Status</th>
                             </tr>
                         </thead>
@@ -126,7 +127,7 @@
                 </div>
             </div>
 
-                </div>
+                
             
                 <div id="lr-teacher-section" style="display: none;">
                     <div class="form-group">
@@ -139,10 +140,10 @@
                         <thead>
                             <tr style="text-align:center">
                                 <th>No </th>
-                                <th>Nama Guru</th>
-                                <th>Slot yg telah ambil</th>
-                                <th>Slot Ganti yg telah ambil</th>
-                                <th>Slot ganti yg tinggal</th>
+                                <th>Teacher Name</th>
+                                <th>Total Slots (Including Original Slots)</th>
+                                <th>Relief Taken</th>
+                                <th>Remaining Relief Slots</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -504,15 +505,19 @@
         // Function to switch between 'details' and 'lr_teacher' modes
         function switchDisplayMode(mode) {
             if (mode === 'details') {
+                $('#btn-details').show();
                 $('#chart-section').hide();
                 $('#details-section').show();
                 $('#lr-teacher-section').hide();
             } else if (mode === 'chart') {
+                $('#btn-details').show();
                 $('#chart-section').show();
                 $('#details-section').hide();
                 $('#lr-teacher-section').hide();
             } else if (mode === 'lr_teacher') {
-                $('#choose-date').hide();
+                $('#btn-details').hide();
+                $('#chart-section').hide();
+                $('#details-section').hide();
                 $('#lr-teacher-section').show();
                 displayTeacher();
             }
