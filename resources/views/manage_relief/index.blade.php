@@ -333,9 +333,9 @@
                         var leave_relief = $(this).attr('data-index');
                         // Use direct property access instead of split
                         var teacher = $(this).val();
-                        if(teacher == 0 || teacher ==null) 
+                        if(teacher == 0 || teacher ==null || teacher == 'No Teacher') 
                             return true;
-                            commitRelief.push(leave_relief+'-'+teacher);
+                        commitRelief.push(leave_relief+'-'+teacher);
                     });
 
             if(commitRelief.length ==0)
@@ -366,42 +366,50 @@
                     row.append('<td>' + relief.leave_teacher + '</td>');
                     if (relief.desc !== null) {
                     row.append('<td>' + relief.desc + '</td>');
-                }else{
-                    row.append('<td></td>');
-                }
+                    }else{
+                        row.append('<td></td>');
+                    }
 
         // Append the select box with options
-        var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  + '" schedule_subject_id="'+relief.schedule_subject_id+'"></select></td>');
+            var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  
+            + '" schedule_subject_id="'+relief.schedule_subject_id +'" slot = "'+relief.slot+'"></select></td>');
 
-        var selectElement = selectColumn.find('select');
+            var selectElement = selectColumn.find('select');
 
-        // Call the updated function to populate the select box options
-       //git  updateTeacherComboBox(index, response.original.free_teacher_list);
+            // Call the updated function to populate the select box options
+        //git  updateTeacherComboBox(index, response.original.free_teacher_list);
 
-        row.append(selectColumn);
-        tableBody.append(row);
-    });
+            row.append(selectColumn);
+            tableBody.append(row);
+        });
 
             var assignTeacherElements = tableBody.find('.assign_teacher');
 
-// Loop through each found element
-assignTeacherElements.each(function(index, element) {
-            var selectedIndex = $(this).attr('data-index');
-            // Use direct property access instead of split
-            var leave_relief_id = selectedIndex;
-            assignTeacher(leave_relief_id);
-    
-    // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
-});
-autoSuggest();
+    $('.assign_teacher').change(function() {
+        var selectedValue = $(this).val();
+        var slot = $(this).attr('slot');
 
-    // tableBody.on('mousedown', '.assign_teacher', function () {
-    //     var selectedIndex = $(this).data('index');
-    // // Use direct property access instead of split
-    // var schedule_subject_id = selectedIndex;
-            // var selectedTeacher = $(this).val();
-            // assignTeacher(schedule_subject_id, selectedTeacher);
-            // });
+        // Use filter to find elements with the same slot and teacher
+        var duplicates = $('.assign_teacher').filter(function() {
+            console.log($(this).val(), $(this).attr(slot));
+            return $(this).val() === selectedValue && $(this).attr('slot') === slot;
+        });
+        // Check if duplicates were found
+        if (duplicates.length > 1) {
+            alert('Duplicate slot and teacher found in other assign_teacher elements.');
+        }
+    });
+        assignTeacherElements.each(function(index, element) {
+                    var selectedIndex = $(this).attr('data-index');
+                    // Use direct property access instead of split
+                    var leave_relief_id = selectedIndex;
+
+                    assignTeacher(leave_relief_id);
+            
+            // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
+        });
+        autoSuggest();
+
         }
 
 // Call fetchReliefData with the corrected success function
@@ -440,7 +448,7 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
     selectBox.empty();
 
     //Check if availableTeachers is defined
-    selectBox.append('<option selected disabled >No Teacher</option>');
+    selectBox.append('<option selected>No Teacher</option>');
     if (availableTeachers) {
         // If availableTeachers is an object, extract the array
         var teachersArray = Array.isArray(availableTeachers) ? availableTeachers : availableTeachers.free_teacher_list;
