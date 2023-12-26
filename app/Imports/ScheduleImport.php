@@ -177,7 +177,8 @@ class ScheduleImport implements ToCollection, WithHeadingRow, WithChunkReading, 
                     'class_id'=>$class->id,
                     'day'=>$day,
                     'slot'=>$i,
-                    'teacher_in_charge'=>$teacher->id
+                    'teacher_in_charge'=>$teacher->id,
+                    'status'=>1
                 ]);
             }
            

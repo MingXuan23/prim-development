@@ -100,7 +100,7 @@ class ScheduleController extends Controller
             ->where('sv.status',1)
             ->where('ss.status',1)
             ->where('tl.date',$date)
-            ->orderBy('lr.confirmation')
+            ->orderBy('ss.slot')
             ->select('lr.id as leave_relief_id','lr.confirmation','ss.id as schedule_subject_id','tl.date','tl.desc'
             ,'sub.name as subject','u1.name as leave_teacher','u2.name as relief_teacher','ss.slot','ss.day','s.time_of_slot','s.start_time','s.time_off','c.nama as class_name')
             ->get();
@@ -234,6 +234,19 @@ class ScheduleController extends Controller
 
     }
 
+    public function checkSameClass($class_id,$teacher_id){
+        $isSameClass = DB::table('schedule_subject as ss')
+                    ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+                    ->leftJoin('schedules as s','s.id','sv.schedule_id')
+                    ->where('sv.status',1)
+                    ->where('ss.status',1)
+                    ->where('s.status',1)
+                    ->where('ss.class_id',$class_id)
+                    ->where('ss.teacher_in_charge',$teacher_id)
+                    ->exists();
+
+        return $isSameClass == true? 1:5; //smaller value will sort first
+    }
     //to auto suggesstion
     public function autoSuggestRelief(Request $request){
         
@@ -272,8 +285,19 @@ class ScheduleController extends Controller
                         return $this->getTeacherInfo($a->id, $date,$date,false) - $this->getTeacherInfo($b->id, $date,$date,false);
                     });
                     break;
-                case 'Class':
-
+                case 'Kelas':
+                    usort($teacherList, function ($a, $b) use ($date, $schedule_subject) {
+                        $comparison = $this->checkSameClass($schedule_subject->class_id, $a->id)
+                            - $this->checkSameClass($schedule_subject->class_id, $b->id);
+                    
+                        if ($comparison !== 0) {
+                            return $comparison;
+                        }
+                    
+                        // If classes are the same, compare using getTeacherInfo
+                        return ($this->getTeacherInfo($a->id, $date, $date, false) + 1)
+                            - ($this->getTeacherInfo($b->id, $date, $date, false) + 1);
+                    });
                     break;
             }
 
@@ -889,6 +913,13 @@ class ScheduleController extends Controller
             ->get();
             //dd($classRelated,$date->dayOfWeek);
             foreach($classRelated as $c){
+                $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+
+                //is today and over the time 
+                if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                    continue;
+                }
                 if($request->isLeaveFullDay){
                     $insert = DB::table('leave_relief')->insert([
                         'teacher_leave_id'=>$leave_id,
@@ -896,17 +927,13 @@ class ScheduleController extends Controller
                         'status'=>1
                     ]);
                 }else{
-                    //dd($start, $end);
 
-                   //dd($request->starttime,$request->endtime);
                     $start = Carbon::createFromFormat('H:i', $request->starttime);
                     $end = Carbon::createFromFormat('H:i', $request->endtime);
-                    $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
 
                     
                     // check if the time is between start and end
-                    if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                    if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
                             'schedule_subject_id'=>$c->schedule_subject_id,

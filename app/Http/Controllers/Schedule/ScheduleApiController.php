@@ -161,6 +161,7 @@ class ScheduleApiController extends Controller
             ->where('sv.status',1)
             ->where('ss.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day')
+            ->orderBy('ss.slot')
             ->get();
 
             
@@ -383,6 +384,15 @@ class ScheduleApiController extends Controller
                 ->get();
                 
                 foreach($classRelated as $c){
+
+                    $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+    
+                    //is today and over the time 
+                    if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                        continue;
+                    }
+
                     if($request->isLeaveFullDay){
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
@@ -392,12 +402,12 @@ class ScheduleApiController extends Controller
                     }else{
                         $start = Carbon::createFromFormat('H:i:s', $request->start_time);
                         $end = Carbon::createFromFormat('H:i:s', $request->end_time);
-                        $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                        $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+                        //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                        //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
 
                         
                         // check if the time is between start and end
-                        if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                        if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$leave_id,
                                 'schedule_subject_id'=>$c->schedule_subject_id,
