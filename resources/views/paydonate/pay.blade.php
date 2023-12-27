@@ -153,7 +153,7 @@
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: center; font-size: 18px">{{ $donation->nama }} </h4>
                         <br>
-                        <form id="bayarform" class="form-validation" method="POST" action="{{ route('fpxIndex') }}"
+                        <form id="bayarform" class="form-validation" method="POST" action="{{ route('directpayIndex') }}"
                             enctype="multipart/form-data">
                             {{csrf_field()}}
                             @if($specialSrabRequest==0)
