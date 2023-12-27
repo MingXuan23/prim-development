@@ -153,7 +153,7 @@
                     <div class="card-body">
                         <h4 class="card-title" style="text-align: center; font-size: 18px">{{ $donation->nama }} </h4>
                         <br>
-                        <form id="bayarform" class="form-validation" method="POST" action="{{ route('fpxIndex') }}"
+                        <form id="bayarform" class="form-validation" method="POST" action="{{ route('directpayIndex') }}"
                             enctype="multipart/form-data">
                             {{csrf_field()}}
                             <div class="form-group">
@@ -165,14 +165,14 @@
                                     data-parsley-error-message="Minimum jumlah untuk diderma adalah RM2.00" required>
                                 <p><i>*Minimum RM 2</i> </p>
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label>Pilih Bank</label>
                                 <select name="bankid" id="bankid" class="form-control"
                                     data-parsley-required-message="Sila pilih bank" required>
                                     <option value="">Pilih bank</option>
                                 </select>
 
-                            </div>
+                            </div> -->
 
                             <input type="hidden" name="desc" id="desc" value="Donation">
                             <input type="hidden" name="d_id" id="d_id" value="{{ $donation->id }} ">
@@ -218,13 +218,13 @@
 
     });
 
-    function checkBank() {
-        var t = jQuery('#bankid').val();
-        if (t === '' || t === null) {
-            alert('Please select a bank');
-            return false;
-        }
-    }
+    // function checkBank() {
+    //     var t = jQuery('#bankid').val();
+    //     if (t === '' || t === null) {
+    //         alert('Please select a bank');
+    //         return false;
+    //     }
+    // }
     
     $(document).ready(function() {
 	    $('.form-validation').parsley();
@@ -232,23 +232,23 @@
 
     var arr = [];
 
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: "/fpx/getBankList",
-        success: function(data) {
-            jQuery.each(data.data, function(key, value){
-                arr.push(key);
-            });
-            for(var i = 0; i < arr.length; i++){
-                arr.sort();
-                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-            }
+    // $.ajax({
+    //     type: 'GET',
+    //     dataType: 'json',
+    //     url: "/fpx/getBankList",
+    //     success: function(data) {
+    //         jQuery.each(data.data, function(key, value){
+    //             arr.push(key);
+    //         });
+    //         for(var i = 0; i < arr.length; i++){
+    //             arr.sort();
+    //             $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
+    //         }
 
-        },
-        error: function (data) {
-            // console.log(data);
-        }
-    });
+    //     },
+    //     error: function (data) {
+    //         // console.log(data);
+    //     }
+    // });
 </script>
 @endsection

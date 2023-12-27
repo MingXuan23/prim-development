@@ -149,10 +149,10 @@
           </div>
         </div>
         
-      <form action="{{ route('fpxIndex') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('directpayIndex') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
-        <div class="card mb-4 border">
+        <!-- <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
               <div class="col">
@@ -166,7 +166,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         
         <input type="hidden" name="amount" id="total_price" value="{{ $cart->total_price }}">
         {{-- <input type="hidden" name="amount" id="total_price" value="2.00"> --}}

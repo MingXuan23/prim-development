@@ -160,14 +160,14 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('fpxIndex') }}" enctype="multipart/form-data">
-                <div class="form-group">
+                <form method="POST" action="{{ route('directpayIndex') }}" enctype="multipart/form-data">
+                <!-- <div class="form-group">
                     <label for="sel1">Sila Pilih Bank:</label>
                     <select name="bankid" id="bankid" class="form-control" data-parsley-required-message="Sila pilih bank" required>
                         <option value="">Pilih bank</option>
                        
                     </select>
-                </div>
+                </div> -->
 
                 @if ($getfees_category_A)
                 @foreach ($get_fees_by_parent as $get_fees_by_parents)
@@ -218,43 +218,43 @@
 </html>
 
 <script>
-    function checkBank() {
-        var t = jQuery('#bankid').val();
-        var a = parseFloat(jQuery('#amount').val());
-        if (t === '' || t === null) {
-            alert('Please select a bank');
-            return false;
-        }
-        if (a < 1.00) {
-            alert('Transaction Amount is Lower than the Minimum Limit RM1.00 for B2C');
-            return false;
-        }
-        else if (a > 30000.00) {
-            alert('Transaction Amount Limit Exceeded RM30,000.00 for B2C');
-            return false;
-        }
-    }
+    // function checkBank() {
+    //     var t = jQuery('#bankid').val();
+    //     var a = parseFloat(jQuery('#amount').val());
+    //     if (t === '' || t === null) {
+    //         alert('Please select a bank');
+    //         return false;
+    //     }
+    //     if (a < 1.00) {
+    //         alert('Transaction Amount is Lower than the Minimum Limit RM1.00 for B2C');
+    //         return false;
+    //     }
+    //     else if (a > 30000.00) {
+    //         alert('Transaction Amount Limit Exceeded RM30,000.00 for B2C');
+    //         return false;
+    //     }
+    // }
     var arr = [];
 
     $(document).ready(function () {
-        $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: "/fpx/getBankList",
-        success: function(data) {
-            jQuery.each(data.data, function(key, value){
-                arr.push(key);
-            });
-            for(var i = 0; i < arr.length; i++){
-                arr.sort();
-                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-            }
+    //     $.ajax({
+    //     type: 'GET',
+    //     dataType: 'json',
+    //     url: "/fpx/getBankList",
+    //     success: function(data) {
+    //         jQuery.each(data.data, function(key, value){
+    //             arr.push(key);
+    //         });
+    //         for(var i = 0; i < arr.length; i++){
+    //             arr.sort();
+    //             $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
+    //         }
 
-        },
-        error: function (data) {
-            // console.log(data);
-        }
-    });
+    //     },
+    //     error: function (data) {
+    //         // console.log(data);
+    //     }
+    // });
     });
 
 </script>
