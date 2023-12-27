@@ -391,7 +391,7 @@ class DirectPayController extends Controller
                 return view('errors.500');
             }
             //dd('fpxsellerOrderNo:'.$fpx_sellerOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo),'fpx_sellerExOrderNo:'.$fpx_sellerExOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo));
-            $private_key = '9BB6D047-2FB3-4B7A-9199-09441E7F4B0C';
+            //$private_key = '9BB6D047-2FB3-4B7A-9199-09441E7F4B0C';
     
             
             //dd($pos,$fpx_sellerOrderNo);
