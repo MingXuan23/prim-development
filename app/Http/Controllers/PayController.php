@@ -534,6 +534,7 @@ class PayController extends AppBaseController
 
     public function fpxIndex(Request $request)
     {
+        return view('errors.500');
         $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
         $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
         $user=null;
