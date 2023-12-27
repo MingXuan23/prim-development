@@ -890,6 +890,7 @@ class DirectPayController extends Controller
 
             Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
             $user = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+            dd($user,$request->Fpx_SellerOrderNo);
             return view('fpx.transactionFailed', compact('request', 'user'));
             
             // Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
