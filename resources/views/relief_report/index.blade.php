@@ -7,6 +7,21 @@
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+        }
+
+        @media only screen and (max-width: 760px) {
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 @include('layouts.datatable')
 @endsection
 
