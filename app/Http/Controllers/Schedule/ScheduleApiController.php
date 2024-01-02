@@ -443,7 +443,7 @@ class ScheduleApiController extends Controller
                     $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
                     if($request->isLeaveFullDay){
                         
-                       DB::table('leave_relief')->update(['Confirmation'=>'Rejected']);
+                       DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
                        
                        $insert = DB::table('leave_relief')->insert([
                         'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
@@ -459,7 +459,7 @@ class ScheduleApiController extends Controller
                         
                         // check if the time is between start and end
                         if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
-                            DB::table('leave_relief')->update(['Confirmation'=>'Rejected']);
+                            DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
                        
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
