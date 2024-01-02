@@ -911,6 +911,20 @@ class ScheduleController extends Controller
             ->where('sv.status',1)
             ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
             ->get();
+
+            $reliefRelated = DB::table('schedule_subject as ss')
+                ->join('leave_relief as lr','lr.schedule_subject_id','ss.id')
+                ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+                ->join('schedules as s','s.id','sv.schedule_id')
+                ->where('ss.day',$date->dayOfWeek)
+                ->where('lr.replace_teacher_id',$user->id)
+                ->where('lr.status',1)
+                ->where('lr.confirmation','Confirmed')
+                ->where('s.status',1)
+                ->where('sv.status',1)
+                ->where('ss.status',1)
+                ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot','lr.id as lrid')
+                ->get();
             //dd($classRelated,$date->dayOfWeek);
             foreach($classRelated as $c){
                 $time_info=$this->getSlotTime($c,$c->day,$c->slot);
@@ -942,6 +956,46 @@ class ScheduleController extends Controller
                     } 
                 }
             }
+
+            foreach($reliefRelated as $c){
+
+                $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+
+                //is today and over the time 
+                if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                    continue;
+                }
+                $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
+                if($request->isLeaveFullDay){
+                    
+                   DB::table('leave_relief')->update(['Confirmation'=>'Rejected']);
+                   
+                   $insert = DB::table('leave_relief')->insert([
+                    'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
+                    'schedule_subject_id'=>$duplicate_row->schedule_subject_id,
+                    'status'=>1
+                    ]);
+                }else{
+                    $start = Carbon::createFromFormat('H:i:s', $request->start_time);
+                    $end = Carbon::createFromFormat('H:i:s', $request->end_time);
+                    //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                    //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+
+                    
+                    // check if the time is between start and end
+                    if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                        DB::table('leave_relief')->update(['Confirmation'=>'Rejected']);
+                   
+                        $insert = DB::table('leave_relief')->insert([
+                            'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
+                            'schedule_subject_id'=>$duplicate_row->schedule_subject_id,
+                            'status'=>1
+                            ]);
+                    } 
+                }
+            }
+            
             $count = DB::table('leave_relief')->where('teacher_leave_id',$leave_id)->count();
             return redirect()->back()->with('success','TeacherLeaveSuccess');
             
