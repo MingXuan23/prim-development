@@ -350,6 +350,7 @@ class ScheduleController extends Controller
                         $query->where(function ($query) use ($teachers,$schedule_subject,$i, $date) {
                             $query->where('lr.replace_teacher_id', $teachers[$i]->id)
                                 ->where('tl.status',1)
+                                ->where('lr.status',1)
                                 ->where('tl.date',$date)
                                 ->where('ss.slot',$schedule_subject->slot)
                                 ->where('ss.day',$schedule_subject->day); 
@@ -995,7 +996,7 @@ class ScheduleController extends Controller
                     } 
                 }
             }
-            
+
             $count = DB::table('leave_relief')->where('teacher_leave_id',$leave_id)->count();
             return redirect()->back()->with('success','TeacherLeaveSuccess');
             
