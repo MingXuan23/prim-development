@@ -385,10 +385,12 @@ class ScheduleApiController extends Controller
 
                 $reliefRelated = DB::table('schedule_subject as ss')
                 ->join('leave_relief as lr','lr.schedule_subject_id','ss.id')
+                ->join('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                 ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
                 ->join('schedules as s','s.id','sv.schedule_id')
                 ->where('ss.day',$date->dayOfWeek)
                 ->where('lr.replace_teacher_id',$user->id)
+                ->where('tl.date',$request->date)
                 ->where('lr.status',1)
                 ->where('lr.confirmation','Confirmed')
                 ->where('s.status',1)
@@ -469,9 +471,21 @@ class ScheduleApiController extends Controller
                         } 
                     }
                 }
-
-                
+                $school =$this->getSchools($user->id)->first();
                 $count = DB::table('leave_relief')->where('teacher_leave_id',$leave_id)->count();
+
+                $admin_id =DB::table('organization_user as ou')
+                ->where('ou.organization_id',$school->id)
+                ->whereIn('ou.role_id',[2,4,7,20])
+                ->select('ou.user_id')
+                ->distinct()
+                ->get();
+                foreach($admin_id as $a){
+                    $msg =$user->name.' apply the leave. Total '.$count.' class affected';
+                 
+                    //dd($msg);
+                    $notification =$this->sendNotification($a->user_id,'Your action is required',$msg );
+                }
                 return response()->json(['Success'=>'Leave Submit Sucessfully.Total '.$count.' classes affected.']);
                 
             }
