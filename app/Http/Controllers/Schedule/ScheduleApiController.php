@@ -87,6 +87,7 @@ class ScheduleApiController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::User();
             if($request->device_token){
+                DB::table('users')->where('device_token',$request->device_token)->update(['device_token',null]);
                 $user->device_token =$request->device_token;
                 $user->save();
             }
