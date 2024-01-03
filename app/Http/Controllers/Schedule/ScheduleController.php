@@ -707,11 +707,12 @@ class ScheduleController extends Controller
         $teacherLeave =DB::table('teacher_leave as tl')
                         ->leftJoin('organization_user as ou','ou.user_id','tl.teacher_id')
                         ->where('ou.organization_id',$organizationId)
-                        ->where('tl.date','>',Carbon::today())
+                        ->where('tl.date','>=',Carbon::today())
                         ->where('tl.status',1)
                         ->select('tl.*','tl.period->fullday as isLeaveFullDay')
                         ->get();
        //dd($teacherLeave);
+      // dd($teacherLeave);
         foreach($teacherLeave as $leave){
             DB::table('leave_relief')->where('teacher_leave_id',$leave->id)->update(['status'=>0]);
             $this->regenerateLeaveRelief($leave);
@@ -721,7 +722,7 @@ class ScheduleController extends Controller
     }
 
     public function regenerateLeaveRelief($leave){
-       
+        $date = Carbon::createFromDate($leave->date);
         $classRelated = DB::table('schedule_subject as ss')
                 ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
                 ->join('schedules as s','s.id','sv.schedule_id')
@@ -732,8 +733,15 @@ class ScheduleController extends Controller
                 ->where('ss.status',1)
                 ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
                 ->get();
-                
+
                 foreach($classRelated as $c){
+                    $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+
+                    //is today and over the time 
+                    if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                        continue;
+                    }
                     if($leave->isLeaveFullDay == "true"){
                         //dd('true');
                         $insert = DB::table('leave_relief')->insert([
@@ -746,10 +754,7 @@ class ScheduleController extends Controller
                         $period = json_decode($leave->period);
                         $start = Carbon::createFromFormat('H:i:s', $period->start_time);
                         $end = Carbon::createFromFormat('H:i:s', $period->end_time);
-                        $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                        $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-
-                        
+                      
                         // check if the time is between start and end
                         if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
