@@ -41,9 +41,10 @@
                 <div class="form-group">
                     <label>Auto Suggestion Sort By:</label>
                     <select name="sort" id="sort" class="form-control">
-                        <option value="0" selected disabled>Sort By</option>
+                        <!-- <option value="0" selected disabled>Sort By</option> -->
                         <option value="Beban Guru">Beban Guru</option>
                         <option value="Kelas">Kelas</option>
+                        <option value="Subjek">Subjek</option>
                     </select>
                 </div>
 
@@ -212,6 +213,7 @@
 
 <script>   
     var dates = []
+    var teachers = "";
     $(document).ready(function() {
 
         $.ajaxSetup({
@@ -388,17 +390,39 @@
     $('.assign_teacher').change(function() {
         var selectedValue = $(this).val();
         var slot = $(this).attr('slot');
+        //$(this).css("color", $("select option:selected").css("color"));
+        var selectedOption = $(this).find('option:selected');
+
+        // Check the color of the selected option
+        var optionColor = selectedOption.css('color');
+
+        // Update the color of the select element
+        $(this).css('color', optionColor);
 
         // Use filter to find elements with the same slot and teacher
+        if(selectedOption.text().trim() == 'No Teacher' || $(this).val() == null){
+            return;
+        }
         var duplicates = $('.assign_teacher').filter(function() {
-            console.log($(this).val(), $(this).attr(slot));
-            return $(this).val() === selectedValue && $(this).attr('slot') === slot;
+            return $(this).val() === selectedValue && $(this).attr('slot') === slot ;
         });
         // Check if duplicates were found
         if (duplicates.length > 1) {
-            alert('Duplicate slot and teacher found in other assign_teacher elements.');
+            console.log(selectedOption.text(),$(this).val(),duplicates)
+            alert(selectedOption.text() +' was selected in the same slot!');
         }
+
+        var checkRelief = $('.assign_teacher').filter(function() {
+            return $(this).val() === selectedValue && $(this).attr('slot') !== slot;
+        });
+      
+        if(checkRelief.length >= parseInt( selectedOption.attr('remaining_relief')) ){
+            alert('This teacher exceed his/her remaining relief already!');
+        }
+        
     });
+
+    
         assignTeacherElements.each(function(index, element) {
                     var selectedIndex = $(this).attr('data-index');
                     // Use direct property access instead of split
@@ -429,7 +453,7 @@ function fetchReliefData() {
             date: date_val,
         },
         success: function (response) {
-            console.log(response);
+            teachers= response.teachers;
             displayRelief(response.pending_relief);
         },
         error: function (xhr, status, error) {
@@ -448,19 +472,40 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
     selectBox.empty();
 
     //Check if availableTeachers is defined
-    selectBox.append('<option selected>No Teacher</option>');
+    selectBox.append('<option selected style="color:DarkOrange;" >No Teacher</option>');
     if (availableTeachers) {
         // If availableTeachers is an object, extract the array
         var teachersArray = Array.isArray(availableTeachers) ? availableTeachers : availableTeachers.free_teacher_list;
-
+        const t = JSON.parse(teachers);
+        //console.log(t);
         // Check if the extracted array is not empty
         if (Array.isArray(teachersArray) && teachersArray.length > 0) {
             // Iterate over the array and add options
             teachersArray.forEach(function (teacher) {
-                selectBox.append('<option value="' + teacher.id + '">' + teacher.name + '</option>');
+                var foundTeacher = t.find(function (tid) {
+                    return teacher.id === tid.id;
+                });
+                if(foundTeacher){
+                    //console.log(foundTeacher)
+                    var option = $('<option></option>').attr('value', foundTeacher.id).text(foundTeacher.name + '('+ foundTeacher.details.busySlot + 'S' + foundTeacher.details.remaining_relief + 'R)');
+                    option.attr('remaining_relief',foundTeacher.details.remaining_relief )
+                    // Check if the current teacher is the found teacher
+                   // console.log(!(foundTeacher.details.remaining_relief >0),foundTeacher);
+                    if (foundTeacher.details.remaining_relief <=0) {
+                        option.css('color', 'red'); // Set text color to red
+                        //*console.log('me');
+                    }else{
+                        option.css('color', 'black');
+                    }
+
+                    selectBox.append(option);
+                }
+                
             });
         }
     }
+
+    selectBox.trigger('change');
     
 }
 
@@ -486,16 +531,19 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
                 data: {
                     organization: organization, 
                     pendingRelief: pendingRelief, 
+                    teachers:teachers,
                     criteria: criteria,
                     date: $('#datepicker').val(),
                 },
                 success: function(response) {
                     console.log(response);
+                    $(".assign_teacher").prop("selectedIndex", 0);
                      response.relief_draft.forEach(function(draft,index){
                         //var combobox = assignTeacherCombobox.has("[data-index='"+draft.leave_relief_id+"']");
                         var combobox = $('.assign_teacher[data-index="'+draft.leave_relief_id+'"]');
                         //combobox.val('17478');
                         combobox.val(draft.teacher_id)
+                        combobox.trigger('change');
                         console.log(draft.teacher_id)
                      })
                 },

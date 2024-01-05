@@ -71,9 +71,28 @@ class ScheduleController extends Controller
         $date =$request->date;
         // dd($request);
         $relief =$this->getAllRelief($oid, $date);
+
+        $teachers = DB::table('organization_user as ou')
+        ->leftJoin('users as u','u.id','ou.user_id')
+        ->where('ou.organization_id',$oid)
+        ->where('ou.role_id',5)
+        ->select('ou.user_id as id','u.name')
+        ->where('ou.status','<>',0)
+        ->get()
+        ->toArray();
+
+        $schedule = DB::table('schedules as s')
+                ->where('s.organization_id',$oid)
+                ->where('s.status',1)
+                ->select('s.teacher_max_slot as max_slot','s.max_relief_slot as max_relief')
+                ->first();
+       
+        foreach($teachers as $t){
+            $t->details = $this->getReliefSlot($date,$t->id,$schedule->max_slot,$schedule->max_relief);
+        }
         // dd($relief);
        // $teachers = $this->getFreeTeacher($request); // New method to get available teachers
-        return response()->json(['pending_relief' => $relief]);
+        return response()->json(['pending_relief' => $relief,'teachers'=>json_encode($teachers)]);
 
         //return response()->json(['pending_relief' => $relief, 'available_teachers' => $teachers]);
     }
@@ -169,9 +188,7 @@ class ScheduleController extends Controller
                 })
                 ->whereBetween('tl.date', [$startDate, $endDate])
                 ->where('lr.status', 1)
-                ->where('ss.status',1)
                 ->where('s.organization_id', $oid)
-                ->where('sv.status', 1)
                 ->orderBy('tl.date')
                 ->select('lr.id as leave_relief_id', 'lr.confirmation', 'ss.id as schedule_subject_id', 'tl.date', 'tl.desc', 'sub.name as subject', 'u1.name as leave_teacher', 'u2.name as relief_teacher', 'ss.slot', 'ss.day', 's.time_of_slot', 's.start_time', 's.time_off', 'c.nama as class_name');
     
@@ -234,6 +251,45 @@ class ScheduleController extends Controller
 
     }
 
+    public function getReliefSlot($date,$teacher_id,$maxSlot,$maxRelief){
+        $carbon_date = Carbon::parse($date);
+        $teacher= new stdClass();
+        $teacher->name = User::find($teacher_id)->name;
+        $teacher->normal_class = DB::table('schedule_subject as ss' )
+                        ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+                        ->where('sv.status',1)
+                        ->where('ss.status',1)
+                        ->where('ss.teacher_in_charge',$teacher_id)
+                        ->where('ss.day',$carbon_date->dayOfWeek)
+                        ->count('ss.id');
+
+        $teacher->relief_class = DB::table('leave_relief as lr')
+                                ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                                ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+                                ->where('lr.status',1)
+                                ->where('lr.replace_teacher_id',$teacher_id)
+                                ->where('tl.date',$date)
+                                ->groupBy('ss.slot')
+                                ->count('ss.slot');
+        
+        $teacher->leave_class =DB::table('leave_relief as lr')
+                    ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                    ->where('lr.status',1)
+                    ->where('tl.teacher_id',$teacher_id)
+                    ->where('tl.date',$date)
+                    ->count('lr.id');
+        $teacher->max_slot = $maxSlot;
+        $teacher ->max_relief =$maxRelief == null?999:$maxRelief;
+        //dd($maxRelief,$teacher->max_relief,$maxRelief == null);
+
+        $teacher->busySlot = $teacher->normal_class - $teacher->leave_class + $teacher->relief_class;
+        $teacher ->remaining_relief = $teacher->max_relief - $teacher->relief_class;
+        if($teacher->busySlot >= $teacher->max_slot || $teacher->relief_class >= $teacher->max_relief) {
+            $teacher ->remaining_relief = -1;
+        } 
+        return $teacher;
+    }
+
     public function checkSameClass($class_id,$teacher_id){
         $isSameClass = DB::table('schedule_subject as ss')
                     ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
@@ -246,6 +302,19 @@ class ScheduleController extends Controller
                     ->exists();
 
         return $isSameClass == true? 1:5; //smaller value will sort first
+    }
+
+    public function checkSameSubject($subject_id,$teacher_id){
+        $isSameSubject = DB::table('schedule_subject as ss')
+            ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+            ->leftJoin('schedules as s','s.id','sv.schedule_id')
+            ->where('sv.status',1)
+            ->where('ss.status',1)
+            ->where('s.status',1)
+            ->where('ss.subject_id',$subject_id)
+            ->where('ss.teacher_in_charge',$teacher_id)
+            ->exists();
+        return $isSameSubject == true? 1:5;
     }
     //to auto suggesstion
     public function autoSuggestRelief(Request $request){
@@ -260,29 +329,41 @@ class ScheduleController extends Controller
         if($pendingRelief == null){
             return response()->json(['relief_draft'=>$relief_draft]);
         }
-        $teachers = DB::table('organization_user as ou')
-        ->leftJoin('users as u','u.id','ou.user_id')
-        ->where('ou.organization_id',$organization)
-        ->where('ou.role_id',5)
-        ->select('ou.user_id as id','u.name')
-        ->get()
-        ->toArray();
+        $teachers = json_decode($request->teachers);
 
         $assignedTeachers = [];
+        $teacherSlots = [];
         //dd($pendingRelief);
+        $current_slot = -1;
+
         foreach($pendingRelief as $p){
             $data =explode('-', $p);
             $leave_relief_id =$data[0];
-            $schedule_subject = DB::table('schedule_subject')->where('id',$data[1])->first();
+            $schedule_subject = DB::table('schedule_subject as ss')
+                    ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+                    ->join('schedules as s','s.id','sv.schedule_id')
+                    ->where('ss.id',$data[1])
+                    ->select('ss.*','s.teacher_max_slot as max_slot','s.max_relief_slot as max_relief')
+                    ->first();
+            //dd($schedule_subject);
             $teacherList = $this->getAvailableTeacherList($schedule_subject,$date,$organization,$teachers);
  // criteria
             
-            
+            //dd($teacherList);
             switch($criteria){
                 case 'Beban Guru':
-                    usort($teacherList, function ($a, $b) use( $date) {
+                    // usort($teacherList, function ($a, $b) use( $date) {
+                    //     // Your custom comparison logic here
+                    //     return $this->getTeacherInfo($a->id, $date,$date,false) - $this->getTeacherInfo($b->id, $date,$date,false);
+                    // });
+
+                    usort($teacherList, function ($a, $b) use( $date,$schedule_subject) {
                         // Your custom comparison logic here
-                        return $this->getTeacherInfo($a->id, $date,$date,false) - $this->getTeacherInfo($b->id, $date,$date,false);
+                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        if($comparison!==0){
+                            return $comparison;
+                        }
+                        return $a->details->busySlot - $b->details->busySlot;
                     });
                     break;
                 case 'Kelas':
@@ -295,17 +376,55 @@ class ScheduleController extends Controller
                         }
                     
                         // If classes are the same, compare using getTeacherInfo
-                        return ($this->getTeacherInfo($a->id, $date, $date, false) + 1)
-                            - ($this->getTeacherInfo($b->id, $date, $date, false) + 1);
+                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        if($comparison!==0){
+                            return $comparison;
+                        }
+                        return $a->details->busySlot - $b->details->busySlot;
                     });
+                    break;
+                case 'Subjek':
+                    usort($teacherList, function ($a, $b) use ($date, $schedule_subject) {
+                        $comparison = $this->checkSameSubject($schedule_subject->subject_id, $a->id)
+                            - $this->checkSameSubject($schedule_subject->subject_id, $b->id);
+                    
+                        if ($comparison !== 0) {
+                            return $comparison;
+                        }
+                    
+                        // If classes are the same, compare using getTeacherInfo
+                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        if($comparison!==0){
+                            return $comparison;
+                        }
+                        return $a->details->busySlot - $b->details->busySlot;
+                    });
+                    break;
+                default:
+                    return response()->json(['relief_draft'=>$relief_draft]);
                     break;
             }
 
            // dd($before,$teacherList);
            //dd(count( $assignedTeachers),$assignedTeachers);
-            foreach($teacherList as $t){
-                if(in_array($t->id,$assignedTeachers) &&   count($teacherList)>count( $assignedTeachers) )
+            foreach($teacherList as $t){ 
+               // dd($t);
+                if(!in_array($t->id,$assignedTeachers )) {
+                    //continue with proccess below
+                }          
+                else if(array_count_values($assignedTeachers)[$t->id] >= $t ->details->remaining_relief || $t->details->remaining_relief <= 0)
                     continue;
+
+                else if($current_slot == $schedule_subject ->slot && in_array($t->id,$teacherSlots)){
+                    continue;
+                }
+                // else{
+                //     dd($current_slot,$schedule_subject ->slot,$t->id  ,$assignedTeachers[count($assignedTeachers) - 1]);
+                // }
+                if($current_slot != $schedule_subject ->slot){
+                    $teacherSlots = [];
+                }
+                $current_slot =$schedule_subject ->slot;
                 $draft = new stdClass();
                 $draft->teacher_id = $t->id;
                 $draft->teacher_name =$t->name;
@@ -314,6 +433,7 @@ class ScheduleController extends Controller
                 $draft->leave_relief_id = $leave_relief_id;
                 array_push($relief_draft, $draft);
                 $assignedTeachers[] = $t->id;
+                $teacherSlots[]=$t->id;
                 break;
             }
 
@@ -622,12 +742,13 @@ class ScheduleController extends Controller
             'starttime' => 'required|date_format:H:i',
             'day' => 'required|array',
             'maxslot' => 'required|integer|min:0',
-            'organization_id'=>'required'
+            'organization_id'=>'required',
+            'maxRelief' => 'required'
             // Add other validation rules for your fields
         ]);
 
         $time_off =[];
-
+        $maxRelief = $request -> maxRelief;
         if($request->time_off != ''){
             $slots =explode(',',$request->time_off);
             foreach ($slots as $slot) {

@@ -254,12 +254,23 @@
                                 <label>Time Off Slot</label>
                                 <input type="text" name="time_off" id="time_off_text" placeholder= "1,2,4..." class="form-control">
                             </div>
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label>Teacher Maximum Slot Per Week</label>
+                                <input type="number" name="maxslot" id="maxslot" min=0 class="form-control">
+                            </div>
+                            <input type="hidden" name="organization_id" class="organization_id" value="0"> -->
+
+                            <div class="form-group">
+                                <label>Teacher Maximum Slot Per Day</label>
                                 <input type="number" name="maxslot" id="maxslot" min=0 class="form-control">
                             </div>
                             <input type="hidden" name="organization_id" class="organization_id" value="0">
 
+                            <div class="form-group">
+                                <label>Teacher Maximum Relief Slot Per Day</label>
+                                <input type="number" name="maxrelief" id="maxrelief" min=0 class="form-control">
+                            </div>
+                            <input type="hidden" name="organization_id" class="organization_id" value="0">
                             <!-- <div class="form-group">
                                 <input type="file" name="file" required>
                             </div> -->
@@ -313,7 +324,7 @@
                             </div>
                             <div class="form-group">
                                 <input type="file" name="file" required><br>
-                                <input type="checkbox"  name="autoInsert">
+                                <input type="checkbox"  name="autoInsert" checked>
                             <label >Automatic insert data of class, teacher and subject if not exist</label>
                             </div>
 
