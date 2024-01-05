@@ -67,6 +67,7 @@
                     <div>
                     <button type="button" id="chart" name="chart" class="btn btn-primary">Daily Status (Default)</button>
                     <button type="button" id="lr_teacher" name="lr_teacher" class="btn btn-primary">Leave and Relief Teacher</button>
+                    <button type="button" class="btn btn-success" onclick="window.print();">Print</button>
                     </div>
                 </div>
                 
@@ -170,6 +171,7 @@
                     </div>
                 </div>
 
+               
             </div>
         </div>
 
