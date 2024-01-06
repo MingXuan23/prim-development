@@ -348,7 +348,7 @@ class ScheduleApiController extends Controller
                  return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
             }
            // $image = $request->input('image');
-           $str = $user->id.'_' .Carbon::now()->toDateTimeString();
+           $str = $user->id.'_' .time();
            $filename = null;
             if (!is_null($request->image)) {
                 
@@ -393,7 +393,7 @@ class ScheduleApiController extends Controller
                 ->where('lr.replace_teacher_id',$user->id)
                 ->where('tl.date',$request->date)
                 ->where('lr.status',1)
-                ->where('lr.confirmation','Confirmed')
+                ->whereIn('lr.confirmation',['Confirmed','Pending'])
                 ->where('s.status',1)
                 ->where('sv.status',1)
                 ->where('ss.status',1)
@@ -409,8 +409,9 @@ class ScheduleApiController extends Controller
                     if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                         continue;
                     }
-
-                    if($request->isLeaveFullDay){
+                   // dd($request->isLeaveFullDay);
+                    if($request->isLeaveFullDay=="true"){
+                       
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
                             'schedule_subject_id'=>$c->schedule_subject_id,
@@ -422,7 +423,7 @@ class ScheduleApiController extends Controller
                         //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
                         //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
 
-                        
+                       
                         // check if the time is between start and end
                         if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
@@ -442,9 +443,11 @@ class ScheduleApiController extends Controller
                     //is today and over the time 
                     if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                         continue;
+                    }else if($date < Carbon::today()){
+                        continue;
                     }
                     $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
-                    if($request->isLeaveFullDay){
+                    if($request->isLeaveFullDay=="true"){
                         
                        DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
                        
@@ -748,10 +751,13 @@ class ScheduleApiController extends Controller
                 ->where('tl.status',1)
                 ->count();
 
-        $report->reliefCount = DB::table('leave_relief')
-            ->where('replace_teacher_id',$user_id)
-            ->where('status',1)
-            ->where('confirmation','Confirmed')
+        $report->reliefCount = DB::table('leave_relief as lr')
+            ->leftJoin('schedule_subject as ss','lr.schedule_subject_id','ss.id')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            ->where('lr.replace_teacher_id',$user_id)
+            ->where('lr.status',1)
+            ->where('lr.confirmation','Confirmed')
+            ->groupBy(['tl.date','ss.slot'])
             ->count();
 
         $report->rejectCount = DB::table('leave_relief')

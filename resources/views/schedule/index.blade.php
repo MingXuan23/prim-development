@@ -433,13 +433,11 @@
                 // Create cells for each slot
                 for (var slotIndex = minSlot; slotIndex <= maxSlot; slotIndex++) {
                     var cell = $('<td></td>');
-                    var slot = slots.find(s => s.day === dayIndex && s.slot === slotIndex);
+                    var slot_array = slots.filter(s => s.day === dayIndex && s.slot === slotIndex);
+                    var cellText ='';
                     var isBreak = timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day.find(d=>d ==dayIndex))) !== undefined;
-                    //console.log(isBreak); 
-                    if (slot) {
-                        cell.text(slot.subject + ' - ' + slot.teacher);
-                    }
-                    else if(isBreak){
+                        //console.log(isBreak); 
+                    if(isBreak){
                         
                         var text ='BREAK';
                         var break1 =timeoff.find(s => s.slot === slotIndex && (s.day ==null || s.day ==dayIndex));
@@ -447,12 +445,21 @@
                             text = break1.desc;
                         }
                         if(break1?.duration){
-                            text += '\n'+break1.duration+' min'
+                            text += '<br>'+break1.duration+' min'
                         }
                         
-                        cell.text(text);
+                        cellText += text + '<br>';
                     }
-
+                    slot_array.forEach((slot, index) => {
+                       
+                        cellText += slot.subject + ' - ' + slot.teacher ;
+                            if (index < slot_array.length - 1) {
+                                cellText += '<br>';
+                            }
+                       
+                    });
+                    
+                        cell.html(cellText.trim());
                         row.append(cell);
                     }
 

@@ -82,109 +82,116 @@ class ScheduleImport implements ToCollection, WithHeadingRow, WithChunkReading, 
 
             $day = (int) $row->first();
             $i=-1;
-            foreach ($row as $slot => $column) {
-                $data =explode('-', $column);
-                //dd($row,$slot,$column,$this->isInsert,$data);
+            foreach ($row as $slot => $cell) {
                 $i++;
-                if(count($data) !=2)
-                    continue;
-                    //dd($data);
-                $subjectCode =trim(strtoupper($data[0]));
-                $subject=DB::table('subject')
-                    ->where('organization_id',$this->organization_id)
-                    ->where(function ($query) use ($subjectCode) {
-                        $query->where('code', $subjectCode)
-                              ->orWhere('name', $subjectCode);
-                    })
-                    ->first();
-                  
-                  
-                if($subject ==null){
-                    //dd("1");
-                    if($this->isInsert){
-                        $newId = DB::table('subject')->insertGetId([
-                            'name'           =>  $subjectCode,
-                            'code'          =>  $subjectCode,
-                            'organization_id' => $this->organization_id
-                        ]);
-                        $subject = DB::table('subject')->where('id',$newId)->first();
-                    }else{
-                        
-                        throw ValidationException::withMessages(["error" => "Some subject is not in the records"]);
-                    }
+                $splitSubject = explode('/',$cell); // handle condition if the cell contain more than 1 subject
+                foreach($splitSubject as $column){
+                     $this->insertScheduleSubject($column,$day,$i,$class);
+                }
                    
-                }
-                //dd($subject);
-                $teacher = DB::table('users as u')
-                    ->join('organization_user as ou','u.id','ou.user_id')
-                    ->where('u.name',$data[1])
-                    ->where('ou.role_id',5)
-                    ->where('ou.organization_id',$this->organization_id)
-                    ->where('ou.status',1)
-                    ->select('u.*')
-                    ->first();
-
-                    
-                if($teacher ==null){
-                    if($this->isInsert){
-                        $newteacher = DB::table('users')->insertGetId([
-                            //
-                            'name'      => $data[1],
-                            // 'icno'      => $row['no_kp'],
-                            'email'     => str_replace(' ','_',$data[1]). rand(100000, 999999) .'@prim.my',
-                            'telno'     => '01000000000',
-                            'password'  => Hash::make('abc123'),
-                
-                        ]);
-                
-                        //$newteacher->save();
-
-                        DB::table('organization_user')->insert([
-                            'organization_id' => $this->organization_id,
-                            'user_id'       => $newteacher,
-                            'role_id'       => 5,
-                            'start_date'    => now(),
-                            'status'        => 1,
-                        ]);
-                
-                        $teacherRole = User::find($newteacher);
-                        //dd($teacher,$newteacher);
-                        // role pare,nt
-                        $rolename = OrganizationRole::find(5);
-                        $teacherRole->assignRole($rolename->nama);
-                        $teacher = DB::table('users')->where('id',$newteacher)->first();
-                    }else{
-                        throw ValidationException::withMessages(["error" => "Some teachers is not in the records"]);
-                    }
-                    
-                }
-                //dd($teacher->id);
-                $teacher = DB::table('users as u')
-                ->join('organization_user as ou','u.id','ou.user_id')
-                ->where('u.name',$data[1])
-                ->where('ou.role_id',5)
-                ->where('ou.organization_id',$this->organization_id)
-                ->where('ou.status',1)
-                ->select('u.*')
-                ->first();
-      
-                //dd($subject,$class,$teacher);
-                DB::table('schedule_subject')->insert([
-                    'created_at'=>Carbon::now(),
-                    'updated_at'=>Carbon::now(),
-                    'schedule_version_id'=>$this->version_id,
-                    'subject_id'=> $subject->id,
-                    'class_id'=>$class->id,
-                    'day'=>$day,
-                    'slot'=>$i,
-                    'teacher_in_charge'=>$teacher->id,
-                    'status'=>1
-                ]);
+                //dd($row,$slot,$column,$this->isInsert,$data);
             }
            
         }
     }
+  
+    public function insertScheduleSubject($column,$day,$i,$class){
+        $data =explode('-', $column);
+        if(count($data) !=2)
+            return;
+            //dd($data);
+        $subjectCode =trim(strtoupper($data[0]));
+        $subject=DB::table('subject')
+            ->where('organization_id',$this->organization_id)
+            ->where(function ($query) use ($subjectCode) {
+                $query->where('code', $subjectCode)
+                      ->orWhere('name', $subjectCode);
+            })
+            ->first();
+          
+          
+        if($subject ==null){
+            //dd("1");
+            if($this->isInsert){
+                $newId = DB::table('subject')->insertGetId([
+                    'name'           =>  $subjectCode,
+                    'code'          =>  $subjectCode,
+                    'organization_id' => $this->organization_id
+                ]);
+                $subject = DB::table('subject')->where('id',$newId)->first();
+            }else{
+                
+                throw ValidationException::withMessages(["error" => "Some subject is not in the records"]);
+            }
+           
+        }
+        //dd($subject);
+        $teacher = DB::table('users as u')
+            ->join('organization_user as ou','u.id','ou.user_id')
+            ->where('u.name',$data[1])
+            ->where('ou.role_id',5)
+            ->where('ou.organization_id',$this->organization_id)
+            ->where('ou.status',1)
+            ->select('u.*')
+            ->first();
 
+            
+        if($teacher ==null){
+            if($this->isInsert){
+                $newteacher = DB::table('users')->insertGetId([
+                    //
+                    'name'      => $data[1],
+                    // 'icno'      => $row['no_kp'],
+                    'email'     => str_replace(' ','_',$data[1]). rand(100000, 999999) .'@prim.my',
+                    'telno'     => '01000000000',
+                    'password'  => Hash::make('abc123'),
+        
+                ]);
+        
+                //$newteacher->save();
+
+                DB::table('organization_user')->insert([
+                    'organization_id' => $this->organization_id,
+                    'user_id'       => $newteacher,
+                    'role_id'       => 5,
+                    'start_date'    => now(),
+                    'status'        => 1,
+                ]);
+        
+                $teacherRole = User::find($newteacher);
+                //dd($teacher,$newteacher);
+                // role pare,nt
+                $rolename = OrganizationRole::find(5);
+                $teacherRole->assignRole($rolename->nama);
+                $teacher = DB::table('users')->where('id',$newteacher)->first();
+            }else{
+                throw ValidationException::withMessages(["error" => "Some teachers is not in the records"]);
+            }
+            
+        }
+        //dd($teacher->id);
+        $teacher = DB::table('users as u')
+        ->join('organization_user as ou','u.id','ou.user_id')
+        ->where('u.name',$data[1])
+        ->where('ou.role_id',5)
+        ->where('ou.organization_id',$this->organization_id)
+        ->where('ou.status',1)
+        ->select('u.*')
+        ->first();
+
+        //dd($subject,$class,$teacher);
+        DB::table('schedule_subject')->insert([
+            'created_at'=>Carbon::now(),
+            'updated_at'=>Carbon::now(),
+            'schedule_version_id'=>$this->version_id,
+            'subject_id'=> $subject->id,
+            'class_id'=>$class->id,
+            'day'=>$day,
+            'slot'=>$i,
+            'teacher_in_charge'=>$teacher->id,
+            'status'=>1
+        ]);
+    }
     public function chunkSize(): int
     {
         return 250; // Adjust the chunk size as needed
