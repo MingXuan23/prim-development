@@ -121,7 +121,7 @@ class ScheduleController extends Controller
             ->where('tl.date',$date)
             ->orderBy('ss.slot')
             ->select('lr.id as leave_relief_id','lr.confirmation','ss.id as schedule_subject_id','tl.date','tl.desc'
-            ,'sub.name as subject','u1.name as leave_teacher','u2.name as relief_teacher','ss.slot','ss.day','s.time_of_slot','s.start_time','s.time_off','c.nama as class_name')
+            ,'sub.name as subject','u1.name as leave_teacher','u2.name as relief_teacher','ss.slot','ss.day','s.time_of_slot','s.start_time','s.time_off','c.nama as class_name','tl.image')
             ->get();
 
             foreach($relief as $r){
@@ -214,20 +214,23 @@ class ScheduleController extends Controller
         $teacher =new stdClass();
         $teacher->id =$teacher_id;
         $teacher->name = User::find($teacher_id)->name;
-        $teacher->normal_class = DB::table('schedule_subject as ss' )
+        $teacher->normal_class = count(DB::table('schedule_subject as ss' )
                         ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
                         ->where('sv.status',1)
                         ->where('ss.status',1)
                         ->where('ss.teacher_in_charge',$teacher_id)
-                        ->count('ss.id');
-
-        $teacher->relief_class = DB::table('leave_relief as lr')
-                                ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
-                                ->where('lr.status',1)
-                                ->where('lr.replace_teacher_id',$teacher_id)
-                                ->whereBetween('tl.date',[$startDate,$endDate])
-                                ->count('lr.id');
-        
+                        ->groupBy(['ss.day','ss.slot'])
+                        ->get());  
+       
+       $teacher->relief_class = DB::table('leave_relief as lr')
+                        ->leftJoin('teacher_leave as tl', 'tl.id', 'lr.teacher_leave_id')
+                        ->leftJoin('schedule_subject as ss', 'ss.id', 'lr.schedule_subject_id')
+                        ->where('lr.status', 1)
+                        ->where('lr.replace_teacher_id', $teacher_id)
+                        ->whereBetween('tl.date', [$startDate, $endDate])
+                        ->groupBy(['tl.date', 'ss.slot'])  // Group by both date and slot
+                        ->count();
+        //dd($teacher);
         $teacher->leave_class =DB::table('leave_relief as lr')
                     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                     ->where('lr.status',1)
@@ -241,10 +244,19 @@ class ScheduleController extends Controller
             $teacher->maxSlot = DB::table('schedules as s' )
                                 ->leftJoin('schedule_version as sv','sv.schedule_id','s.id')
                                 ->where('sv.status',1)
-                                ->select('s.teacher_max_slot')
+                                ->select('s.teacher_max_slot','s.max_relief_slot','s.day_of_week')
                                 ->first();
-             $teacher->maxSlot = $teacher->maxSlot ==null?0:   $teacher->maxSlot->teacher_max_slot    
-                                ;
+                    
+             $dayList = json_decode($teacher->maxSlot->day_of_week);
+             $totalDays = $startDate->diffInDaysFiltered(function (Carbon $date) use ($dayList) {
+                return in_array($date->dayOfWeek, $dayList);
+            }, $endDate);
+
+            //dd($totalDays,$teacher,$dayList);
+            $teacher->maxRelief = $teacher->maxSlot ==null?0:   $teacher->maxSlot->max_relief_slot * $totalDays;
+            $teacher->maxSlot = $teacher->maxSlot ==null?0:   $teacher->maxSlot->teacher_max_slot * $totalDays;
+            
+            
             return $teacher;
         }
         //return $teacher;
@@ -632,6 +644,8 @@ class ScheduleController extends Controller
         ->where('sv.status', 1)
         ->where('ss.status',1)
         ->where('s.status', 1)
+        ->orderBy('ss.day','asc')
+        ->orderBy('ss.slot','asc')
         ->select('ss.id', 's.id as schedule_id', 'c.nama as class', 'sub.code as subject', 's.start_time', 's.time_of_slot', 'ss.slot', 's.time_off', 'ss.day', 'u.name as teacher')
         ->get();
 
@@ -1003,7 +1017,7 @@ class ScheduleController extends Controller
             // return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
         }
        // $image = $request->input('image');
-       $str = $user->id.'_' .Carbon::now()->toDateTimeString();
+       $str = $user->id.'_' .time();
        $filename = null;
         if (!is_null($request->image)) {
             
@@ -1048,7 +1062,7 @@ class ScheduleController extends Controller
                 ->where('lr.replace_teacher_id',$user->id)
                 ->where('tl.date',$request->date)
                 ->where('lr.status',1)
-                ->where('lr.confirmation','Confirmed')
+                ->whereIn('lr.confirmation',['Confirmed','Pending'])
                 ->where('s.status',1)
                 ->where('sv.status',1)
                 ->where('ss.status',1)
@@ -1064,7 +1078,7 @@ class ScheduleController extends Controller
                 if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                     continue;
                 }
-                if($request->isLeaveFullDay){
+                if($request->isLeaveFullDay== "on"){
                     $insert = DB::table('leave_relief')->insert([
                         'teacher_leave_id'=>$leave_id,
                         'schedule_subject_id'=>$c->schedule_subject_id,
@@ -1097,7 +1111,7 @@ class ScheduleController extends Controller
                     continue;
                 }
                 $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
-                if($request->isLeaveFullDay){
+                if($request->isLeaveFullDay== "on"){
                     
                     DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
                    

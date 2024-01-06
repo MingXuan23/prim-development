@@ -198,6 +198,24 @@
     </div>
 </div>
 
+<div id="imageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="width: 40%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">View Image</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" src="" alt="Modal Image" style="width: 80%; height: 70%; display: block; margin-left: auto; margin-right: auto;">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 @endsection
 
@@ -358,7 +376,7 @@
 
                 var tableBody = $('#reliefTable tbody');
                 tableBody.empty();
-
+                
                 reliefData.forEach(function (relief, index) {
                     var row = $('<tr></tr>');
                     row.append('<td>' + (index + 1) + '</td>');
@@ -366,11 +384,29 @@
                     row.append('<td>' + relief.subject + '</td>');
                     row.append('<td>' + relief.slot + '</td>');
                     row.append('<td>' + relief.leave_teacher + '</td>');
+                    
+                    var tdElement = $('<td></td>');
                     if (relief.desc !== null) {
-                    row.append('<td>' + relief.desc + '</td>');
-                    }else{
-                        row.append('<td></td>');
+                         tdElement = $('<td>' + relief.desc + '</td>');
                     }
+
+                    if (relief.image !== null) {
+                        // Add a link to open the modal and display the image
+                        var imageLink = $('<a href="#" class="image-link" data-image="' + relief.image + '">(View)</a>');
+                        imageLink.click(function() {
+                                // Get the image URL from the data attribute
+                                var imageUrl = $(this).data('image');
+                                $('#modalImage').attr('src', '{{ URL::asset('/schedule_leave_image/') }}' + '/' + imageUrl);
+
+                                $('#imageModal').modal('show');
+
+                                return false;
+                                console.log('Image URL:', imageUrl);
+                            });
+                        tdElement.append(imageLink);
+                    }
+
+                    row.append(tdElement);
 
         // Append the select box with options
             var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  
@@ -537,7 +573,7 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
                 },
                 success: function(response) {
                     console.log(response);
-                    $(".assign_teacher").prop("selectedIndex", 0);
+                    $(".assign_teacher").prop("selectedIndex", 0).trigger('change');
                      response.relief_draft.forEach(function(draft,index){
                         //var combobox = assignTeacherCombobox.has("[data-index='"+draft.leave_relief_id+"']");
                         var combobox = $('.assign_teacher[data-index="'+draft.leave_relief_id+'"]');

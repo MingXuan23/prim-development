@@ -596,12 +596,13 @@
                     var newRow = $('<tr>');
                     var fullSlot =teacher.maxSlot*response.NumberOfWeek;
                     // Assuming you have some data properties in newRowData
-                    var busy =teacher.normal_class*response.NumberOfWeek + teacher.relief_class - teacher.leave_class;
+                    var busy = Math.max(teacher.normal_class*response.NumberOfWeek + teacher.relief_class - teacher.leave_class,0);
+                    var remaining_relief = Math.min(teacher.maxRelief- teacher.relief_class, teacher.maxSlot - busy);
                     newRow.append($('<td>').text(i+1));
                     newRow.append($('<td>').text(teacher.name));
                     newRow.append($('<td>').text(busy));
                     newRow.append($('<td>').text(teacher.relief_class));
-                    newRow.append($('<td>').text(Math.max(fullSlot- busy,0)));
+                    newRow.append($('<td>').text(Math.max(remaining_relief,0)));
 
                     // Add more columns as needed
 
