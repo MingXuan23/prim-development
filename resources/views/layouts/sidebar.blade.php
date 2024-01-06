@@ -720,14 +720,13 @@
             </li>
             @endrole --}}
 
-             <!-- <li>
+             {{-- <!-- <li>
                     <a href="{{route('delivery.index')}}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
                         <span>Parcel</span>
                     </a>
-                </li> -->
+                </li> --> --}}
 
-                @role('Homestay Admin|Superadmin|Buyer')
                 <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
                     <i class="mdi mdi-home-city-outline"></i>
@@ -758,37 +757,18 @@
                             <span>Sejarah Tempahan</span>
                         </a>
                     </li> --}}
-                @role('Homestay Admin')
+                     @role('Homestay Admin')
                     <li>   
                          <a href="{{ route('homestay.urusbilik') }}" class=" waves-effect">
                             <i class="mdi mdi-room-service-outline"></i>
                             <span>Urus Homestay</span>
                         </a>
                     </li>
-                    {{-- <li>
-                        <a href="{{ route('homestay.promotionPage') }}" class=" waves-effect">
-                            <i class="mdi mdi-percent"></i>
-                            <span>Set Promosi</span>
-                        </a>
-                    </li> --}}
-                    {{-- <li>
-                        <a href="{{ route('homestay.urustempahan') }}" class=" waves-effect">
-                            <i class="ti-clipboard"></i>
-                            <span>Urus Tempahan</span>
-                        </a>
-                    </li> --}}
-                    {{-- <li>
-                        <a href="{{ route('homestay.viewPerformanceReport') }}" class=" waves-effect">
-                            <i class="mdi mdi-finance"></i>
-                            <span>Lihat Prestasi</span>
-                        </a>
-                    </li> --}}
                     @endrole 
 
                     <li>
                 </ul>  
             </li>
-            @endrole
             
             @role('Grab Student Admin|Superadmin|Buyer')
             <li>

@@ -39,7 +39,7 @@
           <select name="org_id" id="org_id" class="form-control">
             <option value="" selected disabled>Pilih Organisasi</option>
             @foreach($data as $row)
-            <option value="{{ $row->id }}">{{ $row->nama }}</option>
+            <option value="{{ $row->id }}" data-deposit-charge={{$row->fixed_charges ?? 0}}>{{ $row->nama }}</option>
             @endforeach
           </select>
         </div>
@@ -56,8 +56,12 @@
               <option value="all">Semua Homestay</option>
           </select>            
         </div>
-        <a style="margin: 19px; float: right;cursor: pointer;" id="view-booking-history" class="btn-purple"> <i
-            class="fas fa-history"></i> Sejarah Pesanan Pelanggan</a>
+        <div class="d-flex flex-wrap justify-content-center">
+          <button type="button" class="btn-purple m-2"  id="btn-booking-option"><i class="fas fa-coins"></i>&nbsp;Cara Tempahan</button>
+          <a style="cursor: pointer;" id="view-booking-history" class="btn-purple m-2"> <i
+              class="fas fa-history"></i> Sejarah Pesanan Pelanggan</a>          
+        </div>
+
       </div>
       <div class="card-body">
 
@@ -99,6 +103,27 @@
   </div>
 </div>
 
+  <div class="modal" id="modal-payment-option">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="text-right cross mb-3" id="btn-close"> <i class="fa fa-times mr-2"></i> </div>
+
+        <div class="text-justify h3 mb-3 px-5 ">Pilihan Pembayaran Deposit Dahulu Akan Dibuka Jika Terdapat Cas Deposit:</div>
+
+        <form action="{{route('homestay.updateDepositCharge', '')}}" method="post" enctype="multipart/form-data" id="form-deposit-charge" class="px-5 ">
+          @csrf
+          @method('PUT')
+          <div class="d-flex align-items-center justify-content-center flex-wrap my-3">
+            <label for="deposit-charge" class="col-sm-4">Cas Deposit(%)</label>
+            <input type="number" name="deposit_charge" id="deposit_charge"  class="form-control col-sm-8" min="0" max="100" required>
+          </div>
+          <button type="submit" class="btn-purple d-block mx-auto mt-3 mb-5">Simpan</button>
+        </form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
 @endsection
 
 
@@ -198,14 +223,31 @@ $(document).ready(function() {
                     { 
                       data: 'totalprice', 
                       render: function(data,type,row){
-                        return `${Number.parseFloat(data).toFixed(2)}`;
+                        if(row.status == 'Deposited'){
+                          return `${Number.parseFloat(row.deposit_amount).toFixed(2)}(deposit), ${Number.parseFloat(data - row.deposit_amount).toFixed(2)}(baki belum dibayar)`;
+                        }else {
+                          return `${Number.parseFloat(row.totalprice).toFixed(2)}`;
+                        }
                       },
                       orderable: true,
                       searchable: true,
                     },
                     { 
-                      data: 'bookingid', render: function(data) {
-                        return '<button class="btn btn-primary" id="btn-checkout" data-booking-id="' +data + '">Daftar Keluar</button>';
+                      data: 'bookingid', render: function(data,type,row) {
+                        const bookingsReminded = JSON.parse(localStorage.getItem('bookingsReminded')) || [];
+                        var isReminded = false;
+                        if(bookingsReminded.length > 0){
+                          isReminded = bookingsReminded.find(id => id == data)!=undefined ? true : false;
+                        }
+                        if(row.status == 'Deposited'){
+                          if(!isReminded){
+                            return '<button class="btn btn-primary" id="btn-remind-balance" data-booking-id="' +data + '">Ingatkan Baki</button>';                            
+                          }else{
+                            return '<button class="btn btn-primary" id="btn-reminded" data-booking-id="' +data + '">Peringatan Dihantar</button>';     
+                          }
+                        }else{
+                          return '<button class="btn btn-primary" id="btn-checkout" data-booking-id="' +data + '">Daftar Keluar</button>';
+                        }
                       },
                       orderable: false,
                       searchable: false, 
@@ -244,9 +286,13 @@ $(document).ready(function() {
       // Bind onchange event
   $('#org_id').change(function() {
       const orgId = $(this).val();
+      const depositCharge = $(this).find('option:selected').attr('data-deposit-charge');
       $('#view-customers-review').attr('href',`{{route('homestay.viewCustomersReview')}}`);
       const viewBookingHistory = $('#view-booking-history');
       viewBookingHistory.attr('href', `{{ route('homestay.viewBookingHistory', '') }}/${orgId}`);
+      const formDepositCharge = $('#form-deposit-charge');
+      formDepositCharge.attr('action',`{{route('homestay.updateDepositCharge', '')}}/${orgId}`);
+      $('input[name="deposit_charge"]').val(depositCharge);
       getData();
   });
 
@@ -323,6 +369,61 @@ $(document).ready(function() {
           )
         }
       })
+  });
+
+  $(document).on('click', '#btn-remind-balance',function(e){
+      const bookingId = $(this).attr('data-booking-id');
+      const clickedBtn = $(this);
+      Swal.fire({
+        title: 'Adakah anda ingin hantar peringatan pembayaran baki kepada pelanggan ini?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const bookingId = $(this).attr('data-booking-id');
+          $.ajax({
+            url: "{{route('homestay.sendReminder')}}",
+            method: "POST",
+            data: {
+              bookingId: bookingId,
+              "_token" : "{{csrf_token()}}",
+            },
+            success:function(result){
+              const bookingsReminded = JSON.parse(localStorage.getItem('bookingsReminded')) || [];
+              bookingsReminded.push(bookingId);
+              localStorage.setItem('bookingsReminded', JSON.stringify(bookingsReminded));
+
+              clickedBtn.attr('id', 'btn-reminded').text('Peringatan Dihantar');
+            },
+            error: function(){
+              console.log('Send Reminder Failed');
+            }
+          })
+
+          
+          Swal.fire(
+            'Peringatan dihantar!',
+            'Pelanggan tersebut telah terima email peringatan baki',
+            'success'
+          )
+        }
+      })
+  });
+  $(document).on('click','#btn-reminded', function(){
+    Swal.fire(
+            'Peringatan telah dihantar!',
+            'Pelanggan tersebut telah terima email peringatan baki',
+            'warning'
+          )
+  });
+  $(document).on('click','#btn-booking-option', function(){
+    $('#modal-payment-option').modal('show');
+  });
+  $(document).on('click','#btn-close', function(){
+    $('#modal-payment-option').modal('hide');
   });
   $('#homestay_id').on('change', function(){
     getData();

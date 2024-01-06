@@ -195,6 +195,8 @@
     </section>
     {{-- for pagination --}}
         {{$products->links()}}
+
+    <div class="mb-5"></div>
 @endsection
 
 @section('script')

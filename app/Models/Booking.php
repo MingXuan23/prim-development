@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\User;
 
 class Booking extends Model
 {
@@ -22,15 +22,17 @@ class Booking extends Model
         'increase_received',
         'booked_rooms',
         'review_images',
+        'deposit_amount',
+        'transaction_balance_id',
     ];
 
-    public function users()
+    public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class ,'customerid' ,'id');
     }
     public function room()
     {
-        return $this->belongsTo(Room::class);
+        return $this->belongsTo(Room::class ,'roomid');
     }
     public function transaction()
     {

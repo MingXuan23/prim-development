@@ -22,7 +22,7 @@ use App\Models\Transaction;
 use App\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\HomestayReceipt;
-
+use App\Mail\NotifyBalance;
 use View;
 use Carbon\Carbon;
 use DateTime;
@@ -34,21 +34,36 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class HomestayController extends Controller
 {
     public function testPayment(){
-        $transaction = Transaction::where('nama', '=', 'Homestay_20231219193450')->first();
-        $transaction->transac_no = 'test';
+        $transaction = Transaction::where('nama', '=', 'Homestay_20240103213344')->first();
+        $transaction->transac_no = 'test deposit payment';
         $transaction->status = "Success";
         $transaction->save();
 
         // update booking table
-        Booking::where('transactionid',$transaction->id)
-        ->update([
-            'status' => 'Booked',
-            'updated_at' => Carbon::now(),
-        ]);
-
+        // check whether is paying for deposit/full or balance 
+        $booking = $booking = Booking::where('transactionid', $transaction->id)
+        ->orWhere('transaction_balance_id', $transaction->id)
+        ->first();
+       
+        if($booking->deposit_amount > 0 ){
+            if($booking->status == "Deposited"){ // for paying balance
+                $booking->status = "Balance Paid";
+                $booking->updated_at = Carbon::now();
+                $booking->save();                
+            }else{//paying deposit
+                $booking->status = "Deposited";
+                $booking->updated_at = Carbon::now();
+                $booking->save();
+            }
+        }else{
+            // for full payment 
+            $booking->status = "Booked";
+            $booking->updated_at = Carbon::now();
+            $booking->save();
+        }
+        
         $userid = $transaction->user_id;
         
-        $booking = Booking::where('transactionid', '=', $transaction->id)->first();
         $room = Room::find($booking->roomid);
         $user = User::find($transaction->user_id);
         $organization = Organization::find($room->homestayid);
@@ -56,7 +71,7 @@ class HomestayController extends Controller
         $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
         ->join('bookings','rooms.roomid','=','bookings.roomid')
         ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
-        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms')
+        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms','bookings.deposit_amount','bookings.status')
         ->get();
 
         if($transaction->email != NULL)
@@ -353,7 +368,7 @@ class HomestayController extends Controller
         $roomId = $request->roomId;
         $roomNo = $request->roomNo;
         $bookings = Booking::where('roomid', $roomId)
-                           ->whereIn('status', ['Booked', 'Completed'])
+                           ->whereIn('status', ['Booked', 'Completed' ,'Deposited' ,'Balance Paid'])
                            ->get();
         
         $disabledDates = [];
@@ -1240,14 +1255,14 @@ public function getPromotionHistory(Request $request){
             $availability = Booking::where('roomid', $roomId)
             ->where('checkin', '<', $checkOutDate)
             ->where('checkout', '>', $checkInDate)
-            ->whereIn('status', ['Booked', 'Completed'])
+            ->whereIn('status', ['Booked', 'Completed' , 'Deposited' ,'Balance Paid'])
             ->get();       
         }else{
              // for booking type book by rooms
              $availability = Booking::where('roomid', $roomId)
              ->where('checkin', '<', $checkOutDate)
              ->where('checkout', '>', $checkInDate)
-             ->whereIn('status', ['Booked', 'Completed'])
+             ->whereIn('status', ['Booked', 'Completed', 'Deposited' ,'Balance Paid'])
              ->get();
 
              $maxRoomsNo = DB::table('rooms')
@@ -1292,13 +1307,12 @@ public function getPromotionHistory(Request $request){
             ]);
 
             
-            $homestay = DB::table('rooms')
-            ->where([
+            $homestay = Room::where([
                 'roomid' => $request->roomId,
                 'deleted_at' => null,
             ])
             ->first();
-
+            $depositCharge = $homestay->organization->fixed_charges ?? 0;
             $homestayImage = DB::table('homestay_images')
             ->where([
                 'room_id' => $request->roomId,
@@ -1318,8 +1332,9 @@ public function getPromotionHistory(Request $request){
                 'nightCount' => $request->nightCount,
                 'homestay'=>$homestay,  
                 'homestayImage'=> $homestayImage, 
-                'bookingId' => $bookingId,    
-                'bookedRooms' => $bookedRooms,         
+                'bookingId' => $bookingId, 
+                'bookedRooms' => $bookedRooms,    
+                'depositCharge' => $depositCharge,     
             ];
             // redirect to checkout page
             return view('homestay.bookingCheckout')->with(['checkoutDetails' => $checkoutDetails]);
@@ -1407,11 +1422,12 @@ public function getPromotionHistory(Request $request){
         $checkoutBookings = DB::table('bookings')
         ->where([
             'bookings.customerid' => $userId,
-            'bookings.status' => 'Booked',
         ])
+        ->whereIn('bookings.status' ,['Booked','Deposited','Balance Paid'])
         ->join('rooms','rooms.roomid','bookings.roomid')
         ->join('organizations','organizations.id','rooms.homestayid')
         ->orderBy('bookings.updated_at','desc')
+        ->select('rooms.roomid','rooms.roomname','rooms.address','rooms.state','rooms.district','rooms.area','rooms.postcode','rooms.check_in_after','rooms.check_out_before','organizations.telno','bookings.bookingid','bookings.totalprice','bookings.status','bookings.deposit_amount','bookings.checkin','bookings.checkout','bookings.booked_rooms')
         ->get();
         $checkoutImages = [];
         if(!$checkoutBookings->isEmpty()){
@@ -1426,13 +1442,12 @@ public function getPromotionHistory(Request $request){
                 array_push($checkoutImages,$image);
             }            
         }
-
         // data for completed tab
         $completedBookings = DB::table('bookings')
         ->where([
             'bookings.customerid' => $userId,
-            'bookings.status' => 'Completed',
         ])
+        ->whereIn('bookings.status' ,['Completed'])
         ->join('rooms','rooms.roomid','bookings.roomid')
         ->join('organizations','organizations.id','rooms.homestayid')
         ->orderBy('bookings.updated_at','desc')
@@ -1538,7 +1553,9 @@ public function getPromotionHistory(Request $request){
         ->join('transactions' ,'transactions.id' ,'bookings.transactionid')
         ->where([
             'bookings.bookingid' => $bookingId,
+            'transactions.status' => 'Success',
         ])
+        ->select('transactions.description','transactions.datetime_created','bookings.status','bookings.checkin','bookings.checkout','bookings.booked_rooms','bookings.discount_received','bookings.increase_received','bookings.totalprice','bookings.deposit_amount','transactions.amount')
         ->first();
 
         $user = DB::table('bookings')
@@ -1650,11 +1667,10 @@ public function getPromotionHistory(Request $request){
                 'r.deleted_at' => null
             ])
             ->join('bookings as b' , 'b.roomid' , 'r.roomid')
-            ->where([
-                'b.status' => 'Booked'
-            ])
+            ->whereIn('b.status', ['Booked','Deposited','Balance Paid'])
             ->join('users as u', 'u.id' ,'b.customerid')
             ->orderBy('b.bookingid','desc')
+            ->select('r.roomname','r.check_in_after','r.check_out_before','b.bookingid','b.checkin','b.checkout','b.totalprice','b.status','b.deposit_amount' ,'u.name','u.telno')
             ->get();
         }else{
             $bookings = DB::table('rooms as r')
@@ -1664,11 +1680,10 @@ public function getPromotionHistory(Request $request){
                 'r.roomid' => $homestayId,
             ])
             ->join('bookings as b' , 'b.roomid' , 'r.roomid')
-            ->where([
-                'b.status' => 'Booked'
-            ])
+            ->whereIn('b.status', ['Booked','Deposited','Balance Paid'])
             ->join('users as u', 'u.id' ,'b.customerid')
             ->orderBy('b.bookingid','desc')
+            ->select('r.roomname','r.check_in_after','r.check_out_before','b.bookingid','b.checkin','b.checkout','b.totalprice','b.status','b.deposit_amount' ,'u.name','u.telno')
             ->get();
         }
         $homestays = DB::table('rooms')
@@ -1755,6 +1770,14 @@ public function getPromotionHistory(Request $request){
         }
         return response()->json(['bookings' => $bookings]);
     }
+    public function updateDepositCharge(Request $request,$orgId){
+        $depositCharge = $request->deposit_charge;
+        $organization = Organization::find($orgId);
+        $organization->fixed_charges = $depositCharge;
+        $organization->save();
+
+        return redirect()->route('homestay.urustempahan')->with('success','Cas Deposit telah disimpan');
+    }
     public function viewCustomersReview(){
         $orgtype = 'Homestay / Hotel';
         $userId = Auth::id();
@@ -1781,6 +1804,14 @@ public function getPromotionHistory(Request $request){
         // ->select('roomid','roomname')
         // ->get();
         return view('homestay.customersReview',compact('organizations'));
+    }
+    public function sendReminder(Request $request){
+        $bookingId = $request->bookingId;
+        $booking = Booking::find($bookingId);
+        $user = $booking->user;
+        Mail::to($user->email)->send(new NotifyBalance($user,$booking));
+
+        return response()->json(['success' => 'Reminder sent successfully']);
     }
     public function getCustomersReview(Request $request){
         // fetch reviews for all homestays

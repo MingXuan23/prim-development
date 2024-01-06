@@ -11,12 +11,12 @@
     <style>
         /* add padding to the page's content*/
         .page-content{
-            padding: 80px 5%!important;
+            padding: 80px 10%!important;
         }
 
         @media screen and (max-width:500px){
             .page-content{
-                padding: 80px 5%!important;
+                padding: 80px 0!important;
             }
         }
     </style>
@@ -40,6 +40,17 @@
                     <button class="btn-fancy" id="btn-gallery">
                         <span class="btn-fancy-content">Lihat semua gambar</span>
                     </button>
+                </div>
+            </div>            
+            <div class="text-center my-5" id="room-info">
+                <div >
+                    <h5><i class="fas fa-sign-in-alt"></i>&nbsp;Daftar Masuk Selepas: <span class="color-purple">{{ date('h:i A', strtotime($room->check_in_after)) }}</span></h5>
+                </div>
+                <div >
+                    <h5><i class="fas fa-sign-out-alt"></i>&nbsp;Daftar Keluar Sebelum: <span class="color-purple">{{ date('h:i A', strtotime($room->check_out_before)) }}</span></h5>
+                </div>
+                <div>
+                    <h5><i class="fas fa-user-friends"></i>&nbsp;Bilangan Tetamu: <span class="color-purple">{{$room->roompax}}</span></h5>
                 </div>
             </div>
             <div class="row mt-4 ">
@@ -83,11 +94,11 @@
                         @endif
 
                         <div class="form-floating mb-2" >
-                            <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder=" " {{$room->booking_type == "room" ? 'disabled' : ''}} >
+                            <input type="text" autocomplete="off" name="checkIn" id="check-in" class="form-control" placeholder=" " {{$room->booking_type == "room" ? 'disabled' : ''}}  readonly>
                             <label for="check-in">Pilih Daftar Masuk</span>
                         </div>
                         <div class="form-floating mb-2" >
-                            <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder=" " disabled >
+                            <input type="text" autocomplete="off"  name="checkOut" id="check-out" class="form-control" placeholder=" " disabled  readonly>
                             <label for="check-out">Pilih Daftar Keluar</label>
                         </div>
                         <div class="text-white text-center mb-2">
@@ -113,20 +124,7 @@
                     </form>
                 </div>
             </div>
-            <div>
-                <h3 class="color-dark-purple"><i class="fas fa-info"></i>&nbsp;&nbsp;Maklumat Penting</h3>
-                <div class="row text-center p-5" id="room-info">
-                    <div class="col-md-4">
-                        <h5><i class="fas fa-sign-in-alt"></i>&nbsp;Daftar Masuk Selepas: <span class="color-purple">{{ date('H:i', strtotime($room->check_in_after)) }}</span></h5>
-                    </div>
-                    <div class="col-md-4">
-                        <h5><i class="fas fa-sign-out-alt"></i>&nbsp;Daftar Keluar Sebelum: <span class="color-purple">{{ date('H:i', strtotime($room->check_out_before)) }}</span></h5>
-                    </div>
-                    <div class="col-md-4">
-                        <h5><i class="fas fa-user-friends"></i>&nbsp;Room Pax: <span class="color-purple">{{$room->roompax}}</span></h5>
-                    </div>
-                </div>
-            </div>
+
 
             <section aria-labelledby="Review Section">
                 <h3 class="color-dark-purple mb-1"><i class="fas fa-comments"></i>&nbsp;&nbsp;Nilaian Pelanggan</h3>

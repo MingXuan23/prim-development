@@ -176,11 +176,30 @@ class DirectPayController extends Controller
                 
                 $request->amount = $homestay->totalprice;
                 $bookingId = $request->bookingid;
-    
-                DB::table('bookings')->where('bookingid', $bookingId)->update([
-                    'updated_at' => Carbon::now(),
-                    'status' => 'Pending',
-                ]);
+                
+                $paymentType =  $request->paymentType;
+                $depositAmount =  NULL;
+                if($paymentType == 'deposit'){
+                    $depositCharge = $room->organization->fixed_charges;
+                    $depositAmount = $homestay->totalprice * $depositCharge / 100;
+                    $request->amount = $depositAmount;
+                }else if($paymentType == 'balance'){
+                    $request->amount = $homestay->totalprice - $homestay->deposit_amount;
+                    $depositCharge = $room->organization->fixed_charges;
+                    $depositAmount = $homestay->totalprice * $depositCharge / 100;
+                }
+                if($paymentType == 'balance'){
+                    DB::table('bookings')->where('bookingid', $bookingId)->update([
+                        'updated_at' => Carbon::now(),
+                    ]);   
+                }else{
+                    DB::table('bookings')->where('bookingid', $bookingId)->update([
+                        'updated_at' => Carbon::now(),
+                        'status' => 'Pending',
+                        'deposit_amount' => $depositAmount,
+                    ]);                    
+                }
+
     
                 $organization = Organization::find($room->homestayid);
                 $fpx_buyerEmail      = $user->email;
@@ -350,11 +369,20 @@ class DirectPayController extends Controller
                 }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'H')
                 {
-                    $result = DB::table('bookings')
-                    ->where('bookingid', $bookingId)
-                    ->update([
-                        'transactionid' => $transaction->id
-                    ]);
+                    if($paymentType == 'deposit' || $paymentType == 'full'){
+                        $result = DB::table('bookings')
+                        ->where('bookingid', $bookingId)
+                        ->update([
+                            'transactionid' => $transaction->id
+                        ]);                        
+                    }else if($paymentType == 'balance'){
+                        $result = DB::table('bookings')
+                        ->where('bookingid', $bookingId)
+                        ->update([
+                            'transaction_balance_id' => $transaction->id
+                        ]);     
+                    }
+
                    
                 }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'O')
@@ -749,15 +777,30 @@ class DirectPayController extends Controller
                         $transaction->save();
     
                         // update booking table
-                        Booking::where('transactionid',$transaction->id)
-                        ->update([
-                            'status' => 'Booked',
-                            'updated_at' => Carbon::now(),
-                        ]);
-
+                        // check whether is paying for deposit/full or balance 
+                        $booking = Booking::where('transactionid', $transaction->id)
+                        ->orWhere('transaction_balance_id', $transaction->id)
+                        ->first();
+                    
+                        if($booking->deposit_amount > 0 ){
+                            if($booking->status == "Deposited"){ // for paying balance
+                                $booking->status = "Balance Paid";
+                                $booking->updated_at = Carbon::now();
+                                $booking->save();                
+                            }else{//paying deposit
+                                $booking->status = "Deposited";
+                                $booking->updated_at = Carbon::now();
+                                $booking->save();
+                            }
+                        }else{
+                            // for full payment 
+                            $booking->status = "Booked";
+                            $booking->updated_at = Carbon::now();
+                            $booking->save();
+                        }
+                        
                         $userid = $transaction->user_id;
                         
-                        $booking = Booking::where('transactionid', '=', $transaction->id)->first();
                         $room = Room::find($booking->roomid);
                         $user = User::find($transaction->user_id);
                         $organization = Organization::find($room->homestayid);
@@ -765,7 +808,7 @@ class DirectPayController extends Controller
                         $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
                         ->join('bookings','rooms.roomid','=','bookings.roomid')
                         ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
-                        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price', 'rooms.status','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms')
+                        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms','bookings.deposit_amount','bookings.status')
                         ->get();
 
                         if($transaction->email != NULL)
@@ -773,7 +816,7 @@ class DirectPayController extends Controller
                             Mail::to($transaction->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to customer
                         }
                         Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to homestay admin
-    
+
                         return view('homestay.receipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
     
                         break;

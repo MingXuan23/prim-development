@@ -9,15 +9,23 @@
             max-width: 100% !important;
         }
     }
+    @media print{
+        #link-previous{
+            display: none;
+        }
+        #btn-download-receipt{
+            visibility: hidden;
+        }
+    }
 </style>
 @endsection
 
 @section('content')
-    <a href="{{url()->previous()}}" class="color-dark-purple" style="font-size: 20px;"><i class="mt-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
+    <a href="{{url()->previous()}}" class="color-dark-purple" id="link-previous" style="font-size: 20px;"><i class="mt-3 fas fa-chevron-left"></i>&nbsp;Kembali</a>
     <div class="mt-3" id="tab-container">
       <h3 class="color-purple text-center">Butiran Tempahan</h3>    
     </div>
-    <div class="container border-white">
+    <div class="container border-white" id="booking-details">
         <div class="row mt-3">
             <div class="col-12">
                 <div class="card mb-1">
@@ -104,18 +112,46 @@
                                         <td colspan="4" style="text-align:center"><b>Jumlah</b> </td>
                                         <td style="text-align:center">
                                             <b>{{ $transaction->totalprice  }}</b>
-
+ 
                                         </td>
                                     </tr>
-
+                                    @if($transaction->deposit_amount > 0)
+                                        <tr>
+                                            <td></td>
+                                            <td colspan="4" style="text-align:center"><b>Deposit</b> </td>
+                                            <td style="text-align:center">
+                                                <b>{{ $transaction->deposit_amount  }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td colspan="4" style="text-align:center"><b>Baki</b> </td>
+                                            <td style="text-align:center">
+                                                <b>{{number_format($transaction->totalprice - $transaction->deposit_amount, 2 ,'.' , '')  }}</b>
+                                            </td>
+                                        </tr>
+                                    @endif
                                 </table>
 
                                 <div class="d-flex justify-content-end align-items-center">
-                                    <div class="mx-3" colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran
-                                            (RM)</b> </div>
+                                    @if($transaction->status == 'Deposited')
+                                        <div class="mx-3" colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran(Baki Belum Dibayar)</b> </div>
+                                        <div style="font-size:18px;">
+                                            <b>RM{{  number_format((float)$transaction->deposit_amount, 2, '.', '') }}</b>
+                                        </div>
+                                    @elseif($transaction->status == 'Balance Paid')
+                                        <div class="mx-3" colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran(Deposit Dan Baki Telah Dibayar)</b> </div>
                                     <div style="font-size:18px;">
-                                        <b>{{  number_format((float)$transaction->amount, 2, '.', '') }}</b>
+                                        <b>RM{{  number_format((float)$transaction->totalprice, 2, '.', '') }}</b>
                                     </div>
+
+                                    @else
+                                    <div class="mx-3" colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran(Penuh)</b> </div>
+                                    <div style="font-size:18px;">
+                                        <b>RM{{  number_format((float)$transaction->totalprice, 2, '.', '') }}</b>
+                                    </div>
+
+                                    @endif
                                 </div>
 
                                 <div class="d-flex justify-content-center mt-4">

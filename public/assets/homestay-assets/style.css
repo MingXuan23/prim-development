@@ -12,6 +12,13 @@ body,
 tbody > tr > td {
     color: black !important;
 }
+footer {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+.container-fluid {
+    margin-bottom: 20px !important;
+}
 /* remove padding  */
 /* .container-fluid {
     padding: 0 !important;
@@ -203,12 +210,11 @@ button#btn-add-image:hover {
     left: 50%;
     transform: translate(-50%, -50%);
     height: 100%;
-    width: 100%;
+    width: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.592);
 }
 .price-before-discount {
     text-decoration-line: line-through;
@@ -463,6 +469,16 @@ div#modal-fullscreen,
     text-align: justify;
     white-space: pre-wrap;
 }
+#room-info {
+    display: grid;
+    column-gap: 5px;
+    grid-template-columns: repeat(3, 1fr);
+}
+#room-info > div {
+    border: 1px solid var(--secondary-color);
+    padding: 12px;
+}
+
 /* for datepicker - jquery ui */
 .booking-container {
     background-color: #7145ff;
@@ -770,9 +786,16 @@ html .ui-button.ui-state-disabled:active {
         width: 90% !important;
     }
     /* homepage */
+
+    #banner-content {
+        width: 80%;
+    }
     #banner-content > * {
         padding: 8px;
         font-size: 20px !important;
+    }
+    #banner-container > img {
+        object-position: 50% 70%;
     }
     #modal-gallery .modal-body {
         flex-wrap: nowrap;
@@ -795,7 +818,14 @@ html .ui-button.ui-state-disabled:active {
         grid-template-columns: 100%;
     }
     #room-info {
+        grid-template-columns: 100%;
         padding: 12px !important;
+    }
+    #room-info > div {
+        margin-bottom: 12px !important;
+    }
+    #form-book {
+        margin-bottom: 12px;
     }
     #ui-datepicker-div {
         left: 50% !important;

@@ -82,7 +82,7 @@ class Organization extends Model
 
     public function room()
     {
-        return $this->hasMany(Room::class);
+        return $this->hasMany(Room::class , 'id' ,'homestayid' );
     }
 
     public function grab()
