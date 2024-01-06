@@ -63,9 +63,8 @@
                     <li class="menu-item-has-children">
                         <a href="#">Perniagaan</a>
                         <ul class="sub-menu">
-                            <li><a href="/merchant/product">Get&Go</a></li>
+                            <li><a href="{{route('merchant-product.index')}}">Get&Go</a></li>
                             <li><a href="{{route('homestay.homePage')}}">Homestay</a></li>
-                            <li><a href="">Bus</a></li>
                         </ul>
                     </li>
                     {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
@@ -325,7 +324,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="copyright-inner">
+                        <div class="copyright-inner text-center">
                             <!-- copyright inner wrapper -->
                             <div class="left-content-area">
                                 <!-- left content area -->

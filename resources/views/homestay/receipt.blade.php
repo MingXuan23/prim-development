@@ -105,7 +105,8 @@
                                         <td style="text-align: center">{{ $item->roomname }}</td>
                                         <td style="text-align: center">{{ $item->checkin }}</td>
                                         <td style="text-align: center">{{ $item->checkout }}</td>
-                                        @if($booking_order[0]->booked_rooms == null)
+                                        @if($booking_order[0]->booked_rooms == null) 
+                                        {{-- price per night *** --}}
                                             <td style="text-align: center">{{  $item->price  }}</td>
                                         @else
                                             <td style="text-align: center">{{  number_format($item->price * $booking_order[0]->booked_rooms , 2) }} (x{{$booking_order[0]->booked_rooms}} unit) </td>
@@ -138,16 +139,37 @@
                                             <b>{{ $item->totalprice  }}</b>
                                         </td>
                                     </tr>
+                                    @if($booking_order[0]->deposit_amount > 0 )
+                                        <tr>
+                                            <td></td>
+                                            <td colspan="3" style="text-align:center"><b>Deposit</b> </td>
+                                            <td style="text-align:center">
+                                                <b>{{ $item->deposit_amount  }}</b>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td></td>
+                                            <td colspan="3" style="text-align:center"><b>Baki</b> </td>
+                                            <td style="text-align:center">
+                                                <b>{{ $item->totalprice - $item->deposit_amount  }}</b>
+                                            </td>
+                                        </tr>
+                                    @endif
 
                                 </table>
 
                                 <table style="width:100%" class="infotbl">
                                     <tr>
                                         <td></td>
-                                        <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran
-                                                (RM)</b> </td>
+                                        @if($booking_order[0]->status == 'Deposited')
+                                            <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran(Deposit)</b> </td>
+                                        @elseif($booking_order[0]->status == 'Balance Paid')
+                                        <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran(Baki)</b> </td>
+                                        @elseif($booking_order[0]->status == 'Booked')
+                                        <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran(Penuh)</b> </td>
+                                        @endif
                                         <td style="text-align:center; width:20%; font-size:18px">
-                                            <b>{{  number_format((float)$transaction->amount, 2, '.', '') }}</b>
+                                            <b>RM{{  number_format((float)$transaction->amount, 2, '.', '') }}</b>
                                         </td>
                                     </tr>
                                 </table>

@@ -10,9 +10,15 @@
 @endsection
 
 @section('content')
+    {{-- <div>
+        <form action="{{route('homestay.testPayment')}}" method="post">
+            @csrf
+            <button type="submit">Test Payment</button>
+        </form>
+    </div> --}}
     <section aria-label="Banner" class="mb-3">
         <div id="banner-container">
-            <img src="{{URL('assets/homestay-assets/images/home-banner-image.jpeg')}}" alt="Banner Image" id="banner-image">
+            <img src="{{URL('assets/homestay-assets/images/home-banner-image(updated).jpg')}}" alt="Banner Image" id="banner-image">
             <div id="banner-content">
                 <h2>Cari penginapan idaman anda dengan tawaran yang menarik</h2>
             </div>
@@ -75,6 +81,8 @@
 
     </section>
     {{ $rooms->appends(request()->query())->links() }}
+    <div class="mb-5">
+    </div>
 @endsection
 
 

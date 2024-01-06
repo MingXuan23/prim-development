@@ -49,6 +49,14 @@
               Tiada tempahan yang telah dibuat untuk masa kini
             </div>
           </div>
+          <form action="{{route('directpayIndex')}}" method="post" id="form-pay-balance">
+            @csrf
+            <input type="hidden" name="desc" id="desc" value="Homestay">
+            <input type="hidden" name="bookingid" id = "bookingid">
+            <input type="hidden" name="amount" id="amount">
+            <input type="hidden" name="paymentType" id="paymentType">
+
+          </form>
             @for($i = 0 ; $i < count($checkoutBookings); $i++)
               <div class="card tab-card my-3">
                   <div class="card-body row">
@@ -60,13 +68,23 @@
                       <h6 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span>&nbsp;&nbsp;&nbsp;{{$checkoutBookings[$i]->address}}, {{$checkoutBookings[$i]->area}}, {{$checkoutBookings[$i]->postcode}}, {{$checkoutBookings[$i]->district}}, {{$checkoutBookings[$i]->state}}</h6>
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Daftar Masuk: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($checkoutBookings[$i]->check_in_after))}}</h6>
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Daftar Keluar: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkout))}}, sebelum {{date('H:i', strtotime($checkoutBookings[$i]->check_out_before))}}</h6>
-                      <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Jumlah Dibayar: </span>RM{{$checkoutBookings[$i]->totalprice}}</h6>
+                      @if($checkoutBookings[$i]->status == 'Deposited')
+                        <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-bill-alt"></i>&nbsp;Jumlah Dibayar(Deposit): </span>RM{{$checkoutBookings[$i]->deposit_amount}}</h6>    
+                        <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Baki Perlu Dibayar: </span>RM{{$checkoutBookings[$i]->totalprice - $checkoutBookings[$i]->deposit_amount}}</h6>                        
+                      @else
+                        <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Jumlah Dibayar: </span>RM{{$checkoutBookings[$i]->totalprice}}</h6>
+                      @endif
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i>&nbsp;&nbsp;&nbsp;Nombor Telefon Organisasi: </span>{{$checkoutBookings[$i]->telno}}</h6>    
                       @if($checkoutBookings[$i]->booked_rooms != null)
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-door-closed"></i>&nbsp;Jumlah Unit Ditempah: </span>{{$checkoutBookings[$i]->booked_rooms}}</h6>   
                       @endif
                       <div id="booking-button-group" class="d-flex justify-content-end align-items-center flex-wrap gap-3">
-                        <button class="btn-purple mx-2 btn-checkout-room" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Daftar Keluar</button>
+                        @if($checkoutBookings[$i]->status == 'Deposited')
+                          <button class="btn-purple mx-2 btn-pay-balance" data-booking-id="{{$checkoutBookings[$i]->bookingid}}" data-amount="{{$checkoutBookings[$i]->totalprice - $checkoutBookings[$i]->deposit_amount}}">Bayar Baki</button>
+                        @else
+                          <button class="btn-purple mx-2 btn-checkout-room" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Daftar Keluar</button>
+                        @endif
+
                         <a href="{{route('homestay.bookingDetails',$checkoutBookings[$i]->bookingid)}}" class="btn-dark-purple mx-2 btn-detail">Butiran</a>
                         <button class="btn btn-danger mx-2 btn-cancel-booking" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Batal</button>
                       </div>
@@ -249,7 +267,27 @@
             }
           })
       });
+      $('.btn-pay-balance').on('click',function(){
+        const bookingId = $(this).attr('data-booking-id');
+        const payAmount = $(this).attr('data-amount');
+          Swal.fire({
+            title: 'Adakah anda pasti?',
+            text: `Anda mahu bayar baki RM${parseFloat(payAmount).toFixed(2)}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, teruskan dengan pembayaran baki!'
+          }).then((result) => {
+            if (result.isConfirmed) {
+                $('#bookingid').val(bookingId);
+                $('#amount').val(payAmount);
+                $('#paymentType').val('balance');
 
+                $('#form-pay-balance').submit();
+            }
+          })
+      });
       // for review 
       let bookingId = 0;
       $('.btn-review').on('click',function(){

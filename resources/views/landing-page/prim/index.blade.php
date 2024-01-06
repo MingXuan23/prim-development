@@ -34,7 +34,10 @@
         #headerhover:hover {
             transform: scale(1.2);
         }
-
+        .single-feature-list{
+            background-image: -webkit-linear-gradient(50deg,#5e2ced 0,#9749f8 100%)!important;
+            color: white!important;
+        }
         /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
             transform: scale(1.0);
         }
@@ -79,9 +82,8 @@
                     <li class="menu-item-has-children">
                         <a href="#">Perniagaan</a>
                         <ul class="sub-menu">
-                            <li><a href="/merchant/product">Get&Go</a></li>
+                            <li><a href="{{route('merchant-product.index')}}">Get&Go</a></li>
                             <li><a href="{{route('homestay.homePage')}}">Homestay</a></li>
-                            <li><a href="">Bus</a></li>
                         </ul>
                     </li>
                     {{-- <li class="menu-item-has-children">
@@ -190,37 +192,37 @@
                 <div class="col-md-12">
                     <div class="feature-area">
                         <ul class="feature-list wow fadeInUp" style="visibility: visible; animation-name: fadeInUp;">
-                            <li class="single-feature-list">
-                                <div class="icon icon-bg-1">
+                            <li class="single-feature-list col-md-4">
+                                <div class="icon icon-bg-2">
                                     <i class="flaticon-checked"></i>
                                 </div>
                                 <div class="content">
                                     <h4 class="title">
-                                        <a href="#">Mudah</a>
+                                        <a href="#" class="text-white">Mudah</a>
                                     </h4>
-                                    <p>Memudahkan pembayaran dalam talian untuk transaksi atau pembayaran harian maupun bulanan.</p>
+                                    <p class="text-white">Memudahkan pembayaran dalam talian untuk transaksi atau pembayaran harian maupun bulanan.</p>
                                 </div>
                             </li>
-                            <li class="single-feature-list">
+                            <li class="single-feature-list col-md-4">
                                 <div class="icon icon-bg-2">
                                     <i class="flaticon-layers"></i>
                                 </div>
                                 <div class="content">
                                     <h4 class="title">
-                                        <a href="#">Cepat</a>
+                                        <a href="#" class="text-white">Cepat</a>
                                     </h4>
-                                    <p>Kebolehan untuk melakukan transaksi secara terus kepada penerima dengan pantas.</p>
+                                    <p class="text-white">Kebolehan untuk melakukan transaksi secara terus kepada penerima dengan pantas.</p>
                                 </div>
                             </li>
-                            <li class="single-feature-list">
-                                <div class="icon icon-bg-3">
+                            <li class="single-feature-list col-md-4">
+                                <div class="icon icon-bg-2">
                                     <i class="flaticon-shield"></i>
                                 </div>
                                 <div class="content">
                                     <h4 class="title">
-                                        <a href="#">Selamat</a>
+                                        <a href="#" class="text-white">Selamat</a>
                                     </h4>
-                                    <p>Organisasi yang berdaftar adalah organisasi-organisasi yang diiktiraf oleh Bank Islam.</p>
+                                    <p class="text-white">Organisasi yang berdaftar adalah organisasi-organisasi yang diiktiraf oleh Bank Islam.</p>
                                 </div>
                             </li>
                         </ul>
@@ -449,7 +451,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="copyright-inner">
+                        <div class="copyright-inner text-center">
                             <!-- copyright inner wrapper -->
                             <div class="left-content-area">
                                 <!-- left content area -->

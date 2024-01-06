@@ -312,14 +312,20 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
     });
 });
 
+                                //// *** Get & Go ***//// 
+Route::group(['namespace' => 'Merchant'], function() {
+    Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function() {
+    Route::get('/product', 'ProductController@index')->name('merchant-product.index');
+    Route::get('/product/{id}', 'ProductController@show')->name('merchant-product.show');
+    }); 
+});
+
 Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
-    Route::group(['prefix' => 'merchant', 'namespace' => 'Regular'], function() {
+    Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function() {
         // Index
         Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
         Route::get('fetch-merchant', 'LandingPageController@test_index')->name('merchant.fetch-merchant');
         //Product
-        Route::get('/product', 'ProductController@index')->name('merchant-product.index');
-        Route::get('/product/{id}', 'ProductController@show')->name('merchant-product.show');
         Route::get('/cart','ProductController@showAllCart')->name('merchant.all-cart');//to show all products in cart
         Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
@@ -355,7 +361,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
        
     });
 
-    Route::group(['prefix' => 'admin-regular', 'namespace' => 'AdminRegular'], function() {
+    Route::group(['prefix' => 'admin', 'namespace' => 'AdminRegular'], function() {
         # Main Dashboard
         Route::get('/home', 'DashboardController@index')->name('admin-reg.home');
         Route::get('get-latest-orders', 'DashboardController@getLatestOrdersByNow')->name('admin-reg.latest-orders');
@@ -410,6 +416,8 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('order-details/{order_id}', 'OrderController@showList')->name('admin-reg.order-detail');
     });
 });
+                                        //// ***End of Get & Go ***//// 
+
 
 //private school
 Route::group(['prefix' => 'private-school'], function () {
@@ -680,11 +688,12 @@ Route::group(['prefix' => 'delivery'], function () {
             Route::post('cancel-booking', 'HomestayController@cancelBooking')->name('homestay.cancelBooking');
             Route::get('view-booking-history/{id}','HomestayController@viewBookingHistory')->name('homestay.viewBookingHistory');
             Route::get('get-booking-history-data', 'HomestayController@getBookingHistoryData')->name('homestay.getBookingHistoryData');
+            Route::put('update-deposit-charge/{id}','HomestayController@updateDepositCharge')->name('homestay.updateDepositCharge');
             Route::get('view-customers-reviews','HomestayController@viewCustomersReview')->name('homestay.viewCustomersReview');
             Route::get('get-customers-review', 'HomestayController@getCustomersReview')->name('homestay.getCustomersReview');
             Route::get('view-performance-report','HomestayController@viewPerformanceReport')->name('homestay.viewPerformanceReport');
             Route::get('get-report-data', 'HomestayController@getReportData')->name('homestay.getReportData');
-
+            Route::post('send-reminder' ,'HomestayController@sendReminder')->name('homestay.sendReminder');
 
             //Homestay Promotion
             Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');
@@ -700,7 +709,7 @@ Route::group(['prefix' => 'delivery'], function () {
             Route::get('get-promotion-history', 'HomestayController@getPromotionHistory')->name('homestay.getPromotionHistory');
         });
     });
-    // Route::post('test-payment', 'HomestayController@testPayment')->name('homestay.testPayment');
+    Route::post('test-payment', 'HomestayController@testPayment')->name('homestay.testPayment');
 
    
     //// ***End of Book & Stay ***//// 

@@ -35,6 +35,8 @@
             @auth
                 @include('layouts.topbar')
                 @include('layouts.sidebar')
+            @else
+                @include('layouts.topbar-guest')
             @endauth
             <!-- ============================================================== -->
             <!-- Start right Content here -->

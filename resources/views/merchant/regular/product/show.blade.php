@@ -338,7 +338,7 @@
                 </div>
             </div>
             <div class="add-to-cart" data-item-id="{{$product->id}}" data-org-id = "{{$product->organization_id}}">
-                 <a class="fancy">
+                 <a class="fancy" @auth @else href="/login" @endauth>
                     <span class="top-key"></span>
                     <span class="text">Tambah Dalam Troli</span>
                     <span class="bottom-key-1"></span>

@@ -25,12 +25,12 @@ class Room extends Model
 
     public function organization()
     {
-        return $this->belongsTo(Organization::class);
+        return $this->belongsTo(Organization::class ,'homestayid' ,'id');
     }
 
-    public function booking()
+    public function bookings()
     {
-        return $this->hasMany(Booking::class);
+        return $this->hasMany(Booking::class ,'roomid');
     }
     public function homestayImage(){
         return $this->hasMany(HomestayImage::class, 'room_id', 'roomid');// 2nd parameter: foreign key for Room in HomestayImage,3rd parameter: primary key for Room

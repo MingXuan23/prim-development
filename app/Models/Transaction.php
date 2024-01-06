@@ -11,7 +11,7 @@ class Transaction extends Model
 {
     public $timestamps = false;
 
-    protected $dates = ['datetime_created'];
+    protected $dates = ['datetime_created' ,'transaction_balance_id'];
 
     public function donation()
     {

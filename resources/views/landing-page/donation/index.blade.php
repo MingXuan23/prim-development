@@ -34,7 +34,10 @@
         #headerhover:hover {
             transform: scale(1.2);
         }
-
+        .single-feature-list{
+            background-image: -webkit-linear-gradient(50deg,#5e2ced 0,#9749f8 100%)!important;
+            color: white!important;
+        }
         /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
             transform: scale(1.0);
         }
@@ -96,9 +99,8 @@
                     <li class="menu-item-has-children">
                         <a href="#">Perniagaan</a>
                         <ul class="sub-menu">
-                            <li><a href="/merchant/product">Get&Go</a></li>
+                            <li><a href="{{route('merchant-product.index')}}">Get&Go</a></li>
                             <li><a href="{{route('homestay.homePage')}}">Homestay</a></li>
-                            <li><a href="">Bus</a></li>
                         </ul>
                     </li>
                     {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
@@ -226,15 +228,15 @@
 
                                 <div class="hover-inner">
                                     <div class="single-feature-list border wow zoomIn">
-                                        <div class="icon icon-bg-4">
+                                        <div class="icon icon-bg-3">
                                             <i class="flaticon-donation"></i>
                                         </div>
                                         <div class="content">
-                                            <h4 class="title" style="text-align: left;">Penderma</h4>
-                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                            <h4 class="title text-white" style="text-align: left;">Penderma</h4>
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
                                                     style="margin-right: 10px"></i> Mempunyai akaun dalam bank
                                                 talian <i>(online banking)</i> dengan mana-mana bank di Malaysia.</p>
-                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
                                                     style="margin-right: 10px"></i> Penderma akan menerima email
                                                 daripada pihak FPX dan sistem PRiM sebagai bukti pembayaran.</p>
 
@@ -244,24 +246,24 @@
                                 <br><br>
                                 <div class="hover-inner">
                                     <div class="single-feature-list border wow zoomIn">
-                                        <div class="icon icon-bg-2">
+                                        <div class="icon icon-bg-3">
                                             <i class="flaticon-business-and-finance"></i>
                                         </div>
                                         <div class="content">
-                                            <h4 class="title" style="text-align: left;">Penerima Derma</h4>
-                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                            <h4 class="title text-white" style="text-align: left;">Penerima Derma</h4>
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
                                                     style="margin-right: 10px"></i> Mempunyai akaun Bank Islam.</p>
-                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
                                                     style="margin-right: 10px"></i> Mendaftar dengan Paynet melalui Bank
                                                 Islam.
                                                 <br> <i> <a
                                                         href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}"
-                                                        download> (klik untuk muat turun borang)</a> </i> </p>
-                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                                        download class="text-white"> (klik untuk muat turun borang)</a> </i> </p>
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
                                                     style="margin-right: 10px"></i> Mendaftar sebagai organisasi di
                                                 sistem PRiM.
                                             </p>
-                                            <p style="text-align: left;"> <i class="flaticon-checked"
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
                                                     style="margin-right: 10px"></i> Organisasi akan menerima email
                                                 daripada pihak FPX dan sistem PRiM sebagai bukti menerima bayaran.
                                             </p>
@@ -308,7 +310,7 @@
                     <div class="single-counter-item">
                         <!-- single counter item -->
                         <div class="icon">
-                            <i class="flaticon-checked"></i>
+                            <i class="flaticon-business-and-finance"></i>
                         </div>
                         <div class="content">
                             RM<span class="count-num">{{ $totalAmount }}</span>
@@ -705,7 +707,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="copyright-inner">
+                        <div class="copyright-inner text-center">
                             <!-- copyright inner wrapper -->
                             <div class="left-content-area">
                                 <!-- left content area -->
