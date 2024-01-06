@@ -24,9 +24,9 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
+                    <label>Organization Name</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected disabled>Pilih Organisasi</option>
+                        <option value="" selected disabled>Choose Organization</option>
                         @foreach($organization as $row)
                         <option value="{{ $row->id }}">{{ $row->nama }}</option>
                         @endforeach
@@ -34,16 +34,17 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Tarikh</label>
+                    <label>Date</label>
                     <input type="text" value="" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
                 </div>
 
                 <div class="form-group">
                     <label>Auto Suggestion Sort By:</label>
                     <select name="sort" id="sort" class="form-control">
-                        <option value="0" selected disabled>Sort By</option>
+                        <!-- <option value="0" selected disabled>Sort By</option> -->
                         <option value="Beban Guru">Beban Guru</option>
                         <option value="Kelas">Kelas</option>
+                        <option value="Subjek">Subjek</option>
                     </select>
                 </div>
 
@@ -92,12 +93,12 @@
                         <thead>
                             <tr style="text-align:center">
                                 <th>No </th>
-                                <th>Kelas</th>
-                                <th>Subjek</th>
+                                <th>Class</th>
+                                <th>Subject</th>
                                 <th>Slot</th>
-                                <th>Guru Asal</th>
-                                <th>Alasan</th>
-                                <th>Guru Ganti</th>
+                                <th>Orginal Teacher</th>
+                                <th>Reason</th>
+                                <th>Substitute Teacher</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -197,6 +198,24 @@
     </div>
 </div>
 
+<div id="imageModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="width: 40%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">View Image</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImage" src="" alt="Modal Image" style="width: 80%; height: 70%; display: block; margin-left: auto; margin-right: auto;">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 @endsection
 
@@ -212,6 +231,7 @@
 
 <script>   
     var dates = []
+    var teachers = "";
     $(document).ready(function() {
 
         $.ajaxSetup({
@@ -333,9 +353,9 @@
                         var leave_relief = $(this).attr('data-index');
                         // Use direct property access instead of split
                         var teacher = $(this).val();
-                        if(teacher == 0 || teacher ==null) 
+                        if(teacher == 0 || teacher ==null || teacher == 'No Teacher') 
                             return true;
-                            commitRelief.push(leave_relief+'-'+teacher);
+                        commitRelief.push(leave_relief+'-'+teacher);
                     });
 
             if(commitRelief.length ==0)
@@ -356,7 +376,7 @@
 
                 var tableBody = $('#reliefTable tbody');
                 tableBody.empty();
-
+                
                 reliefData.forEach(function (relief, index) {
                     var row = $('<tr></tr>');
                     row.append('<td>' + (index + 1) + '</td>');
@@ -364,44 +384,92 @@
                     row.append('<td>' + relief.subject + '</td>');
                     row.append('<td>' + relief.slot + '</td>');
                     row.append('<td>' + relief.leave_teacher + '</td>');
+                    
+                    var tdElement = $('<td></td>');
                     if (relief.desc !== null) {
-                    row.append('<td>' + relief.desc + '</td>');
-                }else{
-                    row.append('<td></td>');
-                }
+                         tdElement = $('<td>' + relief.desc + '</td>');
+                    }
+
+                    if (relief.image !== null) {
+                        // Add a link to open the modal and display the image
+                        var imageLink = $('<a href="#" class="image-link" data-image="' + relief.image + '">(View)</a>');
+                        imageLink.click(function() {
+                                // Get the image URL from the data attribute
+                                var imageUrl = $(this).data('image');
+                                $('#modalImage').attr('src', '{{ URL::asset('/schedule_leave_image/') }}' + '/' + imageUrl);
+
+                                $('#imageModal').modal('show');
+
+                                return false;
+                                console.log('Image URL:', imageUrl);
+                            });
+                        tdElement.append(imageLink);
+                    }
+
+                    row.append(tdElement);
 
         // Append the select box with options
-        var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  + '" schedule_subject_id="'+relief.schedule_subject_id+'"></select></td>');
+            var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  
+            + '" schedule_subject_id="'+relief.schedule_subject_id +'" slot = "'+relief.slot+'"></select></td>');
 
-        var selectElement = selectColumn.find('select');
+            var selectElement = selectColumn.find('select');
 
-        // Call the updated function to populate the select box options
-       //git  updateTeacherComboBox(index, response.original.free_teacher_list);
+            // Call the updated function to populate the select box options
+        //git  updateTeacherComboBox(index, response.original.free_teacher_list);
 
-        row.append(selectColumn);
-        tableBody.append(row);
-    });
+            row.append(selectColumn);
+            tableBody.append(row);
+        });
 
             var assignTeacherElements = tableBody.find('.assign_teacher');
 
-// Loop through each found element
-assignTeacherElements.each(function(index, element) {
-            var selectedIndex = $(this).attr('data-index');
-            // Use direct property access instead of split
-            var leave_relief_id = selectedIndex;
-            assignTeacher(leave_relief_id);
-    
-    // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
-});
-autoSuggest();
+    $('.assign_teacher').change(function() {
+        var selectedValue = $(this).val();
+        var slot = $(this).attr('slot');
+        //$(this).css("color", $("select option:selected").css("color"));
+        var selectedOption = $(this).find('option:selected');
 
-    // tableBody.on('mousedown', '.assign_teacher', function () {
-    //     var selectedIndex = $(this).data('index');
-    // // Use direct property access instead of split
-    // var schedule_subject_id = selectedIndex;
-            // var selectedTeacher = $(this).val();
-            // assignTeacher(schedule_subject_id, selectedTeacher);
-            // });
+        // Check the color of the selected option
+        var optionColor = selectedOption.css('color');
+
+        // Update the color of the select element
+        $(this).css('color', optionColor);
+
+        // Use filter to find elements with the same slot and teacher
+        if(selectedOption.text().trim() == 'No Teacher' || $(this).val() == null){
+            return;
+        }
+        var duplicates = $('.assign_teacher').filter(function() {
+            return $(this).val() === selectedValue && $(this).attr('slot') === slot ;
+        });
+        // Check if duplicates were found
+        if (duplicates.length > 1) {
+            console.log(selectedOption.text(),$(this).val(),duplicates)
+            alert(selectedOption.text() +' was selected in the same slot!');
+        }
+
+        var checkRelief = $('.assign_teacher').filter(function() {
+            return $(this).val() === selectedValue && $(this).attr('slot') !== slot;
+        });
+      
+        if(checkRelief.length >= parseInt( selectedOption.attr('remaining_relief')) ){
+            alert('This teacher exceed his/her remaining relief already!');
+        }
+        
+    });
+
+    
+        assignTeacherElements.each(function(index, element) {
+                    var selectedIndex = $(this).attr('data-index');
+                    // Use direct property access instead of split
+                    var leave_relief_id = selectedIndex;
+
+                    assignTeacher(leave_relief_id);
+            
+            // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
+        });
+        autoSuggest();
+
         }
 
 // Call fetchReliefData with the corrected success function
@@ -421,7 +489,7 @@ function fetchReliefData() {
             date: date_val,
         },
         success: function (response) {
-            console.log(response);
+            teachers= response.teachers;
             displayRelief(response.pending_relief);
         },
         error: function (xhr, status, error) {
@@ -440,19 +508,40 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
     selectBox.empty();
 
     //Check if availableTeachers is defined
-    selectBox.append('<option selected disabled >No Teacher</option>');
+    selectBox.append('<option selected style="color:DarkOrange;" >No Teacher</option>');
     if (availableTeachers) {
         // If availableTeachers is an object, extract the array
         var teachersArray = Array.isArray(availableTeachers) ? availableTeachers : availableTeachers.free_teacher_list;
-
+        const t = JSON.parse(teachers);
+        //console.log(t);
         // Check if the extracted array is not empty
         if (Array.isArray(teachersArray) && teachersArray.length > 0) {
             // Iterate over the array and add options
             teachersArray.forEach(function (teacher) {
-                selectBox.append('<option value="' + teacher.id + '">' + teacher.name + '</option>');
+                var foundTeacher = t.find(function (tid) {
+                    return teacher.id === tid.id;
+                });
+                if(foundTeacher){
+                    //console.log(foundTeacher)
+                    var option = $('<option></option>').attr('value', foundTeacher.id).text(foundTeacher.name + '('+ foundTeacher.details.busySlot + 'S' + foundTeacher.details.remaining_relief + 'R)');
+                    option.attr('remaining_relief',foundTeacher.details.remaining_relief )
+                    // Check if the current teacher is the found teacher
+                   // console.log(!(foundTeacher.details.remaining_relief >0),foundTeacher);
+                    if (foundTeacher.details.remaining_relief <=0) {
+                        option.css('color', 'red'); // Set text color to red
+                        //*console.log('me');
+                    }else{
+                        option.css('color', 'black');
+                    }
+
+                    selectBox.append(option);
+                }
+                
             });
         }
     }
+
+    selectBox.trigger('change');
     
 }
 
@@ -478,16 +567,19 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
                 data: {
                     organization: organization, 
                     pendingRelief: pendingRelief, 
+                    teachers:teachers,
                     criteria: criteria,
                     date: $('#datepicker').val(),
                 },
                 success: function(response) {
                     console.log(response);
+                    $(".assign_teacher").prop("selectedIndex", 0).trigger('change');
                      response.relief_draft.forEach(function(draft,index){
                         //var combobox = assignTeacherCombobox.has("[data-index='"+draft.leave_relief_id+"']");
                         var combobox = $('.assign_teacher[data-index="'+draft.leave_relief_id+'"]');
                         //combobox.val('17478');
                         combobox.val(draft.teacher_id)
+                        combobox.trigger('change');
                         console.log(draft.teacher_id)
                      })
                 },

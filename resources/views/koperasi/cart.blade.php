@@ -146,7 +146,7 @@ input::-webkit-inner-spin-button {
       </div>
 
       @if(count($cart_item) != 0 || $cart)
-      <form action="{{ route('fpxIndex') }}" method="POST" onsubmit="return validateCart(event)">
+      <form action="{{ route('directpayIndex') }}" method="POST" onsubmit="return validateCart(event)">
       <input type="hidden" name="desc" id="desc" value="Koperasi">
       <input type="hidden" name="cartId" id="cartId" value="{{ $cart->id }}">
       @else
@@ -236,7 +236,7 @@ input::-webkit-inner-spin-button {
                   <option value="-1" selected></option>
           </select>
           @endif
-        <div class="card mb-4 border">
+        <!-- <div class="card mb-4 border">
           <div class="card-body p-4">
             <div class="row">
               <div class="col">
@@ -252,7 +252,7 @@ input::-webkit-inner-spin-button {
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
 
         
 
@@ -344,13 +344,13 @@ input::-webkit-inner-spin-button {
         // console.log($('#week_status').val());
     });
 
-    function checkBank() {
-        var t = jQuery('#bankid').val();
-        if (t === '' || t === null) {
-            alert('Please select a bank');
-            return false;
-        }
-    }
+    // function checkBank() {
+    //     var t = jQuery('#bankid').val();
+    //     if (t === '' || t === null) {
+    //         alert('Please select a bank');
+    //         return false;
+    //     }
+    // }
     
     $(document).ready(function() {
 	    $('.form-validation').parsley();
@@ -358,24 +358,24 @@ input::-webkit-inner-spin-button {
 
     var arr = [];
 
-    $.ajax({
-        type: 'GET',
-        dataType: 'json',
-        url: "/fpx/getBankList",
-        success: function(data) {
-            jQuery.each(data.data, function(key, value){
-                arr.push(key);
-            });
-            for(var i = 0; i < arr.length; i++){
-                arr.sort();
-                $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
-            }
+    // $.ajax({
+    //     type: 'GET',
+    //     dataType: 'json',
+    //     url: "/fpx/getBankList",
+    //     success: function(data) {
+    //         jQuery.each(data.data, function(key, value){
+    //             arr.push(key);
+    //         });
+    //         for(var i = 0; i < arr.length; i++){
+    //             arr.sort();
+    //             $("#bankid").append("<option value='"+data.data[arr[i]].code+"'>"+data.data[arr[i]].nama+"</option>");
+    //         }
 
-        },
-        error: function (data) {
-            // console.log(data);
-        }
-    });
+    //     },
+    //     error: function (data) {
+    //         // console.log(data);
+    //     }
+    // });
     let order_cart_id = null;//update when the user minus until zero at minus button
     let productOrderInCartId=null;
     $(document).on('click', '#delete_confirm_item', function(){

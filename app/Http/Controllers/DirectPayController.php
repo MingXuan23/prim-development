@@ -137,7 +137,6 @@ class DirectPayController extends Controller
                 ->select('user_id', 'organization_id')
                 ->first();
     
-                $ficts_seller_id = "SE00054277";
     
                 $user = User::find($gng_order->user_id);
                 $organization = Organization::find($gng_order->organization_id);
@@ -419,7 +418,7 @@ class DirectPayController extends Controller
                 return view('errors.500');
             }
             //dd('fpxsellerOrderNo:'.$fpx_sellerOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo),'fpx_sellerExOrderNo:'.$fpx_sellerExOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo));
-            $private_key = '9BB6D047-2FB3-4B7A-9199-09441E7F4B0C';
+            //$private_key = '9BB6D047-2FB3-4B7A-9199-09441E7F4B0C';
     
             
             //dd($pos,$fpx_sellerOrderNo);
@@ -479,7 +478,7 @@ class DirectPayController extends Controller
                     break;
 
                 case 'Donation':
-                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Success']);
+                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Success','amount'=>$request->TransactionAmount]);
 
                     $request->fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
                     \Log::channel('PRIM_transaction')->info("Transaction Callback : " .  $request->fpx_sellerExOrderNo . " , " . $status);
@@ -509,7 +508,13 @@ class DirectPayController extends Controller
             switch ($case[0]) {
                 case 'School':
 
-                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Success','buyerBankId'=>$request->Fpx_BuyerBankBranch]);
+                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)
+                            ->update(
+                                ['transac_no' => $request->Fpx_FpxTxnId, 
+                                  'status' => 'Success',
+                                  'buyerBankId'=>$request->Fpx_BuyerBankBranch,
+                                  'amount'=>$request->TransactionAmount]
+                    );
 
                     $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
 
@@ -607,7 +612,13 @@ class DirectPayController extends Controller
 
                 case 'Donation':
 
-                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Success','buyerBankId'=>$request->Fpx_BuyerBankBranch]);
+                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)
+                            ->update(
+                                ['transac_no' => $request->Fpx_FpxTxnId, 
+                                  'status' => 'Success',
+                                  'buyerBankId'=>$request->Fpx_BuyerBankBranch,
+                                  'amount'=>$request->TransactionAmount]
+                    );
 
                     $donation = $this->donation->getDonationByTransactionName($request->Fpx_SellerOrderNo);
 
@@ -627,6 +638,8 @@ class DirectPayController extends Controller
                     $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
                     $transaction->transac_no = $request->Fpx_FpxTxnId;
                     $transaction->status = "Success";
+                    $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
+                    $transaction->amount = $request->TransactionAmount;
                     $transaction->save();
 
                     $userid = $transaction->user_id;
@@ -652,6 +665,8 @@ class DirectPayController extends Controller
                     $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
                     $transaction->transac_no = $request->Fpx_FpxTxnId;
                     $transaction->status = "Success";
+                    $transaction->amount = $request->TransactionAmount;
+                    $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
                     $transaction->save();
                     
                     PgngOrder::where('transaction_id', $transaction->id)->first()->update([
@@ -715,6 +730,8 @@ class DirectPayController extends Controller
                     $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
                     $transaction->transac_no = $request->Fpx_FpxTxnId;
                     $transaction->status = "Success";
+                    $transaction->amount = $request->TransactionAmount;
+                    $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
                     $transaction->save();
 
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
@@ -774,6 +791,8 @@ class DirectPayController extends Controller
                         $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
                         $transaction->transac_no = $request->Fpx_FpxTxnId;
                         $transaction->status = "Success";
+                        $transaction->amount = $request->TransactionAmount;
+                        $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
                         $transaction->save();
     
                         // update booking table
@@ -825,6 +844,8 @@ class DirectPayController extends Controller
                             $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
                             $transaction->transac_no = $request->Fpx_FpxTxnId;
                             $transaction->status = "Success";
+                            $transaction->amount = $request->TransactionAmount;
+                            $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
                             $transaction->save();
         
                             $userid = $transaction->user_id;
@@ -862,6 +883,8 @@ class DirectPayController extends Controller
                             $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
                             $transaction->transac_no = $request->Fpx_FpxTxnId;
                             $transaction->status = "Success";
+                            $transaction->amount = $request->TransactionAmount;
+                            $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
                             $transaction->save();
         
                             $userid = $transaction->user_id;
@@ -896,6 +919,8 @@ class DirectPayController extends Controller
                         $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
                         $transaction->transac_no = $request->Fpx_FpxTxnId;
                         $transaction->status = "Success";
+                        $transaction->amount = $request->TransactionAmount;
+                        $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
                         $transaction->save();
     
                         $userid = $transaction->user_id;
@@ -933,6 +958,7 @@ class DirectPayController extends Controller
 
             Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
             $user = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+            //gitdd($user,$request->Fpx_SellerOrderNo);
             return view('fpx.transactionFailed', compact('request', 'user'));
             
             // Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);

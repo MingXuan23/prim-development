@@ -78,7 +78,7 @@
 <script>
     var values = $("#form1").serialize();
     
-    var count = 5;
+    var count = 2;
     setInterval(function(){
         count--;
         document.getElementById('time').innerHTML = count;

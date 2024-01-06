@@ -87,6 +87,7 @@ class ScheduleApiController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::User();
             if($request->device_token){
+                DB::table('users')->where('device_token',$request->device_token)->update(['device_token'=>null]);
                 $user->device_token =$request->device_token;
                 $user->save();
             }
@@ -159,7 +160,9 @@ class ScheduleApiController extends Controller
             ->where('s.organization_id',$school->id)
             ->where('ss.teacher_in_charge',$user->id)
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day')
+            ->orderBy('ss.slot')
             ->get();
 
             
@@ -176,7 +179,7 @@ class ScheduleApiController extends Controller
 
             $relief_schedule = DB::table('leave_relief as lr')
             ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
-            ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+            ->leftJoin ('schedule_version as sv','sv.id','ss.schedule_version_id')
             ->leftJoin('schedules as s','s.id','sv.schedule_id')
             ->leftJoin('classes as c','c.id','ss.class_id')
             ->leftJoin('subject as sub','sub.id','ss.subject_id')
@@ -187,13 +190,14 @@ class ScheduleApiController extends Controller
             ->where('lr.confirmation','Confirmed')
             ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->where('tl.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
             //dd($schedule);
             $onLeave_schedule = DB::table('leave_relief as lr')
             ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
-            ->leftJoin ('schedule_version as sv','sv.schedule_id','ss.schedule_version_id')
+            ->leftJoin ('schedule_version as sv','sv.id','ss.schedule_version_id')
             ->leftJoin('schedules as s','s.id','sv.schedule_id')
             ->leftJoin('classes as c','c.id','ss.class_id')
             ->leftJoin('subject as sub','sub.id','ss.subject_id')
@@ -203,6 +207,7 @@ class ScheduleApiController extends Controller
             ->where('tl.teacher_id',$user->id)
             ->whereBetween('tl.date', [Carbon::now()->addDays(-7)->format('Y-m-d'), Carbon::now()->addDays(21)->format('Y-m-d')])
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->where('tl.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date','lr.confirmation')
             ->get();
@@ -278,6 +283,7 @@ class ScheduleApiController extends Controller
                     ->where('lr.confirmation','!=','Confirmed')
                     ->where('o.id',$school->id)
                     ->where('sv.status',1)
+                    ->where('ss.status',1)
                     ->where('s.status',1)
                     ->where('tl.status',1)
                     ->where('tl.date','>=',Carbon::today())
@@ -342,7 +348,7 @@ class ScheduleApiController extends Controller
                  return response()->json(['error' => 'The selected time is conflict with the record before'], 401);
             }
            // $image = $request->input('image');
-           $str = $user->id.'_' .Carbon::now()->toDateTimeString();
+           $str = $user->id.'_' .time();
            $filename = null;
             if (!is_null($request->image)) {
                 
@@ -374,11 +380,38 @@ class ScheduleApiController extends Controller
                 ->where('ss.teacher_in_charge',$user->id)
                 ->where('s.status',1)
                 ->where('sv.status',1)
+                ->where('ss.status',1)
                 ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot')
+                ->get();
+
+                $reliefRelated = DB::table('schedule_subject as ss')
+                ->join('leave_relief as lr','lr.schedule_subject_id','ss.id')
+                ->join('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                ->join('schedule_version as sv','sv.id','ss.schedule_version_id')
+                ->join('schedules as s','s.id','sv.schedule_id')
+                ->where('ss.day',$date->dayOfWeek)
+                ->where('lr.replace_teacher_id',$user->id)
+                ->where('tl.date',$request->date)
+                ->where('lr.status',1)
+                ->whereIn('lr.confirmation',['Confirmed','Pending'])
+                ->where('s.status',1)
+                ->where('sv.status',1)
+                ->where('ss.status',1)
+                ->select('s.*','ss.id as schedule_subject_id','ss.day as day','ss.slot as slot','lr.id as lrid')
                 ->get();
                 
                 foreach($classRelated as $c){
-                    if($request->isLeaveFullDay){
+
+                    $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+    
+                    //is today and over the time 
+                    if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                        continue;
+                    }
+                   // dd($request->isLeaveFullDay);
+                    if($request->isLeaveFullDay=="true"){
+                       
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
                             'schedule_subject_id'=>$c->schedule_subject_id,
@@ -387,12 +420,12 @@ class ScheduleApiController extends Controller
                     }else{
                         $start = Carbon::createFromFormat('H:i:s', $request->start_time);
                         $end = Carbon::createFromFormat('H:i:s', $request->end_time);
-                        $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                        $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+                        //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                        //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
 
-                        
+                       
                         // check if the time is between start and end
-                        if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                        if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$leave_id,
                                 'schedule_subject_id'=>$c->schedule_subject_id,
@@ -401,7 +434,62 @@ class ScheduleApiController extends Controller
                         } 
                     }
                 }
+
+                foreach($reliefRelated as $c){
+
+                    $time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+    
+                    //is today and over the time 
+                    if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                        continue;
+                    }else if($date < Carbon::today()){
+                        continue;
+                    }
+                    $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
+                    if($request->isLeaveFullDay=="true"){
+                        
+                       DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
+                       
+                       $insert = DB::table('leave_relief')->insert([
+                        'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
+                        'schedule_subject_id'=>$duplicate_row->schedule_subject_id,
+                        'status'=>1
+                        ]);
+                    }else{
+                        $start = Carbon::createFromFormat('H:i:s', $request->start_time);
+                        $end = Carbon::createFromFormat('H:i:s', $request->end_time);
+                        //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
+                        //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+
+                        
+                        // check if the time is between start and end
+                        if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                            DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
+                       
+                            $insert = DB::table('leave_relief')->insert([
+                                'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
+                                'schedule_subject_id'=>$duplicate_row->schedule_subject_id,
+                                'status'=>1
+                                ]);
+                        } 
+                    }
+                }
+                $school =$this->getSchools($user->id)->first();
                 $count = DB::table('leave_relief')->where('teacher_leave_id',$leave_id)->count();
+
+                $admin_id =DB::table('organization_user as ou')
+                ->where('ou.organization_id',$school->id)
+                ->whereIn('ou.role_id',[2,4,7,20])
+                ->select('ou.user_id')
+                ->distinct()
+                ->get();
+                foreach($admin_id as $a){
+                    $msg =$user->name.' apply the leave. Total '.$count.' class affected';
+                 
+                    //dd($msg);
+                    $notification =$this->sendNotification($a->user_id,'Your action is required',$msg );
+                }
                 return response()->json(['Success'=>'Leave Submit Sucessfully.Total '.$count.' classes affected.']);
                 
             }
@@ -515,6 +603,7 @@ class ScheduleApiController extends Controller
             ->where('lr.confirmation',"Pending")
             ->where('tl.date','>=',Carbon::today())
             ->where('sv.status',1)
+            ->where('ss.status',1)
             ->where('tl.status',1)
             ->select('lr.id as leave_relief_id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
@@ -534,36 +623,36 @@ class ScheduleApiController extends Controller
                 }
 
             $allPending=false;
-            if($request->isAdmin&&$this->checkAdmin($user->id,$school->id)){
-                $allPending = DB::table('organizations as o')
-                ->join('schedules as s','s.organization_id','o.id')
-                ->join('schedule_version as sv','sv.schedule_id','s.id')
-                ->join('schedule_subject as ss','ss.schedule_version_id','sv.id')
-                ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
-                ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
-                ->leftJoin('subject as sub','sub.id','ss.subject_id')
-                ->leftJoin('users as u','u.id','ss.teacher_in_charge')
-                ->leftJoin('users as ur','ur.id','lr.replace_teacher_id')
-                ->leftJoin('classes as c','c.id','ss.class_id')
-                ->where('lr.confirmation','<>',"Confirmed")
-                ->where('sv.status',1)
-                ->where('s.status',1)
-                ->where('tl.status',1)
-                ->where('tl.date','>=',Carbon::today())
-                ->select('lr.id as leave_relief_id','ss.id as schedule_subject_id','c.nama as class','sub.name as subject',
-                's.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as leaveTeacher','ur.name as reliefTeacher','tl.date')
-                ->get();
+            // if($request->isAdmin&&$this->checkAdmin($user->id,$school->id)){
+            //     $allPending = DB::table('organizations as o')
+            //     ->join('schedules as s','s.organization_id','o.id')
+            //     ->join('schedule_version as sv','sv.schedule_id','s.id')
+            //     ->join('schedule_subject as ss','ss.schedule_version_id','sv.id')
+            //     ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
+            //     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            //     ->leftJoin('subject as sub','sub.id','ss.subject_id')
+            //     ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+            //     ->leftJoin('users as ur','ur.id','lr.replace_teacher_id')
+            //     ->leftJoin('classes as c','c.id','ss.class_id')
+            //     ->where('lr.confirmation','<>',"Confirmed")
+            //     ->where('sv.status',1)
+            //     ->where('s.status',1)
+            //     ->where('tl.status',1)
+            //     ->where('tl.date','>=',Carbon::today())
+            //     ->select('lr.id as leave_relief_id','ss.id as schedule_subject_id','c.nama as class','sub.name as subject',
+            //     's.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as leaveTeacher','ur.name as reliefTeacher','tl.date')
+            //     ->get();
 
-                foreach($allPending as $a){
-                    //if(isset($s->duration)){
-                        $time_info= $this->getSlotTime($a,$a->day,$a->slot);
-                        $a->time=$time_info['time'];
-                        $a->duration=$time_info['duration'];
+            //     foreach($allPending as $a){
+            //         //if(isset($s->duration)){
+            //             $time_info= $this->getSlotTime($a,$a->day,$a->slot);
+            //             $a->time=$time_info['time'];
+            //             $a->duration=$time_info['duration'];
              
-                        unset($a->time_off);
-                        unset($a->start_time);
-                }
-            }
+            //             unset($a->time_off);
+            //             unset($a->start_time);
+            //     }
+            // }
             return response()->json(['pendingRelief'=>$pendingRelief,'allPending'=>$allPending]);
         }
         return response()->json(["error"=>"You have not any school"]);
@@ -631,6 +720,7 @@ class ScheduleApiController extends Controller
                     ->where('lr.confirmation','Pending')
                     ->where('lr.status',1)
                     ->where('sv.status',1)
+                    ->where('ss.status',1)
                     ->where('s.status',1)
                     ->where('s.organization_id',$organization->id)
                     ->where('tl.date',Carbon::today())
@@ -658,10 +748,22 @@ class ScheduleApiController extends Controller
 
         $report->leaveCount = DB::table('teacher_leave as tl')
                 ->where('tl.teacher_id',$user_id)
+                ->where('tl.status',1)
                 ->count();
 
-        $report->reliefCount = DB::table('leave_relief')
+        $report->reliefCount = DB::table('leave_relief as lr')
+            ->leftJoin('schedule_subject as ss','lr.schedule_subject_id','ss.id')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            ->where('lr.replace_teacher_id',$user_id)
+            ->where('lr.status',1)
+            ->where('lr.confirmation','Confirmed')
+            ->groupBy(['tl.date','ss.slot'])
+            ->count();
+
+        $report->rejectCount = DB::table('leave_relief')
             ->where('replace_teacher_id',$user_id)
+            ->where('status',1)
+            ->where('confirmation','Rejected')
             ->count();
 
         $report->reliefList =  DB::table('leave_relief as lr')
@@ -721,21 +823,21 @@ class ScheduleApiController extends Controller
         }
 
        // dd( $report->leave_list,$report->reliefList);
-        if($isAdmin){
-            $adminReport =new stdClass();
+        // if($isAdmin){
+        //     $adminReport =new stdClass();
 
-            $adminReport->totalReliefCount = DB::table('teacher_leave as tl')
-            ->join('organization_user as ou','ou.user_id','tl.teacher_id')
-            ->where('ou.organization_id',$school->id)
-            ->count(); 
+        //     $adminReport->totalReliefCount = DB::table('teacher_leave as tl')
+        //     ->join('organization_user as ou','ou.user_id','tl.teacher_id')
+        //     ->where('ou.organization_id',$school->id)
+        //     ->count(); 
 
-            $adminReport->totalLeavefCount = DB::table('leave_relief as lr')
-            ->join('organization_user as ou','ou.user_id','lr.replace_teacher_id')
-            ->where('ou.organization_id',$school->id)
-            ->count(); 
+        //     $adminReport->totalLeavefCount = DB::table('leave_relief as lr')
+        //     ->join('organization_user as ou','ou.user_id','lr.replace_teacher_id')
+        //     ->where('ou.organization_id',$school->id)
+        //     ->count(); 
 
-            return response()->json(['report'=>$report,'report'=>$adminReport]);
-        }
+        //     return response()->json(['report'=>$report,'report'=>$adminReport]);
+        // }
         
         return response()->json(['report'=>$report]);
     }

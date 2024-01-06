@@ -87,3 +87,19 @@ Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
 
     
 });
+
+//route for mobile orderS
+Route::group(['prefix' => 'OrderS'], function (){
+    Route::get('test', 'OrderSController@testData');
+    Route::post('login', 'OrderSController@login');
+    Route::post('isUserOrderSAdmin', 'OrderSController@isUserOrderSAdmin');
+    Route::get('randomDishes', 'OrderSController@randomDishes');
+    Route::get('listDishes', 'OrderSController@listDishes');
+    Route::get('listShops', 'OrderSController@listShops');
+    Route::post('listDishesByShop', 'OrderSController@listDishesByShop');
+    Route::post('listDishAvailable', 'OrderSController@listDishAvailable');
+    Route::post('listOrderAvailable', 'OrderSController@listOrderAvailable');
+    Route::post('getOrderCart', 'OrderSController@getOrderCart');
+    Route::post('createOrderCart', 'OrderSController@createOrderCart');
+    Route::post('getOrderAvailableDish', 'OrderSController@getOrderAvailableDish');
+});

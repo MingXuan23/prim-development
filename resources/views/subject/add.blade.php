@@ -8,9 +8,9 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Subjek</h4>
+            <h4 class="font-size-18">Subject</h4>
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item active">Subjek >> Tambah Subjek</li>
+                <li class="breadcrumb-item active">Subject >> Add Subject</li>
             </ol>
         </div>
     </div>
@@ -32,9 +32,9 @@
             <div class="card-body">
 
                 <div class="form-group">
-                    <label>Nama Organisasi</label>
+                    <label>Organization Name</label>
                     <select name="organization" id="organization" class="form-control">
-                        <option value="" selected>Pilih Organisasi</option>
+                        <option value="" selected>Choose Organization</option>
                         @foreach($organization as $row)
                         @if ($loop->first)
                         <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
@@ -47,19 +47,19 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Nama Subjek</label>
+                    <label>Subject Name</label>
                     <input type="text" name="subject_name" class="form-control" placeholder="Nama Penuh">
                 </div>
 
                 <div class="form-group">
-                    <label>Kod Subjek</label>
+                    <label>Subject Code</label>
                     <input type="text" name="kod" class="form-control" placeholder="Kod Subjek">
                 </div>
 
                 <div class="form-group mb-0">
                     <div>
                         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1">
-                            Simpan
+                            Save
                         </button>
                     </div>
                 </div>
