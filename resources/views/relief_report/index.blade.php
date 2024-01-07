@@ -385,6 +385,7 @@
             var totalConfirmed = 0;
             var totalPending = 0;
             var totalRejected = 0;
+            var totalNotAssign = 0;
 
             // Iterate through reliefData and append rows
             reliefData.forEach(function (relief, index) {
@@ -395,29 +396,42 @@
                 row.append('<td>' + relief.subject + '</td>');
                 row.append('<td>' + relief.slot + '</td>');
                 row.append('<td>' + relief.leave_teacher + '</td>');
-                row.append('<td>' + relief.relief_teacher + '</td>');
+                //row.append('<td>' + relief.relief_teacher + '</td>');
+
+                if (relief.relief_teacher === null) {
+                    row.append('<td>Not Assign</td>');
+                } else {
+                    row.append('<td>' + relief.relief_teacher + '</td>');
+                }
 
                 // Set color based on status
                 var statusColor;
+                var confirmationText;
+
                 switch (relief.confirmation) {
                     case 'Rejected':
                         statusColor = 'red';
                         totalRejected++; // Increment rejected count
+                        confirmationText = 'Rejected';
                         break;
                     case 'Confirmed':
                         statusColor = 'green';
                         totalConfirmed++; // Increment confirmed count
+                        confirmationText = 'Confirmed';
                         break;
                     case 'Pending':
                         statusColor = 'orange'; // Change 'yellow' to 'orange'
                         totalPending++; // Increment pending count
+                        confirmationText = 'Pending';
                         break;
                     default:
-                        statusColor = 'black'; // Default color for unknown status
+                        statusColor = 'black';
+                        totalNotAssign++ // Default color for unknown status
+                        confirmationText = '-';
                         break;
-                    }
+                }
 
-                row.append('<td style="color: ' + statusColor + ';">' + relief.confirmation + '</td>');
+                row.append('<td style="color: ' + statusColor + ';">' + (relief.confirmation || confirmationText) + '</td>');
 
                 tableBody.append(row);
             });
@@ -428,13 +442,13 @@
             // $('.total_rejected').text('Total Rejected: ' + totalRejected);
 
             // Update the bar chart
-            updateBarChart(totalConfirmed, totalPending, totalRejected);
+            updateBarChart(totalConfirmed, totalPending, totalRejected, totalNotAssign);
         }
 
         var barChart; // Declare the chart variable globally
 
-        function updateBarChart(confirmed, pending, rejected) {
-            var total = confirmed + pending + rejected;
+        function updateBarChart(confirmed, pending, rejected, notAssign) {
+            var total = confirmed + pending + rejected + notAssign;
             var ctx = document.getElementById('barChart').getContext('2d');
 
             // Destroy the existing chart if it exists
@@ -445,19 +459,21 @@
             barChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Confirmed', 'Pending', 'Rejected'],
+                    labels: ['Confirmed', 'Pending', 'Rejected', 'Not Assign'],
                     datasets: [{
                         label: 'Total Report (' + total + ')',
-                        data: [confirmed, pending, rejected],
+                        data: [confirmed, pending, rejected, notAssign],
                         backgroundColor: [
                             'rgba(75, 192, 192, 0.2)',
                             'rgba(255, 206, 86, 0.2)',
                             'rgba(255, 99, 132, 0.2)',
+                            'rgba(169, 169, 169, 0.2)',
                         ],
                         borderColor: [
                             'rgba(75, 192, 192, 1)',
                             'rgba(255, 206, 86, 1)',
                             'rgba(255, 99, 132, 1)',
+                            'rgba(169, 169, 169, 1)', 
                         ],
                         borderWidth: 1
                     }]

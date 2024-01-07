@@ -42,9 +42,9 @@
                     <label>Auto Suggestion Sort By:</label>
                     <select name="sort" id="sort" class="form-control">
                         <!-- <option value="0" selected disabled>Sort By</option> -->
-                        <option value="Beban Guru">Beban Guru</option>
-                        <option value="Kelas">Kelas</option>
-                        <option value="Subjek">Subjek</option>
+                        <option value="Beban Guru">Busy Slot</option>
+                        <option value="Kelas">Class</option>
+                        <option value="Subjek">Subject</option>
                     </select>
                 </div>
 

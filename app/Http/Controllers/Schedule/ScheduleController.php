@@ -34,6 +34,11 @@ class ScheduleController extends Controller
         return view('schedule.index', compact('organization', 'classes', 'schedule'));
     }
 
+    public function getScheduleStatus($id){
+
+        return response()->json(['schedule_status'=>DB::table('schedules')->where('id',$id)->where('status',1)->exists()]);
+    }
+
     public function manageReliefIndex()
     {
         $organization = $this->getOrganizationByUserId();
@@ -166,6 +171,20 @@ class ScheduleController extends Controller
        return redirect()->back()->with('success', $msg);
     }
 
+
+    public function updateSchedule(Request $request){
+        $schedule = Schedule::find($request->schedule_id);
+    
+        if(!$this->checkAdmin(Auth::id(),$schedule->organization_id)){
+            return redirect()->back()->with('error', 'You have not authority to change it');
+        }
+
+        //dd($request->schedule_status);
+        $schedule->status = $request->schedule_status == "true";
+        $schedule->save();
+        return redirect()->back()->with('success', 'Update schedule successfully');
+    }
+
     public function getAllReliefForReport($oid, $startDate, $endDate)
     {
         $organization = $this->getOrganizationByUserId();
@@ -184,7 +203,9 @@ class ScheduleController extends Controller
                 ->where(function ($query) {
                     $query->where('lr.confirmation', 'Rejected')
                         ->orWhere('lr.confirmation', 'Confirmed')
-                        ->orWhere('lr.confirmation', 'Pending');
+                        ->orWhere('lr.confirmation', 'Pending')
+                        ->orWhereNull('lr.confirmation');
+                    
                 })
                 ->whereBetween('tl.date', [$startDate, $endDate])
                 ->where('lr.status', 1)
@@ -371,7 +392,7 @@ class ScheduleController extends Controller
 
                     usort($teacherList, function ($a, $b) use( $date,$schedule_subject) {
                         // Your custom comparison logic here
-                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        $comparison = $b->details->remaining_relief -$a->details->remaining_relief ;
                         if($comparison!==0){
                             return $comparison;
                         }
@@ -388,7 +409,7 @@ class ScheduleController extends Controller
                         }
                     
                         // If classes are the same, compare using getTeacherInfo
-                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        $comparison = $b->details->remaining_relief -$a->details->remaining_relief ;
                         if($comparison!==0){
                             return $comparison;
                         }
@@ -405,7 +426,7 @@ class ScheduleController extends Controller
                         }
                     
                         // If classes are the same, compare using getTeacherInfo
-                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        $comparison = $b->details->remaining_relief -$a->details->remaining_relief ;
                         if($comparison!==0){
                             return $comparison;
                         }
@@ -737,7 +758,7 @@ class ScheduleController extends Controller
     public function getScheduleId()
     {
         $organizations = $this->getOrganizationByUserId();
-        $schedule = Schedule::whereIn('organization_id', $organizations->pluck('id'))->get();
+        $schedule = Schedule::whereIn('organization_id', $organizations->pluck('id'))->where('status',1)->get();
 
         return $schedule;
     }

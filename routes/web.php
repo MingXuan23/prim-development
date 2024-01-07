@@ -114,6 +114,9 @@ Route::post('importSubject', 'SubjectController@subjectImport')->name('importSub
 
 Route::group(['prefix' => 'schedule','namespace' => 'Schedule','middleware' => ['auth']], function () {
     Route::get('getVersion/{oid}','ScheduleController@getVersion')->name('schedule.getVersion');
+
+    Route::get('getScheduleStatus/{id}','ScheduleController@getScheduleStatus')->name('schedule.getScheduleStatus');
+    Route::post('updateSchedule','ScheduleController@updateSchedule')->name('schedule.updateSchedule');
     Route::get('getScheduleView/{class_id}','ScheduleController@getScheduleView')->name('schedule.getScheduleView');
     
     Route::get('manageRelief','ScheduleController@manageReliefIndex')->name('schedule.manageRelief');
