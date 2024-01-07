@@ -758,7 +758,7 @@ class ScheduleController extends Controller
     public function getScheduleId()
     {
         $organizations = $this->getOrganizationByUserId();
-        $schedule = Schedule::whereIn('organization_id', $organizations->pluck('id'))->get();
+        $schedule = Schedule::whereIn('organization_id', $organizations->pluck('id'))->where('status',1)->get();
 
         return $schedule;
     }
