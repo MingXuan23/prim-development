@@ -19,7 +19,7 @@
         </div>
     </div>
 </div>
-<div class="content-container">
+<div class="content-container mb-5">
     <div class="col-md-12 border-purple p-0">
         <div class="card card-primary mb-0">
 
@@ -225,7 +225,7 @@ $(document).ready(function () {
         $('.img-thumbnail').on('click', function(){
             $(this).next('input')[0].click();
         });
-        $('input[type="file"]').on('change', function(){
+        $('input.original_images').on('change', function(){
             const imagePreview = $(this).prev('img');
             const imageFile = $(this).prop('files')[0];
             if(imageFile && imageFile.type.includes('jpg')||imageFile.type.includes('jpeg')||imageFile.type.includes('png')){

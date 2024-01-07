@@ -19,7 +19,7 @@
         </div>
     </div>
 </div>
-<div class="promotion-container border-purple p-0">
+<div class="promotion-container border-purple p-0 mb-5">
     <div class="col-md-12 p-0">
         <div class="card card-primary mb-0">
 

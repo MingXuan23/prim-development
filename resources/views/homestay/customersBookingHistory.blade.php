@@ -20,7 +20,7 @@
 </div>
 @include('homestay.adminNavBar')
 
-<div class="row">
+<div class="row mb-5">
 
   <div class="col-md-12">
     <div class="card  mx-auto card-primary card-org">
