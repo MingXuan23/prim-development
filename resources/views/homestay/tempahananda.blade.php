@@ -70,7 +70,7 @@
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;Daftar Keluar: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkout))}}, sebelum {{date('H:i', strtotime($checkoutBookings[$i]->check_out_before))}}</h6>
                       @if($checkoutBookings[$i]->status == 'Deposited')
                         <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-bill-alt"></i>&nbsp;Jumlah Dibayar(Deposit): </span>RM{{$checkoutBookings[$i]->deposit_amount}}</h6>    
-                        <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Baki Perlu Dibayar: </span>RM{{$checkoutBookings[$i]->totalprice - $checkoutBookings[$i]->deposit_amount}}</h6>                        
+                        <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Baki Perlu Dibayar: </span>RM{{number_format(($checkoutBookings[$i]->totalprice - $checkoutBookings[$i]->deposit_amount),2)}}</h6>                        
                       @else
                         <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Jumlah Dibayar: </span>RM{{$checkoutBookings[$i]->totalprice}}</h6>
                       @endif

@@ -25,7 +25,7 @@
     <div class="mt-3" id="tab-container">
       <h3 class="color-purple text-center">Butiran Tempahan</h3>    
     </div>
-    <div class="container border-white" id="booking-details">
+    <div class="container border-white mb-5" id="booking-details">
         <div class="row mt-3">
             <div class="col-12">
                 <div class="card mb-1">

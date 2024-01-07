@@ -13,10 +13,29 @@
         .page-content{
             padding: 80px 10%!important;
         }
-
+        #room-info {
+            display: grid;
+            column-gap: 5px;
+            grid-template-columns: repeat(3, 1fr);
+        }
+        #room-info > div {
+            border: 1px solid var(--secondary-color);
+            padding: 12px;
+        }
+        footer {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
         @media screen and (max-width:500px){
             .page-content{
                 padding: 80px 0!important;
+            }
+            #room-info {
+                grid-template-columns: 100%;
+                padding: 12px !important;
+            }
+            #room-info > div {
+                margin-bottom: 12px !important;
             }
         }
     </style>
@@ -481,6 +500,7 @@ $(document).ready(function() {
                         Swal.fire('Sila pastikan masa slot tempahan daftar masuk dan daftar keluar homestay adalah kosong.');
                         $('#check-in').datepicker("setDate", null);
                         $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
+                        $("#check-out").datepicker("option", "disabled", true);
                     }
             
                 }
@@ -537,6 +557,8 @@ $(document).ready(function() {
                     Swal.fire('Sila pastikan masa antara daftar masuk dan daftar keluar homestay tersebut adalah kosong');
                     $('#check-in').datepicker("setDate", null);
                     $('#check-out').datepicker("setDate", null); // Clear the selected check-out date
+                     $("#check-out").datepicker("option", "disabled", true);
+
                 }
             }
         });
@@ -544,16 +566,22 @@ $(document).ready(function() {
         function checkDisabledDatesBetween() {
             var checkInDate = $('#check-in').datepicker('getDate');
             var checkOutDate = $('#check-out').datepicker('getDate');
-
+            console.log(disabledDates);
             var currentDate = new Date(checkInDate);
             checkOutDate = new Date(checkOutDate);
             var isDisabledFound = false;
-
             while (currentDate <= checkOutDate) {
                 var formattedCurrentDate = $.datepicker.formatDate('dd/mm/yy', currentDate);
-                if (disabledDates.indexOf(formattedCurrentDate) !== -1 && formattedCurrentDate != findNearestDisabledDate(checkInDate)) { //even if the next day is disabled, still can checkout
-                    isDisabledFound = true;
-                    break;
+                if (disabledDates.indexOf(formattedCurrentDate) !== -1 ) { //even if the next day is disabled, still can checkout
+                    if(formattedCurrentDate != findNearestDisabledDate(checkInDate) ){
+                        isDisabledFound = true;
+                        break;  
+                    // if the checkout date is bigger than nearest disable date   
+                    }else if($.datepicker.formatDate('dd/mm/yy', checkOutDate) > findNearestDisabledDate(checkInDate)){
+                        isDisabledFound = true;
+                        break; 
+                    }
+
                 }
                 currentDate.setDate(currentDate.getDate() + 1);
             }

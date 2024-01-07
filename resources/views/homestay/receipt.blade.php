@@ -151,7 +151,7 @@
                                             <td></td>
                                             <td colspan="3" style="text-align:center"><b>Baki</b> </td>
                                             <td style="text-align:center">
-                                                <b>{{ $item->totalprice - $item->deposit_amount  }}</b>
+                                                <b>{{ number_format(($item->totalprice - $item->deposit_amount), 2)  }}</b>
                                             </td>
                                         </tr>
                                     @endif

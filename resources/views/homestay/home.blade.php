@@ -3,8 +3,38 @@
 @section('css')
     <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
     <style>
+        #banner-content {
+            color: #ffffff;
+            padding: 12px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 100%;
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        footer {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
         .rated{
             font-size: 18px;
+        }
+        @media screen and (max-width: 500px){
+            #banner-content {
+                width: 80%;
+            }
+            #banner-content > * {
+                padding: 8px;
+                font-size: 20px !important;
+            }
+            #banner-container > img {
+                object-position: 50% 70%;
+            }
         }
     </style>
 @endsection

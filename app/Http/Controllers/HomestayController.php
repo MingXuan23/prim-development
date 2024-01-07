@@ -34,7 +34,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class HomestayController extends Controller
 {
     public function testPayment(){
-        $transaction = Transaction::where('nama', '=', 'Homestay_20240103213344')->first();
+        $transaction = Transaction::where('nama', '=', 'Homestay_20240102171036')->first();
         $transaction->transac_no = 'test deposit payment';
         $transaction->status = "Success";
         $transaction->save();
@@ -77,6 +77,7 @@ class HomestayController extends Controller
         if($transaction->email != NULL)
         {
             Mail::to($transaction->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to customer
+
         }
         Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to homestay admin
 
@@ -423,9 +424,9 @@ class HomestayController extends Controller
                     $checkIn->modify('+1 day');
                 }
             }
+
         }
 
-        
         // Remove duplicates from the array (if any)
         $disabledDates = array_unique($disabledDates);
         return response()->json(['disabledDates' => $disabledDates]);
@@ -1096,7 +1097,7 @@ public function getPromotionHistory(Request $request){
             $newImages = array_values($newImages);
             foreach($editIdsArray as $key=>$id){
                 // if the edit image is not deleted
-                if(!in_array($id , $deleteIdsArray) && $id != "new_images"){
+                if(!in_array($id , $deleteIdsArray)){
                     $image = DB::table('homestay_images')
                     ->where('id', $id)
                     ->first();
@@ -1284,7 +1285,6 @@ public function getPromotionHistory(Request $request){
              }
             //  if there are enough rooms available we assign empty array, while if not enough do nothing
             $availability = $isAvailable ? []:$availability ;
-
         }
         if($availability== [] || $availability->isEmpty()){
             $floatTotalPrice = (float) str_replace(',', '', $request->amount);
