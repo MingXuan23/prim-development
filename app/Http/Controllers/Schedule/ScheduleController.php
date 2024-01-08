@@ -302,8 +302,10 @@ class ScheduleController extends Controller
                                 ->where('lr.status',1)
                                 ->where('lr.replace_teacher_id',$teacher_id)
                                 ->where('tl.date',$date)
-                                ->groupBy('ss.slot')
-                                ->count('ss.slot');
+                                ->groupBy(['ss.slot','tl.date'])
+                                ->get()
+                                ->count();
+        //dd($teacher);
         
         $teacher->leave_class =DB::table('leave_relief as lr')
                     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
