@@ -529,7 +529,7 @@ class ScheduleApiController extends Controller
 
        // dd($user);
 
-       dd($user);
+       //dd($user);
         if($user->device_token){
 
             $device_token =[];
@@ -575,7 +575,7 @@ class ScheduleApiController extends Controller
         curl_close($ch);
 
         // FCM response
-        dd($result);
+        //dd($result);
 
             return response()->json(["success"=>$result]);
         }
