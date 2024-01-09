@@ -16,6 +16,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            background-color:transparent!important;
         }
         footer {
             background-color: var(--primary-color) !important;

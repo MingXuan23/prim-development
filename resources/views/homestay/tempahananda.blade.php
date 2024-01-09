@@ -10,6 +10,10 @@
   .img-thumbnail{
     padding: 0.15rem!important;
   }
+  footer {
+      background-color: var(--primary-color) !important;
+      color: white !important;
+  }
   @media screen and (max-width: 700px){
     #booking-button-group{
       position: relative;
