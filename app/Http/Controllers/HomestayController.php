@@ -1986,7 +1986,7 @@ public function getPromotionHistory(Request $request){
                 }
         
                 return [
-                    'month' => $month,
+                    'month' => Carbon::createFromFormat('Y-m',$month)->format('m/y'),
                     'earnings' => $totalEarnings,
                     'remainingEarningsForNextMonth' => $remainingEarnings,
                 ];
@@ -2019,7 +2019,7 @@ public function getPromotionHistory(Request $request){
                     }
             
                     $ratings[] = [
-                        'month' => $startMonth,
+                        'month' => Carbon::createFromFormat('Y-m' , $startMonth)->format('m/y'),
                         'ratings' => $ratingsForMonth,
                     ];
             
