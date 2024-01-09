@@ -7,7 +7,12 @@
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
-
+    <style>
+    footer {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+    }
+    </style>
 
 @endsection
 

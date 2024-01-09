@@ -3,6 +3,10 @@
 @section('css')
 <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
 <style>
+        footer {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
     @media screen and (max-width: 700px){
         .row > .col-4{
             display: block;
@@ -139,7 +143,7 @@
                                         <div style="font-size:18px;">
                                             <b>RM{{  number_format((float)$transaction->deposit_amount, 2, '.', '') }}</b>
                                         </div>
-                                    @elseif($transaction->status == 'Balance Paid')
+                                    @elseif($transaction->status == 'Balance Paid' || ($transaction->status == 'Completed' && $transaction->deposit_amount > 0))
                                         <div class="mx-3" colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran(Deposit Dan Baki Telah Dibayar)</b> </div>
                                     <div style="font-size:18px;">
                                         <b>RM{{  number_format((float)$transaction->totalprice, 2, '.', '') }}</b>

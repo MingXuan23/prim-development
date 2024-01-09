@@ -5,7 +5,11 @@
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
 @include('layouts.datatable')
-<style>
+  <style>
+    footer {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+    }
     .sort-homestay{
       width: 25% !important;
     }  

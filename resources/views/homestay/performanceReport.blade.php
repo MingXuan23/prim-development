@@ -10,6 +10,10 @@
 @include('layouts.datatable')
 
 <style>
+    footer {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+    }
     /* style for print */
     @media print{
         /* set margin for the print page */
