@@ -370,8 +370,10 @@ $(document).ready(function () {
         });
         // for deleting images
         $(document).on('click', '#btn-delete-image',function(){
+
             $(this).next('#img-preview').remove();
             const imageId = $(this).next().attr('id');
+            $(this).parent().find(`input`).attr('id' , imageId).remove();//remove the input field
             $(this).remove();
             $('input[name="delete_id"]').val(function(index, value){
                 return (value ? value + ',' : '') + imageId;
