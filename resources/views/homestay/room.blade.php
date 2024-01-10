@@ -464,7 +464,6 @@ $(document).ready(function() {
             maxDate: maxDate,
             beforeShowDay: function(date) {
                 var formattedDate = $.datepicker.formatDate('dd/mm/yy', date);
-
                 var isDisabled = (disabledDates.indexOf(formattedDate) !== -1);
                 var cssClass = toolTip = '';
                 if(discountDates.indexOf(formattedDate) !== -1){
@@ -601,6 +600,9 @@ $(document).ready(function() {
             },
             success: function(result){
                 var disabledDates = result.disabledDates;
+                if(typeof disabledDates != 'array'){
+                    disabledDates = Object.values(disabledDates);
+                }
                 initializeDatepickers(disabledDates);
 
 

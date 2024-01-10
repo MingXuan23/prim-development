@@ -7,7 +7,12 @@
         <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
-
+    <style>
+    footer {
+        background-color: var(--primary-color) !important;
+        color: white !important;
+    }
+    </style>
 
 @endsection
 
@@ -365,8 +370,10 @@ $(document).ready(function () {
         });
         // for deleting images
         $(document).on('click', '#btn-delete-image',function(){
+
             $(this).next('#img-preview').remove();
             const imageId = $(this).next().attr('id');
+            $(this).parent().find(`input`).attr('id' , imageId).remove();//remove the input field
             $(this).remove();
             $('input[name="delete_id"]').val(function(index, value){
                 return (value ? value + ',' : '') + imageId;

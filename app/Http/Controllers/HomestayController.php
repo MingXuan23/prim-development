@@ -370,6 +370,10 @@ class HomestayController extends Controller
         $roomNo = $request->roomNo;
         $bookings = Booking::where('roomid', $roomId)
                            ->whereIn('status', ['Booked', 'Completed' ,'Deposited' ,'Balance Paid'])
+                           ->where(function($query){
+                                $query->where('checkin','>=' ,date('Y-m-d'))
+                                ->orWhere('checkout','>' ,date('Y-m-d'));
+                           })
                            ->get();
         
         $disabledDates = [];
@@ -1065,7 +1069,8 @@ public function getPromotionHistory(Request $request){
        $states = Jajahan::negeri();
         return view('homestay.editBilik')->with(['room'=>$room , 'images'=>$roomImages,'states'=>$states]);
     }
-    public function updateRoom(Request $request){            
+    public function updateRoom(Request $request){      
+
         // for delete
         $deleteIds = $request->delete_id;
         $deleteIdsArray = [];
@@ -1078,23 +1083,25 @@ public function getPromotionHistory(Request $request){
                 ->pluck('image_path')
                 ->first();
                 // delete the image
-                unlink(public_path($deletePath));
+                if(file_exists(public_path($deletePath))){
+                    unlink(public_path($deletePath));
+                }
                 DB::table('homestay_images')
                 ->where('id',$id)
                 ->delete();
 
             }            
         }
-
         // for updating images
         $editIds = $request->edit_id;
         if($request->file('image') != null && $editIds != null){
             $editIdsArray = explode(',', $editIds);//like split
-            sort($editIdsArray);
+            $editIdsArray = array_unique($editIdsArray);
             
             $newImages = $request->file('image');
             // reset the array keys
             $newImages = array_values($newImages);
+            $i = 0;//counter for images
             foreach($editIdsArray as $key=>$id){
                 // if the edit image is not deleted
                 if(!in_array($id , $deleteIdsArray)){
@@ -1102,17 +1109,23 @@ public function getPromotionHistory(Request $request){
                     ->where('id', $id)
                     ->first();
                     // delete the old image at this position
-                    unlink(public_path($image->image_path));
-                    // place the new one
-                    $pathInfo = pathinfo($image->image_path);
-                    $newImagePath = 'homestay-image/'.$pathInfo['filename'].".".$newImages[$key]->getClientOriginalExtension();
-                    $newImages[$key]->move(public_path('homestay-image'),$newImagePath);
+                    if(file_exists(public_path($image->image_path))){
+                        unlink(public_path($image->image_path));
+                    }
+
+                    $currentDateTime = date('YmdHis');
+                    $randomString = uniqid();
+                    $newImagePath = 'homestay-image/'.$image->room_id."(".$currentDateTime."-".$randomString.").".$newImages[$i]->getClientOriginalExtension();
+
+                    $newImages[$i]->move(public_path('homestay-image'),$newImagePath);
 
                     DB::table('homestay_images')
                     ->where('id',$id)
                     ->update([
                         'updated_at' => Carbon::now(),
+                        'image_path' => $newImagePath,
                     ]);
+                    $i++;
                 }
             }
         }
@@ -1973,7 +1986,7 @@ public function getPromotionHistory(Request $request){
                 }
         
                 return [
-                    'month' => $month,
+                    'month' => Carbon::createFromFormat('Y-m',$month)->format('m/y'),
                     'earnings' => $totalEarnings,
                     'remainingEarningsForNextMonth' => $remainingEarnings,
                 ];
@@ -2006,7 +2019,7 @@ public function getPromotionHistory(Request $request){
                     }
             
                     $ratings[] = [
-                        'month' => $startMonth,
+                        'month' => Carbon::createFromFormat('Y-m' , $startMonth)->format('m/y'),
                         'ratings' => $ratingsForMonth,
                     ];
             

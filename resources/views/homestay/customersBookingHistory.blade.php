@@ -4,6 +4,12 @@
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
 <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
+<style>
+  footer {
+      background-color: var(--primary-color) !important;
+      color: white !important;
+  }
+</style>
 @include('layouts.datatable')
 @endsection
 

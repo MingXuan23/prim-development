@@ -2,6 +2,12 @@
 
 @section('css')
     <link rel="stylesheet" href="{{ URL::asset('assets/homestay-assets/style.css')}}">
+    <style>
+        footer {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
+    </style>
 @endsection
 
 @section('content')

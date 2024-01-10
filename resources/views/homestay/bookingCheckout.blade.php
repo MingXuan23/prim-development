@@ -13,7 +13,10 @@
 .main-content{
     color: var(--primary-color);
 }
-
+footer {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
 
 .loading {
   width: 35px;
