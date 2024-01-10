@@ -311,7 +311,10 @@ class ScheduleApiController extends Controller
 
             $period = new stdClass();
             $date = Carbon::createFromDate($request->date);
-            
+            if($date < Carbon::today()){
+                return response()->json(['error' => 'Invalid Date'], 401);
+            }
+
             if($request->isLeaveFullDay == "true"){
                 $period->fullday=true;
                 $period->start_time= "";
@@ -320,7 +323,8 @@ class ScheduleApiController extends Controller
                 $period->fullday=false;
                 $period->start_time= $request->start_time;
                 $period->end_time=$request->end_time;
-
+                $start = Carbon::createFromFormat('H:i:s', $request->start_time);
+                $end = Carbon::createFromFormat('H:i:s', $request->end_time);
             }
 
             $period = json_encode($period);
@@ -409,22 +413,24 @@ class ScheduleApiController extends Controller
                     if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                         continue;
                     }
+
                    // dd($request->isLeaveFullDay);
                     if($request->isLeaveFullDay=="true"){
-                       
+                        $continue =DB::table('leave_relief as lr')
+                        ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                        ->where('lr.schedule_subject_id',$c->schedule_subject_id)
+                        ->where('lr.status',1)
+                        ->where('tl.date',$date)
+                        ->exists();
+                       if($continue)
+                            continue;
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
                             'schedule_subject_id'=>$c->schedule_subject_id,
                             'status'=>1
                         ]);
                     }else{
-                        $start = Carbon::createFromFormat('H:i:s', $request->start_time);
-                        $end = Carbon::createFromFormat('H:i:s', $request->end_time);
-                        //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                        //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-
                        
-                        // check if the time is between start and end
                         if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$leave_id,
@@ -443,8 +449,6 @@ class ScheduleApiController extends Controller
                     //is today and over the time 
                     if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                         continue;
-                    }else if($date < Carbon::today()){
-                        continue;
                     }
                     $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
                     if($request->isLeaveFullDay=="true"){
@@ -457,12 +461,6 @@ class ScheduleApiController extends Controller
                         'status'=>1
                         ]);
                     }else{
-                        $start = Carbon::createFromFormat('H:i:s', $request->start_time);
-                        $end = Carbon::createFromFormat('H:i:s', $request->end_time);
-                        //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                        //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-
-                        
                         // check if the time is between start and end
                         if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
