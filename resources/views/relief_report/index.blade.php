@@ -21,6 +21,13 @@
                 width: 100%;
             }
         }
+
+        @media print {
+            #lrTeacherChart {
+                width: 100%;
+                height: auto;
+            }
+        }
     </style>
 @include('layouts.datatable')
 @endsection
@@ -117,7 +124,7 @@
                     <div class="total_pending"></div>
                     <div class="total_rejected"></div> -->
                     
-                    <canvas id="barChart" width="300" height="100"></canvas>
+                    <canvas id="barChart" width="300px" height="100px"></canvas>
                 </div>
             </div>
 
@@ -166,7 +173,7 @@
                         </tbody>
                     </table>
                 </div>
-                    <div class="total_report">
+                    <div class="total_report" style="padding: 10px;">
                         <canvas id="lrTeacherChart" width="300" height="100"></canvas>
                     </div>
                 </div>
@@ -462,7 +469,8 @@
                     labels: ['Confirmed', 'Pending', 'Rejected', 'Not Assign'],
                     datasets: [{
                         label: 'Total Report (' + total + ')',
-                        data: [confirmed, pending, rejected, notAssign],
+                        // data: [confirmed, pending, rejected, notAssign],
+                        data: [1, 2, 3, 4],
                         backgroundColor: [
                             'rgba(75, 192, 192, 0.2)',
                             'rgba(255, 206, 86, 0.2)',

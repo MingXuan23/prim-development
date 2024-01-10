@@ -231,7 +231,7 @@ u:hover {
                                 </div>
                                 <div class="form-group" >
                                     <label>End Time</label>
-                                    <input type="time" name="endtime" id="endtime" class="form-control">
+                                    <input type="time" name="endtime" id="endtime" class="form-control" onchange="validateTime()">
                                 </div>
                             </div>
 
@@ -248,7 +248,7 @@ u:hover {
                             </div>
 
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Add</button>
+                                <button type="submit" class="btn btn-primary" onclick=" return validateTime()">Add</button>
                             </div>
                         </div>
                     </form>
@@ -371,7 +371,24 @@ u:hover {
             defaultDate: 0, 
         })
 
-       
+        function validateTime() {
+            var startTime = document.getElementById('starttime').value;
+            var endTime = document.getElementById('endtime').value;
+            console.log(endTime);
+            // Convert time strings to Date objects for easier comparison
+            var startDate = new Date('1970-01-01T' + startTime + 'Z');
+            var endDate = new Date('1970-01-01T' + endTime + 'Z');
+
+            // Compare start and end times
+            if (endDate <= startDate) {
+                alert('End time cannot be earlier than or equal to start time.');
+                endTime = '';
+                console.log(endTime);
+                return false;
+            }
+
+            return true;
+        }
 
         function assignTeacher(leave_relief_id) {
            // console.log('Selected teacher for row ' + (schedule_subject_id) + ': ' + teacher);
