@@ -198,11 +198,11 @@
                             </div>
                             <div class="form-group">
                                 <label>Number Of Slot</label>
-                                <input type="number" name="no_of_slot" id="no_of_slot" min=0 class="form-control">
+                                <input type="number" name="no_of_slot" id="no_of_slot" min=1 class="form-control" value =1>
                             </div>
                             <div class="form-group">
                                 <label>Time Of Slot (Minutes)</label>
-                                <input type="number" name="time_of_slot" id="time_of_slot" min=0 class="form-control">
+                                <input type="number" name="time_of_slot" id="time_of_slot" min=1 class="form-control" value=1>
                             </div>
                             <div class="form-group">
                                 <label>Start Time</label>
@@ -263,15 +263,14 @@
 
                             <div class="form-group">
                                 <label>Teacher Maximum Slot Per Day</label>
-                                <input type="number" name="maxslot" id="maxslot" min=0 class="form-control">
+                                <input type="number" name="maxslot" id="maxslot" min=1 class="form-control" value=1>
                             </div>
                             <input type="hidden" name="organization_id" class="organization_id" value="0">
 
                             <div class="form-group">
                                 <label>Teacher Maximum Relief Slot Per Day</label>
-                                <input type="number" name="maxrelief" id="maxrelief" min=0 class="form-control">
+                                <input type="number" name="maxrelief" id="maxrelief" min=1 class="form-control" value=1>
                             </div>
-                            <input type="hidden" name="organization_id" class="organization_id" value="0">
                             <!-- <div class="form-group">
                                 <input type="file" name="file" required>
                             </div> -->
@@ -306,7 +305,9 @@
                             <select name="schedule_id" id="schedule_id" class="form-control">
                                 <option value="" selected disabled>Choose Schedule Name</option>
                                 @foreach($schedule as $row)
-                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    @if ($row->status == 1)
+                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    @endif
                                 @endforeach
                             </select>
                             </div>
