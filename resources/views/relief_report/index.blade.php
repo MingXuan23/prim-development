@@ -23,9 +23,19 @@
         }
 
         @media print {
+            @page {
+                margin: 0.1cm; /* Set the minimum margin value */
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                /* size: A4 portrait; */
+            }
             #lrTeacherChart {
-                width: 100%;
-                height: auto;
+                width: 100% !important;
+                height: auto !important;
+                max-width: 100%;
             }
         }
     </style>
@@ -119,12 +129,12 @@
                 <button type="button" id="details" name="details" class="btn btn-primary">Show Details</button>
                 </div>
                 <div id="chart-section">
-                <div class="total_report">
+                <div class="total_report" style="padding: 10px;">
                     <!-- <div class="total_confirmed"></div>
                     <div class="total_pending"></div>
                     <div class="total_rejected"></div> -->
                     
-                    <canvas id="barChart" width="300px" height="100px"></canvas>
+                    <canvas id="barChart" width="300" height="100"></canvas>
                 </div>
             </div>
 
@@ -257,6 +267,18 @@
     $(document).ready(function() {
         $("#datepicker_start").datepicker("setDate", new Date());
         $("#datepicker_end").datepicker("setDate", new Date());
+
+        $("#datepicker_start").datepicker({
+            onSelect: function(selectedDate) {
+                // Set the minimum date for datepicker_end
+                $("#datepicker_end").datepicker("option", "minDate", selectedDate);
+                
+            }
+        });
+
+        // Set the initial minDate for datepicker_end based on the default value of datepicker_start
+        $("#datepicker_end").datepicker("option", "minDate", $("#datepicker_start").val());
+
         dateOnChange();
 
         if ($("#organization").val() != "") {
@@ -298,6 +320,17 @@
 
         $('#datepicker_start').change(function() {
         //    dateOnChange();
+        $("#datepicker_start").datepicker({
+            onSelect: function(selectedDate) {
+                // Set the minimum date for datepicker_end
+                $("#datepicker_end").datepicker("option", "minDate", selectedDate);
+                
+            }
+        });
+
+        // Set the initial minDate for datepicker_end based on the default value of datepicker_start
+        $("#datepicker_end").datepicker("option", "minDate", $("#datepicker_start").val());
+
         fetchReliefData($('#datepicker_start').val(), $('#datepicker_end').val());
         console.log($('#datepicker_start').val(), $('#datepicker_end').val());
 
@@ -469,8 +502,8 @@
                     labels: ['Confirmed', 'Pending', 'Rejected', 'Not Assign'],
                     datasets: [{
                         label: 'Total Report (' + total + ')',
-                        // data: [confirmed, pending, rejected, notAssign],
-                        data: [1, 2, 3, 4],
+                        data: [confirmed, pending, rejected, notAssign],
+                        // data: [1, 2, 3, 4],
                         backgroundColor: [
                             'rgba(75, 192, 192, 0.2)',
                             'rgba(255, 206, 86, 0.2)',
