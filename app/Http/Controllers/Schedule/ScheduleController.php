@@ -994,7 +994,9 @@ class ScheduleController extends Controller
      public function addTeacherLeave(Request $request){
         $period = new stdClass();
         $date = Carbon::createFromDate($request->date);
-
+        if($date < Carbon::today()){
+            return response()->json(['error' => 'Invalid Date'], 401);
+        }
         // dd($date,$request);
         //dd($date,$request->isLeaveFullDay);
         if($request->isLeaveFullDay == "on"){
@@ -1006,6 +1008,9 @@ class ScheduleController extends Controller
             $period->fullday=false;
             $period->start_time= $request->starttime.':00';
             $period->end_time=$request->endtime.':00';
+            $start = Carbon::createFromFormat('H:i', $request->starttime.':00');
+            $end = Carbon::createFromFormat('H:i', $request->endtime.':00');
+
 
         }
 
@@ -1101,6 +1106,7 @@ class ScheduleController extends Controller
                 if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                     continue;
                 }
+                
                 if($request->isLeaveFullDay== "on"){
                     $insert = DB::table('leave_relief')->insert([
                         'teacher_leave_id'=>$leave_id,
@@ -1108,11 +1114,6 @@ class ScheduleController extends Controller
                         'status'=>1
                     ]);
                 }else{
-
-                    $start = Carbon::createFromFormat('H:i', $request->starttime);
-                    $end = Carbon::createFromFormat('H:i', $request->endtime);
-
-                    
                     // check if the time is between start and end
                     if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                         $insert = DB::table('leave_relief')->insert([
@@ -1144,14 +1145,7 @@ class ScheduleController extends Controller
                     'status'=>1
                     ]);
                 }else{
-                   // dd($request->starttime);
-                    $start = Carbon::createFromFormat('H:i:s', $request->starttime.':00');
-                    $end = Carbon::createFromFormat('H:i:s', $request->endtime.':00');
-                    //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                    //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-
-                    
-                    // check if the time is between start and end
+                                        // check if the time is between start and end
                     if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
 
                         DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);

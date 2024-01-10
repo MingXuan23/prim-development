@@ -141,7 +141,7 @@ $data=$response_value['fpx_buyerBankBranch']."|".$response_value['fpx_buyerBankI
 @endsection
 
 <script>
-    var time = 15;
+    var time = 5;
     setInterval(function() {
         var seconds = time % 60;
         if (seconds.toString().length == 1) {
