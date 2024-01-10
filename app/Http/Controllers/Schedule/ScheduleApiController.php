@@ -323,8 +323,10 @@ class ScheduleApiController extends Controller
                 $period->fullday=false;
                 $period->start_time= $request->start_time;
                 $period->end_time=$request->end_time;
-                $start = Carbon::createFromFormat('H:i:s', $request->start_time);
-                $end = Carbon::createFromFormat('H:i:s', $request->end_time);
+                $start = Carbon::createFromFormat('H:i:s', $request->start_time)->addMinutes(1);
+                $end = Carbon::createFromFormat('H:i:s', $request->end_time)->addMinutes(-1);
+                // $start = Carbon::createFromFormat('H:i:s', $request->starttime.':00')->addMinutes(1);
+                // $end = Carbon::createFromFormat('H:i:s', $request->endtime.':00')->addMinutes(-1);
             }
 
             $period = json_encode($period);
@@ -413,17 +415,18 @@ class ScheduleApiController extends Controller
                     if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                         continue;
                     }
-
+                    $continue =DB::table('leave_relief as lr')
+                    ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                    ->where('lr.schedule_subject_id',$c->schedule_subject_id)
+                    ->where('lr.status',1)
+                    ->where('tl.date',$date)
+                    ->where('tl.status',1)
+                    ->exists();
+                   if($continue)
+                        continue;
                    // dd($request->isLeaveFullDay);
                     if($request->isLeaveFullDay=="true"){
-                        $continue =DB::table('leave_relief as lr')
-                        ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
-                        ->where('lr.schedule_subject_id',$c->schedule_subject_id)
-                        ->where('lr.status',1)
-                        ->where('tl.date',$date)
-                        ->exists();
-                       if($continue)
-                            continue;
+                        
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
                             'schedule_subject_id'=>$c->schedule_subject_id,
@@ -431,7 +434,8 @@ class ScheduleApiController extends Controller
                         ]);
                     }else{
                        
-                        if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                        if ($check->between($start, $end) 
+                        || $check->addMinutes($time_info['duration'])->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$leave_id,
                                 'schedule_subject_id'=>$c->schedule_subject_id,
@@ -462,7 +466,8 @@ class ScheduleApiController extends Controller
                         ]);
                     }else{
                         // check if the time is between start and end
-                        if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                        if ($check->between($start, $end) 
+                        || $check->addMinutes($time_info['duration'])->between($start,$end)) {
                             DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
                        
                             $insert = DB::table('leave_relief')->insert([
