@@ -20,6 +20,9 @@
             .btn {
                 width: 100%;
             }
+            #lrTeacherChart {
+                height: 350px !important;
+            }
         }
 
         @media print {
@@ -34,7 +37,7 @@
             }
             #lrTeacherChart {
                 width: 100% !important;
-                height: auto !important;
+                height: 350px !important;
                 max-width: 100%;
             }
         }
@@ -134,7 +137,7 @@
                     <div class="total_pending"></div>
                     <div class="total_rejected"></div> -->
                     
-                    <canvas id="barChart" width="300" height="100"></canvas>
+                    <canvas id="barChart" width="600" height="350"></canvas>
                 </div>
             </div>
 
@@ -184,7 +187,7 @@
                     </table>
                 </div>
                     <div class="total_report" style="padding: 10px;">
-                        <canvas id="lrTeacherChart" width="300" height="100"></canvas>
+                        <canvas id="lrTeacherChart" width="600" height="350"></canvas>
                     </div>
                 </div>
 
@@ -524,7 +527,10 @@
                         y: {
                             beginAtZero: true
                         }
-                    }
+                    },
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    height: 350
                 }
             });
         }
