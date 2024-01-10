@@ -34,6 +34,11 @@ class ScheduleController extends Controller
         return view('schedule.index', compact('organization', 'classes', 'schedule'));
     }
 
+    public function getScheduleStatus($id){
+
+        return response()->json(['schedule_status'=>DB::table('schedules')->where('id',$id)->where('status',1)->exists()]);
+    }
+
     public function manageReliefIndex()
     {
         $organization = $this->getOrganizationByUserId();
@@ -166,6 +171,20 @@ class ScheduleController extends Controller
        return redirect()->back()->with('success', $msg);
     }
 
+
+    public function updateSchedule(Request $request){
+        $schedule = Schedule::find($request->schedule_id);
+    
+        if(!$this->checkAdmin(Auth::id(),$schedule->organization_id)){
+            return redirect()->back()->with('error', 'You have not authority to change it');
+        }
+
+        //dd($request->schedule_status);
+        $schedule->status = $request->schedule_status == "true";
+        $schedule->save();
+        return redirect()->back()->with('success', 'Update schedule successfully');
+    }
+
     public function getAllReliefForReport($oid, $startDate, $endDate)
     {
         $organization = $this->getOrganizationByUserId();
@@ -184,7 +203,9 @@ class ScheduleController extends Controller
                 ->where(function ($query) {
                     $query->where('lr.confirmation', 'Rejected')
                         ->orWhere('lr.confirmation', 'Confirmed')
-                        ->orWhere('lr.confirmation', 'Pending');
+                        ->orWhere('lr.confirmation', 'Pending')
+                        ->orWhereNull('lr.confirmation');
+                    
                 })
                 ->whereBetween('tl.date', [$startDate, $endDate])
                 ->where('lr.status', 1)
@@ -281,8 +302,10 @@ class ScheduleController extends Controller
                                 ->where('lr.status',1)
                                 ->where('lr.replace_teacher_id',$teacher_id)
                                 ->where('tl.date',$date)
-                                ->groupBy('ss.slot')
-                                ->count('ss.slot');
+                                ->groupBy(['ss.slot','tl.date'])
+                                ->get()
+                                ->count();
+        //dd($teacher);
         
         $teacher->leave_class =DB::table('leave_relief as lr')
                     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
@@ -371,7 +394,7 @@ class ScheduleController extends Controller
 
                     usort($teacherList, function ($a, $b) use( $date,$schedule_subject) {
                         // Your custom comparison logic here
-                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        $comparison = $b->details->remaining_relief -$a->details->remaining_relief ;
                         if($comparison!==0){
                             return $comparison;
                         }
@@ -388,7 +411,7 @@ class ScheduleController extends Controller
                         }
                     
                         // If classes are the same, compare using getTeacherInfo
-                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        $comparison = $b->details->remaining_relief -$a->details->remaining_relief ;
                         if($comparison!==0){
                             return $comparison;
                         }
@@ -405,7 +428,7 @@ class ScheduleController extends Controller
                         }
                     
                         // If classes are the same, compare using getTeacherInfo
-                        $comparison =$a->details->remaining_relief - $b->details->remaining_relief;
+                        $comparison = $b->details->remaining_relief -$a->details->remaining_relief ;
                         if($comparison!==0){
                             return $comparison;
                         }
@@ -737,7 +760,7 @@ class ScheduleController extends Controller
     public function getScheduleId()
     {
         $organizations = $this->getOrganizationByUserId();
-        $schedule = Schedule::whereIn('organization_id', $organizations->pluck('id'))->get();
+        $schedule = Schedule::whereIn('organization_id', $organizations->pluck('id'))->where('status',1)->get();
 
         return $schedule;
     }
@@ -971,7 +994,9 @@ class ScheduleController extends Controller
      public function addTeacherLeave(Request $request){
         $period = new stdClass();
         $date = Carbon::createFromDate($request->date);
-
+        if($date < Carbon::today()){
+            return response()->json(['error' => 'Invalid Date'], 401);
+        }
         // dd($date,$request);
         //dd($date,$request->isLeaveFullDay);
         if($request->isLeaveFullDay == "on"){
@@ -983,6 +1008,9 @@ class ScheduleController extends Controller
             $period->fullday=false;
             $period->start_time= $request->starttime.':00';
             $period->end_time=$request->endtime.':00';
+            $start = Carbon::createFromFormat('H:i', $request->starttime.':00');
+            $end = Carbon::createFromFormat('H:i', $request->endtime.':00');
+
 
         }
 
@@ -1078,6 +1106,7 @@ class ScheduleController extends Controller
                 if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                     continue;
                 }
+                
                 if($request->isLeaveFullDay== "on"){
                     $insert = DB::table('leave_relief')->insert([
                         'teacher_leave_id'=>$leave_id,
@@ -1085,11 +1114,6 @@ class ScheduleController extends Controller
                         'status'=>1
                     ]);
                 }else{
-
-                    $start = Carbon::createFromFormat('H:i', $request->starttime);
-                    $end = Carbon::createFromFormat('H:i', $request->endtime);
-
-                    
                     // check if the time is between start and end
                     if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                         $insert = DB::table('leave_relief')->insert([
@@ -1121,14 +1145,7 @@ class ScheduleController extends Controller
                     'status'=>1
                     ]);
                 }else{
-                   // dd($request->starttime);
-                    $start = Carbon::createFromFormat('H:i:s', $request->starttime.':00');
-                    $end = Carbon::createFromFormat('H:i:s', $request->endtime.':00');
-                    //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                    //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-
-                    
-                    // check if the time is between start and end
+                                        // check if the time is between start and end
                     if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
 
                         DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);

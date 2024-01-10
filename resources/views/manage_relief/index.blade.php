@@ -5,6 +5,64 @@
 {{-- <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet"> --}}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+
+<style>
+
+u:hover {
+    color:red;
+}
+.tags {
+  display: inline;
+  position: relative;
+}
+
+.tags:hover:after {
+  background: #333;
+  background: rgba(0, 0, 0, .8);
+  border-radius: 5px;
+  top: 34px;
+  color: #fff;
+  content: attr(data-title);
+  left: 0; /* Adjusted to start from the most left position */
+  padding: 5px 15px;
+  position: absolute;
+  z-index: 98;
+  width: min(60vw, 450px);
+}
+
+.tags:hover:before {
+  border: solid;
+  border-color: transparent transparent #333;
+  border-width: 6px 6px 0 6px;
+  top: 24px;
+  content: "";
+  left: 50%; /* Centered horizontally */
+  transform: translateX(-50%);
+  position: absolute;
+  z-index: 99;
+}
+
+@media screen and (max-width: 500px) {
+    .tags:hover:after {
+    width: 60vw; /* Set the width to be 100% of the viewport width */
+    left: 50%; /* Start from the center */
+    transform: translateX(-50%); /* Offset by 50% of the element's width to the left */
+    box-sizing: border-box; /* Include padding and border in the element's size */
+    padding: 5px 15px; /* Add some padding inside the tooltip */
+    white-space: normal; /* Allow the text to wrap as needed */
+    text-align: center; /* Center-align the text */
+  }
+  .tags:hover:before {
+    left: 50%; /* Keep the arrow centered */
+    transform: translateX(-50%); /* Adjust translateX for precise centering */
+  }
+  .tags::-webkit-scrollbar{
+    width:0;
+}
+
+ 
+}
+</style>
 @include('layouts.datatable')
 @endsection
 
@@ -42,9 +100,9 @@
                     <label>Auto Suggestion Sort By:</label>
                     <select name="sort" id="sort" class="form-control">
                         <!-- <option value="0" selected disabled>Sort By</option> -->
-                        <option value="Beban Guru">Beban Guru</option>
-                        <option value="Kelas">Kelas</option>
-                        <option value="Subjek">Subjek</option>
+                        <option value="Beban Guru">Busy Slot</option>
+                        <option value="Kelas">Class</option>
+                        <option value="Subjek">Subject</option>
                     </select>
                 </div>
 
@@ -87,7 +145,10 @@
                 @endif
 
                 <div class="flash-message"></div>
-
+                <p style="font-size: 18px;">Ex. What is <u class ="tags" data-title="5S means 5 Busy Slot, this value calculated by the normal class add relief class taken">5S</u>
+                <u  class ="tags" data-title="2R means 2 Remaining Relief Slot, this value calculated by the teacher maximum relief slot minus relief class taken">2R?</u>
+                </p>
+               
                 <div class="table-responsive">
                     <table id="reliefTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
@@ -242,7 +303,6 @@
 
         $("#datepicker").datepicker("setDate", new Date());
         dateOnChange();
-
         
 
         $('#organization').change(function() {

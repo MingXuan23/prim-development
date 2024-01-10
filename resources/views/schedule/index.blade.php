@@ -67,6 +67,7 @@
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i class="fas fa-plus"></i> Add Schedule</a>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId1"> <i class="fas fa-plus"></i> Import</a>
+                <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Manage Schedule</a>
                 <!-- <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId2"> <i class="fas fa-plus"></i> Export</a> -->
                 <!-- <a style="margin: 1px;" href=" {{ route('exportteacher') }}" class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a> -->
@@ -340,6 +341,57 @@
     </div>
 </div>
 
+<!-- Modal 2-->
+<div class="modal fade" id="modelId2" tabindex="-1" role="dialog" aria-labelledby="modelTitleId2" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Manage Schedule</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('schedule.updateSchedule') }}" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            {{ csrf_field() }}
+                            <div class="form-group">
+                            <label>Choose Schedule Name</label>
+                            <select name="schedule_id" id="update_schedule" class="form-control">
+                                <option value="" selected disabled>Choose Schedule Name</option>
+                                @foreach($schedule as $row)
+                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @endforeach
+                                
+                                <!-- <div>
+                                    <input type="text"> </input>
+                                </div> -->
+                            </select>
+                            </div>
+                            <div class="form-group">
+                                    <label>Status:</label>
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name ="schedule_status" id ="radioEnable" value ="true">
+                                        <label class="form-check-label" for="radioConfirmed" >Active</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="radio" class="form-check-input" name ="schedule_status"  id="radioDisable" value ="false">
+                                        <label class="form-check-label" for="radioPending">Inactive</label>
+                                    </div>
+                                </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">Save Changes</button>
+                                
+                            </div>
+                            
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @endsection
 
@@ -357,7 +409,33 @@
     $(document).ready(function() {
 
         var scheduleTable;
-        
+        $('#update_schedule').change(function () {
+            var selectedScheduleId = $(this).val();
+            
+           //console.log(selectedScheduleId);
+            // Make an AJAX call
+            $.ajax({
+                type: 'GET',
+                url: '{{ route("schedule.getScheduleStatus", ":id") }}'.replace(':id', selectedScheduleId), // Replace with your actual AJAX endpoint
+                success: function (response) {
+                    // Assuming the response contains a 'status' field
+                    // and it can be either 'Confirmed' or 'Pending'
+                    if (response.schedule_status ===  true) {
+                        // Check the Confirmed radio button
+                        $('#radioEnable').prop('checked', true);
+                    } else {
+                        // Check the Pending radio button
+                        $('#radioDisable').prop('checked', true);
+                    }
+                   // console.error(response.schedule_status);
+                    // Add more conditions if needed for other statuses
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
             $('.organization_id').val(organizationid);
@@ -470,6 +548,8 @@
                 console.log(error);
             }
         });
+
+        
     });
 
     // ... (Rest of your code)

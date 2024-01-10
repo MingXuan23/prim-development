@@ -17,7 +17,7 @@ use Illuminate\Notifications\Notification;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\ServiceAccount;
-
+use Google\Client;
 
 use App\User;
 
@@ -87,7 +87,7 @@ class ScheduleApiController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::User();
             if($request->device_token){
-                DB::table('users')->where('device_token',$request->device_token)->update(['device_token'=>null]);
+                DB::table('users')->where('device_token',$request->device_token)->where('id','<>',$user->id)->update(['device_token'=>null]);
                 $user->device_token =$request->device_token;
                 $user->save();
             }
@@ -146,7 +146,7 @@ class ScheduleApiController extends Controller
         }
         $school =DB::table('organizations as o')
             ->join('organization_user as ou','ou.organization_id','o.id')
-            ->where('ou.role_id',5)
+            ->whereIn('ou.role_id',[2,4,5,7,20,21])
             ->where ('ou.user_id',$user->id)
             ->select('o.*')
             ->first();
@@ -311,7 +311,10 @@ class ScheduleApiController extends Controller
 
             $period = new stdClass();
             $date = Carbon::createFromDate($request->date);
-            
+            if($date < Carbon::today()){
+                return response()->json(['error' => 'Invalid Date'], 401);
+            }
+
             if($request->isLeaveFullDay == "true"){
                 $period->fullday=true;
                 $period->start_time= "";
@@ -320,7 +323,8 @@ class ScheduleApiController extends Controller
                 $period->fullday=false;
                 $period->start_time= $request->start_time;
                 $period->end_time=$request->end_time;
-
+                $start = Carbon::createFromFormat('H:i:s', $request->start_time);
+                $end = Carbon::createFromFormat('H:i:s', $request->end_time);
             }
 
             $period = json_encode($period);
@@ -409,22 +413,24 @@ class ScheduleApiController extends Controller
                     if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                         continue;
                     }
+
                    // dd($request->isLeaveFullDay);
                     if($request->isLeaveFullDay=="true"){
-                       
+                        $continue =DB::table('leave_relief as lr')
+                        ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                        ->where('lr.schedule_subject_id',$c->schedule_subject_id)
+                        ->where('lr.status',1)
+                        ->where('tl.date',$date)
+                        ->exists();
+                       if($continue)
+                            continue;
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
                             'schedule_subject_id'=>$c->schedule_subject_id,
                             'status'=>1
                         ]);
                     }else{
-                        $start = Carbon::createFromFormat('H:i:s', $request->start_time);
-                        $end = Carbon::createFromFormat('H:i:s', $request->end_time);
-                        //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                        //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-
                        
-                        // check if the time is between start and end
                         if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$leave_id,
@@ -443,8 +449,6 @@ class ScheduleApiController extends Controller
                     //is today and over the time 
                     if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                         continue;
-                    }else if($date < Carbon::today()){
-                        continue;
                     }
                     $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
                     if($request->isLeaveFullDay=="true"){
@@ -457,12 +461,6 @@ class ScheduleApiController extends Controller
                         'status'=>1
                         ]);
                     }else{
-                        $start = Carbon::createFromFormat('H:i:s', $request->start_time);
-                        $end = Carbon::createFromFormat('H:i:s', $request->end_time);
-                        //$time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                        //$check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-
-                        
                         // check if the time is between start and end
                         if ($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
                             DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
@@ -528,6 +526,8 @@ class ScheduleApiController extends Controller
      {  $user =User::find($id);
 
        // dd($user);
+
+       //dd($user);
         if($user->device_token){
 
             $device_token =[];
@@ -580,6 +580,64 @@ class ScheduleApiController extends Controller
         return response()->json(["failed"]);
      }
 
+     public function sendFirebaseNotification($id, $title, $message)
+        {
+            $user = User::find($id);
+
+            if ($user->device_token) {
+                $device_token = $user->device_token;
+                $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send'; // Update with your project ID
+
+                $serviceAccountPath = 'C:\laragon\www\prim_production\prim-development\prim-notification-firebase-adminsdk-ezss1-affe4e1fe4.json';
+
+                // Initialize the Google Client
+                $client = new Client();
+                $client->setAuthConfig($serviceAccountPath);
+                $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
+                $client->fetchAccessTokenWithAssertion();
+            
+                $accessToken = $client->getAccessToken();
+            
+                // Use the access token as the bearer token
+                $headers = [
+                    'Authorization: Bearer ' . $accessToken['access_token'],
+                    'Content-Type: application/json',
+                ];
+
+                $ch = curl_init();
+
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+
+                // Execute post
+                $result = curl_exec($ch);
+
+                if ($result === FALSE) {
+                    die('Curl failed: '. curl_error($ch));
+                }
+            
+                // Close connection
+                curl_close($ch);
+
+                // Decode the response
+                $response = json_decode($result, true);
+
+                // Check for success
+                if (isset($response['success'])) {
+                    return response()->json(["success" => $response]);
+                } else {
+                    // Log error or handle it accordingly
+                    return response()->json(["failed" => $response]);
+                }
+            } else {
+                return response()->json(["failed" => "No device token found"]);
+            }
+        }
 
     public function getPendingRelief(Request $request){
         $user = User::find($request->user_id);
