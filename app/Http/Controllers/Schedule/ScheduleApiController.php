@@ -146,7 +146,7 @@ class ScheduleApiController extends Controller
         }
         $school =DB::table('organizations as o')
             ->join('organization_user as ou','ou.organization_id','o.id')
-            ->where('ou.role_id',5)
+            ->whereIn('ou.role_id',[2,4,5,7,20,21])
             ->where ('ou.user_id',$user->id)
             ->select('o.*')
             ->first();
