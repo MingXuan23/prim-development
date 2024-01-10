@@ -993,6 +993,7 @@ class ScheduleController extends Controller
 
      public function addTeacherLeave(Request $request){
         $period = new stdClass();
+        // dd($request);
         $date = Carbon::createFromDate($request->date);
         if($date < Carbon::today()){
             return response()->json(['error' => 'Invalid Date'], 401);
@@ -1008,8 +1009,8 @@ class ScheduleController extends Controller
             $period->fullday=false;
             $period->start_time= $request->starttime.':00';
             $period->end_time=$request->endtime.':00';
-            $start = Carbon::createFromFormat('H:i', $request->starttime.':00');
-            $end = Carbon::createFromFormat('H:i', $request->endtime.':00');
+            $start = Carbon::createFromFormat('H:i:s', $request->starttime.':00');
+            $end = Carbon::createFromFormat('H:i:s', $request->endtime.':00');
 
 
         }
