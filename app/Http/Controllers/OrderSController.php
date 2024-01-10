@@ -418,6 +418,7 @@ class OrderSController extends Controller
     {  
        $credentials = $request->only('email', 'password');
        $phone = $request->get('email');
+       $device_token = $request->get('device_token');
        //return response()->json(['user',$credentials],200);
        if(is_numeric($request->get('email'))){
            $user = User::where('icno', $phone)->first();
@@ -460,25 +461,61 @@ class OrderSController extends Controller
 
 
        if (Auth::attempt($credentials)) {
-           $user = Auth::User();
+            $user = Auth::User();
 
-           $organization_user = DB::table('organization_user as ou')
-            ->where('ou.user_id', $user->id)
-            ->where('ou.role_id', 17)
-            ->get();
+            $user_device_token = DB::table('users')
+                ->where('id', $user->id)
+                ->select('device_token')
+                ->first();
 
+            if($user_device_token) {
+                if($device_token != $user_device_token) {
+                    DB::table('users')
+                    ->where('id', $user->id)
+                    ->update([
+                        'device_token' => $device_token
+                    ]);
 
-            if(count($organization_user) > 0) {
-                //if user is orders admin
-                $exist = 1;
+                    DB::table('users')
+                    ->where('id', '!=', $user->id)
+                    ->where('device_token', $device_token)
+                    ->update([
+                        'device_token' => null
+                    ]);
+                }
             } else {
-                $exist = 0;
+                DB::table('users')
+                ->where('id', $user->id)
+                ->update([
+                    'device_token' => $device_token
+                ]);
+
+                DB::table('users')
+                ->where('id', '!=', $user->id)
+                ->where('device_token', $device_token)
+                ->update([
+                    'device_token' => null
+                ]);
             }
 
+            
+           $organizations = DB::table('organization_user as ou')
+            ->join('organizations as o', 'ou.organization_id', '=', 'o.id')
+            ->where('ou.user_id', $user->id)
+            ->where('ou.role_id', 17)
+            ->select('o.*')
+            ->first();
+
+        //dd($organization_user);
            return response()->json([
                'id' => $user->id,
                'name' => $user->name,
-               'exist' => $exist
+               'email' => $user->email,
+               'icno' => $user->icno,
+               'telno' => $user->telno,
+               'username' => $user->username,
+               'device_token' => $user->device_token,
+               'organizations' => $organizations
            ], 200);
        }
        return response()->json(['error' => 'Unauthorized'], 401);
@@ -501,10 +538,137 @@ class OrderSController extends Controller
         return response()->json($data);
     }
 
+    public function logout(Request $request) {
+        $user_id = $request->get('user_id');
+
+        if(count($request->all()) >= 1) {
+            DB::table('users')
+                ->where('id', $user_id)
+                ->update([
+                    'device_token' => null
+            ]);
+
+            return response()->json(['response' => 'Log Out Successfully']);
+        } else {
+            return response()->json(['response' => 'Log Out Failed']);
+        }
+    }
+
+    public function updateUser(Request $request) {
+        $user_id = $request->get('user_id');
+        $name = $request->get('name');
+        $telno = $request->get('telno');
+        $email = $request->get('email');
+
+        if(count($request->all()) >= 1) {
+            $user = DB::table('users')
+                ->where('id', $user_id)
+                ->update([
+                    'name' => $name,
+                    'telno' => $telno,
+                    'email' => $email
+            ]);
+
+            return response()->json(['response' => 'Updated Successfully']);
+        } else {
+            return response()->json(['response' => 'Update Failed']);
+        }
+    }
+
+    public function updateOrganization(Request $request) {
+        $organ_id = intval($request->organ_id);
+        $nama = $request->nama;
+        $address = $request->address;
+        $city = $request->city;
+        $district = $request->district;
+        $postcode = $request->postcode;
+        $state = $request->state;
+
+        $file_name = '';
+        $resp = 'Successfully updated';
+
+        if (!is_null($request->file('organization_pic'))) {
+            // Check if there is an existing image
+            $existingImage = DB::table('organizations')
+                ->where('id', $organ_id)
+                ->whereNotNull('organization_picture')
+                ->where('organization_picture', '<>', '')
+                ->first();
+
+            // Delete the existing image
+            if ($existingImage) {
+                $existingImagePath = public_path('organization-picture') . '/' . $existingImage->organization_picture;
+                if (file_exists($existingImagePath)) {
+                    unlink($existingImagePath);
+                }
+            }
+
+            // $storagePath  = $request->dish_image->storeAs('public/orders-asset/dish-image', 'dish-image-'.time(). '-' . $organ_id . '.jpg');
+            // $file_name = basename($storagePath);
+            $resp = 'Successfully updated with image'; 
+            $extension = $request->file('organization_pic')->extension();
+            $storagePath = $request->file('organization_pic')->move(public_path('organization-picture'), 'organization-picture-' . time(). '-' . $organ_id . '.' . $extension);
+            $file_name = basename($storagePath);
+        }
+
+        if(count($request->all()) >= 1) {
+
+            $image_exist = DB::table('organizations')
+                ->where('id', $organ_id)
+                ->whereNotNull('organization_picture')
+                ->where('organization_picture', '<>', '')
+                ->exists();
+
+            if($image_exist) {
+                if($file_name) {
+                    DB::table('organizations')
+                    ->where('id', $organ_id)
+                    ->update([
+                        'nama' => $nama,
+                        'address' => $address,
+                        'city' => $city,
+                        'district' => $district,
+                        'postcode' => $postcode,
+                        'state' => $state,
+                        'organization_picture' => $file_name
+                    ]);
+                } else {
+                    DB::table('organizations')
+                    ->where('id', $organ_id)
+                    ->update([
+                        'nama' => $nama,
+                        'address' => $address,
+                        'city' => $city,
+                        'district' => $district,
+                        'postcode' => $postcode,
+                        'state' => $state,
+                    ]);
+                }
+            } else {
+                DB::table('organizations')
+                ->where('id', $organ_id)
+                ->update([
+                    'nama' => $nama,
+                    'address' => $address,
+                    'city' => $city,
+                    'district' => $district,
+                    'postcode' => $postcode,
+                    'state' => $state,
+                    'organization_picture' => $file_name
+                ]);
+            }
+
+            return response()->json(['response' => $resp]);
+        } else {
+            return response()->json(['response' => 'Update Failed']);
+        }
+    }
+
     public function randomDishes() {
         $data = DB::table('dishes as d')
             ->join('organizations as o', 'd.organ_id', '=', 'o.id')
             ->select('d.*', 'o.nama as o_nama')
+            ->Where('o.type_org', 12) //OrderS
             ->inRandomOrder()
             ->limit(1)
             ->get();
@@ -523,8 +687,9 @@ class OrderSController extends Controller
 
     public function listShops(){
         $data = DB::table('organizations as o')
-            ->where('type_org', 8) //kedai makanan
-            ->orWhere('type_org', 12) //OrderS
+            //->where('type_org', 8) //kedai makanan
+            //->orWhere('type_org', 12) //OrderS
+            ->Where('type_org', 12) //OrderS
             //->where('nama', 'like', '%MAAHAD TAHFIZ SAINS DARUL AMAN%')
             //->limit(30)
             ->get();
@@ -535,14 +700,37 @@ class OrderSController extends Controller
     public function listDishesByShop(Request $request) {
         $org_id = $request->get('organ_id');
         
-        $data = DB::table('dishes as d')
-            ->join('organizations as o', 'd.organ_id', '=', 'o.id')
-            ->where('o.id', $org_id)
-            ->select('d.*')
-            ->get();
+        // $data = DB::table('dishes as d')
+        //     ->join('organizations as o', 'd.organ_id', '=', 'o.id')
+        //     ->where('o.id', $org_id)
+        //     ->select('d.*')
+        //     ->get();
 
-        $count = DB::table('dishes')    
-                    ->select('dishes.id', 'dishes.name', DB::raw('COUNT(order_available.dish_id) as totalOrderAvailable'))
+        $data = DB::table('dishes')    
+                    ->select('dishes.*', DB::raw('COUNT(order_available.dish_id) as totalOrderAvailable'))
+                    ->leftJoin('order_available', 'dishes.id', '=', 'order_available.dish_id')
+                    ->where('dishes.organ_id', $org_id)
+                    ->where('order_available.delivery_date', '>', now())
+                    //->where('order_available.quantity', '>', 0)
+                    ->groupBy('dishes.id', 'dishes.name')
+                    ->orderBy('dishes.id')
+                    ->get();
+
+        // return response()->json($data);
+        return response()->json($data);
+    }
+
+    public function listDishesByShopAdmin(Request $request) {
+        $org_id = $request->get('organ_id');
+        
+        // $data = DB::table('dishes as d')
+        //     ->join('organizations as o', 'd.organ_id', '=', 'o.id')
+        //     ->where('o.id', $org_id)
+        //     ->select('d.*')
+        //     ->get();
+
+        $data = DB::table('dishes')    
+                    ->select('dishes.*', DB::raw('COUNT(order_available.dish_id) as totalOrderAvailable'))
                     ->leftJoin('order_available', 'dishes.id', '=', 'order_available.dish_id')
                     ->where('dishes.organ_id', $org_id)
                     //->where('order_available.quantity', '>', 0)
@@ -551,7 +739,7 @@ class OrderSController extends Controller
                     ->get();
 
         // return response()->json($data);
-        return response()->json(['data'=>$data,'count'=>$count]);
+        return response()->json($data);
     }
 
     public function listDishAvailable(Request $request) {
@@ -579,6 +767,7 @@ class OrderSController extends Controller
             ->join('dishes as d', 'd.id', '=', 'oa.dish_id')
             ->where('d.organ_id', $organ_id)
             ->where('oa.quantity', '>', 0)
+            ->where('oa.delivery_date', '>', now())
             // ->where('oa.dish_id', $dish_id)
             ->get();
             
@@ -590,7 +779,7 @@ class OrderSController extends Controller
         $organ_id = $request->get('organ_id');
 
         $cart = DB::table('order_cart')
-                    ->where('order_status', 'checkout-pending')
+                    ->where('order_status', 'checkout-cart-pending')
                     ->where('user_id', $user_id)
                     ->where('organ_id', $organ_id)
                     ->first();
@@ -601,7 +790,7 @@ class OrderSController extends Controller
         // if($cart->isEmpty()) {
         if(!$cart) {
             $cart_id = DB::table('order_cart')->insertGetId([
-                'order_status' => 'checkout-pending',
+                'order_status' => 'checkout-cart-pending',
                 'totalamount' => 0,
                 'created_at' => now(),
                 'user_id' => $user_id,
@@ -626,15 +815,9 @@ class OrderSController extends Controller
         $totalprice = $request->get('totalprice');
         $order_available_id = $request->get('order_available_id');
         $order_cart_id = $request->get('order_cart_id');
+        $total_amount = $request->get('total_amount');
 
         if(count($request->all()) >= 1) {
-            DB::table('order_cart')
-            ->where('id', $order_cart_id)
-            ->update([
-                'order_status' => 'order-pending',
-                'created_at' => now(),
-            ]);
-
             DB::table('order_available')
             ->where('id', $order_available_id)
             ->decrement('quantity', $quantity);
@@ -646,6 +829,15 @@ class OrderSController extends Controller
                 'order_available_id' => $order_available_id,
                 'order_cart_id' => $order_cart_id
             ]);
+
+            DB::table('order_cart')
+            ->where('id', $order_cart_id)
+            ->update([
+                'order_status' => 'cart-pending',
+                'created_at' => now(),
+                'totalamount' => $total_amount
+            ]);
+
             return response()->json(['response' => 'Order Created Successfully']);
         } else {
             return response()->json(['response' => 'Order Failed']);
@@ -667,109 +859,32 @@ class OrderSController extends Controller
 
         if(count($request->all()) >= 1) {
 
+            $data = DB::table('order_available_dish as oad')
+                ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+                ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
+                ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
+                ->join('organizations as o', 'o.id', '=', 'oc.organ_id')
+                ->where('oc.user_id', $user_id);
+
+            $order_available_dish = $data->select('oad.*')->get();
+            $order_cart = $data->select('oc.*')->get();
+            $order_available = $data->select('oa.*')->get();
+            $dishes = $data->select('d.*')->get();
+            $organizations = $data->select('o.*')->get();
+
             if($option == 0) {
-                $order_available_dish = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '>', now())
-                    ->select('oad.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
-
-                $order_cart = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '>', now())
-                    ->select('oc.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
-
-                $order_available = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '>', now())
-                    ->select('oa.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
-
-                $dishes = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '>', now())
-                    ->select('d.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
-
-                $organizations = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->join('organizations as o', 'o.id', '=', 'oc.organ_id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '>', now())
-                    ->select('o.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
+                $order_available_dish = $data->select('oad.*')->where('oa.delivery_date', '>', now())->orderBy('oa.delivery_date', 'asc')->get();
+                $order_cart = $data->select('oc.*')->where('oa.delivery_date', '>', now())->orderBy('oa.delivery_date', 'asc')->get();
+                $order_available = $data->select('oa.*')->where('oa.delivery_date', '>', now())->orderBy('oa.delivery_date', 'asc')->get();
+                $dishes = $data->select('d.*')->where('oa.delivery_date', '>', now())->orderBy('oa.delivery_date', 'asc')->get();
+                $organizations = $data->select('o.*')->where('oa.delivery_date', '>', now())->orderBy('oa.delivery_date', 'asc')->get();
                     
             } else if($option == 1) {
-                $order_available_dish = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '<', now())
-                    ->select('oad.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
-
-                $order_cart = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '<', now())
-                    ->select('oc.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
-
-                $order_available = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '<', now())
-                    ->select('oa.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
-
-                $dishes = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '<', now())
-                    ->select('d.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
-
-                $organizations = DB::table('order_available_dish as oad')
-                    ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
-                    ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
-                    ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
-                    ->join('organizations as o', 'o.id', '=', 'oc.organ_id')
-                    ->where('oc.user_id', '=', $user_id)
-                    ->where('oa.delivery_date', '<', now())
-                    ->select('o.*')
-                    ->orderBy('oa.delivery_date', 'asc')
-                    ->get();
+                $order_available_dish = $data->select('oad.*')->where('oa.delivery_date', '<', now())->orderBy('oa.delivery_date', 'desc')->get();
+                $order_cart = $data->select('oc.*')->where('oa.delivery_date', '<', now())->orderBy('oa.delivery_date', 'desc')->get();
+                $order_available = $data->select('oa.*')->where('oa.delivery_date', '<', now())->orderBy('oa.delivery_date', 'desc')->get();
+                $dishes = $data->select('d.*')->where('oa.delivery_date', '<', now())->orderBy('oa.delivery_date', 'desc')->get();
+                $organizations = $data->select('o.*')->where('oa.delivery_date', '<', now())->orderBy('oa.delivery_date', 'desc')->get();
             }
         }
         
@@ -777,5 +892,345 @@ class OrderSController extends Controller
         // return response()->json($order_available_dish);
     }
 
-    
+    public function getDishType() {
+        $data = DB::table('dish_type')->get();
+        return response()->json($data);  
+    }
+
+    public function addDishes(Request $request) {
+        $organ_id = intval($request->organ_id);
+        $dish_name = $request->dish_name;
+        $dish_price = doubleval($request->dish_price);
+        $dish_type = intval($request->dish_type);
+        //$dish_image = $request->get('dish_image');
+
+        $file_name = '';
+        $resp = 'Successfully added';
+
+        if (!is_null($request->file('dish_image'))) {
+            // $storagePath  = $request->dish_image->storeAs('public/orders-asset/dish-image', 'dish-image-'.time(). '-' . $organ_id . '.jpg');
+            // $file_name = basename($storagePath);
+            $resp = 'Successfully added with image'; 
+            $extension = $request->file('dish_image')->extension();
+            $storagePath = $request->file('dish_image')->move(public_path('dish-image'), 'dish-image-' . time(). '-' . $organ_id . '.' . $extension);
+            $file_name = basename($storagePath);
+        }
+
+        if(count($request->all()) >= 1) {
+            DB::table('dishes')->insert([
+                'name' => $dish_name,
+                'price' => $dish_price,
+                'dish_image' => $file_name,
+                'created_at' => now(),
+                'organ_id' => $organ_id,
+                'dish_type' => $dish_type
+            ]);
+
+            return response()->json(['response' => $resp]);
+        } else {
+            return response()->json(['response' => 'Add Failed']);
+        }
+    }
+
+    public function updateDishes(Request $request) {
+        $dish_id = intval($request->dish_id);
+        $organ_id = intval($request->organ_id);
+        $dish_name = $request->dish_name;
+        $dish_price = doubleval($request->dish_price);
+        $dish_type = intval($request->dish_type);
+        //$dish_image = $request->get('dish_image');
+
+        $file_name = '';
+        $resp = 'Successfully updated';
+
+        if (!is_null($request->file('dish_image'))) {
+            // Check if there is an existing image
+            $existingImage = DB::table('dishes')
+                ->where('id', $dish_id)
+                ->whereNotNull('dish_image')
+                ->where('dish_image', '<>', '')
+                ->first();
+
+            // Delete the existing image
+            if ($existingImage) {
+                $existingImagePath = public_path('dish-image') . '/' . $existingImage->dish_image;
+                if (file_exists($existingImagePath)) {
+                    unlink($existingImagePath);
+                }
+            }
+
+            // $storagePath  = $request->dish_image->storeAs('public/orders-asset/dish-image', 'dish-image-'.time(). '-' . $organ_id . '.jpg');
+            // $file_name = basename($storagePath);
+            $resp = 'Successfully updated with image'; 
+            $extension = $request->file('dish_image')->extension();
+            $storagePath = $request->file('dish_image')->move(public_path('dish-image'), 'dish-image-' . time(). '-' . $organ_id . '.' . $extension);
+            $file_name = basename($storagePath);
+        }
+
+        if(count($request->all()) >= 1) {
+
+            $image_exist = DB::table('dishes')
+                ->where('id', $dish_id)
+                ->whereNotNull('dish_image')
+                ->where('dish_image', '<>', '')
+                ->exists();
+
+            if($image_exist) {
+                if($file_name) {
+                    DB::table('dishes')
+                    ->where('id', $dish_id)
+                    ->update([
+                        'name' => $dish_name,
+                        'price' => $dish_price,
+                        'dish_image' => $file_name,
+                        'updated_at' => now(),
+                        'organ_id' => $organ_id,
+                        'dish_type' => $dish_type
+                    ]);
+                } else {
+                    DB::table('dishes')
+                    ->where('id', $dish_id)
+                    ->update([
+                        'name' => $dish_name,
+                        'price' => $dish_price,
+                        'updated_at' => now(),
+                        'organ_id' => $organ_id,
+                        'dish_type' => $dish_type
+                    ]);
+                }
+            } else {
+                DB::table('dishes')
+                ->where('id', $dish_id)
+                ->update([
+                    'name' => $dish_name,
+                    'price' => $dish_price,
+                    'dish_image' => $file_name,
+                    'updated_at' => now(),
+                    'organ_id' => $organ_id,
+                    'dish_type' => $dish_type
+                ]);
+            }
+
+            return response()->json(['response' => $resp]);
+        } else {
+            return response()->json(['response' => 'Update Failed']);
+        }
+    }
+
+    public function deleteDishes(Request $request) {
+        $dish_id = $request->get('dish_id');
+
+        $resp = 'Successfully deleted';
+
+        if(count($request->all()) >= 1) {
+            $existingImage = DB::table('dishes')
+                ->where('id', $dish_id)
+                ->whereNotNull('dish_image')
+                ->where('dish_image', '<>', '')
+                ->first();
+
+            // Delete the existing image
+            if ($existingImage) {
+                $existingImagePath = public_path('dish-image') . '/' . $existingImage->dish_image;
+                if (file_exists($existingImagePath)) {
+                    unlink($existingImagePath);
+                }
+            }
+
+            DB::table('dishes')
+            ->where('id', $dish_id)
+            ->delete();
+
+            return response()->json(['response' => $resp]);
+        } else {
+            return response()->json(['response' => 'Delete Failed']);
+        }
+    }
+
+    public function addOrderAvailable(Request $request) {
+        $dish_id = $request->get('dish_id');
+        $open_date = Carbon::createFromDate($request->get('open_date'));
+        $close_date = Carbon::createFromDate($request->get('close_date'));
+        $delivery_date = Carbon::createFromDate($request->get('delivery_date'));
+        $delivery_address = $request->get('delivery_address');
+        $quantity = $request->get('quantity');
+
+        $resp = 'Successfully added';
+
+        if(count($request->all()) >= 1) {
+            DB::table('order_available')->insert([
+                'open_date' => $open_date,
+                'close_date' => $close_date,
+                'delivery_date' => $delivery_date,
+                'delivery_address' => $delivery_address,
+                'quantity' => $quantity,
+                'dish_id' => $dish_id
+            ]);
+
+            return response()->json(['response' => $resp]);
+        } else {
+            return response()->json(['response' => 'Add Failed']);
+        }
+    }
+
+    public function updateOrderAvailable(Request $request) {
+        $dish_id = $request->get('dish_id');
+        $order_available_id = $request->get('order_available_id');
+        $open_date = Carbon::createFromDate($request->get('open_date'));
+        $close_date = Carbon::createFromDate($request->get('close_date'));
+        $delivery_date = Carbon::createFromDate($request->get('delivery_date'));
+        $delivery_address = $request->get('delivery_address');
+        $quantity = $request->get('quantity');
+
+        $resp = 'Successfully updated';
+
+        if(count($request->all()) >= 1) {
+            DB::table('order_available')
+            ->where('id', $order_available_id)
+            ->update([
+                'open_date' => $open_date,
+                'close_date' => $close_date,
+                'delivery_date' => $delivery_date,
+                'delivery_address' => $delivery_address,
+                'quantity' => $quantity
+            ]);
+
+            return response()->json(['response' => $resp]);
+        } else {
+            return response()->json(['response' => 'Update Failed']);
+        }
+    }
+
+    public function deleteOrderAvailable(Request $request) {
+        $order_available_id = $request->get('order_available_id');
+
+        $resp = 'Successfully deleted';
+
+        if(count($request->all()) >= 1) {
+            DB::table('order_available')
+            ->where('id', $order_available_id)
+            ->delete();
+
+            return response()->json(['response' => $resp]);
+        } else {
+            return response()->json(['response' => 'Delete Failed']);
+        }
+    }
+
+    public function listOrderAvailableAdmin(Request $request) {
+        $dish_id = $request->get('dish_id');
+
+        $order_available = DB::table('order_available as oa')
+            ->select('oa.*', DB::raw('COUNT(oad.id) as totalOrderDishAvailable'))
+            ->leftJoin('order_available_dish as oad', 'oad.order_available_id', '=', 'oa.id')
+            ->join('dishes as d', 'd.id', '=', 'oa.dish_id')
+            ->where('d.id', $dish_id)
+            ->groupBy('oa.id')
+            ->get();
+            
+        return response()->json($order_available);
+    }
+
+    public function listOADAdmin(Request $request) {
+        $order_available_id = $request->get('order_available_id');
+
+        $data = DB::table('order_available_dish as oad')
+            ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+            ->join('users as u', 'u.id', '=', 'oc.user_id')
+            ->where('oad.order_available_id', '=', $order_available_id);
+        
+        
+        $order_available_dish = $data->select('oad.*')->get();
+        $users = $data->select('u.*')->get();
+        $order_cart = $data->select('oc.*')->get();
+        
+
+        return response()->json(['order_available_dish'=>$order_available_dish, 'users'=>$users, 'order_cart'=>$order_cart]);
+    }
+
+    public function updateOADAdmin(Request $request) {
+        $order_available_dish_id = $request->get('order_available_dish_id');
+        $order_cart_id = $request->get('order_cart_id');
+        $delivery_status = $request->get('delivery_status');
+        
+        $update_OAD = DB::table('order_available_dish')
+            ->where('id', $order_available_dish_id)
+            ->update([
+                'delivery_status' => $delivery_status
+            ]);
+
+        $total_Pending_Abandon = DB::table('order_cart as oc')
+            ->join('order_available_dish as oad', 'oad.order_cart_id', '=', 'oc.id')
+            ->where('oc.id', $order_cart_id)
+            ->where('oad.delivery_status', 'order-pending')
+            ->count('oad.id');
+
+        $order_cart = DB::table('order_cart')
+            ->where('id', $order_cart_id)
+            ->where('order_status', 'cart-completed')
+            ->first();
+
+        if($order_cart) {
+            DB::table('order_cart')
+            ->where('id', $order_cart_id)
+            ->update([
+                'order_status' => 'cart-pending',
+                'updated_at' => now(),
+            ]);
+        }
+
+        if($total_Pending_Abandon <= 0) {
+            DB::table('order_cart')
+            ->where('id', $order_cart_id)
+            ->update([
+                'order_status' => 'cart-completed',
+                'updated_at' => now(),
+            ]);
+        }
+        
+        if ($update_OAD) {
+            return response()->json(['response' => 'Update successfully']);
+        } else {
+            return response()->json(['response' => 'Update failed']);
+        }        
+        
+    }
+
+    public function getUsers(Request $request) {
+        $organ_id = $request->get('organ_id');
+
+        $users = DB::table('users as u')
+            ->join('organization_user as ou', 'ou.user_id', '=', 'u.id')
+            ->where('ou.organization_id', $organ_id)
+            ->where('ou.role_id', 17)
+            ->first();
+
+        return response()->json($users);
+    }
+
+    public function getReport(Request $request) {
+        $organ_id = $request->get('organ_id');
+        $date = Carbon::createFromDate($request->get('date'));
+        $start_date = Carbon::createFromDate($request->get('start_date'));
+        $end_date = Carbon::createFromDate($request->get('end_date'));
+
+        $results = DB::table('dishes as d')
+            ->join('order_available as oa', 'd.id', '=', 'oa.dish_id')
+            ->join('order_available_dish as oad', 'oad.order_available_id', '=', 'oa.id')
+            ->join('organizations as o', 'o.id', '=', 'd.organ_id')
+            ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
+            ->where('o.id', '=', $organ_id)
+            ->groupBy('d.name')
+            ->select('d.name as dish_name', DB::raw('SUM(oad.totalprice) as profit'), DB::raw('SUM(oad.quantity) as quantity'));
+
+        if(!is_null($request->get('date'))) {
+            $results = $results->whereDate('oc.created_at', $date)->get();
+        } else if ((!is_null($request->get('start_date'))) || (!is_null($request->get('end_date')))) {
+            $results = $results->whereBetween(DB::raw('DATE(oc.created_at)'), [$start_date, $end_date])->get();
+        } else {
+            $results = $results->get();
+        }
+
+        return response()->json($results);
+    }
 }
