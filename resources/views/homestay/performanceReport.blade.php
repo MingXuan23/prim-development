@@ -205,7 +205,6 @@ $(document).ready(function() {
                 });
                 var barData = result.homestays.map(function (homestay) {
                     totalEarnings += homestay.totalEarnings;
-
                     return {
                         y: homestay.roomname,
                         value: homestay.totalEarnings
@@ -236,6 +235,9 @@ $(document).ready(function() {
                         data: barData,
                         xkey: 'y',
                         ykeys: ['value'],
+                        xLabelMargin : 10,
+                        xLabelAngle: 60,
+                        gridTextSize: 10,
                         labels: ['Jumlah Pendapatan'],    
                         hideHover: true,    
                         hoverCallback: function (index, options, content, row) {
@@ -267,7 +269,11 @@ $(document).ready(function() {
                     data: lineData,
                     xkey: 'label',
                     ykeys: ['value'],
-                    labels: ['Jumlah Pendapatan'],   
+                    labels: ['Jumlah Pendapatan'], 
+                    xLabelMargin: 10, 
+                    xLabelAngle: 60,
+                    gridTextSize: 10,
+
                     parseTime: false,     
                     hideHover: true,
                     hoverCallback: function (index, options, content, row) {
@@ -299,7 +305,10 @@ $(document).ready(function() {
                     data: lineRatingData,
                     xkey: 'month',
                     ykeys: homestayNames,  
-                    labels: homestayNames,     
+                    labels: homestayNames,   
+                    xLabelMargin: 10, 
+                    xLabelAngle: 60,
+                    gridTextSize: 10,
                     parseTime: false,     
                     hideHover:'auto',
                     ymax: [5],
