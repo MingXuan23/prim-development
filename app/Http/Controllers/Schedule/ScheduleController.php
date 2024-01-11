@@ -1106,10 +1106,11 @@ class ScheduleController extends Controller
             
             foreach($classRelated as $c){
                 $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+                $check = Carbon::createFromFormat('H:i:s', $time_info['time'] )->addMinutes($time_info['duration']);
+                $before = Carbon::createFromFormat('H:i:s', $time_info['time'] );
 
                 //is today and over the time 
-                if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                if ($date->isToday() &&  now()->gt($check)) {
                     continue;
                 }
 
@@ -1134,8 +1135,8 @@ class ScheduleController extends Controller
                     //dd($check->between($start, $end) && $check->addMinutes($time_info['duration']-1)->between($start,$end));
                     // if($c->slot == 4)
                     //dd($check,$start,$end,$check->addMinutes($time_info['duration']),$check->between($start, $end),$check->addMinutes($time_info['duration'])->between($start,$end));
-                    if ($check->between($start, $end) 
-                        || $check->addMinutes($time_info['duration'])->between($start,$end)) {
+                    if ($start->between($before, $check) 
+                    || $end->between($before,$check)) {
                         //dd("insert"); 
                         $insert = DB::table('leave_relief')->insert([
                             'teacher_leave_id'=>$leave_id,
@@ -1150,10 +1151,11 @@ class ScheduleController extends Controller
             foreach($reliefRelated as $c){
 
                 $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+                $check = Carbon::createFromFormat('H:i:s', $time_info['time'] )->addMinutes($time_info['duration']);
+                $before = Carbon::createFromFormat('H:i:s', $time_info['time'] );
 
                 //is today and over the time 
-                if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                if ($date->isToday() &&  now()->gt($check)) {
                     continue;
                 }
                 $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
@@ -1167,8 +1169,8 @@ class ScheduleController extends Controller
                     'status'=>1
                     ]);
                 }else{
-                    if ($check->between($start, $end) 
-                    || $check->addMinutes($time_info['duration'])->between($start,$end)) {
+                    if ($start->between($before, $check) 
+                    || $end->between($before,$check)) {
 
                         DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
                         $insert = DB::table('leave_relief')->insert([

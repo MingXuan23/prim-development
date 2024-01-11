@@ -409,10 +409,10 @@ class ScheduleApiController extends Controller
                 foreach($classRelated as $c){
 
                     $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-    
+                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] )->addMinutes($time_info['duration']);
+                    $before = Carbon::createFromFormat('H:i:s', $time_info['time'] );
                     //is today and over the time 
-                    if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                    if ($date->isToday() &&  now()->gt($check)) {
                         continue;
                     }
                     $continue =DB::table('leave_relief as lr')
@@ -433,9 +433,8 @@ class ScheduleApiController extends Controller
                             'status'=>1
                         ]);
                     }else{
-                       
-                        if ($check->between($start, $end) 
-                        || $check->addMinutes($time_info['duration'])->between($start,$end)) {
+                        if ($start->between($before, $check) 
+                        || $end->between($before,$check)) {
                             $insert = DB::table('leave_relief')->insert([
                                 'teacher_leave_id'=>$leave_id,
                                 'schedule_subject_id'=>$c->schedule_subject_id,
@@ -448,10 +447,11 @@ class ScheduleApiController extends Controller
                 foreach($reliefRelated as $c){
 
                     $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-    
+                   // $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
+                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] )->addMinutes($time_info['duration']);
+                    $before = Carbon::createFromFormat('H:i:s', $time_info['time'] );
                     //is today and over the time 
-                    if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
+                    if ($date->isToday() &&  now()->gt($check)) {
                         continue;
                     }
                     $duplicate_row = DB::table('leave_relief')->where('id',$c->lrid)->first();
@@ -466,8 +466,8 @@ class ScheduleApiController extends Controller
                         ]);
                     }else{
                         // check if the time is between start and end
-                        if ($check->between($start, $end) 
-                        || $check->addMinutes($time_info['duration'])->between($start,$end)) {
+                       if ($start->between($before, $check) 
+                        || $end->between($before,$check)) {
                             DB::table('leave_relief')->where('id',$c->lrid)->update(['Confirmation'=>'Rejected']);
                        
                             $insert = DB::table('leave_relief')->insert([
