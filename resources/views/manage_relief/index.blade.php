@@ -231,7 +231,7 @@ u:hover {
                                 </div>
                                 <div class="form-group" >
                                     <label>End Time</label>
-                                    <input type="time" name="endtime" id="endtime" class="form-control" onchange="validateTime()">
+                                    <input type="time" name="endtime" id="endtime" class="form-control" onchange="return validateTime()">
                                 </div>
                             </div>
 
@@ -241,6 +241,12 @@ u:hover {
                                 
                                 </select>
                             </div>
+
+                            <div class="form-group">
+                                <label for="reason">Upload Image</label>
+                                <input type="file" name="image" id="image">
+                            </div>
+
                             <input type="hidden" name="date" value="" id="rowdate">
                             <div class="form-group">
                                 <label for="note">Note</label>
@@ -382,7 +388,8 @@ u:hover {
             // Compare start and end times
             if (endDate <= startDate) {
                 alert('End time cannot be earlier than or equal to start time.');
-                endTime = '';
+                // endTime = '';
+                document.getElementById('endtime').value = '';
                 console.log(endTime);
                 return false;
             }
