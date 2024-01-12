@@ -87,8 +87,15 @@ class ScheduleApiController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::User();
             if($request->device_token){
+                
                 DB::table('users')->where('device_token',$request->device_token)->where('id','<>',$user->id)->update(['device_token'=>null]);
+                
+                if($user->device_token != $request->device_token && $user->device_token !=null)
+                {
+                    $this->sendNotification($user->id,'Another device login ypur account!', 'Please logout and login again to get the latest notification pushing' );
+                }
                 $user->device_token =$request->device_token;
+                
                 $user->save();
             }
             return response()->json([
@@ -852,7 +859,7 @@ class ScheduleApiController extends Controller
         ->where ('tl.date','>=',Carbon::today()->subDays(30))
         ->where('tl.status',1)
         //->where('lr.status',1)
-        ->select('tl.id','tl.date','tl.image')
+        ->select('tl.id','tl.date','tl.image','tl.period')
         ->orderBy('tl.date','desc')
         ->get();
 
