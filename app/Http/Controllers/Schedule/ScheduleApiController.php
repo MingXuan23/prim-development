@@ -92,7 +92,7 @@ class ScheduleApiController extends Controller
                 
                 if($user->device_token != $request->device_token && $user->device_token !=null)
                 {
-                    $this->sendNotification($user->id,'Another device login ypur account!', 'Please logout and login again to get the latest notification pushing' );
+                    $this->sendNotification($user->id, 'Hi '. $user->name.', Another device login your account!', 'Please logout and login again to get the latest notification pushing' );
                 }
                 $user->device_token =$request->device_token;
                 
