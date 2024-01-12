@@ -1050,7 +1050,7 @@ class ScheduleController extends Controller
         }
        // $image = $request->input('image');
        $str = $user->id.'_' .time();
-       $filename = null;
+       $filename = $request->image;
         if (!is_null($request->image)) {
             
             $extension =  $request->image->extension();
