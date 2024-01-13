@@ -14,9 +14,29 @@
       background-color: var(--primary-color) !important;
       color: white !important;
   }
+  #booking-button-group >*{
+    margin: 0 6px!important;
+  }
   @media screen and (max-width: 700px){
     #booking-button-group{
       position: relative;
+    }
+    .page-content{
+        padding: 80px 0!important;
+    }
+    .container-fluid{
+      padding-left: 2px!important;
+      padding-right: 2px!important;
+    }
+    #booking-button-group{
+      justify-content: center!important;
+    }
+    #booking-button-group >*{
+      text-overflow: ellipsis !important;
+      overflow: hidden!important;
+      white-space: nowrap!important;
+      margin: 0 3px!important;
+
     }
   }
 </style>
@@ -64,10 +84,10 @@
             @for($i = 0 ; $i < count($checkoutBookings); $i++)
               <div class="card tab-card my-3">
                   <div class="card-body row">
-                    <a class="col-md-5" href="{{route('homestay.showRoom',['id' => $checkoutBookings[$i]->roomid, 'name' => $checkoutBookings[$i]->roomname])}}">
+                    <a class="col-xl-5" href="{{route('homestay.showRoom',['id' => $checkoutBookings[$i]->roomid, 'name' => $checkoutBookings[$i]->roomname])}}">
                       <img src="{{URL($checkoutImages[$i])}}" alt="{{$checkoutBookings[$i]->roomname}}" >
                     </a>  
-                    <div id="booking-details-container" class="col-md-7">
+                    <div id="booking-details-container" class="col-xl-7">
                       <h4 class="color-purple">{{$checkoutBookings[$i]->roomname}}</h4>
                       <h6 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span>&nbsp;&nbsp;&nbsp;{{$checkoutBookings[$i]->address}}, {{$checkoutBookings[$i]->area}}, {{$checkoutBookings[$i]->postcode}}, {{$checkoutBookings[$i]->district}}, {{$checkoutBookings[$i]->state}}</h6>
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Daftar Masuk: </span>{{date('d/m/Y',strtotime($checkoutBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($checkoutBookings[$i]->check_in_after))}}</h6>
@@ -82,15 +102,15 @@
                       @if($checkoutBookings[$i]->booked_rooms != null)
                       <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-door-closed"></i>&nbsp;Jumlah Unit Ditempah: </span>{{$checkoutBookings[$i]->booked_rooms}}</h6>   
                       @endif
-                      <div id="booking-button-group" class="d-flex justify-content-end align-items-center flex-wrap gap-3">
+                      <div id="booking-button-group" class="d-flex justify-content-end align-items-center gap-3">
                         @if($checkoutBookings[$i]->status == 'Deposited')
-                          <button class="btn-purple mx-2 btn-pay-balance" data-booking-id="{{$checkoutBookings[$i]->bookingid}}" data-amount="{{$checkoutBookings[$i]->totalprice - $checkoutBookings[$i]->deposit_amount}}">Bayar Baki</button>
+                          <button class="btn-purple  btn-pay-balance" data-booking-id="{{$checkoutBookings[$i]->bookingid}}" data-amount="{{$checkoutBookings[$i]->totalprice - $checkoutBookings[$i]->deposit_amount}}">Bayar Baki</button>
                         @else
-                          <button class="btn-purple mx-2 btn-checkout-room" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Daftar Keluar</button>
+                          <button class="btn-purple btn-checkout-room" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Daftar Keluar</button>
                         @endif
 
-                        <a href="{{route('homestay.bookingDetails',$checkoutBookings[$i]->bookingid)}}" class="btn-dark-purple mx-2 btn-detail">Butiran</a>
-                        <button class="btn btn-danger mx-2 btn-cancel-booking" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Batal</button>
+                        <a href="{{route('homestay.bookingDetails',$checkoutBookings[$i]->bookingid)}}" class="btn-dark-purple  btn-detail">Butiran</a>
+                        <button class="btn btn-danger  btn-cancel-booking" data-booking-id="{{$checkoutBookings[$i]->bookingid}}">Batal</button>
                       </div>
                     </div>
 
@@ -107,10 +127,10 @@
           @for($i = 0 ; $i < count($completedBookings); $i++)
             <div class="card tab-card my-3">
                 <div class="card-body row">
-                  <a class="col-md-5 d-flex align-items-center" href="{{route('homestay.showRoom',['id' => $completedBookings[$i]->roomid, 'name' => $completedBookings[$i]->roomname])}}">
+                  <a class="col-xl-5 d-flex align-items-center" href="{{route('homestay.showRoom',['id' => $completedBookings[$i]->roomid, 'name' => $completedBookings[$i]->roomname])}}">
                     <img src="{{URL($completedImages[$i])}}" alt="{{$completedBookings[$i]->roomname}}" class="img-fluid">
                   </a>  
-                  <div id="booking-details-container" class="col-md-7">
+                  <div id="booking-details-container" class="col-xl-7">
                     <h4 class="color-purple">{{$completedBookings[$i]->roomname}}</h4>
                     <h6 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span>&nbsp;&nbsp;&nbsp;&nbsp;{{$completedBookings[$i]->address}}, {{$completedBookings[$i]->area}}, {{$completedBookings[$i]->postcode}}, {{$completedBookings[$i]->district}}, {{$completedBookings[$i]->state}}</h6>
                     <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Daftar Masuk: </span>{{date('d/m/Y',strtotime($completedBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($completedBookings[$i]->check_in_after))}}</h6>
@@ -120,7 +140,7 @@
                     <div id="booking-button-group" class="d-flex justify-content-end align-items-center flex-wrap gap-3">
                       {{-- if user haven't leave a review--}}
                       @if($completedBookings[$i]->review_star == null)
-                        <button class="btn-purple mx-2 btn-review" data-booking-id="{{$completedBookings[$i]->bookingid}}">Nilai</button>
+                        <button class="btn-purple  btn-review" data-booking-id="{{$completedBookings[$i]->bookingid}}">Nilai</button>
                       @else
                         {{-- for booking that already have been reviewed --}}
                         <h6 class="color-purple">Dinilai oleh anda: </h6>
@@ -130,7 +150,7 @@
                           @endfor
                         </div>
                       @endif
-                      <a href="{{route('homestay.bookingDetails',$completedBookings[$i]->bookingid)}}" class="btn-dark-purple mx-2 btn-detail">Butiran</a>
+                      <a href="{{route('homestay.bookingDetails',$completedBookings[$i]->bookingid)}}" class="btn-dark-purple btn-detail">Butiran</a>
                     </div>
                   </div>
                 </div>
@@ -146,10 +166,10 @@
           @for($i = 0 ; $i < count($cancelledBookings); $i++)
             <div class="card tab-card my-3">
                 <div class="card-body row">
-                  <a class="col-md-5 d-flex align-items-center" href="{{route('homestay.showRoom',['id' => $cancelledBookings[$i]->roomid, 'name' => $cancelledBookings[$i]->roomname])}}">
+                  <a class="col-xl-5 d-flex align-items-center" href="{{route('homestay.showRoom',['id' => $cancelledBookings[$i]->roomid, 'name' => $cancelledBookings[$i]->roomname])}}">
                     <img src="{{URL($cancelledImages[$i])}}" alt="{{$cancelledBookings[$i]->roomname}}" class="img-fluid">
                   </a>  
-                  <div id="booking-details-container" class="col-md-7">
+                  <div id="booking-details-container" class="col-xl-7">
                     <h4 class="color-purple">{{$cancelledBookings[$i]->roomname}}</h4>
                     <h6 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span>&nbsp;&nbsp;&nbsp;&nbsp;{{$cancelledBookings[$i]->address}}, {{$cancelledBookings[$i]->area}}, {{$cancelledBookings[$i]->postcode}}, {{$cancelledBookings[$i]->district}}, {{$cancelledBookings[$i]->state}}</h6>
                     <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Daftar Masuk: </span>{{date('d/m/Y',strtotime($cancelledBookings[$i]->checkin))}}, selepas {{date('H:i', strtotime($cancelledBookings[$i]->check_in_after))}}</h6>
@@ -157,7 +177,7 @@
                     <h6 class="color-purple"><span class="color-dark-purple"><i class="fas fa-money-check-alt"></i>&nbsp;Jumlah Dibayar: </span>RM{{$cancelledBookings[$i]->totalprice}}</h6>
                     <h6 class="color-purple"><span class="color-dark-purple"><i class="far fa-id-badge"></i>&nbsp;&nbsp;&nbsp;Nombor Telefon Organisasi: </span>{{$cancelledBookings[$i]->telno}}</h6>
                     <div id="booking-button-group" class="d-flex justify-content-end align-items-center flex-wrap gap-3">
-                      <a href="{{route('homestay.bookingDetails',$cancelledBookings[$i]->bookingid)}}" class="btn-dark-purple mx-2 btn-detail">Butiran</a>
+                      <a href="{{route('homestay.bookingDetails',$cancelledBookings[$i]->bookingid)}}" class="btn-dark-purple  btn-detail">Butiran</a>
                     </div>
                   </div>
                 </div>
