@@ -92,7 +92,7 @@ class ScheduleApiController extends Controller
                 
                 if($user->device_token != $request->device_token && $user->device_token !=null)
                 {
-                    $this->sendNotification($user->id, 'Hi '. $user->name.', Another device login your account!', 'Please logout and login again to get the latest notification pushing' );
+                    $this->sendNotification($user->id ,'Another device login your account!', 'Hi '. $user->name.', Please login again to get the latest notification' );
                 }
                 $user->device_token =$request->device_token;
                 
@@ -890,6 +890,9 @@ class ScheduleApiController extends Controller
                             return $item;
                         })->toArray();
                $r->relief_info = $relief;
+
+               $leavePeriod = json_decode($r->period);
+               $r->detail = $leavePeriod-> fullday ==true? "Full Day Leave": "Leave from ". $leavePeriod->start_time .' - '. $leavePeriod->end_time;
         }
 
        // dd( $report->leave_list,$report->reliefList);
