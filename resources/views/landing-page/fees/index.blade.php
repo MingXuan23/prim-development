@@ -28,6 +28,12 @@
             transform: scale(1.2);
         }
 
+        .form-control{
+            border-color:#5e5e5e!important;
+            transition: all 0.2s ease;
+        }
+
+
         @media only screen and (max-width: 991px){
             .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
                 transform: scale(1.0);
@@ -280,7 +286,7 @@
 
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-8">
+                    <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Hubungi</h4>
                             <p>Email : yahya@utem.edu.my </p>

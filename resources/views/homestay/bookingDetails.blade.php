@@ -12,6 +12,10 @@
             display: block;
             max-width: 100% !important;
         }
+        
+        .page-content{
+            padding: 80px 0!important;
+        }
     }
     @media print{
         #link-previous{

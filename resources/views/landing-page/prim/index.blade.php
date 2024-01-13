@@ -38,6 +38,11 @@
             background-image: -webkit-linear-gradient(50deg,#5e2ced 0,#9749f8 100%)!important;
             color: white!important;
         }
+        .form-control{
+            border-color:#5e5e5e!important;
+            transition: all 0.2s ease;
+        }
+
         /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
             transform: scale(1.0);
         }
@@ -191,8 +196,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="feature-area">
-                        <ul class="feature-list wow fadeInUp" style="visibility: visible; animation-name: fadeInUp;">
-                            <li class="single-feature-list col-md-4">
+                        <ul class="feature-list wow fadeInUp d-flex justify-content-center" style="visibility: visible; animation-name: fadeInUp;">
+                            <li class="single-feature-list col-md-9 col-lg-4">
                                 <div class="icon icon-bg-2">
                                     <i class="flaticon-checked"></i>
                                 </div>
@@ -203,7 +208,7 @@
                                     <p class="text-white">Memudahkan pembayaran dalam talian untuk transaksi atau pembayaran harian maupun bulanan.</p>
                                 </div>
                             </li>
-                            <li class="single-feature-list col-md-4">
+                            <li class="single-feature-list  col-md-9  col-lg-4">
                                 <div class="icon icon-bg-2">
                                     <i class="flaticon-layers"></i>
                                 </div>
@@ -214,7 +219,7 @@
                                     <p class="text-white">Kebolehan untuk melakukan transaksi secara terus kepada penerima dengan pantas.</p>
                                 </div>
                             </li>
-                            <li class="single-feature-list col-md-4">
+                            <li class="single-feature-list col-md-9  col-lg-4">
                                 <div class="icon icon-bg-2">
                                     <i class="flaticon-shield"></i>
                                 </div>
@@ -407,7 +412,7 @@
 
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-8">
+                    <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Hubungi</h4>
                             <p>Email : yahya@utem.edu.my </p>

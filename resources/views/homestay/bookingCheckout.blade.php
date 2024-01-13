@@ -93,6 +93,9 @@ input[type = 'radio']:checked + .payment-type{
     color: #3915827b;
     border: 2px solid #3915827b;
   }
+  #container-payment-option{
+    margin-right: 12px!important;
+  }
   @media screen and (max-width: 500px){
     .card{
       width: 100%!important;
@@ -104,6 +107,17 @@ input[type = 'radio']:checked + .payment-type{
     }
     .border-white{
       margin: 0!important;
+    }
+    .page-content{
+        padding: 80px 0!important;
+    }
+    .container{
+      padding-left: 0!important;
+      padding-right: 0!important;
+    }
+    #container-payment-option{
+      margin-right:0!important;
+      margin-bottom: 6px!important;
     }
   }
 </style>
@@ -148,8 +162,8 @@ input[type = 'radio']:checked + .payment-type{
         <input type="hidden" name="desc" id="desc" value="Homestay">
         <input type="hidden" name="bookingid" id = "bookingid" value="{{ $checkoutDetails['bookingId'] }}">
         <input type="hidden" name="amount" id="amount" value="{{ $checkoutDetails['totalPrice'] }}">
-        <div class="row d-flex justify-content-center">
-          <div class="border-white col-md-6 mb-3 mx-2 mr-2">
+        <div class="row d-flex justify-content-center ">
+          <div class="border-white col-md-6" id="container-payment-option">
             <div class="h3 mb-4">Pilih Cara Pembayaran</div>
             <input type="radio" name="paymentType" id="payment-full" value="full" checked hidden>
             <label for="payment-full" class="payment-type my-2 p-4 h3">Pembayaran Penuh &nbsp;<i class="fas fa-hand-holding-usd"></i>
@@ -164,7 +178,7 @@ input[type = 'radio']:checked + .payment-type{
                  </div>
               @endif
           </div>    
-          <div class="border-white col-md-5 mb-3" id="checkout-price-container">
+          <div class="border-white col-md-5" id="checkout-price-container">
             <h4>{{$checkoutDetails['homestay']->roomname}}</h4>
             <div class="row my-3">
               <div class="col-md-4">
@@ -225,8 +239,8 @@ input[type = 'radio']:checked + .payment-type{
          --}}
 
 
-        <div class="row mb-2">
-          <div class="col d-flex justify-content-end">
+        <div class="row mb-2 p-0">
+          <div class="col d-flex justify-content-end my-1">
             <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2" style="color:#391582;">KEMBALI</a>
             <button class="submit-btn" type="submit">
               <span class="hover-underline-animation">Bayar</span>

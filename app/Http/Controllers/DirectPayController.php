@@ -787,58 +787,58 @@ class DirectPayController extends Controller
 
                     break;
 
-                    case 'Homestay':
-                        $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-                        $transaction->transac_no = $request->Fpx_FpxTxnId;
-                        $transaction->status = "Success";
-                        $transaction->amount = $request->TransactionAmount;
-                        $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
-                        $transaction->save();
-    
-                        // update booking table
-                        // check whether is paying for deposit/full or balance 
-                        $booking = Booking::where('transactionid', $transaction->id)
-                        ->orWhere('transaction_balance_id', $transaction->id)
-                        ->first();
-                    
-                        if($booking->deposit_amount > 0 ){
-                            if($booking->status == "Deposited"){ // for paying balance
-                                $booking->status = "Balance Paid";
-                                $booking->updated_at = Carbon::now();
-                                $booking->save();                
-                            }else{//paying deposit
-                                $booking->status = "Deposited";
-                                $booking->updated_at = Carbon::now();
-                                $booking->save();
-                            }
-                        }else{
-                            // for full payment 
-                            $booking->status = "Booked";
+                case 'Homestay':
+                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                    $transaction->transac_no = $request->Fpx_FpxTxnId;
+                    $transaction->status = "Success";
+                    $transaction->amount = $request->TransactionAmount;
+                    $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
+                    $transaction->save();
+
+                    // update booking table
+                    // check whether is paying for deposit/full or balance 
+                    $booking = Booking::where('transactionid', $transaction->id)
+                    ->orWhere('transaction_balance_id', $transaction->id)
+                    ->first();
+                
+                    if($booking->deposit_amount > 0 ){
+                        if($booking->status == "Deposited"){ // for paying balance
+                            $booking->status = "Balance Paid";
+                            $booking->updated_at = Carbon::now();
+                            $booking->save();                
+                        }else{//paying deposit
+                            $booking->status = "Deposited";
                             $booking->updated_at = Carbon::now();
                             $booking->save();
                         }
-                        
-                        $userid = $transaction->user_id;
-                        
-                        $room = Room::find($booking->roomid);
-                        $user = User::find($transaction->user_id);
-                        $organization = Organization::find($room->homestayid);
-                        
-                        $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
-                        ->join('bookings','rooms.roomid','=','bookings.roomid')
-                        ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
-                        ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms','bookings.deposit_amount','bookings.status')
-                        ->get();
+                    }else{
+                        // for full payment 
+                        $booking->status = "Booked";
+                        $booking->updated_at = Carbon::now();
+                        $booking->save();
+                    }
+                    
+                    $userid = $transaction->user_id;
+                    
+                    $room = Room::find($booking->roomid);
+                    $user = User::find($transaction->user_id);
+                    $organization = Organization::find($room->homestayid);
+                    
+                    $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                    ->join('bookings','rooms.roomid','=','bookings.roomid')
+                    ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
+                    ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms','bookings.deposit_amount','bookings.status')
+                    ->get();
 
-                        if($transaction->email != NULL)
-                        {
-                            Mail::to($transaction->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to customer
-                        }
-                        Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to homestay admin
+                    if($transaction->email != NULL)
+                    {
+                        Mail::to($transaction->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to customer
+                    }
+                    Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to homestay admin
 
-                        return view('homestay.receipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
-    
-                        break;
+                    return view('homestay.receipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
+
+                    break;
 
                     case 'Grab Student':
                             $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();

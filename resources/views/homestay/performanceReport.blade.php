@@ -228,7 +228,9 @@ $(document).ready(function() {
                     `);
                     Morris.Donut({
                         element: 'pie-chart-nights-booked',
-                        data: donutData
+                        data: donutData,
+                        resize: true,
+                        redraw:true,
                     });  
                     Morris.Bar({
                         element: 'bar-chart-homestay-earnings',
@@ -238,6 +240,8 @@ $(document).ready(function() {
                         xLabelMargin : 10,
                         xLabelAngle: 60,
                         gridTextSize: 10,
+                        resize: true,
+                        redraw:true,
                         labels: ['Jumlah Pendapatan'],    
                         hideHover: true,    
                         hoverCallback: function (index, options, content, row) {
@@ -273,7 +277,8 @@ $(document).ready(function() {
                     xLabelMargin: 10, 
                     xLabelAngle: 60,
                     gridTextSize: 10,
-
+                    resize: true,
+                    redraw:true,
                     parseTime: false,     
                     hideHover: true,
                     hoverCallback: function (index, options, content, row) {
@@ -309,6 +314,8 @@ $(document).ready(function() {
                     xLabelMargin: 10, 
                     xLabelAngle: 60,
                     gridTextSize: 10,
+                    resize: true,
+                    redraw:true,
                     parseTime: false,     
                     hideHover:'auto',
                     ymax: [5],

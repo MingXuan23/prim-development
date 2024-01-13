@@ -38,6 +38,11 @@
             background-image: -webkit-linear-gradient(50deg,#5e2ced 0,#9749f8 100%)!important;
             color: white!important;
         }
+        .form-control{
+            border-color:#5e5e5e!important;
+            transition: all 0.2s ease;
+        }
+
         /* .navbar-area .nav-container .navbar-collapse ul.navbar-nav li.current-menu-item:hover {
             transform: scale(1.0);
         }
@@ -207,7 +212,7 @@
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="section-title left-aligned">
-                                <h3 class="title extra" style="margin-top: 24px;">Terkini</h3>
+                                <h3 class="title extra" style="margin-top: 24px;font-size: 40px;">Terkini</h3>
                                 <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
                             </div>
                         </div>
@@ -223,7 +228,7 @@
                             </div><!-- //. section title -->
                         </div> --}}
                         <div class="col-lg-6">
-                            <h3 class="title extra" style="margin-bottom: 24px; margin-top: 24px;">Syarat-syarat</h3>
+                            <h3 class="title extra" style="margin-bottom: 24px; margin-top: 24px;font-size: 40px;">Syarat-syarat</h3>
                             <div class="feature-area">
 
                                 <div class="hover-inner">
@@ -663,7 +668,7 @@
 
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-8">
+                    <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Hubungi</h4>
                             <p>Email : yahya@utem.edu.my </p>
