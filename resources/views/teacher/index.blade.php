@@ -207,7 +207,7 @@
         function fetch_data(oid = '') {
             teacherTable = $('#teacherTable').DataTable({
                 processing: true,
-                serverSide: true,
+                //serverSide: true,
                 ajax: {
                     url: "{{ route('teacher.getTeacherDatatable') }}",
                     data: {

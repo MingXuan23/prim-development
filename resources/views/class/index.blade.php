@@ -242,7 +242,7 @@
             getDummyClassStatus();
             classesTable = $('#classesTable').DataTable({
                     processing: true,
-                    serverSide: true,
+                    //serverSide: true,
                     ajax: {
                         url: "{{ route('class.getClassesDatatable') }}",
                         data: {
