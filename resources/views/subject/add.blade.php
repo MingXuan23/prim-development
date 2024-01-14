@@ -17,8 +17,8 @@
 </div>
 <div class="row">
     <div class="card col-md-12">
-
-        @if(count($errors) > 0)
+   
+    @if(count($errors) > 0)
         <div class="alert alert-danger">
             <ul>
                 @foreach($errors->all() as $error)
@@ -30,7 +30,11 @@
         <form method="post" action="{{ route('subject.store') }}" enctype="multipart/form-data">
             {{csrf_field()}}
             <div class="card-body">
-
+            @if(\Session::has('error'))
+                <div class="alert alert-danger">
+                    <p>{{ \Session::get('error') }}</p>
+                </div>
+            @endif
                 <div class="form-group">
                     <label>Organization Name</label>
                     <select name="organization" id="organization" class="form-control">
@@ -83,11 +87,9 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
-    // $(document).ready(function() {
-    //     $('#icno').mask('000000-00-0000');
-    //     $('#telno').mask('+600000000000');
-
-    // });
+    $(document).ready(function() {
+        $('.alert').delay(3000).fadeOut();
+    });
 </script>
 
 @endsection
