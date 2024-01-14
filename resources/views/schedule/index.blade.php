@@ -269,7 +269,7 @@
 
                             <div class="form-group">
                                 <label>Teacher Maximum Relief Slot Per Day</label>
-                                <input type="number" name="maxrelief" id="maxrelief" min=1 class="form-control" value=1>
+                                <input type="number" name="maxRelief" id="maxrelief" min=1 class="form-control" value=1>
                             </div>
                             <!-- <div class="form-group">
                                 <input type="file" name="file" required>

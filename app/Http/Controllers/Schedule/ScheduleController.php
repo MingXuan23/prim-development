@@ -786,7 +786,7 @@ class ScheduleController extends Controller
             'maxRelief' => 'required'
             // Add other validation rules for your fields
         ]);
-
+       
         $time_off =[];
         $maxRelief = $request -> maxRelief;
         if($request->time_off != ''){
