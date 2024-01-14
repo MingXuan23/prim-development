@@ -675,6 +675,7 @@ class ScheduleApiController extends Controller
             ->where('sv.status',1)
             ->where('ss.status',1)
             ->where('tl.status',1)
+            ->where('lr.status',1)
             ->select('lr.id as leave_relief_id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
             //dd($pendingRelief);
