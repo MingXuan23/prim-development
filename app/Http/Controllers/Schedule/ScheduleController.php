@@ -996,11 +996,11 @@ class ScheduleController extends Controller
 
      public function addTeacherLeave(Request $request){
         $request->validate([
-            'file' => 'required|mimes:jpeg,png,gif',
+            'image' => 'required|mimes:jpeg,png,gif',
             //'organization_id'=>'required'
         ]);
 
-        if (!$this->isImage($request->file('file'))) {
+        if (!$this->isImage($request->file('image'))) {
             return response()->json(['error' => 'Image file type must be image only'], 401);
         }
 
