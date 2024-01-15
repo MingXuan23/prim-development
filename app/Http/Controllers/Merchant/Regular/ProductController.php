@@ -142,6 +142,7 @@ class ProductController extends Controller
         
        
     public function calCharge($total,$oid){
+
         $findCharge = DB::table('organization_charges')
                         ->where('organization_id', $oid)
                         ->where('minimum_amount', '<=', $total)
@@ -246,6 +247,7 @@ class ProductController extends Controller
      $pgng_id = $request->pgng_order_id;
     //  $charge = Organization::find($request->org_id)
     //  ->fixed_charges;
+    dd($request->org_id);
     $priceData = $this->calculateTotalPrice($pgng_id, $request->org_id);
     $totalPrice=$priceData['new_total_price'];
     $charges=$priceData['charges'];

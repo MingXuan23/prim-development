@@ -194,11 +194,10 @@ class OrderController extends Controller
                 ->join('users as u', 'pu.user_id', 'u.id')
                 ->whereIn('status', ["Cancel by user", "Cancel by merchant", "Picked-Up"])
                 ->where('organization_id', $org_id)
-                ->select('pu.id', 'pu.pickup_date', 'pu.total_price', 'pu.status',
+                ->select('pu.id', 'pu.pickup_date', 'pu.total_price', 'pu.status', 'pu.transaction_id',
                 'u.name', 'u.telno')
                 ->orderBy('pickup_date', 'asc')
                 ->orderBy('pu.updated_at', 'desc');
-        
         if(request()->ajax()) 
         {
             if(($filter_type == "" || $filter_type == "all") && $date == "") 
@@ -227,7 +226,6 @@ class OrderController extends Controller
             }  
 
             $table = Datatables::of($order);
-
             $table->addColumn('status', function ($row) {
                 if ($row->status == "Picked-Up") {
                     $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya Diambil</span>';
@@ -242,7 +240,8 @@ class OrderController extends Controller
             });
 
             $table->editColumn('total_price', function ($row) {
-                $total_price = number_format($row->total_price, 2, '.', '');
+                $amount = DB::table('transactions')->where('id' , $row->transaction_id)->pluck('amount')->first();
+                $total_price = number_format($amount, 2, '.', '');
                 $total = $total_price." | ";
                 $total = $total."<a href='".route('admin-reg.order-detail', $row->id)."'>Lihat Pesanan</a>";
                 return $total;
@@ -310,12 +309,22 @@ class OrderController extends Controller
         $total_price[] = array();
         $price[] = array();
         
+        $amount = DB::table('pgng_orders as pu')
+        ->join('transactions as t' , 't.id' ,'pu.transaction_id')
+        ->where([
+            'pu.id' => $id
+        ])
+        ->pluck('amount')
+        ->first();
+
+        $amount = number_format($amount,2 );
+            
         foreach($item as $row)
         {
             $price[$row->id] = number_format($row->price, 2, '.', '');
             $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2, '.', ''); // calculate total for each item in cart
         }
 
-        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by'));
+        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount'));
     }
 }

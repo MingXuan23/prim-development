@@ -24,7 +24,7 @@
 </head>
 
 <body>
-    <div>You are being redirected to our homepage in <span id="time">10</span> seconds</div>
+    <div class="text-center">You are being redirected to our homepage in <span id="time">10</span> seconds</div>
     <div class="container">
         <div class="row mt-3">
             <div class="col-12">
@@ -159,7 +159,7 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-            window.location = '/home'; 
+            window.location = '/getngo/product'; 
         }
     },1000);
 </script>

@@ -48,6 +48,6 @@ class MerchantOrderReceipt extends Mailable
         $transaction = $this->transaction;
         $user = $this->user;
 
-        return $this->view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+        return $this->subject('Get&Go Order Receipt')->view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
     }
 }

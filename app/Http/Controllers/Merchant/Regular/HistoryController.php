@@ -34,7 +34,7 @@ class HistoryController extends Controller
                 if ($row->status == 'Paid') {
                     $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya dibayar</span>';
                     return $btn;
-                } else {
+                } else if($row->status == 'Cancel by user'){
                     $btn = '<span class="badge rounded-pill bg-danger text-white">Tidak Diambil</span>';
                     return $btn;
                 }

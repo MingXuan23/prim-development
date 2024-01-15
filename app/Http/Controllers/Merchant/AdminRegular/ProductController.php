@@ -324,10 +324,10 @@ class ProductController extends Controller
         if(count($existedOrders)!=0){
             foreach($existedOrders as $row){
                 $pgng_order_id = $row->pgng_order_id;
-                $org_id = $row->organization_id;
-                $charge = Organization::find($org_id)
-                ->fixed_charges;
-                $totalPrice = $regularProductController->calculateTotalPrice($pgng_order_id, $charge);
+                $org_id = $request->org_id;
+
+
+                $totalPrice = $regularProductController->calculateTotalPrice($pgng_order_id, $org_id);
 
                 // update total in PGNG_ORDERS
                 DB::table('pgng_orders')

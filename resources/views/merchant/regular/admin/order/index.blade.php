@@ -142,7 +142,7 @@
             orgId = $('#org_dropdown option')[1].value
             btnHistory.show()
             btnHistory.attr('href', '')
-            route = "/admin-regular/all-orders/"+orgId+"/history"
+            route = "/admin/all-orders/"+orgId+"/history"
             btnHistory.attr('href', route)
             $('#orderTable').DataTable().destroy()
             fetch_data(orgId)
@@ -154,7 +154,7 @@
             if(orgId != ''){
                 btnHistory.show()
                 btnHistory.attr('href', '')
-                route = "/admin-regular/orders/"+orgId+"/history"
+                route = "/admin/orders/"+orgId+"/history"
                 btnHistory.attr('href', route)
                 $('#orderTable').DataTable().destroy()
                 fetch_data(orgId)

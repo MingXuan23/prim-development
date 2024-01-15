@@ -444,6 +444,7 @@
                 method: 'post',
                 data: {org_id:org_id, "_token": "{{ csrf_token() }}",},
                 success:function(result) {
+                    console.log(result.dates);
                 $.each(result.dates, function(index, value) {
                     dates.push(value)
                 })
@@ -457,7 +458,7 @@
 
         $("#datepicker").datepicker({
             minDate: 1,
-            maxDate: '+1d',
+            maxDate: '+7d',
             dateFormat: 'mm/dd/yy',
             dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
             beforeShowDay: editDays
