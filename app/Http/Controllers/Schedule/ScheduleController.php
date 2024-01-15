@@ -995,6 +995,15 @@ class ScheduleController extends Controller
      }
 
      public function addTeacherLeave(Request $request){
+        $request->validate([
+            'file' => 'required|mimes:jpeg,png,gif',
+            //'organization_id'=>'required'
+        ]);
+
+        if (!$this->isImage($request->file('file'))) {
+            return response()->json(['error' => 'Image file type must be image only'], 401);
+        }
+
         $period = new stdClass();
         // dd($request);
         $date = Carbon::createFromDate($request->date);
@@ -1184,11 +1193,24 @@ class ScheduleController extends Controller
 
             $count = DB::table('leave_relief')->where('teacher_leave_id',$leave_id)->count();
             //dd($count);
-            return redirect()->back()->with('success','TeacherLeaveSuccess');
+            return redirect()->back()->with('success','Leave added successfully');
             
         }
         return response()->json(['error' => 'This user did not exist'], 401);
      }
+
+     // Function to check if the file is an image
+    private function isImage($file) {
+        $allowedImageTypes = ['jpeg', 'png', 'gif', 'jpg'];
+
+        if ($file && $file->isValid()) {
+            $extension = $file->getClientOriginalExtension();
+
+            return in_array(strtolower($extension), $allowedImageTypes);
+        }
+
+        return false;
+    }
 
      public function getTeacherSlot(Request $request){
         $teachers = DB::table('users as u')
