@@ -139,7 +139,7 @@
                 <td class="noborder"></td>
                 <td class="noborder"></td>
                 <td class="table-dark noborder">Jumlah Keseluruhan</td>
-                <td class="table-dark noborder">RM {{ $total_order_price }}</td>
+                <td class="table-dark noborder">RM {{ $amount }}</td>
               </tr>
           </tbody>
       </table>

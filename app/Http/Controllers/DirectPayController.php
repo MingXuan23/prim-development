@@ -699,7 +699,7 @@ class DirectPayController extends Controller
                             ->update([
                                 'quantity_available'=>0,
                                 'type' => 'no inventory',
-                                'status'=>0
+                                'status'=> 0
                             ]);
                         }
                         else{
@@ -721,6 +721,7 @@ class DirectPayController extends Controller
                     ->get();
 
                     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+                    Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
                     
                     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
 
