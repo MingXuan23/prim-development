@@ -76,9 +76,9 @@
                 </div> -->
 
                 <div class="form-group">
-                        <label>Start Time:</label>
+                        <label>Start Date:</label>
                         <input type="text" value="" class="form-control" name="pickup_date" id="datepicker_start"  placeholder="Pilih tarikh" readonly required>
-                        <label>End Time:</label>
+                        <label>End Date:</label>
                         <input type="text" value="" class="form-control" name="pickup_date" id="datepicker_end"  placeholder="Pilih tarikh" readonly required>
                     </div>
 
