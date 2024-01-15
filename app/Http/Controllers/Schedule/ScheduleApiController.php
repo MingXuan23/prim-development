@@ -168,6 +168,7 @@ class ScheduleApiController extends Controller
             ->where('ss.teacher_in_charge',$user->id)
             ->where('sv.status',1)
             ->where('ss.status',1)
+            ->where('s.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day')
             ->orderBy('ss.slot')
             ->get();
@@ -199,6 +200,7 @@ class ScheduleApiController extends Controller
             ->where('sv.status',1)
             ->where('ss.status',1)
             ->where('tl.status',1)
+            ->where('s.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date')
             ->get();
             //dd($schedule);
@@ -216,6 +218,7 @@ class ScheduleApiController extends Controller
             ->where('sv.status',1)
             ->where('ss.status',1)
             ->where('tl.status',1)
+            ->where('s.status',1)
             ->select('ss.id','c.nama as class','sub.name as subject','s.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as relatedTeacher','tl.date','lr.confirmation')
             ->get();
 
