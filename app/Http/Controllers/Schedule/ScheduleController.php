@@ -996,12 +996,14 @@ class ScheduleController extends Controller
 
      public function addTeacherLeave(Request $request){
         $request->validate([
-            'image' => 'required|mimes:jpeg,png,gif',
+            'image' => 'nullable|mimes:jpeg,png,gif',
             //'organization_id'=>'required'
         ]);
 
-        if (!$this->isImage($request->file('image'))) {
-            return response()->json(['error' => 'Image file type must be image only'], 401);
+        if ($request->hasFile('image')) {
+            if (!$this->isImage($request->file('image'))) {
+                return response()->json(['error' => 'Image file type must be an image only'], 401);
+            }
         }
 
         $period = new stdClass();
