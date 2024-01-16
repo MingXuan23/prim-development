@@ -963,7 +963,7 @@ class ScheduleController extends Controller
                         if ($start->between($before, $check) 
                         || $end->between($before,$check)) {
                             $insert = DB::table('leave_relief')->insert([
-                                'teacher_leave_id'=>$leave_id,
+                                'teacher_leave_id'=>$leave->id,
                                 'schedule_subject_id'=>$c->schedule_subject_id,
                                 'status'=>1
                             ]);
