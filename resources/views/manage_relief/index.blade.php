@@ -231,7 +231,7 @@ u:hover {
                                 </div>
                                 <div class="form-group" >
                                     <label>End Time</label>
-                                    <input type="time" name="endtime" id="endtime" class="form-control" onchange="return validateTime()">
+                                    <input type="time" name="endtime" id="endtime" class="form-control" onchange="return validateTimeEnd()">
                                 </div>
                             </div>
 
@@ -254,7 +254,7 @@ u:hover {
                             </div>
 
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary" onclick=" return validateTime()">Add</button>
+                                <button type="submit" class="btn btn-primary" onclick="return validateTimeEnd()">Add</button>
                             </div>
                         </div>
                     </form>
@@ -377,7 +377,7 @@ u:hover {
             defaultDate: 0, 
         })
 
-        function validateTime() {
+        function validateTimeEnd() {
             var startTime = document.getElementById('starttime').value;
             var endTime = document.getElementById('endtime').value;
             console.log(endTime);
@@ -396,6 +396,26 @@ u:hover {
 
             return true;
         }
+
+        // function validateTimeStart() {
+        //     var startTime = document.getElementById('starttime').value;
+        //     var endTime = document.getElementById('endtime').value;
+        //     console.log(endTime);
+        //     // Convert time strings to Date objects for easier comparison
+        //     var startDate = new Date('1970-01-01T' + startTime + 'Z');
+        //     var endDate = new Date('1970-01-01T' + endTime + 'Z');
+
+        //     // Compare start and end times
+        //     if (startDate >= endTime) {
+        //         alert('Start time cannot be late than or equal to end time.');
+        //         // endTime = '';
+        //         document.getElementById('startTime').value = '';
+        //         console.log(endTime);
+        //         return false;
+        //     }
+
+        //     return true;
+        // }
 
         function assignTeacher(leave_relief_id) {
            // console.log('Selected teacher for row ' + (schedule_subject_id) + ': ' + teacher);
@@ -698,7 +718,7 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
       return [true];
     }
 
-    function displaySelectTime(){
+    function displaySelectTime() {
         var selectTimeDiv = document.getElementById('selectTime');
         var periodRadio = document.getElementById('period');
         var fulldayRadio = document.getElementById('fullday');
@@ -706,13 +726,20 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
         if (periodRadio.checked) {
             selectTimeDiv.style.display = 'block';
             fulldayRadio.checked = false;
+
+            // Set the 'required' attribute for the starttime and endtime fields
+            document.getElementById('starttime').setAttribute('required', 'required');
+            document.getElementById('endtime').setAttribute('required', 'required');
         } else {
             selectTimeDiv.style.display = 'none';
-        }
 
+            // Remove the 'required' attribute for the starttime and endtime fields
+            document.getElementById('starttime').removeAttribute('required');
+            document.getElementById('endtime').removeAttribute('required');
+        }
     }
 
-    function displaySelectTimeFull(){
+    function displaySelectTimeFull() {
         var selectTimeDiv = document.getElementById('selectTime');
         var periodRadio = document.getElementById('period');
         var fulldayRadio = document.getElementById('fullday');
@@ -720,9 +747,18 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
         if (fulldayRadio.checked) {
             selectTimeDiv.style.display = 'none';
             periodRadio.checked = false;
+
+            // Remove the 'required' attribute for the starttime and endtime fields
+            document.getElementById('starttime').removeAttribute('required');
+            document.getElementById('endtime').removeAttribute('required');
         } else {
             selectTimeDiv.style.display = 'block';
+
+            // Set the 'required' attribute for the starttime and endtime fields
+            document.getElementById('starttime').setAttribute('required', 'required');
+            document.getElementById('endtime').setAttribute('required', 'required');
         }
     }
+
 </script>
 @endsection
