@@ -201,13 +201,17 @@ class ScheduleController extends Controller
         $schedule->save();
 
         if($request->schedule_status != "true"){
-            DB::table('leave_relief as lr')
+            $leave_relief = DB::table('leave_relief as lr')
             ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
             ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
             ->where('sv.schedule_id',$schedule->id)
-            ->update([
-                'lr.status'=>0
-            ]);
+            ->select('lr.id')
+            ->get();
+
+            foreach($leave_relief as $lr){
+
+                DB::table('leave_relief')->where('id',$lr->id)->update(['status'=>0]);
+            }
         }
        
         return redirect()->back()->with('success', 'Update schedule successfully');
