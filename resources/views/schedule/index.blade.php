@@ -367,6 +367,11 @@
                                     <input type="text"> </input>
                                 </div> -->
                             </select>
+                            <div>
+                                <label id="version_count"></label>
+                                <br>
+                                <label id="schedule_desc"></label>
+                            </div>
                             </div>
                             <div class="form-group">
                                     <label>Status:</label>
@@ -421,6 +426,9 @@
                 success: function (response) {
                     // Assuming the response contains a 'status' field
                     // and it can be either 'Confirmed' or 'Pending'
+                    $('#version_count').text('Version Count: '+ response.version_count);
+                    $('#schedule_desc').text('Desc: '+ response.desc);
+
                     if (response.schedule_status ===  true) {
                         // Check the Confirmed radio button
                         $('#radioEnable').prop('checked', true);

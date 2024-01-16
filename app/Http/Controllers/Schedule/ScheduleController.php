@@ -36,7 +36,22 @@ class ScheduleController extends Controller
 
     public function getScheduleStatus($id){
 
-        return response()->json(['schedule_status'=>DB::table('schedules')->where('id',$id)->where('status',1)->exists()]);
+        $schedule = DB::table('schedules')
+                ->where('id',$id)
+                ->first();
+
+        $versionCount = DB::table('schedule_version')
+                        ->where('schedule_id',$schedule->id)
+                        ->count();
+        //dd($versionCount);
+
+        $desc = DB::table('schedule_version')
+                    ->where('schedule_id',$schedule->id)
+                    ->orderBy('created_at','desc')
+                    ->first();
+        
+                    
+        return response()->json(['schedule_status'=>$schedule->status ,'version_count'=>$versionCount ,'desc'=>$desc==null?'':$desc->desc??'No desc']);
     }
 
     public function manageReliefIndex()
@@ -818,6 +833,7 @@ class ScheduleController extends Controller
             'status' => 1,
             'organization_id' => $request->organization_id,
             'time_off' => json_encode($time_off),
+            'max_relief_slot'=> $maxRelief
             // Add other fields
         ]);
 
