@@ -428,8 +428,8 @@
                     // and it can be either 'Confirmed' or 'Pending'
                     $('#version_count').text('Version Count: '+ response.version_count);
                     $('#schedule_desc').text('Desc: '+ response.desc);
-
-                    if (response.schedule_status ===  true) {
+                    console.log(response);
+                    if (response.schedule_status ==  1) {
                         // Check the Confirmed radio button
                         $('#radioEnable').prop('checked', true);
                     } else {
