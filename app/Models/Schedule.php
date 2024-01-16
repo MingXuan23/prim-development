@@ -37,6 +37,7 @@ class Schedule extends Model
         'status',
         'teacher_max_slot',
         'organization_id',
+        'max_relief_slot'
     ];
 
     public $timestamps = false;
