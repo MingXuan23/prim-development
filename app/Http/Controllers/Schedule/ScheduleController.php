@@ -199,6 +199,17 @@ class ScheduleController extends Controller
         //dd($request->schedule_status);
         $schedule->status = $request->schedule_status == "true";
         $schedule->save();
+
+        if($request->schedule_status != "true"){
+            DB::table('leave_relief as lr')
+            ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+            ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+            ->where('sv.schedule_id',$schedule->id)
+            ->update([
+                'lr.status'=>0
+            ]);
+        }
+       
         return redirect()->back()->with('success', 'Update schedule successfully');
     }
 
@@ -308,6 +319,7 @@ class ScheduleController extends Controller
         $teacher->name = User::find($teacher_id)->name;
         $teacher->normal_class = DB::table('schedule_subject as ss' )
                         ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+                        ->leftJoin('schedules as s','s.id','sv.schedule_id')
                         ->where('sv.status',1)
                         ->where('ss.status',1)
                         ->where('ss.teacher_in_charge',$teacher_id)
