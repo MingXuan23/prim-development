@@ -517,8 +517,10 @@ class ScheduleController extends Controller
                     ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
                     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
                     ->leftJoin('schedule_version as sv','sv.id','ss.schedule_version_id')
+                    ->leftJoin('schedules as s','s.id','sv.schedule_id')
                     ->where('ss.status',1)
                     ->where('sv.status',1)
+                    ->where('s.status',1)
                     ->where(function ($query) use ($teachers,$schedule_subject,$i, $date){
                         $query->where(function ($query) use ($teachers,$schedule_subject,$i, $date) {
                             $query->where('lr.replace_teacher_id', $teachers[$i]->id)
