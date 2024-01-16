@@ -931,12 +931,23 @@ class ScheduleController extends Controller
 
                 foreach($classRelated as $c){
                     $time_info=$this->getSlotTime($c,$c->day,$c->slot);
-                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] );
-
+                    $check = Carbon::createFromFormat('H:i:s', $time_info['time'] )->addMinutes($time_info['duration']);
+                    $before = Carbon::createFromFormat('H:i:s', $time_info['time'] );
                     //is today and over the time 
                     if ($date->isToday() &&  now()->gt($check->addMinutes($time_info['duration']-1))) {
                         continue;
                     }
+
+                    $continue =DB::table('leave_relief as lr')
+                    ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+                    ->where('lr.schedule_subject_id',$c->schedule_subject_id)
+                    ->where('lr.status',1)
+                    ->where('tl.date',$date)
+                    ->where('tl.status',1)
+                    ->exists();
+
+                    if($continue)
+                            continue;
                     if($leave->isLeaveFullDay == "true"){
                         //dd('true');
                         $insert = DB::table('leave_relief')->insert([
@@ -949,15 +960,22 @@ class ScheduleController extends Controller
                         $period = json_decode($leave->period);
                         $start = Carbon::createFromFormat('H:i:s', $period->start_time);
                         $end = Carbon::createFromFormat('H:i:s', $period->end_time);
-                      
-                        // check if the time is between start and end
-                        if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                        if ($start->between($before, $check) 
+                        || $end->between($before,$check)) {
                             $insert = DB::table('leave_relief')->insert([
-                                'teacher_leave_id'=>$leave->id,
+                                'teacher_leave_id'=>$leave_id,
                                 'schedule_subject_id'=>$c->schedule_subject_id,
                                 'status'=>1
                             ]);
                         } 
+                        // check if the time is between start and end
+                        // if ($check->between($start, $end) || $check->addMinutes($time_info['duration']-1)->between($start,$end)) {
+                        //     $insert = DB::table('leave_relief')->insert([
+                        //         'teacher_leave_id'=>$leave->id,
+                        //         'schedule_subject_id'=>$c->schedule_subject_id,
+                        //         'status'=>1
+                        //     ]);
+                        // } 
                     }
                 }
     }
@@ -1167,7 +1185,7 @@ class ScheduleController extends Controller
                         ->where('tl.status',1)
                         ->exists();
                 if($continue)
-                            continue;
+                        continue;
                // dd($request->isLeaveFullDay == "on");
                 if($request->isLeaveFullDay== "on"){
                     $insert = DB::table('leave_relief')->insert([
