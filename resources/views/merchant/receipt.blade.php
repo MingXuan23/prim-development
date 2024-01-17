@@ -159,7 +159,7 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-            window.location = '/getngo/product'; 
+            window.location = '/getngo/all-orders'; 
         }
     },1000);
 </script>

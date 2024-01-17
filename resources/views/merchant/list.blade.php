@@ -75,10 +75,10 @@
     </div>
 
     <div class="row">
-      <label class="col-sm-3 col-form-label ">Alamat</label>
+      <label class="col-sm-3 col-form-label ">Alamat Pengambilan</label>
       <div class="col-sm-7">
         <p class="col col-form-label">
-          {{ $list->address }} {{ $list->postcode }} {{ $list->state }}
+          {{ $list->address }},{{$list->city}}, {{ $list->postcode }} {{$list->district}}, {{ $list->state }}
         </p>
       </div>
     </div>
@@ -91,7 +91,7 @@
     </div> --}}
 
     <div class="row">
-      <label class="col-sm-3 col-form-label ">Tarikh Pengambilan</label>
+      <label class="col-sm-3 col-form-label ">Tarikh dan Masa Pengambilan</label>
       <div class="col-sm-7">
         <p class="col col-form-label">{{ $pickup_date }}</p>
       </div>

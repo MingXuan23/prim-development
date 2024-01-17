@@ -191,7 +191,7 @@ class HistoryController extends Controller
                 ->join('organizations as o', 'o.id', 'pu.organization_id')
                 ->where('pu.id', $order_id)
                 ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status','pu.confirm_picked_up_time','pu.confirm_by',
-                        'o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state', 'o.fixed_charges')
+                        'o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','o.district','o.city', 'o.fixed_charges')
                 ->first();
         
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');

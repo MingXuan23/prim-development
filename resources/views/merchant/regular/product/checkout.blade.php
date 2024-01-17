@@ -134,14 +134,14 @@
             <span class='selected' hidden><i class="bi bi-check2"></i></span>
             <h5>Get & Go</h5>
             <div>
-                <h5><i class="bi bi-shop"></i> Reserve online, then collect at the physical store</h5>
+                <h5><i class="bi bi-shop"></i> Tempah secara dalam talian, kemudian ambil di kedai fizikal.</h5>
             </div>
         </div>
         <div class="procurement-option-container"  onclick="selectThis(this,'Delivery')">
             <span class='selected' hidden><i class="bi bi-check2"></i></span>
             <h5>Standard Delivery</h5>
             <div>
-                <h5><i class="bi bi-truck"></i> Deliver straight to your address</h5>
+                <h5><i class="bi bi-truck"></i> Penghantaran ke alamat anda</h5>
             </div>
         </div>
     </div>
@@ -167,8 +167,8 @@
             </div>        
             @if($cart)
         <div class="row">
-            <div class="col">
-            <div class="card mb-4 border">
+            <div class="col mb-4">
+            <div class="card  h-100 border">
                 <div class="card-body p-4">
                 <div class="table-responsive">
                     <table class="table table-borderless mb-0">
@@ -179,12 +179,12 @@
                         </tr>
                         @if($response->fixed_charges != null)
                             <tr>
-                                <th class="text-muted" scope="row">Cas Servis:</th>
+                                <th class="text-muted" scope="row">Caj Servis:</th>
                                 <td class="lead" style="color:rgb(2, 122, 129)">RM {{ number_format((double)$response->fixed_charges, 2, '.', '') }}</td>
                             </tr>
                         @else
                             <tr>
-                                <th class="text-muted" scope="row">Cas Servis:</th>
+                                <th class="text-muted" scope="row">Caj Servis:</th>
                                 <td class="lead" style="color:rgb(2, 122, 129)">RM 0</td>
                             </tr>
                         @endif
@@ -200,16 +200,29 @@
             </div>
             
             <div class="col">
-            <form action="{{ route('merchant-reg.store-order', ['org_id' => $cart->org_id, 'order_id' => $cart->id]) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('directpayIndex') }}" method="POST" enctype="multipart/form-data" id="form-order">
                 @csrf
                 <div class="card mb-4 border">
                 <div class="card-body p-4">
-                    <input type="hidden" id="org_id" value="{{ $cart->org_id }}">
-                    
+
+                    <input type="hidden" id="org_id" name="org_id" value="{{$cart->org_id}}">
+                    <input type="hidden" name="amount" id="total_price">
+                    <input type="hidden" name="desc" id="desc" value="Merchant">
+                    <input type="hidden" name="order_id" id="order_id">
+
+                    <div class="row">
+                        <div class="col pickup-date-div">
+                            <div class="form-group ">
+                                <label><span><i class="fas fa-map-marker-alt"></i></span> Lokasi Pengambilan</label>
+                                <p>{{$response->pickup_location}}</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col pickup-date-div">
                             <div class="form-group required">
-                                <label>Tarikh Pengambilan</label>
+                                <label><span><i class="fas fa-calendar-alt"></i></span> Tarikh Pengambilan</label>
                                 <input type="text" value="{{ $response->pickup_date }}" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
                             </div>
                         </div>
@@ -218,7 +231,7 @@
                     <div class="row">
                         <div class="col pickup-time-div" hidden>
                         <div class="form-group required">
-                            <label>Masa Pengambilan</label>
+                            <label><span><i class="fas fa-clock"></i></span> Masa Pengambilan</label>
                             <div class="timepicker-section">
                             <input type="time" value="{{ $response->pickup_time }}" class="form-control" name="pickup_time" id="timepicker" required>
                             <p class="time-range"></p>
@@ -231,11 +244,11 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-6">
+            <div class="col-md-6 col-12">
                 <div class="card mb-4 border">
                     <div class="card-body p-4">
                         <div class="form-group">
-                            <label>Nota kepada Peniaga</label>
+                            <div><span><i class="fas fa-sticky-note"></i></span> Nota kepada Peniaga</div>
                             <textarea class="form-control" name="note" placeholder="Optional">{{ $cart->note }}</textarea>
                         </div>
                     </div>
@@ -248,7 +261,7 @@
         <div class="row mb-2">
             <div class="col d-flex justify-content-end">
             <a href="{{route('merchant.all-cart')}}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b;">KEMBALI</a>
-            <button class="submit-btn" type="submit">
+            <button class="submit-btn" type="button">
                 <span class="hover-underline-animation"> Membuat Pesanan</span>
                 <svg viewBox="0 0 46 16" height="10" width="30" xmlns="http://www.w3.org/2000/svg" id="arrow-horizontal">
                     <path transform="translate(30)" d="M8,0,6.545,1.455l5.506,5.506H-30V9.039H12.052L6.545,14.545,8,16l8-8Z" data-name="Path 10" id="Path_10"></path>
@@ -338,8 +351,11 @@
 
 @section('script')
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(document).ready(function(){
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -402,6 +418,8 @@
                     }, ]
                 });
             }
+
+
             $('#datepicker').change(function() {
                 dateOnChange()
             })
@@ -444,7 +462,6 @@
                 method: 'post',
                 data: {org_id:org_id, "_token": "{{ csrf_token() }}",},
                 success:function(result) {
-                    console.log(result.dates);
                 $.each(result.dates, function(index, value) {
                     dates.push(value)
                 })
@@ -475,6 +492,32 @@
         }
         return [true];
         }
+    // form submit
+    $('#form-order').on('submit', function(){
+        $('#total_price').val('{{$cart->total_price}}');
+        $('#order_id').val('{{$cart->id}}');
+
+    });
+
+    $('.submit-btn').on('click', function(){
+        var form = document.getElementById('form-order');
+        if(form.reportValidity()){
+            Swal.fire({
+            title: 'Adakah anda pasti?',
+            text: "Anda akan dialihkan ke payment gateway",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, teruskan dengan pembayaran!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#form-order').submit();
+                }
+            })   
+        }
+
+    }); 
 })    
         const orgs_id = document.querySelectorAll('#org_id');
         function selectThis(element,  option){
@@ -502,6 +545,7 @@
             $('.form-container').children().attr('hidden', true);//hide all children of the container
             $deliverySection =  $('.delivery-section').attr('hidden',false);
         }
+
     </script>
 @endsection
             {{-- // const datePickers = document.querySelectorAll('input[name = "pickup_date"]');

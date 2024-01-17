@@ -11,6 +11,7 @@ use App\Models\Organization;
 use App\Models\ProductItem;
 use App\Models\ProductOrder;
 use App\Models\PgngOrder;
+use App\User;
 use App\Models\Transaction;
 
 // testing commit
@@ -247,7 +248,6 @@ class ProductController extends Controller
      $pgng_id = $request->pgng_order_id;
     //  $charge = Organization::find($request->org_id)
     //  ->fixed_charges;
-    dd($request->org_id);
     $priceData = $this->calculateTotalPrice($pgng_id, $request->org_id);
     $totalPrice=$priceData['new_total_price'];
     $charges=$priceData['charges'];
@@ -334,6 +334,7 @@ class ProductController extends Controller
    public function checkOut($org_id){
         $pickup_date = null;
         $pickup_time = null;
+        $pickup_location = null;
         $fixed_charges = null;
         $user_id = Auth::id();
 
@@ -351,11 +352,14 @@ class ProductController extends Controller
             $fixed_charges = $this->getFixedCharges($cart->org_id);
         }
 
+        $org= Organization::find($org_id);
+        $pickup_location = $org->address.', '.$org->city.', '.$org->postcode.' '.$org->district.', '.$org->state;
         $response = (object)[
             'org_id' => $org_id,
             'pickup_date' => $pickup_date,
             'pickup_time' => $pickup_time,
             'fixed_charges' => $fixed_charges,
+            'pickup_location' => $pickup_location,
         ];
 
      return view('merchant.regular.product.checkout', compact('response', 'cart'));
@@ -397,26 +401,20 @@ class ProductController extends Controller
         }
 
     }
-    // public function testPay(){
-    //     $transaction = Transaction::where('id', '=', 66666)->first();
+    // public function testPayment(){
+    //     $transaction = Transaction::where('nama', '=', 'Merchant_20240116125529')->first();
+    //     $transaction->transac_no = 'test merchant payment';
+    //     $transaction->status = "Success";
+    //     $transaction->save();
         
-    //     PgngOrder::where('transaction_id', $transaction->id)->update([
+    //     PgngOrder::where('transaction_id', $transaction->id)->first()->update([
     //         'status' => 'Paid'
     //     ]);
 
-    //     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
-    //     $item = DB::table('product_order as po')
-    //     ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
-    //     ->where([
-    //         ['po.pgng_order_id', $order->id],
-    //         ['po.deleted_at',NULL],
-    //         ['pi.deleted_at',NULL],
-    //     ])
-    //     ->select('pi.name', 'po.quantity', 'pi.price')
-    //     ->get();
-        
+    //     $order = PgngOrder::where('transaction_id', 41779)->first();
+
     //     $organization = Organization::find($order->organization_id);
-    //     $user = DB::table('users')->find($order->user_id);
+    //     $user = User::find($order->user_id);
         
     //     $relatedProductOrder =DB::table('product_order')
     //     ->where([
@@ -430,16 +428,16 @@ class ProductController extends Controller
     //         $relatedItem=DB::table('product_item')
     //         ->where('id',$item->itemId);
             
-    //         $relatedItemQuantity=$relatedItem->first()->quantity_available;
+    //         $relatedItemQuantity= $relatedItem->first()->quantity_available;
 
     //         $newQuantity= intval($relatedItemQuantity - $item->quantity);
            
     //         if($newQuantity<=0){
     //             $relatedItem
     //             ->update([
-    //                 'quantity_available'=>0,
+    //                 'quantity_available'=> 0,
     //                 'type' => 'no inventory',
-    //                 'status'=>0
+    //                 'status'=> 0,
     //             ]);
     //         }
     //         else{
@@ -448,10 +446,19 @@ class ProductController extends Controller
     //                 'quantity_available'=>$newQuantity
     //         ]);
     //         }
-            
     //     }
-    //     dd($relatedProductOrder);
+    //     $item = DB::table('product_order as po')
+    //     ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
+    //     ->where([
+    //         ['po.pgng_order_id', $order->id],
+    //         ['po.deleted_at',NULL],
+    //         ['pi.deleted_at',NULL],
+    //     ])
+    //     ->select('pi.name', 'po.quantity', 'pi.price')
+    //     ->get();
+
     //     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+    //     Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
         
     //     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
     // }
@@ -490,5 +497,4 @@ class ProductController extends Controller
             
 //         return view('merchant.regular.pay', compact('cart', 'response'));
         
-//     }
 }

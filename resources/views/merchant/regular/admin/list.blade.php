@@ -80,7 +80,7 @@
     </div> --}}
 
     <div class="row">
-      <label class="col-sm-3 col-form-label ">Tarikh Pengambilan</label>
+      <label class="col-sm-3 col-form-label ">Tarikh dan Masa Pengambilan</label>
       <div class="col-sm-7">
         <p class="col col-form-label">{{ $pickup_date }}</p>
       </div>
@@ -135,6 +135,14 @@
                 <td>{{ $total_price[$row->id] }}</td>
               </tr>
             @endforeach
+            @if($fixed_charges != null OR $fixed_charges != 0.00)
+            <tr>
+              <td class="noborder"></td>
+              <td class="noborder"></td>
+              <td class="table-dark noborder">Cas Organisasi</td>
+              <td class="table-dark noborder">RM {{ $fixed_charges }}</td>
+            </tr>
+            @endif
               <tr>
                 <td class="noborder"></td>
                 <td class="noborder"></td>

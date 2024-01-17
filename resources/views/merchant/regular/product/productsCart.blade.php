@@ -277,7 +277,7 @@
 
 @section('content')
     <div> 
-        <div class="previous-nav">
+        <div class="previous-nav my-2">
         <h1 class="font-size-18"><i class="fas fa-angle-left"></i>  <a href="{{ route('merchant-product.index') }}" class="previous-nav">Senarai Produk</a></h1>
         </div>
         <h1 class="title">Troli Membeli-Belah</h1>
@@ -459,7 +459,7 @@
                         total = parseFloat(total).toFixed(2);
                         if(parseFloat(result.fixed_charges) > 0){   
                             let fixed_charges = parseFloat(result.fixed_charges).toFixed(2);
-                            $(totalPrice).html("Jumlah: RM"+total + "<br>(incl. Cas Servis:RM" + fixed_charges +")" );                        
+                            $(totalPrice).html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")" );                        
                         }                        
                         else{
                             $(totalPrice).html("Jumlah: RM"+total);
@@ -601,7 +601,7 @@
                         total = total.toFixed(2);                        
                         if(parseFloat(result.charges) > 0){   
                             let fixed_charges = parseFloat(result.charges).toFixed(2);
-                            $totalPrice.html("Jumlah: RM"+total + "<br>(incl. Cas Servis:RM" + fixed_charges +")" );                        
+                            $totalPrice.html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")" );                        
                         }                        
                         else{
                             $totalPrice.html("Jumlah: RM"+total);

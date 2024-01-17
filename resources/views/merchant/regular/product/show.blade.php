@@ -303,14 +303,14 @@
             </div>
             <div class="product-details">
                 <div class="product-details-title">
-                    <h4>Description</h3>
+                    <h4>Deskripsi</h3>
                     <i class="fas fa-angle-down arrow-icon"></i>
                 </div>
                 <div class="product-details-content">
                     <p>{{$product->desc}}</p>
                 </div>
                 <div class="product-details-title mt-0" >
-                    <h4>Location</h3>
+                    <h4>Lokasi Pengambilan</h3>
                     <i class="fas fa-angle-down arrow-icon"></i>
                 </div>
                 <div class="product-details-content">
