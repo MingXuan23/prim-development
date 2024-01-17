@@ -63,7 +63,7 @@
           </select>            
         </div>
         <div class="d-flex flex-wrap justify-content-center">
-          <button type="button" class="btn-purple m-2"  id="btn-booking-option"><i class="fas fa-coins"></i>&nbsp;Cara Tempahan</button>
+          <button type="button" class="btn-purple m-2"  id="btn-booking-option"><i class="fas fa-coins"></i>&nbsp;Caj Deposit</button>
           <a style="cursor: pointer;" id="view-booking-history" class="btn-purple m-2"> <i
               class="fas fa-history"></i> Sejarah Pesanan Pelanggan</a>          
         </div>
@@ -114,13 +114,13 @@
       <div class="modal-content">
         <div class="text-right cross mb-3" id="btn-close"> <i class="fa fa-times mr-2"></i> </div>
 
-        <div class="text-justify h3 mb-3 px-5 ">Pilihan Pembayaran Deposit Dahulu Akan Dibuka Jika Terdapat Cas Deposit:</div>
+        <div class="text-justify h3 mb-3 px-5 ">Pilihan Pembayaran Deposit Dahulu Akan Dibuka Jika Terdapat Caj Deposit:</div>
 
         <form action="{{route('homestay.updateDepositCharge', '')}}" method="post" enctype="multipart/form-data" id="form-deposit-charge" class="px-5 ">
           @csrf
           @method('PUT')
           <div class="d-flex align-items-center justify-content-center flex-wrap my-3">
-            <label for="deposit-charge" class="col-sm-4">Cas Deposit(%)</label>
+            <label for="deposit-charge" class="col-sm-4">Caj Deposit(%)</label>
             <input type="number" name="deposit_charge" id="deposit_charge"  class="form-control col-sm-8" min="0" max="100" required>
           </div>
           <button type="submit" class="btn-purple d-block mx-auto mt-3 mb-5">Simpan</button>

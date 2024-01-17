@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use phpDocumentor\Reflection\Types\Null_;
 use App\Http\Controllers\AppBaseController;
+use App\Http\Controllers\Merchant\Regular\OrderController;
 use League\CommonMark\Inline\Parser\EscapableParser;
 
 
@@ -125,12 +126,27 @@ class DirectPayController extends Controller
             }
             else if($request->desc == 'Merchant')
             {
+                $note = $request->note;
+                $order_type = $request->order_type;
                 $gng_order_id = $request->order_id;
-    
-                DB::table('pgng_orders')->where('id', $gng_order_id)->update([
-                    'updated_at' => Carbon::now(),
-                    'status' => 'Pending'
-                ]);
+                
+                // for get n go or pick-up
+                if($order_type == 'Pick-Up') {
+                    $pickup_date = $request->pickup_date;
+                    $pickup_time = $request->pickup_time;
+                    if(OrderController::validateRequestedPickupDate($pickup_date, $pickup_time, $request->org_id) == false){
+                        return back()->with('error', 'Sila pilih masa yang sesuai');
+                    }
+                    $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('H:i:s');
+                    
+                    DB::table('pgng_orders')->where('id', $gng_order_id)->update([
+                        'updated_at' => Carbon::now(),
+                        'order_type' => $order_type,
+                        'pickup_date' => $pickup_datetime,
+                        'note' => $note,
+                        'status' => 'Pending'
+                    ]);
+                }
     
                 $gng_order = DB::table('pgng_orders')
                 ->where('id', $gng_order_id)
@@ -694,12 +710,12 @@ class DirectPayController extends Controller
             
                         $newQuantity= intval($relatedItemQuantity - $item->quantity);
                        
-                        if($newQuantity<=0){
+                        if($newQuantity <= 0){
                             $relatedItem
                             ->update([
-                                'quantity_available'=>0,
+                                'quantity_available'=> 0,
                                 'type' => 'no inventory',
-                                'status'=> 0
+                                'status'=> 0,
                             ]);
                         }
                         else{

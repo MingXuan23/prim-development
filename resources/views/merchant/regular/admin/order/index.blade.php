@@ -6,7 +6,26 @@
 @include('layouts.datatable')
 
 <style>
-
+    .form-control{
+        border: 2px solid #5b626b6c!important;
+    }
+    .form-control:focus{
+        outline: none;
+        border: 2px solid #5b626b!important;
+    }
+    .btn-grey{
+        background-color: #5b626b!important;
+        border: 2px solid #5b626b!important;
+        color:#ffffff!important;
+    }
+    .btn-grey:hover{
+        background-color: #ffffff!important;
+        color:#5b626b!important;
+        border: 2px solid #5b626b!important;
+    }
+    #btn-close{
+        font-size: 16px;
+    }
 </style>
 
 @endsection
@@ -19,7 +38,7 @@
                 <select name="org" id="org_dropdown" class="form-control col-md-12">
                     <option value="">Pilih Organisasi</option>
                     @foreach($merchant as $row)
-                    <option value="{{ $row->id }}">{{ $row->nama }}</option>
+                    <option value="{{ $row->id }}" data-service-charge="{{$row->fixed_charges ?? 0}}">{{ $row->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -27,14 +46,15 @@
     </div>
 </div>
 
-<div class="row align-items-center">
+<div class="row align-items-center justify-content-center">
     <div class="col">
         <div class="page-title-box">
             <h4 class="font-size-18">Urus Pesanan</h4>
         </div>
     </div>
     <div class="d-flex justify-content-end mr-3">
-        <a href="" class="btn btn-primary btn-history">Sejarah Pesanan</a>
+        <button href="" class="btn btn-grey mx-1" id="btn-service-charge"><i class="fas fa-coins"></i> Caj Servis</button>
+        <a href="" class="btn btn-grey btn-history"><i class="fas fa-list"></i> Sejarah Pesanan</a>
     </div>
 </div>
 
@@ -64,7 +84,7 @@
 
 <div class="card mb-3">
     <div class="card-header">
-      <i class="ti-email mr-2"></i>Pesanan Anda</div>
+      <i class="ti-email mr-2"></i>Pesanan Pelanggan</div>
     <div class="card-body">
         
         @if(Session::has('success'))
@@ -116,6 +136,31 @@
     </div>
 </div>
 
+
+{{-- service charge modal --}}
+
+<div class="modal" id="modal-service-charge">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <button class="ml-auto btn" id="btn-close"> <i class="fa fa-times mr-2"></i> </button>
+
+        <div class="text-justify h3 mb-3 px-5 ">Caj Servis akan dikenakan untuk setiap pesanan:</div>
+
+        <form action="{{route('admin-reg.updateServiceCharge', '')}}" method="post" enctype="multipart/form-data" id="form-service-charge" class="px-5 ">
+          @csrf
+          @method('PUT')
+          <div class="d-flex align-items-center justify-content-center flex-wrap my-3">
+            <label for="service-charge" class="col-sm-4">Caj Servis(RM)</label>
+            <input type="number" name="service_charge" id="service_charge"  class="form-control col-sm-8" min="0" step=".01" required>
+          </div>
+          <button type="submit" class="btn btn-grey d-block mx-auto mt-3 mb-5">Simpan</button>
+        </form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
 @endsection
 
 @section('script')
@@ -154,13 +199,17 @@
             if(orgId != ''){
                 btnHistory.show()
                 btnHistory.attr('href', '')
-                route = "/admin/orders/"+orgId+"/history"
+                route = "/admin/all-orders/"+orgId+"/history"
                 btnHistory.attr('href', route)
+                $('#form-service-charge').attr('action',`{{route('admin-reg.updateServiceCharge', '')}}/${orgId}`);
+                const serviceCharge = $('#org_dropdown option:selected').attr('data-service-charge');
+                $('input[name = "service_charge"]').val(serviceCharge);
                 $('#orderTable').DataTable().destroy()
                 fetch_data(orgId)
                 countTotalOrders(orgId)
             }else {
                 btnHistory.hide()
+                $('#btn-service-charge').hide();
                 $('#orderTable').DataTable().destroy()
                 fetch_data()
                 countTotalOrders()
@@ -168,6 +217,8 @@
             
         })
         
+        $('#org_dropdown option:nth-child(2)').prop('selected',true);
+        $('#org_dropdown').trigger('change');
         function fetch_data(orgId = '',filterType = '', date = '') {
             orderTable = $('#orderTable').DataTable({
                 pageLength: 5,
@@ -360,7 +411,12 @@
         $('.alert').delay(3000).fadeOut();
 
     })
-    
+    $(document).on('click','#btn-service-charge', function(){
+        $('#modal-service-charge').modal('show');
+    });
+    $(document).on('click','#btn-close', function(){
+        $('#modal-service-charge').modal('hide');
+    });
 </script>
 
 @endsection

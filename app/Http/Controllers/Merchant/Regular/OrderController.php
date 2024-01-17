@@ -466,7 +466,7 @@ class OrderController extends Controller
         return view('merchant.regular.pay', compact('cart', 'response'));
     }
 
-    private function validateRequestedPickupDate($pickup_date, $pickup_time, $org_id)
+    public static function validateRequestedPickupDate($pickup_date, $pickup_time, $org_id)
     {
         $isAvailable = true;
 
@@ -474,7 +474,6 @@ class OrderController extends Controller
         $day = RegularMerchantController::getDayIntegerByDayName(Carbon::parse($pickup_date)->format('l'));
 
         $hour = OrganizationHours::where('organization_id', $org_id)->where('day', $day)->first();
-
         if($isToday) {
             $current_time = Carbon::now()->format('G:i');
             // If the pickup time is less than the current time then return error

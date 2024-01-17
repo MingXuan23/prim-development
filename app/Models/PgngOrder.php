@@ -14,4 +14,8 @@ class PgngOrder extends Model
     protected $fillable = ['order_type', 'pickup_date', 'delivery_date', 'total_price', 'address', 'state', 'postcode', 'city', 'note', 'expired_at', 'status', 'user_id', 'organization_id', 'transaction_id','confirm_picked_up_time','confirm_by'];
     
     public $timestamps = true;
+
+    public function organization(){
+        return $this->belongsTo(Organization::class);
+    }
 }

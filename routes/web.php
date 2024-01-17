@@ -334,7 +334,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
         Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
         
-       //  Route::get('/testPay','ProductController@testPay')->name('merchant.testPay');
+        // Route::get('/testPayment','ProductController@testPayment')->name('merchant.testPayment');
          
          // Checkout
         Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
@@ -396,7 +396,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('/p-group-list/{id}/edit/{item}', 'ProductController@editProductItem')->name('admin-reg.edit-item');
         Route::put('update-item', 'ProductController@updateProductItem')->name('admin-reg.update-item');
         Route::post('/importMerchantProduct', 'ProductController@importMerchantProduct')->name('importMerchantProduct');
-        
+
         # Order Dashboard
         Route::get('orders', 'OrderController@index')->name('admin-reg.orders');
         Route::get('all-orders', 'OrderController@getAllOrders')->name('admin-reg.all-orders');
@@ -406,6 +406,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('all-orders/{id}/history', 'OrderController@showHistory')->name('admin-reg.history');
         Route::get('all-histories', 'OrderController@getAllHistories')->name('admin-reg.all-histories');
 
+        Route::put('update-service-charge/{id}','OrderController@updateServiceCharge' )->name('admin-reg.updateServiceCharge');
         # Report Dashboard
         Route::get('/sales-report', 'ReportController@index')->name('admin-reg.report');
         Route::get('get-report', 'ReportController@getReport')->name('admin-reg.get-report');

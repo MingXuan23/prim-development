@@ -158,7 +158,13 @@ class OrderController extends Controller
 
         return response()->json(['response' => $response]);
     }
+    public function updateServiceCharge(Request $request, $orgId){
+        $org = Organization::find($orgId);
+        $org->fixed_charges = $request->service_charge;
+        $org->save();
 
+        return back()->with(['success'=>'Caj Servis telah disimpan']);
+    }
     public function orderPickedUp(Request $request)
     {
         $update_order = PgngOrder::find($request->o_id)->update([
@@ -290,6 +296,7 @@ class OrderController extends Controller
                         'u.name', 'u.telno', 'u.email')
                 ->first();
 
+        $fixed_charges = PgngOrder::find($id)->organization->fixed_charges;
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
         $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
         $total_order_price = number_format($list->total_price, 2, '.', '');
@@ -325,6 +332,6 @@ class OrderController extends Controller
             $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2, '.', ''); // calculate total for each item in cart
         }
 
-        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount'));
+        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount' , 'fixed_charges'));
     }
 }

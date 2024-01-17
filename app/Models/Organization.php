@@ -50,6 +50,10 @@ class Organization extends Model
     {
         return $this->hasMany(ProductItem::class);
     }
+
+    public function pgng_orders(){
+        return $this->hasMany(PgngOrder::class);
+    }
     
     public function pickup_order()
     {
