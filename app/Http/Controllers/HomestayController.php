@@ -1893,7 +1893,7 @@ public function getPromotionHistory(Request $request){
         ->get();
         foreach ($homestays as $key => $homestay){
             $bookings = DB::table('bookings')
-            ->whereIn('status' ,['Completed','Booked'])
+            ->whereIn('status' ,['Completed','Booked','Deposited','Balance Paid'])
             ->where([
                 'roomid' => $homestay->roomid,
             ])
@@ -1946,7 +1946,7 @@ public function getPromotionHistory(Request $request){
             // to get earnings for each months
             $earningsPerMonth = $homestays->flatMap(function ($homestay) {
                 return DB::table('bookings')
-                    ->whereIn('status', ['Completed', 'Booked'])
+                    ->whereIn('status', ['Completed', 'Booked','Deposited','Balance Paid'])
                     ->where('roomid', $homestay->roomid)
                     ->get();
             })->mapToGroups(function ($booking) {
