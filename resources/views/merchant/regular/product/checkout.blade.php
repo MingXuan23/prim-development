@@ -505,6 +505,7 @@
             Swal.fire({
             title: 'Adakah anda pasti?',
             text: "Anda akan dialihkan ke payment gateway",
+            footer: "<small style='color:#f14343;' >Pesanan dalam sistem kami adalah tidak boleh dipulangkan wang, dan sebarang pemulangan perlu diuruskan antara pembeli dan penjual.</small>",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',

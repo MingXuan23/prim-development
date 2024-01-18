@@ -279,6 +279,7 @@ input[type = 'radio']:checked + .payment-type{
         Swal.fire({
           title: 'Adakah anda pasti?',
           text: "Anda akan dialihkan ke payment gateway",
+          footer: "<small style='color:#f14343;' >Tempahan dalam sistem kami adalah tidak boleh dipulangkan wang, dan sebarang pemulangan perlu diuruskan antara tuan rumah dan tetamu.</small>",
           icon: 'question',
           showCancelButton: true,
           confirmButtonColor: '#3085d6',

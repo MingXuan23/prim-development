@@ -27,8 +27,7 @@ class OrganizationRequest extends FormRequest
         return [
             'nama'         =>  'required',
             'telno'        =>  'required|numeric',
-            // 'email'        =>  ['required', 'email', \Illuminate\Validation\Rule::unique('organizations')->ignore($this->id)],
-            'email' => 'required|email',
+            'email'        =>  ['required', 'email', \Illuminate\Validation\Rule::unique('organizations')->ignore($this->id)],
             'address'      =>  'required',
             'postcode'     =>  'required',
             'district'     =>  'required',
