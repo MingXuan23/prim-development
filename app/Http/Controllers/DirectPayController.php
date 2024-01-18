@@ -1235,4 +1235,35 @@ class DirectPayController extends Controller
 
         return view('fee.pay.view-receipt', compact('getparent', 'get_transaction', 'get_student', 'get_category', 'get_fees', 'getfees_categoryA', 'get_organization'));
     }
+
+
+    public function getTransactionInfo($privateKey, $sellerExOrderNo, $sellerOrderNo) {
+        $url = "https://directpay.my/api/fpx/GetTransactionInfo";
+    
+        $params = [
+            'PrivateKey' => $privateKey,
+            'Fpx_SellerExOrderNo' => $sellerExOrderNo,
+            'Fpx_SellerOrderNo' => $sellerOrderNo,
+        ];
+    
+        $url .= '?' . http_build_query($params);
+    
+        $ch = curl_init($url);
+    
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+        // Execute cURL session and get the response
+        $response = curl_exec($ch);
+    
+        // Check for cURL errors
+        if (curl_errno($ch)) {
+            echo 'Curl error: ' . curl_error($ch);
+        }
+    
+        // Close cURL session
+        curl_close($ch);
+    
+        return $response;
+    }
 }
