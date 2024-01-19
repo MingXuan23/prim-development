@@ -1251,7 +1251,7 @@ class DirectPayController extends Controller
                 }
 
                 if ($response_value['fpx_DebitAuthCode'] == '00') {
-                    
+                    $fpx_productDesc = explode("_", $transaction->nama)[0];
                     switch ($fpx_productDesc) {
                         case 'School':
         
