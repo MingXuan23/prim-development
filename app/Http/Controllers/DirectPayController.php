@@ -1344,7 +1344,7 @@ class DirectPayController extends Controller
                         case 'Donation':
         
                             $result = Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            return response()->json(['res'=>$result, 'sellerNo'=>$fpx_sellerOrderNo,'resp'=>$response_value]);
+                           // return response()->json(['res'=>$result, 'sellerNo'=>$fpx_sellerOrderNo,'resp'=>$response_value]);
                             break;
                         
                         case 'Merchant':
@@ -1608,7 +1608,7 @@ class DirectPayController extends Controller
                     ->first();
             }
         }
-        else if ($fpx_productDesc == "Merchant"){
+        else if ($fpx_productDesc == "Merchant" || $fpx_productDesc == "Koperasi"){
             $order = PgngOrder::where('transaction_id', $transaction->id)->first();
 
             $organ = Organization::find($order->organization_id);
@@ -1619,8 +1619,13 @@ class DirectPayController extends Controller
             ->orWhere('transaction_balance_id', $transaction->id)
             ->first();
             $room = Room::find($booking->roomid);
-            $user = User::find($transaction->user_id);
+       
             $organ = Organization::find($room->homestayid);
+        }
+        else if ($fpx_productDesc == "OrderS"){
+            $orders = Order::where('transaction_id', '=', $transaction->id)->first();
+
+            $organ = Organization::find($orders->organ_id);
         }
         //dd($organ);
         $privateKey = $organ->private_key;
