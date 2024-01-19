@@ -1255,8 +1255,8 @@ class DirectPayController extends Controller
                     switch ($fpx_productDesc) {
                         case 'School':
         
-                            Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            $transaction = Transaction::where('nama', '=', $fpx_sellerExOrderNo)->first();
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         
                             $list_student_fees_id = DB::table('student_fees_new')
                                 ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
@@ -1343,13 +1343,13 @@ class DirectPayController extends Controller
         
                         case 'Donation':
         
-                            Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
         
                             break;
                         
                         case 'Merchant':
-                            Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            $t = Transaction::where('nama', '=', $fpx_sellerExOrderNo)->first();
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
                             
                             PgngOrder::where('transaction_id', $t->id)->first()->update([
                                 'status' => 'Paid'
@@ -1410,8 +1410,8 @@ class DirectPayController extends Controller
                             break;
         
                         case 'Koperasi':
-                            Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            $t = Transaction::where('nama', '=', $fpx_sellerExOrderNo)->first();
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         
                             $order = PgngOrder::where('transaction_id', $t->id)->first();
                             
@@ -1466,8 +1466,8 @@ class DirectPayController extends Controller
                             break;
         
                         case 'Homestay':
-                            Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            $t = Transaction::where('nama', '=', $fpx_sellerExOrderNo)->first();
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         
                             // update booking table
                             // check whether is paying for deposit/full or balance 
@@ -1513,8 +1513,8 @@ class DirectPayController extends Controller
                             break;
         
                             case 'Grab Student':
-                                    Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                                    $t = Transaction::where('nama', '=', $fpx_sellerExOrderNo)->first();
+                                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                                    $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
                 
                 
                                     $booking = Grab_Booking::where('transactionid', '=', $t->id)->first();
@@ -1529,8 +1529,8 @@ class DirectPayController extends Controller
                 
                                     break;
                             case 'Bus':
-                                    Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                                    $t = Transaction::where('nama', '=', $fpx_sellerExOrderNo)->first();
+                                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                                    $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
                 
                                     $userid = $t->user_id;
                 
@@ -1551,14 +1551,14 @@ class DirectPayController extends Controller
                                     break;
                                 
                         default:
-                            Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update([['status' => 'Success','amount'=>$response_value['transactionAmount']]]);
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update([['status' => 'Success','amount'=>$response_value['transactionAmount']]]);
 
                             break;
                     }
                 } 
                 else 
                 {
-                    Transaction::where('nama', '=', $fpx_sellerExOrderNo)->update(['status' => 'Failed']);
+                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Failed']);
                 }
             } 
             catch (\Throwable $th) {
