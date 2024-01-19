@@ -487,7 +487,7 @@ class DirectPayController extends Controller
     // callback for FPX
     public function paymentStatus(Request $request)
     {
-        $case = explode("_", $request->fpx_sellerExOrderNo);
+        $case = explode("_", $request->Fpx_SellerOrderNo);
 
         if ($request->fpx_debitAuthCode == '00') {
             switch ($case[0]) {
@@ -499,7 +499,7 @@ class DirectPayController extends Controller
                                 ->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Success','amount'=>$request->TransactionAmount, 'description' => $request ->Fpx_SellerExOrderNo]);
 
                     $request->fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
-                    \Log::channel('PRIM_transaction')->info("Transaction Callback : " .  $request->fpx_sellerExOrderNo . " , " . $status);
+                    \Log::channel('PRIM_transaction')->info("Transaction Callback : " .  $request->Fpx_SellerExOrderNo . " , " . $status);
 
                     // $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
                     // $organization = $this->organization->getOrganizationByDonationId($donation->id);
@@ -1258,7 +1258,7 @@ class DirectPayController extends Controller
         foreach ($transactions as $transaction)
         {
         //old method()
-            $fpx_sellerOrderNo = $transaction->description;
+            $fpx_sellerOrderNo = $transaction->nama;
             try{
                 $response_value = $this->getTransactionInfo($transaction->id);
                 if (!isset($response_value['fpx_DebitAuthCode']))
@@ -1359,8 +1359,8 @@ class DirectPayController extends Controller
         
                         case 'Donation':
         
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-        
+                            $result = Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            return response()->json(['res'=>$result, 'sellerNo'=>$fpx_sellerOrderNo,'resp'=>$response_value]);
                             break;
                         
                         case 'Merchant':
@@ -1581,6 +1581,7 @@ class DirectPayController extends Controller
                 echo 'Error :', ($th->getMessage());
             }
         }
+    
         \Log::info("Update Transaction Command Run Successfully!");
 
     }
@@ -1589,12 +1590,7 @@ class DirectPayController extends Controller
 
         $transaction = Transaction::find($transaction_id);
         $fpx_sellerOrderNo= $transaction->nama;
-    
-        // $date_time_string = $transaction->datetime_created;
-        // $date_time = date_create_from_format('Y-m-d H:i:s', $date_time_string);
 
-        // $fpx_sellerTxnTime = $date_time->format('YmdHis');
-        $fpx_sellerExOrderNo = $transaction->description;
         $fpx_productDesc = explode("_", $transaction->nama)[0];
 
         if ($fpx_productDesc == "Donation")
