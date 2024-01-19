@@ -1269,7 +1269,7 @@ class DirectPayController extends Controller
                 ->leftJoin('donations as d', 'd.id', 'dt.donation_id')
                 ->leftJoin('donation_organization as do', 'do.donation_id', 'd.id')
                 ->leftJoin('organizations as o', 'o.id', 'do.organization_id')
-                ->select('o.seller_id')
+                ->select('o.private_key')
                 ->where('t.id', $transaction->id)
                 ->first();
         }
@@ -1279,7 +1279,7 @@ class DirectPayController extends Controller
                 ->leftJoin('fees_new as fn', 'o.id', 'fn.organization_id')
                 ->leftJoin('fees_new_organization_user as fou', 'fou.fees_new_id', 'fn.id')
                 ->where('fou.transaction_id', $transaction->id)
-                ->select('o.seller_id')
+                ->select('o.private_key')
                 ->first();
 
             if ($organ == null)
@@ -1289,7 +1289,7 @@ class DirectPayController extends Controller
                     ->leftJoin('student_fees_new as sfn', 'sfn.fees_id', 'fn.id')
                     ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', 'sfn.id')
                     ->where('ftn.transactions_id', $transaction->id)
-                    ->select('o.seller_id')
+                    ->select('o.private_key')
                     ->first();
             }
         }
@@ -1307,8 +1307,9 @@ class DirectPayController extends Controller
             $user = User::find($transaction->user_id);
             $organ = Organization::find($room->homestayid);
         }
-
+        //dd($organ);
         $privateKey = $organ->private_key;
+       
         $url = "https://directpay.my/api/fpx/GetTransactionInfo";
     
         $params = [
