@@ -1665,7 +1665,7 @@ class DirectPayController extends Controller
             ->whereIn('status', ['Pending', 'Failed'])
             ->whereBetween('datetime_created', [now()->subDays(2), now()])
             ->get();
-
+        //dd($transactions);
         // $transaction = DB::table('transactions')
         //             ->where('id',29268)
         //             ->get();
