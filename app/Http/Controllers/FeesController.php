@@ -362,6 +362,8 @@ class FeesController extends AppBaseController
         $student_notcomplete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes','classes.id','=','class_organization.class_id')
+            ->where('classes.levelid','>',0)
             ->where('class_organization.organization_id', $oid)
             ->where('class_student.fees_status', 'Not Complete')
             ->count();
