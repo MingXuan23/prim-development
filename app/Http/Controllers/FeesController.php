@@ -350,7 +350,6 @@ class FeesController extends AppBaseController
 
             }
         }
-        $all_student=$all_student->count();
         // dd($all_student);
         $student_complete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -367,6 +366,7 @@ class FeesController extends AppBaseController
             ->where('class_organization.organization_id', $oid)
             ->where('class_student.fees_status', 'Not Complete')
             ->count();
+        $all_student= $student_complete +$student_notcomplete ;
 
         $oid=$request->oid;//change back the children org if necessary
         $all_parent =  DB::table('organization_user')
@@ -395,7 +395,7 @@ class FeesController extends AppBaseController
             }
         }
       
-        $all_parent=$all_parent->count();
+       
 
         $parent_complete =  DB::table('organization_user')
             ->where('organization_id', $oid)
@@ -410,7 +410,7 @@ class FeesController extends AppBaseController
             ->where('status', 1)
             ->where('fees_status', 'Not Complete')
             ->count();
-
+            $all_parent=$parent_complete + $parent_notcomplete;
         return response()->json(['all_student' => $all_student, 'student_complete' => $student_complete, 'student_notcomplete' => $student_notcomplete, 'all_parent' => $all_parent, 'parent_complete' => $parent_complete, 'parent_notcomplete' => $parent_notcomplete]);
 
     }
