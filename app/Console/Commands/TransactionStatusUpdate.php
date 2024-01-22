@@ -183,7 +183,12 @@ class TransactionStatusUpdate extends Command
                     switch ($fpx_productDesc) {
                         case 'School':
         
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                                [
+                                    'status' => 'Success',
+                                    'amount'=>$response_value['transactionAmount'] ,
+                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                            );
                             $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         
                             $list_student_fees_id = DB::table('student_fees_new')
@@ -271,12 +276,22 @@ class TransactionStatusUpdate extends Command
         
                         case 'Donation':
         
-                            $result = Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            $result =  Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                                [
+                                    'status' => 'Success',
+                                    'amount'=>$response_value['transactionAmount'] ,
+                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                            );
                            // return response()->json(['res'=>$result, 'sellerNo'=>$fpx_sellerOrderNo,'resp'=>$response_value]);
                             break;
                         
                         case 'Merchant':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                                [
+                                    'status' => 'Success',
+                                    'amount'=>$response_value['transactionAmount'] ,
+                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                            );
                             $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
                             
                             PgngOrder::where('transaction_id', $t->id)->first()->update([
@@ -338,7 +353,12 @@ class TransactionStatusUpdate extends Command
                             break;
         
                         case 'Koperasi':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                                [
+                                    'status' => 'Success',
+                                    'amount'=>$response_value['transactionAmount'] ,
+                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                            );
                             $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         
                             $order = PgngOrder::where('transaction_id', $t->id)->first();
@@ -394,7 +414,12 @@ class TransactionStatusUpdate extends Command
                             break;
         
                         case 'Homestay':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                                [
+                                    'status' => 'Success',
+                                    'amount'=>$response_value['transactionAmount'] ,
+                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                            );
                             $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         
                             // update booking table
@@ -441,7 +466,12 @@ class TransactionStatusUpdate extends Command
                             break;
         
                             case 'Grab Student':
-                                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                                Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                                    [
+                                        'status' => 'Success',
+                                        'amount'=>$response_value['transactionAmount'] ,
+                                        'description'=>$response_value['fpx_SellerExOrderNo']]
+                                );
                                     $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
                 
                 
@@ -457,7 +487,12 @@ class TransactionStatusUpdate extends Command
                 
                                     break;
                             case 'Bus':
-                                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
+                                Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                                    [
+                                        'status' => 'Success',
+                                        'amount'=>$response_value['transactionAmount'] ,
+                                        'description'=>$response_value['fpx_SellerExOrderNo']]
+                                );
                                     $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
                 
                                     $userid = $t->user_id;
@@ -479,7 +514,12 @@ class TransactionStatusUpdate extends Command
                                     break;
                                 
                         default:
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update([['status' => 'Success','amount'=>$response_value['transactionAmount']]]);
+                        Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                            [
+                                'status' => 'Success',
+                                'amount'=>$response_value['transactionAmount'] ,
+                                'description'=>$response_value['fpx_SellerExOrderNo']]
+                        );
 
                             break;
                     }
