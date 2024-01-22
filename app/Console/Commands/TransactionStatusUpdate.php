@@ -8,6 +8,44 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Expr\AssignOp\ShiftLeft;
 
+use App\User;
+use App\Models\Order;
+use App\Models\Fee_New;
+use App\Models\Student;
+use App\Models\Booking;
+use App\Models\Room;
+use App\Models\Donation;
+use App\Models\Promotion;
+use App\Mail\OrderReceipt;
+use App\Mail\OrderSReceipt;
+use App\Mail\MerchantOrderReceipt;
+use App\Mail\HomestayReceipt;
+use App\Models\PgngOrder;
+use App\Models\Destination_Offer;
+use App\Models\Grab_Student;
+use App\Models\Grab_Booking;
+use App\Models\Bus;
+use App\Models\Bus_Booking;
+use App\Models\NotifyBus;
+use App\Models\NotifyGrab;
+use Illuminate\Http\Request;
+use App\Mail\DonationReceipt;
+use App\Mail\ResitBayaranGrab;
+use App\Mail\ResitBayaranBus;
+use App\Models\Dev\DevTransaction;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Redirect;
+use phpDocumentor\Reflection\Types\Null_;
+use App\Http\Controllers\AppBaseController;
+use League\CommonMark\Inline\Parser\EscapableParser;
+
+
+
 class TransactionStatusUpdate extends Command
 {
     /**
