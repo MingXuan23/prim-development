@@ -402,7 +402,7 @@ class ProductController extends Controller
 
     }
     // public function testPayment(){
-    //     $transaction = Transaction::where('nama', '=', 'Merchant_20240116125529')->first();
+    //     $transaction = Transaction::where('nama', '=', 'Merchant_20240121155751')->first();
     //     $transaction->transac_no = 'test merchant payment';
     //     $transaction->status = "Success";
     //     $transaction->save();
@@ -411,7 +411,7 @@ class ProductController extends Controller
     //         'status' => 'Paid'
     //     ]);
 
-    //     $order = PgngOrder::where('transaction_id', 41779)->first();
+    //     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
 
     //     $organization = Organization::find($order->organization_id);
     //     $user = User::find($order->user_id);
@@ -431,7 +431,7 @@ class ProductController extends Controller
     //         $relatedItemQuantity= $relatedItem->first()->quantity_available;
 
     //         $newQuantity= intval($relatedItemQuantity - $item->quantity);
-           
+            
     //         if($newQuantity<=0){
     //             $relatedItem
     //             ->update([
@@ -444,7 +444,7 @@ class ProductController extends Controller
     //             $relatedItem
     //             ->update([
     //                 'quantity_available'=>$newQuantity
-    //         ]);
+    //             ]);
     //         }
     //     }
     //     $item = DB::table('product_order as po')

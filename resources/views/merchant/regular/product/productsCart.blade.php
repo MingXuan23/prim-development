@@ -253,11 +253,18 @@
             }
             @media only screen and (max-width:600px){
                 .delete-btn i{
-                    position: static;
-
+                    top: 60%;
+                    right: 0%;
+                }
+                .product-container{
+                    width: 100%;
+                }
+                .page-content{
+                    padding: 80px 0!important;
                 }
                 .product-details{
                     width: 100%;
+                    margin-left: 0;
                 }
                 h1{
                     font-size: 1.5rem!important;
@@ -497,6 +504,7 @@
         })
         const plusButtons = document.querySelectorAll("#button-plus");
         const minusButtons = document.querySelectorAll("#button-minus");
+        let debounceTimer;
         // add click event to plus and minus buttons
         plusButtons.forEach(function(plusButton){
             plusButton.addEventListener("click",function(){
@@ -509,8 +517,10 @@
                 if(inputQuantity < qtyAvailable){
                     inputQuantity++;
                     this.previousElementSibling.value = inputQuantity;
-                    updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
-                    notificationCounter();
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() =>{
+                        updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
+                    } , 500);
                 }
             })
         })
@@ -523,8 +533,10 @@
                 if(inputQuantity > 1){
                     inputQuantity--;
                     this.nextElementSibling.value = inputQuantity;
-                    updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
-                    notificationCounter();
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() =>{
+                        updateInputQuantity(this,inputQuantity,productOrderId,pgngOrderId);
+                    } , 500);
                 }
             })
             }) 
@@ -539,8 +551,10 @@
                         e.preventDefault();
                         // set the input value to the maximum allowed value
                         $(this).val(qtyAvailable);
-                        updateInputQuantity(this, $(this).val(),productOrderId,pgngOrderId);
-                        notificationCounter();
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(() =>{
+                            updateInputQuantity(this, $(this).val(),productOrderId,pgngOrderId);
+                        } , 500);
 
                     }
                     else if($(this).val() < 1){
@@ -550,31 +564,14 @@
                         $(this).val(1);
                     }
                     else{
-                        updateInputQuantity(this, $(this).val(),productOrderId,pgngOrderId);
-                        notificationCounter();
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(() =>{
+                            updateInputQuantity(this, $(this).val(),productOrderId,pgngOrderId);
+                        } , 500);
                     }
                 });
-    });
-    // $("input[type='number']").off('keyup').on('keyup', function(e) {
-    //   var input =this;
-    //   let productOrderId = this.parentElement.getAttribute("data-product-order-id");
-    //   let pgngOrderId = this.parentElement.getAttribute("data-pgng-order-id");
 
-    //     if ( $(this).val()===''){
-    //         setTimeout(function() {
-    //         if($(input).val()===''){
-    //             input.value=1;
-    //             updateInputQuantity(input, 1, productOrderId, pgngOrderId);
-    //             console.log("success");
-    //         }  
-    //         }, 2000);      
-    //     }
-    //     else if ($(this).val()==='0'){
-    //     $(this).val(1);
-    //     updateInputQuantity(this, 1, productOrderId, pgngOrderId);
-    //     }
-    // });
-    function updateInputQuantity(plusButton,inputQuantity,productOrderId,pgngOrderId){
+        function updateInputQuantity(plusButton,inputQuantity,productOrderId,pgngOrderId){
             $.ajax({
                 url: "{{route('merchant.update-cart')}}",
                 method: "PUT",
@@ -606,14 +603,14 @@
                         else{
                             $totalPrice.html("Jumlah: RM"+total);
                         }
-
+                        notificationCounter();
                 },
                 // error:function(result) {
                 //     console.log(result.responseText)
                 // }
            })
     }
-    
+    });
     
     // for validation before proceed to checkout page 
     $('.checkout-button').each(function (index,checkButton) {
@@ -641,20 +638,3 @@
     })
     </script>
 @endsection
-{{-- document.querySelectorAll('.checkout-button').addEventListener('click', function(event) {
-        var productContainer = $(this).parent();
-        console.log(productContainer);
-        var quantityInput = $('input');
-        var quantityValue = parseInt(quantityInput.value);
-
-       if (quantityValue > parseInt(quantityInput.max)) {
-            event.preventDefault(); // Prevent default action
-
-            // Optionally, display an error message or take any other desired action
-            alert('Value is greater than the maximum allowed.');
-    } else {
-            // Update the href attribute to navigate to the desired route
-            var checkoutLink = document.getElementById('checkout-link');
-         checkoutLink.href = "{{ route('merchant.checkout', dollarsignorganization->id) }}";
-        }
- }); --}}

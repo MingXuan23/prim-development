@@ -66,6 +66,12 @@
     </div>
 
     <hr>
+    <div class="row">
+      <label class="col-sm-3 col-form-label ">Resit No.</label>
+      <div class="col-sm-7">
+        <p class="col col-form-label">{{$receipt_no}}</p>
+      </div>
+    </div>
 
     <div class="row">
       <label class="col-sm-3 col-form-label ">No Telefon dan E-mel Peniaga</label>

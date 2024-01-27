@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\DataTables;
+use App\Models\PgngOrder;
 
 class HistoryController extends Controller
 {
@@ -153,9 +154,12 @@ class HistoryController extends Controller
                 if ($row->status == 'Picked-Up') {
                     $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya diambil</span>';
                     return $btn;
-                } else {
-                    $btn = '<span class="badge rounded-pill bg-danger text-white">Tidak Diambil</span>';
+                } else if ($row->status == 'Cancel by user'){
+                    $btn = '<span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh pembeli</span>';
                     return $btn;
+                } else if($row->status == 'Cancel by merchant'){
+                    $btn = '<span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh penjual</span>';
+                    return $btn;                    
                 }
             });
 
@@ -219,8 +223,9 @@ class HistoryController extends Controller
             $price[$row->id] = number_format($row->price, 2);
             $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2); // calculate total for each item in cart
         }
-
-        return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by'));
+        $receipt_no = PgngOrder::with('transaction')->find($order_id)->transaction->nama;
+        
+        return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by' , 'receipt_no'));
     }
 
     private function getAllOrderQuery($status)

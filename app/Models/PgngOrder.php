@@ -18,4 +18,7 @@ class PgngOrder extends Model
     public function organization(){
         return $this->belongsTo(Organization::class);
     }
+    public function transaction(){
+        return $this->hasOne(Transaction::class ,'id' , 'transaction_id');
+    }
 }
