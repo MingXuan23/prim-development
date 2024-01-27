@@ -1612,7 +1612,7 @@ class DirectPayController extends Controller
                 ->where('fou.transaction_id', $transaction->id)
                 ->select('o.private_key')
                 ->first();
-
+           
             if ($organ == null)
             {
                 $organ = DB::table('organizations as o')
@@ -1622,6 +1622,7 @@ class DirectPayController extends Controller
                     ->where('ftn.transactions_id', $transaction->id)
                     ->select('o.private_key')
                     ->first();
+                    //dd($organ);
             }
         }
         else if ($fpx_productDesc == "Merchant" || $fpx_productDesc == "Koperasi"){
@@ -1643,7 +1644,9 @@ class DirectPayController extends Controller
 
             $organ = Organization::find($orders->organ_id);
         }
-        //dd($organ);
+       if($organ == null){
+        return null;
+       }
         $privateKey = $organ->private_key;
        
         $url = "https://directpay.my/api/fpx/GetTransactionInfo";
