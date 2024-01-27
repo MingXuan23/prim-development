@@ -1656,6 +1656,8 @@ class DirectPayController extends Controller
     
         $url .= '?' . http_build_query($params);
         //dd($url);
+
+        
         $ch = curl_init($url);
     
         // Set cURL options
@@ -2048,7 +2050,7 @@ class DirectPayController extends Controller
                 }
             } 
             catch (\Throwable $th) {
-                echo 'Error :', ($th->getMessage());
+                echo 'Error :', ($th->getMessage()),$transaction->id;
             }
         }
     
