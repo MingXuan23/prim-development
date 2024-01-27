@@ -566,7 +566,7 @@ class TransactionStatusUpdate extends Command
                 }
             } 
             catch (\Throwable $th) {
-                echo 'Error :', ($th->getMessage());
+                \Log::info('Error :'. ($th->getMessage()).' '. $transaction->id);
             }
         }
     
