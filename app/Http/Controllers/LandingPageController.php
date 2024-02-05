@@ -200,8 +200,34 @@ class LandingPageController extends AppBaseController
             ->get()
             ->count();
 
-        // dd($donation);
-        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount'));
+        $oneWeekBeforeToday = date_create(date('Y-m-d'));
+        date_sub($oneWeekBeforeToday,date_interval_create_from_date_string('7 days'));
+        $donors = Transaction::where('nama','LIKE' , 'Donation%')
+        ->where('status','Success')
+        ->where(function($query) use ($oneWeekBeforeToday){
+            $query->whereDate('datetime_created', '<=', date('Y-m-d'));
+            // ->where('datetime_created' , '>' , $oneWeekBeforeToday);
+
+        })
+        ->orderBy('datetime_created' ,'desc')
+        ->orderBy('amount' ,'desc')
+        ->take(20)
+        ->get();
+        // if(count($donors) < 20){
+        //     // Calculate how many times we need to duplicate the collection
+        //     $timesToDuplicate = 20 - count($donors);
+        //     $j = 0;
+        //     // Duplicate the collection
+        //     for ($i = 0; $i < $timesToDuplicate; $i++) {
+        //         if($j >= count($donors)){
+        //             $j = 0;
+        //         }else{
+        //             $donors->push($donors[$i]);
+        //             $j++;
+        //         }
+        //     }
+        // }
+        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount' ,'donors'));
     }
 
     public function organizationListDonation()
@@ -322,13 +348,23 @@ class LandingPageController extends AppBaseController
                 ->where('donations.status', 1)
                 ->inRandomOrder()
                 ->get();
-            
+
 
             foreach ($donations as $donation) {
-                $posters = $posters . '<div class="card"> <img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy">';
+                // to get the total amount of donation for each donation posters
+                $amountDonation = DB::table('donation_transaction as dt')->
+                join('transactions as t', 't.id' , 'dt.transaction_id')
+                ->where([
+                    't.status' => 'Success',
+                    'dt.donation_id' => $donation->id,
+                ])
+                ->sum('t.amount');
+                
+                $posters = $posters . '<div class="card"> <div class="donation-amount">Jumlah Derma:<b> RM'.number_format($amountDonation,2).'</b></div><img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy">';
                 $posters = $posters . '<div class="card-body"><div class="d-flex flex-column justify-content-center ">';
                 $posters = $posters . '<a href="' . route('URLdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a></div>';
-                $posters = $posters . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div></div></div>';
+                $posters = $posters . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div></div>
+                </div>';
             }
 
             if ($posters === '') {
