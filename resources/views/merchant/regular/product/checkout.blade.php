@@ -123,6 +123,19 @@
                 outline: none;
                 border: 2px solid #5b626b!important;
             }
+
+            @media screen and (max-width: 500px){
+                .page-content{
+                    padding: 80px 0!important;
+                }
+                .order-procurement-container{
+                    gap: 1rem;
+                }
+                .procurement-option-container{
+                    width: 100%;
+                    height: 120px;
+                }
+            }
     </style>
 @endsection
 
@@ -167,7 +180,7 @@
             </div>        
             @if($cart)
         <div class="row">
-            <div class="col mb-4">
+            <div class="col-sm-6 mb-4">
             <div class="card  h-100 border">
                 <div class="card-body p-4">
                 <div class="table-responsive">
@@ -199,7 +212,7 @@
             </div>
             </div>
             
-            <div class="col">
+            <div class="col-sm-6">
             <form action="{{ route('directpayIndex') }}" method="POST" enctype="multipart/form-data" id="form-order">
                 @csrf
                 <div class="card mb-4 border">
@@ -220,17 +233,14 @@
                     </div>
 
                     <div class="row">
-                        <div class="col pickup-date-div">
+                        <div class="col-md-6 pickup-date-div">
                             <div class="form-group required">
                                 <label><span><i class="fas fa-calendar-alt"></i></span> Tarikh Pengambilan</label>
                                 <input type="text" value="{{ $response->pickup_date }}" class="form-control" name="pickup_date" id="datepicker"  placeholder="Pilih tarikh" readonly required>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col pickup-time-div" hidden>
-                        <div class="form-group required">
+                        <div class="col-md-6 pickup-time-div" hidden>
+                            <div class="form-group required">
                             <label><span><i class="fas fa-clock"></i></span> Masa Pengambilan</label>
                             <div class="timepicker-section">
                             <input type="time" value="{{ $response->pickup_time }}" class="form-control" name="pickup_time" id="timepicker" required>
