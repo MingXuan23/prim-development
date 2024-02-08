@@ -58,6 +58,11 @@
             padding-bottom: 80px;
             background-image: url('assets/landing-page/img/bg/why-us-dark-bg.png');
             background-size: contain;
+            border: 4px solid #B4B1F4;
+
+        }
+        .container.container-donation{
+            overflow: hidden;
         }
         .donors-container{
             display: flex;
@@ -105,6 +110,7 @@
             color: white;
             padding: 12px 0;
         }
+
         @media only screen and (max-width: 991px){
             .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
                 transform: scale(1.0);
@@ -132,7 +138,7 @@
             }
             ::-webkit-scrollbar{
                 width: 20px;
-                height: 8px;
+                height: 12px;
             }
             ::-webkit-scrollbar-thumb{
                 border-radius: 0.5rem;
@@ -266,19 +272,23 @@
     <!-- header area end  -->
 
     <section aria-label="Donors In The Past Week">
-        <h3 class="mb-2 text-white text-center">Penderma</h3>
-        <div class="mb-3 text-white text-center">Paparan penderma-penderma yang terkini</div>
-        <div class="donors-container donors-container-1">
-            @foreach ($donors as $index => $donor)
-                @if ($index % 10 == 0 && $index > 0)
-                    <!-- Close the previous row and open a new one -->
-                    </div><div class="donors-container donors-container-2">
-                @endif
-                <div class="donor-container">
-                    <div class="donor-name" title="{{ $donor->username }}">{{ $donor->username }}</div>
-                    <div class="donor-amount">RM{{ $donor->amount }}</div>
-                </div>
-            @endforeach
+        <div class="container container-donation">
+            <h3 class="my-2 text-white text-center">Penderma</h3>
+            <div class="mb-3 text-white text-center">Paparan penderma-penderma yang terkini</div>
+            <div class="donors-container donors-container-1">
+                @foreach ($donors as $index => $donor)
+                    @if ($index % 10 == 0 && $index > 0)
+                        <!-- Close the previous row and open a new one -->
+                        </div><div class="donors-container donors-container-2">
+                    @endif
+                    <div class="donor-container">
+                        <div class="donor-name" title="{{ $donor->username }}">{{ $donor->username }}</div>
+                        <div class="donor-amount">RM{{ $donor->amount }}</div>
+                        <small>{{date('d/m/Y h:i A',strtotime($donor->datetime_created))}}</small>
+                    </div>
+                @endforeach            
+        </div>
+
         </div>
 
     </section>
