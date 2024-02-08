@@ -195,7 +195,7 @@
                 <input type="hidden" name="amount" id="amount" value="{{ $i + $getorganization->fixed_charges }}">
                 <input type="hidden" name="o_id" id="o_id" value="{{ $getorganization->id }}">
                 <input type="hidden" name="desc" id="desc" value="School_Fees">
-                <div class="float-right">
+                <!-- <div class="float-right">
                     <input type="checkbox" id="TC" name="TC" onchange="
                         if (this.checked)
                             document.getElementById('bayarBtn').disabled = false;
@@ -204,9 +204,9 @@
                         "><label style="margin-left: 5px" for="TC"><a
                             href="https://www.mepsfpx.com.my/FPXMain/termsAndConditions.jsp" target="_blank">I Agree to
                             the FPX Terms And Condition.</a></label>
-                </div>
+                </div> -->
                 <button id="bayarBtn" class="btn btn-primary float-right mt-3 w-100 p-2" style="font-size:18px"
-                    type="submit" onclick="return checkBank();" disabled>Teruskan Pembayaran</button>
+                    type="submit" >Teruskan Pembayaran</button>
                 </form>
             </div>
 
