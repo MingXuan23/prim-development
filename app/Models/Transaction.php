@@ -20,9 +20,11 @@ class Transaction extends Model
 
     public function booking()
     {
-        return $this->hasMany(Booking::class);
+        return $this->belongsTo(Booking::class);
     }
-
+    public function pgngOrder(){
+        return $this->belongsTo(PgngOrder::class ,'id' , 'transaction_id');
+    }
     public static function getTransactionByOrganizationIdAndStatus($organizationId)
     {
         $transaction = Transaction::select('*')

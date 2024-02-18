@@ -279,6 +279,9 @@
              .google-map{
                 height:300px;
              }
+             .page-content{
+                padding: 80px 2px!important;
+            }
            }
     </style>
 @endsection

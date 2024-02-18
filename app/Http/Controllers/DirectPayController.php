@@ -714,11 +714,11 @@ class DirectPayController extends Controller
                         $relatedItem=DB::table('product_item')
                         ->where('id',$item->itemId);
                         
-                        $relatedItemQuantity=$relatedItem->first()->quantity_available;
+                        $relatedItemQuantity= $relatedItem->first()->quantity_available;
             
                         $newQuantity= intval($relatedItemQuantity - $item->quantity);
-                       
-                        if($newQuantity <= 0){
+                        
+                        if($newQuantity<=0){
                             $relatedItem
                             ->update([
                                 'quantity_available'=> 0,
@@ -730,9 +730,8 @@ class DirectPayController extends Controller
                             $relatedItem
                             ->update([
                                 'quantity_available'=>$newQuantity
-                        ]);
+                            ]);
                         }
-                        
                     }
                     $item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
@@ -743,7 +742,7 @@ class DirectPayController extends Controller
                     ])
                     ->select('pi.name', 'po.quantity', 'pi.price')
                     ->get();
-
+            
                     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
                     Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
                     
@@ -1612,7 +1611,7 @@ class DirectPayController extends Controller
                 ->where('fou.transaction_id', $transaction->id)
                 ->select('o.private_key')
                 ->first();
-
+           
             if ($organ == null)
             {
                 $organ = DB::table('organizations as o')
@@ -1622,6 +1621,7 @@ class DirectPayController extends Controller
                     ->where('ftn.transactions_id', $transaction->id)
                     ->select('o.private_key')
                     ->first();
+                    //dd($organ);
             }
         }
         else if ($fpx_productDesc == "Merchant" || $fpx_productDesc == "Koperasi"){
@@ -1643,7 +1643,9 @@ class DirectPayController extends Controller
 
             $organ = Organization::find($orders->organ_id);
         }
-        //dd($organ);
+       if($organ == null){
+        return null;
+       }
         $privateKey = $organ->private_key;
        
         $url = "https://directpay.my/api/fpx/GetTransactionInfo";
@@ -1656,6 +1658,8 @@ class DirectPayController extends Controller
     
         $url .= '?' . http_build_query($params);
         //dd($url);
+
+        
         $ch = curl_init($url);
     
         // Set cURL options
@@ -2048,7 +2052,7 @@ class DirectPayController extends Controller
                 }
             } 
             catch (\Throwable $th) {
-                echo 'Error :', ($th->getMessage());
+                echo 'Error :', ($th->getMessage()),$transaction->id;
             }
         }
     

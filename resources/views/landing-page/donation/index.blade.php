@@ -11,6 +11,7 @@
 
     @include('landing-page.head')
     <style>
+
         .map-responsive {
             overflow: hidden;
             padding-bottom: 56.25%;
@@ -50,6 +51,65 @@
         .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
             transform: scale(1.1);
         } */
+    
+        section[aria-label="Donors In The Past Week"]{
+            background-color: #500ade;
+            padding-top: 80px;
+            padding-bottom: 80px;
+            background-image: url('assets/landing-page/img/bg/why-us-dark-bg.png');
+            background-size: contain;
+            border: 4px solid #B4B1F4;
+
+        }
+        .container.container-donation{
+            overflow: hidden;
+        }
+        .donors-container{
+            display: flex;
+            align-content: center;
+            padding: 30px 0;
+            animation: slide 45s linear infinite;
+        }
+        .donors-container-2{
+            animation: slide 45s linear infinite 0.5s;
+        }
+        .donors-container:hover {
+            animation-play-state: paused;
+        }
+        @keyframes slide{
+            from{
+                transform: translateX(0%);
+            }
+            to{
+                transform: translateX(-2400px);
+            }
+        }
+        .donor-container{
+            flex-shrink:0;
+            background-image: linear-gradient(#5e2ced 0%,#9749f8 100%);
+            color: rgb(255, 255, 255) ;
+            margin:15px 15px 15px 0;
+            padding: 12px;
+            text-align: center;
+            border-radius: 0.25rem;
+            text-transform: capitalize;
+            box-shadow: 1px 1px 4px  rgba(0,0,0,0.8);
+            width: 225px;
+
+        }
+        .donor-name{
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+        }
+        .donation-amount{
+            text-align: center;
+            background-image: linear-gradient(180deg ,#5e2ced 0%,#9749f8 100% );
+            color: white;
+            padding: 12px 0;
+        }
 
         @media only screen and (max-width: 991px){
             .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
@@ -66,6 +126,31 @@
 
             .team-member-area {
                 padding-top: 20px !important;
+            }
+        }
+
+        @media screen and (max-width: 770px){
+            .nav-tabs{
+                display:flex!important;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+            }
+            ::-webkit-scrollbar{
+                width: 20px;
+                height: 12px;
+            }
+            ::-webkit-scrollbar-thumb{
+                border-radius: 0.5rem;
+                background: #500ade;
+            }
+            .nav-tabs >li{
+                white-space: nowrap;
+                scroll-snap-align: center;
+            }
+            .nav-tabs a{
+                min-width: 225px;
+                margin-bottom: 0!important;
             }
         }
     </style>
@@ -185,6 +270,28 @@
         </div>
     </header>
     <!-- header area end  -->
+
+    <section aria-label="Donors In The Past Week">
+        <div class="container container-donation">
+            <h3 class="my-2 text-white text-center">Penderma</h3>
+            <div class="mb-3 text-white text-center">Paparan penderma-penderma yang terkini</div>
+            <div class="donors-container donors-container-1">
+                @foreach ($donors as $index => $donor)
+                    @if ($index % 10 == 0 && $index > 0)
+                        <!-- Close the previous row and open a new one -->
+                        </div><div class="donors-container donors-container-2">
+                    @endif
+                    <div class="donor-container">
+                        <div class="donor-name" title="{{ $donor->username }}">{{ $donor->username }}</div>
+                        <div class="donor-amount">RM{{ $donor->amount }}</div>
+                        <small>{{date('d/m/Y h:i A',strtotime($donor->datetime_created))}}</small>
+                    </div>
+                @endforeach            
+        </div>
+
+        </div>
+
+    </section>
 
     <section class="team-member-area" id="team">
         <div class="bg-shape-1">
@@ -901,6 +1008,12 @@
                 }
             });
         });
+
+        // duplicate the donors to make the loop effect works
+        var duplicate1 = document.querySelector('.donors-container-1').cloneNode(true);
+        $('.donors-container-1').append($(duplicate1).children());
+        var duplicate2 = document.querySelector('.donors-container-2').cloneNode(true);
+        $('.donors-container-2').append($(duplicate2).children());
     });
     </script>
 </body>

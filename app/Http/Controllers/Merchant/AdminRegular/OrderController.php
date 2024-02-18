@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
-
 use Yajra\DataTables\DataTables;
 
 class OrderController extends Controller
@@ -325,13 +324,14 @@ class OrderController extends Controller
         ->first();
 
         $amount = number_format($amount,2 );
-            
+           
+        $receipt_no = PgngOrder::with('transaction')->find($id)->transaction->nama;
         foreach($item as $row)
         {
             $price[$row->id] = number_format($row->price, 2, '.', '');
             $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2, '.', ''); // calculate total for each item in cart
         }
 
-        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount' , 'fixed_charges'));
+        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount' , 'fixed_charges' , 'receipt_no'));
     }
 }
