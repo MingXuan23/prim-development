@@ -603,11 +603,11 @@ class ScheduleApiController extends Controller
                 $device_token = $user->device_token;
                 $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send'; // Update with your project ID
 
-                $serviceAccountPath = 'C:\laragon\www\prim_production\prim-development\prim-notification-firebase-adminsdk-ezss1-affe4e1fe4.json';
-
+                $serviceAccountJson = env('GOOGLE_CREDENTIAL_KEY');
+               // dd($serviceAccountJson);
                 // Initialize the Google Client
                 $client = new Client();
-                $client->setAuthConfig($serviceAccountPath);
+                $client->setAuthConfig(json_decode($serviceAccountJson, true));
                 $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
                 $client->fetchAccessTokenWithAssertion();
             
@@ -860,7 +860,7 @@ class ScheduleApiController extends Controller
         $report->leave_list = DB::table('teacher_leave as tl')
         ->leftJoin('users as u','u.id','tl.teacher_id')
         ->where('tl.teacher_id',$user_id)
-        ->where ('tl.date','>=',Carbon::today()->subDays(30))
+        ->where ('tl.date','>=',Carbon::today()->subDays(120))
         ->where('tl.status',1)
         //->where('lr.status',1)
         ->select('tl.id','tl.date','tl.image','tl.period')
@@ -880,7 +880,7 @@ class ScheduleApiController extends Controller
                         ->leftJoin('subject as s','s.id','ss.subject_id')
                         ->where('lr.teacher_leave_id',$r->id)
                         ->where('lr.status',1)
-                        //->where('lr.confirmation','<>','Rejected')
+                        ->where('lr.confirmation','<>','Rejected')
                         ->select('u.name as relief_teacher','s.name as subject','c.nama as class','ss.slot','lr.confirmation')
                         ->orderBy('ss.slot')
                         ->get()
