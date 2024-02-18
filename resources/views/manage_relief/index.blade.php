@@ -5,6 +5,7 @@
 {{-- <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet"> --}}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
 
 <style>
 
@@ -159,7 +160,7 @@ u:hover {
                                 <th>Slot</th>
                                 <th>Orginal Teacher</th>
                                 <th>Reason</th>
-                                <th>Substitute Teacher</th>
+                                <th data-orderable="false">Substitute Teacher</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -296,10 +297,24 @@ u:hover {
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
 <script>   
     var dates = []
     var teachers = "";
+    var reliefTable;
+
     $(document).ready(function() {
+
+        $('#reliefTable').DataTable({
+            processing: true,
+            paging: true,
+            searching: true,
+            ordering: true,
+            columnDefs: [
+                { "orderable": false, "targets": -1 } // -1 refers to the last column
+            ]
+        });
 
         $.ajaxSetup({
             headers: {
@@ -397,26 +412,6 @@ u:hover {
             return true;
         }
 
-        // function validateTimeStart() {
-        //     var startTime = document.getElementById('starttime').value;
-        //     var endTime = document.getElementById('endtime').value;
-        //     console.log(endTime);
-        //     // Convert time strings to Date objects for easier comparison
-        //     var startDate = new Date('1970-01-01T' + startTime + 'Z');
-        //     var endDate = new Date('1970-01-01T' + endTime + 'Z');
-
-        //     // Compare start and end times
-        //     if (startDate >= endTime) {
-        //         alert('Start time cannot be late than or equal to end time.');
-        //         // endTime = '';
-        //         document.getElementById('startTime').value = '';
-        //         console.log(endTime);
-        //         return false;
-        //     }
-
-        //     return true;
-        // }
-
         function assignTeacher(leave_relief_id) {
            // console.log('Selected teacher for row ' + (schedule_subject_id) + ': ' + teacher);
 
@@ -474,59 +469,151 @@ u:hover {
             $('#commitReliefForm').submit();
         }
 
+    //     function displayRelief(reliefData) {
+    //     console.log('Relief Data:', reliefData);
 
-        function displayRelief(reliefData) {
-        console.log('Relief Data:', reliefData);
-
-                var tableBody = $('#reliefTable tbody');
-                tableBody.empty();
+    //             var tableBody = $('#reliefTable tbody');
+    //             tableBody.empty();
                 
-                reliefData.forEach(function (relief, index) {
-                    var row = $('<tr></tr>');
-                    row.append('<td>' + (index + 1) + '</td>');
-                    row.append('<td>' + relief.class_name + '</td>');
-                    row.append('<td>' + relief.subject + '</td>');
-                    row.append('<td>' + relief.slot + '</td>');
-                    row.append('<td>' + relief.leave_teacher + '</td>');
+    //             reliefData.forEach(function (relief, index) {
+    //                 var row = $('<tr></tr>');
+    //                 row.append('<td>' + (index + 1) + '</td>');
+    //                 row.append('<td>' + relief.class_name + '</td>');
+    //                 row.append('<td>' + relief.subject + '</td>');
+    //                 row.append('<td>' + relief.slot + '</td>');
+    //                 row.append('<td>' + relief.leave_teacher + '</td>');
                     
-                    var tdElement = $('<td></td>');
-                    if (relief.desc !== null) {
-                         tdElement = $('<td>' + relief.desc + '</td>');
-                    }
+    //                 var tdElement = $('<td></td>');
+    //                 if (relief.desc !== null) {
+    //                      tdElement = $('<td>' + relief.desc + '</td>');
+    //                 }
 
-                    if (relief.image !== null) {
-                        // Add a link to open the modal and display the image
-                        var imageLink = $('<a href="#" class="image-link" data-image="' + relief.image + '">(View)</a>');
-                        imageLink.click(function() {
-                                // Get the image URL from the data attribute
-                                var imageUrl = $(this).data('image');
-                                $('#modalImage').attr('src', '{{ URL::asset('/schedule_leave_image/') }}' + '/' + imageUrl);
+    //                 if (relief.image !== null) {
+    //                     // Add a link to open the modal and display the image
+    //                     var imageLink = $('<a href="#" class="image-link" data-image="' + relief.image + '">(View)</a>');
+    //                     imageLink.click(function() {
+    //                             // Get the image URL from the data attribute
+    //                             var imageUrl = $(this).data('image');
+    //                             $('#modalImage').attr('src', '{{ URL::asset('/schedule_leave_image/') }}' + '/' + imageUrl);
 
-                                $('#imageModal').modal('show');
+    //                             $('#imageModal').modal('show');
 
-                                return false;
-                                console.log('Image URL:', imageUrl);
-                            });
-                        tdElement.append(imageLink);
-                    }
+    //                             return false;
+    //                             console.log('Image URL:', imageUrl);
+    //                         });
+    //                     tdElement.append(imageLink);
+    //                 }
 
-                    row.append(tdElement);
+    //                 row.append(tdElement);
 
-        // Append the select box with options
-            var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  
-            + '" schedule_subject_id="'+relief.schedule_subject_id +'" slot = "'+relief.slot+'"></select></td>');
+    //     // Append the select box with options
+    //         var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  
+    //         + '" schedule_subject_id="'+relief.schedule_subject_id +'" slot = "'+relief.slot+'"></select></td>');
 
-            var selectElement = selectColumn.find('select');
+    //         var selectElement = selectColumn.find('select');
 
-            // Call the updated function to populate the select box options
-        //git  updateTeacherComboBox(index, response.original.free_teacher_list);
+    //         // Call the updated function to populate the select box options
+    //     //git  updateTeacherComboBox(index, response.original.free_teacher_list);
 
-            row.append(selectColumn);
-            tableBody.append(row);
+    //         row.append(selectColumn);
+    //         tableBody.append(row);
+    //     });
+        
+    //         var assignTeacherElements = tableBody.find('.assign_teacher');
+
+    // $('.assign_teacher').change(function() {
+    //     var selectedValue = $(this).val();
+    //     var slot = $(this).attr('slot');
+    //     //$(this).css("color", $("select option:selected").css("color"));
+    //     var selectedOption = $(this).find('option:selected');
+
+    //     // Check the color of the selected option
+    //     var optionColor = selectedOption.css('color');
+
+    //     // Update the color of the select element
+    //     $(this).css('color', optionColor);
+
+    //     // Use filter to find elements with the same slot and teacher
+    //     if(selectedOption.text().trim() == 'No Teacher' || $(this).val() == null){
+    //         return;
+    //     }
+    //     var duplicates = $('.assign_teacher').filter(function() {
+    //         return $(this).val() === selectedValue && $(this).attr('slot') === slot ;
+    //     });
+    //     // Check if duplicates were found
+    //     if (duplicates.length > 1) {
+    //         console.log(selectedOption.text(),$(this).val(),duplicates)
+    //         alert(selectedOption.text() +' was selected in the same slot!');
+    //     }
+
+    //     var checkRelief = $('.assign_teacher').filter(function() {
+    //         return $(this).val() === selectedValue && $(this).attr('slot') !== slot;
+    //     });
+      
+    //     if(checkRelief.length >= parseInt( selectedOption.attr('remaining_relief')) ){
+    //         alert('This teacher exceed his/her remaining relief already!');
+    //     }
+        
+    // });
+
+    
+    //     assignTeacherElements.each(function(index, element) {
+    //                 var selectedIndex = $(this).attr('data-index');
+    //                 // Use direct property access instead of split
+    //                 var leave_relief_id = selectedIndex;
+
+    //                 assignTeacher(leave_relief_id);
+            
+    //         // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
+    //     });
+    //     autoSuggest();
+
+    //     }
+
+    function imageLinkFunction(){
+        $(this).click(function() {
+        var imageUrl = $(this).data("image");
+        $("#modalImage").attr("src", "{{ URL::asset('/schedule_leave_image/') }}" + "/" + imageUrl);
+        $("#imageModal").modal("show");
+        return false;
+    });
+    }
+
+    function displayRelief(reliefData) {
+    console.log('Relief Data:', reliefData);
+    var table = $('#reliefTable').DataTable();
+    table.clear().draw(); // Clear the existing data in the table
+    var tableBody = $('#reliefTable').find('tbody');
+
+    reliefData.forEach(function (relief, index) {
+        var imageLink = '';
+        // var imageLinkFunction = '';
+        if (relief.image !== null) {
+            // imageLinkFunction = imageLinkFunction.toString(); // Convert the function to a string
+            imageLink = '<a href="#" class="image-link" data-image="' + relief.image + '">(View)</a>';
+        }
+
+        var rowNode = table.row.add([
+            index + 1,
+            relief.class_name,
+            relief.subject,
+            relief.slot,
+            relief.leave_teacher,
+            relief.desc ? relief.desc + imageLink : imageLink, // Include image link if description exists
+            '<select class="form-control assign_teacher" data-index="' + relief.leave_relief_id +
+            '" schedule_subject_id="' + relief.schedule_subject_id + '" slot="' + relief.slot + '"></select>'
+        ]).draw().node();
+
+        // Set up the click event for the image link
+        $(rowNode).find('.image-link').click(function() {
+            var imageUrl = $(this).data('image');
+            $("#modalImage").attr("src", "{{ URL::asset('/schedule_leave_image/') }}" + "/" + imageUrl);
+            $("#imageModal").modal("show");
+            return false;
         });
+    });
 
-            var assignTeacherElements = tableBody.find('.assign_teacher');
-
+    // Add event listener for the change event on the assign_teacher select elements
     $('.assign_teacher').change(function() {
         var selectedValue = $(this).val();
         var slot = $(this).attr('slot');
@@ -555,26 +642,26 @@ u:hover {
         var checkRelief = $('.assign_teacher').filter(function() {
             return $(this).val() === selectedValue && $(this).attr('slot') !== slot;
         });
-      
+
         if(checkRelief.length >= parseInt( selectedOption.attr('remaining_relief')) ){
             alert('This teacher exceed his/her remaining relief already!');
         }
-        
     });
 
-    
-        assignTeacherElements.each(function(index, element) {
-                    var selectedIndex = $(this).attr('data-index');
-                    // Use direct property access instead of split
-                    var leave_relief_id = selectedIndex;
+    var assignTeacherElements = tableBody.find('.assign_teacher');
 
-                    assignTeacher(leave_relief_id);
-            
-            // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
-        });
-        autoSuggest();
+    assignTeacherElements.each(function(index, element) {
+        var selectedIndex = $(this).attr('data-index');
+        // Use direct property access instead of split
+        var leave_relief_id = selectedIndex;
 
-        }
+        assignTeacher(leave_relief_id);
+        
+        // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
+    });
+    autoSuggest();
+}
+
 
 // Call fetchReliefData with the corrected success function
 function fetchReliefData() {
@@ -595,6 +682,7 @@ function fetchReliefData() {
         success: function (response) {
             teachers= response.teachers;
             displayRelief(response.pending_relief);
+            // initializeDataTable();
         },
         error: function (xhr, status, error) {
             console.error(error);
