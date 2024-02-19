@@ -610,7 +610,7 @@ class ScheduleApiController extends Controller
                 $client->setAuthConfig(json_decode($serviceAccountJson, true));
                 $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
                 $client->fetchAccessTokenWithAssertion();
-            
+                dd($client);
                 $accessToken = $client->getAccessToken();
             
                 // Use the access token as the bearer token
