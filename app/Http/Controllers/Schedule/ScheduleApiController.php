@@ -594,6 +594,22 @@ class ScheduleApiController extends Controller
         return response()->json(["failed"]);
      }
 
+
+     private function getAccessToken()
+    {
+    $credentialsJsonString = env('GOOGLE_CREDENTIAL_KEY');
+    $credentials = json_decode($credentialsJsonString, true);
+
+    $client = new \Google\Client();
+   //dd($credentials);
+    $client->setAuthConfig($credentials);
+    $client->addScope(\Google_Service_FirebaseCloudMessaging::CLOUD_PLATFORM);
+
+    $client->fetchAccessTokenWithAssertion();
+
+    return $client->getAccessToken()['access_token'];
+    }
+
      public function sendNotification3($id,$title,$message)
      {  $user =User::find($id);
 
@@ -620,7 +636,7 @@ class ScheduleApiController extends Controller
         $encodedData = json_encode($data);
 
         $headers = [
-            'Authorization: Bearer '. $serverKey,
+            'Authorization: Bearer ' . $this->getAccessToken(),
             'Content-Type: application/json',
         ];
 
