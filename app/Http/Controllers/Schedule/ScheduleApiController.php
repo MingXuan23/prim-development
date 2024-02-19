@@ -597,17 +597,43 @@ class ScheduleApiController extends Controller
 
      private function getAccessToken()
     {
-    $credentialsJsonString = env('GOOGLE_CREDENTIAL_KEY');
-    $credentials = json_decode($credentialsJsonString, true);
-
-    $client = new \Google\Client();
-   //dd($credentials);
-    $client->setAuthConfig($credentials);
-    $client->addScope(\Google_Service_FirebaseCloudMessaging::CLOUD_PLATFORM);
-
-    $client->fetchAccessTokenWithAssertion();
-
-    return $client->getAccessToken()['access_token'];
+        $credentialsJsonString = env('GOOGLE_CREDENTIAL_KEY');
+        $credentials = json_decode($credentialsJsonString, true);
+    
+        $tokenURL = "https://oauth2.googleapis.com/token";
+        $assertion = [
+            "iss" => $credentials['client_email'],
+            "scope" => "https://www.googleapis.com/auth/firebase.messaging",
+            "aud" => $tokenURL,
+            "exp" => time() + 3600,
+            "iat" => time()
+        ];
+    
+        $jwtHeader = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
+        $encodedHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($jwtHeader));
+        $encodedAssertion = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($assertion)));
+    
+        $signature = '';
+        openssl_sign($encodedHeader . '.' . $encodedAssertion, $signature, $credentials['private_key'], 'SHA256');
+        $jwt = $encodedHeader . '.' . $encodedAssertion . '.' . base64_encode($signature);
+    
+        $postFields = [
+            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion' => $jwt
+        ];
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $tokenURL);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postFields));
+        $response = curl_exec($ch);
+        //dd($assertion);
+        curl_close($ch);
+    
+        $responseArr = json_decode($response, true);
+        
+        return $responseArr['access_token'];
     }
 
      public function sendNotification3($id,$title,$message)
