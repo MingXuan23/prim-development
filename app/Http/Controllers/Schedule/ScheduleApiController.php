@@ -12,12 +12,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Notifications\Notification;
+use Kreait\Firebase\Messaging\Notification;
 
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\ServiceAccount;
-use Google\Client;
+
 
 use App\User;
 
@@ -594,6 +593,129 @@ class ScheduleApiController extends Controller
         }
         return response()->json(["failed"]);
      }
+
+     public function sendNotification3($id,$title,$message)
+     {  $user =User::find($id);
+
+       // dd($user);
+
+       //dd($user);
+        if($user->device_token){
+
+            $device_token =[];
+            $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send';
+            array_push($device_token,$user->device_token);
+        $serverKey = getenv('FCM_SERVER_KEY');
+        //$serverKey = getenv('PRODUCTION_BE_URL');
+        
+       
+        $data = [
+            "registration_ids" => $device_token,
+            "notification" => [
+                "title" => $title,
+                "body" =>$message,
+            ]
+        ];
+
+        $encodedData = json_encode($data);
+
+        $headers = [
+            'Authorization: Bearer '. $serverKey,
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+
+        // Execute post
+        $result = curl_exec($ch);
+
+        if ($result === FALSE) {
+            die('Curl failed: '. curl_error($ch));
+        }
+       
+        // Close connection
+        curl_close($ch);
+
+        // FCM response
+        //dd($result);
+
+            return response()->json(["success"=>$result]);
+        }
+        return response()->json(["failed"]);
+     }
+
+     public function sendNotificationTest($id, $title, $message)
+     {
+        //  $user = User::find($id);
+     
+        //  if ($user->device_token) {
+        //      $deviceToken = $user->device_token;
+             
+        //      // Decode Firebase credentials from .env
+        //      $firebaseCredentials = json_decode(env('GOOGLE_CREDENTIAL_KEY'), true);
+        //     // dd(getenv('FCM_SERVER_KEY'));
+        //      $factory = (new Factory)
+        //          ->withServiceAccount($firebaseCredentials)
+        //          ->withProjectId('prim-notification');
+        //      $messaging = $factory->createMessaging();
+             
+        //      $notification = Notification::create($title, $message);
+        //      $message = CloudMessage::withTarget('token', $deviceToken)
+        //          ->withNotification($notification);
+             
+        //      try {
+        //          $result = $messaging->send($message);
+        //          return response()->json(["success" => $result]);
+        //      } catch (\Kreait\Firebase\Exception\MessagingException $e) {
+        //          return response()->json(["failed" => $e->getMessage()]);
+        //      } catch (\Kreait\Firebase\Exception\FirebaseException $e) {
+        //          return response()->json(["failed" => $e->getMessage()]);
+        //      }
+        //  }
+     
+        //  return response()->json(["failed"]);
+
+    $user = User::find($id);
+    if (!$user || !$user->device_token) {
+        return response()->json(["failed" => "User or device token not found"]);
+    }
+
+    $deviceToken = $user->device_token;
+    $serverKey = env('FCM_SERVER_KEY'); // Obtain the server key from Firebase Console and store in .env
+
+    $data = [
+        'notification' => [
+            'title' => $title,
+            'body' => $message,
+        ],
+        'to' => $deviceToken,
+    ];
+
+    try {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $serverKey,
+            'Content-Type' => 'application/json',
+        ])->post('https://fcm.googleapis.com/v1/projects/your-project-id/messages:send', $data);
+
+        if ($response->successful()) {
+            return response()->json(["success" => $response->json()]);
+        } else {
+            return response()->json(["failed" => $response->json()]);
+        }
+    } catch (Exception $e) {
+        return response()->json(["failed" => $e->getMessage()]);
+    }
+
+     }
+
 
      public function sendFirebaseNotification($id, $title, $message)
         {
