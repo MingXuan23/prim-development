@@ -651,11 +651,21 @@ class ScheduleApiController extends Controller
         //$serverKey = getenv('PRODUCTION_BE_URL');
         
        
+        // $data = [
+        //     "token" => $device_token,
+        //     "notification" => [
+        //         "title" => $title,
+        //         "body" =>$message,
+        //     ]
+        // ];
+
         $data = [
-            "token" => $device_token,
-            "notification" => [
-                "title" => $title,
-                "body" =>$message,
+            "message" => [
+                "token" => $device_token,
+                "notification" => [
+                    "body" => $message,
+                    "title" =>  $title
+                ]
             ]
         ];
 
