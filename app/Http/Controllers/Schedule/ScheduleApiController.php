@@ -652,7 +652,7 @@ class ScheduleApiController extends Controller
         
        
         $data = [
-            "registration_ids" => $device_token,
+            "token" => $device_token,
             "notification" => [
                 "title" => $title,
                 "body" =>$message,
