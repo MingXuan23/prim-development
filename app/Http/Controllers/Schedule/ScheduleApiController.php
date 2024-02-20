@@ -644,10 +644,10 @@ class ScheduleApiController extends Controller
        //dd($user);
         if($user->device_token){
 
-            $device_token =[];
+            //$device_token =[];
             $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send';
-            array_push($device_token,$user->device_token);
-        $serverKey = getenv('FCM_SERVER_KEY');
+            //array_push($device_token,$user->device_token);
+       // $serverKey = getenv('FCM_SERVER_KEY');
         //$serverKey = getenv('PRODUCTION_BE_URL');
         
        
@@ -661,7 +661,7 @@ class ScheduleApiController extends Controller
 
         $data = [
             "message" => [
-                "token" => $device_token,
+                "token" => $user->device_token,
                 "notification" => [
                     "body" => $message,
                     "title" =>  $title
