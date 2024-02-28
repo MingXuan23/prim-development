@@ -469,7 +469,9 @@ Route::group(['middleware' => ['auth']], function () {
         'delivery'           => 'DeliveryController',
     ]);
 });
-Route::get('adminTestFpx/{id}/{update}', 'PayController@adminTestFpx')->name('adminTestFpx');
+Route::get('adminTestFpx/{id}/', 'DirectPayController@adminTestFpx')->name('adminTestFpx');
+Route::get('adminHandle', 'DirectPayController@handle');
+Route::get('getTransactionInfo/{id}','DirectPayController@getTransactionInfo');
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
 Route::get('donateFromMobile', 'PayController@donateFromMobile');
 Route::post('trn', 'PayController@transaction')->name('trn');

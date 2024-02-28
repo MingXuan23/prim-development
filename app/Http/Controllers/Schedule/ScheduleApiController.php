@@ -12,12 +12,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Notifications\Notification;
+use Kreait\Firebase\Messaging\Notification;
 
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\ServiceAccount;
-use Google\Client;
+
 
 use App\User;
 
@@ -595,6 +594,181 @@ class ScheduleApiController extends Controller
         return response()->json(["failed"]);
      }
 
+
+     private function getAccessToken()
+    {
+        $credentialsJsonString = env('GOOGLE_CREDENTIAL_KEY');
+        $credentials = json_decode($credentialsJsonString, true);
+    
+        $tokenURL = "https://oauth2.googleapis.com/token";
+        $assertion = [
+            "iss" => $credentials['client_email'],
+            "scope" => "https://www.googleapis.com/auth/firebase.messaging",
+            "aud" => $tokenURL,
+            "exp" => time() + 3600,
+            "iat" => time()
+        ];
+    
+        $jwtHeader = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
+        $encodedHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($jwtHeader));
+        $encodedAssertion = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($assertion)));
+    
+        $signature = '';
+        openssl_sign($encodedHeader . '.' . $encodedAssertion, $signature, $credentials['private_key'], 'SHA256');
+        $jwt = $encodedHeader . '.' . $encodedAssertion . '.' . base64_encode($signature);
+    
+        $postFields = [
+            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion' => $jwt
+        ];
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $tokenURL);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postFields));
+        $response = curl_exec($ch);
+        //dd($assertion);
+        curl_close($ch);
+    
+        $responseArr = json_decode($response, true);
+        
+        return $responseArr['access_token'];
+    }
+
+     public function sendNotification3($id,$title,$message)
+     {  $user =User::find($id);
+
+       // dd($user);
+
+       //dd($user);
+        if($user->device_token){
+
+            //$device_token =[];
+            $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send';
+            //array_push($device_token,$user->device_token);
+       // $serverKey = getenv('FCM_SERVER_KEY');
+        //$serverKey = getenv('PRODUCTION_BE_URL');
+        
+       
+        // $data = [
+        //     "token" => $device_token,
+        //     "notification" => [
+        //         "title" => $title,
+        //         "body" =>$message,
+        //     ]
+        // ];
+
+        $data = [
+            "message" => [
+                "token" => $user->device_token,
+                "notification" => [
+                    "body" => $message,
+                    "title" =>  $title
+                ]
+            ]
+        ];
+
+        $encodedData = json_encode($data);
+
+        $headers = [
+            'Authorization: Bearer ' . $this->getAccessToken(),
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+
+        // Execute post
+        $result = curl_exec($ch);
+
+        if ($result === FALSE) {
+            die('Curl failed: '. curl_error($ch));
+        }
+       
+        // Close connection
+        curl_close($ch);
+
+        // FCM response
+        //dd($result);
+
+            return response()->json(["success"=>$result]);
+        }
+        return response()->json(["failed"]);
+     }
+
+     public function sendNotificationTest($id, $title, $message)
+     {
+        //  $user = User::find($id);
+     
+        //  if ($user->device_token) {
+        //      $deviceToken = $user->device_token;
+             
+        //      // Decode Firebase credentials from .env
+        //      $firebaseCredentials = json_decode(env('GOOGLE_CREDENTIAL_KEY'), true);
+        //     // dd(getenv('FCM_SERVER_KEY'));
+        //      $factory = (new Factory)
+        //          ->withServiceAccount($firebaseCredentials)
+        //          ->withProjectId('prim-notification');
+        //      $messaging = $factory->createMessaging();
+             
+        //      $notification = Notification::create($title, $message);
+        //      $message = CloudMessage::withTarget('token', $deviceToken)
+        //          ->withNotification($notification);
+             
+        //      try {
+        //          $result = $messaging->send($message);
+        //          return response()->json(["success" => $result]);
+        //      } catch (\Kreait\Firebase\Exception\MessagingException $e) {
+        //          return response()->json(["failed" => $e->getMessage()]);
+        //      } catch (\Kreait\Firebase\Exception\FirebaseException $e) {
+        //          return response()->json(["failed" => $e->getMessage()]);
+        //      }
+        //  }
+     
+        //  return response()->json(["failed"]);
+
+    $user = User::find($id);
+    if (!$user || !$user->device_token) {
+        return response()->json(["failed" => "User or device token not found"]);
+    }
+
+    $deviceToken = $user->device_token;
+    $serverKey = env('FCM_SERVER_KEY'); // Obtain the server key from Firebase Console and store in .env
+
+    $data = [
+        'notification' => [
+            'title' => $title,
+            'body' => $message,
+        ],
+        'to' => $deviceToken,
+    ];
+
+    try {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $serverKey,
+            'Content-Type' => 'application/json',
+        ])->post('https://fcm.googleapis.com/v1/projects/your-project-id/messages:send', $data);
+
+        if ($response->successful()) {
+            return response()->json(["success" => $response->json()]);
+        } else {
+            return response()->json(["failed" => $response->json()]);
+        }
+    } catch (Exception $e) {
+        return response()->json(["failed" => $e->getMessage()]);
+    }
+
+     }
+
+
      public function sendFirebaseNotification($id, $title, $message)
         {
             $user = User::find($id);
@@ -603,14 +777,14 @@ class ScheduleApiController extends Controller
                 $device_token = $user->device_token;
                 $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send'; // Update with your project ID
 
-                $serviceAccountPath = 'C:\laragon\www\prim_production\prim-development\prim-notification-firebase-adminsdk-ezss1-affe4e1fe4.json';
-
+                $serviceAccountJson = env('GOOGLE_CREDENTIAL_KEY');
+               // dd($serviceAccountJson);
                 // Initialize the Google Client
                 $client = new Client();
-                $client->setAuthConfig($serviceAccountPath);
+                $client->setAuthConfig(json_decode($serviceAccountJson, true));
                 $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
                 $client->fetchAccessTokenWithAssertion();
-            
+                dd($client);
                 $accessToken = $client->getAccessToken();
             
                 // Use the access token as the bearer token
@@ -860,7 +1034,7 @@ class ScheduleApiController extends Controller
         $report->leave_list = DB::table('teacher_leave as tl')
         ->leftJoin('users as u','u.id','tl.teacher_id')
         ->where('tl.teacher_id',$user_id)
-        ->where ('tl.date','>=',Carbon::today()->subDays(30))
+        ->where ('tl.date','>=',Carbon::today()->subDays(120))
         ->where('tl.status',1)
         //->where('lr.status',1)
         ->select('tl.id','tl.date','tl.image','tl.period')
@@ -880,7 +1054,7 @@ class ScheduleApiController extends Controller
                         ->leftJoin('subject as s','s.id','ss.subject_id')
                         ->where('lr.teacher_leave_id',$r->id)
                         ->where('lr.status',1)
-                        //->where('lr.confirmation','<>','Rejected')
+                        ->where('lr.confirmation','<>','Rejected')
                         ->select('u.name as relief_teacher','s.name as subject','c.nama as class','ss.slot','lr.confirmation')
                         ->orderBy('ss.slot')
                         ->get()

@@ -350,21 +350,30 @@ class FeesController extends AppBaseController
 
             }
         }
-        $all_student=$all_student->count();
         // dd($all_student);
+        // $student_complete = DB::table('students')
+        //     ->join('class_student', 'class_student.student_id', '=', 'students.id')
+        //     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+        //     ->where('class_organization.organization_id', $oid)
+        //     ->where('class_student.fees_status', 'Completed')
+        //     ->count();
         $student_complete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes','classes.id','=','class_organization.class_id')
+            ->where('classes.levelid','>',0)
             ->where('class_organization.organization_id', $oid)
             ->where('class_student.fees_status', 'Completed')
             ->count();
-
         $student_notcomplete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes','classes.id','=','class_organization.class_id')
+            ->where('classes.levelid','>',0)
             ->where('class_organization.organization_id', $oid)
             ->where('class_student.fees_status', 'Not Complete')
             ->count();
+        $all_student= $student_complete +$student_notcomplete ;
 
         $oid=$request->oid;//change back the children org if necessary
         $all_parent =  DB::table('organization_user')
@@ -393,22 +402,42 @@ class FeesController extends AppBaseController
             }
         }
       
-        $all_parent=$all_parent->count();
+       
 
+        // $parent_complete =  DB::table('organization_user')
+        //     ->where('organization_id', $oid)
+        //     ->where('role_id', 6)
+        //     ->where('status', 1)
+        //     ->where('fees_status', 'Completed')
+        //     ->count();
         $parent_complete =  DB::table('organization_user')
-            ->where('organization_id', $oid)
-            ->where('role_id', 6)
-            ->where('status', 1)
-            ->where('fees_status', 'Completed')
+            ->join('organization_user_student','organization_user.id','=','organization_user_student.organization_user_id')
+            ->join('students','students.id','organization_user_student.student_id')
+            ->join('class_student','class_student.student_id','students.id')
+            ->join('class_organization','class_organization.id','class_student.organclass_id')
+            ->join('classes','classes.id','class_organization.class_id')
+            ->where('classes.levelid','>',0)
+            ->where('organization_user.organization_id', $oid)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
+            ->where('organization_user.fees_status', 'Completed')
+            ->distinct('organization_user.user_id')
             ->count();
 
         $parent_notcomplete =  DB::table('organization_user')
-            ->where('organization_id', $oid)
-            ->where('role_id', 6)
-            ->where('status', 1)
-            ->where('fees_status', 'Not Complete')
+            ->join('organization_user_student','organization_user.id','=','organization_user_student.organization_user_id')
+            ->join('students','students.id','organization_user_student.student_id')
+            ->join('class_student','class_student.student_id','students.id')
+            ->join('class_organization','class_organization.id','class_student.organclass_id')
+            ->join('classes','classes.id','class_organization.class_id')
+            ->where('classes.levelid','>',0)
+            ->where('organization_user.organization_id', $oid)
+            ->where('organization_user.role_id', 6)
+            ->where('organization_user.status', 1)
+            ->where('organization_user.fees_status', 'Not Complete')
+            ->distinct('organization_user.user_id')
             ->count();
-
+            $all_parent=$parent_complete + $parent_notcomplete;
         return response()->json(['all_student' => $all_student, 'student_complete' => $student_complete, 'student_notcomplete' => $student_notcomplete, 'all_parent' => $all_parent, 'parent_complete' => $parent_complete, 'parent_notcomplete' => $parent_notcomplete]);
 
     }
@@ -538,22 +567,54 @@ class FeesController extends AppBaseController
 
             if ($type == 'Selesai') {
 
-                $data = DB::table('users')
-                    ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-                    ->select('users.*', 'organization_user.organization_id')
+                // $data = DB::table('users')
+                //     ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                //     ->select('users.*', 'organization_user.organization_id')
+                //     ->where('organization_user.organization_id', $oid)
+                //     ->where('organization_user.role_id', 6)
+                //     ->where('organization_user.status', 1)
+                //     ->where('organization_user.fees_status', 'Completed')
+                //     ->get();
+                $data =  DB::table ('users')
+                    ->join('organization_user','users.id', '=' ,'organization_user.user_id')
+                    ->join('organization_user_student','organization_user.id','=','organization_user_student.organization_user_id')
+                    ->join('students','students.id','organization_user_student.student_id')
+                    ->join('class_student','class_student.student_id','students.id')
+                    ->join('class_organization','class_organization.id','class_student.organclass_id')
+                    ->join('classes','classes.id','class_organization.class_id')
+                    ->where('classes.levelid','>',0)
                     ->where('organization_user.organization_id', $oid)
                     ->where('organization_user.role_id', 6)
                     ->where('organization_user.status', 1)
                     ->where('organization_user.fees_status', 'Completed')
-                    ->get();
-            } else {
-                $data = DB::table('users')
-                    ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
                     ->select('users.*', 'organization_user.organization_id')
+                    ->distinct('users.id')
+                    ->get();
+     
+            } else {
+                // $data = DB::table('users')
+                //     ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
+                //     ->select('users.*', 'organization_user.organization_id')
+                //     ->where('organization_user.organization_id', $oid)
+                //     ->where('organization_user.role_id', 6)
+                //     ->where('organization_user.status', 1)
+                //     ->where('organization_user.fees_status', 'Not Complete')
+                //     ->get();
+
+                $data =  DB::table ('users')
+                    ->join('organization_user','users.id', '=' ,'organization_user.user_id')
+                    ->join('organization_user_student','organization_user.id','=','organization_user_student.organization_user_id')
+                    ->join('students','students.id','organization_user_student.student_id')
+                    ->join('class_student','class_student.student_id','students.id')
+                    ->join('class_organization','class_organization.id','class_student.organclass_id')
+                    ->join('classes','classes.id','class_organization.class_id')
+                    ->where('classes.levelid','>',0)
                     ->where('organization_user.organization_id', $oid)
                     ->where('organization_user.role_id', 6)
                     ->where('organization_user.status', 1)
                     ->where('organization_user.fees_status', 'Not Complete')
+                    ->select('users.*', 'organization_user.organization_id')
+                    ->distinct('users.id')
                     ->get();
             }
 

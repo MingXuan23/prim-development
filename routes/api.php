@@ -74,7 +74,7 @@ Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
     Route::post('login', 'ScheduleApiController@login');
     Route::get('getTimeOff', 'ScheduleApiController@getTimeOff');
     Route::get('sendNotification/{id}/{title}/{message}', 'ScheduleApiController@sendNotification');
-    Route::get('sendFirebaseNotification/{id}/{title}/{message}', 'ScheduleApiController@sendFirebaseNotification');
+    Route::get('sendFirebaseNotification/{id}/{title}/{message}', 'ScheduleApiController@sendNotification3');
     Route::get('isNoti/{id}', 'ScheduleApiController@isNoti');
     Route::get('getSchedule/{id}', 'ScheduleApiController@getSchedule');
     Route::get('getTeacherInfo/{id}', 'ScheduleApiController@getTeacherInfo');
