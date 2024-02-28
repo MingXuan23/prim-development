@@ -86,7 +86,7 @@ class Organization extends Model
 
     public function room()
     {
-        return $this->hasMany(Room::class , 'id' ,'homestayid' );
+        return $this->hasMany(Room::class , 'id' ,'homestayid')->where('deleted',null);
     }
 
     public function grab()
