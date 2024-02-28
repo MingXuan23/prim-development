@@ -704,70 +704,6 @@ class ScheduleApiController extends Controller
         return response()->json(["failed"]);
      }
 
-     public function sendNotificationTest($id, $title, $message)
-     {
-        //  $user = User::find($id);
-     
-        //  if ($user->device_token) {
-        //      $deviceToken = $user->device_token;
-             
-        //      // Decode Firebase credentials from .env
-        //      $firebaseCredentials = json_decode(env('GOOGLE_CREDENTIAL_KEY'), true);
-        //     // dd(getenv('FCM_SERVER_KEY'));
-        //      $factory = (new Factory)
-        //          ->withServiceAccount($firebaseCredentials)
-        //          ->withProjectId('prim-notification');
-        //      $messaging = $factory->createMessaging();
-             
-        //      $notification = Notification::create($title, $message);
-        //      $message = CloudMessage::withTarget('token', $deviceToken)
-        //          ->withNotification($notification);
-             
-        //      try {
-        //          $result = $messaging->send($message);
-        //          return response()->json(["success" => $result]);
-        //      } catch (\Kreait\Firebase\Exception\MessagingException $e) {
-        //          return response()->json(["failed" => $e->getMessage()]);
-        //      } catch (\Kreait\Firebase\Exception\FirebaseException $e) {
-        //          return response()->json(["failed" => $e->getMessage()]);
-        //      }
-        //  }
-     
-        //  return response()->json(["failed"]);
-
-    $user = User::find($id);
-    if (!$user || !$user->device_token) {
-        return response()->json(["failed" => "User or device token not found"]);
-    }
-
-    $deviceToken = $user->device_token;
-    $serverKey = env('FCM_SERVER_KEY'); // Obtain the server key from Firebase Console and store in .env
-
-    $data = [
-        'notification' => [
-            'title' => $title,
-            'body' => $message,
-        ],
-        'to' => $deviceToken,
-    ];
-
-    try {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $serverKey,
-            'Content-Type' => 'application/json',
-        ])->post('https://fcm.googleapis.com/v1/projects/your-project-id/messages:send', $data);
-
-        if ($response->successful()) {
-            return response()->json(["success" => $response->json()]);
-        } else {
-            return response()->json(["failed" => $response->json()]);
-        }
-    } catch (Exception $e) {
-        return response()->json(["failed" => $e->getMessage()]);
-    }
-
-     }
-
 
      public function sendFirebaseNotification($id, $title, $message)
         {
@@ -871,36 +807,6 @@ class ScheduleApiController extends Controller
                 }
 
             $allPending=false;
-            // if($request->isAdmin&&$this->checkAdmin($user->id,$school->id)){
-            //     $allPending = DB::table('organizations as o')
-            //     ->join('schedules as s','s.organization_id','o.id')
-            //     ->join('schedule_version as sv','sv.schedule_id','s.id')
-            //     ->join('schedule_subject as ss','ss.schedule_version_id','sv.id')
-            //     ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
-            //     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
-            //     ->leftJoin('subject as sub','sub.id','ss.subject_id')
-            //     ->leftJoin('users as u','u.id','ss.teacher_in_charge')
-            //     ->leftJoin('users as ur','ur.id','lr.replace_teacher_id')
-            //     ->leftJoin('classes as c','c.id','ss.class_id')
-            //     ->where('lr.confirmation','<>',"Confirmed")
-            //     ->where('sv.status',1)
-            //     ->where('s.status',1)
-            //     ->where('tl.status',1)
-            //     ->where('tl.date','>=',Carbon::today())
-            //     ->select('lr.id as leave_relief_id','ss.id as schedule_subject_id','c.nama as class','sub.name as subject',
-            //     's.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as leaveTeacher','ur.name as reliefTeacher','tl.date')
-            //     ->get();
-
-            //     foreach($allPending as $a){
-            //         //if(isset($s->duration)){
-            //             $time_info= $this->getSlotTime($a,$a->day,$a->slot);
-            //             $a->time=$time_info['time'];
-            //             $a->duration=$time_info['duration'];
-             
-            //             unset($a->time_off);
-            //             unset($a->start_time);
-            //     }
-            // }
             return response()->json(['pendingRelief'=>$pendingRelief,'allPending'=>$allPending]);
         }
         return response()->json(["error"=>"You have not any school"]);
@@ -987,6 +893,94 @@ class ScheduleApiController extends Controller
         return response()->json(['result'=>$update]);
     }
 
+    public function getHistoryByRange($user_id,$year,$month){
+        $school = $this->getSchools($user_id)->first();
+        $isAdmin =$this->checkAdmin($user_id,$school->id);
+
+        $report = new stdClass();
+
+        $report->leaveCount = DB::table('teacher_leave as tl')
+                ->where('tl.teacher_id',$user_id)
+                ->where('tl.status',1)
+                ->count();
+
+        $report->reliefCount = DB::table('leave_relief as lr')
+            ->leftJoin('schedule_subject as ss','lr.schedule_subject_id','ss.id')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            ->where('lr.replace_teacher_id',$user_id)
+            ->where('lr.status',1)
+            ->where('lr.confirmation','Confirmed')
+            ->groupBy(['tl.date','ss.slot'])
+            ->count();
+
+        $report->rejectCount = DB::table('leave_relief')
+            ->where('replace_teacher_id',$user_id)
+            ->where('status',1)
+            ->where('confirmation','Rejected')
+            ->count();
+
+        $report->reliefList =  DB::table('leave_relief as lr')
+        ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+        ->leftJoin ('schedule_version as sv','sv.id','ss.schedule_version_id')
+        ->leftJoin('schedules as s','s.id','sv.schedule_id')
+        ->leftJoin('classes as c','c.id','ss.class_id')
+        ->leftJoin('subject as sub','sub.id','ss.subject_id')
+        ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+        ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+        ->where('s.organization_id',$school->id)
+        ->where('lr.replace_teacher_id',$user_id)
+        ->where('lr.confirmation',"Confirmed")
+        ->whereMonth('tl.date', $month)
+        ->whereYear('tl.date', $year)
+        ->where('tl.status',1)
+        ->where('lr.status',1)
+        ->select('lr.id as leave_relief_id','c.nama as class','sub.name as subject','ss.slot','u.name as relatedTeacher','tl.date')
+        ->get();
+
+        $report->leave_list = DB::table('teacher_leave as tl')
+        ->leftJoin('users as u','u.id','tl.teacher_id')
+        ->where('tl.teacher_id',$user_id)
+        ->whereMonth('tl.date', $month)
+        ->whereYear('tl.date', $year)
+        ->where('tl.status',1)
+        //->where('lr.status',1)
+        ->select('tl.id','tl.date','tl.image','tl.period')
+        ->orderBy('tl.date','desc')
+        ->get();
+
+
+        foreach( $report->leave_list as $r){
+            //if(isset($s->duration)){
+
+                //$relief_info =[];
+
+                $relief = DB::table('leave_relief as lr')
+                        ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+                        ->leftJoin('classes as c','c.id','ss.class_id')
+                        ->leftJoin('users as u','u.id','lr.replace_teacher_id')
+                        ->leftJoin('subject as s','s.id','ss.subject_id')
+                        ->where('lr.teacher_leave_id',$r->id)
+                        ->where('lr.status',1)
+                        ->where('lr.confirmation','<>','Rejected')
+                        ->select('u.name as relief_teacher','s.name as subject','c.nama as class','ss.slot','lr.confirmation')
+                        ->orderBy('ss.slot')
+                        ->get()
+                        ->map(function ($item) {
+                            // Check if confirmation is not confirmed
+                            if ($item->confirmation != 'Confirmed') {
+                                // Update the relief_teacher to 'No teacher'
+                                $item->relief_teacher = 'No teacher';
+                            }
+                    
+                            return $item;
+                        })->toArray();
+               $r->relief_info = $relief;
+
+               $leavePeriod = json_decode($r->period);
+               $r->detail = $leavePeriod-> fullday ==true? "Full Day Leave": "Leave from ". $leavePeriod->start_time .' - '. $leavePeriod->end_time;
+        }
+        return response()->json(['report'=>$report]);
+    }
     public function getHistory($user_id)
     {
         $school = $this->getSchools($user_id)->first();

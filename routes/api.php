@@ -85,6 +85,8 @@ Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
 
     Route::post('submitReliefResponse','ScheduleApiController@submitReliefResponse');
     Route::get('getHistory/{id}','ScheduleApiController@getHistory');
+    Route::get('getHistoryByRange/{id}/{year}/{month}','ScheduleApiController@getHistoryByRange');
+
 
     
 });
