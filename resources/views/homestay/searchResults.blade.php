@@ -108,7 +108,8 @@ $(document).ready(function() {
                     console.log('Autocomplete Search Faileds');
                 }
             })
-        }
+        },
+        autoSelect: false,
     });
 
 

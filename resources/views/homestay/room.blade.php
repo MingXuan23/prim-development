@@ -519,7 +519,6 @@ $(document).ready(function() {
                     var dateB = b.split('/').reverse().join('-');
                     return new Date(dateA) - new Date(dateB);
                 });
-
             if (disabledDatesAfterCheckIn.length > 0) {
                 return disabledDatesAfterCheckIn[0]; // Return the first disabled date after or on check-in date
             }
@@ -561,33 +560,29 @@ $(document).ready(function() {
                 }
             }
         });
+
+
         // Function to check for disabled dates between check-in and check-out
         function checkDisabledDatesBetween() {
             var checkInDate = $('#check-in').datepicker('getDate');
             var checkOutDate = $('#check-out').datepicker('getDate');
-            console.log(disabledDates);
-            var currentDate = new Date(checkInDate);
-            checkOutDate = new Date(checkOutDate);
+            checkOutDate = moment($.datepicker.formatDate('dd/mm/yy', checkOutDate) ,'DD/MM/YYYY');
             var isDisabledFound = false;
-            while (currentDate <= checkOutDate) {
-                var formattedCurrentDate = $.datepicker.formatDate('dd/mm/yy', currentDate);
-                if (disabledDates.indexOf(formattedCurrentDate) !== -1 ) { //even if the next day is disabled, still can checkout
-                    if(formattedCurrentDate != findNearestDisabledDate(checkInDate) ){
-                        isDisabledFound = true;
-                        break;  
-                    // if the checkout date is bigger than nearest disable date   
-                    }else if($.datepicker.formatDate('dd/mm/yy', checkOutDate) > findNearestDisabledDate(checkInDate)){
-                        isDisabledFound = true;
-                        break; 
-                    }
-
-                }
-                currentDate.setDate(currentDate.getDate() + 1);
+            let firstNearestDateToCheckIn  = findNearestDisabledDate(checkInDate);
+            if(firstNearestDateToCheckIn){
+                firstNearestDateToCheckIn = moment(firstNearestDateToCheckIn.toString() ,'DD/MM/YYYY');
+                if( checkOutDate.isSameOrBefore(firstNearestDateToCheckIn)){
+                    isDisabledFound = false;
+                }else{
+                    // if checkoutDate is after the first disabled dates
+                    isDisabledFound = true;
+                }                
             }
+
             return isDisabledFound;
         }
     }
-    function initializeCheckInOut(){
+    function initializeCheckInOut(){        
         let roomId = $('#roomId').val();
         let roomNo = $('#book-room').val();
 
@@ -604,6 +599,17 @@ $(document).ready(function() {
                     disabledDates = Object.values(disabledDates);
                 }
                 initializeDatepickers(disabledDates);
+                let tempData = JSON.parse(sessionStorage.getItem('checkInOut'));
+                if (tempData && tempData.current_url == window.location.href) {
+                    // Set the datepicker dates
+                    $('#check-in').datepicker("setDate", tempData.check_in);
+                    $('.ui-datepicker-current-day').click();
+                    $('#check-out').datepicker("setDate", tempData.check_out);
+                    $('.ui-datepicker-current-day').click();
+
+                    // Remove the data from session storage
+                    sessionStorage.removeItem('checkInOut');
+                }
 
 
             },
@@ -614,6 +620,7 @@ $(document).ready(function() {
     }
     fetchDiscountOrIncrease();
     initializeCheckInOut();
+
     $('#check-in , #check-out').on('click focus',function(){
         // reset all price text
         $('.price-text').remove();
@@ -647,10 +654,36 @@ $(document).ready(function() {
     })
 
     $('#form-book').on('submit',function(e){
+       let isUserNotLoggedIn =  "{{Auth::guest()}}";
+       let storedSessionData = sessionStorage.getItem('checkInOut');
+
         if($('#amount').val() == 0 || $('#check-in').val() == '' || $('#check-out').val() == ''){
             e.preventDefault();
             Swal.fire('Sila pilih masa daftar masuk dan daftar keluar sebelum membuat tempahan');
-        }
+        }else if( isUserNotLoggedIn && !storedSessionData){
+            // the the user is not logged in
+            e.preventDefault();
+                Swal.fire({
+                    title: 'Sila <b>Daftar/Login</b> dahulu sebelum membuat sebarang tempahan',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Baik',
+                    cancelButtonText: 'Kembali'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Store the current URL in the session
+                        let checkInOut = {
+                            check_in: $('#check-in').val(),
+                            check_out: $('#check-out').val(),
+                            current_url: window.location.href,
+                        }
+                        sessionStorage.setItem('checkInOut', JSON.stringify(checkInOut)); // Set redirect_url in sessionStorage
+                        $('#form-book').submit();
+                    }
+                })
+            }
     });
 
     // for review pagination

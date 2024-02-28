@@ -19,6 +19,7 @@ use App\Models\Promotion;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Models\Transaction;
+use App\Models\HomestayDisabledDate;
 use App\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\HomestayReceipt;
@@ -324,16 +325,14 @@ class HomestayController extends Controller
         $statesDetails = Jajahan::negeri();//get all states
 
         $districts = [];//get all districts
+        $states = [];//to store states name
+
         foreach($statesDetails as $state){
             $districtsInState = Jajahan::daerah($state['id']);
             $districts = array_merge($districts,$districtsInState);//merge two arrays
-        }
-
-        $states = [];//to store states name
-        foreach($statesDetails as $state){
             array_push($states , $state['name']);//push the name of the state
         }
-
+        
         $locations = array_merge($states,$districts);
         // Filter the locations array based on the query
         $filteredLocations= array_filter($locations, function($location) use ($query) {
@@ -341,7 +340,8 @@ class HomestayController extends Controller
             return stripos($location, $query) !== false;
         });
 
-
+        $homestays = Room::filterByHomestay($query)->pluck('roomname')->toArray();
+        $filteredLocations = array_merge($filteredLocations,$homestays);
         // Return the filtered results as JSON response
         return response()->json($filteredLocations);
     }
@@ -377,6 +377,27 @@ class HomestayController extends Controller
                            ->get();
         
         $disabledDates = [];
+        // get disabled dates from homestay_disabled_dates
+        $dates = HomestayDisabledDate::where([
+            'homestay_id' => $roomId,
+        ])
+        ->where(function($query){
+            $query->where('date_from' ,'>=' ,date('Y-m-d'))
+            ->orWhere('date_to','>' , date('Y-m-d'));
+        })
+        ->get();
+
+        foreach($dates as $date){
+            $start = $date->date_from;
+            $end = $date->date_to;
+
+            $current = $start;
+            while ($current <= $end){
+                $disabledDates[] = Carbon::parse($current)->format('d/m/Y');
+                $current = Carbon::parse($current)->addDay()->format('Y-m-d');
+            }
+        }
+
         // for booking type whole
         if($roomNo == null){
             foreach ($bookings as $booking) {
@@ -430,7 +451,6 @@ class HomestayController extends Controller
             }
 
         }
-
         // Remove duplicates from the array (if any)
         $disabledDates = array_unique($disabledDates);
         return response()->json(['disabledDates' => $disabledDates]);
@@ -1195,6 +1215,78 @@ public function getPromotionHistory(Request $request){
             'deleted_at' => Carbon::now(),
         ]);
         return response()->json(['success' => 'Homestay/Bilik Berjaya Dibuang']);
+    }
+    public function manageDate(){
+        $orgtype = 'Homestay / Hotel';
+        $userId = Auth::id();
+        $data = DB::table('organizations as o')
+            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+            ->leftJoin('type_organizations as to', 'o.type_org', 'to.id')
+            ->select("o.*")
+            ->distinct()
+            ->where('ou.user_id', $userId)
+            ->where('to.nama', $orgtype)
+            ->where('o.deleted_at', null)
+            ->get();
+        $homestays = ROOM::where([
+            'homestayid' => $data[0]->id,
+            'deleted_at' => null,
+        ])
+        ->orderBy('roomname')
+        ->select('roomid','roomname')
+        ->get();
+
+        return view('homestay.dates')->with(['data' => $data , 'homestays' => $homestays]);
+    }
+    public function getOrganizationHomestays(Request $request){
+        $homestays = ROOM::where([
+            'homestayid' => $request->orgId,
+            'deleted_at' => null,
+        ])
+        ->orderBy('roomname')
+        ->select('roomid','roomname')
+        ->get();
+        return response()->json([
+            'homestays' => $homestays
+        ],200);
+    }
+    public function getDisabledDates(Request $request){
+        $homestayId = $request->homestayId; 
+
+        $disabledDates = Room::find($homestayId)->disabledDates;
+        return response()->json([
+            'disabledDates' => $disabledDates
+        ],200);
+    }
+    public function addDisableDate(Request $request){
+        $disabledDate = new HomestayDisabledDate();
+        $disabledDate->title = $request->title;
+        $disabledDate->date_from = $request->date_from;
+        $disabledDate->date_to = $request->date_to;
+        $disabledDate->homestay_id = $request->homestay_id;
+        $disabledDate->save();
+
+        return response()->json([
+            'message' => 'Store disabled date successfully'
+        ],200);
+    }
+    
+    public function updateDisabledDate(Request $request){
+        $disabledDate = HomestayDisabledDate::find($request->id);
+        $disabledDate->title = $request->title;
+        $disabledDate->date_from = $request->date_from;
+        $disabledDate->date_to = $request->date_to;
+        $disabledDate->save();
+        return response()->json([
+            'message' => 'Update disabled date successfully'
+        ],200);
+    }
+    public function deleteDisabledDate(Request $request){
+        $disabledDate = HomestayDisabledDate::find($request->id);
+        $disabledDate->delete();
+        return response()->json([
+            'message' => 'Delete disabled date successfully'
+        ],200);
     }
     public function bookinglist()
     {
