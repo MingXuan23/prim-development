@@ -134,6 +134,7 @@ class StudentSwastaCompare implements ToModel, WithValidation, WithHeadingRow
                             ->join('class_organization as co','co.id','cs.organclass_id')
                             //->join('organizations as o','o.id','co.organizaiton_id')
                             ->where('cs.student_id', $findStudent->studentId)
+                            ->where('cs.status', 1)
                             ->where('co.organization_id',$this->oid)
                             ->select('co.class_id')
                             ->get();
@@ -158,6 +159,7 @@ class StudentSwastaCompare implements ToModel, WithValidation, WithHeadingRow
                             ->join('class_organization as co','co.id','cs.organclass_id')
                             //->join('organizations as o','o.id','co.organizaiton_id')
                             ->where('cs.student_id', $findStudent->studentId)
+                            ->where('cs.status', 1)
                             //->where('co.organization_id',$this->oid)
                             ->select('co.class_id')
                             ->get();
