@@ -884,9 +884,19 @@ class StudentController extends Controller
             $class_student_details=$class_student->first();
             //dd( $student->id,$student->class_id,$classid);
             $class_student->update([
-                                'cs.organclass_id'=>$co->id,
-                                'cs.start_date'=>now()
-                            ]);
+                //'cs.organclass_id'=>$co->id,
+                'cs.end_date'=>now(),
+                'cs.status'=>0,
+            ]);
+
+            $new_class_student_id = DB::table('class_student')->insertGetId([
+            'organclass_id'=>$co->id,
+            'student_id'=> $student->studentId,
+            'status'=>1,
+            'start_date'=> now(),
+            //'fee_status'=>'Not Complete'
+
+            ]);
 
             if($class->levelid>0){
                 $ifExitsCateBC = DB::table('fees_new')
@@ -897,7 +907,7 @@ class StudentController extends Controller
     
                 $studentHaveFees=DB::table('student_fees_new as sfn')
                                 ->join('class_student as cs','cs.id','sfn.class_student_id')
-                                ->where('sfn.class_student_id',$class_student_details->id)
+                                ->where('sfn.class_student_id',$new_class_student_id)
                                 ->get();
     
                 $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
@@ -920,7 +930,7 @@ class StudentController extends Controller
                                 DB::table('student_fees_new')->insert([
                                     'status'            => 'Debt',
                                     'fees_id'           =>  $kateBC->id,
-                                    'class_student_id'  =>  $class_student_details->id
+                                    'class_student_id'  =>  $new_class_student_id
                                 ]);
                             }
                             
@@ -932,7 +942,7 @@ class StudentController extends Controller
                                     DB::table('student_fees_new')->insert([
                                         'status'            => 'Debt',
                                         'fees_id'           =>  $kateBC->id,
-                                        'class_student_id'  =>  $class_student_details->id
+                                        'class_student_id'  =>  $new_class_student_id
                                     ]);
                                 }
                             }
@@ -1020,7 +1030,7 @@ class StudentController extends Controller
                                     $student_fees_new = DB::table('student_fees_new')->insertGetId([
                                         'status'            => 'Debt',
                                         'fees_id'           =>  $kateRec->id,
-                                        'class_student_id'  =>  $class_student_details->id
+                                        'class_student_id'  =>  $new_class_student_id
                                     ]);
 
                                     DB::table('fees_recurring')->insert([
@@ -1076,7 +1086,7 @@ class StudentController extends Controller
                                         $student_fees_new = DB::table('student_fees_new')->insertGetId([
                                             'status'            => 'Debt',
                                             'fees_id'           =>  $kateRec->id,
-                                            'class_student_id'  =>  $class_student_details->id
+                                            'class_student_id'  =>  $new_class_student_id
                                         ]);
 
                                         DB::table('fees_recurring')->insert([
@@ -1737,9 +1747,19 @@ class StudentController extends Controller
         $class_student_details=$class_student->first();
 
         $class_student->update([
-                            'cs.organclass_id'=>$co->id,
-                            'cs.start_date'=>now()
+                            //'cs.organclass_id'=>$co->id,
+                            'cs.end_date'=>now(),
+                            'cs.status'=>0,
                         ]);
+
+        $new_class_student_id = DB::table('class_student')->insertGetId([
+            'organclass_id'=>$co->id,
+            'student_id'=> $student->studentId,
+            'status'=>1,
+            'start_date'=> now(),
+            //'fee_status'=>'Not Complete'
+
+        ]);
         
         //if inactive or graduated will not run this 
         if($class->levelid>0){
@@ -1752,7 +1772,7 @@ class StudentController extends Controller
             // dd($class_student->get());
             $studentHaveFees=DB::table('student_fees_new as sfn')
                             ->join('class_student as cs','cs.id','sfn.class_student_id')
-                            ->where('sfn.class_student_id',$class_student_details->id)
+                            ->where('sfn.class_student_id',$new_class_student_id)
                             ->get();
     
             $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
@@ -1775,7 +1795,7 @@ class StudentController extends Controller
                             DB::table('student_fees_new')->insert([
                                 'status'            => 'Debt',
                                 'fees_id'           =>  $kateBC->id,
-                                'class_student_id'  =>  $class_student_details->id
+                                'class_student_id'  =>  $new_class_student_id
                             ]);
                         }
                         
@@ -1787,16 +1807,25 @@ class StudentController extends Controller
                                 DB::table('student_fees_new')->insert([
                                     'status'            => 'Debt',
                                     'fees_id'           =>  $kateBC->id,
-                                    'class_student_id'  =>  $class_student_details->id
+                                    'class_student_id'  =>  $new_class_student_id
                                 ]);
                             }
                         }
                         else{
-                            $delete=DB::table('student_fees_new as sfn')
-                                    ->where('sfn.fees_id',$kateBC->id)
-                                    ->where('sfn.class_student_id',$class_student_details->id)
-                                    ->where('sfn.status',"Debt")
-                                    ->delete();
+
+                            $delete = DB::table('student_fees_new as sfn')
+                            ->where([
+                                ['sfn.fees_id', $kateBC->id],
+                                ['sfn.class_student_id', $class_student_details->id],
+                                ['sfn.status', '=', 'Debt'],
+                            ])
+                            ->get()->pluck('id');
+                        DB::table('student_fees_new')->whereIn('id',$delete)->delete();
+                            // $delete=DB::table('student_fees_new as sfn')
+                            //         ->where('sfn.fees_id',$kateBC->id)
+                            //         ->where('sfn.class_student_id',$new_class_student_id)
+                            //         ->where('sfn.status',"Debt")
+                            //         ->delete();
                             //return response()->json(['data'=>$delete]);  
                         }
                     }
@@ -1868,7 +1897,7 @@ class StudentController extends Controller
                                 $student_fees_new = DB::table('student_fees_new')->insertGetId([
                                     'status'            => 'Debt',
                                     'fees_id'           =>  $kateRec->id,
-                                    'class_student_id'  =>  $class_student_details->id
+                                    'class_student_id'  =>  $new_class_student_id
                                 ]);
 
                                 DB::table('fees_recurring')->insert([
@@ -1925,7 +1954,7 @@ class StudentController extends Controller
                                     $student_fees_new = DB::table('student_fees_new')->insertGetId([
                                         'status'            => 'Debt',
                                         'fees_id'           =>  $kateRec->id,
-                                        'class_student_id'  =>  $class_student_details->id
+                                        'class_student_id'  =>  $new_class_student_id
                                     ]);
 
                                     DB::table('fees_recurring')->insert([
@@ -1939,22 +1968,39 @@ class StudentController extends Controller
                                 }
                             }
                             else{
-                                $delete=DB::table('student_fees_new as sfn')
-                                        ->where('sfn.fees_id',$kateRec->id)
-                                        ->where('sfn.class_student_id',$class_student_details->id)
-                                        ->where('sfn.status',"Debt")
-                                        ->delete();
+                                // $delete=DB::table('student_fees_new as sfn')
+                                //         ->where('sfn.fees_id',$kateRec->id)
+                                //         ->where('sfn.class_student_id',$class_student_details->id)
+                                //         ->where('sfn.status',"Debt")
+                                //         ->delete();
+
+                                        $delete = DB::table('student_fees_new as sfn')
+                                        ->where([
+                                            ['sfn.fees_id', $kateRec->id],
+                                            ['sfn.class_student_id', $class_student_details->id],
+                                            ['sfn.status', '=', 'Debt'],
+                                        ])
+                                        ->get()->pluck('id');
+                                    DB::table('student_fees_new')->whereIn('id',$delete)->delete();
                                 //return response()->json(['data'=>$delete]);  
                             }
                         }
                     }
                     else
                     {
-                        $delete=DB::table('student_fees_new as sfn')
-                                ->where('sfn.fees_id',$kateRec->id)
-                                ->where('sfn.class_student_id',$class_student_details->id)
-                                ->where('sfn.status',"Debt")
-                                ->delete();
+                        // $delete=DB::table('student_fees_new as sfn')
+                        //         ->where('sfn.fees_id',$kateRec->id)
+                        //         ->where('sfn.class_student_id',$class_student_details>id)
+                        //         ->where('sfn.status',"Debt")
+                        //         ->delete();
+                                $delete = DB::table('student_fees_new as sfn')
+                                ->where([
+                                    ['sfn.fees_id', $kateRec->id],
+                                    ['sfn.class_student_id', $class_student_details->id],
+                                    ['sfn.status', '=', 'Debt'],
+                                ])
+                                ->get()->pluck('id');
+                            DB::table('student_fees_new')->whereIn('id',$delete)->delete();
                         //return response()->json(['data'=>$delete]);
                     }
                 }
