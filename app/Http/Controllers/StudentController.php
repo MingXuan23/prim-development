@@ -853,6 +853,7 @@ class StudentController extends Controller
                     , 'class_student.status','students.email','u.name as parentName','u.telno as parentIC')
             ->where([
                 ['students.id', $id],
+                ['class_student.status',1]
             ])
             ->whereIn('class_organization.organization_id',$organizationId)
             ->orderBy('classes.nama')
@@ -891,7 +892,7 @@ class StudentController extends Controller
 
             $new_class_student_id = DB::table('class_student')->insertGetId([
             'organclass_id'=>$co->id,
-            'student_id'=> $student->studentId,
+            'student_id'=> $student->id,
             'status'=>1,
             'start_date'=> now(),
             //'fee_status'=>'Not Complete'
@@ -1153,6 +1154,7 @@ class StudentController extends Controller
             ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status','classes.id as class_id')
             ->where([
                 ['students.id', $id],
+                ['class_student.status',1]
             ]);
         if($student->first()->class_id!=$classid){
             $this->transferClass($getOrganizationClass,$classid,$student->first());
