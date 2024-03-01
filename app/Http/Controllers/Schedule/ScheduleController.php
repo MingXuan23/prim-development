@@ -1291,7 +1291,7 @@ class ScheduleController extends Controller
          // Receive data from the AJAX request
          $reliefId = $request->input('relief_id');
          $confirmationStatus = $request->input('confirmation_status');
-        dd ($reliefId,$confirmationStatus);
+        // dd ($reliefId,$confirmationStatus);
          try {
             // Update the confirmation status in the database
             DB::table('leave_relief')

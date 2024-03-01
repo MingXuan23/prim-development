@@ -645,6 +645,15 @@
                 },
                 success: function (response) {
                     console.log(response);
+                    // Update the table row based on the response
+                    if (response.success) {
+                        // Find the row with the corresponding relief ID
+                        var row = $('#reliefTable tbody').find('tr[data-relief-id="' + reliefId + '"]');
+                        // Update the confirmation text and style
+                        row.find('#confirmation_text').text(confirmationStatus).css('color', response.color);
+                        // Remove the action buttons
+                        row.find('#action').empty();
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.error(error);
