@@ -133,6 +133,7 @@ Route::group(['prefix' => 'schedule','namespace' => 'Schedule','middleware' => [
     Route::post('getTeacherOfOrg','ScheduleController@getTeacherOfOrg')->name('schedule.getTeacherOfOrg');
 
     Route::post('getTeacherSlot','ScheduleController@getTeacherSlot')->name('schedule.getTeacherSlot');
+    Route::post('adminManageRelief','ScheduleController@adminManageRelief')->name('schedule.adminManageRelief');
 });
 Route::post('importSchedule', 'Schedule\ScheduleController@scheduleImport')->name('importSchedule');
 Route::post('importScheduleSubject', 'Schedule\ScheduleController@scheduleSubjectImport')->name('importScheduleSubject');
