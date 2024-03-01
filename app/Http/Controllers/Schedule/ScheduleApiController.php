@@ -919,7 +919,6 @@ class ScheduleApiController extends Controller
         return response()->json(['report'=>$report]);
     }
 
-
     public function index()
     {
         //

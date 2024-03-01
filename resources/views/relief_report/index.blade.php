@@ -154,6 +154,7 @@
                                 <th>Original Teacher</th>
                                 <th>Substitute Teacher</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -161,9 +162,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-
-                
+            </div>        
             
                 <div id="lr-teacher-section" style="display: none;">
                     <div class="form-group">
@@ -194,60 +193,6 @@
                
             </div>
         </div>
-
-        <!-- Modal -->
-        <!-- <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add Row</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form action="" method="post" enctype="multipart/form-data">
-                        <div class="modal-body">
-
-                            {{ csrf_field() }}
-                            <div class="form-group">
-                            <div class="form-group">
-                                <label>Time of Leave</label>
-                                <input type="radio" name="timeOfLeave" id="fullday" onclick="displaySelectTime()" checked> Full Day
-                                <input type="radio" name="timeOfLeave" id="period" onclick="displaySelectTime()"> Period
-                            </div>
-                            
-                            <div id="selectTime" style="display: none;">
-                                <div class="form-group">
-                                    <label>Start Time</label>
-                                    <input type="time" name="starttime" id="starttime" class="form-control">
-                                </div>
-                                <div class="form-group" >
-                                    <label>End Time</label>
-                                    <input type="time" name="starttime" id="endtime" class="form-control">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="reason">Reason</label>
-                                <select name="reason" id="reason" class="form-control">
-                                    <option value="mc">MC</option>
-                                    <option value="event">Event</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="note">Note</label>
-                                <input type="text" name="note" id="note" placeholder="Enter your note here..." class="form-control">
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Add</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>  -->
 
     </div>
 </div>
@@ -342,7 +287,9 @@
         // Initial fetch when the page loads
         fetchReliefData($('#datepicker_start').val(), $('#datepicker_end').val());
         console.log($('#datepicker_start').val(), $('#datepicker_end').val());
+
         });
+        // end document ready
 
         $("#datepicker_start").datepicker({
             minDate: '-1m',
@@ -419,7 +366,6 @@
         });
     }
 
-
         function displayRelief(reliefData) {
             var tableBody = $('#reliefTable tbody');
             tableBody.empty(); // Clear existing data
@@ -433,6 +379,7 @@
             // Iterate through reliefData and append rows
             reliefData.forEach(function (relief, index) {
                 var row = $('<tr></tr>');
+                row.data('relief-id', relief.leave_relief_id);
                 row.append('<td>' + (index + 1) + '</td>');
                 row.append('<td>' + relief.date + '</td>');
                 row.append('<td>' + relief.class_name + '</td>');
@@ -474,7 +421,15 @@
                         break;
                 }
 
-                row.append('<td style="color: ' + statusColor + ';">' + (relief.confirmation || confirmationText) + '</td>');
+                row.append('<td id="confirmation_text" style="color: ' + statusColor + ';">' + (relief.confirmation || confirmationText) + '</td>');
+
+                // Inside the forEach loop where buttons are appended
+                row.append('<td id="action">');
+                if (confirmationText === 'Pending') {
+                    row.find('#action').append('<button class="btn btn-success confirm-btn">Confirm</button>');
+                    row.find('#action').append('<button class="btn btn-danger reject-btn">Reject</button>');
+                }
+                row.append('</td>');
 
                 tableBody.append(row);
             });
@@ -678,8 +633,39 @@
                 console.error(error);
             }
         });
-
         }
+
+        function adminManageRelief(reliefId, confirmationStatus) {
+            $.ajax({
+                url: '{{ route("schedule.adminManageRelief") }}',
+                type: 'POST',
+                data: {
+                    relief_id: reliefId,
+                    confirmation_status: confirmationStatus
+                },
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        // Event listener for Confirm button
+        $(document).on('click', '.confirm-btn', function() {
+            var reliefId = $(this).closest('tr').data('relief-id');
+            console.log(reliefId);
+            adminManageRelief(reliefId, 'Confirmed');
+        });
+
+        // Event listener for Reject button
+        $(document).on('click', '.reject-btn', function() {
+            var reliefId = $(this).closest('tr').data('relief-id');
+            console.log(reliefId);
+            adminManageRelief(reliefId, 'Rejected');
+        });
+
 
 </script>
 @endsection

@@ -1285,4 +1285,24 @@ class ScheduleController extends Controller
         $numberOfWeeks = $startDate->diffInWeeks($endDate) +1;
         return response()->json(['teachers'=>$array,'NumberOfWeek'=>$numberOfWeeks]);
      }
+
+     public function adminManageRelief(Request $request)
+     {
+         // Receive data from the AJAX request
+         $reliefId = $request->input('relief_id');
+         $confirmationStatus = $request->input('confirmation_status');
+        dd ($reliefId,$confirmationStatus);
+         try {
+            // Update the confirmation status in the database
+            DB::table('leave_relief')
+            ->where('id', $reliefId)
+            ->update(['confirmation' => $confirmationStatus]);
+ 
+             // Return a success response
+             return response()->json(['message' => 'Relief confirmation status updated successfully']);
+         } catch (\Exception $e) {
+             // Return an error response if an exception occurs
+             return response()->json(['error' => 'Failed to update relief confirmation status'], 500);
+         }
+     }
 }
