@@ -666,6 +666,7 @@
             var reliefId = $(this).closest('tr').data('relief-id');
             console.log(reliefId);
             adminManageRelief(reliefId, 'Confirmed');
+            fetchReliefData($('#datepicker_start').val(), $('#datepicker_end').val());
         });
 
         // Event listener for Reject button
@@ -673,6 +674,7 @@
             var reliefId = $(this).closest('tr').data('relief-id');
             console.log(reliefId);
             adminManageRelief(reliefId, 'Rejected');
+            fetchReliefData($('#datepicker_start').val(), $('#datepicker_end').val());
         });
 
 
