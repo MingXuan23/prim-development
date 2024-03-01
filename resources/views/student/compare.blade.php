@@ -8,7 +8,7 @@
     margin-bottom:6px;
 }
 
-#addAllNewStudent,#transferAllStudent{
+#addAllNewStudent,#transferAllStudent,#returnBtn{
     float:right;
     margin-bottom:6px;
 }
@@ -23,27 +23,32 @@
     <div class="col-sm-6">
         <div class="page-title-box">
             <h4 class="font-size-18">Pelajar</h4>
+        </div>
             <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
-            @if(count($errors) > 0)
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach($errors->all() as $error)
-                        <li>{{$error}}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                @endif
-                @if(\Session::has('success'))
-                <div class="alert alert-success">
-                    <p>{{ \Session::get('success') }}</p>
-                </div>
-                @endif
-        </div>
+           
+    </div>
+    <div class="col-sm-6">
+    <button class="btn btn-primary" id = "returnBtn" onclick="back()" > Return</button>
+
     </div>
 </div>
-
+@if(count($errors) > 0)
+<div class="alert alert-danger">
+    <ul>
+        @foreach($errors->all() as $error)
+        <li>{{$error}}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
+@if(\Session::has('success'))
+<div class="alert alert-success">
+    <p>{{ \Session::get('success') }}</p>
+</div>
+@endif
+        
 <div class="row">
     <div class="col-md-12">
         <div class="card">
@@ -218,6 +223,11 @@
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
 <script>
+
+function back() {
+    window.location.href = '{{ route("student.index") }}';
+}
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

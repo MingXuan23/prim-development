@@ -12,12 +12,11 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Notifications\Notification;
+use Kreait\Firebase\Messaging\Notification;
 
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\ServiceAccount;
-use Google\Client;
+
 
 use App\User;
 
@@ -595,6 +594,117 @@ class ScheduleApiController extends Controller
         return response()->json(["failed"]);
      }
 
+
+     private function getAccessToken()
+    {
+        $credentialsJsonString = env('GOOGLE_CREDENTIAL_KEY');
+        $credentials = json_decode($credentialsJsonString, true);
+    
+        $tokenURL = "https://oauth2.googleapis.com/token";
+        $assertion = [
+            "iss" => $credentials['client_email'],
+            "scope" => "https://www.googleapis.com/auth/firebase.messaging",
+            "aud" => $tokenURL,
+            "exp" => time() + 3600,
+            "iat" => time()
+        ];
+    
+        $jwtHeader = json_encode(['alg' => 'RS256', 'typ' => 'JWT']);
+        $encodedHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($jwtHeader));
+        $encodedAssertion = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($assertion)));
+    
+        $signature = '';
+        openssl_sign($encodedHeader . '.' . $encodedAssertion, $signature, $credentials['private_key'], 'SHA256');
+        $jwt = $encodedHeader . '.' . $encodedAssertion . '.' . base64_encode($signature);
+    
+        $postFields = [
+            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'assertion' => $jwt
+        ];
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $tokenURL);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postFields));
+        $response = curl_exec($ch);
+        //dd($assertion);
+        curl_close($ch);
+    
+        $responseArr = json_decode($response, true);
+        
+        return $responseArr['access_token'];
+    }
+
+     public function sendNotification3($id,$title,$message)
+     {  $user =User::find($id);
+
+       // dd($user);
+
+       //dd($user);
+        if($user->device_token){
+
+            //$device_token =[];
+            $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send';
+            //array_push($device_token,$user->device_token);
+       // $serverKey = getenv('FCM_SERVER_KEY');
+        //$serverKey = getenv('PRODUCTION_BE_URL');
+        
+       
+        // $data = [
+        //     "token" => $device_token,
+        //     "notification" => [
+        //         "title" => $title,
+        //         "body" =>$message,
+        //     ]
+        // ];
+
+        $data = [
+            "message" => [
+                "token" => $user->device_token,
+                "notification" => [
+                    "body" => $message,
+                    "title" =>  $title
+                ]
+            ]
+        ];
+
+        $encodedData = json_encode($data);
+
+        $headers = [
+            'Authorization: Bearer ' . $this->getAccessToken(),
+            'Content-Type: application/json',
+        ];
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedData);
+
+        // Execute post
+        $result = curl_exec($ch);
+
+        if ($result === FALSE) {
+            die('Curl failed: '. curl_error($ch));
+        }
+       
+        // Close connection
+        curl_close($ch);
+
+        // FCM response
+        //dd($result);
+
+            return response()->json(["success"=>$result]);
+        }
+        return response()->json(["failed"]);
+     }
+
+
      public function sendFirebaseNotification($id, $title, $message)
         {
             $user = User::find($id);
@@ -603,14 +713,14 @@ class ScheduleApiController extends Controller
                 $device_token = $user->device_token;
                 $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send'; // Update with your project ID
 
-                $serviceAccountPath = 'C:\laragon\www\prim_production\prim-development\prim-notification-firebase-adminsdk-ezss1-affe4e1fe4.json';
-
+                $serviceAccountJson = env('GOOGLE_CREDENTIAL_KEY');
+               // dd($serviceAccountJson);
                 // Initialize the Google Client
                 $client = new Client();
-                $client->setAuthConfig($serviceAccountPath);
+                $client->setAuthConfig(json_decode($serviceAccountJson, true));
                 $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
                 $client->fetchAccessTokenWithAssertion();
-            
+                dd($client);
                 $accessToken = $client->getAccessToken();
             
                 // Use the access token as the bearer token
@@ -697,36 +807,6 @@ class ScheduleApiController extends Controller
                 }
 
             $allPending=false;
-            // if($request->isAdmin&&$this->checkAdmin($user->id,$school->id)){
-            //     $allPending = DB::table('organizations as o')
-            //     ->join('schedules as s','s.organization_id','o.id')
-            //     ->join('schedule_version as sv','sv.schedule_id','s.id')
-            //     ->join('schedule_subject as ss','ss.schedule_version_id','sv.id')
-            //     ->leftJoin('leave_relief as lr','lr.schedule_subject_id','ss.id')
-            //     ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
-            //     ->leftJoin('subject as sub','sub.id','ss.subject_id')
-            //     ->leftJoin('users as u','u.id','ss.teacher_in_charge')
-            //     ->leftJoin('users as ur','ur.id','lr.replace_teacher_id')
-            //     ->leftJoin('classes as c','c.id','ss.class_id')
-            //     ->where('lr.confirmation','<>',"Confirmed")
-            //     ->where('sv.status',1)
-            //     ->where('s.status',1)
-            //     ->where('tl.status',1)
-            //     ->where('tl.date','>=',Carbon::today())
-            //     ->select('lr.id as leave_relief_id','ss.id as schedule_subject_id','c.nama as class','sub.name as subject',
-            //     's.start_time','s.time_of_slot','ss.slot','s.time_off','ss.day','u.name as leaveTeacher','ur.name as reliefTeacher','tl.date')
-            //     ->get();
-
-            //     foreach($allPending as $a){
-            //         //if(isset($s->duration)){
-            //             $time_info= $this->getSlotTime($a,$a->day,$a->slot);
-            //             $a->time=$time_info['time'];
-            //             $a->duration=$time_info['duration'];
-             
-            //             unset($a->time_off);
-            //             unset($a->start_time);
-            //     }
-            // }
             return response()->json(['pendingRelief'=>$pendingRelief,'allPending'=>$allPending]);
         }
         return response()->json(["error"=>"You have not any school"]);
@@ -813,6 +893,94 @@ class ScheduleApiController extends Controller
         return response()->json(['result'=>$update]);
     }
 
+    public function getHistoryByRange($user_id,$year,$month){
+        $school = $this->getSchools($user_id)->first();
+        $isAdmin =$this->checkAdmin($user_id,$school->id);
+
+        $report = new stdClass();
+
+        $report->leaveCount = DB::table('teacher_leave as tl')
+                ->where('tl.teacher_id',$user_id)
+                ->where('tl.status',1)
+                ->count();
+
+        $report->reliefCount = DB::table('leave_relief as lr')
+            ->leftJoin('schedule_subject as ss','lr.schedule_subject_id','ss.id')
+            ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+            ->where('lr.replace_teacher_id',$user_id)
+            ->where('lr.status',1)
+            ->where('lr.confirmation','Confirmed')
+            ->groupBy(['tl.date','ss.slot'])
+            ->count();
+
+        $report->rejectCount = DB::table('leave_relief')
+            ->where('replace_teacher_id',$user_id)
+            ->where('status',1)
+            ->where('confirmation','Rejected')
+            ->count();
+
+        $report->reliefList =  DB::table('leave_relief as lr')
+        ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+        ->leftJoin ('schedule_version as sv','sv.id','ss.schedule_version_id')
+        ->leftJoin('schedules as s','s.id','sv.schedule_id')
+        ->leftJoin('classes as c','c.id','ss.class_id')
+        ->leftJoin('subject as sub','sub.id','ss.subject_id')
+        ->leftJoin('users as u','u.id','ss.teacher_in_charge')
+        ->leftJoin('teacher_leave as tl','tl.id','lr.teacher_leave_id')
+        ->where('s.organization_id',$school->id)
+        ->where('lr.replace_teacher_id',$user_id)
+        ->where('lr.confirmation',"Confirmed")
+        ->whereMonth('tl.date', $month)
+        ->whereYear('tl.date', $year)
+        ->where('tl.status',1)
+        ->where('lr.status',1)
+        ->select('lr.id as leave_relief_id','c.nama as class','sub.name as subject','ss.slot','u.name as relatedTeacher','tl.date')
+        ->get();
+
+        $report->leave_list = DB::table('teacher_leave as tl')
+        ->leftJoin('users as u','u.id','tl.teacher_id')
+        ->where('tl.teacher_id',$user_id)
+        ->whereMonth('tl.date', $month)
+        ->whereYear('tl.date', $year)
+        ->where('tl.status',1)
+        //->where('lr.status',1)
+        ->select('tl.id','tl.date','tl.image','tl.period')
+        ->orderBy('tl.date','desc')
+        ->get();
+
+
+        foreach( $report->leave_list as $r){
+            //if(isset($s->duration)){
+
+                //$relief_info =[];
+
+                $relief = DB::table('leave_relief as lr')
+                        ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
+                        ->leftJoin('classes as c','c.id','ss.class_id')
+                        ->leftJoin('users as u','u.id','lr.replace_teacher_id')
+                        ->leftJoin('subject as s','s.id','ss.subject_id')
+                        ->where('lr.teacher_leave_id',$r->id)
+                        ->where('lr.status',1)
+                        ->where('lr.confirmation','<>','Rejected')
+                        ->select('u.name as relief_teacher','s.name as subject','c.nama as class','ss.slot','lr.confirmation')
+                        ->orderBy('ss.slot')
+                        ->get()
+                        ->map(function ($item) {
+                            // Check if confirmation is not confirmed
+                            if ($item->confirmation != 'Confirmed') {
+                                // Update the relief_teacher to 'No teacher'
+                                $item->relief_teacher = 'No teacher';
+                            }
+                    
+                            return $item;
+                        })->toArray();
+               $r->relief_info = $relief;
+
+               $leavePeriod = json_decode($r->period);
+               $r->detail = $leavePeriod-> fullday ==true? "Full Day Leave": "Leave from ". $leavePeriod->start_time .' - '. $leavePeriod->end_time;
+        }
+        return response()->json(['report'=>$report]);
+    }
     public function getHistory($user_id)
     {
         $school = $this->getSchools($user_id)->first();
@@ -860,7 +1028,7 @@ class ScheduleApiController extends Controller
         $report->leave_list = DB::table('teacher_leave as tl')
         ->leftJoin('users as u','u.id','tl.teacher_id')
         ->where('tl.teacher_id',$user_id)
-        ->where ('tl.date','>=',Carbon::today()->subDays(30))
+        ->where ('tl.date','>=',Carbon::today()->subDays(120))
         ->where('tl.status',1)
         //->where('lr.status',1)
         ->select('tl.id','tl.date','tl.image','tl.period')
@@ -880,7 +1048,7 @@ class ScheduleApiController extends Controller
                         ->leftJoin('subject as s','s.id','ss.subject_id')
                         ->where('lr.teacher_leave_id',$r->id)
                         ->where('lr.status',1)
-                        //->where('lr.confirmation','<>','Rejected')
+                        ->where('lr.confirmation','<>','Rejected')
                         ->select('u.name as relief_teacher','s.name as subject','c.nama as class','ss.slot','lr.confirmation')
                         ->orderBy('ss.slot')
                         ->get()

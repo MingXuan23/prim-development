@@ -1231,6 +1231,7 @@ class FeesController extends AppBaseController
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.levelid', $level)
                 ->where('classes.status', "1")
+                ->where('class_student.status',1)
                 ->where('students.gender', $gender)
                 ->get();
             $data = array(
@@ -1247,6 +1248,8 @@ class FeesController extends AppBaseController
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.levelid', $level)
                 ->where('classes.status', "1")
+                ->where('class_student.status',1)
+
                 ->where('class_student.start_date', '<', $date_end)
                 ->get();
                 $data = array(
@@ -1262,6 +1265,7 @@ class FeesController extends AppBaseController
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.levelid', $level)
                 ->where('classes.status', "1")
+                ->where('class_student.status',1)
                 ->get();
                 $data = array(
                     'data' => $level
@@ -1368,6 +1372,7 @@ class FeesController extends AppBaseController
                 ->select('class_student.id as class_student_id')
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.status', "1")
+                ->where('class_student.status',1)
                 ->where('students.gender', $gender)
                 ->whereIn('classes.id', $class)
                 ->get();
@@ -1384,6 +1389,7 @@ class FeesController extends AppBaseController
                 ->select('class_student.id as class_student_id', 'class_student.start_date as class_student_start_date')
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.status', "1")
+                ->where('class_student.status',1)
                 ->whereIn('classes.id', $class)
                 ->where('class_student.start_date', '<', $date_end)
                 ->get();
@@ -1399,6 +1405,7 @@ class FeesController extends AppBaseController
                 ->select('class_student.id as class_student_id')
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.status', "1")
+                ->where('class_student.status',1)
                 ->whereIn('classes.id', $class)
                 ->get();
                 $data = array(
@@ -1498,12 +1505,13 @@ class FeesController extends AppBaseController
             ->join('classes', 'classes.id', '=', 'class_organization.class_id')
             ->select('organizations.id as oid', 'organizations.nama as nschool', 'organizations.parent_org as parent_org', 'students.id as studentid', 'students.nama as studentname', 'classes.nama as classname','classes.levelid', 'organizations.type_org as type_org', 'class_student.start_date as student_startdate')
             ->where('organization_user.user_id', $userid)
+            ->where('class_student.status',1)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
             ->orderBy('organizations.id')
             ->orderBy('classes.nama')
             ->get();
-
+        //dd($list);
         $list_dependent = [];
 
         foreach ($list as $key => $dependent)

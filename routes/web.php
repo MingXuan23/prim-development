@@ -701,7 +701,13 @@ Route::group(['prefix' => 'delivery'], function () {
             Route::get('view-performance-report','HomestayController@viewPerformanceReport')->name('homestay.viewPerformanceReport');
             Route::get('get-report-data', 'HomestayController@getReportData')->name('homestay.getReportData');
             Route::post('send-reminder' ,'HomestayController@sendReminder')->name('homestay.sendReminder');
-
+            // Homestay Dates Management
+            Route::get('homestay-date', 'HomestayController@manageDate')->name('homestay.manageDate');
+            Route::get('get-organization-homestays', 'HomestayController@getOrganizationHomestays')->name('homestay.getOrganizationHomestays');
+            Route::get('get-disabled-dates', 'HomestayController@getDisabledDates')->name('homestay.getDisabledDates');
+            Route::post('add-disabled-date', 'HomestayController@addDisableDate')->name('homestay.addDisabledDate');
+            Route::put('update-disabled-date', 'HomestayController@updateDisabledDate')->name('homestay.updateDisabledDate');
+            Route::delete('delete-disabled-date', 'HomestayController@deleteDisabledDate')->name('homestay.deleteDisabledDate');
             //Homestay Promotion
             Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');
             Route::get('get-promotion-data', 'HomestayController@getPromotionData')->name('homestay.getPromotionData');

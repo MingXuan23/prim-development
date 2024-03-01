@@ -165,7 +165,7 @@
                     <div class="image-flash-message"></div>
                    <div class="form-group d-flex justify-content-center align-items-center flex-wrap gap-2">
                         <input type="file" name="images[]" id="images" multiple accept=".jpg,.jpeg,.png" class="form-control col-5" required>
-                        <label for="images">Pilih gambar-gambar homestay(min:5 gambar, max:20 gambar)<span style="color:#d00"> *</span></label>
+                        <label for="images">Pilih gambar-gambar homestay(min:5 gambar, max:20 gambar)<span style="color:#d00"> * <div>Pengguna Windows/Mac, Sila Guna CTRL/CMD + Left Mouse Click Semasa Memilih Gambar-gambar</div></span></label>
                    </div>
                     <h3 class="text-center">Preview Images:</h3>
                     <div id="image-previews" class="d-flex justify-content-center align-items-center gap-1 flex-wrap mb-2">

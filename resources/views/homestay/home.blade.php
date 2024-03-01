@@ -22,9 +22,6 @@
             background-color: var(--primary-color) !important;
             color: white !important;
         }
-        .rated{
-            font-size: 18px;
-        }
         @media screen and (max-width: 500px){
             #banner-content {
                 width: 80%;
@@ -140,17 +137,18 @@ $(document).ready(function() {
                 },
                 success: function(result){
                     var searchData = [];
-
                     $(Object.values(result)).each(function(i,location){
-                        searchData.push(location);
+                        searchData.push(location.toUpperCase());
                     });
+
                     process(searchData);
                 },
                 error: function(){
                     console.log('Autocomplete Search Faileds');
                 }
             })
-        }
+        },
+        autoSelect: false,
     });
 
 
