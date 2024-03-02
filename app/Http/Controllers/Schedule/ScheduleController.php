@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Input;
 use Maatwebsite\Excel\Facades\Excel;
 use stdClass;
 use App\User;
-
+use Yajra\DataTables\DataTables;
 class ScheduleController extends Controller
 {
     /**
@@ -84,14 +84,44 @@ class ScheduleController extends Controller
         return view('relief_report.index', compact('organization', 'classes'));
     }
 
-    //using ajax to call and get the pending relief
-    public function getPendingRelief(Request $request){
+    public function datatablePendingRelief(Request $request){
+        set_time_limit(300);
         $oid = $request->organization;
         $teachers='';
         $date =$request->date;
         // dd($request);
-        $relief =$this->getAllRelief($oid, $date);
+        $relief =$this->getAllRelief($oid, $date,"isQuery");
 
+        $table = Datatables::of($relief);
+
+        $table->addColumn('reason', function ($row) {
+           $reason = $row->desc;
+           // var imageLinkFunction = '';
+           if ($row->image !== null) {
+               // imageLinkFunction = imageLinkFunction.toString(); // Convert the function to a string
+               $reason = $reason. '<a href="#" class="image-link" data-image="' .$row->image . '">(View)</a>';
+           }
+           return $reason;
+   
+        });
+
+        $table->addColumn('combobox', function ($row) {
+            return  '<select class="form-control assign_teacher" data-index="' . $row->leave_relief_id .
+            '" schedule_subject_id="' . $row->schedule_subject_id . '" slot="' . $row->slot . '"></select>';
+        });
+
+       
+
+        $table->rawColumns(['combobox','reason']);
+        return $table->make(true);
+    }
+    //using ajax to call and get the pending relief
+    public function getAllTeacher(Request $request){
+        set_time_limit(300);
+        $oid = $request->organization;
+        $teachers='';
+        $date =$request->date;
+        // dd($request);
         $teachers = DB::table('organization_user as ou')
         ->leftJoin('users as u','u.id','ou.user_id')
         ->where('ou.organization_id',$oid)
@@ -113,17 +143,17 @@ class ScheduleController extends Controller
         // dd($relief);
        // $teachers = $this->getFreeTeacher($request); // New method to get available teachers
       // dd($relief,$schedule);
-        return response()->json(['pending_relief' => $relief,'teachers'=>json_encode($teachers)]);
+        return response()->json(['teachers'=>json_encode($teachers)]);
 
         //return response()->json(['pending_relief' => $relief, 'available_teachers' => $teachers]);
     }
 
     // get all pending, null and rejected relief
-    public function getAllRelief($oid, $date){
+    public function getAllRelief($oid, $date, $isQuery=null){
         $organization = $this->getOrganizationByUserId();
         
         if($organization->contains('id', $oid)){
-            $relief = DB::table('leave_relief as lr')
+            $query = DB::table('leave_relief as lr')
             ->leftJoin('schedule_subject as ss','ss.id','lr.schedule_subject_id')
             ->leftJoin('classes as c','c.id','ss.class_id')
             ->leftJoin('subject as sub','sub.id','ss.subject_id')
@@ -143,8 +173,12 @@ class ScheduleController extends Controller
             ->where('tl.status',1)
             ->orderBy('ss.slot')
             ->select('lr.id as leave_relief_id','lr.confirmation','ss.id as schedule_subject_id','tl.date','tl.desc'
-            ,'sub.name as subject','u1.name as leave_teacher','u2.name as relief_teacher','ss.slot','ss.day','s.time_of_slot','s.start_time','s.time_off','c.nama as class_name','tl.image')
-            ->get();
+            ,'sub.name as subject','u1.name as leave_teacher','u2.name as relief_teacher','ss.slot','ss.day','s.time_of_slot','s.start_time','s.time_off','c.nama as class_name','tl.image');
+            
+            if($isQuery == "isQuery" ){
+                return $query;
+            }
+             $relief = $query->get();
             //dd($relief);
             foreach($relief as $r){
                 $result=$this->getSlotTime($r,$r->day,$r->slot);
@@ -1289,19 +1323,37 @@ class ScheduleController extends Controller
      public function adminManageRelief(Request $request)
      {
          // Receive data from the AJAX request
+         //dd("error");
          $reliefId = $request->input('relief_id');
          $confirmationStatus = $request->input('confirmation_status');
         // dd ($reliefId,$confirmationStatus);
+        //dd($reliefId);
          try {
             // Update the confirmation status in the database
             DB::table('leave_relief')
             ->where('id', $reliefId)
             ->update(['confirmation' => $confirmationStatus]);
- 
+
+            $duplicate_row = DB::table('leave_relief')->where('id',$reliefId)->first();
+
+            if($confirmationStatus =='Rejected'){
+           
+                $insert = DB::table('leave_relief')->insert([
+                    'teacher_leave_id'=>$duplicate_row->teacher_leave_id,
+                    'schedule_subject_id'=>$duplicate_row->schedule_subject_id,
+                    'status'=>1
+    
+                ]); //generate new record for admin
+
+               // dd($insert);
+            }
+            //dd($reliefId);
+            //dd($re)
              // Return a success response
              return response()->json(['message' => 'Relief confirmation status updated successfully']);
          } catch (\Exception $e) {
              // Return an error response if an exception occurs
+             //dd($e);
              return response()->json(['error' => 'Failed to update relief confirmation status'], 500);
          }
      }

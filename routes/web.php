@@ -120,7 +120,9 @@ Route::group(['prefix' => 'schedule','namespace' => 'Schedule','middleware' => [
     Route::get('getScheduleView/{class_id}','ScheduleController@getScheduleView')->name('schedule.getScheduleView');
     
     Route::get('manageRelief','ScheduleController@manageReliefIndex')->name('schedule.manageRelief');
-    Route::post('getPendingRelief','ScheduleController@getPendingRelief')->name('schedule.getPendingRelief');
+    Route::post('getAllTeacher','ScheduleController@getAllTeacher')->name('schedule.getAllTeacher');
+    Route::post('datatablePendingRelief','ScheduleController@datatablePendingRelief')->name('schedule.datatablePendingRelief');
+
 
     Route::any('getFreeTeacher','ScheduleController@getFreeTeacher')->name('schedule.getFreeTeacher');
     Route::post('autoSuggestRelief','ScheduleController@autoSuggestRelief')->name('schedule.autoSuggestRelief');
