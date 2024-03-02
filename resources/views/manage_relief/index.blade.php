@@ -5,7 +5,6 @@
 {{-- <link href="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.css') }}" rel="stylesheet"> --}}
 <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
 
 <style>
 
@@ -151,7 +150,7 @@ u:hover {
                 </p>
                
                 <div class="table-responsive">
-                    <table id="reliefTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                    <table id="reliefTable" class="table table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
                                 <th>No </th>
@@ -297,7 +296,7 @@ u:hover {
 
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
 
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
 
 <script>   
     var dates = []
@@ -305,16 +304,6 @@ u:hover {
     var reliefTable;
 
     $(document).ready(function() {
-
-        $('#reliefTable').DataTable({
-            processing: true,
-            paging: true,
-            searching: true,
-            ordering: true,
-            columnDefs: [
-                { "orderable": false, "targets": -1 } // -1 refers to the last column
-            ]
-        });
 
         $.ajaxSetup({
             headers: {
@@ -328,7 +317,6 @@ u:hover {
 
         $('#organization').change(function() {
             var organizationid = $("#organization option:selected").val();
-            $('#reliefTable').DataTable().destroy();
 
             $.ajax({
                 url: "{{ route('schedule.getTeacherOfOrg') }}",
@@ -368,6 +356,8 @@ u:hover {
 
         $('#datepicker').change(function() {
             dateOnChange();
+            $('#reliefTable').DataTable().destroy();
+
            fetchReliefData();
         })
         
@@ -469,107 +459,6 @@ u:hover {
             $('#commitReliefForm').submit();
         }
 
-    //     function displayRelief(reliefData) {
-    //     console.log('Relief Data:', reliefData);
-
-    //             var tableBody = $('#reliefTable tbody');
-    //             tableBody.empty();
-                
-    //             reliefData.forEach(function (relief, index) {
-    //                 var row = $('<tr></tr>');
-    //                 row.append('<td>' + (index + 1) + '</td>');
-    //                 row.append('<td>' + relief.class_name + '</td>');
-    //                 row.append('<td>' + relief.subject + '</td>');
-    //                 row.append('<td>' + relief.slot + '</td>');
-    //                 row.append('<td>' + relief.leave_teacher + '</td>');
-                    
-    //                 var tdElement = $('<td></td>');
-    //                 if (relief.desc !== null) {
-    //                      tdElement = $('<td>' + relief.desc + '</td>');
-    //                 }
-
-    //                 if (relief.image !== null) {
-    //                     // Add a link to open the modal and display the image
-    //                     var imageLink = $('<a href="#" class="image-link" data-image="' + relief.image + '">(View)</a>');
-    //                     imageLink.click(function() {
-    //                             // Get the image URL from the data attribute
-    //                             var imageUrl = $(this).data('image');
-    //                             $('#modalImage').attr('src', '{{ URL::asset('/schedule_leave_image/') }}' + '/' + imageUrl);
-
-    //                             $('#imageModal').modal('show');
-
-    //                             return false;
-    //                             console.log('Image URL:', imageUrl);
-    //                         });
-    //                     tdElement.append(imageLink);
-    //                 }
-
-    //                 row.append(tdElement);
-
-    //     // Append the select box with options
-    //         var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  
-    //         + '" schedule_subject_id="'+relief.schedule_subject_id +'" slot = "'+relief.slot+'"></select></td>');
-
-    //         var selectElement = selectColumn.find('select');
-
-    //         // Call the updated function to populate the select box options
-    //     //git  updateTeacherComboBox(index, response.original.free_teacher_list);
-
-    //         row.append(selectColumn);
-    //         tableBody.append(row);
-    //     });
-        
-    //         var assignTeacherElements = tableBody.find('.assign_teacher');
-
-    // $('.assign_teacher').change(function() {
-    //     var selectedValue = $(this).val();
-    //     var slot = $(this).attr('slot');
-    //     //$(this).css("color", $("select option:selected").css("color"));
-    //     var selectedOption = $(this).find('option:selected');
-
-    //     // Check the color of the selected option
-    //     var optionColor = selectedOption.css('color');
-
-    //     // Update the color of the select element
-    //     $(this).css('color', optionColor);
-
-    //     // Use filter to find elements with the same slot and teacher
-    //     if(selectedOption.text().trim() == 'No Teacher' || $(this).val() == null){
-    //         return;
-    //     }
-    //     var duplicates = $('.assign_teacher').filter(function() {
-    //         return $(this).val() === selectedValue && $(this).attr('slot') === slot ;
-    //     });
-    //     // Check if duplicates were found
-    //     if (duplicates.length > 1) {
-    //         console.log(selectedOption.text(),$(this).val(),duplicates)
-    //         alert(selectedOption.text() +' was selected in the same slot!');
-    //     }
-
-    //     var checkRelief = $('.assign_teacher').filter(function() {
-    //         return $(this).val() === selectedValue && $(this).attr('slot') !== slot;
-    //     });
-      
-    //     if(checkRelief.length >= parseInt( selectedOption.attr('remaining_relief')) ){
-    //         alert('This teacher exceed his/her remaining relief already!');
-    //     }
-        
-    // });
-
-    
-    //     assignTeacherElements.each(function(index, element) {
-    //                 var selectedIndex = $(this).attr('data-index');
-    //                 // Use direct property access instead of split
-    //                 var leave_relief_id = selectedIndex;
-
-    //                 assignTeacher(leave_relief_id);
-            
-    //         // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
-    //     });
-    //     autoSuggest();
-
-    //     }
-
     function imageLinkFunction(){
         $(this).click(function() {
         var imageUrl = $(this).data("image");
@@ -578,89 +467,6 @@ u:hover {
         return false;
     });
     }
-
-    function displayRelief(reliefData) {
-    console.log('Relief Data:', reliefData);
-    var table = $('#reliefTable').DataTable();
-    table.clear().draw(); // Clear the existing data in the table
-    var tableBody = $('#reliefTable').find('tbody');
-
-    reliefData.forEach(function (relief, index) {
-        var imageLink = '';
-        // var imageLinkFunction = '';
-        if (relief.image !== null) {
-            // imageLinkFunction = imageLinkFunction.toString(); // Convert the function to a string
-            imageLink = '<a href="#" class="image-link" data-image="' + relief.image + '">(View)</a>';
-        }
-
-        var rowNode = table.row.add([
-            index + 1,
-            relief.class_name,
-            relief.subject,
-            relief.slot,
-            relief.leave_teacher,
-            relief.desc ? relief.desc + imageLink : imageLink, // Include image link if description exists
-            '<select class="form-control assign_teacher" data-index="' + relief.leave_relief_id +
-            '" schedule_subject_id="' + relief.schedule_subject_id + '" slot="' + relief.slot + '"></select>'
-        ]).draw().node();
-
-        // Set up the click event for the image link
-        $(rowNode).find('.image-link').click(function() {
-            var imageUrl = $(this).data('image');
-            $("#modalImage").attr("src", "{{ URL::asset('/schedule_leave_image/') }}" + "/" + imageUrl);
-            $("#imageModal").modal("show");
-            return false;
-        });
-    });
-
-    // Add event listener for the change event on the assign_teacher select elements
-    $('.assign_teacher').change(function() {
-        var selectedValue = $(this).val();
-        var slot = $(this).attr('slot');
-        //$(this).css("color", $("select option:selected").css("color"));
-        var selectedOption = $(this).find('option:selected');
-
-        // Check the color of the selected option
-        var optionColor = selectedOption.css('color');
-
-        // Update the color of the select element
-        $(this).css('color', optionColor);
-
-        // Use filter to find elements with the same slot and teacher
-        if(selectedOption.text().trim() == 'No Teacher' || $(this).val() == null){
-            return;
-        }
-        var duplicates = $('.assign_teacher').filter(function() {
-            return $(this).val() === selectedValue && $(this).attr('slot') === slot ;
-        });
-        // Check if duplicates were found
-        if (duplicates.length > 1) {
-            console.log(selectedOption.text(),$(this).val(),duplicates)
-            alert(selectedOption.text() +' was selected in the same slot!');
-        }
-
-        var checkRelief = $('.assign_teacher').filter(function() {
-            return $(this).val() === selectedValue && $(this).attr('slot') !== slot;
-        });
-
-        if(checkRelief.length >= parseInt( selectedOption.attr('remaining_relief')) ){
-            alert('This teacher exceed his/her remaining relief already!');
-        }
-    });
-
-    var assignTeacherElements = tableBody.find('.assign_teacher');
-
-    assignTeacherElements.each(function(index, element) {
-        var selectedIndex = $(this).attr('data-index');
-        // Use direct property access instead of split
-        var leave_relief_id = selectedIndex;
-
-        assignTeacher(leave_relief_id);
-        
-        // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
-    });
-    autoSuggest();
-}
 
 
 // Call fetchReliefData with the corrected success function
@@ -673,7 +479,7 @@ function fetchReliefData() {
     }
 
     $.ajax({
-        url: '{{ route("schedule.getPendingRelief") }}',
+        url: '{{ route("schedule.getAllTeacher") }}',
         type: 'POST',
         data: {
             organization: $('#organization option:selected').val(),
@@ -681,13 +487,114 @@ function fetchReliefData() {
         },
         success: function (response) {
             teachers= response.teachers;
-            displayRelief(response.pending_relief);
+            //displayRelief(response.pending_relief);
             // initializeDataTable();
         },
         error: function (xhr, status, error) {
             console.error(error);
         }
     });
+    //$('#reliefTable').DataTable().destroy();
+    teacherTable = $('#reliefTable').DataTable({
+                processing: true,
+                //serverSide: true,
+                ajax: {
+                    url: "{{ route('schedule.datatablePendingRelief') }}",
+                    data: {
+                        organization: $('#organization option:selected').val(),
+                        date: date_val,
+                    },
+                    type: 'POST',
+
+                },
+                'columnDefs': [{
+                    "targets": [0], // your case first column
+                    "className": "text-center",
+                    "width": "2%"
+                }, {
+                    "targets": [3, 4, 5, 6], // your case first column
+                    "className": "text-center",
+                }, ],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "class_name",
+                    name: 'class_name'
+                }, {
+                    data: "subject",
+                    name: 'subject'
+                }, {
+                    data: "slot",
+                    name: 'slot'
+                }, {
+                    data: "leave_teacher",
+                    name: 'leave_teacher'
+                }, {
+                    data: 'reason',
+                    name: 'reason',
+                }, {
+                    data: 'combobox',
+                    name: 'combobox',
+                    orderable: false,
+                    searchable: false
+                }, ]
+            });
+
+    teacherTable.off('draw.dt').on('draw.dt', function () {
+        $('.assign_teacher').change(function() {
+            var selectedValue = $(this).val();
+            var slot = $(this).attr('slot');
+            //$(this).css("color", $("select option:selected").css("color"));
+            var selectedOption = $(this).find('option:selected');
+
+            // Check the color of the selected option
+            var optionColor = selectedOption.css('color');
+
+            // Update the color of the select element
+            $(this).css('color', optionColor);
+
+            // Use filter to find elements with the same slot and teacher
+            if(selectedOption.text().trim() == 'No Teacher' || $(this).val() == null){
+                return;
+            }
+            var duplicates = $('.assign_teacher').filter(function() {
+                return $(this).val() === selectedValue && $(this).attr('slot') === slot ;
+            });
+            // Check if duplicates were found
+            if (duplicates.length > 1) {
+                console.log(selectedOption.text(),$(this).val(),duplicates)
+                alert(selectedOption.text() +' was selected in the same slot!');
+            }
+
+            var checkRelief = $('.assign_teacher').filter(function() {
+                return $(this).val() === selectedValue && $(this).attr('slot') !== slot;
+            });
+
+            if(checkRelief.length >= parseInt( selectedOption.attr('remaining_relief')) ){
+                alert('This teacher exceed his/her remaining relief already!');
+            }
+        });
+
+        var tableBody = $('#reliefTable').find('tbody');
+        var assignTeacherElements = tableBody.find('.assign_teacher');
+        console.log(assignTeacherElements);
+        assignTeacherElements.each(function (index, element) {
+            var selectedIndex = $(this).attr('data-index');
+            // Use direct property access instead of split
+            var leave_relief_id = selectedIndex;
+
+            assignTeacher(leave_relief_id);
+
+            // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
+        });
+        autoSuggest();
+    });
+   
 }
 
 
@@ -848,5 +755,108 @@ function updateTeacherComboBox(leave_relief_id,availableTeachers) {
         }
     }
 
+    
+    //     function displayRelief(reliefData) {
+    //     console.log('Relief Data:', reliefData);
+
+    //             var tableBody = $('#reliefTable tbody');
+    //             tableBody.empty();
+                
+    //             reliefData.forEach(function (relief, index) {
+    //                 var row = $('<tr></tr>');
+    //                 row.append('<td>' + (index + 1) + '</td>');
+    //                 row.append('<td>' + relief.class_name + '</td>');
+    //                 row.append('<td>' + relief.subject + '</td>');
+    //                 row.append('<td>' + relief.slot + '</td>');
+    //                 row.append('<td>' + relief.leave_teacher + '</td>');
+                    
+    //                 var tdElement = $('<td></td>');
+    //                 if (relief.desc !== null) {
+    //                      tdElement = $('<td>' + relief.desc + '</td>');
+    //                 }
+
+    //                 if (relief.image !== null) {
+    //                     // Add a link to open the modal and display the image
+    //                     var imageLink = $('<a href="#" class="image-link" data-image="' + relief.image + '">(View)</a>');
+    //                     imageLink.click(function() {
+    //                             // Get the image URL from the data attribute
+    //                             var imageUrl = $(this).data('image');
+    //                             $('#modalImage').attr('src', '{{ URL::asset('/schedule_leave_image/') }}' + '/' + imageUrl);
+
+    //                             $('#imageModal').modal('show');
+
+    //                             return false;
+    //                             console.log('Image URL:', imageUrl);
+    //                         });
+    //                     tdElement.append(imageLink);
+    //                 }
+
+    //                 row.append(tdElement);
+
+    //     // Append the select box with options
+    //         var selectColumn = $('<td><select class="form-control assign_teacher" data-index="' + relief.leave_relief_id  
+    //         + '" schedule_subject_id="'+relief.schedule_subject_id +'" slot = "'+relief.slot+'"></select></td>');
+
+    //         var selectElement = selectColumn.find('select');
+
+    //         // Call the updated function to populate the select box options
+    //     //git  updateTeacherComboBox(index, response.original.free_teacher_list);
+
+    //         row.append(selectColumn);
+    //         tableBody.append(row);
+    //     });
+        
+    //         var assignTeacherElements = tableBody.find('.assign_teacher');
+
+    // $('.assign_teacher').change(function() {
+    //     var selectedValue = $(this).val();
+    //     var slot = $(this).attr('slot');
+    //     //$(this).css("color", $("select option:selected").css("color"));
+    //     var selectedOption = $(this).find('option:selected');
+
+    //     // Check the color of the selected option
+    //     var optionColor = selectedOption.css('color');
+
+    //     // Update the color of the select element
+    //     $(this).css('color', optionColor);
+
+    //     // Use filter to find elements with the same slot and teacher
+    //     if(selectedOption.text().trim() == 'No Teacher' || $(this).val() == null){
+    //         return;
+    //     }
+    //     var duplicates = $('.assign_teacher').filter(function() {
+    //         return $(this).val() === selectedValue && $(this).attr('slot') === slot ;
+    //     });
+    //     // Check if duplicates were found
+    //     if (duplicates.length > 1) {
+    //         console.log(selectedOption.text(),$(this).val(),duplicates)
+    //         alert(selectedOption.text() +' was selected in the same slot!');
+    //     }
+
+    //     var checkRelief = $('.assign_teacher').filter(function() {
+    //         return $(this).val() === selectedValue && $(this).attr('slot') !== slot;
+    //     });
+      
+    //     if(checkRelief.length >= parseInt( selectedOption.attr('remaining_relief')) ){
+    //         alert('This teacher exceed his/her remaining relief already!');
+    //     }
+        
+    // });
+
+    
+    //     assignTeacherElements.each(function(index, element) {
+    //                 var selectedIndex = $(this).attr('data-index');
+    //                 // Use direct property access instead of split
+    //                 var leave_relief_id = selectedIndex;
+
+    //                 assignTeacher(leave_relief_id);
+            
+    //         // Your code to handle each element goes here console.log($(element).text()); // Example: Log the text content of each element using jQuery
+    //     });
+    //     autoSuggest();
+
+    //     }
+
 </script>
 @endsection
+
