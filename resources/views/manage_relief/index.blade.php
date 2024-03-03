@@ -487,6 +487,7 @@ function fetchReliefData() {
         },
         success: function (response) {
             teachers= response.teachers;
+           // console.log(teachers);
             //displayRelief(response.pending_relief);
             // initializeDataTable();
         },
@@ -512,9 +513,13 @@ function fetchReliefData() {
                     "className": "text-center",
                     "width": "2%"
                 }, {
-                    "targets": [3, 4, 5, 6], // your case first column
+                    "targets": [3, 4, 5], // your case first column
                     "className": "text-center",
-                }, ],
+                },
+                {
+                    targets: [6], // Columns containing comboboxe                 
+                    responsivePriority: 1 // Prevent hiding of these columns
+                } ],
                 columns: [{
                     "data": null,
                     searchable: false,
@@ -582,7 +587,7 @@ function fetchReliefData() {
 
         var tableBody = $('#reliefTable').find('tbody');
         var assignTeacherElements = tableBody.find('.assign_teacher');
-        console.log(assignTeacherElements);
+        //console.log(assignTeacherElements);
         assignTeacherElements.each(function (index, element) {
             var selectedIndex = $(this).attr('data-index');
             // Use direct property access instead of split
