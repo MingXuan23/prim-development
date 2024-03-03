@@ -516,7 +516,7 @@ class ScheduleController extends Controller
                 if(!in_array($t->id,$assignedTeachers )) {
                     //continue with proccess below
                 }          
-                else if(array_count_values($assignedTeachers)[$t->id] >= $t ->details->remaining_relief || $t->details->remaining_relief <= 0)
+                else if(array_count_values($assignedTeachers)[$t->id] > $t ->details->remaining_relief || $t->details->remaining_relief <= 0)
                     continue;
 
                 else if($current_slot == $schedule_subject ->slot && in_array($t->id,$teacherSlots)){
