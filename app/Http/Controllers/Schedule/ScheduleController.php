@@ -360,6 +360,7 @@ class ScheduleController extends Controller
                         ->leftJoin('schedules as s','s.id','sv.schedule_id')
                         ->where('sv.status',1)
                         ->where('ss.status',1)
+                        ->where('s.status',1)
                         ->where('ss.teacher_in_charge',$teacher_id)
                         ->where('ss.day',$carbon_date->dayOfWeek)
                         ->count('ss.id');
@@ -388,7 +389,7 @@ class ScheduleController extends Controller
         $teacher->busySlot = $teacher->normal_class - $teacher->leave_class + $teacher->relief_class;
         $teacher ->remaining_relief = $teacher->max_relief - $teacher->relief_class;
         if($teacher->busySlot >= $teacher->max_slot || $teacher->relief_class >= $teacher->max_relief) {
-            $teacher ->remaining_relief = -1;
+            $teacher ->remaining_relief =0;
         } 
         return $teacher;
     }
