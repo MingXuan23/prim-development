@@ -459,15 +459,6 @@ u:hover {
             $('#commitReliefForm').submit();
         }
 
-    function imageLinkFunction(){
-        $(this).click(function() {
-        var imageUrl = $(this).data("image");
-        $("#modalImage").attr("src", "{{ URL::asset('/schedule_leave_image/') }}" + "/" + imageUrl);
-        $("#imageModal").modal("show");
-        return false;
-    });
-    }
-
 
 // Call fetchReliefData with the corrected success function
 function fetchReliefData() {
@@ -551,6 +542,14 @@ function fetchReliefData() {
             });
 
     teacherTable.off('draw.dt').on('draw.dt', function () {
+
+        $('.image-link').click(function() {
+            // Call the imageLinkFunction when the click event occurs on elements with the class .image-link
+            var imageUrl = $(this).data("image");
+            $("#modalImage").attr("src", "{{ URL::asset('/schedule_leave_image/') }}" + "/" + imageUrl);
+            $("#imageModal").modal("show");
+            return false;
+        });
         $('.assign_teacher').change(function() {
             var selectedValue = $(this).val();
             var slot = $(this).attr('slot');
