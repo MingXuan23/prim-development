@@ -422,7 +422,7 @@ class ScheduleController extends Controller
     }
     //to auto suggesstion
     public function autoSuggestRelief(Request $request){
-        
+        set_time_limit(300);
         //$request->date = Carbon::now();
         $pendingRelief = $request -> pendingRelief;
         $date = $request->date;
@@ -516,7 +516,7 @@ class ScheduleController extends Controller
                 if(!in_array($t->id,$assignedTeachers )) {
                     //continue with proccess below
                 }          
-                else if(array_count_values($assignedTeachers)[$t->id] > $t ->details->remaining_relief || $t->details->remaining_relief <= 0)
+                else if(array_count_values($assignedTeachers)[$t->id] >= $t ->details->remaining_relief || $t->details->remaining_relief <= 0)
                     continue;
 
                 else if($current_slot == $schedule_subject ->slot && in_array($t->id,$teacherSlots)){
@@ -528,6 +528,10 @@ class ScheduleController extends Controller
                 if($current_slot != $schedule_subject ->slot){
                     $teacherSlots = [];
                 }
+
+                // if($leave_relief_id == 347){
+                //     dd($t,array_count_values($assignedTeachers)[$t->id] , $t ->details->remaining_relief);
+                // }
                 $current_slot =$schedule_subject ->slot;
                 $draft = new stdClass();
                 $draft->teacher_id = $t->id;
@@ -542,8 +546,8 @@ class ScheduleController extends Controller
             }
 
         }
-
-        return response()->json(['relief_draft'=>$relief_draft]);
+        //dd($assignedTeachers,array_count_values($assignedTeachers)[22044],array_count_values($assignedTeachers)[22044] > 1);
+        return response()->json(['relief_draft'=>$relief_draft,'assignTeacher'=>$assignedTeachers]);
         
        
     }
