@@ -68,7 +68,17 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
     public function columnFormats(): array
     {
         return [
-            'D' => NumberFormat::FORMAT_TEXT, // Column D represents the telephone numbers (change as needed)
+            'D' => NumberFormat::FORMAT_NUMBER, // Column D represents the telephone numbers (change as needed)
         ];
     }
+
+    public function registerEvents(): array
+{
+    return [
+        AfterSheet::class => function(AfterSheet $event) {
+            // Apply custom number format "0" to the telephone numbers column
+            $event->sheet->getStyle('D')->getNumberFormat()->setFormatCode('0');
+        },
+    ];
+}
 }
