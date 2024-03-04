@@ -9,7 +9,10 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+
+class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,WithColumnFormatting
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -32,7 +35,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
         ->join('classes as c', 'c.id', '=', 'co.class_id')
         ->join('organization_user as ou', 'ou.id', 'ous.organization_user_id')
         ->join('users', 'users.id', 'ou.user_id')
-        ->select('students.nama', 'students.gender', 'students.email as student_email', 'users.name', 'users.telno')
+        ->select('students.nama', 'students.gender',  'users.name', 'users.telno')
         ->where([
             ['co.organization_id', $this->organId],
             ['c.id', $this->kelasId],
@@ -55,11 +58,17 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings
     public function headings(): array
     {
         return [
-            'Nama',
-            'Jantina',
-            'Email',
-            'Nama Penjaga',
-            'No. Tel Bimbit Penjaga',
+            'nama',
+            'jantina',
+            'nama_penjaga',
+            'no_ic_penjaga',
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'D' => NumberFormat::FORMAT_TEXT, // Column D represents the telephone numbers (change as needed)
         ];
     }
 }
