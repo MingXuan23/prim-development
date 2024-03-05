@@ -415,9 +415,11 @@
         // console.log(oid);
         if (id.checked) {
 
-            $("input[name='billcheck']:checkbox").prop('checked', true).change();
-            $("input[name='billcheck2']:checkbox").prop('checked', true).change();
-            $("input[value='" + oid + "']").closest('.card').find("input[name='nameSchool']").click();
+            //using id avoid get the data from other org
+            $(id).closest('.card').find("input[name='billcheck']:checkbox").prop('checked', true).change();
+            //$("input[name='billcheck']
+            // $("input[name='billcheck2']:checkbox").prop('checked', true).change();
+            $(id).closest('.card').find("input[value='" + oid + "']").closest('.card').find("input[name='nameSchool']").not(':checked').click();
 
             //$("input[name='billcheck2']:checkbox").prop('checked', true).change();
             
@@ -439,6 +441,9 @@
 
             } 
         }else {
+
+            $("input[name='billcheck']:checkbox").prop('checked', false).change();
+            $("input[name='billcheck2']:checkbox").prop('checked', false).change();
             for(var i=0; i < name.length; i++){
                 name[i].disabled = false;
             } 
@@ -446,8 +451,7 @@
             total = 0;
             amt = 0;
 
-            $("input[name='billcheck']:checkbox").prop('checked', false);
-            $("input[name='billcheck2']:checkbox").prop('checked', false);
+            
             $("#pay").html("0.00");
             myCheckboxes = [];
             myCheckboxes_categoryA = [];
@@ -468,8 +472,8 @@
 
         $('.student-collapse').on('shown.bs.collapse', function () {
         // Find all children checkboxes with the name "billcheck" and set their checked property to true
-        $(this).children().find("input[name='billcheck']").prop('checked', true).change();
-    });
+            $(this).children().find("input[name='billcheck']").not(':checked').prop('checked', true).change();
+        });
     });
 
     function checkD(element) {
