@@ -169,7 +169,8 @@
                                                         data-target="#collapse{{ $organization->id }}-{{ $row->studentid }}"
                                                         aria-expanded="false"
                                                         aria-controls="collapse{{ $organization->id }}-{{ $row->studentid }}"
-                                                        class="d-block position-relative text-dark collapsible-link py-2" />
+                                                        class="d-block position-relative text-dark collapsible-link py-2" 
+                                                        />
 
                                                         <label for="option-{{ $organization->id }}-{{ $row->studentid }}">
                                                         <span style="font-size: 18px">{{ $loop->iteration }}.
@@ -198,7 +199,7 @@
                                             <div id="collapse{{ $organization->id }}-{{ $row->studentid }}"
                                                 aria-labelledby="heading{{ $organization->id }}-{{ $row->studentid }}"
                                                 data-parent="#accordionExample{{ $organization->id }}-{{ $row->studentid }}"
-                                                class="collapse">
+                                                class="collapse student-collapse">
                                                 <div class="card-body pl-0 pr-0">
                                                     {{-- Kelas Name --}}
                                                     @foreach($getfees->where('studentid', $row->studentid)->where('organization_id', $organization->id)->unique('studentid') as $data)
@@ -413,6 +414,13 @@
 
         // console.log(oid);
         if (id.checked) {
+
+            $("input[name='billcheck']:checkbox").prop('checked', true).change();
+            $("input[name='billcheck2']:checkbox").prop('checked', true).change();
+            $("input[value='" + oid + "']").closest('.card').find("input[name='nameSchool']").click();
+
+            //$("input[name='billcheck2']:checkbox").prop('checked', true).change();
+            
             for(var i=0; i < name.length; i++){
                 
                 if(name[i].checked ){
@@ -451,7 +459,13 @@
         } 
         
     }
-    
+    $(document).ready(function() {
+        // Bind event handler to the hidden.bs.collapse event of the collapse element
+        $('.student-collapse').on('hidden.bs.collapse', function () {
+            // Find all children checkboxes with the name "billcheck" and set their checked property to false
+            $(this).children().find("input[name='billcheck']").prop('checked', false).change();
+        });
+    });
 
     function checkD(element) {
         var id = element.id;
