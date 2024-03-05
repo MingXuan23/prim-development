@@ -465,6 +465,11 @@
             // Find all children checkboxes with the name "billcheck" and set their checked property to false
             $(this).children().find("input[name='billcheck']").prop('checked', false).change();
         });
+
+        $('.student-collapse').on('shown.bs.collapse', function () {
+        // Find all children checkboxes with the name "billcheck" and set their checked property to true
+        $(this).children().find("input[name='billcheck']").prop('checked', true).change();
+    });
     });
 
     function checkD(element) {
