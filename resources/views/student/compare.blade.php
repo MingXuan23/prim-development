@@ -19,6 +19,17 @@
 
 @section('content')
 <!-- {{-- <p>Welcome to this beautiful admin panel.</p> --}} -->
+@if(\Session::has('success'))
+                <div class="alert alert-success">
+                    <p>{{ \Session::get('success') }}</p>
+                </div>
+                @endif
+                @if(\Session::has('error'))
+                <p>{{ \Session::get('error') }}</p>
+                <div class="alert alert-danger">
+                    <p>{{ \Session::get('error') }}</p>
+                </div>
+                @endif
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
@@ -34,20 +45,7 @@
 
     </div>
 </div>
-@if(count($errors) > 0)
-<div class="alert alert-danger">
-    <ul>
-        @foreach($errors->all() as $error)
-        <li>{{$error}}</li>
-        @endforeach
-    </ul>
-</div>
-@endif
-@if(\Session::has('success'))
-<div class="alert alert-success">
-    <p>{{ \Session::get('success') }}</p>
-</div>
-@endif
+
         
 <div class="row">
     <div class="col-md-12">
@@ -180,6 +178,9 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <h4>Pelajar Yang Di Sekolah Lain</h4>
+                        @if(count($differentOrgStudents)>0)
+                        <input type="text" name="secureKey" id="secureKey" placeholder="secureKey" class="form-control">
+                        @endif
                     <!-- @if(count($differentOrgStudents)>0)
                         <button id="transferOutsideStudent" class="btn btn-primary align-right">Pindah Semua Pelajar</button>
                     @endif -->
@@ -201,6 +202,7 @@
                                 <td>{{$row->gender}}</td>
                                 <td>{{$row->parentName}}</td>
                                 <td>{{$row->parentTelno}}</td>
+                                <td><button class="btn btn-primary transferFromAnotherSchool" studentNo="{{$loop->iteration - 1}}">Pindah</button></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -236,6 +238,8 @@ function back() {
 
     var number=0;
     $(document).ready(function() {
+        $('.alert').delay(6000).fadeOut();
+
         $('.addNewStudent').on('click', function() {
             document.querySelectorAll('button').forEach(button => button.disabled = true);
             const studentNo = $(this).attr('studentNo');
@@ -258,6 +262,19 @@ function back() {
             transferStudent(student,1);
             //location.reload();
         });
+
+        $('.transferFromAnotherSchool').on('click', function() {
+           
+            const studentNo = $(this).attr('studentNo');
+            const difStudents = @json($differentOrgStudents);
+            
+            var student =JSON.stringify(difStudents[studentNo]);
+            number=0;
+            //console.log(student);
+            transferStudentDiffOrg(student,1);
+            //location.reload();
+        });
+
 
         $('#addAllNewStudent').on('click', function() {
             document.querySelectorAll('button').forEach(button => button.disabled = true);
@@ -287,19 +304,19 @@ function back() {
             //location.reload();
         });
 
-        $('#transferOutsideStudent').on('click', function() {
-            document.querySelectorAll('button').forEach(button => button.disabled = true);
-            const difStudents = @json($differentOrgStudents);
-            difStudents.forEach(function(Student) {
-                // Access properties of the student object
+        // $('#transferOutsideStudent').on('click', function() {
+        //     document.querySelectorAll('button').forEach(button => button.disabled = true);
+        //     const difStudents = @json($differentOrgStudents);
+        //     difStudents.forEach(function(Student) {
+        //         // Access properties of the student object
 
-                var student =JSON.stringify(Student);
-                number=0;
-                transferStudent(student,difStudents.length);
+        //         var student =JSON.stringify(Student);
+        //         number=0;
+        //         transferStudent(student,difStudents.length);
                
-            });
-            //location.reload();
-        });
+        //     });
+        //     //location.reload();
+        // });
     });
 
     function addStudent(student,n){
@@ -325,6 +342,31 @@ function back() {
                 url: '{{ route("student.compareTransferStudent") }}',
                 data: {
                     student: student,
+                },
+                success:function(response){
+                    //console.log(JSON.stringify(response.data));
+                    // console.log(response);
+                    number++;
+                    //console.log("success",n)
+                    if(n===number)
+                        location.reload();
+                }
+            });    
+    }
+
+    function  transferStudentDiffOrg(student,n){
+
+        if ($('#secureKey').val().trim() === '') {
+            alert("Please enter the secure key");
+            return false;
+        }
+        document.querySelectorAll('button').forEach(button => button.disabled = true);
+        $.ajax({
+                type: 'GET',
+                url: '{{ route("student.compareTransferStudentDiffOrg") }}',
+                data: {
+                    student: student,
+                    secureKey:$('#secureKey').val()
                 },
                 success:function(response){
                     //console.log(JSON.stringify(response.data));
