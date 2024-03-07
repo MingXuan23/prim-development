@@ -195,7 +195,7 @@
                                                
                                                 
                                             </div>
-
+                                            @if($row->levelid!=0)
                                             <div id="collapse{{ $organization->id }}-{{ $row->studentid }}"
                                                 aria-labelledby="heading{{ $organization->id }}-{{ $row->studentid }}"
                                                 data-parent="#accordionExample{{ $organization->id }}-{{ $row->studentid }}"
@@ -305,7 +305,9 @@
 
                                                 </div>
                                             </div>
+                                            @endif
                                         </div>
+                                       
                                     </div>
                                 </div>
                                 @endforeach

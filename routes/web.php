@@ -151,6 +151,8 @@ Route::group(['prefix' => 'student'], function () {
     Route::get('list', 'StudentController@getStudentDatatable')->name('student.getStudentDatatable');
     Route::get('compareAddNewStudent', 'StudentController@compareAddNewStudent')->name('student.compareAddNewStudent');
     Route::get('compareTransferStudent', 'StudentController@compareTransferStudent')->name('student.compareTransferStudent');
+    Route::get('compareTransferStudentDiffOrg', 'StudentController@compareTransferStudentDiffOrg')->name('student.compareTransferStudentDiffOrg');
+
     Route::post('student/fetchClass', 'StudentController@fetchClass')->name('student.fetchClass');
 });
 
