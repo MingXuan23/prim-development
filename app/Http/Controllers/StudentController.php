@@ -478,6 +478,7 @@ class StudentController extends Controller
         $classStu = DB::table('class_student')
             ->where('student_id', $student->id)
             ->first();
+           
 
         DB::table('organization_user_student')->insert([
             'organization_user_id'  => $ou->id,
@@ -1686,7 +1687,7 @@ class StudentController extends Controller
                     $newparent->save();
                 } 
             }
-
+            
             // add parent role
             $parentRole = DB::table('organization_user')
                 ->where('user_id', $newparent->id)
@@ -1707,13 +1708,13 @@ class StudentController extends Controller
             $newparent = DB::table('users')
                         ->where('telno', '=', "{$student->parentTelno}")
                         ->first();
-
+                       
             $parentRole = DB::table('organization_user')
                 ->where('user_id', $newparent->id)
                 ->where('organization_id', $co->oid)
                 ->where('role_id', 6)
                 ->first();
-                
+              
             // dd($parentRole);
 
             if(empty($parentRole))
