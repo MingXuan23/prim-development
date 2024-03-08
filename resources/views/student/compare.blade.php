@@ -248,7 +248,7 @@ function back() {
             var student =JSON.stringify(newStudents[studentNo]);
             number=0;
             addStudent(student,1);
-            location.reload();
+            //location.reload();
         });
 
         $('.transferStudent').on('click', function() {
