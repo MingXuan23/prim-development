@@ -2046,10 +2046,13 @@ class DirectPayController extends Controller
 
                             break;
                     }
+                    echo 'Success :',$transaction->id;
+
                 } 
                 else 
                 {
                     Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Failed']);
+                    echo 'Failed :',$transaction->id;
                 }
             } 
             catch (\Throwable $th) {
