@@ -1690,9 +1690,15 @@ class DirectPayController extends Controller
         // $transaction = DB::table('transactions')
         //             ->where('id',29268)
         //             ->get();
+
+        echo 'Start Handle :';
+
         foreach ($transactions as $transaction)
         {
         //old method()
+
+            echo 'Start transaction :', $transaction->id;
+
             $fpx_sellerOrderNo = $transaction->nama;
             try{
                 $response_value = $this->getTransactionInfo($transaction->id);
