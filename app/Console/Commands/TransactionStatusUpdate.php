@@ -197,6 +197,7 @@ class TransactionStatusUpdate extends Command
 
     public function handle()
     {
+        \Log::info("Start handle Transaction Command Run");
         $transactions = DB::table('transactions')
             ->whereIn('status', ['Pending', 'Failed'])
             ->whereBetween('datetime_created', [now()->subDays(2), now()])
@@ -227,6 +228,8 @@ class TransactionStatusUpdate extends Command
                                     'amount'=>$response_value['transactionAmount'] ,
                                     'description'=>$response_value['fpx_SellerExOrderNo']]
                             );
+                    \Log::info('Yuran success :'. $transaction->id);
+
                             $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         
                             $list_student_fees_id = DB::table('student_fees_new')
@@ -559,10 +562,13 @@ class TransactionStatusUpdate extends Command
 
                             break;
                     }
+                    \Log::info('Transaction success :'. $transaction->id);
+                    
                 } 
                 else 
                 {
                     Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Failed']);
+                    \Log::info('Failed :'. $transaction->id);
                 }
             } 
             catch (\Throwable $th) {
