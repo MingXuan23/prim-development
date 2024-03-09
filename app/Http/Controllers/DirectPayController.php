@@ -1691,20 +1691,20 @@ class DirectPayController extends Controller
         //             ->where('id',29268)
         //             ->get();
 
-        echo 'Start Handle :',"\n";
+        echo 'Start Handle :',"<br>";
 
         foreach ($transactions as $transaction)
         {
         //old method()
 
-            echo 'Start transaction :', $transaction->id ,"\n";
+            echo 'Start transaction :', $transaction->id ,"<br>";
 
             $fpx_sellerOrderNo = $transaction->nama;
             try{
                 $response_value = $this->getTransactionInfo($transaction->id);
                 if (!isset($response_value['fpx_DebitAuthCode']))
                 {
-                    echo 'transaction :', $response_value['status'] ,"\n";
+                    echo 'transaction skip <br>';
                     continue;
                 }
 
@@ -2053,7 +2053,7 @@ class DirectPayController extends Controller
 
                             break;
                     }
-                    echo 'Success :',$transaction->id,"\n";
+                    echo 'Success :',$transaction->id,"<br>";
 
                 } 
                 else 
@@ -2063,7 +2063,7 @@ class DirectPayController extends Controller
                 }
             } 
             catch (\Throwable $th) {
-                echo 'Error :', ($th->getMessage()),$transaction->id,"\n";
+                echo 'Error :', ($th->getMessage()),$transaction->id,"<br>";
             }
         }
     
