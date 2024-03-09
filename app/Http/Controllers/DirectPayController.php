@@ -1690,9 +1690,15 @@ class DirectPayController extends Controller
         // $transaction = DB::table('transactions')
         //             ->where('id',29268)
         //             ->get();
+
+        echo 'Start Handle :';
+
         foreach ($transactions as $transaction)
         {
         //old method()
+
+            echo 'Start transaction :', $transaction->id;
+
             $fpx_sellerOrderNo = $transaction->nama;
             try{
                 $response_value = $this->getTransactionInfo($transaction->id);
@@ -2046,10 +2052,13 @@ class DirectPayController extends Controller
 
                             break;
                     }
+                    echo 'Success :',$transaction->id;
+
                 } 
                 else 
                 {
                     Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Failed']);
+                    echo 'Failed :',$transaction->id;
                 }
             } 
             catch (\Throwable $th) {
