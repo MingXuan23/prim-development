@@ -1676,11 +1676,6 @@ class DirectPayController extends Controller
         // Close cURL session
         curl_close($ch);
         $resultArray = json_decode($response, true);
-        if (!isset($resultArray['fpx_DebitAuthCode']))
-                {
-                    dd($resultArray,"here");
-                }
-                dd($resultArray,"here");
 
         return $resultArray ;
     }
