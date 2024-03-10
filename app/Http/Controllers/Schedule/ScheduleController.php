@@ -1362,4 +1362,8 @@ class ScheduleController extends Controller
              return response()->json(['error' => 'Failed to update relief confirmation status'], 500);
          }
      }
+
+     public function leaveReliefPolicy(){
+        return view('schedule.policy');
+     }
 }

@@ -112,7 +112,10 @@ Route::group(['prefix' => 'subject'], function () {
 });
 Route::post('importSubject', 'SubjectController@subjectImport')->name('importSubject');
 
+Route::get('leaveReliefPolicy', 'Schedule\ScheduleController@leaveReliefPolicy')->name('schedule.leaveReliefPolicy');
+
 Route::group(['prefix' => 'schedule','namespace' => 'Schedule','middleware' => ['auth']], function () {
+
     Route::get('getVersion/{oid}','ScheduleController@getVersion')->name('schedule.getVersion');
 
     Route::get('getScheduleStatus/{id}','ScheduleController@getScheduleStatus')->name('schedule.getScheduleStatus');
@@ -476,6 +479,7 @@ Route::group(['middleware' => ['auth']], function () {
 });
 Route::get('adminTestFpx/{id}/', 'DirectPayController@adminTestFpx')->name('adminTestFpx');
 Route::get('adminHandle', 'DirectPayController@handle');
+
 Route::get('getTransactionInfo/{id}','DirectPayController@getTransactionInfo');
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
 Route::get('donateFromMobile', 'PayController@donateFromMobile');
