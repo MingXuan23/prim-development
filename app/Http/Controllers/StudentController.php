@@ -2090,13 +2090,19 @@ class StudentController extends Controller
                 ->first();
 
             if (empty($parentRole)) {
-                DB::table('organization_user')->insert([
+               $ou_id =  DB::table('organization_user')->insertGetId([
                     'organization_id'   => $co->organization_id,
                     'user_id'           => $newparent->id,
                     'role_id'           => 6,
                     'start_date'        => now(),
                     'status'            => 1,
                 ]);
+
+                DB::table('organization_user_student')
+                 ->insert([
+                    'organization_user_id'=>$ou_id,
+                    'student_id'=>$student->studentId
+                 ]);
             }
         
         $class_student_details=$class_student->first();
