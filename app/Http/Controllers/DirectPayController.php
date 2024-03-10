@@ -1677,6 +1677,10 @@ class DirectPayController extends Controller
         curl_close($ch);
         $resultArray = json_decode($response, true);
 
+        if (!isset($resultArray['fpx_SellerOrderNo'])){
+            return "Error: ".$url;
+        }
+
         return $resultArray ;
     }
 
@@ -1702,6 +1706,15 @@ class DirectPayController extends Controller
             $fpx_sellerOrderNo = $transaction->nama;
             try{
                 $response_value = $this->getTransactionInfo($transaction->id);
+                //if invalid params -> no record in direct pay
+                if (is_string($response_value)) {
+                    if(strpos($response_value, 'Error') === 0){
+                        Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Failed']);
+                        echo 'Failed :',$transaction->id;
+                        continue;
+                    }
+                }
+            
                 if (!isset($response_value['fpx_DebitAuthCode']))
                 {
                     echo 'transaction skip <br>';
