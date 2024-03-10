@@ -1715,7 +1715,7 @@ class DirectPayController extends Controller
                     }
                 }
             
-                if (!isset($response_value['fpx_DebitAuthCode']))
+                if (!isset($response_value['fpx_DebitAuthCode']) || $response_value['status'] == "Pending")
                 {
                     echo 'transaction skip <br>';
                     continue;
