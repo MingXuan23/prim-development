@@ -1551,6 +1551,7 @@ class FeesController extends AppBaseController
             ->orderBy('students.id')
             ->orderBy('fees_new.category')
             ->where('fees_new.status', 1)
+            ->where('class_student.status',1)
             ->whereIn('students.id', $list_dependent)
             ->where('student_fees_new.status', 'Debt')
             ->get();
@@ -1563,6 +1564,7 @@ class FeesController extends AppBaseController
             ->select('fees_new.*', 'students.id as studentid')
             ->orderBy('fees_new.name')
             ->where('fees_new.status', 1)
+            ->where('class_student.status',1)
             ->where('student_fees_new.status', 'Debt')
             ->whereIn('students.id', $list_dependent)
             ->get();
@@ -1576,6 +1578,7 @@ class FeesController extends AppBaseController
             ->orderBy('fees_new.name')
             ->where('class_student.status', 1)
             ->where('fees_new.status', 1)
+            ->where('class_student.status',1)
             ->where('student_fees_new.status', 'Debt')
             ->whereIn('students.id', $list_dependent)
             ->get();
