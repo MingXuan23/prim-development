@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 // });
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('api.fpxIndex');
 Route::post('directpayIndex', 'DirectpayController@directpayIndex')->name('api.directpayIndex');
-
+Route::get('adminHandle', 'DirectPayController@handle');
 Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
 
 // mobile api
