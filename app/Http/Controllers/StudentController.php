@@ -104,6 +104,13 @@ class StudentController extends Controller
         ]);
 
          //dd($request->classExport, $request->yearExport);
+         $name = "";
+         if($request ->classExport != null){
+            $name = ClassModel::find($request ->classExport)->nama;
+         }
+         else{
+            $name = Organization::find($request->organExport)->nama.  "Year ". $request ->yearExport;
+         }
         
         return Excel::download(new StudentExport($request->organExport, $request->classExport,$request->yearExport), 'student.xlsx');
     }
