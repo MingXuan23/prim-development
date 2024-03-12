@@ -46,6 +46,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
                 ['cs.status', 1],
                 ['ou.role_id', 6],
             ])
+             
             ->orderBy('students.nama')
             ->get();
         }
@@ -57,6 +58,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
                 ['cs.status', 1],
                 ['ou.role_id', 6],
             ])
+            ->orderBy('c.nama')
             ->orderBy('students.nama')
             ->get();
         }
