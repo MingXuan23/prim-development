@@ -2077,6 +2077,8 @@ class DirectPayController extends Controller
             } 
             catch (\Throwable $th) {
                 echo 'Error :', ($th->getMessage()),$transaction->id,"<br>";
+                \Log::info("Update Transaction Command Run Error :, ".$th->getMessage());
+
             }
         }
     
