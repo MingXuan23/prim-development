@@ -39,7 +39,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
         ->join('users', 'users.id', 'ou.user_id');
 
         if($this->kelasId != null){
-            $liststudents = $query->select('students.nama', 'students.gender',  'users.name', 'users.telno')
+            $liststudents =$query->select('students.nama', 'students.gender',  'users.name', DB::raw("REPLACE(users.telno, '+6', '') as telno"))
             ->where([
                 ['co.organization_id', $this->organId],
                 ['c.id', $this->kelasId],
@@ -50,7 +50,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
             ->get();
         }
         else {
-            $liststudents = $query->select('students.nama', 'students.gender',  'users.name', 'users.telno')
+            $liststudents = $query->select('students.nama', 'students.gender',  'users.name', DB::raw("REPLACE(users.telno, '+6', '') as telno"))
             ->where([
                 ['co.organization_id', $this->organId],
                 ['c.nama', 'LIKE', $this->year . '%'], 
@@ -62,11 +62,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
         }
         
        
-        
-        // dd($liststudents[0]->telno);
-        foreach($liststudents as $liststudent){
-            $liststudent->telno = str_replace('+6', '', $liststudent->telno);
-        }
+    
 
         // dd($liststudents);
 
