@@ -86,6 +86,7 @@
                                 {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Kelas</th>
                                 <th>Status</th>
+                                <th>Start Date</th>
                                 <th>Details</th>
                             </tr>
                         </thead>
@@ -190,6 +191,11 @@
 
                                 </select>
                             </div>
+
+                            <div class="form-group">
+                            <label>Tahun</label>
+                                <input type="number" id="yearExport" name="yearExport" class="form-control" min="1" max="6">
+                            </div>
                             <div class="modal-footer">
                                 <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
                             </div>
@@ -233,6 +239,22 @@
             fetchClass($("#organExport").val(), '#classExport');
         }
 
+        $('#classExport').change(function() {
+            if (this.selectedIndex === 0) {
+                return false; // If the selected option is the first option, return false
+            }
+            $('#yearExport').val(''); // Set the year input to null
+        });
+
+        // Add onchange event handler for the year input
+        $('#yearExport').change(function() {
+            if($('#yearExport').val()=='')
+            {
+                return false;
+            }
+            $('#classExport').prop('selectedIndex', 0); // Set the class select to the first option
+        });
+
         // //this function is use to detect tab view changed
         // function detectFocus() {
         //     // Using document.visibilityState
@@ -264,7 +286,7 @@
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [2,3,4], // your case first column
+                        "targets": [2,3,4,5], // your case first column
                         "className": "text-center",
                     },],
                     order: [
@@ -288,6 +310,10 @@
                         name: 'status',
                         orderable: false,
                         searchable: false
+                    }
+                    , {
+                        data: 'start_date',
+                        name: 'start_date',
                     }, {
                         data: 'action',
                         name: 'action',
