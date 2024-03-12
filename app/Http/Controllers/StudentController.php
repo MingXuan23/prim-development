@@ -99,11 +99,13 @@ class StudentController extends Controller
     {
         $this->validate($request, [
             'organExport'      =>  'required',
-            'classExport'      =>  'required',
+            'classExport' => 'required_without_all:yearExport',
+            'yearExport' => 'required_without_all:classExport',
         ]);
 
-        // dd($request->kelas, $request->organ);
-        return Excel::download(new StudentExport($request->organExport, $request->classExport), 'student.xlsx');
+         //dd($request->classExport, $request->yearExport);
+        
+        return Excel::download(new StudentExport($request->organExport, $request->classExport,$request->yearExport), 'student.xlsx');
     }
 
     public function studentimport(Request $request)
@@ -1218,7 +1220,7 @@ class StudentController extends Controller
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status')
+                    ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status','class_student.start_date')
                     ->where([
                         ['classes.id', $classid],
                         ['class_student.status', 1],
