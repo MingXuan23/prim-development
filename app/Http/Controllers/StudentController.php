@@ -112,7 +112,7 @@ class StudentController extends Controller
             $name = Organization::find($request->organExport)->nama.  "Year ". $request ->yearExport;
          }
         
-        return Excel::download(new StudentExport($request->organExport, $request->classExport,$request->yearExport), 'student.xlsx');
+        return Excel::download(new StudentExport($request->organExport, $request->classExport,$request->yearExport), $name.'.xlsx');
     }
 
     public function studentimport(Request $request)
