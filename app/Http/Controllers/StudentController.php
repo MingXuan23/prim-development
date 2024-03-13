@@ -1648,7 +1648,10 @@ class StudentController extends Controller
         if(count($ifExits) == 0) { // if not teacher or parent
 
             $newparent = DB::table('users')
-                            ->where('telno', '=', $student->parentTelno)
+                            ->where(function($query) use ($student) {
+                                $query->where('name', $student->parentName)
+                                      ->orWhere('telno', $student->parentTelno);
+                            })
                             ->first();
             
             // dd($newparent);
@@ -1715,7 +1718,10 @@ class StudentController extends Controller
             }
         } else {
             $newparent = DB::table('users')
-                        ->where('telno', '=', "{$student->parentTelno}")
+                        ->where(function($query) use ($student) {
+                            $query->where('name', $student->parentName)
+                                ->orWhere('telno', $student->parentTelno);
+                        })
                         ->first();
                        
             $parentRole = DB::table('organization_user')

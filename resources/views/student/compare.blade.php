@@ -68,6 +68,7 @@
                                 <th>Kelas</th>
                                 <th>Nama Penjaga</th>
                                 <th>Tel No Penjaga</th>
+                                <th>Kelas Baharu</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -79,6 +80,7 @@
                                 <td>{{$row->gender}}</td>
                                 <td>{{$row->parentName}}</td>
                                 <td>{{$row->parentTelno}}</td>
+                                <td>{{$row->newClassName}}</td>
                                 <td><button class="btn btn-primary addNewStudent" studentNo="{{$loop->iteration - 1}}">Tambah</button></td>
                             </tr>
                             @endforeach
@@ -108,10 +110,11 @@
                                 <th>No</th>
                                 <th>Nama Penuh</th>
                                 {{-- <th>Nombor Kad pengenalan</th> --}}
-                                <th>Kelas</th>
+                                <th>Jantina</th>
                                 <th>Nama Penjaga</th>
                                 <th>Tel No Penjaga</th>
-                                <th>Kelas</th>
+                                <th>Kelas Lama</th>
+                                <th>Kelas Baharu</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -124,6 +127,8 @@
                                 <td>{{$row->parentName}}</td>
                                 <td>{{$row->parentTelno}}</td>
                                 <td>{{$row->oldClassName}}</td>
+                                <td>{{$row->newClassName}}</td>
+
                                 <td><button class="btn btn-primary transferStudent" studentNo="{{$loop->iteration - 1}}">Pindah</button></td>
                             </tr>
                             @endforeach
@@ -148,9 +153,10 @@
                                 <th>No</th>
                                 <th>Nama Penuh</th>
                                 {{-- <th>Nombor Kad pengenalan</th> --}}
-                                <th>Kelas</th>
+                                <th>Jantina</th>
                                 <th>Nama Penjaga</th>
                                 <th>Tel No Penjaga</th>
+                                <th>Kelas</th>
                                 
                             </tr>
                         </thead>
@@ -162,6 +168,7 @@
                                 <td>{{$row->gender}}</td>
                                 <td>{{$row->parentName}}</td>
                                 <td>{{$row->parentTelno}}</td>
+                                <td>{{$row->newClassName}}</td>
                                
                             </tr>
                             @endforeach
@@ -193,6 +200,9 @@
                                 <th>Kelas</th>
                                 <th>Nama Penjaga</th>
                                 <th>Tel No Penjaga</th>
+                                <th>Organisasi</th>
+                                <th>Kelas Baharu</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -202,6 +212,8 @@
                                 <td>{{$row->gender}}</td>
                                 <td>{{$row->parentName}}</td>
                                 <td>{{$row->parentTelno}}</td>
+                                <td>{{$row->oldOrgName}}</td>
+                                <td>{{$row->newClassName}}</td>
                                 <td><button class="btn btn-primary transferFromAnotherSchool" studentNo="{{$loop->iteration - 1}}">Pindah</button></td>
                             </tr>
                             @endforeach

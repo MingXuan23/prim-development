@@ -25,6 +25,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
     {
         $id = DB::table('class_organization')->where('class_id', $class_id)->first()->class_id;
         $this->class_id = $id;
+        $this->defaultClassId = $id;
         $this->oid = DB::table('class_organization')
         ->where('class_id', $this->class_id)
         ->first()->organization_id;
@@ -68,6 +69,24 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
             }
         }
 
+        if(!isset($row['kelas'])){
+            $this->class_id = $this->defaultClassId;
+        }
+        else{
+            $tempClass = DB::table('classes as c')
+                        ->join('class_organization as co','co.class_id','c.id')
+                        ->where([
+                            ['c.nama',$row['kelas']],
+                            ['co.organization_id',$this->oid]
+                            ])
+                        ->select('c.*')
+                        ->first();
+            
+            $this->class_id = $tempClass?$tempClass->id:$this->defaultClassId;
+        }
+
+        $new_class = DB::table('classes')->where('id',$this->class_id)->first();
+
         $phone = trim((string)$row['no_ic_penjaga']);
         
         $phone = str_replace('-', '', $phone);
@@ -110,8 +129,10 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                             ->join('organization_user as ou','ou.id','ous.organization_user_id')
                             ->join('users as u','u.id','ou.user_id')
                             ->where('s.nama', 'LIKE', '%' . $studentName . '%')
-                            ->where('u.name','LIKE', '%' .$parentName . '%')
-                            ->where('u.telno',$phone)
+                            ->where(function($query) use ($parentName, $phone) {
+                                $query->where('u.name', $parentName )
+                                      ->orWhere('u.telno', $phone);
+                            })
                             ->select('s.id as studentId','s.nama as studentName','s.gender as gender','u.name as parentName','u.id as parentId','u.telno as parentTelno')
                             ->first();
                             //dd(count($findStudent));
@@ -129,6 +150,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
             {
                 $sameClassStudent=$sameOrgStudent->where('class_id',$this->class_id);
                 if(count($sameClassStudent)>0){
+                    $findStudent->newClassName=$new_class->nama;
                     $this->sameClassStudents[]=$findStudent;//this student is still at same class
                 }
                 else{
@@ -136,6 +158,8 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                     $oldClass=DB::table('classes as c')->where('c.id' ,$sameOrgStudent->first()->class_id)->first();
                     $findStudent->oldClassId=$oldClass->id;
                     $findStudent->oldClassName=$oldClass->nama;
+                    $findStudent->newClassName=$new_class->nama;
+
                     $this->differentClassStudents[]=$findStudent;//this student is still at same org but diffretn class
                 }
             }
@@ -147,12 +171,14 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                             ->where('cs.student_id', $findStudent->studentId)
                             ->where('cs.status', 1)
                             //->where('co.organization_id',$this->oid)
-                            ->select('co.class_id')
+                            ->select('co.class_id','co.organization_id')
                             ->get();
                 $findStudent->newClass=$this->class_id;
                 $oldClass=DB::table('classes as c')->where('c.id' ,$sameOrgStudent->first()->class_id)->first();
+                $oldOrgName = DB::table('organizations as o')->where('o.id',$sameOrgStudent->first()->organization_id)->first()->nama;
                 $findStudent->oldClassId=$oldClass->id;
                 $findStudent->oldClassName=$oldClass->nama;
+                $findStudent->oldOrgName = $oldOrgName;
                 $this->differentOrgStudents[]=$findStudent; // this student exist but in different school
             }
         }
@@ -164,7 +190,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
             $newStudentData->parentName =$parentName  ;
             $newStudentData->parentTelno = $phone;
             $newStudentData->classId = $this->class_id;
-
+            $newStudentData->newClassName=$new_class->nama;
 
             $this->newStudents[]=$newStudentData;//new student
         }
