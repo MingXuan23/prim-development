@@ -141,7 +141,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Nama Kelas</label>
+                                <label>Nama Kelas (Default)</label>
                                 <select name="classImport" id="classImport" class="form-control">
 
                                 </select>

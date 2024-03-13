@@ -51,7 +51,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
             ->get();
         }
         else {
-            $liststudents = $query->select('students.nama', 'students.gender',  'users.name', DB::raw("REPLACE(users.telno, '+6', '') as telno"))
+            $liststudents = $query->select('students.nama', 'students.gender',  'users.name', DB::raw("REPLACE(users.telno, '+6', '') as telno"),'c.nama as class_name')
             ->where([
                 ['co.organization_id', $this->organId],
                 ['c.nama', 'LIKE', $this->year . '%'], 
@@ -78,6 +78,7 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
             'jantina',
             'nama_penjaga',
             'no_ic_penjaga',
+            'kelas'
         ];
     }
 
