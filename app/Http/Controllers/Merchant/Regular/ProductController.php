@@ -100,14 +100,14 @@ class ProductController extends Controller
                ['po.user_id',$user_id],
                ['po.status','In cart']
           ])
-          ->select('org.id','nama','fixed_charges')
+          ->select('org.id','nama','fixed_charges' ,'min_waive_service_charge_amount')
           ->distinct('nama')
           ->orderBy('po.id','desc')
           ->get();
 
           return view('merchant.regular.product.productsCart',compact('productInCart','organizations'));
-    } 
-    public function calculateTotalPrice($order_id,$orgId) 
+    }
+    public function calculateTotalPrice($order_id,$orgId)
     {
         $total_price = 0; // total price without charges
         $cart_item = DB::table('product_order as po')
@@ -129,19 +129,18 @@ class ProductController extends Controller
             foreach($cart_item as $row)
             {
                     $total_price += doubleval($row->price * $row->qty );
-            }          
+            }
         }
-       
+
         $fixed_charges = $this->calCharge($total_price,$orgId);
-        
         $new_total_price = $total_price+$fixed_charges;
          return ['new_total_price'=>$new_total_price,
                 'charges'=>$fixed_charges,
-                'total_price'=>$total_price        
+                'total_price'=>$total_price
         ];
     }
-        
-       
+
+
     public function calCharge($total,$oid){
 
         $findCharge = DB::table('organization_charges')
@@ -152,8 +151,13 @@ class ProductController extends Controller
         if($findCharge==null)
         {
             $charge = DB::table('organizations')
-            ->find($oid)
-            ->fixed_charges;
+            ->find($oid);
+//            if total order more than waive amount can waive service charge
+            if($charge->min_waive_service_charge_amount != null && $charge->min_waive_service_charge_amount <= $total){
+                $charge = 0;
+            }else{
+                $charge = $charge->fixed_charges;
+            }
         }
         else{
             $charge=$findCharge->remaining_charges;
@@ -166,7 +170,7 @@ class ProductController extends Controller
         return $charge;
 
     }
-    //for updating a cart 
+    //for updating a cart
     public function updateCart(Request $request){
      // to update quantity in ProductOrder
          ProductOrder::find($request->productOrderId)
@@ -189,15 +193,21 @@ class ProductController extends Controller
         //  ->fixed_charges;
      // to update total price in PGNGOrder
          $priceData = $this->calculateTotalPrice($request->pgngOrderId, $organizationId);
-         $totalPrice=$priceData['new_total_price'];       
-         $charges=$priceData['charges'];         
+         $totalPrice=$priceData['new_total_price'];
+         $charges=$priceData['charges'];
          DB::table('pgng_orders')
          ->where('id', $request->pgngOrderId)
          ->update([
                'total_price' => $totalPrice,
                'updated_at' => Carbon::now(),
          ]);
-         return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges]);
+
+        $min_waive_amount = DB::table('organizations')
+            ->where([
+                'id' => $organizationId
+            ])
+            ->first();
+         return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges ,'min_waive'=> $min_waive_amount->min_waive_service_charge_amount]);
     }
     //to get the number of items in cart
    public function loadCartCounter(){
@@ -214,7 +224,7 @@ class ProductController extends Controller
                ['pgng_orders.deleted_at',NULL]
           ])
           ->count();
-          
+
           //to get the total price of all valid order
           $subquery = DB::table('product_order')
           ->join('product_item', 'product_item.id', '=', 'product_order.product_item_id')
@@ -260,7 +270,13 @@ class ProductController extends Controller
                'total_price' => $totalPrice
          ]);
     //  $totalPrice = number_format($totalPrice, 2);
-     return response()->json(['totalPrice'=>$totalPrice,'fixed_charges'=>$charges]);
+
+       $min_waive_amount = DB::table('organizations')
+           ->where([
+               'id' => $request->org_id
+           ])
+            ->first();
+     return response()->json(['totalPrice'=>$totalPrice,'fixed_charges'=>$charges ,'min_waive' => $min_waive_amount->min_waive_service_charge_amount]);
    }
 //    public function checkOut(){
 //           $user_id = Auth::id();
@@ -289,7 +305,7 @@ class ProductController extends Controller
 //                $product->price = number_format($product->price,2);
 //                $product->total_price = number_format($product->total_price,2);
 //           }
-          
+
 //           $organizations = DB::table('product_order')
 //           ->join('pgng_orders as po','po.id','pgng_order_id')
 //           ->where([
@@ -310,7 +326,7 @@ class ProductController extends Controller
 //           ->distinct('nama')
 //           ->orderBy('po.id','desc')
 //           ->get();
-//           //to get total price of valid order    
+//           //to get total price of valid order
 //           $subquery = DB::table('product_order')
 //           ->join('product_item', 'product_item.id', '=', 'product_order.product_item_id')
 //           ->where('product_item.quantity_available', '>', 0)
@@ -344,12 +360,12 @@ class ProductController extends Controller
             ['user_id', $user_id],
             ['deleted_at',NULL]
         ])->select('id', 'order_type', 'pickup_date', 'total_price', 'note', 'organization_id as org_id')->first();
-        
+
         if($cart) {
             $pickup_date = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('m/d/Y') : '';
-            $pickup_time = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('H:i') : ''; 
-            
-            $fixed_charges = $this->getFixedCharges($cart->org_id);
+            $pickup_time = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('H:i') : '';
+
+            $fixed_charges = $this->getFixedCharges($cart->org_id , $cart->total_price);
         }
 
         $org= Organization::find($org_id);
@@ -364,17 +380,25 @@ class ProductController extends Controller
 
      return view('merchant.regular.product.checkout', compact('response', 'cart'));
    }
-   public static function getFixedCharges($org_id)
+    public static function getFixedCharges($org_id , $total)
     {
-        $fixed_charges = Organization::find($org_id)->fixed_charges;
-        $fixed_charges = $fixed_charges != null ? $fixed_charges : 0;
+        $org = Organization::find($org_id);
+        if (!$org || $org->fixed_charges === null) {
+            return 0;
+        }
+
+        $fixed_charges = $org->fixed_charges;
+        //if more than waive min amount then we can exempt the service charge
+        if ($org->min_waive_service_charge_amount !== null && $total >= $org->min_waive_service_charge_amount) {
+            $fixed_charges = 0;
+        }
 
         return $fixed_charges;
     }
     public function getCheckoutItems(Request $request)
     {
         $c_id = $request->id;
-        
+
         $cart_item = DB::table('product_order as po')
                 ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                 ->where([
@@ -387,8 +411,8 @@ class ProductController extends Controller
                 ->select('po.id', 'pi.name', 'po.quantity', 'pi.price')
                 ->get();
 
-        if(request()->ajax()) 
-        { 
+        if(request()->ajax())
+        {
             $table = Datatables::of($cart_item);
 
             $table->editColumn('price', function ($row) {
@@ -406,7 +430,7 @@ class ProductController extends Controller
     //     $transaction->transac_no = 'test merchant payment';
     //     $transaction->status = "Success";
     //     $transaction->save();
-        
+
     //     PgngOrder::where('transaction_id', $transaction->id)->first()->update([
     //         'status' => 'Paid'
     //     ]);
@@ -415,7 +439,7 @@ class ProductController extends Controller
 
     //     $organization = Organization::find($order->organization_id);
     //     $user = User::find($order->user_id);
-        
+
     //     $relatedProductOrder =DB::table('product_order')
     //     ->where([
     //         ['pgng_order_id',$order->id],
@@ -427,11 +451,11 @@ class ProductController extends Controller
     //     foreach($relatedProductOrder as $item){
     //         $relatedItem=DB::table('product_item')
     //         ->where('id',$item->itemId);
-            
+
     //         $relatedItemQuantity= $relatedItem->first()->quantity_available;
 
     //         $newQuantity= intval($relatedItemQuantity - $item->quantity);
-            
+
     //         if($newQuantity<=0){
     //             $relatedItem
     //             ->update([
@@ -448,7 +472,7 @@ class ProductController extends Controller
     //         }
     //     }
     //     $item = DB::table('product_order as po')
-    //     ->join('product_item as pi', 'po.product_item_id', 'pi.id') 
+    //     ->join('product_item as pi', 'po.product_item_id', 'pi.id')
     //     ->where([
     //         ['po.pgng_order_id', $order->id],
     //         ['po.deleted_at',NULL],
@@ -459,7 +483,7 @@ class ProductController extends Controller
 
     //     Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
     //     Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
-        
+
     //     return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
     // }
 //    public function store(Request $request, $org_id, $order_id)
@@ -468,11 +492,11 @@ class ProductController extends Controller
 //         $pickup_time = $request->pickup_time;
 //         $note = $request->note;
 //         $order_type = $request->order_type;
-        
+
 //         if($this->validateRequestedPickupDate($pickup_date, $pickup_time, $org_id) == false) {
 //             return back()->with('error', 'Sila pilih masa yang sesuai');
 //         }
-        
+
 //         if($order_type == 'Pick-Up') {
 //             $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('H:i:s');
 
@@ -483,7 +507,7 @@ class ProductController extends Controller
 //                 'note' => $note,
 //             ]);
 //         }
-        
+
 //         $cart = DB::table('pgng_orders')
 //         ->where('id', $order_id)->select('id', 'pickup_date', 'note', 'total_price')->first();
 
@@ -494,7 +518,7 @@ class ProductController extends Controller
 //             'pickup_date' => $pickup_date_f,
 //             'amount' => number_format((double)$cart->total_price, 2),
 //         ];
-            
+
 //         return view('merchant.regular.pay', compact('cart', 'response'));
-        
+
 }

@@ -6,7 +6,7 @@
      <link href="{{ URL::asset('assets/css/required-asterick.css')}}" rel="stylesheet">
      <link rel="stylesheet" href="{{ URL::asset('assets/css/datatable.css')}}">
      <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-     @include('layouts.datatable')  
+     @include('layouts.datatable')
    <style>
          :root {
                 --primary-bc: #ffffff;
@@ -143,7 +143,7 @@
     <h1>Semak Keluar</h1>
     <h3>Dapatkan Pesanan Anda</h3>
     <div class="order-procurement-container">
-        <div class="procurement-option-container" onclick="selectThis(this,'GNG')">
+        <div class="procurement-option-container" onclick="selectThis(this,'GNG')" id="gng-option">
             <span class='selected' hidden><i class="bi bi-check2"></i></span>
             <h5>Get & Go</h5>
             <div>
@@ -159,7 +159,7 @@
         </div>
     </div>
     <div class="form-container">
-        <section class="gng-section" hidden> 
+        <section class="gng-section" hidden>
             <h3>Produk Dipesan</h3>
             <input type="hidden" name="cart_id" id="cart_id" value="@if($cart){{ $cart->id }}@endif">
             <div class="card">
@@ -177,7 +177,7 @@
                         </table>
                     </div>
                 </div>
-            </div>        
+            </div>
             @if($cart)
         <div class="row">
             <div class="col-sm-6 mb-4">
@@ -190,7 +190,7 @@
                             <th class="text-muted" scope="row">Jumlah Pesanan:</th>
                             <td class="lead" style="color:rgb(2, 122, 129)">RM {{ number_format((double)($cart->total_price - $response->fixed_charges), 2, '.', '') }}</td>
                         </tr>
-                        @if($response->fixed_charges != null)
+                        @if($response->fixed_charges != null  )
                             <tr>
                                 <th class="text-muted" scope="row">Caj Servis:</th>
                                 <td class="lead" style="color:rgb(2, 122, 129)">RM {{ number_format((double)$response->fixed_charges, 2, '.', '') }}</td>
@@ -205,13 +205,13 @@
                             <th class="text-muted" scope="row">Jumlah Keseluruhan:</th>
                             <td class="lead" style="color:rgb(2, 122, 129)">RM {{ number_format((double)$cart->total_price, 2, '.', '') }}</td>
                         </tr>
-                        </tbody> 
+                        </tbody>
                     </table>
                 </div>
                 </div>
             </div>
             </div>
-            
+
             <div class="col-sm-6">
             <form action="{{ route('directpayIndex') }}" method="POST" enctype="multipart/form-data" id="form-order">
                 @csrf
@@ -265,9 +265,9 @@
                 </div>
             </div>
         </div>
-                
+
         <input type="hidden" name="order_type" id="hidden_order_type" value="Pick-Up">
-                
+
         <div class="row mb-2">
             <div class="col d-flex justify-content-end">
             <a href="{{route('merchant.all-cart')}}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b;">KEMBALI</a>
@@ -279,9 +279,9 @@
             </button>
             </div>
         </div>
-        
+
         </form>
-        
+
     @else
       <div class="d-flex justify-content-center">
         <a href="{{route('merchant.all-cart')}}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b;">KEMBALI</a>
@@ -308,7 +308,7 @@
                 <tbody class="shop-order-container">
                     <tr >
                         <th>{{$organization->nama}}</th>
-                    </tr> 
+                    </tr>
                     <div>
                         @foreach($products as $product)
                             @if($organization->nama == $product->nama)
@@ -327,7 +327,7 @@
                                                 (Cas Servis: RM{{$organization->fixed_charges}})
                                             @endif
                                         </td>
-                                </tr>    
+                                </tr>
                                 @endif
                         @endforeach
                 </tbody>
@@ -351,9 +351,9 @@
                                       <p id="time-range-{{ $organization->id }}"class="time-range"></p>
                             </td>
                         </tr>
-                    </form>    
+                    </form>
             @endforeach
-        </table> 
+        </table>
             <div class="order-summary">
                 <h3>Jumlah Bayaran: RM{{$cartTotalPrice}}</h3>
             </div> --}}
@@ -399,7 +399,7 @@
                     },
                     'columnDefs': [{
                         "targets": [0, 1, 2, 3], // your case first column
-                        "className": "align-middle text-center", 
+                        "className": "align-middle text-center",
                     },
                     { "responsivePriority": 1, "targets": 0 },
                     { "responsivePriority": 2, "targets": 2 },
@@ -464,7 +464,7 @@
                     $('.pickup-time-div').attr('hidden', true)
                 }
             }
-        
+
         var dates = []
         $(document).ready(function() {
             $.ajax({
@@ -481,7 +481,7 @@
                 }
             })
         })
-        
+
 
         $("#datepicker").datepicker({
             minDate: 1,
@@ -492,11 +492,11 @@
         })
 
         disabledDates = dates
-        
+
         function editDays(date) {
         for (var i = 0; i < disabledDates.length; i++) {
-            if (new Date(disabledDates[i]).toString() == date.toString()) {      
-                // if the date is equal with disabled dates(dates),then return false         
+            if (new Date(disabledDates[i]).toString() == date.toString()) {
+                // if the date is equal with disabled dates(dates),then return false
             return [false];
             }
         }
@@ -525,11 +525,11 @@
                 if (result.isConfirmed) {
                     $('#form-order').submit();
                 }
-            })   
+            })
         }
 
-    }); 
-})    
+    });
+})
         const orgs_id = document.querySelectorAll('#org_id');
         function selectThis(element,  option){
             $orderOption = $(element);
@@ -548,6 +548,7 @@
                 loadDelivery();
             }
         }
+        selectThis(document.getElementById('gng-option') , 'GNG')
         function loadGNG(){
             $('.form-container').children().attr('hidden', true);//hide all children of the container
             $gngSection = $('.gng-section').attr('hidden',false);
@@ -568,7 +569,7 @@
             //         url: '{{ route("merchant-reg.disabled-dates") }}',
             //         method: 'post',
             //         data: {
-            //             org_id:orgs_id[index].value, 
+            //             org_id:orgs_id[index].value,
             //             "_token": "{{ csrf_token() }}",
             //         },
             //         success:function(result) {
@@ -584,7 +585,7 @@
             //                 beforeShowDay: function(date) {
             //                     for (var i = 0; i < dates.length; i++) {
             //                         if (new Date(dates[i]).toString() == date.toString()) {
-            //                         // if the date is equal with disabled dates(dates),then return false  
+            //                         // if the date is equal with disabled dates(dates),then return false
             //                         return [false];
             //                         }
             //                     }
@@ -598,7 +599,7 @@
             //         error:function(result) {
             //             console.log(result.responseText)
             //         }
-            //     }) 
+            //     })
             // })
             // $.each(datePickers, function(index, datePicker){
             //     $(datePicker).on('change', function(e) {
@@ -640,4 +641,4 @@
         //             }
         //         }
         // }) --}}
-        
+

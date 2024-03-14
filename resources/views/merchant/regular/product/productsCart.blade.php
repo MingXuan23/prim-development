@@ -13,7 +13,7 @@
             .previous-nav{
                 color:rgb(45, 173, 179);
                 font: bold 22px "Roboto";
-                
+
             }
             .main-content{
                 color: var(--primary-color);
@@ -30,7 +30,7 @@
             .product-container{
                 border: 2px solid var(--primary-color);
                 padding: 0.5em;
-                margin:0.5em; 
+                margin:0.5em;
                 margin-left: auto;
                 margin-right: auto;
                 width: 80%;
@@ -61,7 +61,7 @@
                 margin-left: 2em;
             }
             .quantity-container{
-                
+
                 display: flex;
                 flex-direction: row;
                 align-items: center;
@@ -97,7 +97,7 @@
             .delete-btn i{
                 position: absolute;
                 right: 0;
-                font-size: 18px; 
+                font-size: 18px;
             }
             .delete-btn i:hover{
                 color:rgb(143, 143, 144);
@@ -107,7 +107,8 @@
                 position: absolute;
                 right: 0;
                 bottom: 0;
-                color: var(--secondary-bc)
+                color: var(--secondary-bc);
+                text-align: end;
             }
             .hide{
                 display: none!important;
@@ -283,19 +284,19 @@
 @endsection
 
 @section('content')
-    <div> 
+    <div>
         <div class="previous-nav my-2">
         <h1 class="font-size-18"><i class="fas fa-angle-left"></i>  <a href="{{ route('merchant-product.index') }}" class="previous-nav">Senarai Produk</a></h1>
         </div>
         <h1 class="title">Troli Membeli-Belah</h1>
         <h3 class="carts-counter"></h3>
     </div>
-        
+
     @forelse ($organizations as $organization)
         <div>
             <a href="{{ route('merchant-reg.show', $organization->id) }}">
                 <h3 style="color:#5b626b">{{$organization->nama}}</h3>
-            </a>    
+            </a>
         </div>
             <div class="product-container">
                 @foreach($productInCart as $product)
@@ -311,7 +312,7 @@
                                     </a>
                                 </div>
                                     @if($product->quantity_available > 0 && $product->status == 1)
-                                        <div class="product-details">    
+                                        <div class="product-details">
                                             <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
                                             <h5 style="color: rgb(2, 122, 129);">RM{{$product->price}}/{{$product->collective_noun}}</h5>
                                             <div class  = "quantity-container" >
@@ -328,7 +329,7 @@
                                             </div>
                                         </div>
                                     @elseif($product->status == 0)
-                                        <div class="product-details" style="opacity: 0.3">    
+                                        <div class="product-details" style="opacity: 0.3">
                                             <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
                                             <h5>RM{{$product->price}}/Unit</h5>
                                             <div class  = "quantity-container" >
@@ -343,9 +344,9 @@
                                             <div class="alert-message">
                                             {{-- alert message will be appended here --}}
                                             </div>
-                                        </div>        
+                                        </div>
                                     @else
-                                        <div class="product-details" style="opacity: 0.3">    
+                                        <div class="product-details" style="opacity: 0.3">
                                             <a href="{{route('merchant-product.show',$product->product_item_id)}}"><h5>{{$product->name}}</h5></a>
                                             <h5>RM{{$product->price}}/Unit</h5>
                                             <div class  = "quantity-container" >
@@ -360,8 +361,8 @@
                                             <div class="alert-message">
                                             {{-- alert message will be appended here --}}
                                             </div>
-                                        </div>    
-                                    @endif    
+                                        </div>
+                                    @endif
                                 <div class="delete-btn">
                                     <i class="delete bi bi-x-lg" data-cart-order-id="{{$product->id}}"></i>
                                 </div>
@@ -376,7 +377,7 @@
                                         <span class="bottom-key-2"></span>
                                     </a>
                                 </div>
-                            @endif    
+                            @endif
                     @endif
                 @endforeach
             </div>
@@ -386,7 +387,7 @@
                 <h3>Marilah Membeli-belah Bersama Kami</h3>
             </div>
     @endforelse
-        {{-- @if(count($productInCart)> 0) 
+        {{-- @if(count($productInCart)> 0)
         <div class="checkout-container">
             <div class="checkout-infos">
                 <h3 class="carts-counter"></h3>
@@ -400,7 +401,7 @@
                 </a>
             </div>
         </div>
-            
+
         @endif --}}
     {{-- Delete Confirmation Modal --}}
     <div id="deleteConfirmModal" class="modal fade" role="dialog">
@@ -464,10 +465,14 @@
                     success: function (result) {
                         let total = result.totalPrice;
                         total = parseFloat(total).toFixed(2);
-                        if(parseFloat(result.fixed_charges) > 0){   
+                        if(parseFloat(result.fixed_charges) > 0){
                             let fixed_charges = parseFloat(result.fixed_charges).toFixed(2);
-                            $(totalPrice).html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")" );                        
-                        }                        
+                            if(result.min_waive){
+                                $(totalPrice).html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")<br> <small>Caj Servis Boleh Digecualikan<br> Dengan Pembelian melebihi RM" + result.min_waive +"</small>");
+                            }else{
+                                $(totalPrice).html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")" );
+                            }
+                        }
                         else{
                             $(totalPrice).html("Jumlah: RM"+total);
                         }
@@ -539,7 +544,7 @@
                     } , 500);
                 }
             })
-            }) 
+            })
         //when key in quantity when want to buy in the input field
         $("input[name='quantity-input']").on('input',function(e){
             let qtyAvailable = parseInt(this.nextElementSibling.nextElementSibling.getAttribute("data-qty-available"));
@@ -595,11 +600,15 @@
 
                         $totalPrice = $parent.parent().parent().children().children('.product-details').children('.total-price');
                         let total = result.totalPrice;
-                        total = total.toFixed(2);                        
-                        if(parseFloat(result.charges) > 0){   
+                        total = total.toFixed(2);
+                        if(parseFloat(result.charges) > 0){
                             let fixed_charges = parseFloat(result.charges).toFixed(2);
-                            $totalPrice.html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")" );                        
-                        }                        
+                            if(result.min_waive){
+                                $totalPrice.html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")<br> <small>Caj Servis Boleh Digecualikan<br> Dengan Pembelian melebihi RM" + result.min_waive +"</small>");
+                            }else{
+                                $totalPrice.html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")" );
+                            }
+                        }
                         else{
                             $totalPrice.html("Jumlah: RM"+total);
                         }
@@ -611,8 +620,8 @@
            })
     }
     });
-    
-    // for validation before proceed to checkout page 
+
+    // for validation before proceed to checkout page
     $('.checkout-button').each(function (index,checkButton) {
         $(checkButton).on('click', function (event) {
             var productContainer = $(checkButton).parents('.product-container');

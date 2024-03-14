@@ -40,31 +40,31 @@ class OrderController extends Controller
                 ->orderBy('pu.updated_at', 'desc')
                 ->whereIn('status', ["Paid"])
                 ->where('organization_id', $org_id);
-        
-        if(request()->ajax()) 
+
+        if(request()->ajax())
         {
-            if(($filter_type == "" || $filter_type == "all") && $date == "") 
+            if(($filter_type == "" || $filter_type == "all") && $date == "")
             {
                 $order = $order->get();
             }
             else if($filter_type == "date")
             {
-                $order = $order->whereBetween('pickup_date', 
+                $order = $order->whereBetween('pickup_date',
                 [Carbon::parse($date)->startOfDay()->toDateTimeString(),Carbon::parse($date)->endOfDay()->toDateTimeString()])->get();
             }
             else if($filter_type == "today")
             {
-                $order->whereBetween('pickup_date', 
+                $order->whereBetween('pickup_date',
                 [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->get();
             }
             else if($filter_type == "week")
             {
-                $order->whereBetween('pickup_date', 
+                $order->whereBetween('pickup_date',
                 [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])->get();
             }
             else if($filter_type == "month")
             {
-                $order->whereBetween('pickup_date', 
+                $order->whereBetween('pickup_date',
                 [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])->get();
             }else if($filter_type == "receive-today"){
                 // to get list of order paid today
@@ -79,13 +79,13 @@ class OrderController extends Controller
                 ->where('organization_id', $org_id)
                 ->join('transactions', 'transactions.id','pu.transaction_id')
                 ->where('transactions.status','Success');
-                $order->whereBetween('datetime_created', 
+                $order->whereBetween('datetime_created',
                 [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])
                 ->get();
-            }   
-            
+            }
+
             $table = Datatables::of($order);
-            
+
             $table->addColumn('status', function ($row) {
                 if ($row->status == "Paid") {
                     $btn = '<span class="badge rounded-pill bg-success text-white">Berjaya dibayar</span>';
@@ -136,16 +136,16 @@ class OrderController extends Controller
         $org_id = $request->id;
 
         $count_all = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->count() ?: 0;
-        $count_today = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date', 
+        $count_today = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date',
         [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->count() ?: 0;
-        $count_week = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date', 
+        $count_week = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date',
         [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])->count() ?: 0;
-        $count_month = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date', 
+        $count_month = PgngOrder::where('organization_id', $org_id)->where('status', 'Paid')->whereBetween('pickup_date',
         [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])->count() ?: 0;
         $count_receive_today = PgngOrder::where('organization_id', $org_id)->where('pgng_orders.status', 'Paid')
         ->join('transactions','transactions.id','transaction_id')
         ->where('transactions.status','Success')
-        ->whereBetween('datetime_created', 
+        ->whereBetween('datetime_created',
         [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->count() ?: 0;
         $response = [
             'received_today'=>$count_receive_today,
@@ -160,6 +160,8 @@ class OrderController extends Controller
     public function updateServiceCharge(Request $request, $orgId){
         $org = Organization::find($orgId);
         $org->fixed_charges = $request->service_charge;
+        $org->min_waive_service_charge_amount = $request->min_waive;
+
         $org->save();
 
         return back()->with(['success'=>'Caj Servis telah disimpan']);
@@ -203,32 +205,32 @@ class OrderController extends Controller
                 'u.name', 'u.telno')
                 ->orderBy('pickup_date', 'asc')
                 ->orderBy('pu.updated_at', 'desc');
-        if(request()->ajax()) 
+        if(request()->ajax())
         {
-            if(($filter_type == "" || $filter_type == "all") && $date == "") 
+            if(($filter_type == "" || $filter_type == "all") && $date == "")
             {
                 $order = $order->get();
             }
             else if($filter_type == "date")
             {
-                $order = $order->whereBetween('pickup_date', 
+                $order = $order->whereBetween('pickup_date',
                 [Carbon::parse($date)->startOfDay()->toDateTimeString(),Carbon::parse($date)->endOfDay()->toDateTimeString()])->get();
             }
             else if($filter_type == "today")
             {
-                $order->whereBetween('pickup_date', 
+                $order->whereBetween('pickup_date',
                 [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->get();
             }
             else if($filter_type == "week")
             {
-                $order->whereBetween('pickup_date', 
+                $order->whereBetween('pickup_date',
                 [Carbon::now()->startOfWeek()->toDateTimeString(), Carbon::now()->endOfWeek()->toDateTimeString()])->get();
             }
             else if($filter_type == "month")
             {
-                $order->whereBetween('pickup_date', 
+                $order->whereBetween('pickup_date',
                 [Carbon::now()->startOfMonth()->toDateTimeString(), Carbon::now()->endOfMonth()->toDateTimeString()])->get();
-            }  
+            }
 
             $table = Datatables::of($order);
             $table->addColumn('status', function ($row) {
@@ -270,11 +272,11 @@ class OrderController extends Controller
             'status' => "Cancel by merchant",
             'deleted_at'=> Carbon::now(),
         ]);
-        
+
         $cart = ProductOrder::where('pgng_order_id', $id)->update([
             'deleted_at'=> Carbon::now(),
         ]);
-        
+
         if($update_order&& $cart) {
             Session::flash('success', 'Pesanan Berjaya Dibuang');
             return View::make('layouts/flash-messages');
@@ -294,7 +296,6 @@ class OrderController extends Controller
                 ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status','pu.confirm_picked_up_time','pu.confirm_by',
                         'u.name', 'u.telno', 'u.email')
                 ->first();
-
         $fixed_charges = PgngOrder::find($id)->organization->fixed_charges;
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
         $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
@@ -314,7 +315,7 @@ class OrderController extends Controller
                 ->get();
         $total_price[] = array();
         $price[] = array();
-        
+
         $amount = DB::table('pgng_orders as pu')
         ->join('transactions as t' , 't.id' ,'pu.transaction_id')
         ->where([
@@ -324,7 +325,8 @@ class OrderController extends Controller
         ->first();
 
         $amount = number_format($amount,2 );
-           
+
+
         $receipt_no = PgngOrder::with('transaction')->find($id)->transaction->nama;
         foreach($item as $row)
         {
@@ -332,6 +334,8 @@ class OrderController extends Controller
             $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2, '.', ''); // calculate total for each item in cart
         }
 
-        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount' , 'fixed_charges' , 'receipt_no'));
+        $min_waive = PgngOrder::find($id)->organization->min_waive_service_charge_amount;
+        $min_waive = $min_waive == null? 0 : $min_waive;
+        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount' , 'fixed_charges','min_waive' , 'receipt_no'));
     }
 }
