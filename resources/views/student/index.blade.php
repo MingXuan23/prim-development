@@ -12,6 +12,7 @@
     <div class="col-sm-6">
         <div class="page-title-box">
             <h4 class="font-size-18">Pelajar</h4>
+            <h6>Senarai Pelajar Ikut Sekolah dan Kelas yang Dipilih</h5>
             <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
             </ol> -->
@@ -36,7 +37,7 @@
                 </div>
 
                 <div id="dkelas" class="form-group">
-                    <label> Kelas</label>
+                    <label> Semak Pelajar Dalam Kelas:</label>
                     <select name="classes" id="classes" class="form-control">
                         <option value="" disabled selected>Pilih Kelas</option>
 
@@ -49,14 +50,14 @@
         <div class="card">
             <div>
                 <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
-                        class="fas fa-plus"></i> Import</a>
+                        class="fas fa-plus"></i> Import Pelajar</a>
                 <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
-                        class="fas fa-plus"></i> Export</a>
+                        class="fas fa-plus"></i> Export Pelajar</a>
                 <!-- <a style="margin: 1px;" href="{{ route('exportstudent') }} " class="btn btn-success"> <i
                         class="fas fa-plus"></i> Export</a> -->
                 {{-- {{ route('exportmurid') }} {{ route('murid.create') }} --}}
                 <a style="margin: 19px; float: right;" href="{{ route('student.create') }} " target="_blank" class="btn btn-primary"> <i
-                        class="fas fa-plus"></i> Tambah Murid</a>
+                        class="fas fa-plus"></i> Tambah Pelajar</a>
             </div>
 
             <div class="card-body">
@@ -86,7 +87,7 @@
                                 {{-- <th>Nombor Kad pengenalan</th> --}}
                                 <th>Kelas</th>
                                 <th>Status</th>
-                                <th>Start Date</th>
+                                <th>Tarikh Masuk</th>
                                 <th>Details</th>
                             </tr>
                         </thead>
@@ -100,7 +101,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Padam Murid</h4>
+                        <h4 class="modal-title">Padam Pelajar</h4>
                     </div>
                     <div class="modal-body">
                         Adakah anda pasti?
@@ -121,7 +122,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Import Murid</h5>
+                        <h5 class="modal-title">Import Pelajar</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -141,7 +142,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Nama Kelas (Default)</label>
+                                <label>Kelas Baharu Pelajar (Jika tidak disediakan dalam excel)</label>
                                 <select name="classImport" id="classImport" class="form-control">
 
                                 </select>
@@ -168,7 +169,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Export Murid</h5>
+                        <h5 class="modal-title">Export Pelajar</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
