@@ -128,7 +128,7 @@
                         </button>
                     </div>
                     {{-- {{ route('importmurid')}} --}}
-                    <form action="{{ route('importstudent')}}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('importstudent')}}" method="post" enctype="multipart/form-data" id="form-import">
                         <div class="modal-body">
 
                             {{ csrf_field() }}
@@ -152,10 +152,10 @@
                                 <input type="file" name="file" required>
                             </div>
                             <div class="form-group">
-                                <input type="checkbox" name="compareOption" checked>  Compare Student
+                                <input type="checkbox" name="compareOption" checked disabled> Data Pelakar Akan Disemak Dalam Sistem PRiM
                             </div>
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Import</button>
+                                <button type="button" class="btn btn-primary" id="btn-import">Import</button>
                             </div>
                         </div>
 
@@ -255,6 +255,11 @@
             }
             $('#classExport').prop('selectedIndex', 0); // Set the class select to the first option
         });
+        $(document).on('click','#btn-import', 
+        () => {
+            $('input[name="compareOption"]').prop('disabled',false);
+            $('#form-import').trigger('submit');
+        })
 
         // //this function is use to detect tab view changed
         // function detectFocus() {
