@@ -179,6 +179,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                 $findStudent->oldClassId=$oldClass->id;
                 $findStudent->oldClassName=$oldClass->nama;
                 $findStudent->oldOrgName = $oldOrgName;
+                $findStudent->newClassName=$new_class->nama;
                 $this->differentOrgStudents[]=$findStudent; // this student exist but in different school
             }
         }
