@@ -6,7 +6,10 @@ use App\Http\Controllers\Merchant\RegularMerchantController;
 use App\Models\PgngOrder;
 use App\Models\ProductOrder;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Merchant\Regular\ProductController;
+
 use App\Models\Organization;
+use App\Models\OrganizationCharge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -147,12 +150,17 @@ class OrderController extends Controller
         ->where('transactions.status','Success')
         ->whereBetween('datetime_created',
         [Carbon::now()->startOfDay()->toDateTimeString(), Carbon::now()->endOfDay()->toDateTimeString()])->count() ?: 0;
+
+//        get the min amount to waive service charge
+        $orgCharge = Organization::find($org_id)->charges->first();
+        $min_amount = $orgCharge ? $orgCharge->minimum_amount : 0;
         $response = [
             'received_today'=>$count_receive_today,
             'all' => $count_all,
             'today' => $count_today,
             'week' => $count_week,
-            'month' => $count_month
+            'month' => $count_month,
+            'minimum_amount' => $min_amount,
         ];
 
         return response()->json(['response' => $response]);
@@ -160,9 +168,24 @@ class OrderController extends Controller
     public function updateServiceCharge(Request $request, $orgId){
         $org = Organization::find($orgId);
         $org->fixed_charges = $request->service_charge;
-        $org->min_waive_service_charge_amount = $request->min_waive;
-
         $org->save();
+
+
+        $orgCharges  = $org->charges->first();
+        if($orgCharges){
+            $orgCharges->minimum_amount = $request->min_waive;
+            $orgCharges->remaining_charges = 0;
+            $orgCharges->delivery_charges = 0;
+            $orgCharges->save();
+        }else{
+            $newCharge = new OrganizationCharge();
+            $newCharge->organization_id = $org->id;
+            $newCharge->minimum_amount = $request->min_waive;
+            $newCharge->remaining_charges = 0;
+            $newCharge->delivery_charges = 0;
+            $newCharge->save();
+        }
+
 
         return back()->with(['success'=>'Caj Servis telah disimpan']);
     }
@@ -296,7 +319,6 @@ class OrderController extends Controller
                 ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status','pu.confirm_picked_up_time','pu.confirm_by',
                         'u.name', 'u.telno', 'u.email')
                 ->first();
-        $fixed_charges = PgngOrder::find($id)->organization->fixed_charges;
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
         $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
         $total_order_price = number_format($list->total_price, 2, '.', '');
@@ -334,8 +356,8 @@ class OrderController extends Controller
             $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2, '.', ''); // calculate total for each item in cart
         }
 
-        $min_waive = PgngOrder::find($id)->organization->min_waive_service_charge_amount;
-        $min_waive = $min_waive == null? 0 : $min_waive;
-        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount' , 'fixed_charges','min_waive' , 'receipt_no'));
+        $fixed_charges = ProductController::getFixedCharges(PgngOrder::find($id)->organization_id,$amount);
+
+        return view('merchant.regular.admin.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by', 'amount' , 'fixed_charges' , 'receipt_no'));
     }
 }

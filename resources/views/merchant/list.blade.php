@@ -142,7 +142,7 @@
                   <th>Jumlah (RM)</th>
               </tr>
           </thead>
-          
+
           <tbody>
             @foreach($item as $row)
               <tr>
@@ -157,7 +157,7 @@
               <td class="noborder"></td>
               <td class="noborder"></td>
               <td class="table-dark noborder">Cas Organisasi</td>
-              <td class="table-dark noborder">RM {{ $list->fixed_charges }}</td>
+              <td class="table-dark noborder">RM {{ $org_charge }}</td>
             </tr>
             @endif
             <tr>
