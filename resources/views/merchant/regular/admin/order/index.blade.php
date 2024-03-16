@@ -38,7 +38,7 @@
                 <select name="org" id="org_dropdown" class="form-control col-md-12">
                     <option value="">Pilih Organisasi</option>
                     @foreach($merchant as $row)
-                    <option value="{{ $row->id }}" data-service-charge="{{$row->fixed_charges ?? 0}}">{{ $row->nama }}</option>
+                    <option value="{{ $row->id }}" data-service-charge="{{$row->fixed_charges ?? 0}}" data-min-waive="{{$row->min_waive_service_charge_amount ?? 0}}">{{ $row->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -86,7 +86,7 @@
     <div class="card-header">
       <i class="ti-email mr-2"></i>Pesanan Pelanggan</div>
     <div class="card-body">
-        
+
         @if(Session::has('success'))
             <div class="alert alert-success">
                 <p>{{ Session::get('success') }}</p>
@@ -101,7 +101,7 @@
 
         <div class="table-responsive">
             <table class="table table-striped table-bordered dt-responsive wrap" id="orderTable" width="100%" cellspacing="0">
-    
+
             <thead>
                 <tr>
                 <th style="width: 2%">No.</th>
@@ -153,9 +153,13 @@
             <label for="service-charge" class="col-sm-4">Caj Servis(RM)</label>
             <input type="number" name="service_charge" id="service_charge"  class="form-control col-sm-8" min="0" step=".01" required>
           </div>
+            <div class="d-flex align-items-center justify-content-center flex-wrap my-3">
+                <label for="service-charge" class="col-sm-4">Jumlah Minima Per Transaksi Untuk Pengecualian Cas Servis(RM)</label>
+                <input type="number" name="min_waive" id="min_waive"  class="form-control col-sm-8" min="0" step="1" required>
+            </div>
           <button type="submit" class="btn btn-grey d-block mx-auto mt-3 mb-5">Simpan</button>
         </form>
-          
+
         </div>
       </div>
     </div>
@@ -169,7 +173,7 @@
 
 <script>
     $(document).ready(function() {
-        
+
 
         let orderTable, orgId, route, dropdownLength = $('#org_dropdown').children('option').length;
 
@@ -203,7 +207,10 @@
                 btnHistory.attr('href', route)
                 $('#form-service-charge').attr('action',`{{route('admin-reg.updateServiceCharge', '')}}/${orgId}`);
                 const serviceCharge = $('#org_dropdown option:selected').attr('data-service-charge');
+                const minWaive= $('#org_dropdown option:selected').attr('data-min-waive');
+
                 $('input[name = "service_charge"]').val(serviceCharge);
+                $('input[name = "min_waive"]').val(minWaive);
                 $('#orderTable').DataTable().destroy()
                 fetch_data(orgId)
                 countTotalOrders(orgId)
@@ -214,9 +221,9 @@
                 fetch_data()
                 countTotalOrders()
             }
-            
+
         })
-        
+
         $('#org_dropdown option:nth-child(2)').prop('selected',true);
         $('#org_dropdown').trigger('change');
         function fetch_data(orgId = '',filterType = '', date = '') {
@@ -355,17 +362,17 @@
         function confirmOrder(order_id)
         {
             $('#confirm_order').click(function() {
-                
+
                 $.ajax({
                     url: "{{ route('admin-reg.order-picked-up') }}",
                     method: "POST",
                     data: {o_id:order_id},
                     beforeSend:function() {
-                        
+
                     },
                     success:function(result) {
                         $('div.flash-message').html(result)
-                        
+
                         orderTable.ajax.reload()
                     },
                     error:function(result) {
@@ -389,11 +396,11 @@
                     method: "DELETE",
                     data: {o_id:order_id},
                     beforeSend:function() {
-                        
+
                     },
                     success:function(result) {
                         $('div.flash-message').html(result)
-                        
+
                         orderTable.ajax.reload()
                     },
                     error:function(result) {

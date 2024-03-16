@@ -10,7 +10,7 @@ class Organization extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state', 'type_org', 'fixed_charges', 'district', 'city', 'organization_picture', 'parent_org'];
+    protected $fillable = ['nama', 'code', 'email', 'telno', 'address', 'postcode', 'state', 'type_org', 'min_waive_service_charge_amount', 'fixed_charges', 'district', 'city', 'organization_picture', 'parent_org'];
 
     // public $timestamps = false;
 
@@ -54,7 +54,7 @@ class Organization extends Model
     public function pgng_orders(){
         return $this->hasMany(PgngOrder::class);
     }
-    
+
     public function pickup_order()
     {
         return $this->hasMany(PickUpOrder::class);

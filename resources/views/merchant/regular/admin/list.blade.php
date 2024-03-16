@@ -42,7 +42,7 @@
   </div>
   <hr class="ml-4 mr-4">
   <div class="card-body">
-    
+
     <div class="row">
       <div class="col d-flex justify-content-center align-items-center text-center mb-3">
         <h4 class="display-5">{{ $list->name }}</h4>
@@ -131,7 +131,7 @@
                   <th>Jumlah (RM)</th>
               </tr>
           </thead>
-          
+
           <tbody>
             @foreach($item as $row)
               <tr>
@@ -141,13 +141,15 @@
                 <td>{{ $total_price[$row->id] }}</td>
               </tr>
             @endforeach
-            @if($fixed_charges != null OR $fixed_charges != 0.00)
-            <tr>
-              <td class="noborder"></td>
-              <td class="noborder"></td>
-              <td class="table-dark noborder">Cas Organisasi</td>
-              <td class="table-dark noborder">RM {{ $fixed_charges }}</td>
-            </tr>
+            @if($fixed_charges != null && $fixed_charges != 0.00)
+                @if($amount  < $min_waive)
+                    <tr>
+                      <td class="noborder"></td>
+                      <td class="noborder"></td>
+                      <td class="table-dark noborder">Cas Organisasi</td>
+                      <td class="table-dark noborder">RM {{ $fixed_charges }}</td>
+                    </tr>
+                @endif
             @endif
               <tr>
                 <td class="noborder"></td>
@@ -158,7 +160,7 @@
           </tbody>
       </table>
     </div>
-    
+
     <div class="row">
       <div class="col d-flex justify-content-end">
         <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2">Kembali</a>
