@@ -109,4 +109,8 @@ class Organization extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    public function charges(){
+        return $this->hasMany(OrganizationCharge::class);
+    }
 }

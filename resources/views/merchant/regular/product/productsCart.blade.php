@@ -467,6 +467,7 @@
                         total = parseFloat(total).toFixed(2);
                         if(parseFloat(result.fixed_charges) > 0){
                             let fixed_charges = parseFloat(result.fixed_charges).toFixed(2);
+
                             if(result.min_waive){
                                 $(totalPrice).html("Jumlah: RM"+total + "<br>(+ Caj Servis:RM" + fixed_charges +")<br> <small>Caj Servis Boleh Digecualikan<br> Dengan Pembelian melebihi RM" + result.min_waive +"</small>");
                             }else{

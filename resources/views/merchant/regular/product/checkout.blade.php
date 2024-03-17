@@ -484,7 +484,7 @@
 
 
         $("#datepicker").datepicker({
-            minDate: 1,
+            minDate: 0,
             maxDate: '+7d',
             dateFormat: 'mm/dd/yy',
             dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
@@ -503,13 +503,21 @@
         return [true];
         }
     // form submit
-    $('#form-order').on('submit', function(){
+    $('#form-order').on('submit', function(e){
         $('#total_price').val('{{$cart->total_price}}');
         $('#order_id').val('{{$cart->id}}');
-
     });
 
-    $('.submit-btn').on('click', function(){
+    $('.submit-btn').on('click', function(e){
+        if($('input[name="pickup_date"]').val() == ''){
+            e.preventDefault();
+            Swal.fire({
+                title:"Sila Pilih Tarikh Pengambilan",
+                icon: "warning",
+            });
+            return;
+
+        }
         var form = document.getElementById('form-order');
         if(form.reportValidity()){
             Swal.fire({

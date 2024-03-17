@@ -24,10 +24,10 @@ class HistoryController extends Controller
         $total_price[] = 0;
         $pickup_date[] = 0;
         $status = ['Paid'];
-        
+
         $order = $this->getAllOrderQuery($status)->get();
-        
-        if(request()->ajax()) 
+
+        if(request()->ajax())
         {
             $table = Datatables::of($order);
 
@@ -133,21 +133,21 @@ class HistoryController extends Controller
         $status = ['Failed', 'Pending', 'Cancel by user', 'Cancel by merchant', 'Delivered', 'Picked-Up'];
         $filter_type = $request->filterType;
         $date = $request->date;
-        
+
         $order = $this->getAllOrderQuery($status);
-        
-        if(request()->ajax()) 
+
+        if(request()->ajax())
         {
-            if(($filter_type == "" || $filter_type == "all") && $date == "") 
+            if(($filter_type == "" || $filter_type == "all") && $date == "")
             {
                 $order = $order->get();
             }
             else if($filter_type == "date")
             {
-                $order = $order->whereBetween('pickup_date', 
+                $order = $order->whereBetween('pickup_date',
                 [Carbon::parse($date)->startOfDay()->toDateTimeString(),Carbon::parse($date)->endOfDay()->toDateTimeString()])->get();
             }
-            
+
             $table = Datatables::of($order);
 
             $table->addColumn('status', function ($row) {
@@ -159,7 +159,7 @@ class HistoryController extends Controller
                     return $btn;
                 } else if($row->status == 'Cancel by merchant'){
                     $btn = '<span class="badge rounded-pill bg-danger text-white">Dibatalkan oleh penjual</span>';
-                    return $btn;                    
+                    return $btn;
                 }
             });
 
@@ -195,9 +195,9 @@ class HistoryController extends Controller
                 ->join('organizations as o', 'o.id', 'pu.organization_id')
                 ->where('pu.id', $order_id)
                 ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status','pu.confirm_picked_up_time','pu.confirm_by',
-                        'o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','o.district','o.city', 'o.fixed_charges')
+                        'pu.organization_id','o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','o.district','o.city', 'o.fixed_charges')
                 ->first();
-        
+
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
         $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
         $total_order_price = number_format($list->total_price, 2);
@@ -217,15 +217,16 @@ class HistoryController extends Controller
 
         $total_price[] = array();
         $price[] = array();
-        
+
         foreach($item as $row)
         {
             $price[$row->id] = number_format($row->price, 2);
             $total_price[$row->id] = number_format(doubleval($row->price * $row->quantity), 2); // calculate total for each item in cart
         }
         $receipt_no = PgngOrder::with('transaction')->find($order_id)->transaction->nama;
-        
-        return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by' , 'receipt_no'));
+
+        $org_charge = ProductController::getFixedCharges($list->organization_id ,$list->total_price);
+        return view('merchant.list', compact('list', 'order_date', 'pickup_date', 'total_order_price', 'item', 'price', 'total_price','confirm_picked_up_time','confirm_by' , 'receipt_no' ,'org_charge'));
     }
 
     private function getAllOrderQuery($status)

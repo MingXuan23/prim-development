@@ -100,7 +100,7 @@ class ProductController extends Controller
                ['po.user_id',$user_id],
                ['po.status','In cart']
           ])
-          ->select('org.id','nama','fixed_charges' ,'min_waive_service_charge_amount')
+          ->select('org.id','nama','fixed_charges')
           ->distinct('nama')
           ->orderBy('po.id','desc')
           ->get();
@@ -151,13 +151,8 @@ class ProductController extends Controller
         if($findCharge==null)
         {
             $charge = DB::table('organizations')
-            ->find($oid);
-//            if total order more than waive amount can waive service charge
-            if($charge->min_waive_service_charge_amount != null && $charge->min_waive_service_charge_amount <= $total){
-                $charge = 0;
-            }else{
-                $charge = $charge->fixed_charges;
-            }
+            ->find($oid)
+            ->fixed_charges;
         }
         else{
             $charge=$findCharge->remaining_charges;
@@ -202,12 +197,12 @@ class ProductController extends Controller
                'updated_at' => Carbon::now(),
          ]);
 
-        $min_waive_amount = DB::table('organizations')
+        $min_waive_amount = DB::table('organization_charges')
             ->where([
-                'id' => $organizationId
+                'organization_id' => $organizationId
             ])
             ->first();
-         return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges ,'min_waive'=> $min_waive_amount->min_waive_service_charge_amount]);
+         return response()->json(['success' => 'Item Berjaya Direkodkan', 'totalPrice' => $totalPrice,'charges'=>$charges ,'min_waive'=>$min_waive_amount?$min_waive_amount->minimum_amount: 0]);
     }
     //to get the number of items in cart
    public function loadCartCounter(){
@@ -271,12 +266,12 @@ class ProductController extends Controller
          ]);
     //  $totalPrice = number_format($totalPrice, 2);
 
-       $min_waive_amount = DB::table('organizations')
+       $min_waive_amount = DB::table('organization_charges')
            ->where([
-               'id' => $request->org_id
+               'organization_id' => $request->org_id
            ])
             ->first();
-     return response()->json(['totalPrice'=>$totalPrice,'fixed_charges'=>$charges ,'min_waive' => $min_waive_amount->min_waive_service_charge_amount]);
+     return response()->json(['totalPrice'=>$totalPrice,'fixed_charges'=>$charges ,'min_waive' => $min_waive_amount?$min_waive_amount->minimum_amount:0]);
    }
 //    public function checkOut(){
 //           $user_id = Auth::id();
@@ -389,10 +384,11 @@ class ProductController extends Controller
 
         $fixed_charges = $org->fixed_charges;
         //if more than waive min amount then we can exempt the service charge
-        if ($org->min_waive_service_charge_amount !== null && $total >= $org->min_waive_service_charge_amount) {
-            $fixed_charges = 0;
+        if($org->charges){
+            if($total >= $org->charges->first()->minimum_amount){
+                $fixed_charges = 0;
+            }
         }
-
         return $fixed_charges;
     }
     public function getCheckoutItems(Request $request)

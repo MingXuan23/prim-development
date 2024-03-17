@@ -38,7 +38,7 @@
                 <select name="org" id="org_dropdown" class="form-control col-md-12">
                     <option value="">Pilih Organisasi</option>
                     @foreach($merchant as $row)
-                    <option value="{{ $row->id }}" data-service-charge="{{$row->fixed_charges ?? 0}}" data-min-waive="{{$row->min_waive_service_charge_amount ?? 0}}">{{ $row->nama }}</option>
+                    <option value="{{ $row->id }}" data-service-charge="{{$row->fixed_charges ?? 0}}">{{ $row->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -207,10 +207,8 @@
                 btnHistory.attr('href', route)
                 $('#form-service-charge').attr('action',`{{route('admin-reg.updateServiceCharge', '')}}/${orgId}`);
                 const serviceCharge = $('#org_dropdown option:selected').attr('data-service-charge');
-                const minWaive= $('#org_dropdown option:selected').attr('data-min-waive');
 
                 $('input[name = "service_charge"]').val(serviceCharge);
-                $('input[name = "min_waive"]').val(minWaive);
                 $('#orderTable').DataTable().destroy()
                 fetch_data(orgId)
                 countTotalOrders(orgId)
@@ -307,6 +305,8 @@
                     $('#filter-order').children('option[value=today]').text("Pesanan Perlu Diselesaikan Hari Ini ("+result.response.today+")")
                     $('#filter-order').children('option[value=week]').text("Pesanan Perlu Diselesaikan Minggu Ini ("+result.response.week+")")
                     $('#filter-order').children('option[value=month]').text("Pesanan Perlu Diselesaikan Bulan Ini ("+result.response.month+")")
+                    $('input[name = "min_waive"]').val(result.response.minimum_amount);
+
                 },
                 error:function(result) {
                     console.log(result.responseText)

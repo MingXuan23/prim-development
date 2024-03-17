@@ -142,14 +142,12 @@
               </tr>
             @endforeach
             @if($fixed_charges != null && $fixed_charges != 0.00)
-                @if($amount  < $min_waive)
-                    <tr>
-                      <td class="noborder"></td>
-                      <td class="noborder"></td>
-                      <td class="table-dark noborder">Cas Organisasi</td>
-                      <td class="table-dark noborder">RM {{ $fixed_charges }}</td>
-                    </tr>
-                @endif
+                <tr>
+                  <td class="noborder"></td>
+                  <td class="noborder"></td>
+                  <td class="table-dark noborder">Cas Organisasi</td>
+                  <td class="table-dark noborder">RM {{ $fixed_charges }}</td>
+                </tr>
             @endif
               <tr>
                 <td class="noborder"></td>

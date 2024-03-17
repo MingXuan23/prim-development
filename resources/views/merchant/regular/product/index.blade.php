@@ -95,11 +95,9 @@
                 width: 190px!important;
             }
             .product-image img{
-                object-fit: contain;
-                max-width: 100%;
-                max-height: 100%;
-                width: 190px;
-                height: 190px;
+                object-fit: cover;
+                width: 100%;
+                height: 100%;
                 border-radius: 0.5rem!important;
             }
             .product-name{
@@ -116,7 +114,7 @@
                 font-size: 16px;
                 color: var(--secondary-bc);
                 text-align: right;
-                padding: 10px;  
+                padding: 10px;
             }
             nav .pagination{
                 margin-top:20px;
@@ -178,13 +176,13 @@
     </nav>
     <section class="container products-container">
     @foreach ($products as $product)
-            <a href="{{route('merchant-product.show',$product->id)}}" class="product-container" data-product-id="{{$product->id}}"> 
+            <a href="{{route('merchant-product.show',$product->id)}}" class="product-container" data-product-id="{{$product->id}}">
                 <div class="product-image">
                     @if($product->image == null)
                         <img class="default-img" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}" alt="{{$product->name}}">
                     @else
                     <img id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
-                    @endif 
+                    @endif
                 </div>
                 <div class="product-infos">
                     <div class="product-name">{{$product->name}}</div>
@@ -247,7 +245,7 @@ $(document).ready(function(){
                 $(this).hide(); // Hide the container if there is no match
             }
         });
-       } 
+       }
     });
 })
 </script>
