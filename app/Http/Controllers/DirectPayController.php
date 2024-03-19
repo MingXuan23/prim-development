@@ -348,6 +348,54 @@ class DirectPayController extends Controller
                         }
                     }
                 } 
+                else if (substr($fpx_sellerExOrderNo, 0, 1) == 'D')
+                {
+                    $referral_code = DB::table('referral_code')
+                                    ->where('code',$request->referral_code)
+                                    ->first();
+                    $own_code = DB::table('referral_code')
+                                    ->where('user_id',Auth::id()??0)
+                                    ->first();
+                    $own_code_id = $own_code !=null && $transaction->username !="PENDERMA TANPA NAMA" ?$own_code->id:0;
+
+                    if($own_code!=null && $transaction->username !="PENDERMA TANPA NAMA"){
+                        if($own_code != null ){
+                            //the point will update by trigger in database when transaction is success
+                            DB::table('point_history')
+                            ->insert([
+                                'created_at'=>Carbon::now(),
+                                'updated_at'=>Carbon::now(),
+                                'referral_code_id'=> $own_code->id,
+                                'transaction_id'=> $transaction->id,
+                                'isDebit' =>1,
+                                'fromSubline' =>0,
+                                'status'=>0,
+                                'points'=>2
+    
+                            ]);
+                        }
+                    }
+                    //dd($referral_code != null && $referral_code->id != $own_code_id,$referral_code,$own_code_id,$request->referral_code);
+                    //dd($own_code_id,$referral_code);
+                    if ($referral_code != null && $referral_code->id != $own_code_id) {
+                        //the point will update by trigger in database when transaction is success
+                         DB::table('point_history')
+                         ->insert([
+                            'created_at'=>Carbon::now(),
+                            'updated_at'=>Carbon::now(),
+                            'referral_code_id'=> $referral_code->id,
+                            'transaction_id'=> $transaction->id,
+                            'isDebit' =>1,
+                            'fromSubline' =>1,
+                            'status'=>0,
+                            'points'=>2
+
+                         ]);
+                    }
+
+                   
+                   
+                }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'F')
                 {
                     $result = DB::table('orders')

@@ -44,6 +44,7 @@ class LoginController extends Controller
      */
     public function __construct()
     {
+
         $this->middleware('guest')->except('logout');
     }
 
@@ -78,6 +79,13 @@ class LoginController extends Controller
     protected function credentials(Request $request)
     {
         // $request->get  get email (name) from form
+        if (session()->has('intendedUrl')) {
+            $intendedUrl = session()->pull('intendedUrl');
+            $this->redirectTo =$intendedUrl;
+
+            session()->forget('intendedUrl');
+        }
+
         $phone = $request->get('email');
         
         if(is_numeric($request->get('email'))){
@@ -122,5 +130,6 @@ class LoginController extends Controller
         // }
         return ['email' => $request->get('email'), 'password'=>$request->get('password')];
     }
+    
 }
 

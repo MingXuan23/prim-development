@@ -133,8 +133,10 @@
 @endsection
 
 @section('content')
+
 <div class="bg-shape-1">
     <div class="container border rounded p-3 mb-2 card">
+       
         <div class="row bg-form">
             <div class=" col-lg-6">
                 <div class="h-100">
@@ -221,14 +223,26 @@
                             <input type="hidden" name="desc" id="desc" value="Donation">
                             <input type="hidden" name="d_id" id="d_id" value="{{ $donation->id }} ">
                             <input type="hidden" name="d_code" id="d_code" value="{{ $donation->code }} ">
+                            @if($referral_code != "")
+                                <input type="hidden" value="{{$referral_code}}" name="referral_code">
+                             @endif
                             <br>
 
                             <div class="col-sm-12">
-                                <button class="boxed-btn btn-rounded btn-donation submit" type="submit">
+                                <button class="boxed-btn btn-rounded btn-donation" type="button" onclick="copyReferralLink()">
+                                    Share
+                                </button>
+                            </div>
+<br>
+                            <div class="col-sm-12">
+                                <button class="boxed-btn btn-rounded btn-donation submit" type="submit" >
                                     Derma
                                 </button>
                             </div>
-
+                            <br>
+                            <div class="alert alert-success" style="display:none;">
+                                <p id="success"></p>
+                            </div>
                             <br>
                             <div style="text-align: center;">
                                 <p><i>"The  <b>POWER</b> of <b>GIVING</b> everyday"</i></p>
@@ -252,12 +266,20 @@
 <script src="{{ URL::asset('assets/libs/inputmask/inputmask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.js')}}"></script>
 
 <script>
     $(document).ready(function () {
         $(".input-mask").inputmask();
         $('.phone_no').mask('01000000000');
         $('.form-validation').parsley();
+        $('.alert').delay(10000).fadeOut();
+
+        var msg =@json($message);
+        //console.log(msg);
+        if(msg !=""){
+            alert(msg);
+        }
     });
 
     // function checkBank() {
@@ -274,6 +296,63 @@
 
     var arr = [];
 
+
+    function copyReferralLink(){
+        $.ajax({
+        method: 'GET',
+        url: "{{route('donate.getReferralCode')}}",
+        success: function(data) {
+            var currentURL = window.location.href;
+            var urlWithoutParams = currentURL.split('?')[0];
+            console.log(data);
+            copyToClipboard(urlWithoutParams+'?referral_code='+data.referral_code,true);
+
+        },
+        error: function (data) {
+            var currentURL = window.location.href;
+            var urlWithoutParams = currentURL.split('?')[0];
+            copyToClipboard(urlWithoutParams,false);
+        }
+    });
+    }
+
+    function copyToClipboard(text,isReferralCode) {
+    // Create a temporary input element
+    var input = document.createElement('input');
+    
+    // Set its value to the text that needs to be copied
+    input.style.position = 'absolute';
+    input.style.left = '-9999px';
+    input.value = text;
+    
+    
+    // Append it to the body
+    document.body.appendChild(input);
+    
+    // Select the text inside the input element
+    input.select();
+    
+    // Execute the copy command
+    document.execCommand('copy');
+    
+    // Remove the input element from the DOM
+    document.body.removeChild(input);
+    if(isReferralCode){
+        $('#success').text('Url with your referral code copied');
+    }else{
+        $('#success').text('Url copied, login to get the referral code');
+        
+    }
+   
+    $('.alert-success').show();
+    setTimeout(function() {
+        $('.alert').css('display', 'none');
+    }, 10500);
+
+// Set a timeout to hide the alert after 3 seconds
+
+    
+}
     // $.ajax({
     //     type: 'GET',
     //     dataType: 'json',
