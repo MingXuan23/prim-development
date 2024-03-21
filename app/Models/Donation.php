@@ -77,9 +77,9 @@ class Donation extends Model
     public function getDonationByTransactionName($transaction_name)
     {
         $donation = Donation::with(["transaction"])->whereHas('transaction', function ($query) use ($transaction_name) {
-            $query->where("transactions.nama", $transaction_name);
+            $query->where("nama", $transaction_name);
         })->first();
-        dd($donation,$transaction_name);
+
         // $donation = DB::table('donations')
         //             ->leftJoin('donation_transaction', "donations.id", "donation_transaction.donation_id")
         //             ->leftJoin("transactions", "transactions.id", "=", "donation_transaction.transaction_id")
