@@ -54,6 +54,8 @@ Route::group(['prefix' => 'derma'], function () {
     Route::get('/organization-donation-custom', 'LandingPageController@customOrganizationTabbing')->name('landingpage.donation.custom');
     Route::get('/organization-donation-bytabbing', 'LandingPageController@getDonationByTabbing')->name('landingpage.donation.bytabbing');
     Route::get('/organization-donation-header', 'LandingPageController@getHeaderPoster')->name('landingpage.donation.header');
+
+    
 });
 
 //landing fees page route
@@ -80,6 +82,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     Route::get('organizationList', 'DonationController@getDonationByOrganizationDatatable')->name('donate.donation_list');
     Route::get('history', 'DonationController@historyDonor')->name('donate.donor_history');
     Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('donate.donor_history_datatable');
+
+    Route::get('getReferralCode', 'DonationController@getReferralCode')->name('donate.getReferralCode');
 });
 
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');

@@ -227,6 +227,8 @@ class LandingPageController extends AppBaseController
         //         }
         //     }
         // }
+
+        session()->forget('intendedUrl');//reset intended url for point system 
         return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount' ,'donors'));
     }
 

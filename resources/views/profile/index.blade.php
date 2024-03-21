@@ -81,10 +81,26 @@
             <div class="col-sm-12 text-secondary dataState">
                 <input type="text" class="form-control" value="{{ $userData->state }}" readonly>
             </div>
+
+            <div class="col-sm-5">
+                <h5 class="mb-0">Mata Ganjaran PRiM</h6>
+            </div>
+            @if($referral_code !=null)
+            <div class="col-sm-12 text-secondary dataState">
+                <input type="text" class="form-control" value="{{$referral_code->total_point}} Mata Ganjaran" readonly>
+            </div>
+            @else
+            <div class="col-sm-12 text-secondary dataState">
+            <button class="btn btn-primary w-md waves-effect waves-light" onclick="copyReferralLink()">
+                   Aktifkan
+                </button>
+            </div>
+
+            @endif
             <!-- button for edit -->
             <div class="btn-group editBtnGrp" role="group" aria-label="">
                 <a class="btn btn-light w-md waves-effect waves-light" href="{{ route('profile.resetPassword') }}">Tukar Kata Laluan</a>
-                <a class="btn btn-primary w-md waves-effect waves-light" href="{{ route("profile.edit", $userData->id) }}">
+                <a class="btn btn-primary w-md waves-effect waves-light" href="{{ route('profile.edit', $userData->id) }}">
                     Edit Profil
                 </a>
             </div>
@@ -100,6 +116,18 @@
     $(document).ready(function () {
         $('.phone_no').mask('+600000000000');
     });
+
+    function copyReferralLink(){
+        $.ajax({
+        method: 'GET',
+        url: "{{route('donate.getReferralCode')}}",
+        success: function(data) {
+          
+            window.location.reload();
+        },
+
+    });
+    }
 </script>
 @endsection
 

@@ -23,7 +23,10 @@ class ProfileController extends Controller
     public function index()
     {
         $userData =  Auth::user();
-        return view('profile.index', compact('userData'));
+        $referral_code = DB::table('referral_code')
+                        ->where('user_id',$userData->id)
+                        ->first();
+        return view('profile.index', compact('userData','referral_code'));
     }
     
 
