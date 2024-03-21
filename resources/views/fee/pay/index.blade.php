@@ -202,7 +202,7 @@
                                                 class="collapse student-collapse">
                                                 <div class="card-body pl-0 pr-0">
                                                     {{-- Kelas Name --}}
-                                                    @foreach($getfees->where('studentid', $row->studentid)->where('organization_id', $organization->id)->unique('studentid') as $data)
+                                                    @foreach($getfees->where('studentid', $row->studentid)->where('organization_id', $organization->id)->unique('category') as $data)
                                                     {{-- {{ dd($data) }} --}}
                                                     <div class="col-md-12">
                                                         <div id="accordionExample{{ $data->studentid }}-{{ $data->organization_id }}"
