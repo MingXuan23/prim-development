@@ -348,54 +348,6 @@ class DirectPayController extends Controller
                         }
                     }
                 } 
-                else if (substr($fpx_sellerExOrderNo, 0, 1) == 'D')
-                {
-                    $referral_code = DB::table('referral_code')
-                                    ->where('code',$request->referral_code)
-                                    ->first();
-                    $own_code = DB::table('referral_code')
-                                    ->where('user_id',Auth::id()??0)
-                                    ->first();
-                    $own_code_id = $own_code !=null && $transaction->username !="PENDERMA TANPA NAMA" ?$own_code->id:0;
-
-                    if($own_code!=null && $transaction->username !="PENDERMA TANPA NAMA"){
-                        if($own_code != null ){
-                            //the point will update by trigger in database when transaction is success
-                            DB::table('point_history')
-                            ->insert([
-                                'created_at'=>Carbon::now(),
-                                'updated_at'=>Carbon::now(),
-                                'referral_code_id'=> $own_code->id,
-                                'transaction_id'=> $transaction->id,
-                                'isDebit' =>1,
-                                'fromSubline' =>0,
-                                'status'=>0,
-                                'points'=>2
-    
-                            ]);
-                        }
-                    }
-                    //dd($referral_code != null && $referral_code->id != $own_code_id,$referral_code,$own_code_id,$request->referral_code);
-                    //dd($own_code_id,$referral_code);
-                    if ($referral_code != null && $referral_code->id != $own_code_id) {
-                        //the point will update by trigger in database when transaction is success
-                         DB::table('point_history')
-                         ->insert([
-                            'created_at'=>Carbon::now(),
-                            'updated_at'=>Carbon::now(),
-                            'referral_code_id'=> $referral_code->id,
-                            'transaction_id'=> $transaction->id,
-                            'isDebit' =>1,
-                            'fromSubline' =>1,
-                            'status'=>0,
-                            'points'=>2
-
-                         ]);
-                    }
-
-                   
-                   
-                }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'F')
                 {
                     $result = DB::table('orders')
@@ -476,6 +428,49 @@ class DirectPayController extends Controller
                 }
                 else {
                     $transaction->donation()->attach($id, ['payment_type_id' => 1]);
+
+                    $referral_code = DB::table('referral_code')
+                                    ->where('code',$request->referral_code)
+                                    ->first();
+                    $own_code = DB::table('referral_code')
+                                    ->where('user_id',Auth::id()??0)
+                                    ->first();
+                    $own_code_id = $own_code !=null && $transaction->username !="PENDERMA TANPA NAMA" ?$own_code->id:0;
+
+                    if($own_code!=null && $transaction->username !="PENDERMA TANPA NAMA"){
+                        if($own_code != null ){
+                            //the point will update by trigger in database when transaction is success
+                            DB::table('point_history')
+                            ->insert([
+                                'created_at'=>Carbon::now(),
+                                'updated_at'=>Carbon::now(),
+                                'referral_code_id'=> $own_code->id,
+                                'transaction_id'=> $transaction->id,
+                                'isDebit' =>1,
+                                'fromSubline' =>0,
+                                'status'=>0,
+                                'points'=>2
+    
+                            ]);
+                        }
+                    }
+                    //dd($referral_code != null && $referral_code->id != $own_code_id,$referral_code,$own_code_id,$request->referral_code);
+                    //dd($own_code_id,$referral_code);
+                    if ($referral_code != null && $referral_code->id != $own_code_id) {
+                        //the point will update by trigger in database when transaction is success
+                         DB::table('point_history')
+                         ->insert([
+                            'created_at'=>Carbon::now(),
+                            'updated_at'=>Carbon::now(),
+                            'referral_code_id'=> $referral_code->id,
+                            'transaction_id'=> $transaction->id,
+                            'isDebit' =>1,
+                            'fromSubline' =>1,
+                            'status'=>0,
+                            'points'=>2
+
+                         ]);
+                    }
                 }
             }
             else
@@ -1298,6 +1293,12 @@ class DirectPayController extends Controller
 
     
     public function adminTestFpx($transaction_id){
+
+        $donation = $this->donation->getDonationByTransactionName('Donation_STEM185_20240321143746_94');
+//dd($donation);
+                    $organization = $this->organization->getOrganizationByDonationId($donation->id);
+                    $transaction = $this->transaction->getTransactionByName('Donation_STEM185_20240321143746_94');
+                    dd($donation);
         $transactions = DB::table('transactions')
         ->where('id',$transaction_id)
         ->get();
