@@ -14,10 +14,10 @@ class ClassExport implements FromCollection, WithHeadings, ShouldAutoSize
     /**
      * @return \Illuminate\Support\Collection
      */
-    // public function __construct($organId)
-    // {
-    //     $this->organId = $organId;
-    // }
+    public function __construct($organId)
+    {
+        $this->organId = $organId;
+    }
 
     public function collection()
     {
@@ -31,6 +31,7 @@ class ClassExport implements FromCollection, WithHeadings, ShouldAutoSize
             ->select('organizations.id as schoolid')
             ->where([
                 ['organization_user.user_id', $userid],
+                ['organizations.id',$this->organId ]
                 // ['organization_user.organization_id', $this->organId],
             ])
             ->first();
