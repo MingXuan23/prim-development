@@ -31,7 +31,8 @@ class ClassController extends Controller
 
     public function classexport(Request $request)
     {
-        return Excel::download(new ClassExport(), 'class.xlsx');
+        //dd($request);
+        return Excel::download(new ClassExport($request->organ), 'class.xlsx');
     }
 
     public function classimport(Request $request)
