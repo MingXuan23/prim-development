@@ -232,6 +232,14 @@
         $('.phone_no').mask('01000000000');
         $('.form-validation').parsley();
 
+        $('.alert').delay(10000).fadeOut();
+
+        var msg =@json($message);
+        //console.log(msg);
+        if(msg !=""){
+            alert(msg);
+        }
+
 
     });
 

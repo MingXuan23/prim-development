@@ -347,13 +347,27 @@ class DonationController extends Controller
             return view('errors.404');
         }
 
+        //$referral_code = request()->input('referral_code');
+
         $referral_code = request()->input('referral_code');
+        $message ="";
+        if($referral_code == null){
+             $referral_code ="";
+        }else{
+            $exists = DB::table('referral_code')
+            ->where('code',$referral_code)
+            ->exists();
 
-       if($referral_code == null){
-            $referral_code ="";
-       }
+            if(!$exists){
+                $message = "Invalid Referral Code Used!!";
+                $referral_code ="";
+            }
+        }
 
-        return view('paydonate.anonymous.index', compact('donation','referral_code'));
+        $currentUrl = request()->url();
+        session(['intendedUrl' => $currentUrl]);
+
+        return view('paydonate.anonymous.index', compact('donation','referral_code','message'));
     }
 
     public function create()
