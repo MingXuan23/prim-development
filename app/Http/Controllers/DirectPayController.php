@@ -435,9 +435,9 @@ class DirectPayController extends Controller
                     $own_code = DB::table('referral_code')
                                     ->where('user_id',Auth::id()??0)
                                     ->first();
-                    $own_code_id = $own_code !=null && $transaction->username !="PENDERMA TANPA NAMA" ?$own_code->id:0;
+                    $own_code_id = $own_code !=null ?$own_code->id:0;
 
-                    if($own_code!=null && $transaction->username !="PENDERMA TANPA NAMA"){
+                    if($own_code!=null ){
                         if($own_code != null ){
                             //the point will update by trigger in database when transaction is success
                             DB::table('point_history')
@@ -446,10 +446,11 @@ class DirectPayController extends Controller
                                 'updated_at'=>Carbon::now(),
                                 'referral_code_id'=> $own_code->id,
                                 'transaction_id'=> $transaction->id,
-                                'isDebit' =>1,
+                                'isDebit' =>0,
                                 'fromSubline' =>0,
                                 'status'=>0,
-                                'points'=>2
+                                'points'=>2,
+                                'desc'=>'Donation credit to own referral code'
     
                             ]);
                         }
@@ -464,10 +465,11 @@ class DirectPayController extends Controller
                             'updated_at'=>Carbon::now(),
                             'referral_code_id'=> $referral_code->id,
                             'transaction_id'=> $transaction->id,
-                            'isDebit' =>1,
+                            'isDebit' =>0,
                             'fromSubline' =>1,
                             'status'=>0,
-                            'points'=>2
+                            'points'=>2,
+                            'desc'=>'Donation credit to referral code owner'
 
                          ]);
                     }
