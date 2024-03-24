@@ -330,7 +330,7 @@ class DonationController extends Controller
             }
         }
 
-        $currentUrl = request()->url();
+        $currentUrl = request()->fullUrl();
         session(['intendedUrl' => $currentUrl]);
         //dd(session()->pull('intendedUrl'));
         return view('paydonate.pay', compact('donation', 'user','specialSrabRequest','referral_code','message'));
@@ -364,7 +364,8 @@ class DonationController extends Controller
             }
         }
 
-        $currentUrl = request()->url();
+        $currentUrl = request()->fullUrl();
+       // dd($currentUrl);
         session(['intendedUrl' => $currentUrl]);
 
         return view('paydonate.anonymous.index', compact('donation','referral_code','message'));
