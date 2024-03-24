@@ -229,16 +229,17 @@
                             <br>
 
                             <div class="col-sm-12">
-                                <button class="boxed-btn btn-rounded btn-donation" type="button" onclick="copyReferralLink()">
-                                    Share
-                                </button>
-                            </div>
-<br>
-                            <div class="col-sm-12">
                                 <button class="boxed-btn btn-rounded btn-donation submit" type="submit" >
                                     Derma
                                 </button>
                             </div>
+                            <br>
+                            <div class="col-sm-12">
+                                <button class="boxed-btn btn-rounded btn-donation" type="button" onclick="copyReferralLink()">
+                                    Share
+                                </button>
+                            </div>
+                    
                             <br>
                             <div class="alert alert-success" style="display:none;">
                                 <p id="success"></p>

@@ -186,14 +186,14 @@
                             <br>
 
                             <div class="col-sm-12">
-                                <button class="boxed-btn btn-rounded btn-donation" type="button" onclick="copyReferralLink()">
-                                    Share
+                                <button class="boxed-btn btn-rounded btn-donation submit" type="submit">
+                                    Derma
                                 </button>
                             </div>
                             <br>
                             <div class="col-sm-12">
-                                <button class="boxed-btn btn-rounded btn-donation submit" type="submit">
-                                    Derma
+                                <button class="boxed-btn btn-rounded btn-donation" type="button" onclick="copyReferralLink()">
+                                    Share
                                 </button>
                             </div>
                             <br>
