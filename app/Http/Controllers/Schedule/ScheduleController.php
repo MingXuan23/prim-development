@@ -225,7 +225,7 @@ class ScheduleController extends Controller
         $message = "Notification success to send";
 
        }
-
+       
        return response()->json(['message'=>$message]);
     }
     public function saveRelief(Request $request){
