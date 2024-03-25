@@ -219,7 +219,7 @@ class ScheduleController extends Controller
        $result = $result->getData(true); // Convert response to array
        if (isset($result['success'])) {
            $update = DB::table('leave_relief')
-           ->where('id', $data[0])
+           ->where('id', $leave_relief->id)
            ->increment('notification_count');
 
         $message = "Notification success to send";
