@@ -207,7 +207,6 @@ class ScheduleController extends Controller
     public function notifyTeacher($lr_id){
 
         $leave_relief = DB::table('leave_relief')->where('id',$lr_id)->first();
-       // dd($leave_relief);
         if($leave_relief == null || $leave_relief->replace_teacher_id ==null){
             return response()->json(['message'=>'Data Error']);
         }
