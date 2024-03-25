@@ -91,7 +91,7 @@ class ScheduleApiController extends Controller
                 
                 if($user->device_token != $request->device_token && $user->device_token !=null)
                 {
-                    $this->sendNotification($user->id ,'Another device login your account!', 'Hi '. $user->name.', Please login again to get the latest notification' );
+                    $this->sendFirebaseNotification($user->id ,'Another device login your account!', 'Hi '. $user->name.', Please login again to get the latest notification' );
                 }
                 $user->device_token =$request->device_token;
                 
@@ -500,7 +500,7 @@ class ScheduleApiController extends Controller
                     $msg =$user->name.' apply the leave. Total '.$count.' class affected';
                  
                     //dd($msg);
-                    $notification =$this->sendNotification($a->user_id,'Your action is required',$msg );
+                    $notification =$this->sendFirebaseNotification($a->user_id,'Your action is required',$msg );
                 }
                 return response()->json(['Success'=>'Leave Submit Sucessfully.Total '.$count.' classes affected.']);
                 
@@ -632,11 +632,10 @@ class ScheduleApiController extends Controller
         curl_close($ch);
     
         $responseArr = json_decode($response, true);
-        
         return $responseArr['access_token'];
     }
 
-     public function sendNotification3($id,$title,$message)
+     public function sendFirebaseNotification($id,$title,$message)
      {  $user =User::find($id);
 
        // dd($user);
@@ -699,13 +698,18 @@ class ScheduleApiController extends Controller
         // FCM response
         //dd($result);
 
-            return response()->json(["success"=>$result]);
+        if (isset($result['success'])) {
+            return response()->json(["success"=>"success"]);
+        } else {
+            // Log error or handle it accordingly
+            return response()->json(["failed" =>"falied"]);
         }
-        return response()->json(["failed"]);
+        }
+        return response()->json(["failed"=>"no device id"]);
      }
 
 
-     public function sendFirebaseNotification($id, $title, $message)
+     public function testNoti($id, $title, $message)
         {
             $user = User::find($id);
 
@@ -720,7 +724,7 @@ class ScheduleApiController extends Controller
                 $client->setAuthConfig(json_decode($serviceAccountJson, true));
                 $client->addScope('https://www.googleapis.com/auth/firebase.messaging');
                 $client->fetchAccessTokenWithAssertion();
-                dd($client);
+
                 $accessToken = $client->getAccessToken();
             
                 // Use the access token as the bearer token
@@ -745,7 +749,7 @@ class ScheduleApiController extends Controller
                 if ($result === FALSE) {
                     die('Curl failed: '. curl_error($ch));
                 }
-            
+                
                 // Close connection
                 curl_close($ch);
 
@@ -857,7 +861,7 @@ class ScheduleApiController extends Controller
                     $msg =$msg .'with reason '.$request->desc;
                 }
                 //dd($msg);
-                $notification =$this->sendNotification($a->user_id,'Your action is required',$msg );
+                $notification =$this->sendFirebaseNotification($a->user_id,'Your action is required',$msg );
             }
             //dd($notification);
 
@@ -885,7 +889,7 @@ class ScheduleApiController extends Controller
                 $msg ='There is '.$count.' pending relief not been resolved yet.';
                
                 //dd($msg);
-                $notification =$this->sendNotification($a->user_id,$user->name.' accept the relief.',$msg );
+                $notification =$this->sendFirebaseNotification($a->user_id,$user->name.' accept the relief.',$msg );
             }
            // dd($notification);
         }

@@ -19,6 +19,10 @@ use Maatwebsite\Excel\Facades\Excel;
 use stdClass;
 use App\User;
 use Yajra\DataTables\DataTables;
+
+use App\Http\Controllers\Schedule\ScheduleApiController;
+
+
 class ScheduleController extends Controller
 {
     /**
@@ -217,7 +221,17 @@ class ScheduleController extends Controller
              ]);
 
              $user =User::find($data[1]);
-             $msg =$msg . $this->sendNotification($data[1],'Hi, '.$user->name,'You have a new pending relief. Please check the latest pending relief in APP');;
+             $ScheduleApiController = new ScheduleApiController();
+
+        // Call the sendFirebaseNotification function
+            $result = $ScheduleApiController->sendFirebaseNotification($data[1], 'Hi, ' . $user->name, 'You have a new pending relief. Please check the latest pending relief in APP');
+            $result = $result->getData(true); // Convert response to array
+            if (isset($result['success'])) {
+                $update = DB::table('leave_relief')
+                ->where('id', $data[0])
+                ->increment('notification_count');
+            }
+            
        }
        return redirect()->back()->with('success', $msg);
     }
@@ -1029,31 +1043,43 @@ class ScheduleController extends Controller
                 ->exists();
      }
 
-     public function sendNotification($id,$title,$message)
+     public function sendFirebaseNotification($id,$title,$message)
      {  $user =User::find($id);
 
        // dd($user);
+
+       //dd($user);
         if($user->device_token){
 
-            $device_token =[];
-            $url = 'https://fcm.googleapis.com/fcm/send';
-            array_push($device_token,$user->device_token);
-        $serverKey = getenv('FCM_SERVER_KEY');
+            //$device_token =[];
+            $url = 'https://fcm.googleapis.com/v1/projects/prim-notification/messages:send';
+            //array_push($device_token,$user->device_token);
+       // $serverKey = getenv('FCM_SERVER_KEY');
         //$serverKey = getenv('PRODUCTION_BE_URL');
         
        
+        // $data = [
+        //     "token" => $device_token,
+        //     "notification" => [
+        //         "title" => $title,
+        //         "body" =>$message,
+        //     ]
+        // ];
+
         $data = [
-            "registration_ids" => $device_token,
-            "notification" => [
-                "title" => $title,
-                "body" =>$message,
+            "message" => [
+                "token" => $user->device_token,
+                "notification" => [
+                    "body" => $message,
+                    "title" =>  $title
+                ]
             ]
         ];
 
         $encodedData = json_encode($data);
 
         $headers = [
-            'Authorization:key='. $serverKey,
+            'Authorization: Bearer ' . $this->getAccessToken(),
             'Content-Type: application/json',
         ];
 
@@ -1077,13 +1103,19 @@ class ScheduleController extends Controller
         // Close connection
         curl_close($ch);
 
-        // FCM responsemana
+        // FCM response
         //dd($result);
 
-        return 'Success Send Notification to'.$user->name;
-    }
-    return 'Failed Send Notification to'.$user->name;
+        if (isset($result['success'])) {
+            return response()->json(["success"=>"success"]);
+        } else {
+            // Log error or handle it accordingly
+            return response()->json(["failed" =>"falied"]);
+        }
+        }
+        return response()->json(["failed"=>"no device id"]);
      }
+
 
      public function addTeacherLeave(Request $request){
         $request->validate([
