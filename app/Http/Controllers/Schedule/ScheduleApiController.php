@@ -698,7 +698,7 @@ class ScheduleApiController extends Controller
         // FCM response
         //dd($result);
 
-        if (isset($result['success'])) {
+        if (isset($result['name'])) {
             return response()->json(["success"=>"success"]);
         } else {
             // Log error or handle it accordingly
