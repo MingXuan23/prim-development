@@ -366,6 +366,26 @@
         });
     }
 
+    function notifyTeacher(leave_relief_id) {
+    // Get the route URL with the placeholder
+            var routeUrl = '{{ route("schedule.notifyTeacher", "lrid") }}';
+            
+            // Replace the placeholder with the leave_relief_id
+            var url = routeUrl.replace('lrid', leave_relief_id);
+            
+            // Make the AJAX call with the modified URL
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (response) {
+                    alert(response.message);
+                    $('#datepicker_end').trigger('change');
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
         function displayRelief(reliefData) {
             var tableBody = $('#reliefTable tbody');
             tableBody.empty(); // Clear existing data
@@ -428,6 +448,9 @@
                 if (confirmationText === 'Pending') {
                     row.find('#action').append('<button class="btn btn-success confirm-btn">Confirm</button>');
                     row.find('#action').append('<button class="btn btn-danger reject-btn">Reject</button>');
+                }
+                if(relief.notification_count <=0){
+                    row.find('#action').append('<button class="btn btn-primary noti-btn" onclick=notifyTeacher("'+relief.leave_relief_id +'")>Notify</button>');
                 }
                 row.append('</td>');
 
