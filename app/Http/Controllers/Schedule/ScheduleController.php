@@ -204,6 +204,31 @@ class ScheduleController extends Controller
         return response()->json(['relief_report' => $relief]);
     }
 
+    public function notifyTeacher($lr_id){
+
+        $leave_relief = DB::table('leave_relief')->where('id',$lr_id)->first();
+       // dd($leave_relief);
+        if($leave_relief == null || $leave_relief->replace_teacher_id ==null){
+            return response()->json(['message'=>'Data Error']);
+        }
+        $user =User::find($leave_relief->replace_teacher_id);
+        $ScheduleApiController = new ScheduleApiController();
+
+   // Call the sendFirebaseNotification function
+   $message = "Notification failed to send";
+       $result = $ScheduleApiController->sendFirebaseNotification($user->id, 'Hi, ' . $user->name, 'You have a new pending relief. Please check the latest pending relief in APP');
+       $result = $result->getData(true); // Convert response to array
+       if (isset($result['success'])) {
+           $update = DB::table('leave_relief')
+           ->where('id', $data[0])
+           ->increment('notification_count');
+
+        $message = "Notification success to send";
+
+       }
+
+       return response()->json(['message'=>$message]);
+    }
     public function saveRelief(Request $request){
         $reliefs = $request -> commitRelief;
         if(!$this->checkAdmin(Auth::User()->id,$request->organization)){
@@ -292,7 +317,7 @@ class ScheduleController extends Controller
                 ->where('tl.status',1)
                 ->where('s.organization_id', $oid)
                 ->orderBy('tl.date')
-                ->select('lr.id as leave_relief_id', 'lr.confirmation', 'ss.id as schedule_subject_id', 'tl.date', 'tl.desc', 'sub.name as subject', 'u1.name as leave_teacher', 'u2.name as relief_teacher', 'ss.slot', 'ss.day', 's.time_of_slot', 's.start_time', 's.time_off', 'c.nama as class_name');
+                ->select('lr.id as leave_relief_id', 'lr.confirmation', 'ss.id as schedule_subject_id', 'tl.date', 'tl.desc', 'sub.name as subject', 'u1.name as leave_teacher', 'u2.name as relief_teacher', 'ss.slot', 'ss.day', 's.time_of_slot', 's.start_time', 's.time_off', 'c.nama as class_name','lr.notification_count');
     
             $relief = $query->get();
                     // dd($endDate);
