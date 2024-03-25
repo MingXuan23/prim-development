@@ -48,8 +48,10 @@ class SubjectController extends Controller
             if ($oid != '') {
 
                 $data = DB::table('subject as s')
+                ->where('s.organization_id',$oid)
                     ->select('s.id','s.name', 's.code')
                     //->where('organizations.id', $oid)
+                    
                     ->orderBy('s.name');
             }
             
