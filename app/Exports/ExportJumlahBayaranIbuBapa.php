@@ -33,6 +33,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->distinct()
                 ->where('t.user_id', $data->userId)
                 ->where('t.status', 'Success')
+                ->where('t.datetime_created','>=',$data->start_date)
                 ->where('fn.organization_id', $this->oid)
                 ->select('t.*','fn.name as yuran','fn.totalAmount as yuranAmount')
                 ->get();
@@ -46,6 +47,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->where('t.user_id', $data->userId)
                 ->where('fn.organization_id', $this->oid)
                 ->where('t.status', 'Success')
+                ->where('t.datetime_created','>=',$data->start_date)
                 ->select('t.*','fn.name as yuran','fn.totalAmount as yuranAmount')
                 ->get();        
                 
@@ -87,7 +89,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
             unset($data->userId);
             unset($data->sid);
             unset($data->oid);
-            
+            unset($data->start_date);
         }
 
         return $datas;
@@ -103,7 +105,8 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
             ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
             ->leftJoin('classes as c', 'c.id', 'co.class_id')
             ->where('c.id', $this->kelas)
-            ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid')
+            ->where('cs.status',1)
+            ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
             ->orderBy('s.nama')
             ->get();
             //dd($datas);
@@ -118,7 +121,8 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->where('co.organization_id',$this->org->parent_org)
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid')
+                ->where('cs.status',1)
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
                 ->get();
@@ -132,7 +136,8 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->where('co.organization_id',$this->oid)
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid')
+                ->where('cs.status',1)
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
                 ->get();
