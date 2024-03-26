@@ -33,6 +33,7 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
                 ->distinct()
                 ->where('t.user_id', $data->userId)
                 ->where('t.status', 'Success')
+                ->where('t.datetime_created','>=',$data->start_date)
                 ->where('fn.organization_id', $this->oid)
                 ->select('t.*','fn.name as yuran','fn.totalAmount as yuranAmount')
                 ->get();
@@ -45,6 +46,7 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
                 ->leftJoin('fees_recurring as fr', 'fr.student_fees_new_id', 'sfn.id')
                 ->distinct()
                 ->where('t.user_id', $data->userId)
+                ->where('t.datetime_created','>=',$data->start_date)
                 ->where('fn.organization_id', $this->oid)
                 ->where('t.status', 'Success')
                 ->select('t.*','fn.name as yuran','fr.finalAmount as yuranAmount')
@@ -89,6 +91,7 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
             unset($data->userId);
             unset($data->sid);
             unset($data->oid);
+            unset($data->start_date);
             
         }
 
@@ -105,7 +108,8 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
             ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
             ->leftJoin('classes as c', 'c.id', 'co.class_id')
             ->where('c.id', $this->kelas)
-            ->select('s.nama', 'c.nama as nama_kelas', 's.gender', DB::raw("DATE_FORMAT(cs.start_date, '%d/%m/%Y') as cs_startdate"), 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid')
+            ->where('cs.status',1)
+            ->select('s.nama', 'c.nama as nama_kelas', 's.gender', DB::raw("DATE_FORMAT(cs.start_date, '%d/%m/%Y') as cs_startdate"), 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
             ->orderBy('s.nama')
             ->get();
             //dd($datas);
@@ -120,7 +124,8 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->where('co.organization_id',$this->org->parent_org)
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', DB::raw("DATE_FORMAT(cs.start_date, '%d/%m/%Y') as cs_startdate"), 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid')
+                ->where('cs.status',1)
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', DB::raw("DATE_FORMAT(cs.start_date, '%d/%m/%Y') as cs_startdate"), 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
                 ->get();
@@ -134,7 +139,7 @@ class ExportJumlahBayaranIbuBapaSwasta implements FromCollection, ShouldAutoSize
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->where('co.organization_id',$this->oid)
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', DB::raw("DATE_FORMAT(cs.start_date, '%d/%m/%Y') as cs_startdate"), 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid')
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', DB::raw("DATE_FORMAT(cs.start_date, '%d/%m/%Y') as cs_startdate"), 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
                 ->get();
