@@ -121,7 +121,7 @@ Route::group(['prefix' => 'schedule','namespace' => 'Schedule','middleware' => [
     Route::get('getScheduleStatus/{id}','ScheduleController@getScheduleStatus')->name('schedule.getScheduleStatus');
     Route::post('updateSchedule','ScheduleController@updateSchedule')->name('schedule.updateSchedule');
     Route::get('getScheduleView/{class_id}','ScheduleController@getScheduleView')->name('schedule.getScheduleView');
-    
+
     Route::get('manageRelief','ScheduleController@manageReliefIndex')->name('schedule.manageRelief');
     Route::post('getAllTeacher','ScheduleController@getAllTeacher')->name('schedule.getAllTeacher');
     Route::post('datatablePendingRelief','ScheduleController@datatablePendingRelief')->name('schedule.datatablePendingRelief');
@@ -257,9 +257,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::post('/order/update-pick-up-date', 'UserCooperativeController@updatePickUpDate')->name('koperasi.updatePickUpDate');
         Route::delete('/order/{id}', 'UserCooperativeController@destroyUserOrder')->name('koperasi.destroyUserOrder');
         Route::get('/history', 'UserCooperativeController@indexHistory')->name('koperasi.history');
-        
+
         Route::get('/{id}/list', 'UserCooperativeController@indexList')->name('koperasi.list');
-        
+
         // Koop_Shop
         Route::get('/koop','UserCooperativeController@indexKoop')->name('koperasi.indexKoop');
         Route::get('/koop/{id}','UserCooperativeController@koopShop')->name('koperasi.koopShop');
@@ -272,8 +272,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
 
         //Route::get('/testPay','UserCooperativeController@testPay')->name('koperasi.testPay');
         //created for test action after payment only
-        
-        
+
+
     });
 
     Route::group(['namespace' => 'Admin'], function() {
@@ -284,7 +284,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
         Route::post('/produktype/getProductNumOfGroup','AdminProductCooperativeController@getProductNumOfGroup')->name('koperasi.getProductNumOfGroup');
 
-        
+
         Route::any('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
         Route::post('/produktype/add','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
         Route::post('/produktype/update/{id}','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
@@ -323,12 +323,12 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
     });
 });
 
-                                //// *** Get & Go ***//// 
+                                //// *** Get & Go ***////
 Route::group(['namespace' => 'Merchant'], function() {
     Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function() {
     Route::get('/product', 'ProductController@index')->name('merchant-product.index');
     Route::get('/product/{id}', 'ProductController@show')->name('merchant-product.show');
-    }); 
+    });
 });
 
 Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
@@ -341,9 +341,9 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
         Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
-        
+
         // Route::get('/testPayment','ProductController@testPayment')->name('merchant.testPayment');
-         
+
          // Checkout
         Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
         Route::get('get-checkout-items', 'ProductController@getCheckoutItems')->name('merchant.get-checkout-items');
@@ -368,8 +368,8 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::post('fetch-disabled-dates', 'OrderController@fetchDisabledDates')->name('merchant-reg.disabled-dates');
         Route::post('fetch-hours', 'OrderController@fetchOperationHours')->name('merchant-reg.fetch-hours');
         Route::post('{org_id}/cart/{order_id}/payment', 'OrderController@store')->name('merchant-reg.store-order');
-        
-       
+
+
     });
 
     Route::group(['prefix' => 'admin', 'namespace' => 'AdminRegular'], function() {
@@ -389,7 +389,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('/operation-hours/{id}/check-orders/{hour_id}', 'OperationHourController@editSameDateOrders')->name('admin-reg.edit-same-order');
         Route::post('change-pickup-date', 'OperationHourController@changeOrderPickupDate')->name('admin-reg.change-date');
         Route::put('new-update-hour', 'OperationHourController@updateNew')->name('admin-reg.new-update-hour');
-        
+
         # Product Dashboard
         Route::get('/p-group-list', 'ProductController@indexProductGroup')->name('admin-reg.product-group');
         Route::get('get-group', 'ProductController@getAllProductGroup')->name('admin-reg.get-group');
@@ -419,7 +419,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('/sales-report', 'ReportController@index')->name('admin-reg.report');
         Route::get('get-report', 'ReportController@getReport')->name('admin-reg.get-report');
         Route::get('get-group-table', 'ReportController@getProductGroupTable')->name('admin-reg.group-table');
-        
+
         Route::get('/sales-report/{g_id?}', 'ReportController@showProductItemReport')->name('admin-reg.item-report');
         Route::get('get-item-report', 'ReportController@getProductItemReport')->name('admin-reg.get-item-report');
         Route::get('get-item-table', 'ReportController@getProductItemTable')->name('admin-reg.item-table');
@@ -428,7 +428,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('order-details/{order_id}', 'OrderController@showList')->name('admin-reg.order-detail');
     });
 });
-                                        //// ***End of Get & Go ***//// 
+                                        //// ***End of Get & Go ***////
 
 
 //private school
@@ -444,7 +444,7 @@ Route::group(['prefix' => 'private-school'], function () {
     Route::get('student', 'StudentController@indexSwasta')->name('private-school.student.index');
     Route::get('student/create', 'StudentController@createSwasta')->name('private-school.student.create');
     Route::post('student/store', 'StudentController@storeSwasta')->name('private-school.student.store');
-    
+
     Route::get('parent', 'ParentController@index')->name('private-school.parent.index');
     // Route::get('parent/create', 'ParentController@create')->name('private-school.parent.create');
 });
@@ -455,7 +455,7 @@ Route::group(['middleware' => ['auth']], function () {
         'school'             => 'SchoolController',
         'teacher'            => 'TeacherController',
         'class'              => 'ClassController',
-        'student'            => 'StudentController', 
+        'student'            => 'StudentController',
         'subject'            => 'SubjectController',
         'schedule'           => 'Schedule\ScheduleController',
         'manage_relief'      => 'Schedule\ScheduleController',
@@ -670,7 +670,7 @@ Route::group(['prefix' => 'delivery'], function () {
    //Route::get('')
 });
 
-    //// *** Book & Stay ***//// 
+    //// *** Book & Stay ***////
     Route::group(['prefix' => 'booknstay'], function () {
         // Homestay Guest
         Route::get('home', 'HomestayController@homePage')->name('homestay.homePage');
@@ -683,6 +683,8 @@ Route::group(['prefix' => 'delivery'], function () {
         // Route::get('generate-booking-details-pdf/{id}','HomestayController@generateBookingDetailsPdf')->name('homestay.generateBookingDetailsPdf');
         Route::get('get-more-reviews','HomestayController@getMoreReviews')->name('homestay.getMoreReviews');
         Route::group(['middleware' => 'auth'], function(){
+//            Route::post('test-payment', 'HomestayController@testPayment')->name('homestay.testPayment');
+
             // Homestay Customer
             Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
             Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
@@ -730,10 +732,9 @@ Route::group(['prefix' => 'delivery'], function () {
             Route::get('get-promotion-history', 'HomestayController@getPromotionHistory')->name('homestay.getPromotionHistory');
         });
     });
-    Route::post('test-payment', 'HomestayController@testPayment')->name('homestay.testPayment');
 
-   
-    //// ***End of Book & Stay ***//// 
+
+    //// ***End of Book & Stay ***////
 
 
 
@@ -753,7 +754,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::get('userhistory', 'HomestayController@userhistory')->name('homestay.userhistory');
     Route::get('tunjuksales', 'HomestayController@tunjuksales')->name('homestay.tunjuksales');
     Route::get('homestaysales/{id}/{checkin}/{checkout}', 'HomestayController@homestaysales');
-    
+
     //Route::post('test', 'HomestayController@test')->name('homestay.test');
 
     Route::get('/grab-setcar','GrabStudentController@setcar')->name('grab.setinsert');
@@ -798,7 +799,7 @@ Route::group(['prefix' => 'delivery'], function () {
     Route::post('/bus-sales', 'BusController@bussales')->name('generate-sales-busgraph');
 
 
-    
+
 
 Route::group(['prefix' => 'orders'], function () {
     Route::group(['middleware' => ['auth']], function () {
@@ -821,7 +822,7 @@ Route::group(['prefix' => 'orders'], function () {
     });
 });
 
-    
+
 
 Route::get('/{name}', 'SchoolController@indexLogin')->name('school.loginindex');
 
