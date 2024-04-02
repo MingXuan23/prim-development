@@ -2,6 +2,11 @@
 @include('layouts.datatable')
 @section('css')
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+<style>
+    .errorMessage{
+        color:red;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -106,7 +111,7 @@
                     {{ csrf_field() }}
                     <div class="form-group">
                         <label>Organisasi</label>
-                        <select name="organExport" id="organExport" class="form-control">
+                        <select name="organExport" id="organExport" class="form-control" >
                             <option value="" disabled selected>Pilih Organisasi</option>
                             @foreach($organization as $row)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
@@ -128,7 +133,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="modalJumlahBayaran" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+<div class="modal fade" id="modalJumlahBayaran" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true" >
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -138,7 +143,7 @@
                 </button>
             </div>
 
-            <form action="{{ route('exportJumlahBayaranIbuBapa') }}" method="post" onsubmit="remindMessage()">
+            <form action="{{ route('exportJumlahBayaranIbuBapa') }}" method="post" onsubmit="remindMessage()" id="exportJumlahBayaranIbuBapaForm">
                 <div class="modal-body">
                     {{ csrf_field() }}
                     <div class="form-group">
@@ -152,10 +157,26 @@
                     </div>
                     <div class="form-group">
                         <label>Nama Kelas</label>
-                        <select name="yuranExport1" id="yuranExport1" class="form-control">
+                        <select name="yuranExport1" id="yuranExport1" class="form-control" required>
 
                         </select>
                     </div>
+
+                    <div class="form-row">
+                    <div class="form-group col-md-12 required">
+                        <label class="control-label">Tempoh Traksasi</label>
+
+                        <div class="input-daterange input-group" id="date">
+                            <input type="text" class="form-control" id="date_started" name="date_started" placeholder="Tarikh Awal"
+                                autocomplete="off" data-parsley-required-message="Sila masukkan tarikh awal"
+                                data-parsley-errors-container=".errorMessage" required />
+                            <input type="text" class="form-control"  id="date_end" name="date_end" placeholder="Tarikh Akhir"
+                                autocomplete="off" data-parsley-required-message="Sila masukkan tarikh akhir"
+                                data-parsley-errors-container=".errorMessage" required />
+                        </div>
+                        <div class="errorMessage"></div>
+                    </div>
+                </div>
                     <div class="modal-footer">
                         <button id="buttonExport" type="submit" class="btn btn-primary" >Export</button>
                     </div>
@@ -174,11 +195,51 @@
 
 <!-- Plugin Js-->
 <script src="{{ URL::asset('assets/libs/chartist/chartist.min.js')}}"></script>
-
+<script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
 <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
+<script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script>
 
 <script>
     $(document).ready(function(){
+
+        function validateDateRange() {
+            var startDate = $('#date_started').datepicker('getDate');
+            var endDate = $('#date_end').datepicker('getDate');
+
+            // Check if both dates are selected and validate the date range
+            if (startDate && endDate) {
+                if (endDate < startDate) {
+                    // Clear end date and display error message
+                    $('#date_end').val('');
+                    $('.errorMessage').text('Tarikh Akhir mesti selepas Tarikh Awal');
+                } else {
+                    // Clear error message
+                    $('.errorMessage').text('');
+                }
+            }
+        }
+
+       
+        $('#modalJumlahBayaran').on('shown.bs.modal', function () {
+
+            $('#date .form-control').datepicker({
+                toggleActive: true,
+                todayHighlight:true,
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                container: '#modalJumlahBayaran .modal-body'
+            });
+
+            $('#date_started, #date_end').off('change').on('change', function() {
+                // Call validateDateRange function when either datepicker changes
+                validateDateRange();
+            });
+
+
+        });
+
+       
+
 
         function fetchClass(organizationid = '', yuranId = ''){
             var _token = $('input[name="_token"]').val();

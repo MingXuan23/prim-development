@@ -1701,7 +1701,7 @@ class FeesController extends AppBaseController
                 })
                     ->where('t.status', 'success')
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
-                    ->get();
+                    ;
             }
             else
             {
@@ -1719,7 +1719,7 @@ class FeesController extends AppBaseController
                     ->where('fn.organization_id', $request->oid)
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
-                    ->get();
+                    ;
             }
         }
         else{
@@ -1733,7 +1733,7 @@ class FeesController extends AppBaseController
                     })
                     ->where('t.status', 'success')
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
-                    ->get();
+                    ;
             }
             else if(Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta'))
             {
@@ -1751,7 +1751,7 @@ class FeesController extends AppBaseController
                     ->where('fn.organization_id', $request->oid)
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
-                    ->get();
+                    ;
             }
             else if(Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Pentadbir Swasta') || Auth::user()->hasRole('Guru Swasta'))
             {
@@ -1771,7 +1771,7 @@ class FeesController extends AppBaseController
                     ->where('fn.organization_id', $request->oid)
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
-                    ->get();
+                    ;
             }
             else
             {
@@ -1790,10 +1790,17 @@ class FeesController extends AppBaseController
                     ->where('fn.organization_id', $request->oid)
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
                     ->distinct('name')
-                    ->get();
+                    ;
             }
         }
 
+        if($request->start_date != null && $request->end_date != null){
+            $listHisotry = $listHisotry->whereBetween('datetime_created',[$request->start_date,$request->end_date]);
+            
+
+        }
+        $listHisotry = $listHisotry->get();
+      //  dd($listHisotry,$request->start_date);
         if (request()->ajax()) {
             return datatables()->of($listHisotry)
                 ->editColumn('amount', function ($data) {
@@ -2101,9 +2108,11 @@ class FeesController extends AppBaseController
             ->where('o.type_org', 15)
             ->get();
 
+            $start_date = $request->date_started;
+            $end_date = $request ->date_end;
         if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
-            return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org ), $filename . '.xlsx');
+            return Excel::download(new ExportJumlahBayaranIbuBapa($request->yuranExport1,$org,$start_date,$end_date ), $filename . '.xlsx');
         }
         else
         {
