@@ -1536,6 +1536,19 @@ class PayController extends AppBaseController
             ->orderBy('fees_new.category')
             ->where('fees_transactions_new.transactions_id', $id)
             ->where('student_fees_new.status', 'Paid')
+            ->where(function($query) use( $get_transaction) {
+                $query->where(function($q) use( $get_transaction) {
+                    $q->whereNotNull('class_student.start_date')
+                        ->whereNull('class_student.end_date')
+                        ->where('class_student.start_date','<=',$get_transaction->datetime_created);
+                })
+                ->orWhere(function($q) use( $get_transaction) {
+                    $q->whereNotNull('class_student.start_date')
+                        ->whereNotNull('class_student.end_date')
+                        ->where('class_student.end_date', '>=', $get_transaction->datetime_created)
+                        ->where('class_student.start_date','<=',$get_transaction->datetime_created);
+                });
+            })
             ->get();
 
         // get category fees by transactions
