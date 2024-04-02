@@ -1360,6 +1360,9 @@ class StudentController extends Controller
             $classid = $request->classid;
             $orgId =$request->orgId;
             $hasOrganizaton = $request->hasOrganization;
+            $start_date = $request->start_date;
+            $end_date = $request->end_date;
+           // dd($end_date);
 
             $userId = Auth::id();
 
@@ -1368,11 +1371,17 @@ class StudentController extends Controller
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.*', 'class_student.fees_status','class_student.id as csid')
+                    ->select('students.*', 'class_student.fees_status','class_student.id as csid','class_student.start_date','class_student.end_date')
                     ->where([
                         ['classes.id', $classid],
-                        ['class_student.status', 1],
                     ])
+                    ->where(function($query) use ($start_date, $end_date) {
+                        $query->whereBetween('class_student.start_date', [$start_date, $end_date])
+                              ->orWhere(function($query) use ($end_date) {
+                                  $query->whereNull('class_student.end_date')
+                                        ->where('class_student.start_date', '<=', $end_date);
+                              });
+                    })
                     ->orderBy('students.nama');
                 $update=$this->validateStatus($data->get());
                 if($update){
@@ -1380,13 +1389,21 @@ class StudentController extends Controller
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.*', 'class_student.fees_status','class_student.id as csid')
+                    ->select('students.*', 'class_student.fees_status','class_student.id as csid','class_student.start_date','class_student.end_date')
                     ->where([
                         ['classes.id', $classid],
                         ['class_student.status', 1],
                     ])
+                    ->where(function($query) use ($start_date, $end_date) {
+                        $query->whereBetween('class_student.start_date', [$start_date, $end_date])
+                              ->orWhere(function($query) use ($end_date) {
+                                  $query->whereNull('class_student.end_date')
+                                        ->where('class_student.start_date', '<=', $end_date);
+                              });
+                    })
                     ->orderBy('students.nama');
                 }
+
                 $table = Datatables::of($data);
 
                 $table->addColumn('gender', function ($row) {
@@ -1404,7 +1421,13 @@ class StudentController extends Controller
                 });
 
                 $table->addColumn('status', function ($row) use ($orgId){
+                    $row_end_date =$row->end_date;
+                    if($row->end_date == null){
+                        $row_end_date = Carbon::now()->format('Y-m-d');
+                        //$row->end_date = Carbon::now()->format('Y-m-d');
+                    }
 
+                   // dd($row,$row_end_date);
                     $tranB=DB::table('class_student as cs')
                     ->join('student_fees_new as sfn' ,'sfn.class_student_id','cs.id')
                     ->join('fees_transactions_new as ftn','ftn.student_fees_id','sfn.id')
@@ -1413,6 +1436,7 @@ class StudentController extends Controller
                     ->where('fn.organization_id',$orgId)
                     ->where('cs.id',$row->csid)
                     ->where('t.status',"Success")
+                    ->whereBetween('t.datetime_created', [$row->start_date, $row_end_date])
                     ->select('t.id as transaction_id','t.amount')
                     ->get();
                     
@@ -1425,6 +1449,7 @@ class StudentController extends Controller
                     ->where('ous.student_id', $row->id)
                     ->where('fn.organization_id',$orgId)
                     ->where('t.status', 'Success')
+                    ->whereBetween('t.datetime_created', [$row->start_date, $row_end_date])
                     ->select('t.id as transaction_id','t.amount')
                     ->get();
     
@@ -1452,6 +1477,10 @@ class StudentController extends Controller
 
 
                 $table->rawColumns(['gender', 'status']);
+                $table->removeColumn('start_date');
+                $table->removeColumn('end_date');
+
+              //  dd($table->make(true));
                 return $table->make(true);
             }
 
