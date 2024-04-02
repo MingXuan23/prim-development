@@ -1392,7 +1392,6 @@ class StudentController extends Controller
                     ->select('students.*', 'class_student.fees_status','class_student.id as csid','class_student.start_date','class_student.end_date')
                     ->where([
                         ['classes.id', $classid],
-                        ['class_student.status', 1],
                     ])
                     ->where(function($query) use ($start_date, $end_date) {
                         $query->whereBetween('class_student.start_date', [$start_date, $end_date])
