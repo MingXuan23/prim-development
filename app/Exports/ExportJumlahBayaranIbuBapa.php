@@ -10,11 +10,13 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, WithHeadings
 {
-    public function __construct($kelas, $org)
+    public function __construct($kelas, $org,$start_date,$end_date)
     {
         $this->kelas = $kelas;
         $this->org=$org;
         $this->oid = $org->id;
+        $this->start_date = $start_date;
+        $this->end_date= $end_date;
     }
     /**
     * @return \Illuminate\Support\Collection
@@ -33,7 +35,9 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->distinct()
                 ->where('t.user_id', $data->userId)
                 ->where('t.status', 'Success')
-                ->where('t.datetime_created','>=',$data->start_date)
+                //->where('t.datetime_created','>=',$data->start_date)
+                ->whereBetween('t.datetime_created', [$this->start_date, $this->end_date])
+
                 ->where('fn.organization_id', $this->oid)
                 ->select('t.*','fn.name as yuran','fn.totalAmount as yuranAmount')
                 ->get();
@@ -47,7 +51,7 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->where('t.user_id', $data->userId)
                 ->where('fn.organization_id', $this->oid)
                 ->where('t.status', 'Success')
-                ->where('t.datetime_created','>=',$data->start_date)
+                ->whereBetween('t.datetime_created', [$this->start_date, $this->end_date])
                 ->select('t.*','fn.name as yuran','fn.totalAmount as yuranAmount')
                 ->get();        
                 
@@ -66,18 +70,18 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                
                 $amount = $amount + $tran->yuranAmount;
                 
-                if ($key == 0)
-                {
-                    //$fpxno = $fpxno . $tran->transac_no;
+                // if ($key == 0)
+                // {
+                //     //$fpxno = $fpxno . $tran->transac_no;
                    
-                    //$yuran=$yuran.$tran->yuran;
-                }
-                else
-                {  
+                //     //$yuran=$yuran.$tran->yuran;
+                // }
+                // else
+                // {  
                 
-                    //$fpxno = $fpxno . ', '.$tran->transac_no;
-                    //$yuran=$yuran.",\n".$tran->yuran;
-                }
+                //     //$fpxno = $fpxno . ', '.$tran->transac_no;
+                //     //$yuran=$yuran.",\n".$tran->yuran;
+                // }
                 
             }
             //$yuran = str_replace("\n", "<br>", $yuran);
@@ -96,6 +100,8 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
     }
 
     public function getData(){
+        $this_start_date = $this->start_date;
+        $this_end_date = $this->end_date;
         if($this->kelas!=0){
             $datas = DB::table('students as s')
             ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
@@ -105,11 +111,17 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
             ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
             ->leftJoin('classes as c', 'c.id', 'co.class_id')
             ->where('c.id', $this->kelas)
-            ->where('cs.status',1)
+            ->where(function($query) use ($this_start_date, $this_end_date) {
+                $query->whereBetween('cs.start_date', [$this_start_date, $this_end_date])
+                      ->orWhere(function($query) use ($this_end_date) {
+                          $query->whereNull('cs.end_date')
+                                ->where('cs.start_date', '<=', $this_end_date);
+                      });
+            })
             ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
             ->orderBy('s.nama')
             ->get();
-            //dd($datas);
+            //dd($datas,$this_end_date,$this_start_date);
         }
         else{
             if($this->org->type_org==10){
@@ -121,7 +133,13 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->where('co.organization_id',$this->org->parent_org)
-                ->where('cs.status',1)
+                ->where(function($query) use ($this_start_date, $this_end_date) {
+                    $query->whereBetween('cs.start_date', [$this_start_date, $this_end_date])
+                          ->orWhere(function($query) use ($this_end_date) {
+                              $query->whereNull('cs.end_date')
+                                    ->where('cs.start_date', '<', $this_end_date);
+                          });
+                })
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
@@ -136,7 +154,13 @@ class ExportJumlahBayaranIbuBapa implements FromCollection, ShouldAutoSize, With
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->where('co.organization_id',$this->oid)
-                ->where('cs.status',1)
+                ->where(function($query) use ($this_start_date, $this_end_date) {
+                    $query->whereBetween('cs.start_date', [$this_start_date, $this_end_date])
+                          ->orWhere(function($query) use ($this_end_date) {
+                              $query->whereNull('cs.end_date')
+                                    ->where('cs.start_date', '<', $this_end_date);
+                          });
+                })
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'u.name as username', 'u.id as userId', 'co.organization_id as oid', 's.id as sid','cs.start_date')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')

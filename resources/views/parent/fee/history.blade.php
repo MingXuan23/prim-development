@@ -43,6 +43,22 @@
             @endforeach
           </select>
         </div>
+
+        <div class="form-row">
+                    <div class="form-group col-md-12 required">
+                        <label class="control-label">Tempoh Traksasi</label>
+
+                        <div class="input-daterange input-group" id="date">
+                            <input type="text" class="form-control" id="date_started" name="date_started" placeholder="Tarikh Awal"
+                                autocomplete="off" data-parsley-required-message="Sila masukkan tarikh awal"
+                                data-parsley-errors-container=".errorMessage" required />
+                            <input type="text" class="form-control"  id="date_end" name="date_end" placeholder="Tarikh Akhir"
+                                autocomplete="off" data-parsley-required-message="Sila masukkan tarikh akhir"
+                                data-parsley-errors-container=".errorMessage" required />
+                        </div>
+                        <div class="errorMessage"></div>
+                    </div>
+                </div>
       </div>
 
       {{-- <div class="">
@@ -98,9 +114,24 @@
 
 
 @section('script')
+<script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script>
 <script>
     $( document ).ready(function() {
 
+      $('#date').datepicker({
+                toggleActive: true,
+                todayHighlight:true,
+                startDate: new Date("2010-01-01"),
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                orientation: 'bottom'
+               
+            });
+
+          $('#date_started, #date_end').on('change', function() {
+              // Call validateDateRange function when either datepicker changes
+              $('#organization').trigger('change');
+          });
         fetch_data();
 
         var receiptTable;
@@ -113,6 +144,8 @@
                         url: "{{ route('fees.getFeesReceiptDataTable') }}",
                         data: {
                             oid: oid,
+                            start_date : $('#date_started').val(),
+                            end_date : $('#date_end').val()
                         },
                         type: 'GET',
 

@@ -39,7 +39,11 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
         ->join('users', 'users.id', 'ou.user_id');
 
         if($this->kelasId != null){
-            $liststudents =$query->select('students.nama', 'students.gender',  'users.name', DB::raw("REPLACE(users.telno, '+6', '') as telno"))
+            $liststudents =$query->select('students.nama', 'students.gender',  'users.name', 
+             DB::raw("CASE 
+                WHEN users.icno IS NOT NULL THEN users.icno
+                ELSE REPLACE(users.telno, '+6', '')
+                END AS telno"))
             ->where([
                 ['co.organization_id', $this->organId],
                 ['c.id', $this->kelasId],
@@ -51,7 +55,13 @@ class StudentExport implements FromCollection, ShouldAutoSize, WithHeadings,With
             ->get();
         }
         else {
-            $liststudents = $query->select('students.nama', 'students.gender',  'users.name', DB::raw("REPLACE(users.telno, '+6', '') as telno"),'c.nama as class_name')
+           // $liststudents = $query->select('students.nama', 'students.gender',  'users.name', DB::raw("REPLACE(users.telno, '+6', '') as telno"),'c.nama as class_name')
+            $liststudents =$query->select('students.nama', 'students.gender',  'users.name', 
+            DB::raw("CASE 
+               WHEN users.icno IS NOT NULL THEN users.icno
+               ELSE REPLACE(users.telno, '+6', '')
+               END AS telno"),
+            'c.nama as class_name')
             ->where([
                 ['co.organization_id', $this->organId],
                 ['c.nama', 'LIKE', $this->year . '%'], 
