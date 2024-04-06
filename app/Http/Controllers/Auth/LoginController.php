@@ -57,7 +57,7 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-
+        session()->forget('referral_code');
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();

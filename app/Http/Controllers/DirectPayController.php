@@ -363,6 +363,18 @@ class DirectPayController extends Controller
                     ->update([
                         'transaction_id' => $transaction->id
                     ]);
+                    if (session()->has('referral_code')) {
+                        $referral_code = session()->pull('referral_code');
+                       //dd($referral_code);
+                       $code_id = DB::table('referral_code')
+                       ->where('code',$referral_code)
+                       ->first();
+
+                       if($code_id !=null)
+                        $this->insertPointHistory($code_id->id,$transaction->id,1,1,'Get n go credit to referral code owner');
+
+                    }
+
                 }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'K')
                 {
@@ -435,44 +447,40 @@ class DirectPayController extends Controller
                     $own_code = DB::table('referral_code')
                                     ->where('user_id',Auth::id()??0)
                                     ->first();
-                    $own_code_id = $own_code !=null ?$own_code->id:0;
+                   // $own_code_id = $own_code !=null ?$own_code->id:0;
+                    if($referral_code !=null){
+                        $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Donation credit to referral code owner');
+                        // DB::table('point_history')
+                        // ->insert([
+                        //    'created_at'=>Carbon::now(),
+                        //    'updated_at'=>Carbon::now(),
+                        //    'referral_code_id'=> $referral_code->id,
+                        //    'transaction_id'=> $transaction->id,
+                        //    'isDebit' =>0,
+                        //    'fromSubline' =>1,
+                        //    'status'=>0,
+                        //    'points'=>2,
+                        //    'desc'=>'Donation credit to referral code owner'
 
-                    if($own_code!=null ){
-                        if($own_code != null ){
-                            //the point will update by trigger in database when transaction is success
-                            DB::table('point_history')
-                            ->insert([
-                                'created_at'=>Carbon::now(),
-                                'updated_at'=>Carbon::now(),
-                                'referral_code_id'=> $own_code->id,
-                                'transaction_id'=> $transaction->id,
-                                'isDebit' =>0,
-                                'fromSubline' =>0,
-                                'status'=>0,
-                                'points'=>2,
-                                'desc'=>'Donation credit to own referral code'
-    
-                            ]);
-                        }
+                        // ]);
                     }
-                    //dd($referral_code != null && $referral_code->id != $own_code_id,$referral_code,$own_code_id,$request->referral_code);
-                    //dd($own_code_id,$referral_code);
-                    if ($referral_code != null && $referral_code->id != $own_code_id) {
-                        //the point will update by trigger in database when transaction is success
-                         DB::table('point_history')
-                         ->insert([
-                            'created_at'=>Carbon::now(),
-                            'updated_at'=>Carbon::now(),
-                            'referral_code_id'=> $referral_code->id,
-                            'transaction_id'=> $transaction->id,
-                            'isDebit' =>0,
-                            'fromSubline' =>1,
-                            'status'=>0,
-                            'points'=>2,
-                            'desc'=>'Donation credit to referral code owner'
+                    else if ($own_code !=null){
+                        $this->insertPointHistory($own_code->id,$transaction->id,0,1,'Donation credit to own referral code');
+                        // DB::table('point_history')
+                        // ->insert([
+                        //     'created_at'=>Carbon::now(),
+                        //     'updated_at'=>Carbon::now(),
+                        //     'referral_code_id'=> $own_code->id,
+                        //     'transaction_id'=> $transaction->id,
+                        //     'isDebit' =>0,
+                        //     'fromSubline' =>0,
+                        //     'status'=>0,
+                        //     'points'=>2,
+                        //     'desc'=>'Donation credit to own referral code'
 
-                         ]);
+                        // ]);
                     }
+                
                 }
             }
             else
@@ -529,6 +537,22 @@ class DirectPayController extends Controller
         // ));
     }
 
+    public function insertPointHistory($code_id,$transaction_id,$fromSubline,$point,$desc){
+
+        DB::table('point_history')
+        ->insert([
+           'created_at'=>Carbon::now(),
+           'updated_at'=>Carbon::now(),
+           'referral_code_id'=> $code_id,
+           'transaction_id'=> $transaction_id,
+           'isDebit' =>0,
+           'fromSubline' =>$fromSubline,
+           'status'=>0,
+           'points'=>$point,
+           'desc'=>$desc 
+
+        ]);
+    }
     // callback for FPX
     public function paymentStatus(Request $request)
     {
