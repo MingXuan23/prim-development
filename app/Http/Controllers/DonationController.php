@@ -328,6 +328,10 @@ class DonationController extends Controller
                 $message = "Invalid Referral Code Used!!";
                 $referral_code ="";
             }
+
+            DB::table('referral_code')
+            ->where('code', $referral_code)
+            ->increment('total_visit');
         }
 
         $currentUrl = request()->fullUrl();
@@ -362,6 +366,10 @@ class DonationController extends Controller
                 $message = "Invalid Referral Code Used!!";
                 $referral_code ="";
             }
+
+            DB::table('referral_code')
+            ->where('code', $referral_code)
+            ->increment('total_visit');
         }
 
         $currentUrl = request()->fullUrl();

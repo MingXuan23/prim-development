@@ -86,6 +86,14 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     Route::get('getReferralCode', 'DonationController@getReferralCode')->name('donate.getReferralCode');
 });
 
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
+    Route::get('getPointHistoryDatatable', 'PointController@getPointHistoryDatatable')->name('point.getPointHistoryDatatable');
+    Route::get('spinningWheel', 'PointController@spinningWheel')->name('point.spinningWheel');
+
+   
+});
+
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
 Route::get('sumbangan_anonymous/{link}', 'DonationController@anonymouIndex')->name('ANONdonate');
 
@@ -482,6 +490,7 @@ Route::group(['middleware' => ['auth']], function () {
         'dorm'               => 'DormController',
         'koperasi'           => 'Cooperative\User\UserCooperativeController',
         'delivery'           => 'DeliveryController',
+        'point'             =>'PointController'
     ]);
 });
 Route::get('adminTestFpx/{id}/', 'DirectPayController@adminTestFpx')->name('adminTestFpx');
