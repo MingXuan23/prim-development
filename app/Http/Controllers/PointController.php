@@ -40,8 +40,9 @@ class PointController extends Controller
         ->where('ph.status',1)
         ->select('rc.code', 'rc.id', DB::raw('SUM(ph.points) as points_in_month'))
         ->groupBy('rc.code')
+        //->orderByRaw('RAND()') 
         ->get();
-
+        //dd($referral_code);
         return $referral_code;
     }
 
