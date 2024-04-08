@@ -186,7 +186,7 @@ class DonationController extends Controller
                     return number_format($data->amount, 2);
                 })
                 ->editColumn('datetime_created', function ($data) {
-                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created)->format('d/m/Y');
+                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created);
                     return $formatedDate;
                 })
                 ->make(true);
@@ -233,7 +233,7 @@ class DonationController extends Controller
         if (request()->ajax()) {
             return datatables()->of($listhistory)
                 ->editColumn('datetime_created', function ($data) {
-                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created)->format('d/m/Y');
+                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created);
                     return $formatedDate;
                 })
                 ->editColumn('amount', function ($data) {

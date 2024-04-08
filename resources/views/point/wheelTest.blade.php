@@ -84,11 +84,11 @@
             createWheel();
         });
         function randomColor(i) {
-            if (i % 3 === 0) {
+            if (i % 4 === 0) {
                 // Even index, return dark purple
                 return {r:255,g:179,b:102}; 
                 // Dark purple: rgb(63, 0, 63)
-            } else if( i%3 === 1) {
+            } else if( i%4 === 1 || i%4 === 3) {
                 // Odd index, return light purple
                 return { r: 238, g: 204, b: 255 }; // Light purple: rgb(221, 160, 221)
             } else {
@@ -197,46 +197,57 @@
 
                 // check winner
                 var code = items[i].code;
-                console.log(code,startDeg%360, endDeg % 360)
-                if(startDeg%360 < 360 && startDeg%360 > 270  && endDeg % 360 > 0 && endDeg%360 < 90 ){
+                
+                //console.log(code,startDeg%360, endDeg % 360)
+                if(startDeg%360 > 270 && endDeg % 360 <=270 ){
                    
                    $('.Winner').html('Winner: '+code);
-                   console.log('update',code,startDeg%360, endDeg % 360)
+                   //console.log('update',code,startDeg%360, endDeg % 360)
                 }
+                // if(startDeg%360 <= 360 && startDeg%360 > 270  && endDeg % 360 > 0 && endDeg%360 < 90 ){
+                   
+                //    $('.Winner').html('Winner: '+code);
+                //    console.log('update',code,startDeg%360, endDeg % 360)
+                // }
             }
         }
         
 
         let speed = 0
-        let maxRotation = randomRange(360* 3, 360 * 6)
+        let maxRotation =360* 5 + randomRange(0,360);
         let pause = false
         function animate(){
             if(pause){
                 return
             }
             speed = easeOutSine(getPercent(currentDeg ,maxRotation ,0)) * 20
-            if(speed < 0.01){
+            if(speed < 0.1){
                 speed = 0
                 pause = true
+                console.log($('.Winner').html());
+                //spin();
             }
             currentDeg += speed
             draw()
             window.requestAnimationFrame(animate);
         }
         
+        function randomItem(){
+            return Math.random() + 0.5;
+        }
         function spin(){
             if(speed != 0){
                 return
             }
-
-            maxRotation = randomRange(360* 3, 360 * 6);
-            currentDeg = 0
+            items.sort(() => Math.random() - 0.5);
+            maxRotation = 360* 5 + randomRange(-180,360);
+            currentDeg =0;
            // createWheel()
             draw();
             //alert('hello');
            // maxRotation = (360 * 6) - itemDegs[0].endDeg + 10
             itemDegs = {}
-            //console.log("max",maxRotation)
+            console.log("max",maxRotation,maxRotation%360)
             //console.log(itemDegs);
             pause = false
             window.requestAnimationFrame(animate);
