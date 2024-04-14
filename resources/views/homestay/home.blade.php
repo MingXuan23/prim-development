@@ -53,7 +53,7 @@
         </div>
         <div aria-label="Search Input" >
             <form action="{{route('homestay.searchRoom')}}" method="get" enctype="multipart/form-data" class="d-flex justify-content-center align-items-center mt-3" id="form-search">
-                @csrf            
+                @csrf
                 <div class="search-container-input">
                     <input type="search" placeholder="Masukkan destinasi" id="search-room" name="searchRoom" autocomplete="off" class="input">
                     <svg id="search-icon" fill="#852aff" width="20px" height="20px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg">
@@ -63,7 +63,7 @@
             </form>
         </div>
     </section>
- 
+
     <section aria-label="Homestays or Rooms Listings" >
         <div class="home-thumbnails-container">
             @forelse($rooms as $room)
@@ -80,7 +80,7 @@
                                 </div>
                             @endif
                         @endif
-                        <img src="{{URL($room->homestayImage->first()->image_path)}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">                      
+                        <img src="{{URL($room->homestayImage->first()->image_path)}}" alt="{{$room->roomname}}'s Image" class="home-thumbnail-img">
                         <div class="home-thumbnail-captions p-2">
                                 <h4 class="color-purple">{{$room->roomname}}</h4>
                             <div class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->district}},{{$room->state}}</div>
@@ -91,20 +91,20 @@
                                     <span></span>
                                 @endif
                                 @if($room->ongoingDiscount != null)
-                                    <h5 class="color-purple text-right"><span class="price-before-discount">RM{{$room->price}}</span> RM{{number_format(($room->price - ($room->price * $room->ongoingDiscount / 100)) , 2 )}}/malam</h5>  
-                                
+                                    <h5 class="color-purple text-right"><span class="price-before-discount">RM{{$room->price}}</span> RM{{number_format(($room->price - ($room->price * $room->ongoingDiscount / 100)) , 2 )}}/malam</h5>
+
                                 @else
-                                    <h5 class="color-purple text-right">RM{{$room->price}}/malam</h5>  
+                                    <h5 class="color-purple text-right">RM{{$room->price}}/malam</h5>
                                 @endif
                             </div>
 
-                        </div>                      
+                        </div>
                     </a>
                 </div>
-            
+
             @empty
-                    
-            @endforelse         
+
+            @endforelse
         </div>
 
     </section>
@@ -157,7 +157,7 @@ $(document).ready(function() {
             e.preventDefault();
             Swal.fire('Sila masukkan nama homestay/bilik untuk memulakan pencarian');
         }
-    });  
+    });
     $(document).on('click','.typeahead',function(){
         $('#form-search').trigger('submit');
     })
