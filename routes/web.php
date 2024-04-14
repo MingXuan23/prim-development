@@ -83,13 +83,15 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     Route::get('history', 'DonationController@historyDonor')->name('donate.donor_history');
     Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('donate.donor_history_datatable');
 
-    Route::get('getReferralCode', 'DonationController@getReferralCode')->name('donate.getReferralCode');
+   //Route::get('getReferralCode', 'PointController@getReferralCode')->name('donate.getReferralCode');
 });
 
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
     Route::get('getPointHistoryDatatable', 'PointController@getPointHistoryDatatable')->name('point.getPointHistoryDatatable');
     Route::get('spinningWheel', 'PointController@spinningWheel')->name('point.spinningWheel');
+    Route::get('shareReferralLink','PointController@shareReferralLink')->name('point.shareReferralLink');
+    Route::get('getReferralCode', 'PointController@getReferralCode')->name('point.getReferralCode');
 
    
 });

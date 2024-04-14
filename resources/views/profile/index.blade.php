@@ -82,25 +82,38 @@
                 <input type="text" class="form-control" value="{{ $userData->state }}" readonly>
             </div>
 
-            <div class="col-sm-6">
-                <div class="row mb-0 " >
+            <div class="col-sm-9">
+                
                     <div class="col-sm-6">
                         <h5 class="mb-0">Mata Ganjaran PRiM</h6>
 
                     </div>
-                    <div class="col-sm-6">
+                    <div class="row mb-12 " >
                     @if($referral_code !=null)
-                        <a class="btn btn-primary w-md waves-effect waves-light form-control mb-3" href="{{ route('point.index') }}">{{$referral_code->total_point}} Mata Ganjaran</a>
+                    <div class="col-sm-6 text-secondary dataState">
+                        <input type="text" class="form-control" value="{{$referral_code->total_point}} Mata Ganjaran" readonly>
+                    </div>
+                    <div class="col-sm-3 text-secondary dataState">
+                        <a class="btn btn-primary w-md waves-effect waves-light form-control mb-3" href="{{ route('point.index') }}">Butiran</a>
+
+                    </div>
+                    <div class="col-sm-3 text-secondary dataState">
+                        <a class="btn btn-success w-md waves-effect waves-light form-control mb-3" href="#" data-toggle="modal" data-target="#itemModal">Dapat Link</a>
+
+                    </div>
+
+
                     @else
                     <button class="btn btn-primary w-md waves-effect waves-light" onclick="copyReferralLink()">
                         Aktifkan
                         </button>
                     @endif
                     </div>
-                    
-                </div>
                
             </div>
+            <div class="alert alert-success" style="display:none;">
+                                <p id="success"></p>
+                            </div>
     <br>
             <!-- button for edit -->
             <div class="btn-group editBtnGrp" role="group" aria-label="">
@@ -114,25 +127,111 @@
     </div> <!-- end of card -->
 </div> <!-- end of most outer -->
 
+
+<!-- Modal -->
+<div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="itemModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="itemModalLabel">Pilih Link</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <select id="itemSelect" class="form-control">
+                    <!-- Populate options dynamically using JavaScript or Blade -->
+                    <option value="M" selected>Get & Go</option>
+                    
+                    <!-- Add more options as needed -->
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="sendRequest()" data-dismiss="modal">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 @section('script')
 <script src="{{ URL::asset('assets/libs/jquery-mask/jquery.mask.min.js')}}"></script>
 <script>
     $(document).ready(function () {
         $('.phone_no').mask('+600000000000');
+      //  $('.alert').delay(5000).fadeOut();
     });
 
     function copyReferralLink(){
         $.ajax({
         method: 'GET',
-        url: "{{route('donate.getReferralCode')}}",
+        url: "{{route('point.getReferralCode')}}",
         success: function(data) {
           
             window.location.reload();
         },
 
     });
+
+    
     }
+
+    function sendRequest() {
+        var selectedItem = document.getElementById('itemSelect').value;
+        $.ajax({
+            method: 'GET',
+            data: {
+                page:selectedItem
+            },
+            url: "{{route('point.shareReferralLink')}}",
+            success: function(data) {
+            
+                copyToClipboard(data.link,true)
+                console.log(data);
+            },
+
+        });
+    }
+
+    function copyToClipboard(text,isReferralCode) {
+    // Create a temporary input element
+    var input = document.createElement('input');
+    
+    // Set its value to the text that needs to be copied
+    input.style.position = 'absolute';
+    input.style.left = '-9999px';
+    input.value = text;
+    
+    
+    // Append it to the body
+    document.body.appendChild(input);
+    
+    // Select the text inside the input element
+    input.select();
+    
+    // Execute the copy command
+    document.execCommand('copy');
+    
+    // Remove the input element from the DOM
+    document.body.removeChild(input);
+    if(isReferralCode){
+        $('#success').text('Url with your referral code copied');
+    }else{
+        $('#success').text('Url copied, login to get the referral code');
+        
+    }
+   
+    $('.alert-success').show();
+    setTimeout(function() {
+        $('.alert').css('display', 'none');
+    }, 7500);
+
+// Set a timeout to hide the alert after 3 seconds
+
+    
+}
+    
 </script>
 @endsection
 

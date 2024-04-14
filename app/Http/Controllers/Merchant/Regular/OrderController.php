@@ -66,6 +66,28 @@ class OrderController extends Controller
             $price[$row->id] = number_format((double)($row->price), 2, '.', '');
         }
 
+
+        $referral_code = request()->input('referral_code');
+       $message ="";
+       if($referral_code == null){
+            $referral_code ="";
+       }else{
+           $exists = DB::table('referral_code')
+           ->where('code',$referral_code)
+           ->exists();
+
+           if(!$exists){
+               $message = "Invalid Referral Code Used!!";
+               $referral_code ="";
+           }
+
+           DB::table('referral_code')
+           ->where('code', $referral_code)
+           ->increment('total_visit');
+       }
+
+       session(['referral_code' => $referral_code]);
+       
         return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price'));
     }
 

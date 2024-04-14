@@ -301,7 +301,7 @@
     function copyReferralLink(){
         $.ajax({
         method: 'GET',
-        url: "{{route('donate.getReferralCode')}}",
+        url: "{{route('point.getReferralCode')}}",
         success: function(data) {
             var currentURL = window.location.href;
             var urlWithoutParams = currentURL.split('?')[0];

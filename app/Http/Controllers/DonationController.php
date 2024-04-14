@@ -650,12 +650,5 @@ class DonationController extends Controller
         ]);
     }
 
-    public function getReferralCode(){
-        if(!DB::table('referral_code')->where('user_id',Auth::id())->exists()){
-           $this->generateReferralCode();
-        }
-
-        $code =DB::table('referral_code')->where('user_id',Auth::id())->first();
-        return response()->json(['referral_code'=>$code->code]);
-    }
+    
 }
