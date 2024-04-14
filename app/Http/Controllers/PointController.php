@@ -58,7 +58,8 @@ class PointController extends Controller
 
     public function getPointHistoryDatatable(){
         if (request()->ajax()) {
-            $referral_code = $this->getReferralCode();
+            $referral_code = $this->getReferralCode(true);
+            //dd($referral_code);
             $data = DB::table('point_history as ph')
                     ->leftJoin('transactions as t','t.id','ph.transaction_id')
                     ->where('ph.referral_code_id',$referral_code->id)
@@ -66,18 +67,51 @@ class PointController extends Controller
                     ->where('ph.status',1)
                     ->select('t.username','ph.points','ph.created_at as datetime','ph.desc')
                     ->orderBy('ph.created_at','desc');
-
+            //dd($data);
             $table = Datatables::of($data);
             return $table->make(true);
         }
     }
 
-    public function getReferralCode(){
-        $user_id = Auth::id();
 
-        $referral_code = DB::table('referral_code')->where('user_id',$user_id)->first();
-        return $referral_code;
+    public function getReferralCode($object =false){
+        if(request()->ajax() && !$object){
+            if(!DB::table('referral_code')->where('user_id',Auth::id())->exists()){
+                $this->generateReferralCode();
+             }
+     
+             $code =DB::table('referral_code')->where('user_id',Auth::id())->first();
+             return response()->json(['referral_code'=>$code->code]);
+        }else{
+            $user_id = Auth::id();
+
+            $referral_code = DB::table('referral_code')->where('user_id',$user_id)->first();
+            //dd($referral_code);
+            return $referral_code;
+        }
+        
     }
+
+
+    public function shareReferralLink(Request $request){
+        try{
+            $user_id = Auth::id();
+
+            $referral_code = DB::table('referral_code')->where('user_id',$user_id)->where('status',1)->first();
+            $hostname = request()->getHost();
+            //dd($request->page);
+            switch ($request->page){
+                case 'M' :
+                    return response()->json(['link'=>$hostname.'/getngo/product?referral_code='.$referral_code->code]);
+                default:
+                    return response()->json(['link'=>'Invalid Link']);
+            }
+        }catch(Exception $e){
+            return response()->json(['link'=>'Invalid Link']);
+        }
+       
+    }
+
     public function create()
     {
         

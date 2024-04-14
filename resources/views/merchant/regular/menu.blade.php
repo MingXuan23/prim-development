@@ -152,10 +152,14 @@
   <div class="col-sm-6">
       <div class="page-title-box">
           <h4 class="font-size-18"><a href="{{ route('merchant-reg.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
+         
       </div>
   </div>
+  <div class="col-sm-6 text-right">
+            <button class="btn btn-success" onclick="copyReferralLink()">Dapat Link</button>
+        </div>
 </div>
-
+<div class="url-message"></div>
 <div class="row mt-4 ">
   <div class="col-12">
     <div class="card border border-dark">
@@ -473,6 +477,61 @@
 
     
   });
+
+  function copyReferralLink(){
+        $.ajax({
+        method: 'GET',
+        url: "{{route('point.getReferralCode')}}",
+        success: function(data) {
+            var currentURL = window.location.href;
+            var urlWithoutParams = currentURL.split('?')[0];
+            console.log(data);
+            copyToClipboard(urlWithoutParams+'?referral_code='+data.referral_code,true);
+
+        },
+        error: function (data) {
+            var currentURL = window.location.href;
+            var urlWithoutParams = currentURL.split('?')[0];
+            copyToClipboard(urlWithoutParams,false);
+        }
+    });
+    }
+
+
+    function copyToClipboard(text,isReferralCode) {
+    // Create a temporary input element
+    var input = document.createElement('input');
+    
+    // Set its value to the text that needs to be copied
+    input.style.position = 'absolute';
+    input.style.left = '-9999px';
+    input.value = text;
+    
+    
+    // Append it to the body
+    document.body.appendChild(input);
+    
+    // Select the text inside the input element
+    input.select();
+    
+    // Execute the copy command
+    document.execCommand('copy');
+    
+    // Remove the input element from the DOM
+    document.body.removeChild(input);
+    var message = "<div class='alert alert-success'>Url copied, login to get the referral code</div>";
+    if(isReferralCode){
+      message = "<div class='alert alert-success'>Url with your referral code copied</div>";
+    }
+    $('div.url-message').empty()
+    $('div.url-message').show()
+    $('div.url-message').append(message)
+    $('div.url-message').delay(3000).fadeOut()
+
+// Set a timeout to hide the alert after 3 seconds
+
+    
+}
 </script>
 
 @endsection
