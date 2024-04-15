@@ -261,11 +261,11 @@
                 flex-direction: column;
                 margin-left:20px;
             }
-            .product-merchant-right a{ 
+            .product-merchant-right a, .shareButtonContainer a{ 
                 border: 2px solid #5b626b;
                font-weight: bold;
             } 
-            .product-merchant-right a:hover{
+            .product-merchant-right a:hover ,.shareButtonContainer a:hover{
                 background-color: var(--primary-color);
                 
             }
@@ -337,9 +337,8 @@
 
                 </div>    
                 
-                <div class="text-right col-lg-5 md-12">
-                     <button class="btn btn-success" style = "color: #fff!important;" onclick="copyReferralLink('{{ route('point.getReferralCode') }}')">Dapat Link</button>
-
+                <div class="text-right col-lg shareButtonContainer d-flex">
+                     <a class="btn flex-grow-1"  onclick="copyReferralLink('{{ route('point.getReferralCode') }}')"><i class="bi bi-share-fill"></i>  Dapat Link</a>
                 </div>
                 </div>
                 
