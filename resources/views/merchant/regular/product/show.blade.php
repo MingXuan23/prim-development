@@ -304,6 +304,7 @@
                     <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
                 @endif
             </div>
+          
             <div class="product-details">
                 <div class="product-details-title">
                     <h4>Deskripsi</h3>
@@ -329,7 +330,20 @@
         <section class="col-md-4 right-container">
             <div>
                 <h2 class="product-name">{{$product->name}}</h2>
-                <h3 class="product-price">RM{{$product->price}}/{{$product->collective_noun}}</h3>
+                <!-- <h3 class="product-price ">RM{{$product->price}}/{{$product->collective_noun}}</h3> -->
+                <div class="row">
+                <div class="col-lg-0">
+                    <h3 class="product-price col-lg-0 " style=" margin-left:12px; ">RM{{$product->price}}/{{$product->collective_noun}}</h3>
+
+                </div>    
+                
+                <div class="text-right col-lg-5 md-12">
+                     <button class="btn btn-success" style = "color: #fff!important;" onclick="copyReferralLink('{{ route('point.getReferralCode') }}')">Dapat Link</button>
+
+                </div>
+                </div>
+                
+                <div class="url-message"></div>
             </div>
             <div class="quantity-container">
                 <h4>Kuantiti</h4>
@@ -366,6 +380,7 @@
 @endsection
 
 @section('script')
+<script src="{{URL('assets/js/referral_code_link.js')}}"></script>
     <script>
         $(document).ready(function(){
             let qtyAvailable = $("#quantity-available").attr("data-qty-available");
