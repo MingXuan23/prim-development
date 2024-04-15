@@ -156,7 +156,8 @@
       </div>
   </div>
   <div class="col-sm-6 text-right">
-            <button class="btn btn-success" onclick="copyReferralLink()">Dapat Link</button>
+      <button class="btn btn-success" onclick="copyReferralLink('{{ route('point.getReferralCode') }}')">Dapat Link</button>
+
         </div>
 </div>
 <div class="url-message"></div>
@@ -286,6 +287,7 @@
 @section('script')
 
 <script src="{{ URL('assets/libs/bootstrap-touchspin-master/src/jquery.bootstrap-touchspin.js')}}"></script>
+<script src="{{URL('assets/js/referral_code_link.js')}}"></script>
 
 <script>
   $(document).ready(function(){
@@ -478,60 +480,7 @@
     
   });
 
-  function copyReferralLink(){
-        $.ajax({
-        method: 'GET',
-        url: "{{route('point.getReferralCode')}}",
-        success: function(data) {
-            var currentURL = window.location.href;
-            var urlWithoutParams = currentURL.split('?')[0];
-            console.log(data);
-            copyToClipboard(urlWithoutParams+'?referral_code='+data.referral_code,true);
-
-        },
-        error: function (data) {
-            var currentURL = window.location.href;
-            var urlWithoutParams = currentURL.split('?')[0];
-            copyToClipboard(urlWithoutParams,false);
-        }
-    });
-    }
-
-
-    function copyToClipboard(text,isReferralCode) {
-    // Create a temporary input element
-    var input = document.createElement('input');
-    
-    // Set its value to the text that needs to be copied
-    input.style.position = 'absolute';
-    input.style.left = '-9999px';
-    input.value = text;
-    
-    
-    // Append it to the body
-    document.body.appendChild(input);
-    
-    // Select the text inside the input element
-    input.select();
-    
-    // Execute the copy command
-    document.execCommand('copy');
-    
-    // Remove the input element from the DOM
-    document.body.removeChild(input);
-    var message = "<div class='alert alert-success'>Url copied, login to get the referral code</div>";
-    if(isReferralCode){
-      message = "<div class='alert alert-success'>Url with your referral code copied</div>";
-    }
-    $('div.url-message').empty()
-    $('div.url-message').show()
-    $('div.url-message').append(message)
-    $('div.url-message').delay(3000).fadeOut()
-
-// Set a timeout to hide the alert after 3 seconds
-
-    
-}
+ 
 </script>
 
 @endsection
