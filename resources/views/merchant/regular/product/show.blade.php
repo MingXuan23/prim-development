@@ -23,7 +23,7 @@
             .previous-nav{
                 color:rgb(45, 173, 179);
                 font: bold 19px "Roboto";
-                
+
             }
             .cart-btn {
                 z-index: 999;
@@ -61,7 +61,7 @@
             }
             .product-image img{
                 object-fit: contain;
-                height: 450px; 
+                height: auto;
                 width: 450px;
                 margin-top:30px;
                 padding: 10px;
@@ -76,11 +76,11 @@
                gap:15px;
             }
             .right-container >*{
-                margin-left:10px; 
+                margin-left:10px;
             }
             .product-price{
                 color: var(--secondary-bc);
-                
+
             }
             .product-details-title{
                 margin-top:30px;
@@ -92,7 +92,7 @@
             .product-details-title:first-child{
                 border-top:2px solid #ccc;
             }
-            
+
             .product-details-title i{
                 align-self: center;
                 transition: var(--transition);
@@ -115,7 +115,7 @@
                 transform: rotate(180deg);
             }
             .quantity-container{
-                
+
                 display: flex;
                 flex-direction: row;
                 align-items: center;
@@ -138,7 +138,7 @@
                 width: 50px;
                 border: 0.15em solid #5b626b;
             }
-            
+
             /* to remove the arrow up and down for input type number */
             input::-webkit-outer-spin-button,
             input::-webkit-inner-spin-button {
@@ -261,13 +261,13 @@
                 flex-direction: column;
                 margin-left:20px;
             }
-            .product-merchant-right a, .shareButtonContainer a{ 
+            .product-merchant-right a, .shareButtonContainer a{
                 border: 2px solid #5b626b;
                font-weight: bold;
-            } 
+            }
             .product-merchant-right a:hover ,.shareButtonContainer a:hover{
                 background-color: var(--primary-color);
-                
+
             }
             .btn{
                  color: var(--primary-color)!important;
@@ -297,14 +297,14 @@
     </div>
     <div class="row">
         <section class="col-md-8 left-container">
-            <div class="product-image"> 
+            <div class="product-image">
                 @if($product->image == null)
                     <img class="img-fluid mx-auto d-block" id="img-size"  src="{{ URL('merchant-image/default-item.jpeg')}}" alt="{{$product->name}}">
                 @else
                     <img class="rounded img-fluid " id="img-size" src="{{ URL('merchant-image/product-item/'.$product->code.'/'.$product->image)}}" alt="{{$product->name}}">
                 @endif
             </div>
-          
+
             <div class="product-details">
                 <div class="product-details-title">
                     <h4>Deskripsi</h3>
@@ -335,31 +335,48 @@
                 <div class="col-lg-0">
                     <h3 class="product-price col-lg-0 " style=" margin-left:12px; ">RM{{$product->price}}/{{$product->collective_noun}}</h3>
 
-                </div>    
-                
+                </div>
+
                 <div class="text-right col-lg shareButtonContainer d-flex">
                      <a class="btn flex-grow-1"  onclick="copyReferralLink('{{ route('point.getReferralCode') }}')"><i class="bi bi-share-fill"></i>  Dapat Link</a>
                 </div>
                 </div>
-                
+
                 <div class="url-message"></div>
             </div>
-            <div class="quantity-container">
-                <h4>Kuantiti</h4>
-                <div class="quantity-input-container">
-                    <button id="button-minus"><i class="bi bi-dash-square"></i></button>
-                    <input type="number" class="quantity-input" name = "quantity-input" value="1" min="1">
-                    <button id="button-plus"><i class="bi bi-plus-square"></i></button>
-                    <h6 data-qty-available="{{$product->quantity_available}}" id="quantity-available">{{$product->quantity_available}} barang lagi</h6>
-                </div>
+            <div class="quantity-container" >
+                @if($product->quantity_available > 0 && $product->status == 1)
+                    <h4>Kuantiti</h4>
+                    <div class="quantity-input-container">
+                        <button id="button-minus"><i class="bi bi-dash-square"></i></button>
+                        <input type="number" class="quantity-input" name = "quantity-input" value="1" min="1">
+                        <button id="button-plus"><i class="bi bi-plus-square"></i></button>
+                        <h6 data-qty-available="{{$product->quantity_available}}" id="quantity-available">{{$product->quantity_available}} barang lagi </h6>
+                    </div>
+                @else
+                    <h4>Kuantiti</h4>
+                    <div class="ml-2 quantity-input-container">
+                        <h6 id="quantity-available" class="text-danger">Stok Telah Habis</h6>
+                    </div>
+                @endif
+
             </div>
             <div class="add-to-cart" data-item-id="{{$product->id}}" data-org-id = "{{$product->organization_id}}">
+                @if($product->quantity_available > 0)
                  <a class="fancy" @auth @else href="/login" @endauth>
                     <span class="top-key"></span>
                     <span class="text">Tambah Dalam Troli</span>
                     <span class="bottom-key-1"></span>
                     <span class="bottom-key-2"></span>
                   </a>
+                @else
+                    <a class="fancy" @auth @else href="/login"  @endauth disabled style="opacity: 0.3;pointer-events: none">
+                        <span class="top-key"></span>
+                        <span class="text">Tambah Dalam Troli</span>
+                        <span class="bottom-key-1"></span>
+                        <span class="bottom-key-2"></span>
+                    </a>
+                @endif
             </div>
             <div class="alert-message" >
                 {{-- alert message will be appended here --}}
@@ -372,10 +389,10 @@
                     <h6><i class="bi bi-geo-alt">{{$product->city}}, {{$product->district}}</i></h6>
                    <a class="btn" href="{{ route('merchant-reg.show', $product->organization_id)}}">Layari Kedai</a>
                 </div>
-                
+
             </div>
         </section>
-     </div>   
+     </div>
 @endsection
 
 @section('script')
@@ -458,11 +475,11 @@
                     inputValue = newValue;
                 }
             });
-            
+
             //for add to cart section
             let item_id = $(".add-to-cart").attr("data-item-id");
             let org_id = $(".add-to-cart").attr("data-org-id");
-            
+
             $(".add-to-cart a").click(()=>{
                 $.ajax({
                     url: "{{route('merchant-reg.store-item')}}",

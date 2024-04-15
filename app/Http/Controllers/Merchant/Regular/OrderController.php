@@ -21,7 +21,7 @@ class OrderController extends Controller
     public function index($id)
     {
         $todayDate = Carbon::now()->format('l');
-        
+
         $day = RegularMerchantController::getDayIntegerByDayName($todayDate);
 
         $merchant = Organization::
@@ -45,7 +45,7 @@ class OrderController extends Controller
         ->select('pg.id', 'pg.name')
         ->distinct('pg.name')
         ->get();
-            
+
         $product_item = DB::table('product_item as pi')
         ->join('product_group as pg', 'pg.id', 'pi.product_group_id')
         ->where([
@@ -56,7 +56,7 @@ class OrderController extends Controller
         ])
         ->select('pi.id', 'pi.name', 'pi.desc', 'pi.price', 'pi.collective_noun', 'pi.image', 'pi.status', 'pi.product_group_id')
         ->orderBy('pi.product_group_id', 'asc')
-        ->orderBy('pi.name')  
+        ->orderBy('pi.name')
         ->get();
 
         $price = array();
@@ -87,7 +87,7 @@ class OrderController extends Controller
        }
 
        session(['referral_code' => $referral_code]);
-       
+
         return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price'));
     }
 
@@ -97,7 +97,7 @@ class OrderController extends Controller
         $o_id = $request->get('o_id');
         $user_id = Auth::id();
         $modal = '';
-        
+
         $item = ProductItem::where('id', $i_id)
         ->select('id', 'type', 'name', 'price', 'quantity_available as qty')
         ->first();
@@ -113,19 +113,19 @@ class OrderController extends Controller
         ])
         ->select('quantity as qty')
         ->first();
-        
+
         if($item->type == 'have inventory') {
             if($order) { // Order exists in cart
-                $max_quantity = ($item->qty + $order->qty); // (20 + (5 * 2)) = 
+                $max_quantity = ($item->qty + $order->qty); // (20 + (5 * 2)) =
             } else {
                 $max_quantity = $item->qty;
             }
-            
+
             $modal .= '<div class="row justify-content-center"><i>Kuantiti Inventori : '.$item->qty.'</i></div>';
         } else if($item->type == 'no inventory') {
             $max_quantity = 999;
         }
-        
+
         if(!$order) {
             $modal .= '<input id="quantity_input" type="text" value="1" name="quantity_input">';
             $modal .= '<div id="quantity-danger">Kuantiti Melebihi Inventori</div>';
@@ -160,7 +160,7 @@ class OrderController extends Controller
             $msg = "Sila masukkan nilai.";
             return response()->json(['alert' => $msg]);
         }
-        
+
         $item = ProductItem::where('id', $request->i_id)
         ->select('type', 'quantity_available as qty', 'price')
         ->first();
@@ -172,13 +172,13 @@ class OrderController extends Controller
             ['organization_id', $request->o_id],
             ['deleted_at',NULL]
         ])->select('id')->first();
-            
+
         // Check if quantity request is less or equal to quantity available
         if($item->type == 'have inventory' && ($request->qty) > $item->qty && !$order) /** $item->unit_qty*/ {
             $msg = "Stock Barang Ini Tidak Mencukupi | Stock : ".$item->qty;
             return response()->json(['alert' => $msg]);
         }
-        
+
         // Check if order already exists
         if($order) // order exists
         {
@@ -214,7 +214,7 @@ class OrderController extends Controller
                         return response()->json(['alert' => $msg]);
                     }
                 }
-                
+
                 ProductOrder::create([
                     'quantity' => $request->qty,
                     'product_item_id' => $request->i_id,
@@ -226,17 +226,17 @@ class OrderController extends Controller
             DB::table('pgng_orders')->where('id', $order->id)->update([
                 'total_price' => $new_total_price
             ]);
-            
+
         }
         else // order did not exists
         {
             $fixed_charges = $this->getFixedCharges($request->o_id);
-            $total_price = ($item->price * (int)($request->qty))+ $fixed_charges; /** $item->unit_qty*/ 
+            $total_price = ($item->price * (int)($request->qty))+ $fixed_charges; /** $item->unit_qty*/
 
             // if($item->type == 'have inventory') {
             //     $new_stock_qty = intval((int)$item->qty - (int)($request->qty * $item->unit_qty));
             // }
-            
+
             $new_order_id = DB::table('pgng_orders')->insertGetId([
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -256,7 +256,7 @@ class OrderController extends Controller
         // if($item->type == 'have inventory') {
         //     $msg = $this->updateQuantityAvailable($request->i_id, $new_stock_qty);
         // }
-        
+
         return response()->json(['success' => 'Item Berjaya Direkodkan', 'alert' => $msg]);
     }
 
@@ -273,11 +273,11 @@ class OrderController extends Controller
             ['user_id', $user_id],
             ['deleted_at',NULL]
         ])->select('id', 'order_type', 'pickup_date', 'total_price', 'note', 'organization_id as org_id')->first();
-        
+
         if($cart) {
             $pickup_date = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('m/d/Y') : '';
-            $pickup_time = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('H:i') : ''; 
-            
+            $pickup_time = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('H:i') : '';
+
             $fixed_charges = $this->getFixedCharges($cart->org_id);
         }
 
@@ -294,7 +294,7 @@ class OrderController extends Controller
     public function getAllItemsInCart(Request $request)
     {
         $c_id = $request->id;
-        
+
         $cart_item = DB::table('product_order as po')
                 ->join('product_item as pi', 'po.product_item_id', 'pi.id')
                 ->where([
@@ -307,8 +307,8 @@ class OrderController extends Controller
                 ->select('po.id', 'pi.name', 'po.quantity', 'pi.price')
                 ->get();
 
-        if(request()->ajax()) 
-        { 
+        if(request()->ajax())
+        {
             $table = Datatables::of($cart_item);
 
             // $table->editColumn('full_quantity', function ($row) {
@@ -339,14 +339,14 @@ class OrderController extends Controller
     public function destroyItemInCart(Request $request)
     {
         $cart_id = $request->cart_id;
-        
+
         $cart_item = ProductOrder::where('id', $cart_id)
         ->select('quantity as qty', 'product_item_id as i_id', 'pgng_order_id as o_id')
         ->first();
         $product_item = ProductItem::where('id', $cart_item->i_id)
         ->select('id', 'type', 'quantity_available as qty')
         ->first();
-        
+
         // if($product_item->type == 'have inventory') {
         //     $new_quantity = intval($product_item->qty + ($cart_item->qty * $cart_item->unit_qty)); // increment quantity
         //     /* If previous product item is being unavailable because of added item in cart,
@@ -366,7 +366,7 @@ class OrderController extends Controller
         //         ]);
         //     }
         // }
-        
+
         ProductOrder::where('id', $cart_id)->forceDelete();
 
         $total_price = $this->calculateTotalPrice($cart_item->o_id);
@@ -381,7 +381,7 @@ class OrderController extends Controller
         }
     }
 
-    public function fetchDisabledDates(Request $request) 
+    public function fetchDisabledDates(Request $request)
     {
         $start_date = Carbon::now();
         $end_date = Carbon::now()->addMonths(2);
@@ -401,13 +401,13 @@ class OrderController extends Controller
                 }
             }
         }
-        
+
         return response()->json(['dates' => $dates, 'org_id' => $org_day]);
     }
 
     public function fetchOperationHours(Request $request)
     {
-        $date = Carbon::parse($request->date);
+        $date = Carbon::createFromFormat('d/m/Y', $request->date);
         $day_int = RegularMerchantController::getDayIntegerByDayName($date->format('l'));
 
         $op_hour = OrganizationHours::where('organization_id', $request->org_id)
@@ -443,7 +443,7 @@ class OrderController extends Controller
                 $body = '<p>Waktu Buka dari '.$open_hour.' - '.$close_hour.'</p>';
             }
         }
-        
+
         $response = array(
             "open" => $isOpen,
             "min" => $open_hour_f,
@@ -458,7 +458,7 @@ class OrderController extends Controller
     {
         $note = $request->note;
         $order_type = $request->order_type;
-        
+
         // for get n go or pick-up
         if($order_type == 'Pick-Up') {
             $pickup_date = $request->pickup_date;
@@ -467,7 +467,7 @@ class OrderController extends Controller
                 return back()->with('error', 'Sila pilih masa yang sesuai');
             }
             $pickup_datetime = Carbon::parse($pickup_date)->format('Y-m-d').' '.Carbon::parse($pickup_time)->format('H:i:s');
-            
+
             DB::table('pgng_orders')->where('id', $order_id)->update([
                 'updated_at' => Carbon::now(),
                 'order_type' => $order_type,
@@ -493,7 +493,7 @@ class OrderController extends Controller
         $isAvailable = true;
 
         $isToday = RegularMerchantController::compareDateWithToday($pickup_date);
-        $day = RegularMerchantController::getDayIntegerByDayName(Carbon::parse($pickup_date)->format('l'));
+        $day = RegularMerchantController::getDayIntegerByDayName( Carbon::createFromFormat('d/m/Y',$pickup_date)->format('l'));
 
         $hour = OrganizationHours::where('organization_id', $org_id)->where('day', $day)->first();
         if($isToday) {
@@ -564,7 +564,7 @@ class OrderController extends Controller
         return $msg;
     }
 
-    private function calculateTotalPrice($order_id) 
+    private function calculateTotalPrice($order_id)
     {
         $new_total_price = null;
 
@@ -577,13 +577,13 @@ class OrderController extends Controller
             ])
             ->select('po.quantity as qty', 'pi.price')/*, 'pi.selling_quantity as unit_qty'*/
             ->get();
-        
+
         $order = PgngOrder::find($order_id);
-        
+
         if ($order) {
             $org_id = $order->organization_id;
             $fixed_charges = $this->getFixedCharges($org_id);
-            
+
             if (count($cart_item) != 0) {
                 foreach ($cart_item as $row) {
                  $new_total_price += doubleval($row->price * ($row->qty)); /** $row->unit_qty*/
@@ -591,7 +591,7 @@ class OrderController extends Controller
                 $new_total_price += $fixed_charges;
             }
         }
-        
+
         return $new_total_price;
     }
 }
