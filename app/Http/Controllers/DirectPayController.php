@@ -371,7 +371,7 @@ class DirectPayController extends Controller
                        ->first();
 
                        if($code_id !=null)
-                        $this->insertPointHistory($code_id->id,$transaction->id,1,1,'Get n go credit to referral code owner');
+                        $this->insertPointHistory($code_id->id,$transaction->id,1,1,'Transaksi Get & Go RM'.$transaction->amount);
 
                     }
 
@@ -449,7 +449,7 @@ class DirectPayController extends Controller
                                     ->first();
                    // $own_code_id = $own_code !=null ?$own_code->id:0;
                     if($referral_code !=null){
-                        $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Donation credit to referral code owner');
+                        $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Derma daripada kod');
                         // DB::table('point_history')
                         // ->insert([
                         //    'created_at'=>Carbon::now(),
@@ -465,7 +465,7 @@ class DirectPayController extends Controller
                         // ]);
                     }
                     else if ($own_code !=null){
-                        $this->insertPointHistory($own_code->id,$transaction->id,0,1,'Donation credit to own referral code');
+                        $this->insertPointHistory($own_code->id,$transaction->id,0,1,'Transaksi Derma daripada sendiri');
                         // DB::table('point_history')
                         // ->insert([
                         //     'created_at'=>Carbon::now(),
