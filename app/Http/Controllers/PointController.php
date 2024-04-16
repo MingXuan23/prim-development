@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class PointController extends Controller
 {
@@ -14,7 +16,7 @@ class PointController extends Controller
     {
         $user_id = Auth::id();
 
-        $referral_code = $this->getReferralCode();
+        $referral_code = $this->getReferralCode(true);
 
         $point_month = DB::table('point_history')
         ->where('referral_code_id',$referral_code->id)
@@ -81,17 +83,53 @@ class PointController extends Controller
              }
      
              $code =DB::table('referral_code')->where('user_id',Auth::id())->first();
+             //dd($code);
              return response()->json(['referral_code'=>$code->code]);
         }else{
             $user_id = Auth::id();
 
-            $referral_code = DB::table('referral_code')->where('user_id',$user_id)->first();
+            $referral_code = DB::table('referral_code')
+                            ->leftJoin('users','users.id','referral_code.user_id')
+                            ->where('referral_code.user_id',$user_id)
+                            ->select('referral_code.*','users.name as username')
+                            ->first();
             //dd($referral_code);
             return $referral_code;
         }
         
     }
 
+
+    public function generateReferralCode(){
+        $userId = Auth::id();
+
+        if(DB::table('referral_code')->where('user_id',$userId)->exists()){
+            return;
+        }
+        
+        $namestr = substr(str_replace(' ', '', Auth::user()->name),0,5);
+
+        $randomString = Str::random(3);
+        $user_code = base_convert($userId, 10, 32);
+        $user_code = Str::upper(str_pad($user_code, 4, '0', STR_PAD_LEFT));
+
+       
+        $code = $namestr.$randomString.$user_code;
+
+        while(DB::table('referral_code')->where('code',$code)->exists()){
+            $randomString = Str::random(3);
+            $code = $namestr.$randomString.$user_code;
+        }
+        
+        DB::table('referral_code')->insert([
+            'created_at'=>Carbon::now(),
+            'updated_at'=>Carbon::now(),
+            'code'=> $code,
+            'user_id'=>$userId,
+            'status'=>1,
+            'total_point'=>0
+        ]);
+    }
 
     public function shareReferralLink(Request $request){
         try{

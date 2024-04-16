@@ -10,6 +10,7 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
+            <h4 class="font-size-18">Pemilik Kod: {{$referral_code->username}}</h4>
             <h4 class="font-size-18">Kod Anda: {{$referral_code->code}}</h4>
             <!-- <ol class="breadcrumb mb-0">
                 <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
@@ -120,7 +121,6 @@
 
     $(document).ready(function(){
         fetch_data();
-        console.log('hello');
     });
 
    function fetch_data() {
