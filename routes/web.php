@@ -865,6 +865,20 @@ Route::group(['prefix' => 'polimas'], function () {
     });
 });
 
+//offer & ride
+Route::group(['prefix' => 'offernride'], function () {
+    // Home page
+    Route::get('/home', 'OfferNRideController@index')->name('offernride.index');
+    // Driver page
+    Route::get('/driver', 'OfferNRideController@driver_index')->name('offernride.driver-index');
+    Route::get('/driver/getDriverDatatable', 'OfferNRideController@getDriverDatatable')->name('offernride.getDriverDatatable');
+    Route::get('/driver/add', 'OfferNRideController@driver_add')->name('offernride.driver-add');
+    Route::post('/driver/add/store', 'OfferNRideController@driver_store')->name('offernride.driver-store');
+    Route::get('/driver/{oid}{id}', 'OfferNRideController@driver_edit')->name('offernride.driver-edit');
+    // Vehicle page
+    Route::get('/vehicle', 'OfferNRideController@vehicle_index')->name('offernride.vehicle-index');
+    Route::get('/vehicle/getVehicleDatatable', 'OfferNRideController@getVehicleDatatable')->name('offernride.getVehicleDatatable');
+});
 
 
 
