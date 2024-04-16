@@ -46,7 +46,7 @@
 
         <div class="form-row">
                     <div class="form-group col-md-12 required">
-                        <label class="control-label">Tempoh Traksasi</label>
+                        <label class="control-label">Tempoh Transaksi</label>
 
                         <div class="input-daterange input-group" id="date">
                             <input type="text" class="form-control" id="date_started" name="date_started" placeholder="Tarikh Awal"

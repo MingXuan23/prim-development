@@ -84,6 +84,28 @@ class ProductController extends Controller
           ->first(); //first() to get a single row
           $product->price = number_format($product->price,2);
           $address = $product->address.','.$product->city;
+
+          $referral_code = request()->input('referral_code');
+          $message ="";
+          if($referral_code == null){
+               $referral_code ="";
+          }else{
+              $exists = DB::table('referral_code')
+              ->where('code',$referral_code)
+              ->exists();
+   
+              if(!$exists){
+                  $message = "Invalid Referral Code Used!!";
+                  $referral_code ="";
+              }
+   
+              DB::table('referral_code')
+              ->where('code', $referral_code)
+              ->increment('total_visit');
+          }
+   
+          session(['referral_code' => $referral_code]);
+          
           return view('merchant.regular.product.show',compact('product','address'));
     }
     public function showAllCart(){
