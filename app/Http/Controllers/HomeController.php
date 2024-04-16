@@ -35,6 +35,13 @@ class HomeController extends AppBaseController
         $organization = OrganizationController::getOrganizationByUserId();
         $donation = DonationController::getDonationByUserId();
         
+        if(auth()->user()->hasRole('Penjaga')){
+            return redirect()->route('dependent_fees');
+        }
+        else if(auth()->user()->hasRole('Buyer')){
+            return redirect()->route('merchant-product.index');
+
+        }
         return view("index", compact('organization', 'donation'));
     }
 
