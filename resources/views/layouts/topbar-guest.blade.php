@@ -6,10 +6,9 @@
 
             <!-- user profile -->
             <div class="d-flex">
-                <a href="/login"><button class="btn btn-primary mx-2">Login</button></a>
-                <a href="/register"><button class="btn btn-info mx-2">Daftar</button></a>
+                <a href="/login"><button class="btn btn-primary mx-2 text-white">Login</button></a>
+                <a href="/register"><button class="btn btn-info mx-2 text-white">Daftar</button></a>
             </div>
 
-        </div>
     </div>
 </header>

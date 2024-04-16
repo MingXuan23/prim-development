@@ -450,6 +450,7 @@
                         timePicker.prop('disabled', false)
                         timePicker.attr('min', result.hour.min)
                         timePicker.attr('max', result.hour.max)
+                        timePicker.val(result.hour.min);
                         timeRange.append(result.hour.body)
                         } else {
                         timePicker.prop('disabled', true)
@@ -466,6 +467,8 @@
             }
 
         var dates = []
+        let defaultDate ="";
+
         $(document).ready(function() {
             $.ajax({
                 url: '{{ route("merchant-reg.disabled-dates") }}',
@@ -475,33 +478,44 @@
                 $.each(result.dates, function(index, value) {
                     dates.push(value)
                 })
+                    // get the initial value for the datepicker which is the first non-disabled date
+                    defaultDate = getDefaultDate();
+                    $("#datepicker").datepicker('setDate', defaultDate).change();
                 },
                 error:function(result) {
                 console.log(result.responseText)
                 }
             })
         })
+            $("#datepicker").datepicker({
+                minDate: 0,
+                maxDate: '+7d',
+                dateFormat: 'dd/mm/yy',
+                dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
+                beforeShowDay: editDays,
+            });
 
-
-        $("#datepicker").datepicker({
-            minDate: 0,
-            maxDate: '+7d',
-            dateFormat: 'mm/dd/yy',
-            dayNamesMin: ['Ahd', 'Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab'],
-            beforeShowDay: editDays
-        })
-
-        disabledDates = dates
-
-        function editDays(date) {
-        for (var i = 0; i < disabledDates.length; i++) {
-            if (new Date(disabledDates[i]).toString() == date.toString()) {
-                // if the date is equal with disabled dates(dates),then return false
-            return [false];
+            var disabledDates = dates;
+            function editDays(date) {
+                for (var i = 0; i < disabledDates.length; i++) {
+                    if (new Date(disabledDates[i]).toString() == date.toString()) {
+                        return [false];
+                    }
+                }
+                return [true];
             }
-        }
-        return [true];
-        }
+
+            function getDefaultDate() {
+                var currentDate = new Date();
+                var nextDate = new Date(currentDate);
+                while (true) {
+                    var nextDateString = nextDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                   if (!disabledDates.includes(nextDateString)) {
+                        return nextDate;
+                    }
+                    nextDate.setDate(nextDate.getDate() + 1);
+                }
+            }
     // form submit
     $('#form-order').on('submit', function(e){
         $('#total_price').val('{{$cart->total_price}}');

@@ -185,7 +185,7 @@
                     @endif
                 </div>
                 <div class="product-infos">
-                    <div class="product-name">{{$product->name}}</div>
+                    <div class="product-name" title="{{$product->name}}">{{$product->name}}</div>
                     <div class="product-price">RM{{$product->price}}</div>
                 </div>
             </a>

@@ -14,7 +14,7 @@ class RegularMerchantController extends Controller
     {
         $role_id = DB::table('organization_roles')->where('nama', 'Regular Merchant Admin')->first()->id;
         $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
-        
+
         $org_id = DB::table('organizations as o')
         ->join('organization_user as ou', 'ou.organization_id', 'o.id')
         ->where([
@@ -26,7 +26,7 @@ class RegularMerchantController extends Controller
         ])
         ->select('o.id')
         ->first()->id;
-        
+
         return $org_id;
     }
 
@@ -34,7 +34,7 @@ class RegularMerchantController extends Controller
     {
         $role_id = DB::table('organization_roles')->where('nama', 'Regular Merchant Admin')->first()->id;
         $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
-        
+
         $org = DB::table('organizations as o')
         ->join('organization_user as ou', 'ou.organization_id', 'o.id')
         ->where([
@@ -46,16 +46,16 @@ class RegularMerchantController extends Controller
         ])
         ->select('o.*')
         ->get();
-        
+
         return $org;
     }
 
     public static function compareDateWithToday($date)
     {
         $today = Carbon::now();
-        $date_f = Carbon::parse($date);
-        
-        if($today->format('d-m-Y') == $date_f->format('d-m-Y')) {
+        $date_f =  $date;
+
+        if($today->format('d-m-Y') == $date_f) {
             return true;
         } else {
             return false;

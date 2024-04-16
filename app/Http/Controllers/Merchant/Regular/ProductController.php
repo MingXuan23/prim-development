@@ -80,7 +80,7 @@ class ProductController extends Controller
                ['product_item.id',$id]
           ])
           ->where('org.deleted_at',NULL)
-          ->select('product_item.name','product_item.id','price','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'address','postcode','state','district','city','organization_picture','code')//need to use DB::raw because both table have same column name
+          ->select('product_item.name','product_item.id','price','status','image','desc','quantity_available','collective_noun','product_group_id',DB::raw('pg.name as pg_name'),'pg.organization_id',DB::raw('org.nama as org_name'),'address','postcode','state','district','city','organization_picture','code')//need to use DB::raw because both table have same column name
           ->first(); //first() to get a single row
           $product->price = number_format($product->price,2);
           $address = $product->address.','.$product->city;
