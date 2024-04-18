@@ -150,6 +150,44 @@ class PointController extends Controller
        
     }
 
+    public static function processReferralCode($inputReferralCode) {
+        // Initialize variables
+        $referral_code = "";
+        $message = "";
+
+        // Check if referral code is provided in request input
+        if ($inputReferralCode !== null) {
+            $referral_code = $inputReferralCode;
+        } elseif (session()->has('referral_code') && !empty(session('referral_code'))) {
+            // Retrieve referral code from session if not provided in request input
+            $referral_code = session()->pull('referral_code');
+        }
+    
+        // Check if referral code exists in the database
+        $exists = DB::table('referral_code')
+            ->where('code', $referral_code)
+            ->exists();
+    
+        if (!$exists) {
+            // If referral code doesn't exist, handle the error
+            if($referral_code !="" && $referral_code !=null)
+                $message = "Invalid Referral Code Used!!";
+
+            $referral_code = "";
+        } else {
+            // Increment the total visit count for the referral code
+            DB::table('referral_code')
+                ->where('code', $referral_code)
+                ->increment('total_visit');
+        }
+    
+        // Store the referral code in the session
+        session(['referral_code' => $referral_code]);
+        //dd(session()->pull('referral_code'));
+        // Return the processed referral code and any error message
+        return ['referral_code' => $referral_code, 'message' => $message];
+    }
+
     public function create()
     {
         
