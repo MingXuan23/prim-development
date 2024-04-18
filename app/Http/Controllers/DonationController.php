@@ -21,6 +21,8 @@ use function PHPUnit\Framework\isEmpty;
 use function PHPUnit\Framework\isNull;
 use Illuminate\Support\Str;
 
+use App\Http\Controllers\PointController;
+
 class DonationController extends Controller
 {
     private $user;
@@ -315,25 +317,10 @@ class DonationController extends Controller
         }
         // this code can be remove if this donation is not active 
 
-        $referral_code = request()->input('referral_code');
-        $message ="";
-        if($referral_code == null){
-             $referral_code ="";
-        }else{
-            $exists = DB::table('referral_code')
-            ->where('code',$referral_code)
-            ->exists();
-
-            if(!$exists){
-                $message = "Invalid Referral Code Used!!";
-                $referral_code ="";
-            }
-
-            DB::table('referral_code')
-            ->where('code', $referral_code)
-            ->increment('total_visit');
-        }
-
+        $inputReferralCode = request()->input('referral_code');
+        $result = PointController::processReferralCode($inputReferralCode);
+        $referral_code = $result['referral_code'];
+        $message = $result['message'];
         $currentUrl = request()->fullUrl();
         session(['intendedUrl' => $currentUrl]);
         //dd(session()->pull('intendedUrl'));
@@ -353,24 +340,11 @@ class DonationController extends Controller
 
         //$referral_code = request()->input('referral_code');
 
-        $referral_code = request()->input('referral_code');
-        $message ="";
-        if($referral_code == null){
-             $referral_code ="";
-        }else{
-            $exists = DB::table('referral_code')
-            ->where('code',$referral_code)
-            ->exists();
-
-            if(!$exists){
-                $message = "Invalid Referral Code Used!!";
-                $referral_code ="";
-            }
-
-            DB::table('referral_code')
-            ->where('code', $referral_code)
-            ->increment('total_visit');
-        }
+        $inputReferralCode = request()->input('referral_code');
+        $result = PointController::processReferralCode($inputReferralCode);
+        //dd($result);
+        $referral_code = $result['referral_code'];
+        $message = $result['message'];
 
         $currentUrl = request()->fullUrl();
        // dd($currentUrl);

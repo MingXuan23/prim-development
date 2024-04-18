@@ -14,7 +14,8 @@ use App\Models\PgngOrder;
 use App\User;
 use App\Models\Transaction;
 
-// testing commit
+use App\Http\Controllers\PointController;
+
 use Yajra\DataTables\DataTables;//for datatable
 
 class ProductController extends Controller
@@ -46,31 +47,8 @@ class ProductController extends Controller
        }
 
        //referral_code start
-       $referral_code = "";
-          $message ="";
-          if(request()->input('referral_code') == null && !session()->has('referral_code')){
-               $referral_code ="";
-          }else if(request()->input('referral_code')!=null){
-            $referral_code = request()->input('referral_code') ;
-          }
-          else if(session()->has('refferal_code')){
-            $referral_code = session()->pull('refferal_code') ;
-          }
-
-            $exists = DB::table('referral_code')
-            ->where('code',$referral_code)
-            //->orWhere('code',session()->pull('referral_code'))
-            ->exists();
-
-            if(!$exists){
-                $message = "Invalid Referral Code Used!!";
-                $referral_code ="";
-            }else{
-                DB::table('referral_code')
-                ->where('code', $referral_code)
-                ->increment('total_visit');
-            }
-          session(['referral_code' => $referral_code]);
+       $inputReferralCode = request()->input('referral_code');
+       $result = PointController::processReferralCode($inputReferralCode);
 
         //referral_code end
         return view('merchant.regular.product.index',compact('products'));
@@ -91,31 +69,9 @@ class ProductController extends Controller
           $product->price = number_format($product->price,2);
           $address = $product->address.','.$product->city;
 
-          $referral_code = "";
-          $message ="";
-          if(request()->input('referral_code') == null && !session()->has('referral_code')){
-               $referral_code ="";
-          }else if(request()->input('referral_code')!=null){
-            $referral_code = request()->input('referral_code') ;
-          }
-          else if(session()->has('referral_code')){
-            $referral_code = session()->pull('referral_code') ;
-          }
+          $inputReferralCode = request()->input('referral_code');
+        $result = PointController::processReferralCode($inputReferralCode);
 
-            $exists = DB::table('referral_code')
-            ->where('code',$referral_code)
-            //->orWhere('code',session()->pull('referral_code'))
-            ->exists();
-
-            if(!$exists){
-                $message = "Invalid Referral Code Used!!";
-                $referral_code ="";
-            }else{
-                DB::table('referral_code')
-                ->where('code', $referral_code)
-                ->increment('total_visit');
-            }
-          session(['referral_code' => $referral_code]);
           //dd(session()->pull('referral_code'));
           
           return view('merchant.regular.product.show',compact('product','address'));
