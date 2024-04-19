@@ -22,6 +22,16 @@ class ProfileController extends Controller
      */
     public function index()
     {
+        if(auth()->user()->hasRole('Guest')){
+            //dd(Auth::id());
+            Auth::logout();
+            //session()->forget('referral_code');
+            return redirect('/login');
+        }
+        
+    
+
+       
         $userData =  Auth::user();
         $referral_code = DB::table('referral_code')
                         ->where('user_id',$userData->id)

@@ -15,7 +15,7 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga'))
+                @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga') || auth()->user()->hasRole('Guest'))
                 <li>
                     <a href="{{ route('organization.index') }}" class=" waves-effect">
                         <i class="mdi mdi-account-group"></i>

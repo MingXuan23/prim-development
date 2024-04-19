@@ -26,11 +26,11 @@
                 <div class="form-group">
                 <div class="form-row">
                     <div class="col-md-6">
-                        <label for="total_point" class="col-form-label">Jumlah Markah:</label>
+                        <label for="total_point" class="col-form-label">Jumlah Mata Ganjaran:</label>
                         <input type="text" id="total_point" readonly value="{{ $referral_code->total_point }}" class="form-control">
                     </div>
                     <div class="col-md-6">
-                        <label for="point_month" class="col-form-label">Markah Bulanan:</label>
+                        <label for="point_month" class="col-form-label">Mata Ganjaran Bulanan:</label>
                         <input type="text" readonly value="{{ number_format($point_month, 2) }}" class="form-control">
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                             <tr style="text-align:center">
                                 <th> No. </th>
                                 <th>Nama</th>
-                                <th>Markah</th>
+                                <th>Mata Ganjaran</th>
                                 <th>Tarikh</th>
                                 <th>Nota</th>
                             </tr>
@@ -171,7 +171,7 @@
                             }).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
-                        $(api.column(0).footer()).html('Jumlah Markah: ' + sum);
+                        $(api.column(0).footer()).html('Jumlah Mata Ganjarano: ' + sum);
                         console.log(sum);
                     }
        
