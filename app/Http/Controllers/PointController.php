@@ -78,10 +78,15 @@ class PointController extends Controller
 
     public function getReferralCode($object =false){
         if(request()->ajax() && !$object){
+
+            if(auth()->user()->hasRole('Guest')){
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
             if(!DB::table('referral_code')->where('user_id',Auth::id())->exists()){
                 $this->generateReferralCode();
              }
      
+
              $code =DB::table('referral_code')->where('user_id',Auth::id())->first();
              //dd($code);
              return response()->json(['referral_code'=>$code->code]);
