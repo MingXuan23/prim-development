@@ -55,7 +55,7 @@ Route::group(['prefix' => 'derma'], function () {
     Route::get('/organization-donation-bytabbing', 'LandingPageController@getDonationByTabbing')->name('landingpage.donation.bytabbing');
     Route::get('/organization-donation-header', 'LandingPageController@getHeaderPoster')->name('landingpage.donation.header');
 
-    
+
 });
 
 //landing fees page route
@@ -93,7 +93,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
     Route::get('shareReferralLink','PointController@shareReferralLink')->name('point.shareReferralLink');
     Route::get('getReferralCode', 'PointController@getReferralCode')->name('point.getReferralCode');
 
-   
+
 });
 
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
@@ -345,6 +345,8 @@ Route::group(['namespace' => 'Merchant'], function() {
     Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function() {
     Route::get('/product', 'ProductController@index')->name('merchant-product.index');
     Route::get('/product/{id}', 'ProductController@show')->name('merchant-product.show');
+    Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
+
     });
 });
 
@@ -352,7 +354,6 @@ Route::group(['namespace' => 'Merchant'], function() {
 Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
     Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function() {
         // Index
-        Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
         Route::get('fetch-merchant', 'LandingPageController@test_index')->name('merchant.fetch-merchant');
         //Product
         Route::get('/cart','ProductController@showAllCart')->name('merchant.all-cart');//to show all products in cart
@@ -360,7 +361,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
         Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
 
-        // Route::get('/testPayment','ProductController@testPayment')->name('merchant.testPayment');
+         Route::get('/testPayment','ProductController@testPayment')->name('merchant.testPayment');
 
          // Checkout
         Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
@@ -378,7 +379,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         // Menu
        // Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
         Route::post('get-counter', 'OrderController@countItemsInCart')->name('merchant-reg.count-cart');
-        
+
         Route::post('store-item', 'OrderController@storeItemInCart')->name('merchant-reg.store-item');
         // Cart & Pay
         Route::get('{id}/cart', 'OrderController@showCart')->name('merchant-reg.cart');

@@ -14,7 +14,7 @@
   flex-direction: row!important;
   flex-wrap: wrap!important;
  justify-content: space-evenly;
- 
+
 }
 .list-group a{
   width: 40%;
@@ -22,7 +22,7 @@
   border: 1px solid rgba(0, 0, 0, 0.125)!important;
 } */
 
-@media screen and (max-width: 850px) { 
+@media screen and (max-width: 850px) {
   #img-size
   {
     width: 50px;
@@ -74,14 +74,14 @@
               @endif
                 <div class="d-flex" >
                     <img class="rounded img-fluid bg-dark" id="img-size" src="
-                    {!! $row->organization_picture != null ? 
-                      URL('organization-picture/'.$row->organization_picture) : 
+                    {!! $row->organization_picture != null ?
+                      URL('organization-picture/'.$row->organization_picture) :
                       URL('images/koperasi/default-item.png')
                     !!}">
                     <div class="flex-column ml-2">
                         <h4 class="merchant_name">
-                          {!! 
-                          $is_open[$row->id] == true ? $row->nama : $row->nama." <label class='text-danger'>Closed</label>" 
+                          {!!
+                          $is_open[$row->id] == true ? $row->nama : $row->nama." <label class='text-danger'>Closed</label>"
                           !!}
                         </h4>
                         <div class="d-flex">
@@ -107,11 +107,11 @@
               <a href="{{ route('merchant-reg.show', $row->id) }}" class="order_modal list-group-item list-group-item-action">
                 <div class="d-flex">
                     {{-- <img class="rounded img-fluid bg-dark" id="img-size" src="{{URL("images/koperasi/default-item.png")}}"> --}}
-                    <img class="rounded img-fluid bg-dark" id="img-size" src="{!! $row->organization_picture != null ? 
-                      URL('organization-picture/'.$row->organization_picture) : 
+                    <img class="rounded img-fluid bg-dark" id="img-size" src="{!! $row->organization_picture != null ?
+                      URL('organization-picture/'.$row->organization_picture) :
                       URL('images/koperasi/default-item.png')
                     !!}">
-                    
+
                     <div class="flex-column ml-2">
                         <h4 class="merchant_name">
                           {!! $row->nama !!}
@@ -153,7 +153,7 @@
                 </div>
             </div>
           </a> --}}
-          
+
           {{-- <div class="row mt-2 ">
             <div class="col d-flex justify-content-end">
               {{ $merchant->links() }}
@@ -234,7 +234,7 @@
       // }
 
       // $('.order_modal').click(function(){
-        
+
       // })
 
       // function callAlert(message)

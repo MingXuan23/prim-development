@@ -73,7 +73,7 @@ class HistoryController extends Controller
             });
 
             $table->editColumn('pickup_date', function ($row) {
-                return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+                return Carbon::parse($row->pickup_date)->format('d/m/Y H:i A');
             });
 
             $table->rawColumns(['total_price', 'status','action']);
@@ -179,7 +179,7 @@ class HistoryController extends Controller
             });
 
             $table->editColumn('pickup_date', function ($row) {
-                return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+                return Carbon::parse($row->pickup_date)->format('d/m/Y H:i A');
             });
 
             $table->rawColumns(['note', 'total_price', 'status']);
@@ -240,7 +240,7 @@ class HistoryController extends Controller
                 ->select('pu.id', 'pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
                 'o.nama', 'o.telno')
                 ->orderBy('status', 'desc')
-                ->orderBy('pickup_date', 'asc')
+                ->orderBy('pickup_date', 'desc')
                 ->orderBy('pu.updated_at', 'desc');
 
         return $order;

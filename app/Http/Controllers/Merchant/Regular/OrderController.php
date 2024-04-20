@@ -25,7 +25,7 @@ class OrderController extends Controller
 {
     public function index($id)
     {
-        
+
         $todayDate = Carbon::now()->format('l');
 
         $day = RegularMerchantController::getDayIntegerByDayName($todayDate);
@@ -79,7 +79,7 @@ class OrderController extends Controller
         if(Auth::id()==null){
             if(request()->input('mode') == 'guest'){
                 $this->loginAsGuest();
-               
+
                 //login as guest
             }else{
                 $currentUrl = request()->fullUrl();
@@ -104,13 +104,13 @@ class OrderController extends Controller
         ]);
         $cart = DB::table('pgng_orders')->where('user_id', $guest->guest_id)->where('status','In cart')->delete();
         //dd($cart);
-        
+
         // DB::table('users')->update([
         //     'updated_at'=>now()
         // ]);
         Auth::loginUsingId($guest->guest_id);
         //dd($guestList);
-        
+
     }
     public function fetchItem(Request $request)
     {
@@ -410,16 +410,38 @@ class OrderController extends Controller
         $dates = array();
         $period = CarbonPeriod::create($start_date, $end_date);
 
-        $org_day = OrganizationHours::where('organization_id', $request->org_id)
-        ->where('status', 0)
-        ->select('day')->get();
+        $org_day = OrganizationHours::where('organization_id', $request->org_id)->get();
+//        ->where('status', 0)
+//        ->select('day')
 
-        foreach($period as $row) {
-            $day_name = $row->format('l');
-            $day_int = RegularMerchantController::getDayIntegerByDayName($day_name);
-            foreach($org_day as $org) {
-                if($day_int == $org->day) {
-                    $dates[] = $row->format('m/d/Y');
+        $currentTime = Carbon::now();
+        $currentDay = Carbon::now()->format('l');
+        $currentDay = RegularMerchantController::getDayIntegerByDayName($currentDay);
+
+        foreach($period as $key=>$row) {
+            if($key == 0){
+//                for the first date which is today
+                foreach($org_day as $org) {
+                    if($currentDay == $org->day) {
+                        if( $org->status == 1 && Carbon::createFromFormat('H:i:s', $org->close_hour)->lt($currentTime)){
+                            $dates[] = $row->format('m/d/Y');
+                            break;
+                        }else if($org->status == 0 ){
+                            $dates[] = $row->format('m/d/Y');
+                            break;
+                        }
+                    }
+                }
+            }else{
+                $day_name = $row->format('l');
+                $day_int = RegularMerchantController::getDayIntegerByDayName($day_name);
+                foreach($org_day as $org) {
+                    if($day_int == $org->day) {
+                        if($org->status == 0){
+                            $dates[] = $row->format('m/d/Y');
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -442,7 +464,6 @@ class OrderController extends Controller
 
         $open_hour_f = Carbon::parse($op_hour->open_hour)->format('G:i');
         $close_hour_f = Carbon::parse($op_hour->close_hour)->format('G:i');
-
         $isToday = RegularMerchantController::compareDateWithToday($date);
 
         $current_time = Carbon::now()->format('G:i');

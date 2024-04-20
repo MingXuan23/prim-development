@@ -90,7 +90,7 @@
                                         @else
                                         <td class="py-2 w-50">{{ date_create($order->pickup_date)->format('j M Y H:i:s A') }}</td>
                                         @endif
-                                        
+
                                         <td class="py-2" colspan="3"></td>
                                     </tr>
                                 </table>
@@ -110,10 +110,10 @@
                                             <div class="pl-2"> {{ $row->name }} </div>
                                         </td>
                                         <td style="text-align: center">{{ $row->quantity }}</td>
-                                        
+
                                         <td style="text-align: center">
                                             {{  number_format((float)$row->price, 2, '.', '') }} </td>
-                                        
+
                                     </tr>
                                     @endforeach
                                     <tr>
@@ -127,6 +127,7 @@
                                 </table>
 
                                 <table style="width:100%" class="infotbl">
+                                    @if($organization->charges[0]->minimum_amount > $transaction->amount)
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right">
@@ -136,6 +137,7 @@
                                             {{  number_format((float)$organization->fixed_charges, 2, '.', '') }}
                                         </td>
                                     </tr>
+                                    @endif
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran
@@ -159,7 +161,7 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-            window.location = '/getngo/all-orders'; 
+            window.location = '/getngo/all-orders';
         }
     },1000);
 </script>
