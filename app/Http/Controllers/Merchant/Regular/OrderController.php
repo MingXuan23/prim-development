@@ -114,9 +114,10 @@ class OrderController extends Controller
     }
     public function fetchItem(Request $request)
     {
+        //dd($request->user_id);
         $i_id = $request->get('i_id');
         $o_id = $request->get('o_id');
-        $user_id = Auth::id();
+        $user_id = Auth::id()??$request->user_id;
         $modal = '';
 
         $item = ProductItem::where('id', $i_id)

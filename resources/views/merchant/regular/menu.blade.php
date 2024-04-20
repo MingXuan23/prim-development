@@ -151,7 +151,13 @@
 <div class="row align-items-center">
   <div class="col-sm-6">
       <div class="page-title-box">
-          <h4 class="font-size-18"><a href="{{ route('merchant-reg.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
+         @if (auth()->user()->hasRole('Guest'))
+         <h4 class="font-size-18"><a href="" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
+
+         @else
+         <h4 class="font-size-18"><a href="{{ route('merchant-reg.index') }}" class="text-muted">Senarai Peniaga</a> <i class="fas fa-angle-right"></i> {{ $merchant->nama }}</h4>
+
+         @endif
          
       </div>
   </div>
@@ -160,6 +166,9 @@
 
         </div>
 </div>
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
 <div class="url-message"></div>
 <div class="row mt-4 ">
   <div class="col-12">
@@ -168,7 +177,8 @@
       <div class="card-header text-white" id="shop-bg-img">
         <div class="row justify-content-between">
           <h2>{{ $merchant->nama }}</h2>
-          <a href="{{route('merchant.all-cart')}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
+          <!-- <a href="{{route('merchant.all-cart')}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a> -->
+          <a href="{{ route('merchant.checkout', $merchant->id) }}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
         </div>
         
         <input type="hidden" name="hidden-org-id" id="hidden-org-id" value="{{ $merchant->id }}">
@@ -291,9 +301,9 @@
 
 <script>
   $(document).ready(function(){
-    let item_id, org_id;
+    let item_id, org_id,auth_id;
     
-
+    console.log('{{Auth::user()->name}}');
     $.ajaxSetup({
       headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -331,11 +341,12 @@
       modalBody.empty()
       item_id = $(this).attr('data-item-id')
       org_id = $(this).attr('data-org-id')
-      
+      auth_id = {{Auth::user()->id}};  
+    
       $.ajax({
         url: "{{ route('merchant-reg.fetch-item') }}",
         method: "POST",
-        data: {i_id:item_id, o_id:org_id},
+        data: {i_id:item_id, o_id:org_id, user_id: auth_id },
         beforeSend:function() {
           $('#addToCartModal').modal('show')
           modalBody.append("<div class='text-center'><img src='{{ URL('images/koperasi/loading-ajax.gif')}}' style='width:40px;height:40px;'></div>")
