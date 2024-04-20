@@ -374,8 +374,10 @@ class ProductController extends Controller
             $pickup_time = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('H:i') : '';
 
             $fixed_charges = $this->getFixedCharges($cart->org_id , $cart->total_price);
+        }else{
+            return redirect()->back()->with('error', 'Tiada Barang Dalam Troli');
         }
-
+        
         $org= Organization::find($org_id);
         $pickup_location = $org->address.', '.$org->city.', '.$org->postcode.' '.$org->district.', '.$org->state;
         $response = (object)[
