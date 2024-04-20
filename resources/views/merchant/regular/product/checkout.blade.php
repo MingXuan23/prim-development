@@ -164,6 +164,7 @@
             <input type="hidden" name="cart_id" id="cart_id" value="@if($cart){{ $cart->id }}@endif">
             <div class="card">
                 <div class="card-body">
+                    <a href="{{route('merchant.all-cart')}}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b;">Ubah Troli</a>
                     <div class="table-responsive">
                         <table class="table table-borderless responsive" id="cartTable" width="100%" cellspacing="0">
                             <thead class="thead-dark">
@@ -175,6 +176,7 @@
                                 </tr>
                             </thead>
                         </table>
+                       
                     </div>
                 </div>
             </div>
@@ -270,7 +272,13 @@
 
         <div class="row mb-2">
             <div class="col d-flex justify-content-end">
+                @if(auth()->user()->hasRole('Guest'))
+                <a href="{{ url()->previous() }}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b;">KEMBALI</a>
+
+                @else
             <a href="{{route('merchant.all-cart')}}" type="button" class="btn-lg btn-light mr-2" style="color:#5b626b;">KEMBALI</a>
+
+                @endif
             <button class="submit-btn" type="button">
                 <span class="hover-underline-animation"> Membuat Pesanan</span>
                 <svg viewBox="0 0 46 16" height="10" width="30" xmlns="http://www.w3.org/2000/svg" id="arrow-horizontal">

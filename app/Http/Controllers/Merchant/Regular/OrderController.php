@@ -16,10 +16,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
+use App\User;
+use Illuminate\Support\Facades\Hash;
+
+use App\Http\Controllers\PointController;
+
 class OrderController extends Controller
 {
     public function index($id)
     {
+        
         $todayDate = Carbon::now()->format('l');
 
         $day = RegularMerchantController::getDayIntegerByDayName($todayDate);
@@ -66,36 +72,52 @@ class OrderController extends Controller
             $price[$row->id] = number_format((double)($row->price), 2, '.', '');
         }
 
+        $inputReferralCode = request()->input('referral_code');
+        $result = PointController::processReferralCode($inputReferralCode);
 
-        $referral_code = request()->input('referral_code');
-       $message ="";
-       if($referral_code == null){
-            $referral_code ="";
-       }else{
-           $exists = DB::table('referral_code')
-           ->where('code',$referral_code)
-           ->exists();
 
-           if(!$exists){
-               $message = "Invalid Referral Code Used!!";
-               $referral_code ="";
-           }
-
-           DB::table('referral_code')
-           ->where('code', $referral_code)
-           ->increment('total_visit');
-       }
-
-       session(['referral_code' => $referral_code]);
+        if(Auth::id()==null){
+            if(request()->input('mode') == 'guest'){
+                $this->loginAsGuest();
+               
+                //login as guest
+            }else{
+                $currentUrl = request()->fullUrl();
+                session(['intendedUrl' => $currentUrl]);
+               return redirect()->route('login');
+            }
+        }
 
         return view('merchant.regular.menu', compact('merchant', 'product_group', 'product_item', 'price'));
     }
 
+    public function loginAsGuest(){
+       $guest = DB::table('users as u')
+                    ->join('model_has_roles as m','m.model_id','u.id')
+                    ->where('m.role_id',22)
+                    ->orderBy('u.updated_at')
+                    ->orderBy('u.id')
+                    ->select('u.id as guest_id')
+                    ->first();
+        DB::table('users')->where('id',$guest->guest_id)->update([
+            'updated_at'=>now()
+        ]);
+        $cart = DB::table('pgng_orders')->where('user_id', $guest->guest_id)->where('status','In cart')->delete();
+        //dd($cart);
+        
+        // DB::table('users')->update([
+        //     'updated_at'=>now()
+        // ]);
+        Auth::loginUsingId($guest->guest_id);
+        //dd($guestList);
+        
+    }
     public function fetchItem(Request $request)
     {
+        //dd($request->user_id);
         $i_id = $request->get('i_id');
         $o_id = $request->get('o_id');
-        $user_id = Auth::id();
+        $user_id = Auth::id()??$request->user_id;
         $modal = '';
 
         $item = ProductItem::where('id', $i_id)

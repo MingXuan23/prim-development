@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 
 class PointController extends Controller
 {
@@ -14,7 +16,7 @@ class PointController extends Controller
     {
         $user_id = Auth::id();
 
-        $referral_code = $this->getReferralCode();
+        $referral_code = $this->getReferralCode(true);
 
         $point_month = DB::table('point_history')
         ->where('referral_code_id',$referral_code->id)
@@ -76,22 +78,63 @@ class PointController extends Controller
 
     public function getReferralCode($object =false){
         if(request()->ajax() && !$object){
+
+            if(auth()->user()->hasRole('Guest')){
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
             if(!DB::table('referral_code')->where('user_id',Auth::id())->exists()){
                 $this->generateReferralCode();
              }
      
+
              $code =DB::table('referral_code')->where('user_id',Auth::id())->first();
+             //dd($code);
              return response()->json(['referral_code'=>$code->code]);
         }else{
             $user_id = Auth::id();
 
-            $referral_code = DB::table('referral_code')->where('user_id',$user_id)->first();
+            $referral_code = DB::table('referral_code')
+                            ->leftJoin('users','users.id','referral_code.user_id')
+                            ->where('referral_code.user_id',$user_id)
+                            ->select('referral_code.*','users.name as username')
+                            ->first();
             //dd($referral_code);
             return $referral_code;
         }
         
     }
 
+
+    public function generateReferralCode(){
+        $userId = Auth::id();
+
+        if(DB::table('referral_code')->where('user_id',$userId)->exists()){
+            return;
+        }
+        
+        $namestr = substr(str_replace(' ', '', Auth::user()->name),0,5);
+
+        $randomString = Str::random(3);
+        $user_code = base_convert($userId, 10, 32);
+        $user_code = Str::upper(str_pad($user_code, 4, '0', STR_PAD_LEFT));
+
+       
+        $code = $namestr.$randomString.$user_code;
+
+        while(DB::table('referral_code')->where('code',$code)->exists()){
+            $randomString = Str::random(3);
+            $code = $namestr.$randomString.$user_code;
+        }
+        
+        DB::table('referral_code')->insert([
+            'created_at'=>Carbon::now(),
+            'updated_at'=>Carbon::now(),
+            'code'=> $code,
+            'user_id'=>$userId,
+            'status'=>1,
+            'total_point'=>0
+        ]);
+    }
 
     public function shareReferralLink(Request $request){
         try{
@@ -110,6 +153,44 @@ class PointController extends Controller
             return response()->json(['link'=>'Invalid Link']);
         }
        
+    }
+
+    public static function processReferralCode($inputReferralCode) {
+        // Initialize variables
+        $referral_code = "";
+        $message = "";
+
+        // Check if referral code is provided in request input
+        if ($inputReferralCode !== null) {
+            $referral_code = $inputReferralCode;
+        } elseif (session()->has('referral_code') && !empty(session('referral_code'))) {
+            // Retrieve referral code from session if not provided in request input
+            $referral_code = session()->pull('referral_code');
+        }
+    
+        // Check if referral code exists in the database
+        $exists = DB::table('referral_code')
+            ->where('code', $referral_code)
+            ->exists();
+    
+        if (!$exists) {
+            // If referral code doesn't exist, handle the error
+            if($referral_code !="" && $referral_code !=null)
+                $message = "Invalid Referral Code Used!!";
+
+            $referral_code = "";
+        } else {
+            // Increment the total visit count for the referral code
+            DB::table('referral_code')
+                ->where('code', $referral_code)
+                ->increment('total_visit');
+        }
+    
+        // Store the referral code in the session
+        session(['referral_code' => $referral_code]);
+        //dd(session()->pull('referral_code'));
+        // Return the processed referral code and any error message
+        return ['referral_code' => $referral_code, 'message' => $message];
     }
 
     public function create()

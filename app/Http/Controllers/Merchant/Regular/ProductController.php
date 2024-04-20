@@ -14,7 +14,8 @@ use App\Models\PgngOrder;
 use App\User;
 use App\Models\Transaction;
 
-// testing commit
+use App\Http\Controllers\PointController;
+
 use Yajra\DataTables\DataTables;//for datatable
 
 class ProductController extends Controller
@@ -46,26 +47,9 @@ class ProductController extends Controller
        }
 
        //referral_code start
-       $referral_code = request()->input('referral_code');
-       $message ="";
-       if($referral_code == null){
-            $referral_code ="";
-       }else{
-           $exists = DB::table('referral_code')
-           ->where('code',$referral_code)
-           ->exists();
+       $inputReferralCode = request()->input('referral_code');
+       $result = PointController::processReferralCode($inputReferralCode);
 
-           if(!$exists){
-               $message = "Invalid Referral Code Used!!";
-               $referral_code ="";
-           }
-
-           DB::table('referral_code')
-           ->where('code', $referral_code)
-           ->increment('total_visit');
-       }
-
-       session(['referral_code' => $referral_code]);
         //referral_code end
         return view('merchant.regular.product.index',compact('products'));
     }
@@ -84,6 +68,12 @@ class ProductController extends Controller
           ->first(); //first() to get a single row
           $product->price = number_format($product->price,2);
           $address = $product->address.','.$product->city;
+
+          $inputReferralCode = request()->input('referral_code');
+        $result = PointController::processReferralCode($inputReferralCode);
+
+          //dd(session()->pull('referral_code'));
+          
           return view('merchant.regular.product.show',compact('product','address'));
     }
     public function showAllCart(){
@@ -384,8 +374,10 @@ class ProductController extends Controller
             $pickup_time = $cart->pickup_date != null ? Carbon::parse($cart->pickup_date)->format('H:i') : '';
 
             $fixed_charges = $this->getFixedCharges($cart->org_id , $cart->total_price);
+        }else{
+            return redirect()->back()->with('error', 'Tiada Barang Dalam Troli');
         }
-
+        
         $org= Organization::find($org_id);
         $pickup_location = $org->address.', '.$org->city.', '.$org->postcode.' '.$org->district.', '.$org->state;
         $response = (object)[

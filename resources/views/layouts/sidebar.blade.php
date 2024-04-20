@@ -15,16 +15,17 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                {{-- @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga')) --}}
+                @unless(auth()->user()->hasRole('Buyer') || auth()->user()->hasRole('Penjaga') || auth()->user()->hasRole('Guest'))
                 <li>
                     <a href="{{ route('organization.index') }}" class=" waves-effect">
                         <i class="mdi mdi-account-group"></i>
                         <span>Organisasi</span>
                     </a>
                 </li>
-                {{-- @endunless --}}
+                @endunless
 
-                <li>
+                @role('Admin|Pentadbir')
+                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="fas fa-hand-holding-heart"></i>
                         <span>Derma</span>
@@ -39,12 +40,12 @@
                         </li>
                     @endunless
 
-                        <li>
+                        <!-- <li>
                             <a href="{{ route('donate.index') }}" class=" waves-effect">
                                 <i class="fas fa-hand-holding-heart"></i>
                                 <span>Derma</span>
                             </a>
-                        </li>
+                        </li> -->
 
                         @role('Superadmin')
                         <li>
@@ -66,7 +67,7 @@
                         
                     </ul>
                 </li>
-
+                @endrole
 
                 @role('Jaim')
                 <li>
@@ -615,7 +616,7 @@
             @endrole
 
 
-            
+            @role('Regular Merchant Admin|Buyer|Superadmin')
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
                     <i class="mdi mdi-store"></i>
@@ -643,7 +644,7 @@
                     </li>
                 </ul>  
             </li>
-
+            @endrole
             {{-- <!-- @role('Superadmin|Penjaga') -syah punye
             <li>
                 <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -726,7 +727,7 @@
                         <span>Parcel</span>
                     </a>
                 </li> --> --}}
-
+                @role('Homestay Admin|Buyer|Superadmin') 
                 <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">
                     <i class="mdi mdi-home-city-outline"></i>
@@ -769,7 +770,7 @@
                     <li>
                 </ul>  
             </li>
-            
+            @endrole
             @role('Grab Student Admin|Superadmin|Buyer')
             <li>
                 <a href="javascript: void(0);7" class="has-arrow waves-effect">

@@ -348,6 +348,7 @@ Route::group(['namespace' => 'Merchant'], function() {
     });
 });
 
+
 Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
     Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function() {
         // Index
@@ -375,9 +376,9 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('get-order-history', 'HistoryController@getOrderHistory')->name('merchant.get-order-history');
         Route::get('{order_id}/order-details', 'HistoryController@showOrderDetail')->name('merchant.order-detail');
         // Menu
-        Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
+       // Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
         Route::post('get-counter', 'OrderController@countItemsInCart')->name('merchant-reg.count-cart');
-        Route::post('fetch-item', 'OrderController@fetchItem')->name('merchant-reg.fetch-item');
+        
         Route::post('store-item', 'OrderController@storeItemInCart')->name('merchant-reg.store-item');
         // Cart & Pay
         Route::get('{id}/cart', 'OrderController@showCart')->name('merchant-reg.cart');
@@ -447,6 +448,13 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
 });
                                         //// ***End of Get & Go ***////
 
+//without login
+Route::group(['namespace' => 'Merchant\Regular'], function() {
+    Route::group(['prefix' => 'getngo'], function() {
+        Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
+        Route::post('fetch-item', 'OrderController@fetchItem')->name('merchant-reg.fetch-item');
+    });
+});
 
 //private school
 Route::group(['prefix' => 'private-school'], function () {

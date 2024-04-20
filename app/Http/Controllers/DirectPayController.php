@@ -363,16 +363,18 @@ class DirectPayController extends Controller
                     ->update([
                         'transaction_id' => $transaction->id
                     ]);
-                    if (session()->has('referral_code')) {
-                        $referral_code = session()->pull('referral_code');
-                       //dd($referral_code);
-                       $code_id = DB::table('referral_code')
-                       ->where('code',$referral_code)
-                       ->first();
 
-                       if($code_id !=null)
-                        $this->insertPointHistory($code_id->id,$transaction->id,1,1,'Get n go credit to referral code owner');
+                    $result = $this->getReferralCodeFromSource($request->referral_code);
+                    //dd($referral_code);
+                    $code = $result['code'];
+                    
+                    $referral_code = DB::table('referral_code')
+                                    ->where('code',$code)
+                                    ->first();
 
+                   // $own_code_id = $own_code !=null ?$own_code->id:0;
+                     if ($result['source'] != 'none'){
+                        $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Get & Go RM'.$transaction->amount);
                     }
 
                 }
@@ -440,32 +442,23 @@ class DirectPayController extends Controller
                 }
                 else {
                     $transaction->donation()->attach($id, ['payment_type_id' => 1]);
-
+                    $result = $this->getReferralCodeFromSource($request->referral_code);
+                    //dd($referral_code);
+                    $code = $result['code'];
+                    
                     $referral_code = DB::table('referral_code')
-                                    ->where('code',$request->referral_code)
+                                    ->where('code',$code)
                                     ->first();
-                    $own_code = DB::table('referral_code')
-                                    ->where('user_id',Auth::id()??0)
-                                    ->first();
-                   // $own_code_id = $own_code !=null ?$own_code->id:0;
-                    if($referral_code !=null){
-                        $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Donation credit to referral code owner');
-                        // DB::table('point_history')
-                        // ->insert([
-                        //    'created_at'=>Carbon::now(),
-                        //    'updated_at'=>Carbon::now(),
-                        //    'referral_code_id'=> $referral_code->id,
-                        //    'transaction_id'=> $transaction->id,
-                        //    'isDebit' =>0,
-                        //    'fromSubline' =>1,
-                        //    'status'=>0,
-                        //    'points'=>2,
-                        //    'desc'=>'Donation credit to referral code owner'
 
-                        // ]);
+                   // $own_code_id = $own_code !=null ?$own_code->id:0;
+                    if($result['source'] == 'own'){
+                        $this->insertPointHistory($referral_code->id,$transaction->id,0,1,'Transaksi Derma daripada sendiri');
+
                     }
-                    else if ($own_code !=null){
-                        $this->insertPointHistory($own_code->id,$transaction->id,0,1,'Donation credit to own referral code');
+                    else if ($result['source'] != 'none'){
+                        $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Derma daripada kod');
+
+                       
                         // DB::table('point_history')
                         // ->insert([
                         //     'created_at'=>Carbon::now(),
@@ -535,6 +528,26 @@ class DirectPayController extends Controller
         //     'getstudentfees',
         //     'getparentfees'
         // ));
+    }
+
+    public function getReferralCodeFromSource($requestReferralCode){
+
+        $own_code = DB::table('referral_code')
+                ->where('user_id',Auth::id()??0)
+                ->first();
+
+        if(!empty($requestReferralCode)){
+            return ['code' => $requestReferralCode, 'source' => 'request'];
+        }
+        else if (session()->has('referral_code') && !empty(session('referral_code'))) {
+            $referral_code = session()->pull('referral_code');
+            return ['code' => $referral_code, 'source' => 'session'];
+
+        }else if($own_code !=null){
+            return ['code' => $own_code->code, 'source' => 'own'];
+        }
+        return ['code' =>"", 'source' => 'none'];
+
     }
 
     public function insertPointHistory($code_id,$transaction_id,$fromSubline,$point,$desc){

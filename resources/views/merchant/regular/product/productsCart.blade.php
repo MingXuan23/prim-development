@@ -286,7 +286,9 @@
 @section('content')
     <div>
         <div class="previous-nav my-2">
+            @if( !auth()->user()->hasRole('Guest'))
         <h1 class="font-size-18"><i class="fas fa-angle-left"></i>  <a href="{{ route('merchant-product.index') }}" class="previous-nav">Senarai Produk</a></h1>
+        @endif
         </div>
         <h1 class="title">Troli Membeli-Belah</h1>
         <h3 class="carts-counter"></h3>
@@ -427,6 +429,13 @@
 @section('script')
     <script>
     $(document).ready(function(){
+
+        var isGuest = "{{ auth()->user()->hasRole('Guest') }}";
+        // If the user is a guest, remove the href attribute from all anchor tags within the .product div
+        if (isGuest) {
+            $('.product a').removeAttr('href');
+        }
+        
         $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
