@@ -174,7 +174,7 @@
                       data: "description",
                       name: 'description',
                       searchable: true,
-                      "width": "30%"
+                      "width": "20%"
                   }, {
                       data: "date_started",
                       name: 'start_date',
@@ -199,7 +199,7 @@
                       orderable: false,
                       searchable: false,
                       "className": "text-center",
-                      "width": "20%"
+                      "width": "30%"
                   },]
           });
       }

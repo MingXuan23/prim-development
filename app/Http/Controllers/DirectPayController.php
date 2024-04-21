@@ -1979,7 +1979,6 @@ class DirectPayController extends Controller
                             Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
                             Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
 
-                            return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
 
                             break;
 
