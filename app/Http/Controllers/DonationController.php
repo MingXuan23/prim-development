@@ -77,13 +77,14 @@ class DonationController extends Controller
                     ->orderBy('donations.nama');
                 }
             }
-            elseif ($hasOrganizaton == "false") {
+            elseif ($hasOrganizaton == "false" || Auth::user()->hasRole('Superadmin')) {
                 $data = DB::table('donations')
                     ->join('donation_organization', 'donation_organization.donation_id', '=', 'donations.id')
                     ->join('organizations', 'organizations.id', '=', 'donation_organization.organization_id')
                     ->select('organizations.id as oid', 'donations.id', 'donations.nama', 'donations.description', 'donations.date_started', 'donations.date_end', 'donations.status', 'donations.url')
                     ->where('donations.status', 1)
                     ->orderBy('donations.nama');
+                
             }
             elseif ($hasOrganizaton == "true") {
                 $data = DB::table('organizations')
@@ -95,6 +96,7 @@ class DonationController extends Controller
                     ->distinct()
                     ->where('users.id', $userId)
                     ->orderBy('donations.nama');
+                    
             }
 
             // dd($data->oid);
@@ -134,7 +136,8 @@ class DonationController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = '<a href="' . route('donate.details', $row->id) . '" class="btn btn-primary m-1">Details</a>';
+                    $btn = '<a href="' . route('donate.details', $row->id) . '" class="btn btn-primary m-1">Donors</a>';
+                    $btn = $btn.'<a href="' . route('donate.code_details', $row->id) . '" class="btn btn-primary m-1">Kod</a>';
                     $btn = $btn . '<a href="' . route('donation.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                     return $btn;
@@ -161,10 +164,57 @@ class DonationController extends Controller
         return view('donate.donor', compact('donation'));
     }
 
-    public function getDonorDatatable(Request $request)
+    public function listAllCodeDonor($id)
     {
+        $donation = $this->donation->getDonationById($id);
+
+        return view('donate.referral_code_donor', compact('donation'));
+    }
+
+    public function getDonorDatatable(Request $request)
+    {    
         $donor = $this->transaction->getDonorByDonationId($request->id);
 
+        if (isset($request->startDate) && isset($request->endDate))
+        {
+            $startDate = date('Y-m-d', strtotime($request->startDate));
+            $endDate = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
+            $donor = $donor->whereBetween('datetime_created', [$startDate, $endDate]);
+            
+            // if($request->startDate==$request->endDate)
+            //     $donor = $donor->where('datetime_created', '>=', $startDate);   
+            // else
+            //     $donor = $donor->whereBetween('datetime_created', [$startDate, $endDate]);
+            // ->orderBy('transactions.datetime_created', 'desc');
+            
+        }
+        
+         
+        if (request()->ajax()) {
+            return datatables()->of($donor)
+                ->editColumn('amount', function ($data) {
+                    return number_format($data->amount, 2);
+                })
+                ->editColumn('datetime_created', function ($data) {
+                    $formatedDate = Carbon::createFromFormat('Y-m-d H:i:s', $data->datetime_created);
+                    return $formatedDate;
+                })
+                ->make(true);
+        }
+    }
+
+    public function getDonorCodeDatatable(Request $request)
+    {
+        $donor = DB::table('point_history as ph')
+                ->join('transactions as t','t.id','ph.transaction_id')
+                ->join('donation_transaction as dt','dt.transaction_id','t.id')
+                ->leftjoin('referral_code as r','r.id','ph.referral_code_id')
+                ->leftJoin('users as u','u.id','r.user_id')
+                ->where('dt.donation_id',$request->id)
+                ->where('t.status','Success')
+                ->where('ph.status',1)
+                ->select('r.code','u.name as owner','t.username','t.amount','t.datetime_created','t.transac_no as fpx_id');
+                
 
        
         if (isset($request->startDate) && isset($request->endDate))
@@ -195,6 +245,46 @@ class DonationController extends Controller
         }
     }
 
+    public function getCodeDatatable(Request $request)
+    {
+        $donor = DB::table('point_history as ph')
+                ->join('transactions as t','t.id','ph.transaction_id')
+                ->join('donation_transaction as dt','dt.transaction_id','t.id')
+                ->leftjoin('referral_code as r','r.id','ph.referral_code_id')
+                ->leftJoin('users as u','u.id','r.user_id');
+
+       
+        if (isset($request->startDate) && isset($request->endDate))
+        {
+            $startDate = date('Y-m-d', strtotime($request->startDate));
+            $endDate = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
+            $donor = $donor->whereBetween('datetime_created', [$startDate, $endDate]);
+            
+            // if($request->startDate==$request->endDate)
+            //     $donor = $donor->where('datetime_created', '>=', $startDate);   
+            // else
+            //     $donor = $donor->whereBetween('datetime_created', [$startDate, $endDate]);
+            // ->orderBy('transactions.datetime_created', 'desc');
+            
+        }
+        
+        $donor = $donor ->where('dt.donation_id',$request->id)
+        ->where('t.status','Success')
+        ->where('ph.status',1)
+        ->groupBy('r.code')
+        ->select('r.code','u.name as owner', 
+        DB::raw('COUNT(t.id) as transaction_count'),
+        DB::raw('SUM(t.amount) as total_amount'));
+        
+         
+        if (request()->ajax()) {
+            return datatables()->of($donor)
+                ->editColumn('total_amount', function ($data) {
+                    return number_format($data->total_amount, 2);
+                })
+                ->make(true);
+        }
+    }
     public function historyDonor()
     {
         if (!Auth::user()->hasRole('Superadmin')) {
@@ -268,6 +358,10 @@ class DonationController extends Controller
         $listorg = Organization::whereHas('user', function ($query) use ($userId) {
             $query->where('user_id', $userId)->whereIn('role_id', [1, 2, 4]);
         })->get();
+        if (Auth::user()->hasRole('Superadmin')) {
+            $listorg = Organization::get();
+        }
+
         return $listorg;
     }
 
