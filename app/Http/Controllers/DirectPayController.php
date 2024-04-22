@@ -367,7 +367,7 @@ class DirectPayController extends Controller
                     $result = $this->getReferralCodeFromSource($request->referral_code);
                     //dd($referral_code);
                     $code = $result['code'];
-                    
+
                     $referral_code = DB::table('referral_code')
                                     ->where('code',$code)
                                     ->first();
@@ -445,7 +445,7 @@ class DirectPayController extends Controller
                     $result = $this->getReferralCodeFromSource($request->referral_code);
                     //dd($referral_code);
                     $code = $result['code'];
-                    
+
                     $referral_code = DB::table('referral_code')
                                     ->where('code',$code)
                                     ->first();
@@ -458,7 +458,7 @@ class DirectPayController extends Controller
                     else if ($result['source'] != 'none'){
                         $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Derma daripada kod');
 
-                       
+
                         // DB::table('point_history')
                         // ->insert([
                         //     'created_at'=>Carbon::now(),
@@ -775,11 +775,10 @@ class DirectPayController extends Controller
                     $transaction->description = $request ->Fpx_SellerExOrderNo;
                     $transaction->save();
 
-                    PgngOrder::where('transaction_id', $transaction->id)->first()->update([
-                        'status' => 'Paid'
-                    ]);
-
                     $order = PgngOrder::where('transaction_id', $transaction->id)->first();
+                    $order->status = "Paid";
+                    $order->updated_at = Carbon::now();
+                    $order->save();
 
                     $organization = Organization::find($order->organization_id);
                     $user = User::find($order->user_id);

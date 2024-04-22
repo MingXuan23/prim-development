@@ -150,13 +150,13 @@
                 <h5><i class="bi bi-shop"></i> Tempah secara dalam talian, kemudian ambil di kedai fizikal.</h5>
             </div>
         </div>
-        <div class="procurement-option-container"  onclick="selectThis(this,'Delivery')">
+        {{-- <div class="procurement-option-container"  onclick="selectThis(this,'Delivery')">
             <span class='selected' hidden><i class="bi bi-check2"></i></span>
             <h5>Standard Delivery</h5>
             <div>
                 <h5><i class="bi bi-truck"></i> Penghantaran ke alamat anda</h5>
             </div>
-        </div>
+        </div> --}}
     </div>
     <div class="form-container">
         <section class="gng-section" hidden>
@@ -176,7 +176,7 @@
                                 </tr>
                             </thead>
                         </table>
-                       
+
                     </div>
                 </div>
             </div>
@@ -373,7 +373,6 @@
 
     <script>
         $(document).ready(function(){
-
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -455,14 +454,14 @@
                     },
                     success:function(result) {
                         if(result.hour.open) {
-                        timePicker.prop('disabled', false)
-                        timePicker.attr('min', result.hour.min)
-                        timePicker.attr('max', result.hour.max)
-                        timePicker.val(result.hour.min);
-                        timeRange.append(result.hour.body)
+                            timePicker.prop('disabled', false)
+                            timePicker.attr('min', result.hour.min)
+                            timePicker.attr('max', result.hour.max)
+                            timePicker.val(result.hour.min);
+                            timeRange.append(result.hour.body)
                         } else {
-                        timePicker.prop('disabled', true)
-                        timeRange.append(result.hour.body)
+                            timePicker.prop('disabled', true)
+                            timeRange.append(result.hour.body)
                         }
                     },
                     error:function(result) {
@@ -531,6 +530,7 @@
     });
 
     $('.submit-btn').on('click', function(e){
+
         if($('input[name="pickup_date"]').val() == ''){
             e.preventDefault();
             Swal.fire({
@@ -538,8 +538,8 @@
                 icon: "warning",
             });
             return;
-
         }
+
         var form = document.getElementById('form-order');
         if(form.reportValidity()){
             Swal.fire({
