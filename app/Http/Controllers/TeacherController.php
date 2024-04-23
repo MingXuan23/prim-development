@@ -412,7 +412,7 @@ class TeacherController extends Controller
             ->join('organizations', 'organization_user.organization_id', '=', 'organizations.id')
             ->where('users.id', $id)
             ->whereIn('organization_user.role_id', [5, 21])
-            ->select('organizations.id as organization_id', 'users.id as uid', 'users.name as tcname', 'users.icno as icno', 'users.email as email', 'users.telno as telno', 'organization_user.role_id as role_id')
+            ->select('organizations.id as organization_id', 'users.id as uid', 'users.name as tcname', 'users.icno as icno', 'users.email as email', 'users.telno as telno', 'organization_user.role_id as role_id','organization_user.status')
             ->first();
 
         $organization = $this->getOrganizationByUserId();
@@ -508,11 +508,14 @@ class TeacherController extends Controller
                 ]
             );
 
+        $status = $request->status == "Aktif"?1:0;
         DB::table('organization_user')
             ->where('user_id', $id)
+            ->where('organization_id',$request->get('old-org'))
             ->update(
                 [
                     'organization_id'      => $request->get('organization'),
+                    'status'               => $status
                 ]
             );
 
@@ -674,7 +677,7 @@ class TeacherController extends Controller
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
                 $btn = $btn . '<a href="' . route('teacher.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                //$btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
                 return $btn;
             });
 

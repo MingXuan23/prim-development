@@ -43,6 +43,7 @@
                         value="{{$teacher->icno}}">
             </div> --}}
 
+            <input type="hidden" value="{{$teacher->organization_id}}" name="old-org">
             <div class="form-group">
                 <label>Nama Organisasi</label>
                 <select name="organization" id="organization" class="form-control">
@@ -60,6 +61,15 @@
             <div class="form-group">
                 <label>Email</label>
                 <input type="text" name="email" class="form-control" placeholder="Email" value="{{ $teacher->email }}">
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <input type="radio" name="status" id="aktif" value="Aktif">
+                <label for="aktif">Aktif</label>
+                <input type="radio"  name="status" id="tidak-aktif" value="Tidak Aktif">
+                <label for="tidak-aktif">Tidak Aktif</label><br>
+                
             </div>
 
             <div class="form-group">
@@ -94,6 +104,14 @@
     $(document).ready(function() {
         $('#icno').mask('000000-00-0000');
         $('#telno').mask('+600000000000');
-    });
+
+        var status = "{{ $teacher->status }}"; // Assuming $teacher->status contains the status value
+    
+        if (status == 1) {
+            $('#aktif').prop('checked', true);
+        } else {
+            $('#tidak-aktif').prop('checked', true);
+        }
+        });
 </script>
 @endsection
