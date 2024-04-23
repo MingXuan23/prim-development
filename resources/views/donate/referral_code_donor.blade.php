@@ -42,6 +42,22 @@
 
     <div class="col-md-12">
         <div class="card">
+        <div class="card-body">
+                 <h4 class="font-size-18">Tempoh</h4>
+                    <div class="input-daterange input-group" id="date">
+                        <input type="text" id="startDate" class="form-control" name="startDate" placeholder="Tarikh Awal" autocomplete="off" 
+                        data-parsley-required-message="Sila masukkan tarikh awal"
+                        data-parsley-errors-container=".errorMessage"  onchange="fetchDataTableDonor()"/>
+                        <input type="text" id="endDate" class="form-control" name="endDate" placeholder="Tarikh Akhir" autocomplete="off"
+                        data-parsley-required-message="Sila masukkan tarikh akhir"
+                        data-parsley-errors-container=".errorMessage"  onchange="fetchDataTableDonor()"/>
+                    </div>
+                    <div class="errorMessage"></div>
+                    <div class="errorMessage"></div>
+                </div>
+
+        </div>
+        <div class="card">
 
             <div class="card-body">
 
@@ -61,18 +77,33 @@
                 @endif
 
                 <input hidden type="text" id="don" name="don" class="form-control" value="{{ $donation->id }}">
-                <div class="card-body">
-                    <div class="input-daterange input-group" id="date">
-                        <input type="text" id="startDate" class="form-control" name="startDate" placeholder="Tarikh Awal" autocomplete="off" 
-                        data-parsley-required-message="Sila masukkan tarikh awal"
-                        data-parsley-errors-container=".errorMessage"  onchange="fetchDataTableDonor()"/>
-                        <input type="text" id="endDate" class="form-control" name="endDate" placeholder="Tarikh Akhir" autocomplete="off"
-                        data-parsley-required-message="Sila masukkan tarikh akhir"
-                        data-parsley-errors-container=".errorMessage"  onchange="fetchDataTableDonor()"/>
-                    </div>
-                    <div class="errorMessage"></div>
-                    <div class="errorMessage"></div>
+                
+                <h4 class="font-size-18">Kontributor</h4>
+                <div class="table-responsive" >
+                    <table id="codeTable" class="table table-bordered table-striped dt-responsive nowrap"
+                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                        <thead>
+                            <tr style="text-align:center">
+                                <th> No. </th>
+                                <th> Kod </th>
+                                <th> Pemilik Kod</th>
+                                <th> Jumlah Transaksi </th>
+                                <th>Jumlah Amaun (RM)</th>
+                               
+                            </tr>
+                        </thead>
+                    </table>
                 </div>
+
+                
+
+               
+            </div>
+           
+        </div>
+        <div class="card">
+             <div class="card-body">
+             <h4 class="font-size-18">Sejarah Kod</h4>
                 <div class="table-responsive">
                     <table id="donorTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -85,22 +116,6 @@
                                 <th> FPX id </th>
                                 <th> Tarikh Derma </th>
                                 <th> Amaun (RM) </th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-
-                <div class="table-responsive">
-                    <table id="codeTable" class="table table-bordered table-striped dt-responsive nowrap"
-                        style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                        <thead>
-                            <tr style="text-align:center">
-                                <th> No. </th>
-                                <th> Kod </th>
-                                <th> Pemilik Kod</th>
-                                <th> Jumlah Transaksi </th>
-                                <th>Jumlah Amaun (RM)</th>
-                               
                             </tr>
                         </thead>
                     </table>
@@ -140,7 +155,7 @@
 
         $('#date').datepicker({
             toggleActive: true,
-            format: 'dd-mm-yyyy',
+            format: 'yyyy-mm-dd',
             orientation: 'bottom'
         });
     });
@@ -177,6 +192,58 @@
         else{
             let donateid = $('#don').val();
 
+            if ($.fn.DataTable.isDataTable('#codeTable')) {
+                $('#codeTable').DataTable().destroy();
+            }
+
+
+            let code_table = $('#codeTable').DataTable({   
+
+                ajax: {
+                    processing: true,
+                    url: "{{ route('donate.code_datatable') }}",
+                    data: {
+                        id: donateid,
+                        startDate:sDate,
+                        endDate:eDate
+                    },
+                    type: 'GET',
+
+                },
+                'columnDefs': [{
+                    "targets": [1,2, 3, 4],
+                    "className": "text-center",
+                    "width": "2%"
+                },{
+                    "targets": [0],
+                    "className": "text-center",
+                    "width": "2%"
+                }],
+                columns: [{
+                    "data": null,
+                    searchable: false,
+                    "sortable": false,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }, {
+                    data: "code",
+                    name: 'code'
+                },
+                {
+                    data: "owner",
+                    name: 'owner'
+                },
+                {
+                    data: "transaction_count",
+                    name: 'transaction_count'
+                }, 
+                {
+                    data: "total_amount",
+                    name: 'total_amount'
+                }, ]
+            });
+            
             if ($.fn.DataTable.isDataTable('#donorTable')) {
                 $('#donorTable').DataTable().destroy();
             }
@@ -268,57 +335,7 @@
             });
 
 
-            if ($.fn.DataTable.isDataTable('#codeTable')) {
-                $('#codeTable').DataTable().destroy();
-            }
-
-
-            let code_table = $('#codeTable').DataTable({   
-
-                ajax: {
-                    processing: true,
-                    url: "{{ route('donate.code_datatable') }}",
-                    data: {
-                        id: donateid,
-                        startDate:sDate,
-                        endDate:eDate
-                    },
-                    type: 'GET',
-
-                },
-                'columnDefs': [{
-                    "targets": [1,2, 3, 4],
-                    "className": "text-center",
-                    "width": "2%"
-                },{
-                    "targets": [0],
-                    "className": "text-center",
-                    "width": "2%"
-                }],
-                columns: [{
-                    "data": null,
-                    searchable: false,
-                    "sortable": false,
-                    render: function(data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                }, {
-                    data: "code",
-                    name: 'code'
-                },
-                {
-                    data: "owner",
-                    name: 'owner'
-                },
-                {
-                    data: "transaction_count",
-                    name: 'transaction_count'
-                }, 
-                {
-                    data: "total_amount",
-                    name: 'total_amount'
-                }, ]
-            });
+           
         }
         
     }
