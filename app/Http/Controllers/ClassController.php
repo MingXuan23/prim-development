@@ -89,6 +89,7 @@ class ClassController extends Controller
             'class_id'        => $class->id,
             'organ_user_id'  =>  $request->get('classTeacher'),
             'start_date'      => now(),
+            'updated_at'       =>   now()
         ]);
 
         return redirect('/class')->with('success', 'New class has been added successfully');
@@ -176,7 +177,14 @@ class ClassController extends Controller
             ->where('classes.id', $id)
             ->first();
 
-        return view('class.update', compact('class', 'organization', 'id'));
+        $teacher = DB::table('users as u')
+                    ->join('organization_user as ou','ou.user_id','u.id')
+                    ->where('ou.id',$class->organ_user_id??0)
+                    ->select('u.name')
+                    ->first();
+        $teacher = $teacher->name ??'Tiada Guru';
+       
+        return view('class.update', compact('class', 'organization', 'id','teacher'));
     }
 
     public function update(Request $request, $id)
@@ -187,7 +195,7 @@ class ClassController extends Controller
             'name'          =>  'required',
             'level'         =>  'required',
             'organization'  =>  'required',
-            'classTeacher'  =>  'required'
+            
         ]);
 
         DB::table('classes')
@@ -205,11 +213,20 @@ class ClassController extends Controller
                 'levelid'   => $request->get('level')
             ]);
             
-        DB::table('class_organization')->where('class_id', $id)
-            ->update([
-                'organization_id' => $request->get('organization'),
-                'organ_user_id'    =>  $request->get('classTeacher')
+        $update = DB::table('class_organization')->where('class_id', $id);
+        $update ->update([
+            'organization_id' => $request->get('organization'),
+           
+        ]);
+
+        if($request->get('classTeacher') !=""){
+            $update ->update([
+                'organ_user_id'    =>  $request->get('classTeacher'),
+                'updated_at'       =>   now()
+               
             ]);
+        }
+       
 
         return redirect('/class')->with('success', 'The data has been updated!');
     }
@@ -249,7 +266,7 @@ class ClassController extends Controller
                     ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                     ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
                     ->leftJoin('users', 'organization_user.user_id', 'users.id')
-                    ->select('classes.id as cid', 'classes.nama as cnama', 'classes.levelid', 'users.name as guru')
+                    ->select('classes.id as cid', 'classes.nama as cnama', 'classes.levelid', 'users.name as guru','class_organization.updated_at')
                     ->where([
                         ['class_organization.organization_id', $oid],
                         ['classes.status', "1"]

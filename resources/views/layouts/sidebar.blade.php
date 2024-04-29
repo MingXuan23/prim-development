@@ -24,6 +24,15 @@
                 </li>
                 @endunless
 
+                @role('Buyer')
+                    <li>
+                        <a href="/derma" class="waves-effect">
+                            <i class="fas fa-hand-holding-heart"></i>
+                            <span>Derma</span>
+                        </a>
+
+                    </li>
+                @endrole
                 @role('Admin|Pentadbir')
                  <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">

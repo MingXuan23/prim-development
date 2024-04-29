@@ -351,6 +351,8 @@ class LandingPageController extends AppBaseController
                 ->inRandomOrder()
                 ->get();
 
+            $currentYear = date('Y');
+            
 
             foreach ($donations as $donation) {
                 // to get the total amount of donation for each donation posters
@@ -360,9 +362,20 @@ class LandingPageController extends AppBaseController
                     't.status' => 'Success',
                     'dt.donation_id' => $donation->id,
                 ])
+                ->whereYear('t.datetime_created', $currentYear)
+                ->sum('t.amount');
+
+                $previousDonation = DB::table('donation_transaction as dt')->
+                join('transactions as t', 't.id' , 'dt.transaction_id')
+                ->where([
+                    't.status' => 'Success',
+                    'dt.donation_id' => $donation->id,
+                ])
+                ->whereYear('t.datetime_created', $currentYear -1)
                 ->sum('t.amount');
                 
-                $posters = $posters . '<div class="card"> <div class="donation-amount">Jumlah Derma:<b> RM'.number_format($amountDonation,2).'</b></div><img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy">';
+                $posters = $posters . '<div class="card"> <div class="donation-amount">Tahun '.$currentYear.':<b> RM'.number_format($amountDonation,2).'</b></div>';
+                $posters = $posters. '<div class="donation-amount">Tahun '.($currentYear -1).':<b> RM'.number_format($previousDonation,2).'</b></div><img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy">';
                 $posters = $posters . '<div class="card-body"><div class="d-flex flex-column justify-content-center ">';
                 $posters = $posters . '<a href="' . route('URLdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a></div>';
                 $posters = $posters . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div></div>
@@ -388,8 +401,30 @@ class LandingPageController extends AppBaseController
             ->limit(5)
             ->get();
 
+            $currentYear = date('Y');
+
         foreach ($donations as $donation) {
-            $posters = $posters . '<div class="card"><a href="' . route('ANONdonate', ['link' => $donation->url]) . '">';
+            $amountDonation = DB::table('donation_transaction as dt')->
+            join('transactions as t', 't.id' , 'dt.transaction_id')
+            ->where([
+                't.status' => 'Success',
+                'dt.donation_id' => $donation->id,
+            ])
+            ->whereYear('t.datetime_created', $currentYear)
+            ->sum('t.amount');
+
+            $previousDonation = DB::table('donation_transaction as dt')->
+            join('transactions as t', 't.id' , 'dt.transaction_id')
+            ->where([
+                't.status' => 'Success',
+                'dt.donation_id' => $donation->id,
+            ])
+            ->whereYear('t.datetime_created', $currentYear -1)
+            ->sum('t.amount');
+
+            $posters = $posters . '<div class="card"> <div class="donation-amount">Tahun '.$currentYear.':<b> RM'.number_format($amountDonation,2).'</b></div> ';
+            $posters = $posters .'<div class="donation-amount">Tahun '.($currentYear -1).':<b> RM'.number_format($previousDonation,2).'</b></div>';
+            $posters = $posters. '<a href="' . route('ANONdonate', ['link' => $donation->url]) . '">';
             $posters = $posters . '<img class="card-img-top header-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy"></a></div>';
         }
 
