@@ -65,7 +65,7 @@
                     <div class="form-group">
                         <label>Guru Kelas</label>
                         <select name="classTeacher" id="classTeacher" class="form-control">
-                            <option value="" selected disabled>Pilih Guru Kelas</option>
+                           
                         </select>
                     </div>
                     
@@ -118,7 +118,7 @@
                 success:function(result)
                 {
                     $('#classTeacher').empty();
-                    $("#classTeacher").append("<option value='' disabled selected> Pilih Guru</option>");
+                    $("#classTeacher").append('<option value="" selected disabled>Tiada Perubahan ({{$teacher}})</option>');
                     jQuery.each(result.success, function(key, value){
                         $("#classTeacher").append("<option value='"+ value.id +"'>" + value.name + "</option>");
                     });

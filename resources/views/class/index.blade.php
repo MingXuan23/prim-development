@@ -88,6 +88,7 @@
                                 <th> No. </th>
                                 <th>Nama Kelas</th>
                                 <th>Guru Kelas</th>
+                                <th>Tarikh Masuk Guru</th>
                                 <th>Bilangan Pelajar</th>
                                 <th>Details</th>
                             </tr>
@@ -252,11 +253,11 @@
                         type: 'GET',
                     },
                     'columnDefs': [{
-                        "targets": [0], // your case first column
+                        "targets": [0,3], // your case first column
                         "className": "text-center",
                         "width": "2%"
                     },{
-                        "targets": [1,2,3,4], // your case first column
+                        "targets": [1,2,4,5], // your case first column
                         "className": "text-center",
                         "width":"20%"
                     },],
@@ -276,7 +277,12 @@
                     },{
                         data: 'gkelas',
                         name: 'gkelas',
-                    }, {
+                    }
+                    ,{
+                        data: 'updated_at',
+                        name: 'updated_at',
+                    }
+                    , {
                         data: 'totalstudent',
                         name: 'totalstudent',
                         orderable: false,
