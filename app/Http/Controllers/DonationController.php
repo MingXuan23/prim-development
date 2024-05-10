@@ -136,10 +136,10 @@ class DonationController extends Controller
                 $table->addColumn('action', function ($row) {
                     $token = csrf_token();
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = '<a href="' . route('donate.details', $row->id) . '" class="btn btn-primary m-1">Donors</a>';
-                    $btn = $btn.'<a href="' . route('donate.code_details', $row->id) . '" class="btn btn-primary m-1">Kod</a>';
-                    $btn = $btn . '<a href="' . route('donation.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = '<a href="' . route('donate.details', $row->id) . '" class="btn btn-primary m-1">Senarai Derma</a>';
+                    $btn = $btn.'<a href="' . route('donate.code_details', $row->id) . '" class="btn btn-primary m-1">Kod Rujukan</a>';
+                    $btn = $btn . '<a href="' . route('donation.edit', $row->id) . '" class="btn btn-primary m-1">Kemaskini</a>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Tutup Derma</button></div>';
                     return $btn;
                 });
             }

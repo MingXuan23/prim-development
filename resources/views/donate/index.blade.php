@@ -93,7 +93,7 @@
                 <th> Tarikh Mula </th>
                 <th> Tarikh Berakhir </th>
                 <th> Status </th>
-                <th> Action </th>
+                <th> Tindakan </th>
               </tr>
             </thead>
           </table>
