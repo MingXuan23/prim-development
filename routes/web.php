@@ -77,6 +77,8 @@ Route::post('parent/fetchStd', 'ParentController@fetchStd')->name('parent.fetchS
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     Route::get('', 'DonationController@indexDerma')->name('donate.index');
+    Route::get('inviteLetter/{year}/{month}', 'DonationController@inviteLetter')->name('donate.inviteLetter');
+
     Route::get('donor/{id}', 'DonationController@listAllDonor')->name('donate.details');
     Route::get('donor/code/{id}', 'DonationController@listAllCodeDonor')->name('donate.code_details');
 
@@ -92,6 +94,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
 });
 
 
+Route::get('point/policy', 'PointController@pointPolicy')->name('point.pointPolicy');
 Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
     Route::get('getPointHistoryDatatable', 'PointController@getPointHistoryDatatable')->name('point.getPointHistoryDatatable');
     Route::get('spinningWheel', 'PointController@spinningWheel')->name('point.spinningWheel');
