@@ -22,6 +22,8 @@ use function PHPUnit\Framework\isNull;
 use Illuminate\Support\Str;
 
 use App\Http\Controllers\PointController;
+use App\Mail\InviteReferralCodeMail;
+use Illuminate\Support\Facades\Mail;
 
 class DonationController extends Controller
 {
@@ -685,6 +687,27 @@ class DonationController extends Controller
         
         $organization = $this->organization->getOrganizationByDonationId($donation->id);
         return view('lhdn.receipt', compact('donation', 'organization', 'transaction'));
+    }
+
+    public function inviteLetter($year,$month){
+        $infos = DB::table('transactions as t')
+            ->join('donation_transaction as dt','dt.transaction_id','t.id')
+            ->join('donations as d','d.id','dt.donation_id')
+            ->whereYear('t.datetime_created', $year)
+            ->whereMonth('t.datetime_created', $month)
+            ->where('t.username', '<>', 'PENDERMA TANPA NAMA')
+            ->where('t.status', "Success")
+            ->where('t.email','yahya@utem.edu.my')
+            ->select('t.email', 'd.nama as derma_nama', 'd.donation_poster', 't.datetime_created', 't.username')
+            ->groupBy('t.email')
+            ->get();
+
+        foreach($infos as $info){
+            Mail::to('mxchuah23@gmail.com')->send(new InviteReferralCodeMail($info));
+            return view('emails.inviteReferralCodeMail',compact('info'));
+        }
+        dd($user);
+
     }
 
     public function generateReferralCode(){
