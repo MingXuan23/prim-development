@@ -2148,6 +2148,18 @@ class StudentController extends Controller
                  ]);
             }
         
+            $old_org_user = DB::table('class_organization as co')
+                 ->join('organization_user as ou','co.organization_id','ou.organization_id')
+                ->where('co.class_id',$student->oldClassId)
+                ->where('ou.role_id',6)
+                ->select('ou.id')
+                ->first();
+
+            DB::table('organization_user_student')
+            ->where('organization_user_id', $old_org_user->id)
+            ->where('student_id', $student->studentId)
+            ->delete();
+            
         $class_student_details=$class_student->first();
 
         $class_student->update([
