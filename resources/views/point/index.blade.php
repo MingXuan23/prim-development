@@ -49,6 +49,33 @@
                    
                 </div>
 
+               @if($referral_code->phase_level == 1)
+               <label class="col-form-label">Capaian Hari Ini</label>
+              {!!$progressToday!!}
+                <br>
+
+                
+                <div id="progressBars">
+               <label class="col-form-label">Jumlah Hari: {{ $referral_code->donation_streak }}/40</label>
+
+                    <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
+                        <div class="progress-bar {{ $referral_code->streakToday ? 'bg-danger' : 'bg-warning' }}" style="width: {{ $referral_code->donation_streak * 2.5 }}%;" role="progressbar" aria-valuenow="{{ $referral_code->donation_streak }}" aria-valuemin="0" aria-valuemax="40"></div>
+                    </div>
+                    
+                </div>
+
+                @else 
+
+                <div id="progressBars">
+                    <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
+                        <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" style="width:100%" aria-valuemin="0" aria-valuemax="40">
+                            <h4 class="text-white">Anda sudah capai peringkat 2</h4>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+               </div>
 
             </div>
 

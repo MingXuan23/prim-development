@@ -2060,9 +2060,10 @@ class StudentController extends Controller
 
         if($request->secureKey != getenv('SECURE_ADMIN_KEY')){
             //dd($request->secureKey);
+            //dd(getenv('SECURE_ADMIN_KEY'));
             return redirect()->back()->with('error', 'Invalid Secure Key');
         }
-
+       
         
         $student = json_decode($request->student);
         $co=DB::table('class_organization as co')
@@ -2142,23 +2143,16 @@ class StudentController extends Controller
                 ]);
 
                 DB::table('organization_user_student')
+                ->where('student_id', $student->studentId)
+                ->delete();
+
+                DB::table('organization_user_student')
                  ->insert([
                     'organization_user_id'=>$ou_id,
                     'student_id'=>$student->studentId
                  ]);
             }
         
-            $old_org_user = DB::table('class_organization as co')
-                 ->join('organization_user as ou','co.organization_id','ou.organization_id')
-                ->where('co.class_id',$student->oldClassId)
-                ->where('ou.role_id',6)
-                ->select('ou.id')
-                ->first();
-
-            DB::table('organization_user_student')
-            ->where('organization_user_id', $old_org_user->id)
-            ->where('student_id', $student->studentId)
-            ->delete();
             
         $class_student_details=$class_student->first();
 
