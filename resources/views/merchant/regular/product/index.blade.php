@@ -147,24 +147,26 @@
                     padding-right : 0!important;
                 }
                 .product-container{
-                    height:180px;
-                    width: 100px;
+                    height:200px;
+                    width: 140px;
                 }
                 .product-name{
                     font-size:12px;
                 }
                 .product-price{
                     font-size: 12px;
+                    padding: 0 12px;
                 }
                 .product-image{
-                    height: 100px!important;
-                    width: 100px!important;
+                    height: 140px!important;
+                    width: 100%!important;
                 }
             }
     </style>
 @endsection
 
 @section('content')
+
     <nav>
         <div class="search-container-input">
             <input type="text" placeholder="Search" id="search-input" name="text" autocomplete="off" class="input">

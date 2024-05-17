@@ -287,7 +287,7 @@
     <div>
         <div class="previous-nav my-2">
             @if( !auth()->user()->hasRole('Guest'))
-        <h1 class="font-size-18"><i class="fas fa-angle-left"></i>  <a href="{{ route('merchant-product.index') }}" class="previous-nav">Senarai Produk</a></h1>
+        <h1 class="font-size-18"> <a href="{{ route('merchant-product.index') }}" class="previous-nav"><span><i class="fas fa-angle-left"></i> </span>Senarai Produk</a></h1>
         @endif
         </div>
         <h1 class="title">Troli Membeli-Belah</h1>
@@ -435,7 +435,7 @@
         if (isGuest) {
             $('.product a').removeAttr('href');
         }
-        
+
         $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

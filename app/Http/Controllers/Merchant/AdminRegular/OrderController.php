@@ -75,8 +75,8 @@ class OrderController extends Controller
                 ->join('users as u', 'pu.user_id', 'u.id')
                 ->select('pu.id', 'pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status',
                 'u.name', 'u.telno')
+                ->orderBy('pickup_date', 'desc')
                 ->orderBy('status', 'desc')
-                ->orderBy('pickup_date', 'asc')
                 ->orderBy('pu.updated_at', 'desc')
                 ->whereIn('pu.status', ["Paid"])
                 ->where('organization_id', $org_id)
@@ -125,7 +125,7 @@ class OrderController extends Controller
             });
 
             $table->editColumn('pickup_date', function ($row) {
-                return Carbon::parse($row->pickup_date)->format('d/m/y H:i A');
+                return Carbon::parse($row->pickup_date)->format('d/m/Y H:i A');
             });
 
             $table->rawColumns(['note', 'total_price', 'status', 'action']);
@@ -226,7 +226,7 @@ class OrderController extends Controller
                 ->where('organization_id', $org_id)
                 ->select('pu.id', 'pu.pickup_date', 'pu.total_price', 'pu.status', 'pu.transaction_id',
                 'u.name', 'u.telno')
-                ->orderBy('pickup_date', 'asc')
+                ->orderBy('pickup_date', 'desc')
                 ->orderBy('pu.updated_at', 'desc');
         if(request()->ajax())
         {
@@ -278,7 +278,7 @@ class OrderController extends Controller
             });
 
             $table->editColumn('pickup_date', function ($row) {
-                return Carbon::parse($row->pickup_date)->format('d/m/y h:i A');
+                return Carbon::parse($row->pickup_date)->format('d/m/Y h:i A');
             });
 
             $table->rawColumns(['total_price', 'status']);
