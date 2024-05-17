@@ -59,7 +59,7 @@
                <label class="col-form-label">Jumlah Hari: {{ $referral_code->donation_streak }}/40</label>
 
                     <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
-                        <div class="progress-bar {{ $referral_code->streakToday ? 'bg-danger' : 'bg-warning' }}" style="width: {{ $referral_code->donation_streak * 2.5 }}%;" role="progressbar" aria-valuenow="{{ $referral_code->donation_streak }}" aria-valuemin="0" aria-valuemax="40"></div>
+                        <div class="progress-bar {{ $referral_code->streakToday ?  'bg-warning':'bg-danger' }}" style="width: {{ $referral_code->donation_streak * 2.5 }}%;" role="progressbar" aria-valuenow="{{ $referral_code->donation_streak }}" aria-valuemin="0" aria-valuemax="40"></div>
                     </div>
                     
                 </div>
