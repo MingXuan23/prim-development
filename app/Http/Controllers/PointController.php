@@ -23,6 +23,21 @@ class PointController extends Controller
         ->whereBetween('created_at', [now()->startOfMonth()->format('Y-m-d'), now()->endOfMonth()->format('Y-m-d')])
         ->where('status',1)
         ->sum('points');
+
+        $continueStreak = DB::table('point_history')
+        ->where('referral_code_id', $referral_code->id)
+        ->where(function($query) {
+            $query->whereDate('created_at', today())
+                ->orWhereDate('created_at', today()->subDay());
+        })
+        ->exists();
+
+        if(!$continueStreak && $referral_code->donation_streak >0 ){
+            DB::table('referral_code')
+            ->where('id',$referral_code->id)
+            ->update(['donation_streak'=>0]);
+            $referral_code = $this->getReferralCode(true);
+        }
         
         $total_transaction = DB::table('point_history as ph')
         ->leftJoin('transactions as t','t.id','ph.transaction_id')
@@ -31,7 +46,36 @@ class PointController extends Controller
         ->where('t.status',"Success")
         ->sum('t.amount');
 
-         return view('point.index',compact('referral_code','point_month','total_transaction'));
+        //dd($referral_code);
+
+        $donationsToday = DB::table('point_history as ph')
+            ->join('donation_transaction as dt', 'dt.transaction_id', 'ph.transaction_id')
+            ->join('transactions as t', 't.id', 'ph.transaction_id')
+            ->where('ph.status', 1)
+            ->whereDate('t.datetime_created', today())
+            ->where('ph.referral_code_id', $referral_code->id)
+            ->select(
+                DB::raw('COUNT(CASE WHEN ph.fromSubline = 0 THEN ph.id END) AS donation_leader_today'),
+                DB::raw('COUNT(CASE WHEN ph.fromSubline = 1 THEN ph.id END) AS donation_member_today'),
+                DB::raw('COUNT(ph.id) AS total_donation_today')
+            )
+            ->first();
+
+        $progressToday = '<div class="form-row">
+            <div id="criteria1" class="col-md-4 col-sm-12">
+                <input type="text" readonly value="Derma anda: ' . $donationsToday->donation_leader_today . '/1" class="form-control bg-' . ($donationsToday->donation_leader_today > 0 ? 'success' : 'danger') . ' text-white">
+            </div>
+            <div id="criteria2" class="col-md-4 col-sm-12">
+                <input type="text" readonly value="Derma guna kod anda: '.$donationsToday->donation_member_today.'/1" class="form-control bg-' . ($donationsToday->donation_member_today > 0 ? 'success' : 'danger') . ' text-white">
+            </div>
+            <div id="criteria3" class="col-md-4 col-sm-12">
+                <input type="text" readonly value="Total Derma hari ini: '.$donationsToday->total_donation_today.'/16" class="form-control bg-' . ($donationsToday->total_donation_today >= 16 ? 'success' : 'danger') . ' text-white">
+            </div>
+        </div>';
+
+        $referral_code->streakToday = Carbon::parse($referral_code->updated_at)->toDateString() == today()->toDateString();
+
+         return view('point.index',compact('referral_code','point_month','total_transaction','progressToday'));
     }
 
     public function getWheelList(){
@@ -205,6 +249,7 @@ class PointController extends Controller
 
     public function show($id)
     {
+        
         //
     }
 
@@ -221,5 +266,9 @@ class PointController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function pointPolicy(){
+        return view('point.policy');
     }
 }
