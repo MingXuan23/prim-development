@@ -74,7 +74,7 @@ class PointController extends Controller
         </div>';
 
         $referral_code->streakToday = Carbon::parse($referral_code->updated_at)->toDateString() == today()->toDateString();
-
+//dd($donationsToday,$referral_code);
          return view('point.index',compact('referral_code','point_month','total_transaction','progressToday'));
     }
 
