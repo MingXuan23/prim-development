@@ -45,7 +45,8 @@ Route::group(['prefix' => ''], function () {
 
 //landing donation page route
 Route::group(['prefix' => 'derma'], function () {
-    Route::get('', 'LandingPageController@indexDonation');
+    // routes/web.php
+    Route::match(['get', 'post'], '', 'LandingPageController@indexDonation');
     Route::get('/organization-list', 'LandingPageController@organizationListDonation');
     Route::get('/activity-list', 'LandingPageController@activitylistDonation');
     Route::get('/activity-details', 'LandingPageController@activitydetailsDonation');

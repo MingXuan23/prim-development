@@ -30,6 +30,7 @@ class PointController extends Controller
             $query->whereDate('created_at', today())
                 ->orWhereDate('created_at', today()->subDay());
         })
+        ->where('desc','LIKE','Transaksi Derma%')
         ->exists();
 
         if(!$continueStreak && $referral_code->donation_streak >0 ){
