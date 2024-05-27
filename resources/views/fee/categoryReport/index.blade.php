@@ -61,6 +61,13 @@
                 </div>
 
                 <div id="yuran" class="form-group">
+                    <label> Tahun </label>
+                    <select name="fee_year" id="fee_year" class="form-control">
+                        <option value="0" disabled selected>Pilih Tahun</option>
+                    </select>
+                </div>
+
+                <div id="yuran" class="form-group">
                     <label> Yuran </label>
                     <select name="fees" id="fees" class="form-control">
                         <option value="0" disabled selected>Pilih Yuran</option>
@@ -243,11 +250,33 @@
 
         function fetchClass(organizationid = '', yuranId = ''){
             var _token = $('input[name="_token"]').val();
+            var fee_year = $('#fee_year').val();
             $.ajax({
                 url:"{{ route('fees.fetchYuranByOrganId') }}",
                 method:"POST",
                 data:{ oid:organizationid,
-                        _token:_token },
+                        _token:_token,
+                        fee_year: fee_year},
+                success:function(result)
+                {
+                    $(yuranId).empty();
+                    $(yuranId).append("<option value='0' selected>Semua Yuran</option>");
+                    jQuery.each(result.success, function(key, value){
+                        $(yuranId).append("<option value='"+ value.id +"'>" + value.name + "</option>");
+                    });
+                }
+            })
+        }
+
+        function fetchYear(organizationid = ''){
+            var _token = $('input[name="_token"]').val();
+            var fee_year = $('#fee_year').val();
+            $.ajax({
+                url:"{{ route('fees.fetchYuranByOrganId') }}",
+                method:"POST",
+                data:{ oid:organizationid,
+                        _token:_token,
+                        fee_year :fee_year },
                 success:function(result)
                 {
                     $(yuranId).empty();
@@ -290,24 +319,29 @@
                         jQuery.each(result.success, function(key, value){
                             $(classId).append("<option value='"+ value.cid +"'>" + value.cname + "</option>");
                         });
+
+                        $('#fee_year').empty();
+                        jQuery.each(result.years, function(key, value){
+                            $('#fee_year').append("<option value='"+ value.year +"'>Tahun " + value.year + "</option>");
+                        });
                     }   
                 })    
         }
-
         $('#classes').change(function(){
             if($(this).val() != '')
             {
                 var classid   = $("#classes option:selected").val();
                 var _token    = $('input[name="_token"]').val();
-            
-                console.log(classid);
+                var fee_year = $("#fee_year").val();
+                //console.log(classid);
                 $.ajax({
                     url:"{{ route('fees.fetchYuran') }}",
                     method:"POST",
                     data:{ 
                         classid: classid,
                         oid : $("#organization").val(),
-                        _token: _token 
+                        _token: _token,
+                        fee_year:fee_year 
                     },
                     success:function(result)
                     {
@@ -320,6 +354,10 @@
                     }
                 })
             }
+        });
+
+        $('#fee_year').change(function(){
+            $('#classes').trigger('change');
         });
 
         $('#organization').change(function(){
