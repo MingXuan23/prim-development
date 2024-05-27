@@ -78,8 +78,8 @@
 <script>
     var values = $("#form1").serialize();
     $('#form1').submit();
-    var count = 3;
-    document.getElementById('time').innerHTML = count;
+    // var count = 3;
+    // document.getElementById('time').innerHTML = count;
     // setInterval(function(){
     //     count--;
     //     document.getElementById('time').innerHTML = count;

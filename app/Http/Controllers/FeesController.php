@@ -1895,22 +1895,29 @@ class FeesController extends AppBaseController
                 ->get();
         }
 
-        return response()->json(['success' => $list]);
+        $years = DB::table('fees_new')
+        ->where('organization_id',$organ->id)
+        ->selectRaw('DISTINCT YEAR(start_date) as year')
+        ->orderByDesc('year')
+        ->get();
+
+        return response()->json(['success' => $list,'years'=>$years]);
     }
 
     public function fetchYuran(Request $request)
     {
         $class = ClassModel::find($request->classid);
         $oid = $request->oid;
-
+        $year = $request->fee_year;
         $lists = DB::table('fees_new')
         ->select('fees_new.*', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
         ->where('organization_id', $oid)
+        ->whereYear('start_date',$year)
         ->orderBy('category')
         ->orderBy('name')
         ->get();
 
-        // dd($lists);
+         //dd($lists,$year);
 
         foreach($lists as $key=>$list)
         {
@@ -1939,14 +1946,15 @@ class FeesController extends AppBaseController
     public function fecthYuranByOrganizationId(Request $request)
     {
         $oid = $request->oid;
-
+        $year = $request->fee_year;
         $yurans = DB::table('fees_new')
             ->where('organization_id', $oid)
+            ->whereYear('start_date',$year)
             ->select('id', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
             ->orderBy('category')
             ->orderBy('name')
             ->get();
-        
+
         return response()->json(['success' => $yurans]);
     }
 
