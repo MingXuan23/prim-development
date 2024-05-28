@@ -76,7 +76,17 @@ class PointController extends Controller
 
         $referral_code->streakToday = Carbon::parse($referral_code->updated_at)->toDateString() == today()->toDateString();
 //dd($donationsToday,$referral_code);
-         return view('point.index',compact('referral_code','point_month','total_transaction','progressToday'));
+
+        $transaction_ids = DB::table('point_history')
+                            ->where('referral_code_id',$referral_code->id)
+                            ->where('desc','LIKE','Transaksi Get & Go%')
+                            ->where('status',1)
+                            ->select('transaction_id')
+                            ->pluck('transaction_id')
+                            ->unique()
+                            ->toArray();
+        //dd($transaction_ids);
+         return view('point.index',compact('referral_code','point_month','total_transaction','progressToday','transaction_ids'));
     }
 
     public function getWheelList(){

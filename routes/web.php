@@ -385,6 +385,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('all-orders/history', 'HistoryController@history')->name('merchant.order-history');
         Route::get('get-order-history', 'HistoryController@getOrderHistory')->name('merchant.get-order-history');
         Route::get('{order_id}/order-details', 'HistoryController@showOrderDetail')->name('merchant.order-detail');
+        Route::get('{transaction_id}/order-details-transaction', 'HistoryController@showOrderDetailTransaction')->name('merchant.order-detail-transaction');
         // Menu
        // Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
         Route::post('get-counter', 'OrderController@countItemsInCart')->name('merchant-reg.count-cart');
