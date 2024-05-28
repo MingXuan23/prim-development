@@ -1063,7 +1063,9 @@ class DirectPayController extends Controller
                             break;
                     case 'OrderS':
                         
+                        //dd(DB::table('transactions')->where('nama', '=', $request->Fpx_SellerOrderNo)->get());
                         $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
+                        //dd($request, $transaction);
                         $transaction->transac_no = $request->Fpx_FpxTxnId;
                         $transaction->status = "Success";
                         $transaction->amount = $request->TransactionAmount;
@@ -1098,11 +1100,13 @@ class DirectPayController extends Controller
 
                         //mobile OrderS
                         $result = DB::table('order_cart')
-                            ->where('id', $transaction->id)
+                            ->where('transactions_id', $transaction->id)
                             ->update([
                                 'order_status' => "cart-payment-completed",
                                 'updated_at' => Carbon::now()
                             ]);
+
+                        //dd($result);
 
                         $user = DB::table('users')
                                     ->where('id', $transaction->user_id)
@@ -1120,19 +1124,20 @@ class DirectPayController extends Controller
                                                     ->leftjoin('order_available as ou', 'oad.order_available_id', '=', 'ou.id')
                                                     ->leftjoin('dishes as d', 'ou.dish_id', '=', 'd.id')
                                                     ->where('oad.order_cart_id', $order_cart->id)
-                                                    ->select('*', 'oad.quantity as oad_quantity')
+                                                    ->select('*', 'oad.quantity as oad_quantity', 'oad.id as oad_id', 'oad.quantity as oad_quantity')
                                                     ->get();
+                        
 
                         foreach ($order_available_dish as $oad) {
                             DB::table('order_available_dish')
-                            ->where('id', $oad->id)
+                            ->where('id', $oad->oad_id)
                             ->update([
                                 'delivery_status' => "order-preparing"
                             ]);
-
+                            
                             DB::table('order_available')
                             ->where('id', $oad->order_available_id)
-                            ->decrement('quantity', $oad->quantity);
+                            ->decrement('quantity', $oad->oad_quantity);
                         }
 
                         // dd($transaction, $user, $order_cart, $organization, $order_available_dish);
