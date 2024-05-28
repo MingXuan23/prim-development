@@ -105,6 +105,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c','c.id','co.class_id')
                 ->where('ou.organization_id', $orgID)
+                ->where('cs.status',1)
                 ->selectRaw('count(distinct s.id) as count')
                 ->first();
 
