@@ -514,6 +514,7 @@ class FeesController extends AppBaseController
                     ->select('class_organization.organization_id as oid', 'classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
                     ->where('class_organization.organization_id', $oid)
                     ->where('class_student.fees_status', 'Completed')
+                    ->where('class_student.status',1)
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
                     ->get();
@@ -525,6 +526,8 @@ class FeesController extends AppBaseController
                     ->select('class_organization.organization_id as oid', 'classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
                     ->where('class_organization.organization_id', $oid)
                     ->where('class_student.fees_status', 'Not Complete')
+                    ->where('class_student.status',1)
+
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
                     ->get();
@@ -542,6 +545,7 @@ class FeesController extends AppBaseController
                     ->select('classes.nama', DB::raw('COUNT(students.id) as totalallstudent'))
                     ->where('class_organization.organization_id', $row->oid)
                     ->where('classes.id', $row->id)
+                    ->where('class_student.status',1)
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
                     ->first();
