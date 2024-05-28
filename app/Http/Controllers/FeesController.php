@@ -332,6 +332,7 @@ class FeesController extends AppBaseController
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->where('class_organization.organization_id', $oid)
+            ->where('class_student.status',1)
             ->select('class_student.id as csid');
         
         foreach($all_student->get() as $s){
@@ -348,6 +349,10 @@ class FeesController extends AppBaseController
                     ->where('id', $s->csid)
                     ->update(['fees_status' => 'Completed']);
 
+            }else{
+                DB::table('class_student')
+                    ->where('id', $s->csid)
+                    ->update(['fees_status' => 'Not Complete']);
             }
         }
         // dd($all_student);
@@ -364,6 +369,7 @@ class FeesController extends AppBaseController
             ->where('classes.levelid','>',0)
             ->where('class_organization.organization_id', $oid)
             ->where('class_student.fees_status', 'Completed')
+            ->where('class_student.status',1)
             ->count();
         $student_notcomplete = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -371,6 +377,7 @@ class FeesController extends AppBaseController
             ->join('classes','classes.id','=','class_organization.class_id')
             ->where('classes.levelid','>',0)
             ->where('class_organization.organization_id', $oid)
+            ->where('class_student.status',1)
             ->where('class_student.fees_status', 'Not Complete')
             ->count();
         $all_student= $student_complete +$student_notcomplete ;
