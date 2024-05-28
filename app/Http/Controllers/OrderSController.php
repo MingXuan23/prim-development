@@ -690,7 +690,8 @@ class OrderSController extends Controller
             //->where('type_org', 8) //kedai makanan
             //->orWhere('type_org', 12) //OrderS
             ->Where('type_org', 12) //OrderS
-            //->where('nama', 'like', '%MAAHAD TAHFIZ SAINS DARUL AMAN%')
+            ->where('seller_id', '!=', NULL)
+            ->where('private_key', '!=', NULL)
             //->limit(30)
             ->get();
 
@@ -729,14 +730,14 @@ class OrderSController extends Controller
         //     ->select('d.*')
         //     ->get();
 
-        $data = DB::table('dishes')    
-                    ->select('dishes.*', DB::raw('COUNT(order_available.dish_id) as totalOrderAvailable'))
-                    ->leftJoin('order_available', 'dishes.id', '=', 'order_available.dish_id')
-                    ->where('dishes.organ_id', $org_id)
-                    //->where('order_available.quantity', '>', 0)
-                    ->groupBy('dishes.id', 'dishes.name')
-                    ->orderBy('dishes.id')
-                    ->get();
+        $data = DB::table('dishes')
+            ->select('dishes.*', DB::raw('COUNT(CASE WHEN order_available.close_date > NOW() THEN order_available.dish_id ELSE NULL END) as totalOrderAvailable'))
+            ->leftJoin('order_available', 'dishes.id', '=', 'order_available.dish_id')
+            ->where('dishes.organ_id', $org_id)
+            ->groupBy('dishes.id', 'dishes.name')
+            ->orderBy('dishes.id')
+            ->get();
+
 
         // return response()->json($data);
         return response()->json($data);
@@ -866,7 +867,8 @@ class OrderSController extends Controller
                 ->join('order_available as oa', 'oad.order_available_id', '=', 'oa.id')
                 ->join('dishes as d', 'oa.dish_id', '=', 'd.id')
                 ->join('organizations as o', 'o.id', '=', 'oc.organ_id')
-                ->where('oc.user_id', $user_id);
+                ->where('oc.user_id', $user_id)
+                ->where('oad.delivery_status', '!=', 'order-pending');
 
             $order_available_dish = $data->select('oad.*')->get();
             $order_cart = $data->select('oc.*')->get();
@@ -1123,12 +1125,13 @@ class OrderSController extends Controller
         $dish_id = $request->get('dish_id');
 
         $order_available = DB::table('order_available as oa')
-            ->select('oa.*', DB::raw('COUNT(oad.id) as totalOrderDishAvailable'))
+            ->select('oa.*', DB::raw('COUNT(CASE WHEN oad.delivery_status != "order-pending" THEN oad.id ELSE NULL END) as totalOrderDishAvailable'))
             ->leftJoin('order_available_dish as oad', 'oad.order_available_id', '=', 'oa.id')
             ->join('dishes as d', 'd.id', '=', 'oa.dish_id')
             ->where('d.id', $dish_id)
             ->groupBy('oa.id')
             ->get();
+
             
         return response()->json($order_available);
     }
@@ -1139,7 +1142,8 @@ class OrderSController extends Controller
         $data = DB::table('order_available_dish as oad')
             ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
             ->join('users as u', 'u.id', '=', 'oc.user_id')
-            ->where('oad.order_available_id', '=', $order_available_id);
+            ->where('oad.order_available_id', '=', $order_available_id)
+            ->where('oad.delivery_status', '!=', 'order-pending');
         
         
         $order_available_dish = $data->select('oad.*')->get();
@@ -1222,6 +1226,7 @@ class OrderSController extends Controller
             ->join('organizations as o', 'o.id', '=', 'd.organ_id')
             ->join('order_cart as oc', 'oc.id', '=', 'oad.order_cart_id')
             ->where('o.id', '=', $organ_id)
+            ->where('oad.delivery_status', '!=', 'order-pending')
             ->groupBy('d.name')
             ->select('d.name as dish_name', DB::raw('SUM(oad.totalprice) as profit'), DB::raw('SUM(oad.quantity) as quantity'));
 
