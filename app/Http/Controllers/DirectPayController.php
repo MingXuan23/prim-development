@@ -267,32 +267,57 @@ class DirectPayController extends Controller
             }
             else if($request->desc == 'OrderS')
             {
-                $orders = Order::find($request->orderid);
-                $user = User::find($orders->user_id);
+                if($request->mobile != 'true') {
+                    $orders = Order::find($request->orderid);
+                    $user = User::find($orders->user_id);
 
-                $amount = $request->amount;
-                $orderId = $request->orderId;
+                    $amount = $request->amount;
+                    $orderId = $request->orderId;
 
-                DB::table('orders')->where('id', $orderId)->update([
-                    'updated_at' => Carbon::now(),
-                    'status' => 'Preparing'
-                ]);
+                    DB::table('orders')->where('id', $orderId)->update([
+                        'updated_at' => Carbon::now(),
+                        'status' => 'Preparing'
+                    ]);
 
-                $organization = Organization::find($orders->organ_id);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
-                $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
-                $private_key= $organization->private_key;
+                    $organization = Organization::find($orders->organ_id);
+                    $fpx_buyerEmail      = $user->email;
+                    $telno               = $user->telno;
+                    $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                    $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+                    $fpx_sellerOrderNo  = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
+                    $private_key= $organization->private_key;
+                } else {
+                    $user = User::find($request->user_id);
+                    $user_name = $request->name;
+                    $user_email = $request->email;
+                    $user_telno = $request->telno;
+                    $organ_id = $request->organ_id;
+                    $order_cart_id = $request->order_cart_id;
+
+                    DB::table('order_cart')
+                    ->where('id', $order_cart_id)
+                    ->update ([
+                        'updated_at' => Carbon::now(),
+                        'order_status' => 'checkout-cart-pending-payment',
+                        'totalamount' => $request->amount
+                    ]);
+
+                    $organization = Organization::find($organ_id);
+                    $fpx_buyerEmail      = $user_email;
+                    $telno               = $user_telno;
+                    $fpx_buyerName       = $user_name;
+                    $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+                    $fpx_sellerOrderNo  = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
+                    $private_key= $organization->private_key;
+                }
                // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
             }
 
 
 
-             $fpx_sellerTxnTime  = date('YmdHis');
-             $fpx_txnAmount      = $request->amount;
+            $fpx_sellerTxnTime  = date('YmdHis');
+            $fpx_txnAmount      = $request->amount;
 
 
             $transaction = new Transaction();
@@ -417,11 +442,20 @@ class DirectPayController extends Controller
                 }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'O')
                 {
-                    $result = DB::table('orders')
-                    ->where('id', $orderId)
-                    ->update([
-                        'transaction_id' => $transaction->id
-                    ]);
+                    if($request->mobile != 'true') {
+                        $result = DB::table('orders')
+                        ->where('id', $orderId)
+                        ->update([
+                            'transaction_id' => $transaction->id
+                        ]);
+                    } else {
+                        $result = DB::table('order_cart')
+                        ->where('id', $order_cart_id)
+                        ->update([
+                            'transactions_id' => $transaction->id
+                        ]);
+                    }
+                    
 
                 }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'G')
@@ -483,6 +517,7 @@ class DirectPayController extends Controller
             //dd('fpxsellerOrderNo:'.$fpx_sellerOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo),'fpx_sellerExOrderNo:'.$fpx_sellerExOrderNo.'\nlength:'.strlen($fpx_sellerOrderNo));
             //$private_key = '9BB6D047-2FB3-4B7A-9199-09441E7F4B0C';
 
+            // dd($fpx_buyerEmail, $fpx_buyerName, $private_key, $fpx_txnAmount, $fpx_sellerExOrderNo, $fpx_sellerOrderNo);
 
             //dd($pos,$fpx_sellerOrderNo);
             return view('directpay.index',compact(
@@ -605,6 +640,8 @@ class DirectPayController extends Controller
         $case = explode("_", $request->Fpx_SellerOrderNo);
         //return response()->json(['request'=>'success']);
         if ($request->Fpx_DebitAuthCode == '00') {
+        // dd($case[0]);
+
             switch ($case[0]) {
                 case 'School':
 
@@ -1025,6 +1062,7 @@ class DirectPayController extends Controller
 
                             break;
                     case 'OrderS':
+                        
                         $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
                         $transaction->transac_no = $request->Fpx_FpxTxnId;
                         $transaction->status = "Success";
@@ -1035,26 +1073,71 @@ class DirectPayController extends Controller
 
                         $userid = $transaction->user_id;
 
-                        $orders = Order::where('transaction_id', '=', $transaction->id)->first();
+//                        dd($transaction->id);
 
-                        $user = User::find($transaction->user_id);
-                        $organization = Organization::find($orders->organ_id);
+                        //old version OrderS
+                        // $orders = Order::where('transaction_id', '=', $transaction->id)->first();
 
-                        $booking_order = Organization::join('orders', 'organizations.id', '=', 'orders.organ_id')
-                        ->join('order_dish','order_dish.order_id','=','orders.id')
-                        ->join('dishes','dishes.id','=','order_dish.dish_id')
-                        ->where('orders.user_id', $userId)
-                        ->where('orders.id',$orderId)
-                        ->select('organizations.nama', 'organizations.address', 'dishes.name', 'order_dish.quantity', 'dishes.price','order_dish.updated_at', DB::raw('SUM(order_dish.quantity*dishes.price) as totalprice'))
-                        ->get();
+                        // $user = User::find($transaction->user_id);
+                        // $organization = Organization::find($orders->organ_id);
 
-                        if($transaction->email != NULL)
-                        {
-                            Mail::to($transaction->email)->send(new OrderSReceipt($orders, $organization, $transaction, $user));
+                        // $booking_order = Organization::join('orders', 'organizations.id', '=', 'orders.organ_id')
+                        // ->join('order_dish','order_dish.order_id','=','orders.id')
+                        // ->join('dishes','dishes.id','=','order_dish.dish_id')
+                        // ->where('orders.user_id', $userId)
+                        // ->where('orders.id',$orderId)
+                        // ->select('organizations.nama', 'organizations.address', 'dishes.name', 'order_dish.quantity', 'dishes.price','order_dish.updated_at', DB::raw('SUM(order_dish.quantity*dishes.price) as totalprice'))
+                        // ->get();
+
+                        // if($transaction->email != NULL)
+                        // {
+                        //     Mail::to($transaction->email)->send(new OrderSReceipt($orders, $organization, $transaction, $user));
+                        // }
+
+                        // return view('orders.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
+
+                        //mobile OrderS
+                        $result = DB::table('order_cart')
+                            ->where('id', $transaction->id)
+                            ->update([
+                                'order_status' => "cart-payment-completed",
+                                'updated_at' => Carbon::now()
+                            ]);
+
+                        $user = DB::table('users')
+                                    ->where('id', $transaction->user_id)
+                                    ->first();
+
+                        $order_cart = DB::table('order_cart')
+                                        ->where('transactions_id', $transaction->id)
+                                        ->first();
+
+                        $organization = DB::table('organizations')
+                                            ->where('id', $order_cart->organ_id)
+                                            ->first();
+
+                        $order_available_dish = DB::table('order_available_dish as oad')
+                                                    ->leftjoin('order_available as ou', 'oad.order_available_id', '=', 'ou.id')
+                                                    ->leftjoin('dishes as d', 'ou.dish_id', '=', 'd.id')
+                                                    ->where('oad.order_cart_id', $order_cart->id)
+                                                    ->select('*', 'oad.quantity as oad_quantity')
+                                                    ->get();
+
+                        foreach ($order_available_dish as $oad) {
+                            DB::table('order_available_dish')
+                            ->where('id', $oad->id)
+                            ->update([
+                                'delivery_status' => "order-preparing"
+                            ]);
+
+                            DB::table('order_available')
+                            ->where('id', $oad->order_available_id)
+                            ->decrement('quantity', $oad->quantity);
                         }
 
+                        // dd($transaction, $user, $order_cart, $organization, $order_available_dish);
 
-                        return view('orders.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
+                        return view('orders.mobile.receipt', compact('transaction', 'user', 'order_cart', 'organization', 'order_available_dish'));
 
                     break;
 
@@ -2171,4 +2254,9 @@ class DirectPayController extends Controller
         \Log::info("Update Transaction Command Run Successfully!");
     }
 
+    
+    public function testcallback()
+    {
+        return view('directpay.testcallback');
+    }
 }

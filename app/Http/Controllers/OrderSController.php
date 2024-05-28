@@ -779,10 +779,12 @@ class OrderSController extends Controller
         $organ_id = $request->get('organ_id');
 
         $cart = DB::table('order_cart')
-                    ->where('order_status', 'checkout-cart-pending')
-                    ->where('user_id', $user_id)
-                    ->where('organ_id', $organ_id)
-                    ->first();
+            ->where('order_status', 'checkout-cart-pending')
+            //->orWhere('order_status', 'checkout-cart-pending-payment')
+            ->where('user_id', $user_id)
+            ->where('organ_id', $organ_id)
+            ->first();
+
 
         // $cart_id = $cart->id;
         // dd($cart_id);
@@ -818,9 +820,9 @@ class OrderSController extends Controller
         $total_amount = $request->get('total_amount');
 
         if(count($request->all()) >= 1) {
-            DB::table('order_available')
-            ->where('id', $order_available_id)
-            ->decrement('quantity', $quantity);
+            // DB::table('order_available')
+            // ->where('id', $order_available_id)
+            // ->decrement('quantity', $quantity);
 
             DB::table('order_available_dish')->insert([
                 'quantity' => $quantity,
@@ -833,12 +835,12 @@ class OrderSController extends Controller
             DB::table('order_cart')
             ->where('id', $order_cart_id)
             ->update([
-                'order_status' => 'cart-pending',
+                'order_status' => 'checkout-cart-pending-payment',
                 'created_at' => now(),
                 'totalamount' => $total_amount
             ]);
 
-            return response()->json(['response' => 'Order Created Successfully']);
+            return response()->json(['response' => 'Order Created Successfully | Waiting For Payment']);
         } else {
             return response()->json(['response' => 'Order Failed']);
         }
@@ -1162,19 +1164,19 @@ class OrderSController extends Controller
         $total_Pending_Abandon = DB::table('order_cart as oc')
             ->join('order_available_dish as oad', 'oad.order_cart_id', '=', 'oc.id')
             ->where('oc.id', $order_cart_id)
-            ->where('oad.delivery_status', 'order-pending')
+            ->where('oad.delivery_status', 'order-preparing')
             ->count('oad.id');
 
         $order_cart = DB::table('order_cart')
             ->where('id', $order_cart_id)
-            ->where('order_status', 'cart-completed')
+            ->where('order_status', 'cart-overall-completed')
             ->first();
 
         if($order_cart) {
             DB::table('order_cart')
             ->where('id', $order_cart_id)
             ->update([
-                'order_status' => 'cart-pending',
+                'order_status' => 'cart-payment-completed',
                 'updated_at' => now(),
             ]);
         }
@@ -1183,7 +1185,7 @@ class OrderSController extends Controller
             DB::table('order_cart')
             ->where('id', $order_cart_id)
             ->update([
-                'order_status' => 'cart-completed',
+                'order_status' => 'cart-overall-completed',
                 'updated_at' => now(),
             ]);
         }
@@ -1232,5 +1234,71 @@ class OrderSController extends Controller
         }
 
         return response()->json($results);
+    }
+
+    public function mobilepayment(Request $request) {
+
+        $order_cart_id = (int) $request->header('order_cart_id');
+        $user_id = (int) $request->header('user_id');
+        $organ_id = (int) $request->header('organ_id');
+        $totalamount = (double) $request->header('totalamount');
+
+        $order_cart = DB::table('order_cart')
+            ->where('id', $order_cart_id)
+            ->first();
+
+        $users = DB::table('users')
+            ->where('id', $user_id)
+            ->first();
+
+        $organizations = DB::table('organizations')
+            ->where('id', $organ_id)
+            ->first();
+
+        //dd($order_cart, $users, $organizations, $totalamount);
+
+        return view('orders.mobile.pay', compact('order_cart', 'users', 'organizations', 'totalamount'));
+    }
+
+    public function cartreceipt($transaction_id) {
+
+        $transaction = DB::table('transactions')
+                        ->where('id', $transaction_id)
+                        ->first();
+
+        $user = DB::table('users')
+                    ->where('id', $transaction->user_id)
+                    ->first();
+
+        $order_cart = DB::table('order_cart')
+                        ->where('transactions_id', $transaction->id)
+                        ->first();
+
+        $organization = DB::table('organizations')
+                            ->where('id', $order_cart->organ_id)
+                            ->first();
+
+        $order_available_dish = DB::table('order_available_dish as oad')
+                                    ->leftjoin('order_available as ou', 'oad.order_available_id', '=', 'ou.id')
+                                    ->leftjoin('dishes as d', 'ou.dish_id', '=', 'd.id')
+                                    ->where('oad.order_cart_id', $order_cart->id)
+                                    ->select('*', 'oad.quantity as oad_quantity')
+                                    ->get();
+
+        // dd($transaction, $user, $order_cart, $organization, $order_available_dish);
+
+        return view('orders.mobile.receipt', compact('transaction', 'user', 'order_cart', 'organization', 'order_available_dish'));
+    }
+
+    public function checkPaymentStatus(Request $request) {
+        $organ_id = $request->get('organ_id');
+
+        $users = DB::table('users as u')
+            ->join('organization_user as ou', 'ou.user_id', '=', 'u.id')
+            ->where('ou.organization_id', $organ_id)
+            ->where('ou.role_id', 17)
+            ->first();
+
+        return response()->json($users);
     }
 }
