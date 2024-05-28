@@ -148,7 +148,10 @@
 
     $(document).ready(function(){
         fetch_data();
+        console.log('hallo');
+        console.log(@json($transaction_ids));
     });
+
 
    function fetch_data() {
     pointHistoryTable = $('#pointHistoryTable').DataTable({
