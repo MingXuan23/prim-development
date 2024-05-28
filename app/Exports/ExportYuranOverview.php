@@ -58,11 +58,13 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                 $student= DB::table('student_fees_new as sfn')
                         ->leftJoin('fees_transactions_new as ftn','ftn.student_fees_id','sfn.id')
                         ->leftJoin('transactions as t','t.id','ftn.transactions_id')
+                        ->leftJoin('class_student as cs','cs.id','sfn.class_student_id')
                         ->where('sfn.fees_id',$fn->id) 
+                        ->where('cs.status',1)
                         ->select('sfn.*','t.status as tstatus')
                         ->distinct()
                         ->get();
-                        
+
                 $paid=$student->where('status',"Paid")->where('tstatus',"Success");
                 $feedata->no=$key+1;
 
@@ -104,6 +106,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                 ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c','c.id','co.class_id')
+                ->where('c.levelid','>',0)
                 ->where('ou.organization_id', $orgID)
                 ->where('cs.status',1)
                 ->selectRaw('count(distinct s.id) as count')
