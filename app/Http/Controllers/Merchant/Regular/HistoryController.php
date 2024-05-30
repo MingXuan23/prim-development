@@ -249,6 +249,10 @@ class HistoryController extends Controller
 
         //delete in the futurre
         $list->status = 'Picked-Up';
+        if (in_array($trasanction_id, [46726,47003])) {
+            $list->user_name = "CHOONG HUI XIN";
+        }
+
         //delete in the futurre
 
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
