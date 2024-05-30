@@ -193,9 +193,10 @@ class HistoryController extends Controller
         // Get Information about the order
         $list = DB::table('pgng_orders as pu')
                 ->join('organizations as o', 'o.id', 'pu.organization_id')
+                ->leftJoin('users as u','u.id','pu.user_id')
                 ->where('pu.id', $order_id)
                 ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status','pu.confirm_picked_up_time','pu.confirm_by',
-                        'pu.organization_id','o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','o.district','o.city', 'o.fixed_charges')
+                        'pu.organization_id','o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','o.district','o.city', 'o.fixed_charges','u.name as user_name')
                 ->first();
 
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
@@ -240,10 +241,15 @@ class HistoryController extends Controller
         // Get Information about the order
         $list = DB::table('pgng_orders as pu')
                 ->join('organizations as o', 'o.id', 'pu.organization_id')
+                ->leftJoin('users as u','u.id','pu.user_id')
                 ->where('pu.id', $order_id)
                 ->select('pu.updated_at', 'pu.pickup_date', 'pu.total_price', 'pu.note', 'pu.status','pu.confirm_picked_up_time','pu.confirm_by',
-                        'pu.organization_id','o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','o.district','o.city', 'o.fixed_charges')
+                        'pu.organization_id','o.nama', 'o.telno', 'o.email', 'o.address', 'o.postcode', 'o.state','o.district','o.city', 'o.fixed_charges','u.name as user_name')
                 ->first();
+
+        //delete in the futurre
+        $list->status = 'Picked-Up';
+        //delete in the futurre
 
         $order_date = Carbon::parse($list->updated_at)->format('d/m/y H:i A');
         $pickup_date = Carbon::parse($list->pickup_date)->format('d/m/y H:i A');
