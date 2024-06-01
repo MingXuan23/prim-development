@@ -890,7 +890,9 @@ class StudentController extends Controller
             $class_student=DB::table('class_organization as co')
                             ->join('class_student as cs','cs.organclass_id','co.id')
                             ->where('cs.student_id',$student->id)
-                            ->where('co.class_id',$student->class_id);
+                            ->where('co.class_id',$student->class_id)
+                            ->where('cs.status',1)
+                            ->select('co.*','cs.*','cs.id as class_student_id');
             
             $class_student_details=$class_student->first();
             //dd( $student->id,$student->class_id,$classid);
@@ -899,7 +901,7 @@ class StudentController extends Controller
                 'cs.end_date'=>now(),
                 'cs.status'=>0,
             ]);
-
+            //dd($class_student_details);
             $new_class_student_id = DB::table('class_student')->insertGetId([
             'organclass_id'=>$co->id,
             'student_id'=> $student->id,
@@ -918,63 +920,14 @@ class StudentController extends Controller
     
                 $studentHaveFees=DB::table('student_fees_new as sfn')
                                 ->join('class_student as cs','cs.id','sfn.class_student_id')
-                                ->where('sfn.class_student_id',$new_class_student_id)
+                                ->join('students as s','s.id','cs.student_id')
+                                ->where('s.id',$student->id)
                                 ->get();
     
                 $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
     
-                
-                if (!$ifExitsCateBC->isEmpty()) {
-                    foreach ($ifExitsCateBC as $kateBC) {
-                        $target = json_decode($kateBC->target);
-    
-                        if (isset($target->gender)) {
-                            if ($target->gender != $studentData->gender) {
-                                continue;
-                            }
-                        }
-                        
-                        if ($target->data == "All_Level" || $target->data == $class->levelid) {
-                            if (in_array($kateBC->id, $studentFeesIDs)){
-                                continue;
-                            }else{
-                                DB::table('student_fees_new')->insert([
-                                    'status'            => 'Debt',
-                                    'fees_id'           =>  $kateBC->id,
-                                    'class_student_id'  =>  $new_class_student_id
-                                ]);
-                            }
-                            
-                        } else if (is_array($target->data)) {
-                            if (in_array($classid, $target->data)) { 
-                                if (in_array($kateBC->id, $studentFeesIDs)){
-                                    continue;
-                                }else{
-                                    DB::table('student_fees_new')->insert([
-                                        'status'            => 'Debt',
-                                        'fees_id'           =>  $kateBC->id,
-                                        'class_student_id'  =>  $new_class_student_id
-                                    ]);
-                                }
-                            }
-                            else{
-
-                                $Debt = "Debt";
-                                $delete = DB::table('student_fees_new as sfn')
-                                    ->where([
-                                        ['sfn.fees_id', $kateBC->id],
-                                        ['sfn.class_student_id', $class_student_details->id],
-                                        ['sfn.status', '=', 'Debt'],
-                                    ])
-                                    ->get()->pluck('id');
-                                DB::table('student_fees_new')->whereIn('id',$delete)->delete();
-
-                               
-                                  
-                            }
-                        }
-                    }
-                }
+                $this->checkFeesBCWhenClassChanged($ifExitsCateBC,$studentFeesIDs ,$student,$class->levelid,$new_class_student_id,$class_student_details->id);
+               
 
                 $ifExitsCateRecurring = DB::table('fees_new')
                 ->where('category', 'Kategori Berulang')
@@ -1775,6 +1728,77 @@ class StudentController extends Controller
 
     }
 
+    public function checkFeesBCWhenClassChanged($ifExitsCateBC,$studentFeesIDs ,$student ,$level_id,$new_class_student_id,$old_class_student_id){
+       
+        $new_class = DB::table('class_student as cs')
+                ->join('class_organization as co','co.id','cs.organclass_id')
+                ->where('cs.id',$new_class_student_id)->select('co.class_id')->first()->class_id;
+
+        if (!$ifExitsCateBC->isEmpty()) {
+            foreach ($ifExitsCateBC as $kateBC) {
+                $target = json_decode($kateBC->target);
+
+                if (isset($target->gender)) {
+                    if ($target->gender != $student->gender) {
+                        continue;
+                    }
+                }
+               
+                if ($target->data == "All_Level" || $target->data == $level_id) {
+                    if (in_array($kateBC->id, $studentFeesIDs)){
+                        $res = DB::table('student_fees_new')
+                        ->where('class_student_id',$old_class_student_id)
+                        ->where('fees_id',$kateBC->id)
+                        ->where('status','Debt')
+                        ->update([
+                            'class_student_id'  =>  $new_class_student_id
+                        ]);
+
+                    }else{
+                        DB::table('student_fees_new')->insert([
+                            'status'            => 'Debt',
+                            'fees_id'           =>  $kateBC->id,
+                            'class_student_id'  =>  $new_class_student_id
+                        ]);
+                    }
+                    
+                } else if (is_array($target->data)) {
+                    if (in_array($new_class, $target->data)) { 
+                        if (in_array($kateBC->id, $studentFeesIDs)){
+                            DB::table('student_fees_new')
+                            ->where('class_student_id',$old_class_student_id)
+                            ->where('fees_id',$kateBC->id)
+                            ->where('status','Debt')
+                            ->update([
+                                'class_student_id'  =>  $new_class_student_id
+                            ]);
+
+                        }else{
+                            DB::table('student_fees_new')->insert([
+                                'status'            => 'Debt',
+                                'fees_id'           =>  $kateBC->id,
+                                'class_student_id'  =>  $new_class_student_id
+                            ]);
+
+                        }
+                    }
+                    else{
+
+                        $delete = DB::table('student_fees_new as sfn')
+                        ->where([
+                            ['sfn.fees_id', $kateBC->id],
+                            ['sfn.class_student_id', $old_class_student_id],
+                            ['sfn.status', '=', 'Debt'],
+                        ])
+                        ->get()->pluck('id');
+                    DB::table('student_fees_new')->whereIn('id',$delete)->delete();
+
+                    }
+                }
+            }
+        }
+    }
+
     public function compareTransferStudent(Request $request){
         set_time_limit(300);
 
@@ -1787,9 +1811,11 @@ class StudentController extends Controller
                 ->where('c.id',$student->newClass)
                 ->first();
         $class_student=DB::table('class_organization as co')
-                        ->join('class_student as cs','cs.organclass_id','co.id')
-                        ->where('cs.student_id',$student->studentId)
-                        ->where('co.class_id',$student->oldClassId);
+                ->join('class_student as cs','cs.organclass_id','co.id')
+                ->where('cs.student_id',$student->id)
+                ->where('cs.status',1)
+                ->select('co.*','cs.*','cs.id as class_student_id')
+                ->where('co.class_id',$student->class_id);
         
         $class_student_details=$class_student->first();
 
@@ -1819,65 +1845,13 @@ class StudentController extends Controller
             // dd($class_student->get());
             $studentHaveFees=DB::table('student_fees_new as sfn')
                             ->join('class_student as cs','cs.id','sfn.class_student_id')
-                            ->where('sfn.class_student_id',$new_class_student_id)
+                            ->whereIn('sfn.class_student_id',[$new_class_student_id,$class_student_details])
                             ->get();
     
             $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
     
+            $this->checkFeesBCWhenClassChanged($ifExitsCateBC,$studentFeesIDs ,$student,$class->levelid,$new_class_student_id,$class_student_details->id);
             
-            if (!$ifExitsCateBC->isEmpty()) {
-                foreach ($ifExitsCateBC as $kateBC) {
-                    $target = json_decode($kateBC->target);
-    
-                    if (isset($target->gender)) {
-                        if ($target->gender != $student->gender) {
-                            continue;
-                        }
-                    }
-                    
-                    if ($target->data == "All_Level" || $target->data == $class->levelid) {
-                        if (in_array($kateBC->id, $studentFeesIDs)){
-                            continue;
-                        }else{
-                            DB::table('student_fees_new')->insert([
-                                'status'            => 'Debt',
-                                'fees_id'           =>  $kateBC->id,
-                                'class_student_id'  =>  $new_class_student_id
-                            ]);
-                        }
-                        
-                    } else if (is_array($target->data)) {
-                        if (in_array($student->newClass, $target->data)) { 
-                            if (in_array($kateBC->id, $studentFeesIDs)){
-                                continue;
-                            }else{
-                                DB::table('student_fees_new')->insert([
-                                    'status'            => 'Debt',
-                                    'fees_id'           =>  $kateBC->id,
-                                    'class_student_id'  =>  $new_class_student_id
-                                ]);
-                            }
-                        }
-                        else{
-
-                            $delete = DB::table('student_fees_new as sfn')
-                            ->where([
-                                ['sfn.fees_id', $kateBC->id],
-                                ['sfn.class_student_id', $class_student_details->id],
-                                ['sfn.status', '=', 'Debt'],
-                            ])
-                            ->get()->pluck('id');
-                        DB::table('student_fees_new')->whereIn('id',$delete)->delete();
-                            // $delete=DB::table('student_fees_new as sfn')
-                            //         ->where('sfn.fees_id',$kateBC->id)
-                            //         ->where('sfn.class_student_id',$new_class_student_id)
-                            //         ->where('sfn.status',"Debt")
-                            //         ->delete();
-                            //return response()->json(['data'=>$delete]);  
-                        }
-                    }
-                }
-            }
 
             $ifExitsCateRecurring = DB::table('fees_new')
             ->where('category', 'Kategori Berulang')
@@ -2073,9 +2047,11 @@ class StudentController extends Controller
                 ->where('c.id',$student->newClass)
                 ->first();
         $class_student=DB::table('class_organization as co')
-                        ->join('class_student as cs','cs.organclass_id','co.id')
-                        ->where('cs.student_id',$student->studentId)
-                        ->where('co.class_id',$student->oldClassId);
+                ->join('class_student as cs','cs.organclass_id','co.id')
+                ->where('cs.student_id',$student->id)
+                ->where('cs.status',1)
+                ->select('co.*','cs.*','cs.id as class_student_id')
+                ->where('co.class_id',$student->class_id);
         $newparent = DB::table('users')
                             ->where('telno', '=', $student->parentTelno)
                             ->first();
@@ -2182,65 +2158,13 @@ class StudentController extends Controller
             // dd($class_student->get());
             $studentHaveFees=DB::table('student_fees_new as sfn')
                             ->join('class_student as cs','cs.id','sfn.class_student_id')
-                            ->where('sfn.class_student_id',$new_class_student_id)
+                            ->whereIn('sfn.class_student_id',[$new_class_student_id,$class_student_details])
                             ->get();
-    
+                            
             $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
     
+            $this->checkFeesBCWhenClassChanged($ifExitsCateBC,$studentFeesIDs ,$student.$class->levelid,$new_class_student_id,$class_student_details->id);
             
-            if (!$ifExitsCateBC->isEmpty()) {
-                foreach ($ifExitsCateBC as $kateBC) {
-                    $target = json_decode($kateBC->target);
-    
-                    if (isset($target->gender)) {
-                        if ($target->gender != $student->gender) {
-                            continue;
-                        }
-                    }
-                    
-                    if ($target->data == "All_Level" || $target->data == $class->levelid) {
-                        if (in_array($kateBC->id, $studentFeesIDs)){
-                            continue;
-                        }else{
-                            DB::table('student_fees_new')->insert([
-                                'status'            => 'Debt',
-                                'fees_id'           =>  $kateBC->id,
-                                'class_student_id'  =>  $new_class_student_id
-                            ]);
-                        }
-                        
-                    } else if (is_array($target->data)) {
-                        if (in_array($student->newClass, $target->data)) { 
-                            if (in_array($kateBC->id, $studentFeesIDs)){
-                                continue;
-                            }else{
-                                DB::table('student_fees_new')->insert([
-                                    'status'            => 'Debt',
-                                    'fees_id'           =>  $kateBC->id,
-                                    'class_student_id'  =>  $new_class_student_id
-                                ]);
-                            }
-                        }
-                        else{
-
-                            $delete = DB::table('student_fees_new as sfn')
-                            ->where([
-                                ['sfn.fees_id', $kateBC->id],
-                                ['sfn.class_student_id', $class_student_details->id],
-                                ['sfn.status', '=', 'Debt'],
-                            ])
-                            ->get()->pluck('id');
-                        DB::table('student_fees_new')->whereIn('id',$delete)->delete();
-                            // $delete=DB::table('student_fees_new as sfn')
-                            //         ->where('sfn.fees_id',$kateBC->id)
-                            //         ->where('sfn.class_student_id',$new_class_student_id)
-                            //         ->where('sfn.status',"Debt")
-                            //         ->delete();
-                            //return response()->json(['data'=>$delete]);  
-                        }
-                    }
-                }
-            }
 
             $ifExitsCateRecurring = DB::table('fees_new')
             ->where('category', 'Kategori Berulang')
