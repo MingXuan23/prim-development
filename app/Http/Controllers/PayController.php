@@ -167,6 +167,7 @@ class PayController extends AppBaseController
                         ->select('student_fees_new.id')
                         ->where('fees_new.id', $feesid[$i])
                         ->where('students.id', $studentid[$i])
+                        ->where('class_student.status',1)
                         ->first();
 
                     // dd($getfees_req);
@@ -209,6 +210,7 @@ class PayController extends AppBaseController
                     ->select('fees_new.category', 'students.id as studentid')
                     ->distinct()
                     ->whereIn('student_fees_new.id', $student_fees)
+                    ->where('class_student.status',1)
                     ->get();
                 //duplicate code 
 
@@ -218,6 +220,7 @@ class PayController extends AppBaseController
                     ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
                     ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid')
                     ->whereIn('student_fees_new.id', $student_fees)
+                    ->where('class_student.status',1)
                     ->get();
 
                 // $getfees_bystudentSwasta     = DB::table('students')
@@ -268,6 +271,7 @@ class PayController extends AppBaseController
                         ->select('student_fees_new.id')
                         ->where('fees_new.id', $feesid[$i])
                         // ->where('fr.id', $feesid[$i]) //fees_recurring id
+                        ->where('class_student.status',1)
                         ->where('students.id', $studentid[$i])
                         ->first();
 
@@ -294,6 +298,7 @@ class PayController extends AppBaseController
                     ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
                     ->select('students.id as studentid', 'students.nama as studentname', 'fees_new.id as feeid', 'fees_new.organization_id as organizationid')
                     ->whereIn('students.id', $res_student)
+                    ->where('class_student.status',1)
                     ->first();
 
                 $getorganization  = DB::table('organizations')
@@ -310,6 +315,7 @@ class PayController extends AppBaseController
                     ->select('fees_new.category', 'students.id as studentid')
                     ->distinct()
                     ->whereIn('student_fees_new.id', $student_fees)
+                    ->where('class_student.status',1)
                     ->get();
                 //duplicate code 
 
@@ -320,6 +326,7 @@ class PayController extends AppBaseController
                     ->join('fees_recurring as fr', 'fr.student_fees_new_id', '=', 'student_fees_new.id')
                     ->select('fees_new.id', 'fees_new.name', 'fees_new.quantity', 'fees_new.price', 'fees_new.organization_id', 'fees_new.category','fees_new.desc as feedesc', 'students.id as studentid', 'fr.finalAmount as fr_finalamount')
                     ->whereIn('student_fees_new.id', $student_fees)
+                    ->where('class_student.status',1)
                     ->get();
 
                 // $getfees_bystudentSwasta     = DB::table('students')
@@ -342,6 +349,7 @@ class PayController extends AppBaseController
                     ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
                     ->select('student_fees_new.id')
                     ->whereIn('student_fees_new.id', $student_fees)
+                    ->where('class_student.status',1)
                     ->get();
             }
         }
