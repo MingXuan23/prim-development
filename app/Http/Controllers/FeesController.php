@@ -2013,6 +2013,7 @@ class FeesController extends AppBaseController
                         ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                         ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
                         ->where('sfn.fees_id', $fees->id)
+                        ->where('cs.status',1)
                         ->where('co.class_id', $request->classid)
                         ->select('s.*', 'sfn.status')
                         ->orderBy('s.nama')
