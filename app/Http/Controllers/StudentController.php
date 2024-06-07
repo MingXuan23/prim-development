@@ -1389,6 +1389,9 @@ class StudentController extends Controller
                     ->where('cs.id',$row->csid)
                     ->where('t.status',"Success")
                     ->whereBetween('t.datetime_created', [$row->start_date, $row_end_date])
+                    //this line should be disable at 2025
+                    ->whereYear('t.datetime_created',substr($row_end_date,0,4))
+                    //end
                     ->select('t.id as transaction_id','t.amount')
                     ->get();
                     
@@ -1402,6 +1405,9 @@ class StudentController extends Controller
                     ->where('fn.organization_id',$orgId)
                     ->where('t.status', 'Success')
                     ->whereBetween('t.datetime_created', [$row->start_date, $row_end_date])
+                    //this line should be disable at 2025
+                    ->whereYear('t.datetime_created',substr($row_end_date,0,4))
+                    //end
                     ->select('t.id as transaction_id','t.amount')
                     ->get();
     
