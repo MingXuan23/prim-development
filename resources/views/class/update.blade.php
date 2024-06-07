@@ -49,9 +49,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Nama Kelas</label>
+                        <label>Nama Kelas (Hanya untuk pembetulan kesalahan ejaan sahaja)</label>
+                        <br>
+                        <b class="text-danger">NOTA: Sebarang perubahan nama/tahun kelas akan mempengaruhi nama kelas dalam resit sedia ada</b>
                         <input type="text" name="name" class="form-control" placeholder="Nama Kelas"
                             value="{{$class->nama}}">
+                        
                     </div>
 
                     <div class="form-group">
