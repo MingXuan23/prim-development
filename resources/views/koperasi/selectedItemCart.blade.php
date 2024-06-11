@@ -354,7 +354,7 @@ input::-webkit-inner-spin-button {
         if (noteRequirement) {
             // Split the note requirement string using the '|' delimiter
             const noteRequirementsArray = noteRequirement.split('|');
-            
+            $('#week_status').val(-1);
             $('.note-div').empty();
             // Loop through each subtext in the note requirement
             noteRequirementsArray.forEach(function(subtext,index) {
