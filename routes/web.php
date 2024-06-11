@@ -272,7 +272,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
     Route::get('/resetPwd', 'ProfileController@showChangePwd')->name('profile.resetPassword');
     Route::post('/updatePwd/{id}', 'ProfileController@updatePwd')->name('profile.updatePwd');
 });
-
+Route::group([ 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
+    Route::group(['namespace' => 'User'], function() {
+        Route::get('/selectedItemCart/{group_id}/{product_name}', 'UserCooperativeController@selectedItemCart')->name('koperasi.selectedItemCart');
+    });
+});
 Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
     Route::group(['namespace' => 'User'], function() {
         // Koop School

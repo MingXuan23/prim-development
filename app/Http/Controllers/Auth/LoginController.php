@@ -7,6 +7,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\User;
 
 class LoginController extends Controller
@@ -130,6 +131,29 @@ class LoginController extends Controller
         // }
         return ['email' => $request->get('email'), 'password'=>$request->get('password')];
     }
+
+    public static function loginAsGuest(){
+        $guest = DB::table('users as u')
+                        ->join('model_has_roles as m','m.model_id','u.id')
+                        ->where('m.role_id',22)
+                        ->orderBy('u.updated_at')
+                        ->orderBy('u.id')
+                        ->select('u.id as guest_id')
+                        ->first();
+            DB::table('users')->where('id',$guest->guest_id)->update([
+                'updated_at'=>now()
+            ]);
+            $cart = DB::table('pgng_orders')->where('user_id', $guest->guest_id)->where('status','In cart')->delete();
+            //dd($cart);
+    
+            // DB::table('users')->update([
+            //     'updated_at'=>now()
+            // ]);
+            Auth::loginUsingId($guest->guest_id);
+             //dd($guestList);
+     
+    }
+    
     
 }
 
