@@ -881,7 +881,7 @@ class DirectPayController extends Controller
 
 
                     $pgngOrder= PgngOrder::where('transaction_id', $transaction->id)->first();
-                    $updateQuantity = $pgngOrder !=2;
+                    $updateQuantity = $pgngOrder->status != "2";
                     $pgngOrder->status=2;
                     $pgngOrder->created_at=now();
                     $pgngOrder->updated_at=now();
