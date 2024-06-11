@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Carbon;
 
+use App\Http\Controllers\Auth\LoginController;
+
 class UserCooperativeController extends Controller
 {
     public function index()
@@ -327,6 +329,78 @@ class UserCooperativeController extends Controller
             return response()->json(['insufficientQuantity' => 1]);
     }
 
+    public function selectedItemCart($group_id,$product_name){
+        $item =  DB::table('product_item')
+            ->where('product_group_id',$group_id)
+            ->where('name',str_replace('_', ' ', $product_name))
+            ->where('status',1)
+            ->first();
+        if($item == null){
+            return view('errors.404');
+        }
+        $org_id = DB::table('product_group')->where('id',$group_id)->first()->organization_id;
+
+        if(Auth::id() == null){
+            LoginController::loginAsGuest();
+        }
+
+        $result = DB::table('pgng_orders')->where([
+            ['status', 1],
+            ['organization_id', $org_id],
+            ['user_id', Auth::id()],
+        ])->delete();
+        
+
+        $newOrder = PgngOrder::create([
+            'method_status' => 1,
+            'total_price' => $item->price + $this->calCharge( $item->price,$org_id),
+            'status' => 1,
+            'user_id' => Auth::id(),
+            'organization_id' => $org_id
+        ]);
+
+        ProductOrder::create([
+            'quantity' => 1,
+            'status' => 1,
+            'product_item_id' => $item->id,
+            'pgng_order_id' => $newOrder->id
+        ]);
+
+        $allDay = OrganizationHours::where([
+            ['organization_id', $org_id],
+            //['status', 1],
+        ])->get();
+        $isPast = array();
+        foreach($allDay as $row)
+        {
+            $TodayDate = Carbon::now()->format('l');
+            // $MondayNextWeek = Carbon::now()->next(1);
+
+            $day = $this->getDayIntegerByDayName($TodayDate);
+
+            $key = strval($row->day);
+            
+            $isPast = $this->getDayStatus($day, $row->day, $isPast, $key);
+        }
+
+        $cart = DB::table('pgng_orders as pgng')->where([
+            'pgng.status' => 1,
+            'pgng.user_id' => Auth::id(),
+            'pgng.organization_id' => $org_id
+        ])->first();
+
+        $charge=$this->calCharge( $cart->total_price,$org_id); 
+
+        $cart_item =  DB::table('product_order as po')
+            ->join('product_item as pi','pi.id','po.product_item_id')
+            ->where('po.pgng_order_id',$cart->id)
+            
+        ->select('po.pgng_order_id as pgngId','pi.name','po.quantity','pi.quantity_available','pi.image','pi.price','po.id as productOrderId')
+        ->get();
+            $id = $org_id;
+        
+        return view('koperasi.selectedItemCart',compact('cart','cart_item','charge','allDay','id'));
+    }
     public function edit($id) // user see their cart here
     {
         $cart_item = array(); // empty if cart is empty
