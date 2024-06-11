@@ -881,6 +881,7 @@ class DirectPayController extends Controller
 
 
                     $pgngOrder= PgngOrder::where('transaction_id', $transaction->id)->first();
+                    $updateQuantity = $pgngOrder !=2;
                     $pgngOrder->status=2;
                     $pgngOrder->created_at=now();
                     $pgngOrder->updated_at=now();
@@ -894,29 +895,32 @@ class DirectPayController extends Controller
                     ->select('product_item_id as itemId','quantity')
                     ->get();
 
-                    foreach($relatedProductOrder as $item){
-                        $relatedItem=DB::table('product_item')
-                        ->where('id',$item->itemId);
-
-                        $relatedItemQuantity=$relatedItem->first()->quantity_available;
-
-                        $newQuantity= intval($relatedItemQuantity - $item->quantity);
-
-                        if($newQuantity<=0){
-                            $relatedItem
-                            ->update([
-                                'quantity_available'=>0,
-                                'status'=>0
+                    if($updateQuantity){
+                        foreach($relatedProductOrder as $item){
+                            $relatedItem=DB::table('product_item')
+                            ->where('id',$item->itemId);
+    
+                            $relatedItemQuantity=$relatedItem->first()->quantity_available;
+    
+                            $newQuantity= intval($relatedItemQuantity - $item->quantity);
+    
+                            if($newQuantity<=0){
+                                $relatedItem
+                                ->update([
+                                    'quantity_available'=>0,
+                                    'status'=>0
+                                ]);
+                            }
+                            else{
+                                $relatedItem
+                                ->update([
+                                    'quantity_available'=>$newQuantity
                             ]);
+                            }
+                            //dd($relatedItem);
                         }
-                        else{
-                            $relatedItem
-                            ->update([
-                                'quantity_available'=>$newQuantity
-                        ]);
-                        }
-                        //dd($relatedItem);
                     }
+                    
 
                     $item = DB::table('product_order as po')
                     ->join('product_item as pi', 'po.product_item_id', 'pi.id')

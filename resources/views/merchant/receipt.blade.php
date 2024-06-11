@@ -161,6 +161,13 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
+
+            var desc = @json($transaction->nama);
+            if (desc.startsWith('Koperasi')) {
+                window.location.href = '/koperasi/order';
+                return;
+            }
+
             window.location = '/getngo/all-orders';
         }
     },1000);
