@@ -83,15 +83,25 @@
 
                                 <table style="width:100%" class="infotbl">
                                     <tr>
-                                        <td class="py-3">Tarikh Pick-Up</td>
-                                        <td class="py-2">:</td>
+                                        <td style="width: 40%">Tarikh Pick-Up</td>
+                                        <td>:</td>
                                         @if($order->pickup_date == "0001-01-01 00:00:00")
-                                        <td class="py-2 w-50">Sila Tunggu Mesaj Dari Koperasi</td>
+                                        <td class=" w-60">Sila Tunggu Mesaj Dari Koperasi</td>
                                         @else
-                                        <td class="py-2 w-50">{{ date_create($order->pickup_date)->format('j M Y H:i:s A') }}</td>
+                                        <td class="w-60">{{ date_create($order->pickup_date)->format('j M Y H:i:s A') }}</td>
                                         @endif
 
-                                        <td class="py-2" colspan="3"></td>
+                                        <td colspan="3"></td>
+                                    </tr>
+                                    <tr>
+                                        <td >Nota</td>
+                                        <td >:</td>
+                                        <td >{{$order->note}}</td>
+
+                                        <td ></td>
+                                    </tr>
+                                    <tr>
+                                    <td class="py-2"></td>
                                     </tr>
                                 </table>
 
@@ -161,7 +171,6 @@
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-
             var desc = @json($transaction->nama);
             if (desc.startsWith('Koperasi')) {
                 window.location.href = '/koperasi/order';
