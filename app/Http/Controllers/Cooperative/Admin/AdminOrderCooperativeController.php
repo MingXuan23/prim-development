@@ -41,13 +41,16 @@ class AdminOrderCooperativeController extends Controller
         $order = DB::table('pgng_orders as pg')
         ->join('users as u','pg.user_id','=','u.id')
         ->join('organization_user as ou','pg.organization_id','=','ou.organization_id')
+        ->join('transactions as t','t.id','pg.transaction_id')
         ->where('ou.organization_id', $request->koopId)
         ->where(function ($query) use ($request) {
             $query->where('u.name', 'LIKE', '%' . $request->key . '%')
                 ->orWhere('pg.id', $request->key)
-                ->orWhere('pg.note', 'LIKE', '%' . $request->key . '%');
+                ->orWhere('pg.note', 'LIKE', '%' . $request->key . '%')
+                ->orWhere('pg.created_at', 'LIKE', '%' . $request->key . '%');
         })
         ->whereIn('pg.status', [2,4])
+        ->where('t.status','Success')
         ->groupBy('pg.id')
         ->orderBy('pg.pickup_date')
         ->select('pg.*','u.*','u.id as customerID','ou.*','pg.id as id','pg.status as status','pg.created_at as orderTime')
