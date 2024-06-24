@@ -1865,17 +1865,17 @@ class DirectPayController extends Controller
 
     public function handle()
     {
-        // $transactions = DB::table('transactions')
-        //     ->whereIn('status', ['Pending', 'Failed'])
-        //     ->whereBetween('datetime_created', [now()->subDays(2), now()])
-        //     ->get();
-
-            $transactions = DB::table('transactions')
-            ->whereIn('status', ['Success'])
-            ->whereNull('transac_no')
-            ->where('nama','LIKE','%School_Fees_%')
-            //->whereBetween('datetime_created', [now()->subDays(2), now()])
+        $transactions = DB::table('transactions')
+            ->whereIn('status', ['Pending', 'Failed'])
+            ->whereBetween('datetime_created', [now()->subDays(2), now()])
             ->get();
+
+            // $transactions = DB::table('transactions')
+            // ->whereIn('status', ['Success'])
+            // ->whereNull('transac_no')
+            // ->where('nama','LIKE','%School_Fees_%')
+            // //->whereBetween('datetime_created', [now()->subDays(2), now()])
+            // ->get();
         //dd($transactions);
         // $transaction = DB::table('transactions')
         //             ->where('id',29268)
