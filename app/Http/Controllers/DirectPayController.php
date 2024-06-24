@@ -1865,9 +1865,16 @@ class DirectPayController extends Controller
 
     public function handle()
     {
-        $transactions = DB::table('transactions')
-            ->whereIn('status', ['Pending', 'Failed'])
-            ->whereBetween('datetime_created', [now()->subDays(2), now()])
+        // $transactions = DB::table('transactions')
+        //     ->whereIn('status', ['Pending', 'Failed'])
+        //     ->whereBetween('datetime_created', [now()->subDays(2), now()])
+        //     ->get();
+
+            $transactions = DB::table('transactions')
+            ->whereIn('status', ['Success'])
+            ->whereNull('transac_no')
+            ->where('nama','LIKE','%School_Fees_%')
+            //->whereBetween('datetime_created', [now()->subDays(2), now()])
             ->get();
         //dd($transactions);
         // $transaction = DB::table('transactions')
@@ -1909,7 +1916,10 @@ class DirectPayController extends Controller
                                 [
                                     'status' => 'Success',
                                     'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                                    'description'=>$response_value['fpx_SellerExOrderNo'],
+                                    'transac_no' => $response_value['fpx_FpxTxnId']
+                                ]
+                                    
                             );
                             $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
 
@@ -2002,7 +2012,8 @@ class DirectPayController extends Controller
                                 [
                                     'status' => 'Success',
                                     'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                                    'description'=>$response_value['fpx_SellerExOrderNo'],
+                                    'transac_no' => $response_value['fpx_FpxTxnId']]
                             );
                            // return response()->json(['res'=>$result, 'sellerNo'=>$fpx_sellerOrderNo,'resp'=>$response_value]);
                             break;
@@ -2012,7 +2023,8 @@ class DirectPayController extends Controller
                                 [
                                     'status' => 'Success',
                                     'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                                    'description'=>$response_value['fpx_SellerExOrderNo'],
+                                    'transac_no' => $response_value['fpx_FpxTxnId']]
                             );
                             $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
 
@@ -2078,7 +2090,8 @@ class DirectPayController extends Controller
                                 [
                                     'status' => 'Success',
                                     'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                                    'description'=>$response_value['fpx_SellerExOrderNo'],
+                                    'transac_no' => $response_value['fpx_FpxTxnId']]
                             );
                             $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
 
@@ -2139,7 +2152,8 @@ class DirectPayController extends Controller
                                 [
                                     'status' => 'Success',
                                     'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo']]
+                                    'description'=>$response_value['fpx_SellerExOrderNo'],
+                                    'transac_no' => $response_value['fpx_FpxTxnId']]
                             );
                             $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
 
@@ -2191,7 +2205,8 @@ class DirectPayController extends Controller
                                     [
                                         'status' => 'Success',
                                         'amount'=>$response_value['transactionAmount'] ,
-                                        'description'=>$response_value['fpx_SellerExOrderNo']]
+                                        'description'=>$response_value['fpx_SellerExOrderNo'],
+                                        'transac_no' => $response_value['fpx_FpxTxnId']]
                                 );
                                     $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
 
@@ -2212,7 +2227,8 @@ class DirectPayController extends Controller
                                     [
                                         'status' => 'Success',
                                         'amount'=>$response_value['transactionAmount'] ,
-                                        'description'=>$response_value['fpx_SellerExOrderNo']]
+                                        'description'=>$response_value['fpx_SellerExOrderNo'],
+                                        'transac_no' => $response_value['fpx_FpxTxnId']]
                                 );
                                     $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
 
@@ -2239,7 +2255,8 @@ class DirectPayController extends Controller
                             [
                                 'status' => 'Success',
                                 'amount'=>$response_value['transactionAmount'] ,
-                                'description'=>$response_value['fpx_SellerExOrderNo']]
+                                'description'=>$response_value['fpx_SellerExOrderNo'],
+                                'transac_no' => $response_value['fpx_FpxTxnId']]
                         );
 
                             break;
