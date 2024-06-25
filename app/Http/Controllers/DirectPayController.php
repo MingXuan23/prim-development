@@ -345,6 +345,7 @@ class DirectPayController extends Controller
             if ($transaction->save()) {
                 
                 $transaction->nama = $transaction->nama.'_'.($transaction->id%100); //to makesure it is unique
+                $fpx_sellerExOrderNo = $transaction->nama;
                 $transaction->save();
                 //dd($transaction->nama);
                 // ******* save bridge transaction *********
