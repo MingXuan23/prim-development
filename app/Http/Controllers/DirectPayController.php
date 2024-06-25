@@ -343,7 +343,10 @@ class DirectPayController extends Controller
             $id = (int) str_replace("PRIM", "", $id[0]);
 
             if ($transaction->save()) {
-
+                
+                $transaction->nama = $transaction->nama.'_'.($transaction->id%100); //to makesure it is unique
+                $transaction->save();
+                //dd($transaction->nama);
                 // ******* save bridge transaction *********
                 // type = S for school fees and D for donation
 
@@ -641,520 +644,19 @@ class DirectPayController extends Controller
         //return response()->json(['request'=>'success']);
         if ($request->Fpx_DebitAuthCode == '00') {
         // dd($case[0]);
-
-            switch ($case[0]) {
-                case 'School':
-
-                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)
-                            ->update(
-                                ['transac_no' => $request->Fpx_FpxTxnId,
-                                  'status' => 'Success',
-                                  'buyerBankId'=>$request->Fpx_BuyerBankBranch,
-                                  'amount'=>$request->TransactionAmount,
-                                  'description' => $request ->Fpx_SellerExOrderNo
-                                  ]
-                    );
-
-                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-
-                    $list_student_fees_id_by_student = DB::table('student_fees_new')
-                        ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
-                        ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
-                        ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
-                        ->where('transactions.id', $transaction->id)
-                        ->get()
-                        ->groupBy('class_student_id');
-
-                    $list_parent_fees_id  = DB::table('fees_new')
-                        ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
-                        ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
-                        ->select('fees_new_organization_user.*')
-                        ->orderBy('fees_new.category')
-                        ->where('organization_user.user_id', $transaction->user_id)
-                        ->where('organization_user.role_id', 6)
-                        ->where('organization_user.status', 1)
-                        ->where('fees_new_organization_user.transaction_id', $transaction->id)
-                        ->get();
-
-                   foreach($list_student_fees_id_by_student as $list_student_fees_id){
-                        for ($i = 0; $i < count($list_student_fees_id); $i++) {
-
-                            // ************************* update student fees status fees by transactions *************************
-                            $res  = DB::table('student_fees_new')
-                                ->where('id', $list_student_fees_id[$i]->student_fees_id)
-                                ->update(['status' => 'Paid']);
-
-                            // ************************* check the student if have still debt *************************
-
-                            if ($i == count($list_student_fees_id) - 1)
-                            {
-                                $check_debt = DB::table('students')
-                                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                                    ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                                    ->select('students.*')
-                                    ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
-                                    ->where('student_fees_new.status', 'Debt')
-                                    ->count();
-
-
-                                // ************************* update status fees for student if all fees completed paid*************************
-
-                                if ($check_debt == 0) {
-                                    DB::table('class_student')
-                                        ->where('id', $list_student_fees_id[$i]->class_student_id)
-                                        ->update(['fees_status' => 'Completed']);
-
-                                }
-                            }
-                        }
-                   }
-
-                    for ($i = 0; $i < count($list_parent_fees_id); $i++) {
-
-                        // ************************* update status fees for parent *************************
-                        DB::table('fees_new_organization_user')
-                            ->where('id', $list_parent_fees_id[$i]->id)
-                            ->update([
-                                'status' => 'Paid'
-                            ]);
-
-                        // ************************* check the parent if have still debt *************************
-                        if ($i == count($list_parent_fees_id) - 1)
-                        {
-                            $org = DB::table('organization_user as ou')->where('ou.user_id',$transaction->user_id)->get();
-                            foreach($org as $o){
-                                $check_debt = DB::table('organization_user')
-                                ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
-                                ->where('organization_user.user_id', $transaction->user_id)
-                                ->where('organization_user.organization_id',$o->organization_id)
-                                ->where('organization_user.role_id', 6)
-                                ->where('organization_user.status', 1)
-                                ->where('fees_new_organization_user.status', 'Debt')
-                                ->count();
-
-                            // ************************* update status fees for organization user (parent) if all fees completed paid *************************
-
-                                if ($check_debt == 0) {
-                                    DB::table('organization_user')
-                                        ->where('user_id', $transaction->user_id)
-                                        ->where('role_id', 6)
-                                        ->where('status', 1)
-                                        ->update(['fees_status' => 'Completed']);
-                                }
-                            }
-
-                        }
-                    }
-
-                    return $this->ReceiptFees($transaction->id);
-                    break;
-
-                case 'Donation':
-
-                    Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)
-                            ->update(
-                                ['transac_no' => $request->Fpx_FpxTxnId,
-                                  'status' => 'Success',
-                                  'buyerBankId'=>$request->Fpx_BuyerBankBranch,
-                                  'amount'=>$request->TransactionAmount,
-                                  'description' => $request ->Fpx_SellerExOrderNo
-                                  ]
-                    );
-
-                    $donation = $this->donation->getDonationByTransactionName($request->Fpx_SellerOrderNo);
-
-                    $organization = $this->organization->getOrganizationByDonationId($donation->id);
-                    $transaction = $this->transaction->getTransactionByName($request->Fpx_SellerOrderNo);
-
-                    if($transaction->username != "PENDERMA TANPA NAMA" && $transaction->email != NULL)
-                    {
-                        Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
-                    }
-
-                    return view('receipt.index', compact('request', 'donation', 'organization', 'transaction'));
-
-                    break;
-
-                case 'Food':
-                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-                    $transaction->transac_no = $request->Fpx_FpxTxnId;
-                    $transaction->status = "Success";
-                    $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
-                    $transaction->amount = $request->TransactionAmount;
-                    $transaction->description = $request ->Fpx_SellerExOrderNo;
-                    $transaction->save();
-
-                    $userid = $transaction->user_id;
-
-                    $order = Order::where('transaction_id', '=', $transaction->id)->first();
-                    $user = User::find($transaction->user_id);
-                    $organization = Organization::find($order->organ_id);
-
-                    $order_dishes = DB::table('order_dish as od')
-                        ->leftJoin('dishes as d', 'd.id', 'od.dish_id')
-                        ->leftJoin('orders as o', 'o.id', 'od.order_id')
-                        ->where('od.order_id', $order->id)
-                        ->orderBy('d.name')
-                        ->get();
-
-                    Mail::to($transaction->email)->send(new OrderReceipt($order, $organization, $transaction, $user));
-
-                    return view('order.receipt', compact('order_dishes', 'organization', 'transaction', 'user'));
-
-                    break;
-
-                case 'Merchant':
-                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-                    $transaction->transac_no = $request->Fpx_FpxTxnId;
-                    $transaction->status = "Success";
-                    $transaction->amount = $request->TransactionAmount;
-                    $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
-                    $transaction->description = $request ->Fpx_SellerExOrderNo;
-                    $transaction->save();
-
-                    $order = PgngOrder::where('transaction_id', $transaction->id)->first();
-                    $order->status = "Paid";
-                    $order->updated_at = Carbon::now();
-                    $order->save();
-
-                    $organization = Organization::find($order->organization_id);
-                    $user = User::find($order->user_id);
-
-                    $relatedProductOrder =DB::table('product_order')
-                    ->where([
-                        ['pgng_order_id',$order->id],
-                        ['deleted_at',NULL]
-                    ])
-                    ->select('product_item_id as itemId','quantity')
-                    ->get();
-
-                    foreach($relatedProductOrder as $item){
-                        $relatedItem=DB::table('product_item')
-                        ->where('id',$item->itemId);
-
-                        $relatedItemQuantity= $relatedItem->first()->quantity_available;
-
-                        $newQuantity= intval($relatedItemQuantity - $item->quantity);
-
-                        if($newQuantity<=0){
-                            $relatedItem
-                            ->update([
-                                'quantity_available'=> 0,
-                                'type' => 'no inventory',
-                                'status'=> 0,
-                            ]);
-                        }
-                        else{
-                            $relatedItem
-                            ->update([
-                                'quantity_available'=>$newQuantity
-                            ]);
-                        }
-                    }
-                    $item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                    ->where([
-                        ['po.pgng_order_id', $order->id],
-                        ['po.deleted_at',NULL],
-                        ['pi.deleted_at',NULL],
-                    ])
-                    ->select('pi.name', 'po.quantity', 'pi.price')
-                    ->get();
-
-                    Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
-                    Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
-
-                    return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
-
-                    break;
-
-                case 'Koperasi':
-                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-                    $transaction->transac_no = $request->Fpx_FpxTxnId;
-                    $transaction->status = "Success";
-                    $transaction->amount = $request->TransactionAmount;
-                    $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
-                    $transaction->description = $request ->Fpx_SellerExOrderNo;
-                    $transaction->save();
-
-                    $order = PgngOrder::where('transaction_id', $transaction->id)->first();
-
-
-                    $pgngOrder= PgngOrder::where('transaction_id', $transaction->id)->first();
-                    $updateQuantity = $pgngOrder->status != "2";
-                    $pgngOrder->status=2;
-                    $pgngOrder->created_at=now();
-                    $pgngOrder->updated_at=now();
-                    $pgngOrder->save();
-
-                    $organization = Organization::where('id','=',$order->organization_id)->first();
-                    $user = User::where('id','=',$order->user_id)->first();
-
-                    $relatedProductOrder =DB::table('product_order')
-                    ->where('pgng_order_id',$order->id)
-                    ->select('product_item_id as itemId','quantity')
-                    ->get();
-
-                    if($updateQuantity){
-                        foreach($relatedProductOrder as $item){
-                            $relatedItem=DB::table('product_item')
-                            ->where('id',$item->itemId);
-    
-                            $relatedItemQuantity=$relatedItem->first()->quantity_available;
-    
-                            $newQuantity= intval($relatedItemQuantity - $item->quantity);
-    
-                            if($newQuantity<=0){
-                                $relatedItem
-                                ->update([
-                                    'quantity_available'=>0,
-                                    'status'=>0
-                                ]);
-                            }
-                            else{
-                                $relatedItem
-                                ->update([
-                                    'quantity_available'=>$newQuantity
-                            ]);
-                            }
-                            //dd($relatedItem);
-                        }
-                    }
-                    
-
-                    $item = DB::table('product_order as po')
-                    ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                    ->where('po.pgng_order_id', $order->id)
-                    ->select('pi.name', 'po.quantity', 'pi.price')
-                    ->get();
-
-                    Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
-
-                    return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
-
-                    break;
-
-                case 'Homestay':
-                    $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-                    $transaction->transac_no = $request->Fpx_FpxTxnId;
-                    $transaction->status = "Success";
-                    $transaction->amount = $request->TransactionAmount;
-                    $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
-                    $transaction->description = $request ->Fpx_SellerExOrderNo;
-                    $transaction->save();
-
-                    // update booking table
-                    // check whether is paying for deposit/full or balance
-                    $booking = Booking::where('transactionid', $transaction->id)
-                    ->orWhere('transaction_balance_id', $transaction->id)
-                    ->first();
-
-                    if($booking->deposit_amount > 0 ){
-                        if($booking->status == "Deposited"){ // for paying balance
-                            $booking->status = "Balance Paid";
-                            $booking->updated_at = Carbon::now();
-                            $booking->save();
-                        }else{//paying deposit
-                            $booking->status = "Deposited";
-                            $booking->updated_at = Carbon::now();
-                            $booking->save();
-                        }
-                    }else{
-                        // for full payment
-                        $booking->status = "Booked";
-                        $booking->updated_at = Carbon::now();
-                        $booking->save();
-                    }
-
-                    $userid = $transaction->user_id;
-
-                    $room = Room::find($booking->roomid);
-                    $user = User::find($transaction->user_id);
-                    $organization = Organization::find($room->homestayid);
-
-                    $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
-                    ->join('bookings','rooms.roomid','=','bookings.roomid')
-                    ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
-                    ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms','bookings.deposit_amount','bookings.status')
-                    ->get();
-
-                    if($transaction->email != NULL)
-                    {
-                        Mail::to($transaction->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to customer
-                    }
-                    Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to homestay admin
-
-                    return view('homestay.receipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
-
-                    break;
-
-                    case 'Grab Student':
-                            $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-                            $transaction->transac_no = $request->Fpx_FpxTxnId;
-                            $transaction->status = "Success";
-                            $transaction->amount = $request->TransactionAmount;
-                            $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
-                            $transaction->description = $request ->Fpx_SellerExOrderNo;
-                            $transaction->save();
-
-                            $userid = $transaction->user_id;
-
-                            $booking = Grab_Booking::where('transactionid', '=', $transaction->id)->first();
-                            $destination = Destination_Offer::find($booking->id_destination_offer);
-                            $user = User::find($transaction->user_id);
-                            $grab = Grab_Student::find($destination->id_grab_student);
-                            $organization = Organization::find($grab->id_organizations);
-
-                            $grab_booking = Organization::join('grab_students', 'organizations.id', '=', 'grab_students.id_organizations')
-                            ->join('destination_offers','grab_students.id','=','destination_offers.id_grab_student')
-                            ->join('grab_bookings','destination_offers.id','=','grab_bookings.id_destination_offer')
-                            ->where('grab_bookings.id',$booking->id)
-                            ->select('destination_offers.pick_up_point','destination_offers.destination_name','destination_offers.available_time', 'grab_students.car_brand', 'grab_students.car_name', 'grab_students.car_registration_num', 'grab_students.number_of_seat')
-                            ->get();
-
-
-                            if($transaction->email != NULL)
-                            {
-                                Mail::to($transaction->email)->send(new ResitBayaranGrab($booking, $user));
-                            }
-
-                            $result = DB::table('grab_bookings')
-                            ->where('id', $booking->id)
-                            ->update([
-                            'status' => "PAID"
-                            ]);
-
-
-                            return view('grab.resitbayaran', compact('grab_booking', 'booking', 'user'));
-
-                            break;
-                    case 'Bus':
-                            $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-                            $transaction->transac_no = $request->Fpx_FpxTxnId;
-                            $transaction->status = "Success";
-                            $transaction->amount = $request->TransactionAmount;
-                            $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
-                            $transaction->description = $request ->Fpx_SellerExOrderNo;
-                            $transaction->save();
-
-                            $userid = $transaction->user_id;
-
-                            $booking = Bus_Booking::where('transactionid', '=', $transaction->id)->first();
-                            $bus = Bus::find($booking->id_bus);
-                            $user = User::find($transaction->user_id);
-                            $organization = Organization::find($bus->id_organizations);
-
-                            $bus_booking = Organization::join('buses', 'organizations.id', '=', 'buses.id_organizations')
-                            ->join('bus_bookings','buses.id','=','bus_bookings.id_bus')
-                            ->where('bus_bookings.id',$booking->id)
-                            ->select('bus_bookings.id as bookid', 'buses.bus_registration_number', 'buses.booked_seat', 'buses.available_seat', 'buses.trip_number', 'buses.bus_depart_from', 'buses.bus_destination', 'buses.departure_time', 'buses.departure_date', 'buses.price_per_seat')
-                            ->get();
-
-                            if($transaction->email != NULL)
-                            {
-                                Mail::to($transaction->email)->send(new ResitBayaranBus($booking, $user));
-                            }
-
-                            $result = DB::table('bus_bookings')
-                            ->where('id', $booking->id)
-                            ->update([
-                            'status' => "PAID"
-                            ]);
-
-
-                            return view('bus.resitbayaran', compact('bus_booking', 'booking', 'user'));
-
-                            break;
-                    case 'OrderS':
-                        
-                        //dd(DB::table('transactions')->where('nama', '=', $request->Fpx_SellerOrderNo)->get());
-                        $transaction = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
-                        //dd($request, $transaction);
-                        $transaction->transac_no = $request->Fpx_FpxTxnId;
-                        $transaction->status = "Success";
-                        $transaction->amount = $request->TransactionAmount;
-                        $transaction->buyerBankId = $request->Fpx_BuyerBankBranch;
-                        $transaction->description = $request ->Fpx_SellerExOrderNo;
-                        $transaction->save();
-
-                        $userid = $transaction->user_id;
-
-//                        dd($transaction->id);
-
-                        //old version OrderS
-                        // $orders = Order::where('transaction_id', '=', $transaction->id)->first();
-
-                        // $user = User::find($transaction->user_id);
-                        // $organization = Organization::find($orders->organ_id);
-
-                        // $booking_order = Organization::join('orders', 'organizations.id', '=', 'orders.organ_id')
-                        // ->join('order_dish','order_dish.order_id','=','orders.id')
-                        // ->join('dishes','dishes.id','=','order_dish.dish_id')
-                        // ->where('orders.user_id', $userId)
-                        // ->where('orders.id',$orderId)
-                        // ->select('organizations.nama', 'organizations.address', 'dishes.name', 'order_dish.quantity', 'dishes.price','order_dish.updated_at', DB::raw('SUM(order_dish.quantity*dishes.price) as totalprice'))
-                        // ->get();
-
-                        // if($transaction->email != NULL)
-                        // {
-                        //     Mail::to($transaction->email)->send(new OrderSReceipt($orders, $organization, $transaction, $user));
-                        // }
-
-                        // return view('orders.receipt', compact('booking_order', 'organization', 'transaction', 'user'));
-
-                        //mobile OrderS
-                        $result = DB::table('order_cart')
-                            ->where('transactions_id', $transaction->id)
-                            ->update([
-                                'order_status' => "cart-payment-completed",
-                                'updated_at' => Carbon::now()
-                            ]);
-
-                        //dd($result);
-
-                        $user = DB::table('users')
-                                    ->where('id', $transaction->user_id)
-                                    ->first();
-
-                        $order_cart = DB::table('order_cart')
-                                        ->where('transactions_id', $transaction->id)
-                                        ->first();
-
-                        $organization = DB::table('organizations')
-                                            ->where('id', $order_cart->organ_id)
-                                            ->first();
-
-                        $order_available_dish = DB::table('order_available_dish as oad')
-                                                    ->leftjoin('order_available as ou', 'oad.order_available_id', '=', 'ou.id')
-                                                    ->leftjoin('dishes as d', 'ou.dish_id', '=', 'd.id')
-                                                    ->where('oad.order_cart_id', $order_cart->id)
-                                                    ->select('*', 'oad.quantity as oad_quantity', 'oad.id as oad_id', 'oad.quantity as oad_quantity')
-                                                    ->get();
-                        
-
-                        foreach ($order_available_dish as $oad) {
-                            DB::table('order_available_dish')
-                            ->where('id', $oad->oad_id)
-                            ->update([
-                                'delivery_status' => "order-preparing"
-                            ]);
-                            
-                            DB::table('order_available')
-                            ->where('id', $oad->order_available_id)
-                            ->decrement('quantity', $oad->oad_quantity);
-                        }
-
-                        // dd($transaction, $user, $order_cart, $organization, $order_available_dish);
-
-                        return view('orders.mobile.receipt', compact('transaction', 'user', 'order_cart', 'organization', 'order_available_dish'));
-
-                    break;
-
-                default:
-                    return view('errors.500');
-                    break;
-            }
-            return view('errors.500');
+            Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)
+            ->update(
+                ['transac_no' => $request->Fpx_FpxTxnId,
+                'status' => 'Success',
+                'buyerBankId'=>$request->Fpx_BuyerBankBranch,
+                'amount'=>$request->TransactionAmount,
+                'description' => $request ->Fpx_SellerExOrderNo
+                ]
+            );
+
+            return $this->updateTransaction($case[0],$request->Fpx_SellerOrderNo,true);
+            
+            
         }
         else {
 
@@ -1446,309 +948,18 @@ class DirectPayController extends Controller
 
                 if ($response_value['fpx_DebitAuthCode'] == '00') {
                     $fpx_productDesc = explode("_", $transaction->nama)[0];
-                    switch ($fpx_productDesc) {
-                        case 'School':
 
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                            $list_student_fees_id = DB::table('student_fees_new')
-                                ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
-                                ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
-                                ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
-                                ->where('transactions.id', $transaction->id)
-                                ->get();
-
-                            $list_parent_fees_id  = DB::table('fees_new')
-                                ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
-                                ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
-                                ->select('fees_new_organization_user.*')
-                                ->orderBy('fees_new.category')
-                                ->where('organization_user.user_id', $transaction->user_id)
-                                ->where('organization_user.role_id', 6)
-                                ->where('organization_user.status', 1)
-                                ->where('fees_new_organization_user.transaction_id', $transaction->id)
-                                ->get();
-
-
-                            for ($i = 0; $i < count($list_student_fees_id); $i++) {
-
-                                // ************************* update student fees status fees by transactions *************************
-                                $res  = DB::table('student_fees_new')
-                                    ->where('id', $list_student_fees_id[$i]->student_fees_id)
-                                    ->update(['status' => 'Paid']);
-
-                                // ************************* check the student if have still debt *************************
-
-                                if ($i == count($list_student_fees_id) - 1)
-                                {
-                                    $check_debt = DB::table('students')
-                                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                                        ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                                        ->select('students.*')
-                                        ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
-                                        ->where('student_fees_new.status', 'Debt')
-                                        ->count();
-
-
-                                    // ************************* update status fees for student if all fees completed paid*************************
-
-                                    if ($check_debt == 0) {
-                                        DB::table('class_student')
-                                            ->where('id', $list_student_fees_id[$i]->class_student_id)
-                                            ->update(['fees_status' => 'Completed']);
-                                    }
-                                }
-                            }
-
-                            for ($i = 0; $i < count($list_parent_fees_id); $i++) {
-
-                                // ************************* update status fees for parent *************************
-                                DB::table('fees_new_organization_user')
-                                    ->where('id', $list_parent_fees_id[$i]->id)
-                                    ->update([
-                                        'status' => 'Paid'
-                                    ]);
-
-                                // ************************* check the parent if have still debt *************************
-                                if ($i == count($list_student_fees_id) - 1)
-                                {
-                                    $check_debt = DB::table('organization_user')
-                                        ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
-                                        ->where('organization_user.user_id', $transaction->user_id)
-                                        ->where('organization_user.role_id', 6)
-                                        ->where('organization_user.status', 1)
-                                        ->where('fees_new_organization_user.status', 'Debt')
-                                        ->count();
-
-                                    // ************************* update status fees for organization user (parent) if all fees completed paid *************************
-
-                                    if ($check_debt == 0) {
-                                        DB::table('organization_user')
-                                            ->where('user_id', $transaction->user_id)
-                                            ->where('role_id', 6)
-                                            ->where('status', 1)
-                                            ->update(['fees_status' => 'Completed']);
-                                    }
-                                }
-                            }
-
-                            break;
-
-                        case 'Donation':
-
-                            $result = Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                           // return response()->json(['res'=>$result, 'sellerNo'=>$fpx_sellerOrderNo,'resp'=>$response_value]);
-                            break;
-
-                        case 'Merchant':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                            PgngOrder::where('transaction_id', $t->id)->first()->update([
-                                'status' => 'Paid'
-                            ]);
-
-                            $order = PgngOrder::where('transaction_id', $t->id)->first();
-
-                            $organization = Organization::find($order->organization_id);
-                            $user = User::find($order->user_id);
-
-                            $relatedProductOrder =DB::table('product_order')
-                            ->where([
-                                ['pgng_order_id',$order->id],
-                                ['deleted_at',NULL]
-                            ])
-                            ->select('product_item_id as itemId','quantity')
-                            ->get();
-
-                            foreach($relatedProductOrder as $item){
-                                $relatedItem=DB::table('product_item')
-                                ->where('id',$item->itemId);
-
-                                $relatedItemQuantity=$relatedItem->first()->quantity_available;
-
-                                $newQuantity= intval($relatedItemQuantity - $item->quantity);
-
-                                if($newQuantity<=0){
-                                    $relatedItem
-                                    ->update([
-                                        'quantity_available'=>0,
-                                        'type' => 'no inventory',
-                                        'status'=> 0
-                                    ]);
-                                }
-                                else{
-                                    $relatedItem
-                                    ->update([
-                                        'quantity_available'=>$newQuantity
-                                ]);
-                                }
-
-                            }
-                            $item = DB::table('product_order as po')
-                            ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                            ->where([
-                                ['po.pgng_order_id', $order->id],
-                                ['po.deleted_at',NULL],
-                                ['pi.deleted_at',NULL],
-                            ])
-                            ->select('pi.name', 'po.quantity', 'pi.price')
-                            ->get();
-
-                            Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
-                            Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
-
-                            return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
-
-                            break;
-
-                        case 'Koperasi':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                            $order = PgngOrder::where('transaction_id', $t->id)->first();
-
-
-                            $pgngOrder= PgngOrder::where('transaction_id', $t->id)->first();
-                            $pgngOrder->status=2;
-                            $pgngOrder->created_at=now();
-                            $pgngOrder->updated_at=now();
-                            $pgngOrder->save();
-
-                            $organization = Organization::where('id','=',$order->organization_id)->first();
-                            $user = User::where('id','=',$order->user_id)->first();
-
-                            $relatedProductOrder =DB::table('product_order')
-                            ->where('pgng_order_id',$order->id)
-                            ->select('product_item_id as itemId','quantity')
-                            ->get();
-
-                            foreach($relatedProductOrder as $item){
-                                $relatedItem=DB::table('product_item')
-                                ->where('id',$item->itemId);
-
-                                $relatedItemQuantity=$relatedItem->first()->quantity_available;
-
-                                $newQuantity= intval($relatedItemQuantity - $item->quantity);
-
-                                if($newQuantity<=0){
-                                    $relatedItem
-                                    ->update([
-                                        'quantity_available'=>0,
-                                        'status'=>0
-                                    ]);
-                                }
-                                else{
-                                    $relatedItem
-                                    ->update([
-                                        'quantity_available'=>$newQuantity
-                                ]);
-                                }
-                                //dd($relatedItem);
-                            }
-
-                            $item = DB::table('product_order as po')
-                            ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                            ->where('po.pgng_order_id', $order->id)
-                            ->select('pi.name', 'po.quantity', 'pi.price')
-                            ->get();
-
-                            Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
-
-
-                            break;
-
-                        case 'Homestay':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                            // update booking table
-                            // check whether is paying for deposit/full or balance
-                            $booking = Booking::where('transactionid', $t->id)
-                            ->orWhere('transaction_balance_id', $t->id)
-                            ->first();
-
-                            if($booking->deposit_amount > 0 ){
-                                if($booking->status == "Deposited"){ // for paying balance
-                                    $booking->status = "Balance Paid";
-                                    $booking->updated_at = Carbon::now();
-                                    $booking->save();
-                                }else{//paying deposit
-                                    $booking->status = "Deposited";
-                                    $booking->updated_at = Carbon::now();
-                                    $booking->save();
-                                }
-                            }else{
-                                // for full payment
-                                $booking->status = "Booked";
-                                $booking->updated_at = Carbon::now();
-                                $booking->save();
-                            }
-
-                            $userid = $t->user_id;
-
-                            $room = Room::find($booking->roomid);
-                            $user = User::find($t->user_id);
-                            $organization = Organization::find($room->homestayid);
-
-                            $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
-                            ->join('bookings','rooms.roomid','=','bookings.roomid')
-                            ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
-                            ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms','bookings.deposit_amount','bookings.status')
-                            ->get();
-
-                            if($t->email != NULL)
-                            {
-                                Mail::to($t->email)->send(new HomestayReceipt($room,$booking, $organization, $t, $user));//mail to customer
-                            }
-                            Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $t, $user));//mail to homestay admin
-
-                            break;
-
-                            case 'Grab Student':
-                                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                                    $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-
-                                    $booking = Grab_Booking::where('transactionid', '=', $t->id)->first();
-
-
-                                    $result = DB::table('grab_bookings')
-                                    ->where('id', $booking->id)
-                                    ->update([
-                                    'status' => "PAID"
-                                    ]);
-
-
-                                    break;
-                            case 'Bus':
-                                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Success','amount'=>$response_value['transactionAmount']]);
-                                    $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                                    $userid = $t->user_id;
-
-                                    $booking = Bus_Booking::where('transactionid', '=', $t->id)->first();
-                                    $user = User::find($t->user_id);
-
-                                    if($t->email != NULL)
-                                    {
-                                        Mail::to($transaction->email)->send(new ResitBayaranBus($booking, $user));
-                                    }
-
-                                    $result = DB::table('bus_bookings')
-                                    ->where('id', $booking->id)
-                                    ->update([
-                                    'status' => "PAID"
-                                    ]);
-
-                                    break;
-
-                        default:
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update([['status' => 'Success','amount'=>$response_value['transactionAmount']]]);
-
-                            break;
-                    }
+                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                        [
+                            'status' => 'Success',
+                            'amount'=>$response_value['transactionAmount'] ,
+                            'description'=>$response_value['fpx_SellerExOrderNo'],
+                            'transac_no' => $response_value['fpx_FpxTxnId']
+                        ]
+                            
+                    );
+
+                    $this->updateTransaction($fpx_productDesc,$fpx_sellerOrderNo,false);
                 }
                 else
                 {
@@ -1863,23 +1074,448 @@ class DirectPayController extends Controller
         return $resultArray ;
     }
 
+    public function updateTransaction($fpx_productDesc,$fpx_sellerOrderNo,$returnView){
+        $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
+        if($transaction->status != 'Success'){
+            return;
+        }
+        $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
+        switch ($fpx_productDesc) {
+            case 'School':
+                $list_student_fees_id_by_student = DB::table('student_fees_new')
+                    ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
+                    ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
+                    ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
+                    ->where('transactions.id', $transaction->id)
+                    ->get()
+                    ->groupBy('class_student_id');
+
+                $list_parent_fees_id  = DB::table('fees_new')
+                    ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
+                    ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
+                    ->select('fees_new_organization_user.*')
+                    ->orderBy('fees_new.category')
+                    ->where('organization_user.user_id', $transaction->user_id)
+                    ->where('organization_user.role_id', 6)
+                    ->where('organization_user.status', 1)
+                    ->where('fees_new_organization_user.transaction_id', $transaction->id)
+                    ->get();
+
+               foreach($list_student_fees_id_by_student as $list_student_fees_id){
+                    for ($i = 0; $i < count($list_student_fees_id); $i++) {
+
+                        // ************************* update student fees status fees by transactions *************************
+                        $res  = DB::table('student_fees_new')
+                            ->where('id', $list_student_fees_id[$i]->student_fees_id)
+                            ->update(['status' => 'Paid']);
+
+                        // ************************* check the student if have still debt *************************
+
+                        if ($i == count($list_student_fees_id) - 1)
+                        {
+                            $check_debt = DB::table('students')
+                                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                                ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+                                ->select('students.*')
+                                ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
+                                ->where('student_fees_new.status', 'Debt')
+                                ->count();
+
+
+                            // ************************* update status fees for student if all fees completed paid*************************
+
+                            if ($check_debt == 0) {
+                                DB::table('class_student')
+                                    ->where('id', $list_student_fees_id[$i]->class_student_id)
+                                    ->update(['fees_status' => 'Completed']);
+
+                            }
+                        }
+                    }
+               }
+
+                for ($i = 0; $i < count($list_parent_fees_id); $i++) {
+
+                    // ************************* update status fees for parent *************************
+                    DB::table('fees_new_organization_user')
+                        ->where('id', $list_parent_fees_id[$i]->id)
+                        ->update([
+                            'status' => 'Paid'
+                        ]);
+
+                    // ************************* check the parent if have still debt *************************
+                    if ($i == count($list_parent_fees_id) - 1)
+                    {
+                        $org = DB::table('organization_user as ou')->where('ou.user_id',$transaction->user_id)->get();
+                        foreach($org as $o){
+                            $check_debt = DB::table('organization_user')
+                            ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
+                            ->where('organization_user.user_id', $transaction->user_id)
+                            ->where('organization_user.organization_id',$o->organization_id)
+                            ->where('organization_user.role_id', 6)
+                            ->where('organization_user.status', 1)
+                            ->where('fees_new_organization_user.status', 'Debt')
+                            ->count();
+
+                        // ************************* update status fees for organization user (parent) if all fees completed paid *************************
+
+                            if ($check_debt == 0) {
+                                DB::table('organization_user')
+                                    ->where('user_id', $transaction->user_id)
+                                    ->where('role_id', 6)
+                                    ->where('status', 1)
+                                    ->update(['fees_status' => 'Completed']);
+                            }
+                        }
+
+                    }
+                }
+
+                if($returnView)
+                    return $this->ReceiptFees($transaction->id);
+                break;
+
+            case 'Donation':
+
+                $donation = $this->donation->getDonationByTransactionName($fpx_sellerOrderNo);
+
+                $organization = $this->organization->getOrganizationByDonationId($donation->id);
+                $transaction = $this->transaction->getTransactionByName($fpx_sellerOrderNo);
+
+                if($transaction->username != "PENDERMA TANPA NAMA" && $transaction->email != NULL)
+                {
+                    Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
+                }
+
+                if($returnView)
+                    return view('receipt.index', compact('donation', 'organization', 'transaction'));
+
+                break;
+
+            case 'Food':
+
+                $userid = $transaction->user_id;
+
+                $order = Order::where('transaction_id', '=', $transaction->id)->first();
+                $user = User::find($transaction->user_id);
+                $organization = Organization::find($order->organ_id);
+
+                $order_dishes = DB::table('order_dish as od')
+                    ->leftJoin('dishes as d', 'd.id', 'od.dish_id')
+                    ->leftJoin('orders as o', 'o.id', 'od.order_id')
+                    ->where('od.order_id', $order->id)
+                    ->orderBy('d.name')
+                    ->get();
+
+                Mail::to($transaction->email)->send(new OrderReceipt($order, $organization, $transaction, $user));
+                if($returnView)
+                    return view('order.receipt', compact('order_dishes', 'organization', 'transaction', 'user'));
+
+                break;
+
+            case 'Merchant':
+
+                $order = PgngOrder::where('transaction_id', $transaction->id)->first();
+                $updateQuantity = $order->status !='Paid';
+                $order->status = "Paid";
+                $order->updated_at = Carbon::now();
+                $order->save();
+
+                $organization = Organization::find($order->organization_id);
+                $user = User::find($order->user_id);
+
+                $relatedProductOrder =DB::table('product_order')
+                ->where([
+                    ['pgng_order_id',$order->id],
+                    ['deleted_at',NULL]
+                ])
+                ->select('product_item_id as itemId','quantity')
+                ->get();
+                if($updateQuantity){
+                    foreach($relatedProductOrder as $item){
+                        $relatedItem=DB::table('product_item')
+                        ->where('id',$item->itemId);
+    
+                        $relatedItemQuantity= $relatedItem->first()->quantity_available;
+    
+                        $newQuantity= intval($relatedItemQuantity - $item->quantity);
+    
+                        if($newQuantity<=0){
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=> 0,
+                                'type' => 'no inventory',
+                                'status'=> 0,
+                            ]);
+                        }
+                        else{
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>$newQuantity
+                            ]);
+                        }
+                    }
+                }
+                
+                $item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                ->where([
+                    ['po.pgng_order_id', $order->id],
+                    ['po.deleted_at',NULL],
+                    ['pi.deleted_at',NULL],
+                ])
+                ->select('pi.name', 'po.quantity', 'pi.price')
+                ->get();
+
+                Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+                Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+
+                if($returnView)
+                    return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+
+                break;
+
+            case 'Koperasi':
+                
+                $order = PgngOrder::where('transaction_id', $transaction->id)->first();
+
+
+                $pgngOrder= PgngOrder::where('transaction_id', $transaction->id)->first();
+                $updateQuantity = $pgngOrder->status != "2";
+                $pgngOrder->status=2;
+                $pgngOrder->created_at=now();
+                $pgngOrder->updated_at=now();
+                $pgngOrder->save();
+
+                $organization = Organization::where('id','=',$order->organization_id)->first();
+                $user = User::where('id','=',$order->user_id)->first();
+
+                $relatedProductOrder =DB::table('product_order')
+                ->where('pgng_order_id',$order->id)
+                ->select('product_item_id as itemId','quantity')
+                ->get();
+
+                if($updateQuantity){
+                    foreach($relatedProductOrder as $item){
+                        $relatedItem=DB::table('product_item')
+                        ->where('id',$item->itemId);
+
+                        $relatedItemQuantity=$relatedItem->first()->quantity_available;
+
+                        $newQuantity= intval($relatedItemQuantity - $item->quantity);
+
+                        if($newQuantity<=0){
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>0,
+                                'status'=>0
+                            ]);
+                        }
+                        else{
+                            $relatedItem
+                            ->update([
+                                'quantity_available'=>$newQuantity
+                        ]);
+                        }
+                        //dd($relatedItem);
+                    }
+                }
+                
+
+                $item = DB::table('product_order as po')
+                ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                ->where('po.pgng_order_id', $order->id)
+                ->select('pi.name', 'po.quantity', 'pi.price')
+                ->get();
+
+                Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $transaction, $user));
+              
+                if($returnView){
+                    return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+                }
+                    
+
+                break;
+
+            case 'Homestay':
+               
+                // update booking table
+                // check whether is paying for deposit/full or balance
+                $booking = Booking::where('transactionid', $transaction->id)
+                ->orWhere('transaction_balance_id', $transaction->id)
+                ->first();
+
+                if($booking->deposit_amount > 0 ){
+                    if($booking->status == "Deposited"){ // for paying balance
+                        $booking->status = "Balance Paid";
+                        $booking->updated_at = Carbon::now();
+                        $booking->save();
+                    }else{//paying deposit
+                        $booking->status = "Deposited";
+                        $booking->updated_at = Carbon::now();
+                        $booking->save();
+                    }
+                }else{
+                    // for full payment
+                    $booking->status = "Booked";
+                    $booking->updated_at = Carbon::now();
+                    $booking->save();
+                }
+
+                $userid = $transaction->user_id;
+
+                $room = Room::find($booking->roomid);
+                $user = User::find($transaction->user_id);
+                $organization = Organization::find($room->homestayid);
+
+                $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
+                ->join('bookings','rooms.roomid','=','bookings.roomid')
+                ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
+                ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms','bookings.deposit_amount','bookings.status')
+                ->get();
+
+                if($transaction->email != NULL)
+                {
+                    Mail::to($transaction->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to customer
+                }
+                Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $transaction, $user));//mail to homestay admin
+                if($returnView)
+                    return view('homestay.receipt', compact('room','booking_order', 'organization', 'transaction', 'user'));
+            break;
+
+            case 'Grab Student':
+                    
+                $userid = $transaction->user_id;
+
+                $booking = Grab_Booking::where('transactionid', '=', $transaction->id)->first();
+                $destination = Destination_Offer::find($booking->id_destination_offer);
+                $user = User::find($transaction->user_id);
+                $grab = Grab_Student::find($destination->id_grab_student);
+                $organization = Organization::find($grab->id_organizations);
+
+                $grab_booking = Organization::join('grab_students', 'organizations.id', '=', 'grab_students.id_organizations')
+                ->join('destination_offers','grab_students.id','=','destination_offers.id_grab_student')
+                ->join('grab_bookings','destination_offers.id','=','grab_bookings.id_destination_offer')
+                ->where('grab_bookings.id',$booking->id)
+                ->select('destination_offers.pick_up_point','destination_offers.destination_name','destination_offers.available_time', 'grab_students.car_brand', 'grab_students.car_name', 'grab_students.car_registration_num', 'grab_students.number_of_seat')
+                ->get();
+
+
+                if($transaction->email != NULL)
+                {
+                    Mail::to($transaction->email)->send(new ResitBayaranGrab($booking, $user));
+                }
+
+                $result = DB::table('grab_bookings')
+                ->where('id', $booking->id)
+                ->update([
+                'status' => "PAID"
+                ]);
+
+                if($returnView)
+                    return view('grab.resitbayaran', compact('grab_booking', 'booking', 'user'));
+
+                break;
+            case 'Bus':
+                   
+                    $userid = $transaction->user_id;
+
+                    $booking = Bus_Booking::where('transactionid', '=', $transaction->id)->first();
+                    $bus = Bus::find($booking->id_bus);
+                    $user = User::find($transaction->user_id);
+                    $organization = Organization::find($bus->id_organizations);
+
+                    $bus_booking = Organization::join('buses', 'organizations.id', '=', 'buses.id_organizations')
+                    ->join('bus_bookings','buses.id','=','bus_bookings.id_bus')
+                    ->where('bus_bookings.id',$booking->id)
+                    ->select('bus_bookings.id as bookid', 'buses.bus_registration_number', 'buses.booked_seat', 'buses.available_seat', 'buses.trip_number', 'buses.bus_depart_from', 'buses.bus_destination', 'buses.departure_time', 'buses.departure_date', 'buses.price_per_seat')
+                    ->get();
+
+                    if($transaction->email != NULL)
+                    {
+                        Mail::to($transaction->email)->send(new ResitBayaranBus($booking, $user));
+                    }
+
+                    $result = DB::table('bus_bookings')
+                    ->where('id', $booking->id)
+                    ->update([
+                    'status' => "PAID"
+                    ]);
+
+                    if($returnView)
+                        return view('bus.resitbayaran', compact('bus_booking', 'booking', 'user'));
+
+                    break;
+            case 'OrderS':
+                $userid = $transaction->user_id;
+
+                $updateQuantity = DB::table('order_cart')
+                    ->where('transactions_id', $transaction->id)
+                    ->where('order_status','<>','cart-payment-completed')
+                    ->exists();
+
+                $result = DB::table('order_cart')
+                    ->where('transactions_id', $transaction->id)
+                    ->update([
+                        'order_status' => "cart-payment-completed",
+                        'updated_at' => Carbon::now()
+                    ]);
+
+                //dd($result);
+
+                $user = DB::table('users')
+                            ->where('id', $transaction->user_id)
+                            ->first();
+
+                $order_cart = DB::table('order_cart')
+                                ->where('transactions_id', $transaction->id)
+                                ->first();
+
+                $organization = DB::table('organizations')
+                                    ->where('id', $order_cart->organ_id)
+                                    ->first();
+
+                $order_available_dish = DB::table('order_available_dish as oad')
+                                            ->leftjoin('order_available as ou', 'oad.order_available_id', '=', 'ou.id')
+                                            ->leftjoin('dishes as d', 'ou.dish_id', '=', 'd.id')
+                                            ->where('oad.order_cart_id', $order_cart->id)
+                                            ->select('*', 'oad.quantity as oad_quantity', 'oad.id as oad_id', 'oad.quantity as oad_quantity')
+                                            ->get();
+                
+
+                foreach ($order_available_dish as $oad) {
+                    DB::table('order_available_dish')
+                    ->where('id', $oad->oad_id)
+                    ->update([
+                        'delivery_status' => "order-preparing"
+                    ]);
+                    if($updateQuantity){
+                        DB::table('order_available')
+                            ->where('id', $oad->order_available_id)
+                            ->decrement('quantity', $oad->oad_quantity);
+                    }
+                    
+                }
+                if($returnView)
+                    return view('orders.mobile.receipt', compact('transaction', 'user', 'order_cart', 'organization', 'order_available_dish'));
+
+            break;
+
+            default:
+                if($returnView)
+                    return view('errors.500');
+                break;
+        }
+        if($returnView)
+            return view('errors.500');
+    }
+
     public function handle()
     {
         $transactions = DB::table('transactions')
             ->whereIn('status', ['Pending', 'Failed'])
             ->whereBetween('datetime_created', [now()->subDays(2), now()])
             ->get();
-
-            // $transactions = DB::table('transactions')
-            // ->whereIn('status', ['Success'])
-            // ->whereNull('transac_no')
-            // ->where('nama','LIKE','%School_Fees_%')
-            // //->whereBetween('datetime_created', [now()->subDays(2), now()])
-            // ->get();
-        //dd($transactions);
-        // $transaction = DB::table('transactions')
-        //             ->where('id',29268)
-        //             ->get();
 
         echo 'Start Handle :',"<br>";
 
@@ -1909,358 +1545,19 @@ class DirectPayController extends Controller
 
                 if ($response_value['fpx_DebitAuthCode'] == '00') {
                     $fpx_productDesc = explode("_", $transaction->nama)[0];
-                    switch ($fpx_productDesc) {
-                        case 'School':
 
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
-                                [
-                                    'status' => 'Success',
-                                    'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo'],
-                                    'transac_no' => $response_value['fpx_FpxTxnId']
-                                ]
-                                    
-                            );
-                            $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                            $list_student_fees_id = DB::table('student_fees_new')
-                                ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')
-                                ->join('transactions', 'transactions.id', '=', 'fees_transactions_new.transactions_id')
-                                ->select('student_fees_new.id as student_fees_id', 'student_fees_new.class_student_id')
-                                ->where('transactions.id', $transaction->id)
-                                ->get();
-
-                            $list_parent_fees_id  = DB::table('fees_new')
-                                ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
-                                ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
-                                ->select('fees_new_organization_user.*')
-                                ->orderBy('fees_new.category')
-                                ->where('organization_user.user_id', $transaction->user_id)
-                                ->where('organization_user.role_id', 6)
-                                ->where('organization_user.status', 1)
-                                ->where('fees_new_organization_user.transaction_id', $transaction->id)
-                                ->get();
-
-
-                            for ($i = 0; $i < count($list_student_fees_id); $i++) {
-
-                                // ************************* update student fees status fees by transactions *************************
-                                $res  = DB::table('student_fees_new')
-                                    ->where('id', $list_student_fees_id[$i]->student_fees_id)
-                                    ->update(['status' => 'Paid']);
-
-                                // ************************* check the student if have still debt *************************
-
-                                if ($i == count($list_student_fees_id) - 1)
-                                {
-                                    $check_debt = DB::table('students')
-                                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                                        ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
-                                        ->select('students.*')
-                                        ->where('class_student.id', $list_student_fees_id[$i]->class_student_id)
-                                        ->where('student_fees_new.status', 'Debt')
-                                        ->count();
-
-
-                                    // ************************* update status fees for student if all fees completed paid*************************
-
-                                    if ($check_debt == 0) {
-                                        DB::table('class_student')
-                                            ->where('id', $list_student_fees_id[$i]->class_student_id)
-                                            ->update(['fees_status' => 'Completed']);
-                                    }
-                                }
-                            }
-
-                            for ($i = 0; $i < count($list_parent_fees_id); $i++) {
-
-                                // ************************* update status fees for parent *************************
-                                DB::table('fees_new_organization_user')
-                                    ->where('id', $list_parent_fees_id[$i]->id)
-                                    ->update([
-                                        'status' => 'Paid'
-                                    ]);
-
-                                // ************************* check the parent if have still debt *************************
-                                if ($i == count($list_student_fees_id) - 1)
-                                {
-                                    $check_debt = DB::table('organization_user')
-                                        ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
-                                        ->where('organization_user.user_id', $transaction->user_id)
-                                        ->where('organization_user.role_id', 6)
-                                        ->where('organization_user.status', 1)
-                                        ->where('fees_new_organization_user.status', 'Debt')
-                                        ->count();
-
-                                    // ************************* update status fees for organization user (parent) if all fees completed paid *************************
-
-                                    if ($check_debt == 0) {
-                                        DB::table('organization_user')
-                                            ->where('user_id', $transaction->user_id)
-                                            ->where('role_id', 6)
-                                            ->where('status', 1)
-                                            ->update(['fees_status' => 'Completed']);
-                                    }
-                                }
-                            }
-
-                            break;
-
-                        case 'Donation':
-
-                            $result =  Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
-                                [
-                                    'status' => 'Success',
-                                    'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo'],
-                                    'transac_no' => $response_value['fpx_FpxTxnId']]
-                            );
-                           // return response()->json(['res'=>$result, 'sellerNo'=>$fpx_sellerOrderNo,'resp'=>$response_value]);
-                            break;
-
-                        case 'Merchant':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
-                                [
-                                    'status' => 'Success',
-                                    'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo'],
-                                    'transac_no' => $response_value['fpx_FpxTxnId']]
-                            );
-                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                            PgngOrder::where('transaction_id', $t->id)->first()->update([
-                                'status' => 'Paid'
-                            ]);
-
-                            $order = PgngOrder::where('transaction_id', $t->id)->first();
-
-                            $organization = Organization::find($order->organization_id);
-                            $user = User::find($order->user_id);
-
-                            $relatedProductOrder =DB::table('product_order')
-                            ->where([
-                                ['pgng_order_id',$order->id],
-                                ['deleted_at',NULL]
-                            ])
-                            ->select('product_item_id as itemId','quantity')
-                            ->get();
-
-                            foreach($relatedProductOrder as $item){
-                                $relatedItem=DB::table('product_item')
-                                ->where('id',$item->itemId);
-
-                                $relatedItemQuantity=$relatedItem->first()->quantity_available;
-
-                                $newQuantity= intval($relatedItemQuantity - $item->quantity);
-
-                                if($newQuantity<=0){
-                                    $relatedItem
-                                    ->update([
-                                        'quantity_available'=>0,
-                                        'type' => 'no inventory',
-                                        'status'=> 0
-                                    ]);
-                                }
-                                else{
-                                    $relatedItem
-                                    ->update([
-                                        'quantity_available'=>$newQuantity
-                                ]);
-                                }
-
-                            }
-                            $item = DB::table('product_order as po')
-                            ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                            ->where([
-                                ['po.pgng_order_id', $order->id],
-                                ['po.deleted_at',NULL],
-                                ['pi.deleted_at',NULL],
-                            ])
-                            ->select('pi.name', 'po.quantity', 'pi.price')
-                            ->get();
-
-                            Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
-                            Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
-
-
-                            break;
-
-                        case 'Koperasi':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
-                                [
-                                    'status' => 'Success',
-                                    'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo'],
-                                    'transac_no' => $response_value['fpx_FpxTxnId']]
-                            );
-                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                            $order = PgngOrder::where('transaction_id', $t->id)->first();
-
-
-                            $pgngOrder= PgngOrder::where('transaction_id', $t->id)->first();
-                            $pgngOrder->status=2;
-                            $pgngOrder->created_at=now();
-                            $pgngOrder->updated_at=now();
-                            $pgngOrder->save();
-
-                            $organization = Organization::where('id','=',$order->organization_id)->first();
-                            $user = User::where('id','=',$order->user_id)->first();
-
-                            $relatedProductOrder =DB::table('product_order')
-                            ->where('pgng_order_id',$order->id)
-                            ->select('product_item_id as itemId','quantity')
-                            ->get();
-
-                            foreach($relatedProductOrder as $item){
-                                $relatedItem=DB::table('product_item')
-                                ->where('id',$item->itemId);
-
-                                $relatedItemQuantity=$relatedItem->first()->quantity_available;
-
-                                $newQuantity= intval($relatedItemQuantity - $item->quantity);
-
-                                if($newQuantity<=0){
-                                    $relatedItem
-                                    ->update([
-                                        'quantity_available'=>0,
-                                        'status'=>0
-                                    ]);
-                                }
-                                else{
-                                    $relatedItem
-                                    ->update([
-                                        'quantity_available'=>$newQuantity
-                                ]);
-                                }
-                                //dd($relatedItem);
-                            }
-
-                            $item = DB::table('product_order as po')
-                            ->join('product_item as pi', 'po.product_item_id', 'pi.id')
-                            ->where('po.pgng_order_id', $order->id)
-                            ->select('pi.name', 'po.quantity', 'pi.price')
-                            ->get();
-
-                            Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
-
-
-                            break;
-
-                        case 'Homestay':
-                            Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
-                                [
-                                    'status' => 'Success',
-                                    'amount'=>$response_value['transactionAmount'] ,
-                                    'description'=>$response_value['fpx_SellerExOrderNo'],
-                                    'transac_no' => $response_value['fpx_FpxTxnId']]
-                            );
-                            $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                            // update booking table
-                            // check whether is paying for deposit/full or balance
-                            $booking = Booking::where('transactionid', $t->id)
-                            ->orWhere('transaction_balance_id', $t->id)
-                            ->first();
-
-                            if($booking->deposit_amount > 0 ){
-                                if($booking->status == "Deposited"){ // for paying balance
-                                    $booking->status = "Balance Paid";
-                                    $booking->updated_at = Carbon::now();
-                                    $booking->save();
-                                }else{//paying deposit
-                                    $booking->status = "Deposited";
-                                    $booking->updated_at = Carbon::now();
-                                    $booking->save();
-                                }
-                            }else{
-                                // for full payment
-                                $booking->status = "Booked";
-                                $booking->updated_at = Carbon::now();
-                                $booking->save();
-                            }
-
-                            $userid = $t->user_id;
-
-                            $room = Room::find($booking->roomid);
-                            $user = User::find($t->user_id);
-                            $organization = Organization::find($room->homestayid);
-
-                            $booking_order = Organization::join('rooms', 'organizations.id', '=', 'rooms.homestayid')
-                            ->join('bookings','rooms.roomid','=','bookings.roomid')
-                            ->where('bookings.bookingid',$booking->bookingid) // Filter by the selected homestay
-                            ->select('organizations.id','organizations.nama','organizations.address', 'rooms.roomid', 'rooms.roomname', 'rooms.details', 'rooms.roompax', 'rooms.price','bookings.bookingid','bookings.checkin','bookings.checkout','bookings.totalprice','bookings.discount_received','bookings.increase_received','bookings.booked_rooms','bookings.deposit_amount','bookings.status')
-                            ->get();
-
-                            if($t->email != NULL)
-                            {
-                                Mail::to($t->email)->send(new HomestayReceipt($room,$booking, $organization, $t, $user));//mail to customer
-                            }
-                            Mail::to($organization->email)->send(new HomestayReceipt($room,$booking, $organization, $t, $user));//mail to homestay admin
-
-                            break;
-
-                            case 'Grab Student':
-                                Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
-                                    [
-                                        'status' => 'Success',
-                                        'amount'=>$response_value['transactionAmount'] ,
-                                        'description'=>$response_value['fpx_SellerExOrderNo'],
-                                        'transac_no' => $response_value['fpx_FpxTxnId']]
-                                );
-                                    $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-
-                                    $booking = Grab_Booking::where('transactionid', '=', $t->id)->first();
-
-
-                                    $result = DB::table('grab_bookings')
-                                    ->where('id', $booking->id)
-                                    ->update([
-                                    'status' => "PAID"
-                                    ]);
-
-
-                                    break;
-                            case 'Bus':
-                                Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
-                                    [
-                                        'status' => 'Success',
-                                        'amount'=>$response_value['transactionAmount'] ,
-                                        'description'=>$response_value['fpx_SellerExOrderNo'],
-                                        'transac_no' => $response_value['fpx_FpxTxnId']]
-                                );
-                                    $t = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-
-                                    $userid = $t->user_id;
-
-                                    $booking = Bus_Booking::where('transactionid', '=', $t->id)->first();
-                                    $user = User::find($t->user_id);
-
-                                    if($t->email != NULL)
-                                    {
-                                        Mail::to($transaction->email)->send(new ResitBayaranBus($booking, $user));
-                                    }
-
-                                    $result = DB::table('bus_bookings')
-                                    ->where('id', $booking->id)
-                                    ->update([
-                                    'status' => "PAID"
-                                    ]);
-
-                                    break;
-
-                        default:
-                        Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
-                            [
-                                'status' => 'Success',
-                                'amount'=>$response_value['transactionAmount'] ,
-                                'description'=>$response_value['fpx_SellerExOrderNo'],
-                                'transac_no' => $response_value['fpx_FpxTxnId']]
-                        );
-
-                            break;
-                    }
+                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
+                        [
+                            'status' => 'Success',
+                            'amount'=>$response_value['transactionAmount'] ,
+                            'description'=>$response_value['fpx_SellerExOrderNo'],
+                            'transac_no' => $response_value['fpx_FpxTxnId']
+                        ]
+                            
+                    );
+
+                    $this->updateTransaction($fpx_productDesc,$fpx_sellerOrderNo,false);
+                    
                     echo 'Success :',$transaction->id,"<br>";
 
                 }

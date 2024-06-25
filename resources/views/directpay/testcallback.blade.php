@@ -1,6 +1,6 @@
 <form action="/directpayReceipt" method="post">
     @csrf
-    <input type="hidden" name="Fpx_SellerOrderNo" value="Koperasi_20240611231236" />
+    <input type="hidden" name="Fpx_SellerOrderNo" value="Donation_LA170_20240625195150_160_56" />
     <input type="hidden" name="TransactionAmount" value="1.00" />
     <input type="hidden" name="Fpx_SellerExOrderNo" value="DirectPayTest20231227201201" />
     <input type="hidden" name="Fpx_DebitAuthCode" value="00" />
