@@ -70,6 +70,14 @@
         transition: all .3s ease-in;
     }
 
+    .login-btn{
+        background-color: #626ed4;
+    }
+
+    .info-btn{
+        background-color: #38a4f8;
+    }
+
     .boxed-btn:hover {
         color: #fff;
         background-color: #333;
@@ -185,17 +193,39 @@
                              @endif
                             <br>
 
-                            <div class="col-sm-12">
-                                <button class="boxed-btn btn-rounded btn-donation submit" type="submit">
-                                    Derma
-                                </button>
+                            <div class="row ">
+                                <div class="col-sm-12">
+                                    <button class="boxed-btn btn-rounded btn-donation submit" type="submit">
+                                        Derma
+                                    </button>
+                                </div>
                             </div>
                             <br>
-                            <div class="col-sm-12">
-                                <button class="boxed-btn btn-rounded btn-donation" type="button" onclick="copyReferralLink()">
-                                    Share
-                                </button>
+
+                            @if(Auth::id() == null)
+                            <div class="row ">
+                                <div class="col-sm-6 mb-3" >
+                                    <button class="boxed-btn login-btn btn-rounded btn-donation" type="button" onclick=" window.location.href = '/login';" >
+                                       Login
+                                        
+                                    </button>
+                                </div>
+                                <div class="col-sm-6 mb-3" >
+                                    <button class="boxed-btn info-btn btn-rounded btn-donation" type="button" onclick="copyReferralLink()">
+                                        Share
+                                    </button>
+                                </div>
                             </div>
+                            @else
+                            <div class="row ">
+                                <div class="col-sm-12 mb-3" >
+                                    <button class="boxed-btn info-btn btn-rounded btn-donation" type="button" onclick="copyReferralLink()">
+                                        Share
+                                    </button>
+                                </div>
+                            </div>
+                            @endif
+                           
                             <br>
                             <div class="alert alert-success" style="display:none;">
                                 <p id="success"></p>

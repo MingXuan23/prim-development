@@ -23,6 +23,8 @@ use App\Models\Bus;
 use App\Models\Bus_Booking;
 use App\Models\NotifyBus;
 use App\Models\NotifyGrab;
+use App\Models\DonationStreak;
+
 use Illuminate\Http\Request;
 use App\Mail\DonationReceipt;
 use App\Mail\ResitBayaranGrab;
@@ -574,23 +576,43 @@ class DirectPayController extends Controller
         $own_code = DB::table('referral_code')
                 ->where('user_id',Auth::id()??0)
                 ->first();
+        $leader_code = DB::table('referral_code_member as rcm')
+                    ->join('referral_code as rc','rc.id','rcm.leader_referral_code_id')
+                    ->where('rcm.member_user_id',Auth::id()??0)
+                    ->select('rc.code')
+                    ->first();
 
+        $result = ['code' => "", 'source' => 'none'];
+      
+       
         if(!empty($requestReferralCode)){
-            return ['code' => $requestReferralCode, 'source' => 'request'];
+            $result =  ['code' => $requestReferralCode, 'source' => 'request'];
         }
         else if (session()->has('referral_code') && !empty(session('referral_code'))) {
             $referral_code = session()->pull('referral_code');
-            return ['code' => $referral_code, 'source' => 'session'];
+            $result =  ['code' => $referral_code, 'source' => 'session'];
 
-        }else if($own_code !=null){
-            return ['code' => $own_code->code, 'source' => 'own'];
+        }else if($own_code == null && $leader_code != null){
+            $result = ['code' => $leader_code->code, 'source' => 'leader'];
         }
-        return ['code' =>"", 'source' => 'none'];
+        else if($own_code !=null){
+            $result = ['code' => $own_code->code??'', 'source' => 'own'];
+        }
+        
+        
+        if($result['code'] == $own_code->code  && $leader_code != null){
+            $result = ['code' => $leader_code->code, 'source' => 'leader'];
+        }
+        
+        //dd($result,$leader_code);
+        return $result;
 
     }
 
     public function insertPointHistory($code_id,$transaction_id,$fromSubline,$point,$desc){
 
+        $insertMember = DB::table('referral_code_member')->where('leader_referral_code_id',$code_id)->where('member_user_id',Auth::id())->first();
+        $member_id = $insertMember!=null?$insertMember->id:null;
         DB::table('point_history')
         ->insert([
            'created_at'=>Carbon::now(),
@@ -601,7 +623,8 @@ class DirectPayController extends Controller
            'fromSubline' =>$fromSubline,
            'status'=>0,
            'points'=>$point,
-           'desc'=>$desc
+           'desc'=>$desc,
+           'member_id' =>$member_id
 
         ]);
     }
@@ -1182,7 +1205,7 @@ class DirectPayController extends Controller
 
                 $organization = $this->organization->getOrganizationByDonationId($donation->id);
                 $transaction = $this->transaction->getTransactionByName($fpx_sellerOrderNo);
-
+                DonationStreak::updateStreak($transaction->user_id,$transaction->id);
                 if($transaction->username != "PENDERMA TANPA NAMA" && $transaction->email != NULL)
                 {
                     Mail::to($transaction->email)->send(new DonationReceipt($donation, $transaction, $organization));
@@ -1509,6 +1532,10 @@ class DirectPayController extends Controller
         }
         if($returnView)
             return view('errors.500');
+    }
+
+    public function updateDonationStreak(){
+
     }
 
     public function handle()

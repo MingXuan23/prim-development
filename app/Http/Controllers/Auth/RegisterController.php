@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\PointController;
 
 class RegisterController extends Controller
 {
@@ -57,7 +58,7 @@ class RegisterController extends Controller
 
     protected function validator(array $data)
     {
-        return Validator::make($data, [
+        $validator = Validator::make($data, [
             'name'              => ['required', 'string', 'max:255'],
             'email'             => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
@@ -66,6 +67,19 @@ class RegisterController extends Controller
         ], [
             'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character (@!$#%^&*())',
         ]);
+
+        $validator->after(function ($validator) use ($data) {
+            if (!isset($data['referral_code'])) {
+                return;
+            }
+
+            $valid = PointController::validateReferralCode($data['referral_code']);
+            if (!$valid) {
+                $validator->errors()->add('referral_code', 'Expired referral code.');
+            }
+        });
+
+        return $validator;
     }
 
     public function registerAdmin(Request $request)
@@ -84,7 +98,8 @@ class RegisterController extends Controller
      * @return \App\User
      */
     protected function create(array $data)
-    {
+    { 
+        
         //dd($data,isset($data['isAdmin']));
         $user= User::create([
             'name'              => $data['name'],
@@ -101,6 +116,13 @@ class RegisterController extends Controller
                 'model_type' => "App\User",
                 'model_id' => $user->id,
             ]);
+        }
+
+        
+        $referral_code = $data['referral_code'];
+
+        if($referral_code!=null){
+            $this->referral_code_member_registration($referral_code,$user);
         }
         
         return $user;
@@ -125,5 +147,17 @@ class RegisterController extends Controller
         }
         
         return redirect($this->redirectTo);
+    }
+
+    protected function referral_code_member_registration($referral_code,$user){
+        //dd($referral_code,$user);
+        $code = DB::table('referral_code')->where('code',$referral_code)->first();
+        DB::table('referral_code_member')->insert([
+            'created_at' =>now(),
+            'updated_at' => now(),
+            'leader_referral_code_id' => $code->id,
+            'member_user_id' => $user->id,
+            'status' =>1
+        ]);
     }
 }
