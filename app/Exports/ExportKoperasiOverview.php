@@ -40,7 +40,7 @@ class ExportKoperasiOverview implements FromCollection, ShouldAutoSize, WithHead
             ->join('transactions as t', 't.id', '=', 'pg.transaction_id')
             ->where('pi.id',$i->id)
             ->where('pg.status', '>', 1)
-            
+            ->where('t.status','Success')
             ->select( 'po.quantity as quantity','pg.status as status','t.id')
             ->get();
             
@@ -69,6 +69,7 @@ class ExportKoperasiOverview implements FromCollection, ShouldAutoSize, WithHead
         ->join('transactions as t', 't.id', '=', 'pg.transaction_id')
         ->where('pg.organization_id', $this->orgId)
         ->where('pg.status', '>', 1)
+        ->where('t.status','Success')
         ->distinct('pg.id') 
         ->select('pg.id','pg.total_price','pg.status')
         ->get(); // Sum the total column

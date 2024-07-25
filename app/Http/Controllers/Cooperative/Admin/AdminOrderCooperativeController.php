@@ -49,7 +49,7 @@ class AdminOrderCooperativeController extends Controller
                 ->orWhere('pg.note', 'LIKE', '%' . $request->key . '%')
                 ->orWhere('pg.created_at', 'LIKE', '%' . $request->key . '%');
         })
-        ->whereIn('pg.status', [2,4])
+        ->whereIn('pg.status', [2,3,4])
         ->where('t.status','Success')
         ->groupBy('pg.id')
         ->orderBy('pg.pickup_date')
