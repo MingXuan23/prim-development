@@ -30,8 +30,8 @@
                         <input type="text" id="total_point" readonly value="{{ $referral_code->total_point }}" class="form-control">
                     </div>
                     <div class="col-md-6">
-                        <label for="point_month" class="col-form-label">Mata Ganjaran Bulanan:</label>
-                        <input type="text" readonly value="{{ number_format($point_month, 2) }}" class="form-control">
+                        <label for="point_month" class="col-form-label">Jumlah PRiM medal:</label>
+                        <input type="text" readonly value="{{ $streakData['prim_medal'] }}" class="form-control">
                     </div>
                 </div>
 
@@ -41,39 +41,59 @@
                         <input type="text" id="total_point" readonly value="{{ $referral_code->total_visit }}" class="form-control">
                     </div>
                     <div class="col-md-6">
-                        <label for="point_month" class="col-form-label">Jumlah Transaksi:</label>
-                        <input type="text" readonly value="RM {{ number_format($total_transaction, 2) }}" class="form-control">
+                        <label for="point_month" class="col-form-label">Jumlah Ahli</label>
+                        <input type="text" readonly value="{{ $total_follower }}" class="form-control">
                     </div>
                 </div>
                    
                    
                 </div>
 
-               @if($referral_code->phase_level == 1)
-               <label class="col-form-label">Capaian Hari Ini</label>
+              
+               <label class="col-form-label">Capaian Hari Ini</label> 
               {!!$progressToday!!}
                 <br>
 
                 
                 <div id="progressBars">
-               <label class="col-form-label">Jumlah Hari: {{ $referral_code->donation_streak }}/40</label>
-
+               <label class="col-form-label">
+                    @if($streakData['streak_today'])
+                        <div >
+                            <i class="fas fa-check-circle text-success"></i> Anda telah derma pada hari ini: {{ $streakData['current_streak'] }}/40 Hari 
+                        </div>
+                        @else
+                        <div  class ="text-danger">
+                            <i class="fas fa-exclamation-circle text-danger"></i> Anda belum derma pada hari ini: {{ $streakData['current_streak'] }}/40 Hari 
+                         </div>
+                        @endif </label>
+                   
+                      
+                    
                     <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
-                        <div class="progress-bar {{ $referral_code->streakToday ?  'bg-warning':'bg-danger' }}" style="width: {{ $referral_code->donation_streak * 2.5 }}%;" role="progressbar" aria-valuenow="{{ $referral_code->donation_streak }}" aria-valuemin="0" aria-valuemax="40"></div>
+                        <div class="progress-bar {{ $streakData['streak_today'] ?  'bg-warning':'bg-danger' }}" style="width: {{ $streakData['current_streak'] * 2.5 }}%;" role="progressbar" aria-valuenow="{{ $streakData['current_streak'] }}" aria-valuemin="0" aria-valuemax="40">
+
+                      
+                        </div>
+                       
                     </div>
+                    <!-- @if(isset($streakData['streak_startdate']))
+                    (Mulai {{$streakData['streak_startdate']}})
+                    @endif -->
+                    
+                  
                     
                 </div>
 
-                @else 
 
-                <div id="progressBars">
+                <a href="/derma" class="btn btn-primary col-sm-12">Derma Sekarang</a>
+                <!-- <div id="progressBars">
                     <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
                         <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" style="width:100%" aria-valuemin="0" aria-valuemax="40">
                             <h4 class="text-white">Anda sudah capai peringkat 2</h4>
                         </div>
                     </div>
-                </div>
-                @endif
+                </div> -->
+              
 
                </div>
 
@@ -82,6 +102,107 @@
         </div>
     </div>
 
+    <div class="col-md-12">
+    <div class="card">
+        <div class="card-body">
+
+            @if(count($errors) > 0)
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                    <li>{{$error}}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+            @if(\Session::has('success'))
+            <div class="alert alert-success">
+                <p>{{ \Session::get('success') }}</p>
+            </div>
+            @endif
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#tab1" role="tab">Sejarah Mata Ganjaran PRiM</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab2" role="tab">Ahli Anda</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab3" role="tab">Sejarah PRiM Medal</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab1" role="tabpanel">
+                    <div class="table-responsive">
+                        <table id="pointHistoryTable" class="table table-bordered table-striped dt-responsive nowrap"
+                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <thead>
+                                <tr style="text-align:center">
+                                    <th>No.</th>
+                                    <th>Nama</th>
+                                    <th>Mata Ganjaran</th>
+                                    <th>Tarikh</th>
+                                    <th>Nota</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="5"></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab2" role="tabpanel">
+                    <div class="table-responsive">
+                        <table id="memberTable" class="table table-bordered table-striped dt-responsive nowrap"
+                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            
+                            <thead>
+                                <tr style="text-align:center">
+                                    <th>No.</th>
+                                    <th>Nama Ahli</th>
+                                    <th>Tarikh Masuk</th>
+                                    <th>Jenis Ahli</th>
+                                    <th>Jumlah Kontribusi</th>
+                                    <th>Kontribusi Hari ini</th>
+                                </tr>
+                            </thead>
+                           
+                        </table>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab3" role="tabpanel">
+                    <div class="table-responsive">
+                        <table id="streakTable" class="table table-bordered table-striped dt-responsive nowrap"
+                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            
+                            <thead>
+                                <tr style="text-align:center">
+                                    <th>No.</th>
+                                    <th>Tarikh Mula</th>
+                                    <th>Tarikh Tamat</th>
+                                    <th>Butiran</th>
+                                    <th>PRiM Medal</th>
+                                    <th>Status</th>
+                                    <th>Butiran</th>
+                                   
+                                </tr>
+                            </thead>
+                           
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- 
     <div class="col-md-12">
         <div class="card">
 
@@ -129,7 +250,7 @@
 
       
        
-    </div>
+    </div> -->
 </div>
 @endsection
 
@@ -148,11 +269,106 @@
 
     $(document).ready(function(){
         fetch_data();
-        console.log('hallo');
-        console.log(@json($transaction_ids));
+        fetch_member();
+        fetch_donation_streak();
+       
     });
 
 
+    function fetch_donation_streak(){
+        streakTable = $('#streakTable').DataTable({
+        processing: true,
+        ajax: {
+            url: "{{ route('point.getDonationStreakTable') }}",
+            type: 'GET',
+        },
+        columnDefs: [
+            {
+                targets: [0, 1, 2, 3, 4,5,6], // Assuming you have 4 columns (index 0, 1, 2, 3)
+                className: 'text-center',
+            },
+            {
+                targets: 0,
+                width: '2%',
+               
+            },
+            {
+                targets: [1, 2, 3,4,5,6],
+                width: '20%',
+            }
+        ],
+        order: [[0, 'asc']],
+        columns: [
+            
+            {"data": null,
+                searchable: false,
+                "sortable": false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
+            { data: 'startdate', name: 'startdate' },
+            { data: 'enddate', name: 'enddate' },
+            { data: 'desc', name: 'desc' },
+            { data: 'prim_medal', name: 'prim_medal' },
+            { data: 'status', name: 'status' },
+            { data: 'detail', name: 'detail' },
+
+        ],createdRow: function(row, data, dataIndex) {
+            if (data.status === 'Gagal') {
+                $(row).addClass('table-danger');
+            }else if(data.status === '-'){
+                $(row).addClass('table-warning');
+            }
+            else{
+                $(row).addClass('table-success');
+            }
+        }
+    });
+    }
+
+    function fetch_member() {
+    memberTable = $('#memberTable').DataTable({
+        processing: true,
+        ajax: {
+            url: "{{ route('point.getReferralCodeMemberDatatable') }}",
+            type: 'GET',
+        },
+        columnDefs: [
+            {
+                targets: [0, 1, 2, 3, 4,5], // Assuming you have 4 columns (index 0, 1, 2, 3)
+                className: 'text-center',
+            },
+            {
+                targets: 0,
+                width: '2%',
+               
+            },
+            {
+                targets: [1, 2, 3,4,5],
+                width: '20%',
+            }
+        ],
+        order: [[0, 'asc']],
+        columns: [
+            
+            {"data": null,
+                searchable: false,
+                "sortable": false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
+            { data: 'member_name', name: 'member_name' },
+            { data: 'created_at', name: 'created_at' },
+            { data: 'level', name: 'level' },
+            { data: 'contribution', name: 'contribution' },
+            { data: 'todayContribution', name: 'todayContribution' },
+        ]
+    });
+}
+
+    
    function fetch_data() {
     pointHistoryTable = $('#pointHistoryTable').DataTable({
                     processing: true,
@@ -201,7 +417,7 @@
                             }).data().reduce(function(a, b) {
                                 return parseFloat(a) + parseFloat(b);
                             }, 0);
-                        $(api.column(0).footer()).html('Jumlah Mata Ganjarano: ' + sum);
+                        $(api.column(0).footer()).html('Jumlah Mata Ganjaran: ' + sum);
                         console.log(sum);
                     }
        

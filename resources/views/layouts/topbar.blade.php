@@ -197,8 +197,10 @@
                                     <!-- item1 profile CHANGE THE ROUTE HERE-->
                                     <a class="dropdown-item" href="{{ route('profile.index') }}"><i class="mdi mdi-account-circle font-size-17 align-middle mr-1"></i> Profile</a>
                                     <!-- logout -->
+                               
+                                <a class="dropdown-item" href="{{ route('point.index') }}"><i class="mdi mdi-account-circle font-size-17 align-middle mr-1"></i>PRiM Medal</a>
+                                    <!-- logout -->
                                 <div class="dropdown-divider"></div>
-                              
                                 <a class="dropdown-item text-danger" href="javascript:void();" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="bx bx-power-off font-size-17 align-middle mr-1 text-danger"></i>
                                     {{ __('Logout') }}

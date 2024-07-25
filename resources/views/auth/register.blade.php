@@ -59,9 +59,21 @@ Register
 
                         <div class="card-body p-4">
                             <div class="p-3">
+                           
                                 <form method="POST" class="form-horizontal mt-4" action="{{ route('register') }}">
                                     @csrf
+                                    <div class="form-group">
 
+                                        <input type="hidden"
+                                            class="form-control @error('password') is-invalid @enderror" name="referral_code"
+                                             id="referral_code">
+                                             @error('referral_code')
+                                            <div class="invalid-feedback" style="display: block;">
+                                                <strong>{{ $message }}</strong>
+                                            </div>
+                                            @enderror
+                                    </div>
+                                    
                                     <div class="form-group">
                                         <label for="name">Nama Penuh</label>
                                         <input type="text" name="name" id="name"
@@ -116,6 +128,7 @@ Register
                                             class="form-control @error('password_confirmation') is-invalid @enderror"
                                             name="password_confirmation" required placeholder="Sahkan Kata Laluan">
                                     </div>
+                                  
 
                                     <div class="form-group row">
                                         <div class="col-12 text-center">
@@ -133,7 +146,8 @@ Register
                                                 style="pointer-events: none;"  class="text-primary">Terma</a> PRIM</p>
                                         </div>
                                     </div>
-
+                                   
+                                    
                                 </form>
 
                             </div>
@@ -160,6 +174,19 @@ Register
 <script>
     $(document).ready(function () {
         $('.phone_no').mask('+600000000000');
+
+        // Function to update the input field with the referral code
+        function updateReferralCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+           
+            const referralCode = urlParams.get('referral_code');
+          
+            if (referralCode) {
+                document.getElementById('referral_code').value = referralCode;
+            }
+        }
+
+        updateReferralCode();
     });
 </script>
 @endsection

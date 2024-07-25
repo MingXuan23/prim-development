@@ -141,7 +141,8 @@
             <div class="modal-body">
                 <select id="itemSelect" class="form-control">
                     <!-- Populate options dynamically using JavaScript or Blade -->
-                    <option value="M" selected>Get & Go</option>
+                    <option value="R" selected>Inviatation Link</option>
+                    <option value="M" >Get & Go</option>
                     
                     <!-- Add more options as needed -->
                 </select>

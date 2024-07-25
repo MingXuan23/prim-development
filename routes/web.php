@@ -98,9 +98,17 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
 Route::get('point/policy', 'PointController@pointPolicy')->name('point.pointPolicy');
 Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
     Route::get('getPointHistoryDatatable', 'PointController@getPointHistoryDatatable')->name('point.getPointHistoryDatatable');
+
+    Route::get('getReferralCodeMemberDatatable', 'PointController@getReferralCodeMemberDatatable')->name('point.getReferralCodeMemberDatatable');
+    Route::get('getDonationStreakTable', 'PointController@getDonationStreakTable')->name('point.getDonationStreakTable');
+    Route::get('donationStreak/{id}', 'PointController@viewDonationStreak')->name('point.viewDonationStreak');
+    Route::get('getDonationStreakTransactionTable/{id}', 'PointController@getDonationStreakTransactionTable')->name('point.getDonationStreakTransactionTable');
+
+    
     Route::get('spinningWheel', 'PointController@spinningWheel')->name('point.spinningWheel');
     Route::get('shareReferralLink','PointController@shareReferralLink')->name('point.shareReferralLink');
     Route::get('getReferralCode', 'PointController@getReferralCode')->name('point.getReferralCode');
+    Route::get('reward', 'ReferralCodeRewardController@view')->name('point.viewreward');
 
 
 });
@@ -515,7 +523,8 @@ Route::group(['middleware' => ['auth']], function () {
         'dorm'               => 'DormController',
         'koperasi'           => 'Cooperative\User\UserCooperativeController',
         'delivery'           => 'DeliveryController',
-        'point'             =>'PointController'
+        'point'             =>'PointController',
+        'admin/reward'            =>'ReferralCodeRewardController'
     ]);
 });
 Route::get('adminTestFpx/{id}/', 'DirectPayController@adminTestFpx')->name('adminTestFpx');
