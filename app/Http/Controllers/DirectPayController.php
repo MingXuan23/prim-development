@@ -599,10 +599,12 @@ class DirectPayController extends Controller
             $result = ['code' => $own_code->code??'', 'source' => 'own'];
         }
         
-        
-        if($result['code'] == $own_code->code  && $leader_code != null){
-            $result = ['code' => $leader_code->code, 'source' => 'leader'];
+        if($own_code!=null){
+            if($result['code'] == $code??''  && $leader_code != null){
+                $result = ['code' => $leader_code->code, 'source' => 'leader'];
+            }
         }
+       
         
         //dd($result,$leader_code);
         return $result;

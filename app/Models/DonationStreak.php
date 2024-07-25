@@ -146,7 +146,7 @@ class DonationStreak extends Model
     {
         $transaction = DB::table('transactions')->where('id', $transaction_id)->first();
     
-        if (!$transaction) {
+        if (!$transaction || !$user_id) {
             return; // Or handle the error as appropriate
         }
         else if($transaction->status != "Success"){
