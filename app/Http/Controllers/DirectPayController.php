@@ -395,18 +395,18 @@ class DirectPayController extends Controller
                         'transaction_id' => $transaction->id
                     ]);
 
-                    $result = $this->getReferralCodeFromSource($request->referral_code);
-                    //dd($referral_code);
-                    $code = $result['code'];
+                //     $result = $this->getReferralCodeFromSource($request->referral_code);
+                //     //dd($referral_code);
+                //     $code = $result['code'];
 
-                    $referral_code = DB::table('referral_code')
-                                    ->where('code',$code)
-                                    ->first();
+                //     $referral_code = DB::table('referral_code')
+                //                     ->where('code',$code)
+                //                     ->first();
 
-                   // $own_code_id = $own_code !=null ?$own_code->id:0;
-                     if ($result['source'] != 'none'){
-                        $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Get & Go RM'.$transaction->amount);
-                    }
+                //    // $own_code_id = $own_code !=null ?$own_code->id:0;
+                //      if ($result['source'] != 'none'){
+                //         $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Get & Go RM'.$transaction->amount);
+                //     }
 
                 }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'K')
@@ -491,29 +491,17 @@ class DirectPayController extends Controller
                                     ->first();
 
                    // $own_code_id = $own_code !=null ?$own_code->id:0;
-                    if($result['source'] == 'own'){
-                        $this->insertPointHistory($referral_code->id,$transaction->id,0,1,'Transaksi Derma daripada sendiri');
 
-                    }
-                    else if ($result['source'] != 'none'){
+                   if($result['own_code'] != ""){
+                        $own_code =  DB::table('referral_code')
+                                    ->where('code',$result['own_code'])
+                                    ->first();
+                         $this->insertPointHistory($own_code->id,$transaction->id,0,1,'Transaksi Derma daripada sendiri');
+                   }
+                    if ($result['source'] != 'none'){
                         $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Derma daripada kod');
-
-
-                        // DB::table('point_history')
-                        // ->insert([
-                        //     'created_at'=>Carbon::now(),
-                        //     'updated_at'=>Carbon::now(),
-                        //     'referral_code_id'=> $own_code->id,
-                        //     'transaction_id'=> $transaction->id,
-                        //     'isDebit' =>0,
-                        //     'fromSubline' =>0,
-                        //     'status'=>0,
-                        //     'points'=>2,
-                        //     'desc'=>'Donation credit to own referral code'
-
-                        // ]);
                     }
-
+                    //dd('stop');
                 }
             }
             else
@@ -582,31 +570,38 @@ class DirectPayController extends Controller
                     ->select('rc.code')
                     ->first();
 
-        $result = ['code' => "", 'source' => 'none'];
-      
+        $result = ['own_code' => "", 'code'=>"" ,'source' => 'none'];
+        
+        if($own_code !=null){
+            $result['own_code'] = $own_code->code;
+        }
        
         if(!empty($requestReferralCode)){
-            $result =  ['code' => $requestReferralCode, 'source' => 'request'];
+            if($result['own_code'] != $requestReferralCode ){
+                $result['code'] = $requestReferralCode;
+                $result['source'] = 'request';
+            }
+            
         }
         else if (session()->has('referral_code') && !empty(session('referral_code'))) {
             $referral_code = session()->pull('referral_code');
-            $result =  ['code' => $referral_code, 'source' => 'session'];
+            if($referral_code != $result['own_code']){
+                $result['code'] = $referral_code;
+                $result['source'] = 'session';
+            }
 
-        }else if($own_code == null && $leader_code != null){
-            $result = ['code' => $leader_code->code, 'source' => 'leader'];
-        }
-        else if($own_code !=null){
-            $result = ['code' => $own_code->code??'', 'source' => 'own'];
         }
         
-        if($own_code!=null && $leader_code != null){
-            if($result['code'] == $own_code->code??''  ){
-                $result = ['code' => $leader_code->code, 'source' => 'leader'];
-            }
+        if($leader_code != null && $result['source'] == 'none'){
+            $result['code'] =$leader_code->code;
+            $result['source'] = 'leader';
+            //$result = ['code' => $leader_code->code, 'source' => 'leader'];
         }
        
+      
+       
         
-       // dd($result,$leader_code);
+        //dd($result,$leader_code);
         return $result;
 
     }
