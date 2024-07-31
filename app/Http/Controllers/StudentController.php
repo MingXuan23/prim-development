@@ -1315,6 +1315,7 @@ class StudentController extends Controller
             $hasOrganizaton = $request->hasOrganization;
             $start_date = $request->start_date;
             $end_date = $request->end_date;
+            //dd($request);
            // dd($end_date);
 
             $userId = Auth::id();
@@ -1373,10 +1374,12 @@ class StudentController extends Controller
                 });
 
                 $table->addColumn('status', function ($row) use ($orgId){
-                    $row_end_date =$row->end_date;
+                   
                     if($row->end_date == null){
-                        $row_end_date = Carbon::now()->format('Y-m-d');
+                        $row_end_date = Carbon::tomorrow()->format('Y-m-d');
                         //$row->end_date = Carbon::now()->format('Y-m-d');
+                    }else{
+                        $row_end_date = Carbon::parse($row->end_date)->endOfDay()->format('Y-m-d H:i:s');;
                     }
 
                    // dd($row,$row_end_date);
