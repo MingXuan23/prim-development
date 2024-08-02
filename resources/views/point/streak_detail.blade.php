@@ -6,7 +6,10 @@
 @endsection
 @section('content')
 <div class="container">
-    <h1>Sejarah Derma Dalam PRiM Medal</h1>
+    <div class="row align-items-center">
+    <h1 class="col-auto">Sejarah Derma Dalam PRiM Medal</h1> <a class="btn btn-primary col-auto" href="{{route('point.index')}}">Return</a>
+
+    </div>
     <table class="table table-bordered data-table" id="datatable">
         <thead>
             <tr>
