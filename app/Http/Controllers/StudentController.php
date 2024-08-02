@@ -1819,12 +1819,13 @@ class StudentController extends Controller
         $class=DB::table('classes as c')
                 ->where('c.id',$student->newClass)
                 ->first();
+       // dd($student);
         $class_student=DB::table('class_organization as co')
                 ->join('class_student as cs','cs.organclass_id','co.id')
-                ->where('cs.student_id',$student->id)
+                ->where('cs.student_id',$student->id??$student->studentId)
                 ->where('cs.status',1)
                 ->select('co.*','cs.*','cs.id as class_student_id')
-                ->where('co.class_id',$student->class_id);
+                ->where('co.class_id',$student->class_id??$student->oldClassId);
         
         $class_student_details=$class_student->first();
 
