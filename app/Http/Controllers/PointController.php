@@ -15,7 +15,6 @@ class PointController extends Controller
 {
      public function index()
     {
-        //DonationStreak::updateStreak(17151,42633);
         $user_id = Auth::id();
 
         $referral_code = $this->getReferralCode(true);
@@ -27,21 +26,21 @@ class PointController extends Controller
         // ->sum('points');
 
 
-        $continueStreak = DB::table('point_history')
-        ->where('referral_code_id', $referral_code->id)
-        ->where(function($query) {
-            $query->whereDate('created_at', today())
-                ->orWhereDate('created_at', today()->subDay());
-        })
-        ->where('desc','LIKE','Transaksi Derma%')
-        ->exists();
+        // $continueStreak = DB::table('point_history')
+        // ->where('referral_code_id', $referral_code->id)
+        // ->where(function($query) {
+        //     $query->whereDate('created_at', today())
+        //         ->orWhereDate('created_at', today()->subDay());
+        // })
+        // ->where('desc','LIKE','Transaksi Derma%')
+        // ->exists();
 
-        if(!$continueStreak && $referral_code->donation_streak >0 ){
-            DB::table('referral_code')
-            ->where('id',$referral_code->id)
-            ->update(['donation_streak'=>0]);
-            $referral_code = $this->getReferralCode(true);
-        }
+        // if(!$continueStreak && $referral_code->donation_streak >0 ){
+        //     DB::table('referral_code')
+        //     ->where('id',$referral_code->id)
+        //     ->update(['donation_streak'=>0]);
+        //     $referral_code = $this->getReferralCode(true);
+        // }
         
         // $total_transaction = DB::table('point_history as ph')
         // ->leftJoin('transactions as t','t.id','ph.transaction_id')
@@ -109,12 +108,14 @@ class PointController extends Controller
             </div>
            '.$followerDiv.$donateToLeaderDiv.'
         </div>';
-        $streakData = DonationStreak::getStreakData();
-       
 
-
+        $result = DonationStreak::getStreakData();
+                
+        $streakData = $result['donation_streak'];
+        $sedekah_subuh = $result['sedekah_subuh'];
+       // dd($streakData,$sedekah_subuh);
         //dd($transaction_ids);
-         return view('point.index',compact('referral_code','total_follower','progressToday','streakData'));
+         return view('point.index',compact('referral_code','total_follower','progressToday','streakData','sedekah_subuh'));
     }
 
     public function getWheelList(){
@@ -159,15 +160,17 @@ class PointController extends Controller
     }
 
 
-    public function getDonationStreakTable(){
+    public function getDonationStreakTable(Request $request){
         if (request()->ajax()) {
             $user_id = Auth::id();
+            $quality_donation = $request->sedekahSubuh == "1";
+           // dd($quality_donation);
             $donationStreak = $this->getReferralCode(true);
             //dd($referral_code);
-            $data = DB::table('donation_streak as ds')
+            $data = DB::table('donation_streak_new as ds')
                     ->where('ds.status',1)
                     ->where('ds.user_id', $user_id)
-                   
+                    ->where('ds.quality_donation',$quality_donation)
                     ->select('ds.startdate','ds.enddate','ds.prim_medal','ds.desc','ds.id')
                     ->orderBy('ds.startdate','desc')
                     ->get();
@@ -195,9 +198,9 @@ class PointController extends Controller
     }
     
     public function viewDonationStreak($id){
-        $donationStreak = DB::table('donation_streak')->where('id', $id)->first();
+        $donationStreak = DB::table('donation_streak_new')->where('id', $id)->first();
         if (!$donationStreak) {
-           return view('erros.404');
+           return view('errors.404');
         }
 
         // Generate the route for the DataTable
@@ -211,13 +214,21 @@ class PointController extends Controller
 
     public function getDonationStreakTransactionTable($id){
         if(request()->ajax()){
-           $data= DB::table('donation_streak_transaction')
-            ->where('donation_streak_id',$id)
-            ->select('created_at','day','quality_donation')
+        $streak = DonationStreak::find($id);
+        if($streak == null){
+            return null;
+        }
+        $ids = json_decode($streak->donation_streak_record_ids);
+
+           $data= DB::table('donation_streak_record')
+            ->whereIn('id',$ids)
+            ->select('created_at','quality_donation')
+            ->orderBy('created_at','desc')
             ->get();
 
             foreach($data as $d){
                 $d->quality_donation =  $d->quality_donation?'YA':'TIDAK';
+                $d->day = Carbon::parse($streak->startdate)->diffInDays($d->created_at) +1;
             }
 
             return DataTables::of($data)->make(true);
@@ -249,6 +260,8 @@ class PointController extends Controller
                                     ])
                                     ->whereBetween('ph.created_at', [Carbon::today(), Carbon::tomorrow()])
                                     ->sum('ph.points');
+                $level = DB::table('referral_code_member_level')->where('id', $d->level)->first();
+                $d->level = $level == null? $d->level:$level->level;
                 // switch($d->level){
                 //     case '1':
                 //         $d->level = 'Ahli Biasa'; break;

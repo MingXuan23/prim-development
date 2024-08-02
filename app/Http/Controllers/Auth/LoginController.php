@@ -45,7 +45,13 @@ class LoginController extends Controller
      */
     public function __construct()
     {
-
+        $this->middleware(function ($request, $next) {
+            if (Auth::check()) {
+                return redirect($this->redirectTo)->send();
+            }
+    
+            return $next($request);
+        });
         //$this->middleware('guest')->except('logout');
     }
 

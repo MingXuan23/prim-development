@@ -41,8 +41,8 @@
                         <input type="text" id="total_point" readonly value="{{ $referral_code->total_visit }}" class="form-control">
                     </div>
                     <div class="col-md-6">
-                        <label for="point_month" class="col-form-label">Jumlah Ahli</label>
-                        <input type="text" readonly value="{{ $total_follower }}" class="form-control">
+                        <label for="point_month" class="col-form-label">Jumlah Sedekah Subuh</label>
+                        <input type="text" readonly value="{{ $sedekah_subuh['prim_medal'] }}" class="form-control">
                     </div>
                 </div>
                    
@@ -59,11 +59,11 @@
                <label class="col-form-label">
                     @if($streakData['streak_today'])
                         <div >
-                            <i class="fas fa-check-circle text-success"></i> Anda telah derma pada hari ini: {{ $streakData['current_streak'] }}/40 Hari 
+                            <i class="fas fa-check-circle text-success"></i> PRiM Medal @if (isset($streakData['streak_startdate'])) Mulai {{$streakData['streak_startdate']}} @endif: {{ $streakData['current_streak'] }}/40 Hari 
                         </div>
                         @else
                         <div  class ="text-danger">
-                            <i class="fas fa-exclamation-circle text-danger"></i> Anda belum derma pada hari ini: {{ $streakData['current_streak'] }}/40 Hari 
+                            <i class="fas fa-exclamation-circle text-danger"></i> PRiM Medal @if (isset($streakData['streak_startdate'])) Mulai {{$streakData['streak_startdate']}} @endif: {{ $streakData['current_streak'] }}/40 Hari 
                          </div>
                         @endif </label>
                    
@@ -71,6 +71,34 @@
                     
                     <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
                         <div class="progress-bar {{ $streakData['streak_today'] ?  'bg-warning':'bg-danger' }}" style="width: {{ $streakData['current_streak'] * 2.5 }}%;" role="progressbar" aria-valuenow="{{ $streakData['current_streak'] }}" aria-valuemin="0" aria-valuemax="40">
+
+                      
+                        </div>
+                       
+                    </div>
+                    <!-- @if(isset($streakData['streak_startdate']))
+                    (Mulai {{$streakData['streak_startdate']}})
+                    @endif -->
+                    
+                  
+                    
+                </div>
+                <div id="progressBars">
+               <label class="col-form-label">
+                    @if($sedekah_subuh['streak_today'])
+                        <div >
+                            <i class="fas fa-check-circle text-success"></i> Sedekah Subuh @if (isset($sedekah_subuh['streak_startdate'])) Mulai {{$sedekah_subuh['streak_startdate']}} @endif: {{ $sedekah_subuh['current_streak'] }}/40 Hari 
+                        </div>
+                        @else
+                        <div  class ="text-danger">
+                            <i class="fas fa-exclamation-circle text-danger"></i> Sedekah Subuh  @if (isset($sedekah_subuh['streak_startdate'])) Mulai {{$sedekah_subuh['streak_startdate']}} @endif:   {{ $sedekah_subuh['current_streak'] }}/40 Hari 
+                         </div>
+                        @endif </label>
+                   
+                      
+                    
+                    <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
+                        <div class="progress-bar {{ $sedekah_subuh['streak_today'] ?  'bg-warning':'bg-danger' }}" style="width: {{ $sedekah_subuh['current_streak'] * 2.5 }}%;" role="progressbar" aria-valuenow="{{ $sedekah_subuh['current_streak'] }}" aria-valuemin="0" aria-valuemax="40">
 
                       
                         </div>
@@ -132,6 +160,9 @@
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="tab" href="#tab3" role="tab">Sejarah PRiM Medal</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab4" role="tab">Sejarah Sedekah Subuh</a>
+                </li>
             </ul>
 
             <!-- Tab panes -->
@@ -179,6 +210,28 @@
                 <div class="tab-pane" id="tab3" role="tabpanel">
                     <div class="table-responsive">
                         <table id="streakTable" class="table table-bordered table-striped dt-responsive nowrap"
+                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            
+                            <thead>
+                                <tr style="text-align:center">
+                                    <th>No.</th>
+                                    <th>Tarikh Mula</th>
+                                    <th>Tarikh Tamat</th>
+                                    <th>Butiran</th>
+                                    <th>PRiM Medal</th>
+                                    <th>Status</th>
+                                    <th>Butiran</th>
+                                   
+                                </tr>
+                            </thead>
+                           
+                        </table>
+                    </div>
+                  
+                </div>
+                <div class="tab-pane" id="tab4" role="tabpanel">
+                    <div class="table-responsive">
+                        <table id="sedekahTable" class="table table-bordered table-striped dt-responsive nowrap"
                             style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                             
                             <thead>
@@ -271,8 +324,64 @@
         fetch_data();
         fetch_member();
         fetch_donation_streak();
+        fetch_sedekah_subuh();
        
     });
+
+    function fetch_sedekah_subuh(){
+        streakTable = $('#sedekahTable').DataTable({
+        processing: true,
+        ajax: {
+            url: "{{ route('point.getDonationStreakTable') }}",
+            type: 'GET',
+            data: {
+                sedekahSubuh: 1,
+            }
+        },
+        columnDefs: [
+            {
+                targets: [0, 1, 2, 3, 4,5,6], // Assuming you have 4 columns (index 0, 1, 2, 3)
+                className: 'text-center',
+            },
+            {
+                targets: 0,
+                width: '2%',
+               
+            },
+            {
+                targets: [1, 2, 3,4,5,6],
+                width: '20%',
+            }
+        ],
+        order: [[0, 'asc']],
+        columns: [
+            
+            {"data": null,
+                searchable: false,
+                "sortable": false,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
+            { data: 'startdate', name: 'startdate' },
+            { data: 'enddate', name: 'enddate' },
+            { data: 'desc', name: 'desc' },
+            { data: 'prim_medal', name: 'prim_medal' },
+            { data: 'status', name: 'status' },
+            { data: 'detail', name: 'detail' },
+
+        ],createdRow: function(row, data, dataIndex) {
+            if (data.status === 'Gagal') {
+                $(row).addClass('table-danger');
+            }else if(data.status === '-'){
+                $(row).addClass('table-warning');
+            }
+            else{
+                $(row).addClass('table-success');
+            }
+        }
+    });
+    }
 
 
     function fetch_donation_streak(){
@@ -281,6 +390,9 @@
         ajax: {
             url: "{{ route('point.getDonationStreakTable') }}",
             type: 'GET',
+            data: {
+                sedekahSubuh: 0,
+            }
         },
         columnDefs: [
             {

@@ -11,7 +11,7 @@ class DonationStreak extends Model
 {
 
 
-    protected $table = 'donation_streak';
+    protected $table = 'donation_streak_new';
 
     protected $fillable = [
         'user_id',
@@ -20,6 +20,9 @@ class DonationStreak extends Model
         'prim_medal',
         'status',
         'desc',
+        'quality_donation',
+        'donation_streak_record_ids',
+        'total_day'
     ];
 
 
@@ -50,6 +53,7 @@ class DonationStreak extends Model
         return Carbon::parse($date->format('Y-m-d'));
 
     }
+
     static public function getStreakData(){
         $user_id = Auth::id();
         
@@ -65,27 +69,57 @@ class DonationStreak extends Model
         $streak =  DonationStreak::where('user_id', $user_id)
             ->where('status', 1)
             ->whereNull('enddate')
-            ->where('prim_medal', -1) 
+            ->where('prim_medal', -1)
+            ->where('quality_donation',0) 
             ->first();
 
         $prim_medal = DonationStreak::where('user_id', $user_id)
                     ->where('status', 1)
                     ->where('prim_medal', 1) 
+                    ->where('quality_donation',0) 
                     ->count();
 
 
         if($streak == null){
-            return ['current_streak'=>0, 'streak_today'=>0, 'prim_medal'=>$prim_medal];
+            $donation_streak = ['current_streak'=>0, 'streak_today'=>0, 'prim_medal'=>$prim_medal];
+        }else{
+ 
+            $streak_startdate = $streak->startdate;
+            $streak_today = Carbon::today()->diffInDays(DonationStreak::getDateWithoutTime($streak->updated_at)) == 0;
+            $current_streak = $streak->total_day;
+           // dd($streak_today,$streak->updated_at->format('Y-m-d'),Carbon::today());
+    
+           //dd($current_streak);
+           $donation_streak = ['current_streak'=>$current_streak, 'streak_today'=>$streak_today , 'prim_medal' => $prim_medal ,'streak_startdate'=>$streak_startdate];
         }
-        
-       
-        $streak_startdate = $streak->startdate;
-        $streak_today = Carbon::today()->diffInDays(DonationStreak::getDateWithoutTime($streak->updated_at)) == 0;
-        $current_streak = Carbon::today()->diffInDays($streak->startdate) + ($streak_today?1:0);
-       // dd($streak_today,$streak->updated_at->format('Y-m-d'),Carbon::today());
 
-       //dd($current_streak);
-        return ['current_streak'=>$current_streak, 'streak_today'=>$streak_today , 'prim_medal' => $prim_medal ,'streak_startdate'=>$streak_startdate];
+        $q_streak =  DonationStreak::where('user_id', $user_id)
+        ->where('status', 1)
+        ->whereNull('enddate')
+        ->where('prim_medal', -1)
+        ->where('quality_donation',1) 
+        ->first();
+
+        $q_prim_medal = DonationStreak::where('user_id', $user_id)
+                    ->where('status', 1)
+                    ->where('prim_medal', 1) 
+                    ->where('quality_donation',1) 
+                    ->count();
+      
+        if($q_streak == null){
+            $sedekah_subuh = ['current_streak'=>0, 'streak_today'=>0, 'prim_medal'=>$q_prim_medal];
+        }else{
+    
+            $streak_startdate = $q_streak->startdate;
+            $streak_today = Carbon::today()->diffInDays(DonationStreak::getDateWithoutTime($q_streak->updated_at)) == 0;
+            $current_streak = $q_streak->total_day;
+            // dd($streak_today,$streak->updated_at->format('Y-m-d'),Carbon::today());
+    
+            //dd($current_streak);
+            $sedekah_subuh = ['current_streak'=>$current_streak, 'streak_today'=>$streak_today , 'prim_medal' => $q_prim_medal ,'streak_startdate'=>$streak_startdate];
+        }
+      
+        return ['donation_streak'=>$donation_streak ,'sedekah_subuh'=>$sedekah_subuh];
     }
 
     static public function updateFollowerStatus($user_id){
@@ -142,6 +176,48 @@ class DonationStreak extends Model
      
     }
     
+
+    static public function saveStreak($user_id,$transactionDate,$quality_donation,$record_id){
+        $streak =  DonationStreak::where('user_id', $user_id)
+        ->where('status', 1)
+        ->whereNull('enddate')
+        ->where('prim_medal', -1) 
+        ->where('quality_donation',$quality_donation)
+        ->first();
+        //dd($transactionDate);
+        $today = Carbon::today();
+
+        if ($streak === null) {
+            $ids =[] ;
+            $streak = new DonationStreak();
+            $streak->user_id = $user_id;
+            $streak->startdate = $transactionDate;
+            $streak->status = 1;
+            $streak->prim_medal = -1;
+           // $streak->desc = 'Anda telah derma 1 hari';
+            $streak->quality_donation = $quality_donation;
+            $streak->donation_streak_record_ids = json_encode($ids);
+          
+            $streak->save();
+        } 
+
+        $current_streak =DonationStreak::getDateWithoutTime($transactionDate)->diffInDays($streak->startdate) +1;
+        if($current_streak >=40){
+            $streak->prim_medal = 1;
+            $streak->enddate = $transactionDate;
+        }
+
+        $ids = json_decode($streak->donation_streak_record_ids);
+        $ids[] = $record_id;
+
+        $streak->donation_streak_record_ids = json_encode($ids);
+        $streak->desc = 'Anda telah derma ' . $current_streak . ' hari';
+        $streak->updated_at = $transactionDate;
+        $streak->total_day = $current_streak;
+        
+        $streak->save();
+    }
+
     static public function updateStreak($user_id, $transaction_id)
     {
         $transaction = DB::table('transactions')->where('id', $transaction_id)->first();
@@ -152,67 +228,129 @@ class DonationStreak extends Model
         else if($transaction->status != "Success"){
             return;
         }
-        else if(DB::table('donation_streak_transaction')->where('status',1)->where('transaction_id',$transaction->id)->exists()){
+        else if(DB::table('donation_streak_record')->where('status',1)->where('transaction_id',$transaction->id)->exists()){
             return;
         }
-    
+
         $transactionDate = Carbon::parse($transaction->datetime_created);
         $quality_transaction = $transactionDate->hour >= 3 && $transactionDate->hour < 7.5;
-    
-        $streaks = DonationStreak::where('user_id', $user_id)
-            ->where('status', 1)
-            ->whereNull('enddate')
-            ->where('prim_medal', -1)
-            ->get();
-        foreach($streaks as $s){
-            $s->validateCurrentStreak($transactionDate);
-        }
+
+        $record_id = DB::table('donation_streak_record')->insertGetId([
             
-       
-        $streak =  DonationStreak::where('user_id', $user_id)
-            ->where('status', 1)
-            ->whereNull('enddate')
-            ->where('prim_medal', -1) 
-            ->first();
-        //dd($transactionDate);
-        $today = Carbon::today();
-    
-        if ($streak === null) {
-            $streak = new DonationStreak();
-            $streak->user_id = $user_id;
-            $streak->startdate = $transactionDate;
-            $streak->status = 1;
-            $streak->prim_medal = -1;
-           // $streak->desc = 'Anda telah derma 1 hari';
-          
-          
-            $streak->save();
-        } 
-        //dd($streak->updated_at);
-    
-        $current_streak =DonationStreak::getDateWithoutTime($transactionDate)->diffInDays($streak->startdate) +1;
-        if($current_streak >=40){
-            $streak->prim_medal = 1;
-            $streak->enddate = $transactionDate;
-        }
-
-
-        $streak->desc = 'Anda telah derma ' . $current_streak . ' hari';
-        $streak->updated_at = $transactionDate;
-        $streak->save();
-    
-        DB::table('donation_streak_transaction')->insert([
-            'donation_streak_id' => $streak->id,
             'transaction_id' => $transaction->id,
-            'day' => $current_streak,
+            'user_id'       =>$user_id,
             'quality_donation' => $quality_transaction,
             'created_at' => $transactionDate,
             'updated_at' => $transactionDate,
             'status'     => 1
         ]);
+    
+        if($quality_transaction){
+            $streaks = DonationStreak::where('user_id', $user_id)
+            ->where('status', 1)
+            ->whereNull('enddate')
+            ->where('prim_medal', -1)
+            ->where('quality_donation',1)
+            ->get();
+
+            foreach($streaks as $s){
+                $s->validateCurrentStreak($transactionDate);
+            }
+
+            DonationStreak::saveStreak($user_id,$transactionDate,1,$record_id);
+           
+
+        }
+        
+        $streaks = DonationStreak::where('user_id', $user_id)
+        ->where('status', 1)
+        ->whereNull('enddate')
+        ->where('prim_medal', -1)
+        ->where('quality_donation',0)
+        ->get();
+
+        foreach($streaks as $s){
+            $s->validateCurrentStreak($transactionDate);
+        }
+
+        DonationStreak::saveStreak($user_id,$transactionDate,0,$record_id);
+       
 
         DonationStreak::updateFollowerStatus($user_id);
 
     }
+
+    // static public function updateStreak($user_id, $transaction_id)
+    // {
+    //     $transaction = DB::table('transactions')->where('id', $transaction_id)->first();
+    
+    //     if (!$transaction || !$user_id) {
+    //         return; // Or handle the error as appropriate
+    //     }
+    //     else if($transaction->status != "Success"){
+    //         return;
+    //     }
+    //     else if(DB::table('donation_streak_transaction')->where('status',1)->where('transaction_id',$transaction->id)->exists()){
+    //         return;
+    //     }
+    
+    //     $transactionDate = Carbon::parse($transaction->datetime_created);
+    //     $quality_transaction = $transactionDate->hour >= 3 && $transactionDate->hour < 7.5;
+    
+    //     $streaks = DonationStreak::where('user_id', $user_id)
+    //         ->where('status', 1)
+    //         ->whereNull('enddate')
+    //         ->where('prim_medal', -1)
+    //         ->get();
+    //     foreach($streaks as $s){
+    //         $s->validateCurrentStreak($transactionDate);
+    //     }
+            
+       
+    //     $streak =  DonationStreak::where('user_id', $user_id)
+    //         ->where('status', 1)
+    //         ->whereNull('enddate')
+    //         ->where('prim_medal', -1) 
+    //         ->first();
+    //     //dd($transactionDate);
+    //     $today = Carbon::today();
+    
+    //     if ($streak === null) {
+    //         $streak = new DonationStreak();
+    //         $streak->user_id = $user_id;
+    //         $streak->startdate = $transactionDate;
+    //         $streak->status = 1;
+    //         $streak->prim_medal = -1;
+    //        // $streak->desc = 'Anda telah derma 1 hari';
+          
+          
+    //         $streak->save();
+    //     } 
+    //     //dd($streak->updated_at);
+    
+    //     $current_streak =DonationStreak::getDateWithoutTime($transactionDate)->diffInDays($streak->startdate) +1;
+    //     if($current_streak >=40){
+    //         $streak->prim_medal = 1;
+    //         $streak->enddate = $transactionDate;
+    //     }
+
+
+    //     $streak->desc = 'Anda telah derma ' . $current_streak . ' hari';
+    //     $streak->updated_at = $transactionDate;
+    //     $streak->save();
+    
+    //     DB::table('donation_streak_transaction')->insert([
+    //         'donation_streak_id' => $streak->id,
+    //         'transaction_id' => $transaction->id,
+    //         'day' => $current_streak,
+    //         'quality_donation' => $quality_transaction,
+    //         'created_at' => $transactionDate,
+    //         'updated_at' => $transactionDate,
+    //         'status'     => 1
+    //     ]);
+
+    //     DonationStreak::updateFollowerStatus($user_id);
+
+    // }
 
 }
