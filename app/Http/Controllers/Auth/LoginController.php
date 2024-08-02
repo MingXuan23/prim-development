@@ -46,13 +46,22 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
+            // Check if the current route is 'logout'
+            if ($request->route()->getName() === 'logout') {
+                // Allow the logout route to proceed without redirection
+                return $next($request);
+            }
+
+            // If the user is authenticated, redirect them
             if (Auth::check()) {
                 return redirect($this->redirectTo)->send();
             }
-    
+
             return $next($request);
         });
-        //$this->middleware('guest')->except('logout');
+
+        // Uncomment this if you want to apply 'guest' middleware except for logout
+        // $this->middleware('guest')->except('logout');
     }
 
      /**
