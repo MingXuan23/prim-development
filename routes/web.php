@@ -194,6 +194,9 @@ Route::group(['prefix' => 'student'], function () {
 });
 
 Route::group(['prefix' => 'fees'], function () {
+    Route::post('/test/submitSamuraForm','FeesController@submitSamuraForm')->name('fees.test.submitSamuraForm');
+    Route::get('/test/samuraFeeForm','FeesController@samuraFeeForm')->name('fees.test.samuraFeeForm');
+
     Route::post('/year', 'FeesController@fetchYear')->name('fees.fetchYear');
     Route::post('/class', 'FeesController@fetchClass')->name('fees.fetchClass');
 

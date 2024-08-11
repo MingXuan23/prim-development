@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AppBaseController;
 use Symfony\Component\VarDumper\Cloner\Data;
 
+use App\Imports\AssignFeeByParentIncome;
+
 class FeesController extends AppBaseController
 {
     public function index()
@@ -1229,6 +1231,31 @@ class FeesController extends AppBaseController
         }
         else {
             return redirect('/fees/Recurring')->with('success', 'Yuran Kategori Berulang telah berjaya dimasukkan');
+        }
+    }
+
+    public function samuraFeeForm()
+    {
+        return view('fee.test.samuraForm');
+    }
+
+    public function submitSamuraForm(Request $request)
+    {
+       
+
+        $file = $request->file('file');
+
+        // Data to be passed to the import class
+        $organization_id = $request->input('organization_id');
+        $fee1_id = $request->input('fee1_id');
+        $fee2_id = $request->input('fee2_id');
+        $income_threshold = $request->input('income_threshold');
+
+        try {
+            Excel::import(new AssignFeeByParentIncome($organization_id, $fee1_id, $fee2_id, $income_threshold), $file);
+            return redirect()->back()->with('success', 'File processed successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 

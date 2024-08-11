@@ -1266,6 +1266,8 @@ class StudentController extends Controller
                 ])
                 ->orderBy('classes.nama')
                 ->get();
+
+            
         } else {
             $list = DB::table('class_organization')
                 ->leftJoin('classes', 'class_organization.class_id', '=', 'classes.id')
@@ -2047,7 +2049,7 @@ class StudentController extends Controller
             //dd(getenv('SECURE_ADMIN_KEY'));
             return redirect()->back()->with('error', 'Invalid Secure Key');
         }
-       
+        //dd('here');
         
         $student = json_decode($request->student);
         $co=DB::table('class_organization as co')
@@ -2056,12 +2058,14 @@ class StudentController extends Controller
         $class=DB::table('classes as c')
                 ->where('c.id',$student->newClass)
                 ->first();
+                
         $class_student=DB::table('class_organization as co')
                 ->join('class_student as cs','cs.organclass_id','co.id')
-                ->where('cs.student_id',$student->id)
+                ->where('cs.student_id',$student->studentId)
                 ->where('cs.status',1)
                 ->select('co.*','cs.*','cs.id as class_student_id')
-                ->where('co.class_id',$student->class_id);
+                ->where('co.class_id',$student->oldClassId);
+               // dd('pass');
         $newparent = DB::table('users')
                             ->where('telno', '=', $student->parentTelno)
                             ->first();
@@ -2173,7 +2177,7 @@ class StudentController extends Controller
                             
             $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
     
-            $this->checkFeesBCWhenClassChanged($ifExitsCateBC,$studentFeesIDs ,$student.$class->levelid,$new_class_student_id,$class_student_details->id);
+            $this->checkFeesBCWhenClassChanged($ifExitsCateBC,$studentFeesIDs ,$student,$class->levelid,$new_class_student_id,$class_student_details->id);
             
 
             $ifExitsCateRecurring = DB::table('fees_new')
