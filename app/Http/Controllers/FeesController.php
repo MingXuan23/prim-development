@@ -749,7 +749,23 @@ class FeesController extends AppBaseController
                         ->select('s.id')
                         ->distinct()
                         ->get();
-                if(count($activeChildren)>0){
+                $parent_org = DB::table('organizations')->where('id',$parent_id[$i]->organization_id)->first();
+                $activeChildrenInParent =[];
+                if(isset($parent_org->parent_org)){
+                    $activeChildrenInParent = DB::table('organization_user_student as ous')
+                    ->join('students as s' ,'s.id','ous.student_id')
+                    ->join('class_student as cs','cs.student_id','s.id')
+                    ->join('class_organization as co','co.id','cs.organclass_id')
+                    ->join('organization_user as ou','ou.id','ous.organization_user_id')
+                    ->join('classes as c','c.id','co.class_id')
+                    ->where('c.levelid','>',0)
+                    ->where('ou.user_id',$parent_id[$i]->user_id)
+                    ->where('ou.organization_id',$parent_org->parent_org)
+                    ->select('s.id')
+                    ->distinct()
+                    ->get();
+                }
+                if(count($activeChildren)>0 || count($activeChildrenInParent)>0){
                     $fees_parent = DB::table('organization_user')
                     ->where('id', )
                     ->update(['fees_status' => 'Not Complete']);
