@@ -213,23 +213,20 @@ class LandingPageController extends AppBaseController
         ->orderBy('amount' ,'desc')
         ->take(20)
         ->get();
-        // if(count($donors) < 20){
-        //     // Calculate how many times we need to duplicate the collection
-        //     $timesToDuplicate = 20 - count($donors);
-        //     $j = 0;
-        //     // Duplicate the collection
-        //     for ($i = 0; $i < $timesToDuplicate; $i++) {
-        //         if($j >= count($donors)){
-        //             $j = 0;
-        //         }else{
-        //             $donors->push($donors[$i]);
-        //             $j++;
-        //         }
-        //     }
-        // }
+
+        $leaders = DB::table('referral_code as rc')
+        ->join('referral_code_member as rcm', 'rc.id', '=', 'rcm.leader_referral_code_id')
+        ->join('users as u', 'u.id', '=', 'rc.user_id')
+        ->where('u.id','<>',17151)
+        ->groupBy('rc.id', 'u.name') // Also grouping by 'u.name'
+        ->select('u.name', DB::raw('COUNT(rcm.id) as member_count'))
+        ->orderBy('member_count','desc')
+        ->limit(15)
+        ->get();
+
 
         session()->forget('intendedUrl');//reset intended url for point system 
-        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount' ,'donors'));
+        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount' ,'donors','leaders'));
     }
 
     public function organizationListDonation()

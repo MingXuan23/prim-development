@@ -197,10 +197,12 @@
                                 <tr style="text-align:center">
                                     <th>No.</th>
                                     <th>Nama Ahli</th>
+                                    <th>No Telefon</th>
+                                    <th>Email</th>
                                     <th>Tarikh Masuk</th>
                                     <th>Jenis Ahli</th>
-                                    <th>Jumlah Kontribusi</th>
-                                    <th>Kontribusi Hari ini</th>
+                                    <th>Jumlah Sedekah</th>
+                                    <th>Sedekah Hari ini</th>
                                 </tr>
                             </thead>
                            
@@ -448,7 +450,7 @@
         },
         columnDefs: [
             {
-                targets: [0, 1, 2, 3, 4,5], // Assuming you have 4 columns (index 0, 1, 2, 3)
+                targets: [0, 1, 2, 3, 4,5,6,7], // Assuming you have 4 columns (index 0, 1, 2, 3)
                 className: 'text-center',
             },
             {
@@ -457,7 +459,7 @@
                
             },
             {
-                targets: [1, 2, 3,4,5],
+                targets: [1, 2, 3,4,5,6,7],
                 width: '20%',
             }
         ],
@@ -472,6 +474,10 @@
                 }
             },
             { data: 'member_name', name: 'member_name' },
+            { data: 'member_telno', name: 'member_telno' },
+
+            { data: 'member_email', name: 'member_email' },
+
             { data: 'created_at', name: 'created_at' },
             { data: 'level', name: 'level' },
             { data: 'contribution', name: 'contribution' },
