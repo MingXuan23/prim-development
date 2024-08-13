@@ -1830,7 +1830,7 @@ class StudentController extends Controller
                 ->where('co.class_id',$student->class_id??$student->oldClassId);
         
         $class_student_details=$class_student->first();
-
+        //dd($class_student_details,$student);
         $class_student->update([
                             //'cs.organclass_id'=>$co->id,
                             'cs.end_date'=>now(),
@@ -1857,7 +1857,7 @@ class StudentController extends Controller
             // dd($class_student->get());
             $studentHaveFees=DB::table('student_fees_new as sfn')
                             ->join('class_student as cs','cs.id','sfn.class_student_id')
-                            ->whereIn('sfn.class_student_id',[$new_class_student_id,$class_student_details])
+                            ->whereIn('sfn.class_student_id',[$new_class_student_id,$class_student_details->id])
                             ->get();
     
             $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();

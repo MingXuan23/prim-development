@@ -52,7 +52,7 @@
             transform: scale(1.1);
         } */
     
-        section[aria-label="Donors In The Past Week"]{
+        section[aria-label="Donors In The Past Week"] , section[aria-label="Top Ketua Ahli"]{
             background-color: #500ade;
             padding-top: 80px;
             padding-bottom: 80px;
@@ -109,6 +109,95 @@
             background-image: linear-gradient(180deg ,#5e2ced 0%,#9749f8 100% );
             color: white;
             padding: 12px 0;
+        }
+
+        .leader-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .leader-groups {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .leader-group {
+            margin: 15px;
+            max-width: 400px;
+            flex: 1 1 calc(33.33% - 30px); /* Ensure three groups per row on large screens */
+        }
+
+        .leader-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .leader-item {
+            width: 100%;
+            padding: 15px;
+            justify-content: space-between; 
+            display:flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+  
+        .leader-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateX(10px);
+        }
+
+        .leader-name {
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .follower-count {
+            color: #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .leader-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        /* Display rules for different screen sizes */
+        @media (max-width: 799px) {
+            .leader-groups {
+            flex-direction: column;
+            }
+
+            .leader-group {
+            flex: 1 1 100%;
+            max-width: 100%;
+            }
+
+            #group2, #group3 {
+            display: none;
+            }
+        }
+
+        @media (min-width: 800px) and (max-width: 1199px) {
+            .leader-group {
+            flex: 1 1 calc(50% - 30px);
+            max-width: calc(50% - 30px);
+            }
+
+            #group3 {
+            display: none;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .leader-group {
+            flex: 1 1 calc(33.33% - 30px);
+            max-width: calc(33.33% - 30px);
+            }
         }
 
         @media only screen and (max-width: 991px){
@@ -292,7 +381,61 @@
         </div>
 
     </section>
+    <section aria-label="Top Ketua Ahli">
+        <div class="leader-container">
+            <h3 class="my-2 text-white text-center">Senarai Ketua dengan Bilangan Pengikut (follower)</h3>
 
+            <!-- Containers for all groups -->
+            <div class="leader-groups">
+                @foreach ($leaders as $index => $leader)
+                    <?php
+                        $groupNumber = floor($index / 5) + 1;
+                    ?>
+                    <!-- Create the group divs dynamically based on the group number -->
+                    @if($index % 5 == 0)
+                        <div class="leader-group" id="group{{ $groupNumber }}">
+                            <ul class="leader-list">
+                    @endif
+                    
+                    <!-- Leader item -->
+                    <li class="leader-item" style="animation-delay: {{ $index * 0.1 }}s;">
+                        <span class="leader-name">{{ $index + 1 }}. {{ $leader->name }}</span>
+                        <span class="follower-count">{{ $leader->member_count }} Ahli</span>
+                    </li>
+
+                    <!-- Close the group divs when the last leader of the group is reached -->
+                    @if($index % 5 == 4 || $index == count($leaders) - 1)
+                            </ul>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+<!-- 
+            <div class="leader-buttons">
+                <button class="btn btn-info" onclick="showInfo()">Maklumat Lanjut</button>
+                <button class="btn btn-register" onclick="register()">Daftar</button>
+            </div> -->
+        </div>
+    </section>
+
+    <!-- <section aria-label="Donors In The Past Week">
+        <div class="container container-donation">
+            <h3 class="my-2 text-white text-center">Ketua Ahli</h3>
+            
+            <div class="donors-container">
+                @foreach ($leaders as $index => $leader)
+
+                    <div class="donor-container">
+                        <div class="donor-name" title="{{ $leader->name }}">{{ $leader->name}}</div>
+                        <div class="donor-amount">Ahli: {{ $leader->member_count  }}</div>
+                       
+                    </div>
+                @endforeach            
+        </div>
+
+        </div>
+
+    </section> -->
     <section class="team-member-area" id="team">
         <div class="bg-shape-1">
             <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width: 90%";>
@@ -585,7 +728,7 @@
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
                                     role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-church"></i>
-                                    Rumah Ibadat </a>
+                                    Wakaf MAIM</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"

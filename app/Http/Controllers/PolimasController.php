@@ -255,8 +255,11 @@ class PolimasController extends Controller
                         ->leftJoin('fees_new as fn', 'fn.id', 'sfn.fees_id')
                         ->where('sfn.status', 'Paid')
                         ->where('sfn.class_student_id', $row->csid)
+                        ->where('fn.name','LIKE','%Yuran Konvokesyen%')
                         ->select('fn.name')
                         ->first();
+                    
+                    
                     
                     if ($isPaid)
                     {

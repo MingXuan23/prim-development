@@ -11,6 +11,8 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 
+use App\Http\Controllers\ProfileController;
+
 class PointController extends Controller
 {
      public function index()
@@ -18,7 +20,12 @@ class PointController extends Controller
         $user_id = Auth::id();
 
         $referral_code = $this->getReferralCode(true);
+        if($referral_code == null){
+            $controller = new ProfileController();
+            return $controller->index();
 
+        }
+        //dd($referral_code);
         // $point_month = DB::table('point_history')
         // ->where('referral_code_id',$referral_code->id)
         // ->whereBetween('created_at', [now()->startOfMonth()->format('Y-m-d'), now()->endOfMonth()->format('Y-m-d')])
@@ -243,7 +250,7 @@ class PointController extends Controller
             $data = DB::table('referral_code_member as rcm')
                     ->join('users as mu', 'mu.id', '=', 'rcm.member_user_id') 
                     ->where('rcm.leader_referral_code_id', $referral_code->id)
-                    ->select('mu.name as member_name', 'rcm.created_at', 'mu.id as member_user_id','rcm.level','rcm.id as rcm_id')
+                    ->select('mu.name as member_name','mu.telno as member_telno','mu.email as member_email', 'rcm.created_at', 'mu.id as member_user_id','rcm.level','rcm.id as rcm_id')
                     ->get(); // Execute the query to fetch data
             
             foreach ($data as $d) {
