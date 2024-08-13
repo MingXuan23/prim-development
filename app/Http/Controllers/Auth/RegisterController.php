@@ -70,7 +70,7 @@ class RegisterController extends Controller
 
         $validator->after(function ($validator) use ($data) {
             if (!isset($data['referral_code'])) {
-                return;
+                $validator->errors()->add('referral_code', 'Register service was not available now');
             }
 
             $valid = PointController::validateReferralCode($data['referral_code']);
@@ -123,6 +123,9 @@ class RegisterController extends Controller
 
         if($referral_code!=null){
             $this->referral_code_member_registration($referral_code,$user);
+        }else{
+            $this->referral_code_member_registration("YahyaNMd0005",$user);
+            //13/8/2024 - sir yahya want to do so 
         }
         
         return $user;
