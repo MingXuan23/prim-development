@@ -69,11 +69,11 @@ class RegisterController extends Controller
         ]);
 
         $validator->after(function ($validator) use ($data) {
-            if($data['isAdmin']){
+            if(isset($data['isAdmin'])){
                 return;
             }
             if (!isset($data['referral_code'])) {
-                $validator->errors()->add('referral_code', 'Register service was not available now');
+                return;
             }
 
             $valid = PointController::validateReferralCode($data['referral_code']);

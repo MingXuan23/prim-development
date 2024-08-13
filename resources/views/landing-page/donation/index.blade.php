@@ -727,7 +727,7 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-church"></i>
+                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-solid fa-hammer"></i>
                                     Wakaf MAIM</a>
                             </li>
                             <li class="nav-item">
