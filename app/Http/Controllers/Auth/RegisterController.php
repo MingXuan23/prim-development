@@ -69,6 +69,9 @@ class RegisterController extends Controller
         ]);
 
         $validator->after(function ($validator) use ($data) {
+            if($data['isAdmin']){
+                return;
+            }
             if (!isset($data['referral_code'])) {
                 $validator->errors()->add('referral_code', 'Register service was not available now');
             }
@@ -109,13 +112,18 @@ class RegisterController extends Controller
             'remember_token'    => $data['_token'],
 
         ]);
-
+       
         if (!isset($data['isAdmin'])) {
             $role = DB::table('model_has_roles')->insert([
                 'role_id' => 15,
                 'model_type' => "App\User",
                 'model_id' => $user->id,
             ]);
+           
+           
+        }else{
+            return $user;
+            //no going code below as he is admin
         }
 
         
