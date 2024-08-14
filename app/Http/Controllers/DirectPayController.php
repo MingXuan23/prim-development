@@ -1050,7 +1050,8 @@ class DirectPayController extends Controller
             $organ = Organization::find($room->homestayid);
         }
         else if ($fpx_productDesc == "OrderS"){
-            $orders = Order::where('transaction_id', '=', $transaction->id)->first();
+            //$orders = Order::where('transaction_id', '=', $transaction->id)->first();
+            $orders = DB::table('order_cart')->where('transactions_id', '=', $transaction->id)->first();
 
             $organ = Organization::find($orders->organ_id);
         }
