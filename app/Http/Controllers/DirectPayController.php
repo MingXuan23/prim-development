@@ -947,11 +947,7 @@ class DirectPayController extends Controller
 
     public function adminTestFpx($transaction_id){
 
-        $donation = $this->donation->getDonationByTransactionName('Donation_STEM185_20240321143746_94');
-//dd($donation);
-                    $organization = $this->organization->getOrganizationByDonationId($donation->id);
-                    $transaction = $this->transaction->getTransactionByName('Donation_STEM185_20240321143746_94');
-                    dd($donation);
+       
         $transactions = DB::table('transactions')
         ->where('id',$transaction_id)
         ->get();

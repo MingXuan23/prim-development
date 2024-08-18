@@ -122,3 +122,11 @@ Route::group(['prefix' => 'OrderS'], function (){
     Route::post('getUsers', 'OrderSController@getUsers');
     Route::post('getReport', 'OrderSController@getReport');
 });
+
+Route::group(['prefix' => 'derma', 'namespace' => 'MobileAPI'], function (){
+    Route::post('login','DermaController@login');
+    Route::get('getDerma','DermaController@getDerma');
+    Route::post('returnDermaView','DermaController@returnDermaView');
+
+
+});
