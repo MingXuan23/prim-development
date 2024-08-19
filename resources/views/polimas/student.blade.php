@@ -226,7 +226,7 @@
         function fetch_data(cid = '') {
             studentTable = $('#studentTable').DataTable({
                 processing: true,
-                serverSide: true,
+                //serverSide: true,
                 ajax: {
                     url: "{{ route('polimas.student.getStudentDatatable') }}",
                     data: {

@@ -241,7 +241,7 @@ class PolimasController extends Controller
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.id as id',  'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.student_id as csid')
+                    ->select('students.id as id',  'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.id as csid')
                     ->where([
                         ['classes.id', $classid],
                         ['class_student.status', 1],
