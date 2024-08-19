@@ -23,7 +23,7 @@ class PolimasAllSutdentExport implements FromCollection, ShouldAutoSize, WithHea
         ->join('classes as c', 'c.id', '=', 'co.class_id')
         ->join('organization_user as ou', 'ou.id', 'ous.organization_user_id')
         ->join('users', 'users.id', 'ou.user_id')
-        ->select('users.name', 'c.nama', 'users.name', 'users.icno', 'users.telno', 'cs.status','cs.student_id as csid')
+        ->select('users.name', 'c.nama', 'users.name', 'users.icno', 'users.telno', 'cs.status','cs.id as csid')
         ->where([
             ['co.organization_id', $this->organId],
             ['cs.status', 1],
@@ -42,6 +42,7 @@ class PolimasAllSutdentExport implements FromCollection, ShouldAutoSize, WithHea
                 ->leftJoin('fees_new as fn', 'fn.id', 'sfn.fees_id')
                 ->where('sfn.status', 'Paid')
                 ->where('sfn.class_student_id', $student->csid)
+                ->where('fn.name','LIKE','%Yuran Konvokesyen%')
                 ->select('fn.name')
                 ->first();
             if ($isPaid)
