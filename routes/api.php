@@ -125,6 +125,8 @@ Route::group(['prefix' => 'OrderS'], function (){
 
 Route::group(['prefix' => 'derma', 'namespace' => 'MobileAPI'], function (){
     Route::post('login','DermaController@login');
+    Route::post('validateToken','DermaController@validateToken');
+
     Route::get('getDerma','DermaController@getDerma');
     Route::post('returnDermaView','DermaController@returnDermaView');
 
