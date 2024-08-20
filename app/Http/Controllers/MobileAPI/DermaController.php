@@ -11,6 +11,19 @@ use Illuminate\Support\Facades\DB;
 
 class DermaController extends Controller
 {
+    public function validateLogin(Request $request)
+    {  
+        $token = $request->token;
+        $user = DB::table('users')->where('remember_token',$token)->exists();
+
+        if($user){
+            return response()->json(['result' => 'validated'], 200);
+        }
+        else{
+            return response()->json(['result' => 'validated'], 401);
+        }
+    }
+    
     public function login(Request $request)
     {  
         Auth::logout();
