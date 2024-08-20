@@ -11,19 +11,19 @@ use Illuminate\Support\Facades\DB;
 
 class DermaController extends Controller
 {
-    public function validateLogin(Request $request)
+    public function validateToken(Request $request)
     {  
         $token = $request->token;
         $user = DB::table('users')->where('remember_token',$token)->exists();
 
         if($user){
-            return response()->json(['result' => 'validated'], 200);
+            return response()->json(['result' => 'Validated'], 200);
         }
         else{
-            return response()->json(['result' => 'validated'], 401);
+            return response()->json(['result' => 'Unauthorized'], 401);
         }
     }
-    
+
     public function login(Request $request)
     {  
         Auth::logout();
@@ -110,7 +110,12 @@ class DermaController extends Controller
             ];
         })->values()->all();
 
-        return response()->json(['data'=>$groupedDonations]);
+        $relogin = true;
+        $token = request()->header('token');
+        if(isset($token)){
+            $relogin = !DB::table('users')->where('remember_token',$token)->exists();
+        }
+        return response()->json(['data'=>$groupedDonations,'relogin'=>$relogin]);
         //dd($groupedDonations);
     }
 

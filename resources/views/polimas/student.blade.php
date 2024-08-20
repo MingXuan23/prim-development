@@ -263,8 +263,7 @@
                 }, {
                     data: 'status',
                     name: 'status',
-                    orderable: false,
-                    searchable: false
+                    
                 }, {
                     data: 'action',
                     name: 'action',
