@@ -78,7 +78,7 @@
 
                 <input hidden type="text" id="don" name="don" class="form-control" value="{{ $donation->id }}">
                 
-                <h4 class="font-size-18">Kontributor</h4>
+                <h4 class="font-size-18">Penyumbang</h4>
                 <div class="table-responsive" >
                     <table id="codeTable" class="table table-bordered table-striped dt-responsive nowrap"
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -87,6 +87,7 @@
                                 <th> No. </th>
                                 <th> Kod </th>
                                 <th> Pemilik Kod</th>
+                                <th> Tel</th>
                                 <th> Jumlah Transaksi </th>
                                 <th>Jumlah Amaun (RM)</th>
                                
@@ -211,7 +212,7 @@
 
                 },
                 'columnDefs': [{
-                    "targets": [1,2, 3, 4],
+                    "targets": [1,2, 3, 4,5],
                     "className": "text-center",
                     "width": "2%"
                 },{
@@ -233,6 +234,10 @@
                 {
                     data: "owner",
                     name: 'owner'
+                },
+                {
+                    data: "owner_tel",
+                    name: 'owner_tel'
                 },
                 {
                     data: "transaction_count",

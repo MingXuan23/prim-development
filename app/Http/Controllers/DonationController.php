@@ -274,7 +274,7 @@ class DonationController extends Controller
         ->where('t.status','Success')
         ->where('ph.status',1)
         ->groupBy('r.code')
-        ->select('r.code','u.name as owner', 
+        ->select('r.code','u.name as owner', 'u.telno as owner_tel',
         DB::raw('COUNT(t.id) as transaction_count'),
         DB::raw('SUM(t.amount) as total_amount'));
         
