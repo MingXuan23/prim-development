@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Session;
 
 
 class DermaController extends Controller
@@ -74,7 +75,7 @@ class DermaController extends Controller
        if (Auth::attempt($credentials)) {
            $user = Auth::User();
            $randomString = Str::random(25);
-           $newToken = $user->id . $randomString;
+           $newToken =  Str::random(10) .$user->id . $randomString;
        
            // Update the user's device_token with the new token
            $user->remember_token = $newToken;
@@ -141,7 +142,7 @@ class DermaController extends Controller
 
             $referral_code = "";
             $message = "";
-
+          
             if($tanpaNama){
                 return view('paydonate.anonymous.index', compact('donation','referral_code','message'));
 
