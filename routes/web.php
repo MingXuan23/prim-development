@@ -44,6 +44,10 @@ Route::group(['prefix' => ''], function () {
 //end wan add
 
 //landing donation page route
+Route::group(['prefix' => 'api/derma', 'namespace' => 'MobileAPI'], function (){
+    Route::post('returnDermaView','DermaController@returnDermaView');
+
+});
 Route::group(['prefix' => 'derma'], function () {
     // routes/web.php
     Route::match(['get', 'post'], '', 'LandingPageController@indexDonation');
