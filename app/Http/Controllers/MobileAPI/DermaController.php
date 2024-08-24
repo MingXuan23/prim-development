@@ -10,13 +10,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Session;
 
+use Illuminate\Support\Carbon;
 
 class DermaController extends Controller
 {
     public function validateToken(Request $request)
     {  
         $token = $request->token;
-        $user = DB::table('users')->where('remember_token',$token)->exists();
+
+        $user = DB::table('user_token')->where('application_id',1)->where('remember_token',$token)->exists();
+        //$user = DB::table('users')->where('remember_token',$token)->exists();
 
         if($user){
             return response()->json(['result' => 'Validated'], 200);
@@ -24,6 +27,50 @@ class DermaController extends Controller
         else{
             return response()->json(['result' => 'Unauthorized'], 401);
         }
+    }
+
+    public function getUserByToken($token){
+        $user_token =  DB::table('user_token')->where('application_id',1)->where('remember_token',$token)->select('user_id')->first();
+        if($user_token ==null)
+            return null;
+
+        $user = User::where('id',$user_token->user_id)->first();
+        return $user;
+
+    }
+
+    public function updateToken($user_id,$token){
+        $update =  DB::table('user_token')
+        ->where('application_id',1)
+        ->where('user_id',$user_id)
+        ->update([
+            'remember_token' => $token,
+            'updated_at' => Carbon::now(),
+            'expired_at' =>Carbon::now()->addDays(7),
+        ]);
+
+        if($update)
+        {
+            return;
+        }
+
+        $exist = DB::table('user_token')
+        ->where('application_id',1)
+        ->where('user_id',$user_id)
+       ->exists();
+
+       if($exist)
+       {
+        return;
+       }
+          
+       DB::table('user_token')->insert([
+        'application_id'=>1,
+        'user_id'=>$user_id,
+        'remember_token'=> $token,
+        'updated_at' => Carbon::now(),
+        'expired_at' =>Carbon::now()->addDays(7),
+       ]);
     }
 
     public function login(Request $request)
@@ -76,10 +123,9 @@ class DermaController extends Controller
            $user = Auth::User();
            $randomString = Str::random(25);
            $newToken =  Str::random(10) .$user->id . $randomString;
-       
+            $this->updateToken($user->id ,$newToken);
            // Update the user's device_token with the new token
-           $user->remember_token = $newToken;
-           $user->save();
+           
             //dd($user);
            return response()->json([
                'token' => $newToken,
@@ -115,7 +161,9 @@ class DermaController extends Controller
         $relogin = true;
         $token = request()->header('token');
         if(isset($token)){
-            $relogin = !DB::table('users')->where('remember_token',$token)->exists();
+           
+            $relogin = $this->getUserByToken($token)==null;
+
         }
         return response()->json(['data'=>$groupedDonations,'relogin'=>$relogin]);
         //dd($groupedDonations);
@@ -127,7 +175,7 @@ class DermaController extends Controller
             $donation_id = $request->donation_id;
             $tanpaNama = $request->desc == "Derma Tanpa Nama";
 
-            $user = User::where('remember_token',$token)->first();
+            $user =$this->getUserByToken($token);
             Auth::logout();
             Auth::loginUsingId($user->id);
         // dd(Auth::id());
