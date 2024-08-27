@@ -54,8 +54,8 @@ class DonationStreak extends Model
 
     }
 
-    static public function getStreakData(){
-        $user_id = Auth::id();
+    static public function getStreakData($user_id = null){
+        $user_id = $user_id??Auth::id();
         
         $streaks = DonationStreak::where('user_id', $user_id)
             ->where('status', 1)

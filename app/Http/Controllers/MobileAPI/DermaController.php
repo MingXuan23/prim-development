@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Session;
+use App\Models\DonationStreak;
 
+use App\Http\Controllers\PointController;
+use Exception;
 use Illuminate\Support\Carbon;
 
 class DermaController extends Controller
@@ -176,6 +179,9 @@ class DermaController extends Controller
             $tanpaNama = $request->desc == "Derma Tanpa Nama";
 
             $user =$this->getUserByToken($token);
+            if (!$user) {
+                throw new Exception('User not found');
+            }
             Auth::logout();
             Auth::loginUsingId($user->id);
         // dd(Auth::id());
@@ -208,5 +214,36 @@ class DermaController extends Controller
             }
         
 
+    }
+
+    public function getDermaInfo(Request $request){
+        try{
+            $token = $request->token;
+            //dd('here');
+            $user =$this->getUserByToken($token);
+            if (!$user) {
+                throw new Exception('User not found');
+            }
+
+            $data = DonationStreak::getStreakData($user->id);
+           // dd($jsondata);
+           // $data = json_decode($jsondata);
+            $data['prim_medal_days'] = 40;
+            $data['sedekah_subuh_days'] = 40;
+
+            $controller = new PointController();
+           // dd('here');
+            $codeOfUser = $controller->getReferralCode(false,$user->id);
+
+            $code = $codeOfUser ==null?null:$codeOfUser->code;
+
+            
+
+            return response()->json(['data'=>$data, 'code'=>$code]);
+        }catch(Exception $e){
+           //dd($e);
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+       
     }
 }
