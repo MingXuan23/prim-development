@@ -294,7 +294,7 @@ class PointController extends Controller
 
 
 
-    public function getReferralCode($object =false){
+    public function getReferralCode($object =false, $user_id = null){
         if(request()->ajax() && !$object){
 
             if(auth()->user()->hasRole('Guest')){
@@ -309,7 +309,7 @@ class PointController extends Controller
              //dd($code);
              return response()->json(['referral_code'=>$code->code]);
         }else{
-            $user_id = Auth::id();
+            $user_id = $user_id??Auth::id();
 
             $referral_code = DB::table('referral_code')
                             ->leftJoin('users','users.id','referral_code.user_id')
