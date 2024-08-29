@@ -226,6 +226,7 @@ class DermaController extends Controller
             }
 
             $data = DonationStreak::getStreakData($user->id);
+            
            // dd($jsondata);
            // $data = json_decode($jsondata);
             $data['prim_medal_days'] = 40;
@@ -234,9 +235,21 @@ class DermaController extends Controller
             $controller = new PointController();
            // dd('here');
             $codeOfUser = $controller->getReferralCode(false,$user->id);
+            $donationsToday = DB::table('point_history as ph')
+            ->join('donation_transaction as dt', 'dt.transaction_id', 'ph.transaction_id')
+            ->join('transactions as t', 't.id', 'ph.transaction_id')
+            ->where('ph.status', 1)
+            ->whereDate('t.datetime_created', today())
+            ->where('ph.referral_code_id', $codeOfUser->id)
+            ->select(
+                DB::raw('COUNT(CASE WHEN ph.fromSubline = 0 THEN ph.id END) AS donation_today'),
+                // DB::raw('COUNT(CASE WHEN ph.fromSubline = 1 THEN ph.id END) AS donation_member_today'),
+                // DB::raw('COUNT(ph.id) AS total_donation_today')
+            )
+            ->first();
 
             $code = $codeOfUser ==null?null:$codeOfUser->code;
-
+            $data['donation_today'] = $code ==null?0: $donationsToday->donation_today;
             
 
             return response()->json(['data'=>$data, 'code'=>$code]);
