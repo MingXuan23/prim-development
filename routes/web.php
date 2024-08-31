@@ -121,6 +121,11 @@ Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonat
 Route::get('sumbangan_anonymous/{link}', 'DonationController@anonymouIndex')->name('ANONdonate');
 
 Route::group(['prefix' => 'organization'], function () {
+    Route::get('manage','OrganizationController@manage')->name('organization.manage');
+    Route::post('updateSellerId','OrganizationController@updateSellerId')->name('organization.updateSellerId');
+
+    Route::get('getPendingOrgDatatable','OrganizationController@getPendingOrgDatatable')->name('organization.getPendingOrgDatatable');
+
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');

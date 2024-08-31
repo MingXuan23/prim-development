@@ -24,6 +24,111 @@ class OrganizationController extends Controller
         return view('organization.index');
     }
 
+    public function manage(){
+       if(!Auth::user()->hasRole('Superadmin')){
+            return view('errors.404');
+       }
+
+      // $pending_org = DB::table('organizations')->whereNull('private_key')->get();
+       return view('organization.manage');
+    }
+
+    public function createMerchant($nama,$email,$sellerId)
+{
+    $url = env("DIRECT_PAY_MERCHANT_URL");
+    //dd($url);
+
+    $data = [
+        "name" => $nama,
+        "email" => $email,
+        "sellerId" => $sellerId,
+        "callbackurl" => "https://prim.my/directpayReceipt"
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+    // Execute the cURL request and assign the response to a variable
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    // You can now use $response for further processing
+    // For example, you can decode it if it's in JSON format:
+    
+    $decodedResponse = json_decode($response, true);
+
+    // Return or use the response as needed
+    return $decodedResponse;
+}
+
+    public function getPendingOrgDatatable(){
+        if (request()->ajax()) {
+            $pending_org = DB::table('organizations')
+                ->whereNull('private_key')
+                ->select('id', 'nama', 'address')
+                ->get();
+    
+                return datatables()::of($pending_org)
+                ->addColumn('seller_id', function($row) {
+                    return '<input type="text" name="seller_id['.$row->id.']" class="form-control seller-id" data-id="'.$row->id.'" />';
+                })
+                ->addColumn('action', function($row) {
+                    return '<button type="button" class="btn btn-primary update-button" data-id="'.$row->id.'">Update</button>';
+                })
+                ->rawColumns(['seller_id', 'action'])
+                ->make(true);
+        }
+    }
+
+    public function updateSellerId(Request $request)
+    {
+        $sellerId = trim($request->seller_id);
+        // Validation logic
+        if(!Auth::user()->hasRole('Superadmin')){
+            return response()->json(['success' => false, 'message' => 'Unauthorized Action']);
+       }
+        else if (empty($sellerId)) {
+            return response()->json(['success' => false, 'message' => 'Seller ID cannot be empty.']);
+        }
+    
+       else if (!preg_match('/^SE/',  $sellerId) || strlen( $sellerId) < 10) {
+            return response()->json(['success' => false, 'message' => 'Invalid Format Seller ID']);
+        }
+
+        $org = DB::table('organizations')->where('id',$request->id)->first();
+       // dd('here');
+       try{
+
+        $private_key = $this->createMerchant($org->nama,$org->email,$sellerId);
+        if (empty($private_key)){
+        return response()->json(['success' => false, 'message' => 'Server Busy. Please Try again later']);
+
+        }
+        $result = DB::table('organizations')->where('id',$request->id)->update([
+            'private_key' =>$private_key,
+            'seller_id'=>$sellerId
+        ]);
+
+        if($result){
+            return response()->json(['success' => true, 'message' => 'Update Success']);
+
+        }else{
+            return response()->json(['success' => false, 'message' => 'Update Failed']);
+
+        }
+       }catch(\Exception $e){
+        return response()->json(['success' => false, 'message' => 'Server Busy. Please Try again later']);
+            
+       }
+       
+    }
+    
+
     public function create()
     {
         // after launch remove where

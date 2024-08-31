@@ -10,21 +10,13 @@
 <div class="row align-items-center">
     <div class="col-sm-6">
         <div class="page-title-box">
-            <h4 class="font-size-18">Organisasi</h4>
+            <h4 class="font-size-18">Organisasi >> Urus Organisasi</h4>
         </div>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
         <div class="card">
-            <div>
-                <a style="margin: 19px; float: right;" href="{{ route('organization.create') }}"
-                    class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Organisasi</a>
-                @role('Superadmin')
-                <a style="margin: 19px; float: right;" href="{{ route('organization.manage') }}"
-                    class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Seller Id</a>
-                @endrole
-            </div>
 
             <div class="card-body">
 
@@ -50,14 +42,13 @@
                         style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
-                                <th>No</th>
+                                <th>ID</th>
                                 <th>Nama Organisasi</th>
                                 {{-- <th>Kod</th> --}}
-                                <th>No Telefon</th>
-                                <th>Email</th>
                                 <th>Alamat</th>
+                                <th>Seller Id</th>
                                 <th>Action</th>
-                                <th>Status</th>
+                                
                             </tr>
                         </thead>
                     </table>
@@ -68,25 +59,6 @@
     </div>
 </div>
 
-{{-- confirmation delete modal --}}
-<div id="deleteConfirmationModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Padam Organisasi</h4>
-            </div>
-            <div class="modal-body">
-                Adakah anda pasti?
-            </div>
-            <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
-                    name="delete">Padam</button>
-                <button type="button" data-dismiss="modal" class="btn">Batal</button>
-            </div>
-        </div>
-    </div>
-</div>
-{{-- end confirmation delete modal --}}
 
 @endsection
 
@@ -103,9 +75,9 @@
         var organizationTable = $('#organizationTable').DataTable({
             ordering: true,
             processing: true,
-            serverSide: true,
+           // serverSide: true,
                 ajax: {
-                    url: "{{ route('organization.getOrganizationDatatable') }}",
+                    url: "{{ route('organization.getPendingOrgDatatable') }}",
                     type: 'GET',
                 },
                 'columnDefs': [{
@@ -116,14 +88,11 @@
                 order: [
                     [1, 'asc']
                 ],
-                columns: [{
-                    "data": null,
-                    searchable: false,
-                    "sortable": false,
-                    render: function (data, type, row, meta) {
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                }, {
+                columns: [ {
+                    data: "id",
+                    name: "nama",
+                    "width": "10%"
+                },{
                     data: "nama",
                     name: "nama",
                     "width": "20%"
@@ -133,17 +102,13 @@
                 //     name: "code"
                 // }, 
                 {
-                    data: "telno",
-                    name: "telno",
-                    "width": "10%"
-                }, {
-                    data: "email",
-                    name: "email",
-                    "width": "10%"
-                }, {
                     data: "address",
                     name: "address",
-                    "width": "30%"
+                    "width": "20%"
+                }, {
+                    data: "seller_id",
+                    name: "seller_id",
+                    "width": "15%"
                 }, {
                     data: 'action',
                     name: 'action',
@@ -151,13 +116,7 @@
                     searchable: false,
                     "width": "10%"
                 },
-                {
-                    data: 'status',
-                    name: 'status',
-                    orderable: false,
-                    searchable: false,
-                    "width": "10%"
-                }
+                
             ]
           });
 
@@ -170,39 +129,36 @@
 
         var organization_id;
 
-        $(document).on('click', '.btn-danger', function(){
-            organization_id = $(this).attr('id');
-            $('#deleteConfirmationModal').modal('show');
-        });
 
-        $('#delete').click(function() {
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                    _method: 'DELETE'
-                },
-                url: "/organization/" + organization_id,
-                beforeSend: function() {
-                    $('#delete').text('Padam...');
-                },
-                success: function(data) {
-                    setTimeout(function() {
-                        $('#confirmModal').modal('hide');
-                    }, 2000);
-
-                    $('div.flash-message').html(data);
-
-                    organizationTable.ajax.reload();
-                },
-                error: function (data) {
-                    $('div.flash-message').html(data);
-                }
-            })
-        });
 
         $('.alert').delay(3000).fadeOut();
+
+        
+        $(document).on('click', '.update-button', function() {
+            var id = $(this).data('id');
+            var sellerId = $('input.seller-id[data-id="'+id+'"]').val();
+
+            $.ajax({
+                url: '{{route("organization.updateSellerId")}}',
+                type: 'POST',
+                data: {
+                    id: id,
+                    seller_id: sellerId,
+                    _token: '{{ csrf_token() }}' // Include CSRF token for Laravel
+                },
+               success: function(response) {
+                    if (response.success) {
+                        alert(response.message);
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('An error occurred: ' + error);
+                }
+            });
+        });
 
     });
 
