@@ -129,7 +129,7 @@ Route::group(['prefix' => 'derma', 'namespace' => 'MobileAPI'], function (){
 
     Route::get('getDerma','DermaController@getDerma');
     Route::post('getDermaInfo','DermaController@getDermaInfo');
-    Route::get('pointPage','DermaController@pointPage');
+  
 
 
     //Route::post('returnDermaView','DermaController@returnDermaView');
