@@ -80,6 +80,7 @@ class DermaController extends Controller
 
     public function pointPage(Request $request)
     {
+
         // Extract the Authorization header (Bearer token)
         $authorizationHeader = $request->header('Authorization');
 
@@ -91,10 +92,11 @@ class DermaController extends Controller
             if($user){
                 Auth::logout();
                 Auth::loginUsingId($user->id);
-                return redirect()->route('point.index');
-            }
 
-           
+                return redirect('/point');
+            } 
+
+            return response()->json(['error' => 'Unauthorized'], 401);
         
         } else {
             // Return an error if the Authorization header is missing or invalid

@@ -46,6 +46,7 @@ Route::group(['prefix' => ''], function () {
 //landing donation page route
 Route::group(['prefix' => 'api/derma', 'namespace' => 'MobileAPI'], function (){
     Route::post('returnDermaView','DermaController@returnDermaView');
+    Route::get('pointPage','DermaController@pointPage');
 
 });
 Route::group(['prefix' => 'derma'], function () {
