@@ -78,6 +78,30 @@ class DermaController extends Controller
        ]);
     }
 
+    public function pointPage(Request $request)
+    {
+        // Extract the Authorization header (Bearer token)
+        $authorizationHeader = $request->header('Authorization');
+
+        // Check if the Authorization header exists and starts with 'Bearer '
+        if ($authorizationHeader && strpos($authorizationHeader, 'Bearer ') === 0) {
+            // Extract the token
+            $token = substr($authorizationHeader, 7);
+            $user = $this->getUserByToken($token);
+            if($user){
+                Auth::logout();
+                Auth::loginUsingId($user->id);
+                return redirect()->route('point.index');
+            }
+
+           
+        
+        } else {
+            // Return an error if the Authorization header is missing or invalid
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
+
     public function login(Request $request)
     {  
         Auth::logout();
