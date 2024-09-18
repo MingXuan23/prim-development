@@ -29,7 +29,7 @@ class VerifyCsrfToken extends Middleware
         'https://dev.prim.my/mobile/*',
         'https://prim.my/directpayReceipt',
         'https://prim.my/api/derma/returnDermaView',
-        // 'http://localhost:8000/api/derma/returnDermaView',
+        'https://prim.my/api/derma/pointPage',
         // 'https://prim.my/sumbangan_anonymous/*',
         // 'https://prim.my/sumbangan/*',
         // 'http://localhost:8000/sumbangan_anonymous/*',
