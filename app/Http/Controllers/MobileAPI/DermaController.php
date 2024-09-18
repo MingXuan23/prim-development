@@ -42,7 +42,7 @@ class DermaController extends Controller
 
     }
 
-    public function updateToken($user_id,$token){
+    public function updateToken($user_id,$token,$device_token){
         $update =  DB::table('user_token')
         ->where('application_id',1)
         ->where('user_id',$user_id)
@@ -50,6 +50,7 @@ class DermaController extends Controller
             'remember_token' => $token,
             'updated_at' => Carbon::now(),
             'expired_at' =>Carbon::now()->addDays(7),
+            'device_token' =>$device_token
         ]);
 
         if($update)
@@ -73,6 +74,7 @@ class DermaController extends Controller
         'remember_token'=> $token,
         'updated_at' => Carbon::now(),
         'expired_at' =>Carbon::now()->addDays(7),
+        'device_token' =>$device_token
        ]);
     }
 
@@ -81,6 +83,7 @@ class DermaController extends Controller
         Auth::logout();
        $credentials = $request->only('email', 'password');
        $phone = $request->get('email');
+       $device_token = $request->get('device_token')??null;
        //return response()->json(['user',$credentials],200);
        if(is_numeric($request->get('email'))){
            $user = User::where('icno', $phone)->first();
@@ -126,7 +129,7 @@ class DermaController extends Controller
            $user = Auth::User();
            $randomString = Str::random(25);
            $newToken =  Str::random(10) .$user->id . $randomString;
-            $this->updateToken($user->id ,$newToken);
+            $this->updateToken($user->id ,$newToken,$device_token);
            // Update the user's device_token with the new token
            
             //dd($user);
@@ -224,13 +227,14 @@ class DermaController extends Controller
             if (!$user) {
                 throw new Exception('User not found');
             }
-
+            $code =DB::table('referral_code')->where('user_id',$user->id)->first();
             $data = DonationStreak::getStreakData($user->id);
             
            // dd($jsondata);
            // $data = json_decode($jsondata);
             $data['prim_medal_days'] = 40;
             $data['sedekah_subuh_days'] = 40;
+            $data['prim_point'] = isset($code)?$code->total_point:0;
 
             $controller = new PointController();
            // dd('here');
