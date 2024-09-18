@@ -200,16 +200,16 @@ class DermaController extends Controller
             $referral_code = "";
             $message = "";
           
-            if($tanpaNama){
-                return view('paydonate.anonymous.index', compact('donation','referral_code','message'));
-
-            }else{
-                $specialSrabRequest=0;
-                if($donation->id==161){
-                    $specialSrabRequest=1;
-                }
-                return view('paydonate.pay', compact('donation', 'user','specialSrabRequest','referral_code','message'));
-
+            if ($tanpaNama) {
+                // Redirect to the anonymous donation route
+                return redirect()->route('ANONdonate', ['link' => $donation->url]);
+            } else {
+    
+                // Redirect to the non-anonymous donation route
+                return redirect()->route('URLdonate', [
+                    'link' => $donation->url,
+        
+                ]);
             }
 
             }catch(Exception $e){
