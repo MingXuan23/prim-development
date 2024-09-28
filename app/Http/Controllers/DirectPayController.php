@@ -11,6 +11,9 @@ use App\Models\Donation;
 use App\Models\Promotion;
 use App\Mail\OrderReceipt;
 use App\Mail\OrderSReceipt;
+use App\Mail\SHelperReceipt;
+use App\Mail\SHelperReminder;
+
 use App\Mail\MerchantOrderReceipt;
 use App\Mail\HomestayReceipt;
 use App\Models\PgngOrder;
@@ -314,6 +317,24 @@ class DirectPayController extends Controller
                 }
                // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
+            }else if($request->desc == "Request_Help"){
+
+                $draft = DB::table('code_requests')->where('status','Draft')->where('id',$request->request_id)->first();
+
+              
+                $user_name = $draft->name;
+                $user_email = $draft->email;
+                $user_telno = $draft->phone;
+                $organ_id = 168; //nex way enterprise, change it in the future
+               
+
+                $organization = Organization::find($organ_id);
+                $fpx_buyerEmail      = $user_email;
+                $telno               = $user_telno;
+                $fpx_buyerName       = $user_name;
+                $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
+                $fpx_sellerOrderNo  = "RSPRIM" . date('YmdHis') . rand(10000, 99999);
+                $private_key= $organization->private_key;
             }
 
 
@@ -479,6 +500,12 @@ class DirectPayController extends Controller
                     ->update([
                         'transactionid' => $transaction->id
                     ]);
+                }else if(substr($fpx_sellerExOrderNo, 0, 1) == 'R'){
+                    DB::table('code_requests')->where('status','Draft')->where('id',$request->request_id)->update([
+                       'transaction_id' => $transaction->id,
+                       'status' => 'Pending Payment'
+                    ]);
+                   
                 }
                 else {
                     $transaction->donation()->attach($id, ['payment_type_id' => 1]);
@@ -682,6 +709,7 @@ class DirectPayController extends Controller
         else {
 
             Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
+            $this->failTransactionAction($case[0],$request->Fpx_SellerOrderNo);
             $user = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
             //gitdd($user,$request->Fpx_SellerOrderNo);
             return view('fpx.transactionFailed', compact('request', 'user'));
@@ -963,8 +991,9 @@ class DirectPayController extends Controller
                     continue;
                 }
 
+                $fpx_productDesc = explode("_", $transaction->nama)[0];
+
                 if ($response_value['fpx_DebitAuthCode'] == '00') {
-                    $fpx_productDesc = explode("_", $transaction->nama)[0];
 
                     Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
                         [
@@ -981,6 +1010,8 @@ class DirectPayController extends Controller
                 else
                 {
                     Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Failed']);
+                    //Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
+                    $this->failTransactionAction($fpx_productDesc,$fpx_sellerOrderNo);
                 }
             }
             catch (\Throwable $th) {
@@ -1050,6 +1081,8 @@ class DirectPayController extends Controller
             $orders = DB::table('order_cart')->where('transactions_id', '=', $transaction->id)->first();
 
             $organ = Organization::find($orders->organ_id);
+        }else if($fpx_productDesc == "Request"){
+            $organ = Organization::find(168);
         }
        if($organ == null){
         return null;
@@ -1092,6 +1125,20 @@ class DirectPayController extends Controller
         return $resultArray ;
     }
 
+    public function failTransactionAction($fpx_productDesc,$fpx_sellerOrderNo){
+        $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
+        if($transaction->status != 'Failed'){
+            return;
+        }
+
+        switch ($fpx_productDesc) {
+            case 'Request':
+                $update = DB::table('code_requests')->where('transaction_id',$transaction->id)->update([
+                    'status' => 'Payment Failed',
+                    
+                ]);
+        }
+    }
     public function updateTransaction($fpx_productDesc,$fpx_sellerOrderNo,$returnView){
         $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         if($transaction->status != 'Success'){
@@ -1516,6 +1563,56 @@ class DirectPayController extends Controller
                 }
                 if($returnView)
                     return view('orders.mobile.receipt', compact('transaction', 'user', 'order_cart', 'organization', 'order_available_dish'));
+
+            break;
+            case 'Request':
+                $update = DB::table('code_requests')->where('transaction_id',$transaction->id)->update([
+                    'status' => 'Pending Helper',
+                    
+                ]);
+
+
+                $codeRequest = DB::table('code_requests')->where('transaction_id',$transaction->id)->first();
+                //dd($codeRequest,$transaction);
+                $details = DB::table('code_requests as cr')
+                ->join('code_language as cl','cl.id','cr.language_id')
+                ->join('code_package as cp','cp.id','cr.package_id')
+                ->join('transactions as t','t.id','cr.transaction_id')
+                ->where('cr.id',$codeRequest->id)
+                ->select('cl.name as language_name','cp.name as package_name','t.transac_no')
+                ->first();
+                if($update){
+                    Mail::to($codeRequest->email)->send(new SHelperReceipt($codeRequest,$details));
+                    $count = DB::table('code_requests')->where('status','Pending Helper')->count();
+                    $helpers = DB::table('users as u')
+                            ->join('model_has_roles as m','m.model_id','u.id')
+                            ->where('role_id',23) //the helper role is 23
+                            ->pluck('u.email')
+                            ->toArray();
+
+                    if (!empty($helpers)) {
+                        // Send SHelperReminder to the first helper and CC the rest, excluding the first
+                        Mail::to(array_shift($helpers)) // Sends to the first helper
+                            ->cc($helpers)              // CCs the remaining helpers
+                            ->send(new SHelperReminder($count));
+                    }
+                   
+                    //Mail::to($helpers[0])->cc($helpers)->send(new SHelperReminder($count));
+
+
+                    // Update the email_sent field
+                    $sent = DB::table('code_requests')->where('id',$codeRequest->id)->update([
+                        'email_sent' => 1,
+                        'created_at' => now(),
+                        'updated_at' =>now()
+                        
+                    ]);
+                    
+                
+                }
+                //dd($codeRequest);
+                if($returnView)
+                    return view('code_request.receipt', compact('codeRequest', 'details'));
 
             break;
 

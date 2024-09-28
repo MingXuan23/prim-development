@@ -76,6 +76,40 @@ Route::post('feedback', 'LandingPageController@storeMessage')->name('feedback.st
 
 Route::resource('school', 'SchoolController');
 
+//they are same, but s-helper just for the url to display to the user
+//codereq is the route that use to update the backend logic
+
+Route::group(['prefix' => 'codereq'], function () {
+    Route::post('validateRequest', 'CodeRequestController@validateRequest')->name('codereq.validateRequest');
+    Route::post('list_by_email', 'CodeRequestController@list_by_email')->name('codereq.list_by_email');
+    Route::get('receipt/{token}', 'CodeRequestController@receipt')->name('codereq.receipt');
+  
+});
+
+Route::group(['middleware' => ['auth'], 'prefix' => 'codereq'], function () {
+   
+    Route::get('helperList', 'CodeRequestController@helperList')->name('codereq.helperList');
+    Route::post('list_by_helper', 'CodeRequestController@list_by_helper')->name('codereq.list_by_helper');
+    Route::get('helper_join_request/{id}/{status}', 'CodeRequestController@helper_join_request')->name('codereq.helper_join_request');
+    Route::get('show_source_code/{id}/', 'CodeRequestController@show_source_code')->name('codereq.show_source_code');
+
+
+
+  
+});
+
+// Route::group(['prefix' => 's-helper'], function () {
+//     Route::get('track-list', 'CodeRequestController@track_list')->name('codereq.track_list');
+
+// });
+
+Route::get('s-helper/show', 'CodeRequestController@show')->name('codereq.showlist');
+
+Route::resource('s-helper', 'CodeRequestController')->names('s_helper'); 
+Route::resource('codereq', 'CodeRequestController')->names('codereq');
+
+
+
 Route::get('getdetails/{id}', 'DetailsController@getFees')->name('details.getfees');
 
 Route::post('parent/fetchClass', 'ParentController@fetchClass')->name('parent.fetchClass');
