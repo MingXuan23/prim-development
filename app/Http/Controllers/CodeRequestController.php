@@ -42,7 +42,7 @@ class CodeRequestController extends Controller
             $validator = Validator::make($request->all(), [
                 'name'  => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
-                'telno' => ['required', 'numeric', 'min:10'],
+                'telno' => ['required', 'string', 'regex:/^\+?[0-9]{11,12}$/'],
                 'problem_description' =>['required']
             ]);
 
