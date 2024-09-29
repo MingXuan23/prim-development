@@ -44,7 +44,7 @@
         <p>You currently have {{ $pending_request }} requests awaiting your assistance. Your help is needed now.</p>
             
         <div class="button-container">
-            <a href="{{ route('codereq.list_by_helper') }}" class="redirect-button">Help Them Now</a>
+            <a href="{{ route('codereq.helperList') }}" class="redirect-button">Help Them Now</a>
         </div>
             
         </div>
