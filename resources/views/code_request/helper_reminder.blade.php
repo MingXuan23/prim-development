@@ -14,7 +14,25 @@
     .content { padding: 20px; }
     .footer { background-color: #0066cc; padding: 10px; text-align: center; font-size: 0.8em; color: white; }
     
-    
+    .redirect-button {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            width:90%
+        }
+        .button-container {
+            text-align: center; /* Center align the button */
+            margin-top: 20px;
+            
+        }
+        .redirect-button:hover {
+            background-color: #005bb5;
+        }
     </style>
 </head>
 <body>
@@ -25,7 +43,9 @@
         <div class="content">
         <p>You currently have {{ $pending_request }} requests awaiting your assistance. Your help is needed now.</p>
             
-            
+        <div class="button-container">
+            <a href="{{ route('codereq.list_by_helper') }}" class="redirect-button">Help Them Now</a>
+        </div>
             
         </div>
         <div class="footer">
