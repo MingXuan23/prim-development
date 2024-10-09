@@ -1652,8 +1652,9 @@ class PayController extends AppBaseController
             $get_organization = DB::table('organizations')->where('id', $oid->organization_id)->first();
         }
         // dd($get_fees);
+        return view('fee.pay.receipt2', compact('getparent', 'get_transaction', 'get_student', 'get_category', 'get_fees', 'getfees_categoryA', 'get_organization'));
 
-        return view('fee.pay.view-receipt', compact('getparent', 'get_transaction', 'get_student', 'get_category', 'get_fees', 'getfees_categoryA', 'get_organization'));
+        //return view('fee.pay.view-receipt', compact('getparent', 'get_transaction', 'get_student', 'get_category', 'get_fees', 'getfees_categoryA', 'get_organization'));
     }
 
     public function getDetailReceipt($id)
