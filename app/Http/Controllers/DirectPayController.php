@@ -1352,7 +1352,7 @@ class DirectPayController extends Controller
                 $pgngOrder->updated_at=now();
                 $pgngOrder->save();
 
-                $organization = Organization::where('id','=',$order->organization_id)->first();
+                $organization = Organization::find($order->organization_id);
                 $user = User::where('id','=',$order->user_id)->first();
 
                 $relatedProductOrder =DB::table('product_order')

@@ -25,6 +25,7 @@
 
 <body>
     <div class="text-center">You are being redirected to our homepage in <span id="time">10</span> seconds</div>
+    
     <div class="container">
         <div class="row mt-3">
             <div class="col-12">
@@ -137,7 +138,17 @@
                                 </table>
 
                                 <table style="width:100%" class="infotbl">
-                                    @if($organization->charges[0]->minimum_amount > $transaction->amount)
+                                    @if(!isset($organization->charges) || count($organization->charges)==0)
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="3" style="text-align:right">
+                                            Caj yang dikenakan oleh organisasi (RM)
+                                        </td>
+                                        <td style="text-align:center;width:20%">
+                                            {{  number_format((float)$organization->fixed_charges, 2, '.', '') }}
+                                        </td>
+                                    </tr>
+                                    @elseif($organization->charges[0]->minimum_amount > $transaction->amount)
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right">
@@ -163,17 +174,38 @@
                 </div>
             </div>
         </div>
+        <br>
+        <br>
+        <div class="text-center">
+            <button type="button" class="btn btn-primary" onclick="saveAndExit()">Save and Exit</button>
+        </div>
+        
     </div>
 </body>
 <script>
+
+    function saveAndExit(){
+        window.print();
+        count =5;
+        //window.location.href = '/derma';
+        return;
+    }
+
     var count = 10;
+    var desc = @json($transaction->nama);
+    if (desc.startsWith('Koperasi')) {        
+        count = 60;
+    }
+
     setInterval(function(){
         count--;
         document.getElementById('time').innerHTML = count;
         if (count == 0) {
-            var desc = @json($transaction->nama);
+           
             if (desc.startsWith('Koperasi')) {
-                window.location.href = '/koperasi/order';
+               // window.location.href = '/koperasi/order';
+                window.location.href = '/derma';
+
                 return;
             }
 
