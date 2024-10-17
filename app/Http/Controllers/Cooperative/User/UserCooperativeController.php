@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Carbon;
 
+use App\Http\Controllers\Merchant\Regular\OrderController;
+
 use App\Http\Controllers\Auth\LoginController;
 
 class UserCooperativeController extends Controller
@@ -519,7 +521,7 @@ class UserCooperativeController extends Controller
                 ['organization_id', $id],
                 ['user_id', $user_id],
             ])->first();
-            
+         
             return view('koperasi.cart', compact('cart', 'cart_item', 'allDay', 'isPast' ,'id','updateMessage','charge'));
         }
         else
@@ -898,6 +900,20 @@ class UserCooperativeController extends Controller
         ->where('type_org',$role_id)
         ->where('id',$id)
         ->first();
+
+        if(Auth::id()==null){
+            if(request()->input('mode') == 'guest'){
+                $controller = new OrderController();
+
+                $controller->loginAsGuest();
+
+                //login as guest
+            }else{
+                $currentUrl = request()->fullUrl();
+                session(['intendedUrl' => $currentUrl]);
+               return redirect()->route('login');
+            }
+        }
         $userId=Auth::id();
 
         $products = DB::table('product_group as pg')

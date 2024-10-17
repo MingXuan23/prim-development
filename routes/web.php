@@ -332,6 +332,14 @@ Route::group([ 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function()
         Route::get('/selectedItemCart/{group_id}/{product_name}', 'UserCooperativeController@selectedItemCart')->name('koperasi.selectedItemCart');
     });
 });
+
+Route::group([ 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
+    Route::group(['namespace' => 'User'], function() {
+        Route::get('/koop/{id}','UserCooperativeController@koopShop')->name('koperasi.koopShop');
+
+    }
+    );
+});
 Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
     Route::group(['namespace' => 'User'], function() {
         // Koop School
@@ -347,7 +355,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
 
         // Koop_Shop
         Route::get('/koop','UserCooperativeController@indexKoop')->name('koperasi.indexKoop');
-        Route::get('/koop/{id}','UserCooperativeController@koopShop')->name('koperasi.koopShop');
         Route::post('/koop/productsListByGroup','UserCooperativeController@productsListByGroup')->name('koperasi.productsListByGroup');
         Route::get('/koop/store/{id}','UserCooperativeController@storeKoop')->name('koperasi.storeKoop');
         Route::get('/koop/{id}/cart','UserCooperativeController@koopCart')->name('koperasi.koopCart');
