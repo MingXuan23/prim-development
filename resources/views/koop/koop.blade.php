@@ -143,6 +143,13 @@
     color:rgb(6, 225, 237);;
     transform: translateX(-3px);
 }
+
+@media (max-width: 760px) {
+    .mdi-cart {
+      display: none;
+    }
+  }
+
 </style>
 @endsection
 
@@ -164,11 +171,20 @@
 
 
 <div class="card-body pl-0 pr-0">
+<div style="display: flex; justify-content: space-between; align-items: center;">
     <label for="DisplayParentName">
         <span style="font-size: 35px">{{ $parent->name }}</span>
-        <br> 
     </label>
-    <a href="{{route('koperasi.edit', $Sekolah->id)}}" class="cart-btn"><i class="mdi mdi-cart fa-3x"></i><span class='notification' hidden></span></a>
+    
+    <a href="{{ route('koperasi.edit', $Sekolah->id) }}" class="cart-btn" style="display: flex; align-items: center;">
+        <i class="mdi mdi-cart fa-4x"></i>
+        <button type="button" class="btn btn-success" style="margin-left: 10px;">
+            <h3>Your Cart</h3>
+        </button>
+        <span class='notification' hidden></span>
+    </a>
+</div>
+
 <!-- <a href="{{ route('koperasi.edit', $Sekolah->id) }}" class=" btn btn-primary waves-effect waves-light">
                     <i class="fas fa-cart-arrow-down"></i> View Cart</a> -->
     {{-- display item --}}

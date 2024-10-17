@@ -262,7 +262,7 @@ input::-webkit-inner-spin-button {
               <div class="col">
                 <div class="form-group required">
                   <label class="col">Nota kepada Koperasi</label>
-                  <div class="col">
+                  <div class="col note-div">
                     <input type="text" name="note" class="form-control" id="noteTxt" placeholder="Optional" data-parsley-required-message="Sila isi nota">
                   </div>
                 </div>
@@ -327,13 +327,50 @@ input::-webkit-inner-spin-button {
         $('.form-validation').parsley();
         var inputElement = document.getElementById('noteTxt');
         
-        const pholder = "{{$allDay[0]->note_requirement}}";
-        if(pholder){
-          // Check if pholder is null or empty, if not, use the original placeholder
-          inputElement.placeholder = pholder ? pholder : 'Optional';
-          inputElement.required = true;
-          $('#week_status').val(-1);
-        }
+        // const pholder = "{{$allDay[0]->note_requirement}}";
+        // if(pholder){
+        //   // Check if pholder is null or empty, if not, use the original placeholder
+        //   inputElement.placeholder = pholder ? pholder : 'Optional';
+        //   inputElement.required = true;
+        //   $('#week_status').val(-1);
+        // }
+
+        const noteRequirement = "{{$allDay[0]->note_requirement}}";
+        
+        // Check if note requirement is not null or empty
+        if (noteRequirement) {
+            // Split the note requirement string using the '|' delimiter
+            const noteRequirementsArray = noteRequirement.split('|');
+            console.log(noteRequirementsArray);
+            $('#week_status').val(-1);
+            $('.note-div').empty();
+            // Loop through each subtext in the note requirement
+            noteRequirementsArray.forEach(function(subtext,index) {
+                // Create a new input element
+                //console.log(subtext)
+                var inputElement = document.createElement('input');
+                inputElement.type = 'text';
+                inputElement.name = 'note';
+                inputElement.className = 'form-control noteTxt';
+                inputElement.placeholder = 'Optional'; // Default placeholder
+                inputElement.dataset.parsleyRequiredMessage = 'Sila isi nota'; // Parsley required message
+
+                // Set the placeholder to the subtext if it's not empty
+                if (subtext.trim() !== '') {
+                    inputElement.placeholder = subtext.trim();
+                    inputElement.required = true; // Mark as required if the subtext is not empty
+                }
+
+                // Append the input element to the note-div
+                $('.note-div').append(inputElement);
+                if (index < noteRequirementsArray.length - 1) {
+                    $('.note-div').append('<br>');
+                } 
+               
+            });
+          }
+       
+    
        
     });
     
