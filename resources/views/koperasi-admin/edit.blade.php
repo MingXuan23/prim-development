@@ -81,7 +81,7 @@
                      
          <label>Gambar Produk</label>
          <div class="fallback">
-         <input type="file" name="images" id="image"></br></br>
+         <input type="file" name="image" id="image"></br></br>
         </div>
 
         <button type="submit" class="btn btn-primary waves-effect waves-light mr-1" onclick="checkByClassOrByYear()">Simpan</button>
