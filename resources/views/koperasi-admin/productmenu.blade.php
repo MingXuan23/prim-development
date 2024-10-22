@@ -34,6 +34,10 @@ form {
   display:inline;
 }
 
+.footer{
+  position: static !important; 
+}
+
 </style>
 
 <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
@@ -167,7 +171,7 @@ form {
       </div>
 
         
-</div>
+
 {{--import modal--}}
 <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -223,8 +227,11 @@ form {
                     </form>
                 </div>
             </div>
-        </div>       
+        </div>  
+       
 {{--end import modal--}}
+@endsection
+
 @section('script')
 
 
@@ -668,4 +675,4 @@ function checkByClassOrByYear(){
 </script>
 @endSection
 
-@endsection
+
