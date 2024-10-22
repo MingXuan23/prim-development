@@ -457,10 +457,25 @@ class AdminProductCooperativeController extends Controller
         }
         $target = json_encode($data);
 
+        if (!is_null($request->image)) {
+
+            $link = explode(" ", $request->nama);
+            $str = implode("-", $link);
+            $extension = $request->image->extension();
+            $storagePath  = $request->image->move(public_path('koperasi-item'), $str . '.' . $extension);
+            $file_name = basename($storagePath);
+
+            $update = DB::table('product_item')->where('id',$id)->update([
+               
+                'image' => $file_name,
+                
+            ]);
+        }
+       
+
         $update = DB::table('product_item')->where('id',$id)->update([
             'name' => $request->nama,
             'desc' => $request->description,
-            'image' => $request->image,
             'quantity_available' => $request->quantity,
             'price' => $request->price,
             'status'=> $request->status,
