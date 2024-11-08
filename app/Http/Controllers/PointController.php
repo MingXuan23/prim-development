@@ -19,6 +19,8 @@ class PointController extends Controller
     {
         $user_id = Auth::id();
 
+        DonationStreak::fetchLastTransactionStatus(3,$user_id);
+
         $referral_code = $this->getReferralCode(true);
         if($referral_code == null){
             $controller = new ProfileController();

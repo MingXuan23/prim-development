@@ -116,8 +116,10 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                             ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', 'sfn.id')
                             ->leftJoin('transactions as t', 't.id', 'ftn.transactions_id')
                             ->leftJoin('class_student as cs', 'cs.id', 'sfn.class_student_id')
+                            ->leftJoin('class_organization as co','co.id','cs.organclass_id')
+                            ->leftJoin('classes as c','c.id','co.class_id')
                             ->where('sfn.fees_id', $fn->id)
-                           
+                            ->where('c.levelid','>',0)
                             ->select('sfn.*', 't.status as tstatus')
                             ->distinct()
                             ->get();
