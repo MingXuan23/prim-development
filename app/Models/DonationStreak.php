@@ -25,6 +25,67 @@ class DonationStreak extends Model
         'total_day'
     ];
 
+    static public function fetchLastTransactionStatus($days,$user_id){
+        $transactions = DB::table('transactions')
+        ->where('datetime_created', '>=', Carbon::today()->subDays($days))
+        ->orderBy('datetime_created')
+        ->where('nama','LIKE', "Donation%")
+        ->where('status',"Success")
+        ->where('user_id',$user_id)
+        ->get();
+
+        foreach($transactions as $t)
+        {
+            $record = DB::table('donation_streak_record')->where('transaction_id',$t->id)->where('status',1)->first();
+            $transactionDate = Carbon::parse($t->datetime_created);
+            $quality_transaction = $transactionDate->hour >= 3 && $transactionDate->hour < 7.5;
+
+            if($record == null){
+                $record_id = DB::table('donation_streak_record')->insertGetId([
+            
+                    'transaction_id' => $t->id,
+                    'user_id'       =>$user_id,
+                    'quality_donation' => $quality_transaction, //check this
+                    'created_at' => $transactionDate,
+                    'updated_at' => $transactionDate,
+                    'status'     => 1
+                ]);
+                $record = DB::table('donation_streak_record')->where('transaction_id',$t->id)->where('status',1)->first();
+                
+            }
+
+            $streak =  DonationStreak::where('user_id', $user_id)
+                    ->where('status', 1)
+                    ->whereNull('enddate')
+                    ->where('prim_medal', -1) 
+                    ->where('quality_donation',0)
+                    ->first();
+            $ids = json_decode($streak->donation_streak_record_ids);
+
+            if (!in_array($record->id, $ids)) {
+                DonationStreak::saveStreak($user_id,$transactionDate,0,$record->id);
+
+            }
+
+           
+            if($record->quality_donation){
+                $streak =  DonationStreak::where('user_id', $user_id)
+                ->where('status', 1)
+                ->whereNull('enddate')
+                ->where('prim_medal', -1) 
+                ->where('quality_donation',1)
+                ->first();
+                $ids = json_decode($streak->donation_streak_record_ids);
+
+                if (!in_array($record->id, $ids)) {
+                    DonationStreak::saveStreak($user_id,$transactionDate,1,$record->id);
+
+                }
+            }
+        }
+
+
+    }
 
     public function validateCurrentStreak(?Carbon $date = null)
     {

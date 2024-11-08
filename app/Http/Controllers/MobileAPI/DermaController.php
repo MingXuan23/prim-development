@@ -254,6 +254,8 @@ class DermaController extends Controller
                 throw new Exception('User not found');
             }
             $code =DB::table('referral_code')->where('user_id',$user->id)->first();
+            DonationStreak::fetchLastTransactionStatus(3,$user_id);
+
             $data = DonationStreak::getStreakData($user->id);
             
            // dd($jsondata);
@@ -263,6 +265,7 @@ class DermaController extends Controller
             $data['prim_point'] = isset($code)?$code->total_point:0;
 
             $controller = new PointController();
+
            // dd('here');
             $codeOfUser = $controller->getReferralCode(false,$user->id);
             $donationsToday = DB::table('point_history as ph')
