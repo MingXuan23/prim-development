@@ -60,12 +60,15 @@ class DonationStreak extends Model
                     ->where('prim_medal', -1) 
                     ->where('quality_donation',0)
                     ->first();
-            $ids = json_decode($streak->donation_streak_record_ids);
+            if($streak !=null){
+                $ids = json_decode($streak->donation_streak_record_ids);
 
-            if (!in_array($record->id, $ids)) {
-                DonationStreak::saveStreak($user_id,$transactionDate,0,$record->id);
-
+                if (!in_array($record->id, $ids)) {
+                    DonationStreak::saveStreak($user_id,$transactionDate,0,$record->id);
+    
+                }
             }
+            
 
            
             if($record->quality_donation){
@@ -75,6 +78,10 @@ class DonationStreak extends Model
                 ->where('prim_medal', -1) 
                 ->where('quality_donation',1)
                 ->first();
+
+                if($streak == null){
+                    continue;
+                }
                 $ids = json_decode($streak->donation_streak_record_ids);
 
                 if (!in_array($record->id, $ids)) {
