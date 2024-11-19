@@ -40,6 +40,7 @@ class DonationStreak extends Model
             $transactionDate = Carbon::parse($t->datetime_created);
             $quality_transaction = $transactionDate->hour >= 3 && $transactionDate->hour < 7.5;
 
+            
             if($record == null){
                 $record_id = DB::table('donation_streak_record')->insertGetId([
             
@@ -60,6 +61,10 @@ class DonationStreak extends Model
                     ->where('prim_medal', -1) 
                     ->where('quality_donation',0)
                     ->first();
+
+            if (!$transactionDate->gte(Carbon::parse($streak->startdate))) {
+                continue;
+            }
             if($streak !=null){
                 $ids = json_decode($streak->donation_streak_record_ids);
 
