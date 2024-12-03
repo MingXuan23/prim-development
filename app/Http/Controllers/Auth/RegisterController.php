@@ -132,7 +132,7 @@ class RegisterController extends Controller
         if($referral_code!=null){
             $this->referral_code_member_registration($referral_code,$user);
         }else{
-            $this->referral_code_member_registration("YahyaNMd0005",$user);
+            $this->referral_code_member_registration("4St449BZ0005",$user);
             //13/8/2024 - sir yahya want to do so 
         }
         
