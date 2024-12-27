@@ -22,7 +22,8 @@
                 <a style="margin: 19px; float: right;" id="btn-download" class="btn btn-primary"> <i
                         class="fas fa-download"></i> Muat Turun PDF</a>
             </div> --}}
-
+            <form method="POST" action="{{ route('fees.generateExcelClassTransaction') }}">
+            @csrf
             <div class="card-body">
                 {{csrf_field()}}
                 <div class="card-body">
@@ -59,7 +60,14 @@
                         </div>
                         <div class="errorMessage"></div>
                     </div>
-                </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-12 required">
+                        
+                            <button class= "btn btn-primary" type="submit">Download In Excel</button>
+
+                        </div>
+                    </div>
                 </div>
                 @if(count($errors) > 0)
                 <div class="alert alert-danger">
@@ -90,6 +98,8 @@
                     </table>
                 </div>
             </div>
+
+            </form>
         </div>
 
     </div>
@@ -229,6 +239,8 @@
                 })
             }
 
+          
+
             $('#classes').change(function() {
                 var organizationid    = $("#organization option:selected").val();
 
@@ -255,7 +267,33 @@
 
                 $('.alert').delay(3000).fadeOut();
 
+          
+
         });
+
+
+//         function downloadExcel(){
+
+// if ($("#organization").val() === null || $("#organization").val() === "") {
+//     alert('Organization Not Selected!');
+//     return;
+// }
+
+// $.ajax({
+//     url:"{{ route('fees.generateExcelClassTransaction') }}",
+//     method:"GET",
+//     data:{ 
+//         class_id: $("#classes option:selected").val(),
+//         orgId : $("#organization").val(),
+//         start_date:$('#date_started').val(),
+//         end_date: $('#date_end').val()
+//     },
+//     success:function(result)
+//     {
+        
+//     }
+// })
+// }
         
         
 </script>

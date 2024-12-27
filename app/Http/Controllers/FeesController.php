@@ -16,6 +16,7 @@ use App\Exports\ExportYuranStatus;
 use App\Exports\ExportYuranStatusSwasta;
 use App\Exports\ExportJumlahBayaranIbuBapa;
 use App\Exports\ExportJumlahBayaranIbuBapaSwasta;
+use App\Exports\ExportClassTransaction;
 use App\Exports\ExportYuranOverview;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -1725,6 +1726,31 @@ class FeesController extends AppBaseController
 
         return view('fee.report-search.index', compact('organization', 'listclass'));
     }
+
+    public function generateExcelClassTransaction(Request $request)
+    {
+        $class_id = $request->classes;
+        $orgId = $request->organization;
+        $start_date = $request->date_started;
+        $end_date = $request-> date_end;
+       
+        
+        //$class = ClassModel::where('id', $class_id)->first();
+
+        $org = DB::table('organizations')->where('id',$orgId)->first();
+      //  dd($request->all(), $orgId,$org);
+        if($org == null){
+
+          
+            return redirect()->back()->withError('Invalid Organization!');
+        }
+      
+        return Excel::download(new ExportClassTransaction($class_id, $org, $start_date, $end_date), 'class_transaction.xlsx');
+
+
+       
+    }
+
 
     public function searchreportswasta()
     {

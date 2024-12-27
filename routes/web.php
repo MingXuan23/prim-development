@@ -285,6 +285,8 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/list-student', 'StudentController@getStudentDatatableFees')->name('fees.getStudentDatatableFees');
     Route::get('/list-student-swasta', 'StudentController@getStudentSwastaDatatableFees')->name('fees.getStudentSwastaDatatableFees');
     Route::get('/download-PDF', 'StudentController@generatePDFByClass')->name('fees.generatePDFByClass');
+    Route::post('/generateExcelClassTransaction', 'FeesController@generateExcelClassTransaction')->name('fees.generateExcelClassTransaction');
+
 
     Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
     Route::get('/list-receipt', 'FeesController@getFeesReceiptDataTable')->name('fees.getFeesReceiptDataTable');
