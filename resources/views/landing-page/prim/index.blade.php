@@ -416,7 +416,7 @@
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Hubungi</h4>
                             <p>Email : yahya@utem.edu.my </p>
-                            <p>Phone : 60 13-647 7388</p>
+                            <p>Phone : 60 13-901 7388</p>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">

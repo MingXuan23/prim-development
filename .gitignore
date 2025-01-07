@@ -7,3 +7,4 @@ yarn-error.log
 composer.lock
 .idea
 firebase_credentials.json
+.codegpt
