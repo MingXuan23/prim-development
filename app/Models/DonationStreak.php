@@ -306,7 +306,13 @@ class DonationStreak extends Model
         }
 
         $transactionDate = Carbon::parse($transaction->datetime_created);
-        $quality_transaction = $transactionDate->hour >= 3 && $transactionDate->hour < 7.5;
+        $hour = $transactionDate->hour; // Integer representing the hour
+        $minute = $transactionDate->minute; // Integer representing the minute
+
+        // Check if the time is between 3:00 AM and 7:30 AM
+        $quality_transaction = ($hour >= 3 ) &&
+                            ($hour < 7 || ($hour == 7 && $minute <= 30));
+
 
         $record_id = DB::table('donation_streak_record')->insertGetId([
             
