@@ -81,7 +81,10 @@ class UserCooperativeController extends Controller
     {
         $sID = $request->get('sID');
         $isBuyer=$request->get('isBuyer');
-        if($isBuyer==true){
+
+        //dd("here");
+        if($isBuyer==true && $isBuyer!="false"){
+           // dd($isBuyer);
             $koop = DB::table('organizations as o')
             ->join('organization_url as url','url.organization_id','o.id')
             ->where('o.parent_org', $sID)
@@ -94,6 +97,8 @@ class UserCooperativeController extends Controller
             ->where('parent_org', $sID)
             ->select('o.*')
             ->get();
+
+          //  dd($sID, $koop);
         }
         return response()->json(['success' => $koop]);
     }
