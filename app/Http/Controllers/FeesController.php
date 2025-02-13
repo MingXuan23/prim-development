@@ -1589,7 +1589,7 @@ class FeesController extends AppBaseController
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
             ->whereNull('organizations.deleted_at')
-            ->where('organizations.type_org','<>',10)
+            //->where('organizations.type_org','<>',10)
             ->orderBy('organizations.nama')
             ->get();
 
