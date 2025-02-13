@@ -105,7 +105,7 @@
                         <p>Sebuah sistem yang menyediakan perkhidmatan untuk pengurusan yuran sesebuah organisasi
                             berdaftar.</p>
                         <div class="btn-wrapper wow fadeInUp">
-                            <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
+                            <!-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a> -->
                             <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
                         </div>
                     </div>
