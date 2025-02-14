@@ -477,7 +477,7 @@
                     @role('Superadmin|Guru Swasta|Koop Admin|Pentadbir Swasta')
                     <a href="{{ route('fees.category.report_swasta') }}" class=" waves-effect">
                         <i class="ti-clipboard"></i>
-                        <span>Laporan Yuran</span>
+                        <span>Statistik Yuran</span>
                     </a>
                     @endrole
                 </li>
@@ -492,7 +492,7 @@
                     @role('Superadmin|Guru Swasta|Koop Admin|Pentadbir Swasta')
                     <a href="{{ route('fees.searchreportswasta') }}" class=" waves-effect" aria-expanded="true">
                         <i class="fas fa-search"></i>
-                        <span>Laporan Kelas</span>
+                        <span>Laporan Kelas ikut Tarikh</span>
                     </a>
                     @endrole
                 </li>
