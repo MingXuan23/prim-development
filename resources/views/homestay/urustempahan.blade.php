@@ -95,6 +95,7 @@
                     <th>Daftar Keluar</th>
                     <th>Nama Homestay</th>
                     <th>Jumlah Dibayar (RM)</th>
+                    <th>Promoter</th>
                     <th>Tindakan 01</th>
                     <th>Tindakan 02</th>
                     <th>Tindakan 03</th>
@@ -238,6 +239,14 @@ $(document).ready(function() {
                       orderable: true,
                       searchable: true,
                     },
+                    { 
+                      data: 'refer_status',
+                      orderable: true,
+                      searchable: true,
+                      render: function(data,type, row){
+                        return data
+                      }
+                    },      
                     { 
                       data: 'bookingid', render: function(data,type,row) {
                         const bookingsReminded = JSON.parse(localStorage.getItem('bookingsReminded')) || [];

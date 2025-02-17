@@ -43,8 +43,23 @@
 
 @section('content')
     <section aria-label="Homestay or Room Details">
-        <h3 class="color-purple"><span><a href="{{route('homestay.homePage')}}" class="color-dark-purple" target="_self"><i class="fas fa-home"></i> Laman Utama >> </a></span>{{$room->roomname}}</h3>
+    <div class="d-flex justify-content-between align-items-center">
+    <h3 class="color-purple">
+        <span>
+            <a href="{{route('homestay.homePage')}}" class="color-dark-purple" target="_self">
+                <i class="fas fa-home"></i> Laman Utama >>
+            </a>
+        </span>
+        {{$room->roomname}}
+    </h3>
+    <button class="boxed-btn info-btn btn-primary" type="button" onclick="copyReferralLink()">
+        Share
+    </button>
+</div>
+
+       
         <h5 class="color-dark-purple"><span><i class="fas fa-map-marker-alt"></i></span> {{$room->address}}, {{$room->area}}, {{$room->postcode}}, {{$room->district}}, {{$room->state}}</h5>
+        
             <div class="gallery-container">
                 <img src="{{URL('../' . $roomImages[0])}}" id="first-gallery-image" alt="Room Image">
                 <div class="inner-gallery-container">
@@ -141,7 +156,9 @@
                             </button>                            
                         </div>
                     </form>
+                   
                 </div>
+                
             </div>
 
 
@@ -757,6 +774,68 @@ $(document).ready(function() {
         $(this).parents('.modal').modal('hide');
     });
     $('.alert').delay(3000).fadeOut()
+
+    
+
 });
+
+
+function copyReferralLink(){
+        $.ajax({
+        method: 'GET',
+        url: "{{route('point.getReferralCode')}}",
+        success: function(data) {
+            var currentURL = window.location.href;
+            var urlWithoutParams = currentURL.split('?')[0];
+            console.log(data);
+            copyToClipboard(urlWithoutParams+'?referral_code='+data.referral_code,true);
+
+        },
+        error: function (data) {
+            var currentURL = window.location.href;
+            var urlWithoutParams = currentURL.split('?')[0];
+            copyToClipboard(urlWithoutParams,false);
+        }
+    });
+    }
+
+
+    function copyToClipboard(text,isReferralCode) {
+    // Create a temporary input element
+    var input = document.createElement('input');
+    
+    // Set its value to the text that needs to be copied
+    input.style.position = 'absolute';
+    input.style.left = '-9999px';
+    input.value = text;
+    
+    
+    // Append it to the body
+    document.body.appendChild(input);
+    
+    // Select the text inside the input element
+    input.select();
+    
+    // Execute the copy command
+    document.execCommand('copy');
+    
+    // Remove the input element from the DOM
+    document.body.removeChild(input);
+    if(isReferralCode){
+        alert('Url with your referral code copied');
+      
+    }else{
+        alert('Url copied, login to get the referral code');
+       
+        
+    }
+   
+   
+
+// Set a timeout to hide the alert after 3 seconds
+
+    
+}
+
 </script>
 @endsection
