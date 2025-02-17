@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use stdClass;
 use App\User;
 use App\Models\Order;
 use App\Models\Fee_New;
@@ -465,6 +467,23 @@ class DirectPayController extends Controller
                         ]);
                     }
 
+                    $result = $this->getReferralCodeFromSource($request->referral_code);
+                    //dd($referral_code);
+                    $code = $result['code'];
+
+                    $referral_code = DB::table('referral_code')
+                                    ->where('code',$code)
+                                    ->first();
+
+                   // $own_code_id = $own_code !=null ?$own_code->id:0;
+                     if ($result['source'] != 'none'){
+                        $entity = new stdClass();
+                        $entity->room_booking_id = (int)$bookingId;
+                        $entity_json = json_encode($entity);
+                       // dd($entity,$entity_json);
+                        $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Book & Stay RM'.$transaction->amount,$entity_json);
+                    }
+
 
                 }
                 else if (substr($fpx_sellerExOrderNo, 0, 1) == 'O')
@@ -633,7 +652,7 @@ class DirectPayController extends Controller
 
     }
 
-    public function insertPointHistory($code_id,$transaction_id,$fromSubline,$point,$desc){
+    public function insertPointHistory($code_id,$transaction_id,$fromSubline,$point,$desc,$entity_json = null){
 
         $insertMember = DB::table('referral_code_member')->where('leader_referral_code_id',$code_id)->where('member_user_id',Auth::id())->first();
         $member_id = $insertMember!=null?$insertMember->id:null;
@@ -648,7 +667,8 @@ class DirectPayController extends Controller
            'status'=>0,
            'points'=>$point,
            'desc'=>$desc,
-           'member_id' =>$member_id
+           'member_id' =>$member_id,
+           'entity_id' => $entity_json
 
         ]);
     }

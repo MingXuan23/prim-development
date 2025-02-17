@@ -30,6 +30,7 @@ use DateTime;
 use DateInterval;
 use DatePeriod;
 use PDF;
+use App\Http\Controllers\PointController;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class HomestayController extends Controller
@@ -235,6 +236,10 @@ class HomestayController extends Controller
         $ratings = $this->getRating($roomId);
         $customerReviewsRating = $ratings['overallRating'];
         $customerReviewsCount = $ratings['ratingCount'];
+
+        $inputReferralCode = request()->input('referral_code');
+        $result = PointController::processReferralCode($inputReferralCode);
+            //dd("here");
         return view('homestay.room')->with(['room' => $room , 'roomImages' => $roomImages ,'customerReviews' => $customerReviews, 'customerReviewsRating' => $customerReviewsRating,'customerReviewsCount' => $customerReviewsCount]);
     }
     public function getMoreReviews(Request $request){
@@ -1800,6 +1805,25 @@ public function getPromotionHistory(Request $request){
         ->select('roomid','roomname')
         ->get();
 
+
+        foreach($bookings as $b){
+            $point_history = DB::table('point_history as ph')
+            ->join('referral_code as rc','rc.id','ph.referral_code_id')
+            ->join('users as u','u.id','rc.user_id')
+            ->whereJsonContains('ph.entity_id->room_booking_id', $b->bookingid)
+           
+            ->where('rc.status',1)
+            ->where('ph.status',1)
+            ->select('u.name as username','rc.code','u.telno')
+            ->first();
+           
+
+            if($point_history==null){
+                $b->refer_status ="-";
+            }else{
+                $b->refer_status ="Referred by ".$point_history->username."(".$point_history->code.")\nContact: ".$point_history->telno;
+            }
+        }
         return response()->json(['bookings' => $bookings ,'homestays' => $homestays]);
     }
     public function checkoutHomestay(Request $request){
