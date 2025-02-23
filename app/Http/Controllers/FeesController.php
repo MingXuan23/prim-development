@@ -930,7 +930,7 @@ class FeesController extends AppBaseController
                     return $btn;
                 }
             });
-
+            //to do update status btn
             /* $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
