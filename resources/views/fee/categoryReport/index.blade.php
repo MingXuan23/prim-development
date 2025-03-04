@@ -125,6 +125,12 @@
                             @endforeach
                         </select>
                     </div>
+                    <div id="yuran" class="form-group">
+                        <label> Tahun </label>
+                        <select name="fee_year" id="fee_year_export" class="form-control">
+                            <option value="0" disabled selected>Pilih Tahun</option>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label>Nama Yuran</label>
                         <select name="yuranExport" id="yuranExport" class="form-control">
@@ -248,9 +254,9 @@
        
 
 
-        function fetchClass(organizationid = '', yuranId = ''){
+        function fetchClass(organizationid = '', yuranId = '', year=''){
             var _token = $('input[name="_token"]').val();
-            var fee_year = $('#fee_year').val();
+            var fee_year = year ?? $('#fee_year').val();
             $.ajax({
                 url:"{{ route('fees.fetchYuranByOrganId') }}",
                 method:"POST",
@@ -291,8 +297,15 @@
         $('#organExport').change(function() {
             var organizationid    = $("#organExport").val();
             var _token            = $('input[name="_token"]').val();
-            fetchClass(organizationid, '#yuranExport');
+            fetch_data_year(organizationid)
+            fetchClass(organizationid, '#yuranExport',$('#fee_year_export').val());
         });
+
+       $('#fee_year_export').change(function(){
+        var organizationid    = $("#organExport").val();
+            fetchClass(organizationid, '#yuranExport',$('#fee_year_export').val());
+        
+       })
 
         $('#organExport1').change(function() {
             var organizationid    = $("#organExport1").val();
@@ -327,6 +340,25 @@
                     }   
                 })    
         }
+
+        function fetch_data_year(oid = ''){ 
+            var _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url:"{{ route('fees.fetchClassForCateYuran') }}",
+                    method:"POST",
+                    data:{ oid:oid,
+                            _token:_token },
+                    success:function(result)
+                    {
+                       
+                        $('#fee_year_export').empty();
+                        jQuery.each(result.years, function(key, value){
+                            $('#fee_year_export').append("<option value='"+ value.year +"'>Tahun " + value.year + "</option>");
+                        });
+                    }   
+                })    
+        }
+
         $('#classes').change(function(){
             if($(this).val() != '')
             {

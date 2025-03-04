@@ -2028,14 +2028,32 @@ class FeesController extends AppBaseController
     {
         $oid = $request->oid;
         $year = $request->fee_year;
-        $yurans = DB::table('fees_new')
-            ->where('organization_id', $oid)
-            ->whereYear('start_date',$year)
-            ->select('id', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
-            ->orderBy('category')
-            ->orderBy('name')
-            ->get();
+        //dd($year);
+        $yurans = DB::table('fees_new as fn')
+        ->leftJoin('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
+        ->leftJoin('fees_new_organization_user as fou', 'fou.fees_new_id', '=', 'fn.id')
+        ->where(function ($query) {
+            $query->whereExists(function ($subQuery) {
+                $subQuery->select(DB::raw(1))
+                    ->from('student_fees_new')
+                    ->whereColumn('student_fees_new.fees_id', 'fn.id')
+                    ->where('student_fees_new.status', 'paid');
+            })->orWhereExists(function ($subQuery) {
+                $subQuery->select(DB::raw(1))
+                    ->from('fees_new_organization_user')
+                    ->whereColumn('fees_new_organization_user.fees_new_id', 'fn.id')
+                    ->where('fees_new_organization_user.status', 'paid');
+            });
+        })
+        ->where('fn.organization_id', $oid)
+        ->whereYear('fn.start_date', $year)
+        ->groupBy('fn.id')
+        ->select('fn.id', DB::raw("CONCAT(fn.category, ' - ', fn.name) AS name"))
+        ->orderBy('fn.category')
+        ->orderBy('name')
+        ->get();
 
+        //dd($yurans);
         return response()->json(['success' => $yurans]);
     }
 
