@@ -21,6 +21,14 @@
 </div>
 @endif
 
+@if($errors->any())
+    <div class="alert alert-danger">
+        @foreach($errors->all() as $message)
+            <p>{{ $message }}</p>
+        @endforeach
+    </div>
+@endif
+
 
 <!-- error message -->
 <div class="card ">
@@ -44,7 +52,7 @@
                 <!-- email -->
                 <label for="useremail">Emel:</label>
                 <input type="email" class="form-control @error('email') is-invalid @enderror"
-                value="@error('email'){{ old('email')}}  @enderror  @if (!(old('email'))) {{ Auth::user()->email }} @endif" 
+                value="{{ old('email', Auth::user()->email) }}" 
                 name="email">
                 <!-- value=" @error('email'){{ old('email')}}  @enderror  @if (!(old('email'))) {{-- Auth::user()->email --}} @endif"  -->
                 <!-- if got error then take back the old email, if no old -->
@@ -70,7 +78,7 @@
             <div class="form-group">
                 <label>Nombor Kad Pengenalan</label>
                 <input type="text" name="icno" class="form-control icno" placeholder="Nombor Kad Pengenalan"
-                    value="{{ Auth::user()->icno}}">
+                value="{{ old('icno', Auth::user()->icno) }}">
             </div>
 
             <div class="form-group">
@@ -78,7 +86,7 @@
                 <label for="telno">No. Telefon:</label>
                 <input type="text" name="telno"  
                 class="form-control  phone_no  @error('telno') is-invalid @enderror" 
-                value="@error('telno'){{ old('telno')}}  @enderror  @if (!(old('telno'))) {{ $usertel }} @endif" 
+               value="{{ old('telno', $usertel) }}"
                 data-parsley-required-message="Sila masukkan no telefon"
                 min="10"  max="13" 
                 >
