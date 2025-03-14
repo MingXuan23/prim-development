@@ -74,6 +74,36 @@ class ProfileController extends Controller
             'email'     => "required|email|unique:users,email,$id",
         ]);
 
+        if ($request->filled('icno')) {
+            // Check if 'icno' already used by another user (exclude current user)
+            $icExists = DB::table("users")
+                ->where('icno', $request->icno)
+                ->where('id', '!=', Auth::id())
+                ->exists();
+    
+            if ($icExists) {
+                return redirect()->back()
+                    ->withErrors(['icno' => 'IC ini telah digunakan oleh pengguna lain.'])
+                    ->withInput();
+            }
+    
+            // Check if 'icno' is being used as 'telno' by another user (exclude current user)
+            $icAsTelOrEmailExists = DB::table("users")
+                    ->where(function ($query) use ($request) {
+                        $query->where('telno', $request->icno)
+                            ->orWhere('email', $request->icno);
+                    })
+                    ->where('id', '!=', Auth::id())
+                    ->exists();
+    
+            if($icAsTelOrEmailExists){
+                return redirect()->back()
+                    ->withErrors(['icno' => 'IC ini telah digunakan oleh pengguna lain. Jika anda penjaga yang ingin membayar yuran sekolah, sila gunakan IC anda dan kata laluan yang diberikan oleh guru.'])
+                    ->withInput();
+            }
+        }
+        
+
         // unique: tableName, columName, $id to exclude
 
         $userUpdate = DB::table('users')
