@@ -1336,9 +1336,21 @@ class StudentController extends Controller
                               ->orWhere(function($query) use ($end_date) {
                                   $query->whereNull('class_student.end_date')
                                         ->where('class_student.start_date', '<=', $end_date);
-                              });
-                    })
+                              })
+                              ->orWhere(function($query) use ($start_date, $end_date) {
+                                $query->whereNotNull('class_student.end_date')
+                                      ->whereBetween('class_student.end_date',  [$start_date, $end_date]);
+                            })
+                            ->orWhere(function($query) use ($start_date, $end_date) {
+                                $query->whereNotNull('class_student.end_date')
+                                      ->where( 'class_student.end_date','>=', $start_date)
+                                      ->where('class_student.start_date','<=',$end_date);
+
+                            });
+                            
+                    }) 
                     ->orderBy('students.nama');
+
                 $update=$this->validateStatus($data->get());
                 if($update){
                     $data = DB::table('students')
@@ -1354,11 +1366,31 @@ class StudentController extends Controller
                               ->orWhere(function($query) use ($end_date) {
                                   $query->whereNull('class_student.end_date')
                                         ->where('class_student.start_date', '<=', $end_date);
-                              });
-                    })
+                              })
+                              ->orWhere(function($query) use ($start_date, $end_date) {
+                                $query->whereNotNull('class_student.end_date')
+                                      ->whereBetween('class_student.end_date',  [$start_date, $end_date]);
+                            })
+                            ->orWhere(function($query) use ($start_date, $end_date) {
+                                $query->whereNotNull('class_student.end_date')
+                                      ->where($start_date ,'<=','class_student.end_date')
+                                      ->where('class_student.start_date','<=',$end_date);
+
+                            });
+                            
+                            //   ->orWhere(function($query) use ($start_date, $end_date) {
+                            //       $query->whereNotNull('class_student.end_date')
+                            //             ->whereBetween($start_date, ['class_student.start_date', 'class_student.end_date']);
+                            //   })
+                            //   ->orWhere(function($query) use ($start_date, $end_date) {
+                            //     $query->whereNotNull('class_student.end_date')
+                            //           ->whereBetween($end_date, ['class_student.start_date', 'class_student.end_date']);
+                            // })
+                           
+                    }) 
                     ->orderBy('students.nama');
                 }
-
+               // dd($data->get());
                 $table = Datatables::of($data);
 
                 $table->addColumn('gender', function ($row) {
