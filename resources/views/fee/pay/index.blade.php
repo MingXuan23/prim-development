@@ -160,7 +160,7 @@
                                                             {{ $row->studentname  }}</span>
                                                         <span> ( {{ $row->classname }} )</span>
                                                         <br>
-                                                        <span> {{ $row->nschool }} </span>
+                                                        <!-- <span> {{ $row->nschool }} </span> -->
                                                         </label>
                                                     @else
                                                         <input id="option-{{ $organization->id }}-{{ $row->studentid }}"
