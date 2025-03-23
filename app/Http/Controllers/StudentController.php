@@ -1373,7 +1373,7 @@ class StudentController extends Controller
                             })
                             ->orWhere(function($query) use ($start_date, $end_date) {
                                 $query->whereNotNull('class_student.end_date')
-                                      ->where($start_date ,'<=','class_student.end_date')
+                                      ->where('class_student.end_date','>=' ,$start_date)
                                       ->where('class_student.start_date','<=',$end_date);
 
                             });
