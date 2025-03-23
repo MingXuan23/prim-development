@@ -1730,27 +1730,24 @@ class FeesController extends AppBaseController
 
     public function generateExcelClassTransaction(Request $request)
     {
-        $class_id = $request->classes;
-        $orgId = $request->organization;
+        $class_id   = $request->classes;
+        $orgId      = $request->organization;
         $start_date = $request->date_started;
-        $end_date = $request-> date_end;
-       
-        
-        //$class = ClassModel::where('id', $class_id)->first();
-
-        $org = DB::table('organizations')->where('id',$orgId)->first();
-      //  dd($request->all(), $orgId,$org);
-        if($org == null){
-
-          
+        $end_date   = $request->date_end;
+        $show_all_payment = $request->show_all_payments =="true" ? true : false;
+    
+        $org = DB::table('organizations')->where('id', $orgId)->first();
+    
+        if ($org == null) {
             return redirect()->back()->withError('Invalid Organization!');
         }
       
-        return Excel::download(new ExportClassTransaction($class_id, $org, $start_date, $end_date), 'class_transaction.xlsx');
-
-
-       
+        return Excel::download(
+            new ExportClassTransaction($class_id, $org, $start_date, $end_date, $show_all_payment),
+            'class_transaction.xlsx'
+        );
     }
+    
 
 
     public function searchreportswasta()
