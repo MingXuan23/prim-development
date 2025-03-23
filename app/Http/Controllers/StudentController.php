@@ -1407,7 +1407,7 @@ class StudentController extends Controller
                     }
                 });
 
-                $table->addColumn('status', function ($row) use ($orgId){
+                $table->addColumn('status', function ($row) use ($orgId,$start_date,$end_date,$request){
                    
                     if($row->end_date == null){
                         $row_end_date = Carbon::tomorrow()->format('Y-m-d');
@@ -1429,7 +1429,7 @@ class StudentController extends Controller
                     //this line should be disable at 2025
                     //->whereYear('t.datetime_created',substr($row_end_date,0,4))
                     //end
-                    ->select('t.id as transaction_id','t.amount')
+                    ->select('t.id as transaction_id','t.amount','t.datetime_created')
                     ->get();
                     
                     $tranA = DB::table('transactions as t')
@@ -1445,14 +1445,23 @@ class StudentController extends Controller
                     //this line should be disable at 2025
                     ->whereYear('t.datetime_created',substr($row_end_date,0,4))
                     //end
-                    ->select('t.id as transaction_id','t.amount')
+                    ->select('t.id as transaction_id','t.amount','t.datetime_created')
                     ->get();
     
 
                 $combined = $tranA->concat($tranB);
     
                 $unique = $combined->unique('transaction_id');
-               
+
+                
+                    if($request->show_all_payments != "true"){
+                            $unique = $unique->filter(function ($item) use ($start_date, $end_date) {
+                                return $item->datetime_created >= $start_date && $item->datetime_created <= $end_date;
+                            });
+
+                          
+                    }
+
                     if(count($unique)>0) {
                         $btn = '<div class="d-flex  align-items-center flex-column">';
                         foreach($unique as $t){
@@ -1619,33 +1628,39 @@ class StudentController extends Controller
 
     public function generatePDFByClass(Request $request)
     {
-        $class_id = $request->class_id;
-        $class = ClassModel::where('id', $class_id)->first();
-
-        $get_organization = DB::table('organizations')
-            ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('organizations.*', 'classes.nama as classname')
-            ->where([
-                ['classes.id', $class_id],
-            ])
-            ->first();
-
-        $data = DB::table('students')
-            ->join('class_student', 'class_student.student_id', '=', 'students.id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('students.*', 'class_student.fees_status')
-            ->where([
-                ['classes.id', $class_id],
-                ['class_student.status', 1],
-            ])
-            ->orderBy('students.nama')
-            ->get();
-
-        $pdf = PDF::loadView('fee.report-search.template-pdf', compact('data', 'get_organization'));
-
-        return $pdf->download($class->nama . '.pdf');
+        try {
+            $class_id = $request->class_id;
+            $class = ClassModel::where('id', $class_id)->first();
+    
+            $get_organization = DB::table('organizations')
+                ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('organizations.*', 'classes.nama as classname')
+                ->where([
+                    ['classes.id', $class_id],
+                ])
+                ->first();
+    
+            $data = DB::table('students')
+                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->select('students.*', 'class_student.fees_status')
+                ->where([
+                    ['classes.id', $class_id],
+                    ['class_student.status', 1],
+                ])
+                ->orderBy('students.nama')
+                ->get();
+    
+            $pdf = PDF::loadView('fee.report-search.template-pdf', compact('data', 'get_organization'));
+    
+            return $pdf->download($class->nama . '.pdf');
+    
+        } catch (\Throwable $e) {
+           
+        }
+        
     }
 
    

@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 Auth::routes();
 
 Route::get('registerAdmin', 'Auth\RegisterController@AdminRegisterIndex')->name('register.admin');
+Route::get('register_yuran', 'Auth\RegisterController@YuranRegisterIndex')->name('register.yuran_register');
+
 //Route::post('registerAdmin', 'Auth\RegisterController@registerAdmin');
 // Auth::routes(['register' => false]);
 

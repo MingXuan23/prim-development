@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Events\Registered; // 
 use App\Http\Controllers\PointController;
 
 class RegisterController extends Controller
@@ -56,19 +57,35 @@ class RegisterController extends Controller
         return view('auth.registerAdmin');
     }
 
+
+    public function YuranRegisterIndex()
+    {
+        return view('auth.yuran_register');
+    }
+
     protected function validator(array $data)
     {
+      
         $validator = Validator::make($data, [
             'name'              => ['required', 'string', 'max:255'],
             'email'             => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
             'telno'             => ['required', 'numeric', 'min:10'],
             
+            
         ], [
             'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character (@!$#%^&*())',
         ]);
 
+        
         $validator->after(function ($validator) use ($data) {
+            if(!isset($data['registration_type'])){
+                $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
+            }
+
+            else if($data['registration_type'] == '-'){
+                $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
+            }
             if(isset($data['isAdmin'])){
                 return;
             }
@@ -76,12 +93,14 @@ class RegisterController extends Controller
                 return;
             }
 
+            
             $valid = PointController::validateReferralCode($data['referral_code']);
             if (!$valid) {
                 $validator->errors()->add('referral_code', 'Expired referral code.');
             }
         });
 
+        //dd($validator->errors());
         return $validator;
     }
 
@@ -139,6 +158,25 @@ class RegisterController extends Controller
         return $user;
 
     }
+
+    public function register(Request $request)
+    {
+        // If the registration type is "bayar_yuran", redirect without validation or user creation.
+        if ($request->input('registration_type') === 'bayar_yuran') {
+            return redirect('/register_yuran');
+        }
+       
+        // Otherwise, perform the usual registration.
+        $this->validator($request->all())->validate();
+
+        event(new Registered($user = $this->create($request->all())));
+
+        $this->guard()->login($user);
+
+        return $this->registered($request, $user) ?: redirect($this->redirectPath());
+    }
+
+
     // to redirect back to intended link even after revalidation
     public function showRegistrationForm(Request $request)
     {
