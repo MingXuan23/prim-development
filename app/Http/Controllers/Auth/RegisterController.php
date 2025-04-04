@@ -129,6 +129,7 @@ class RegisterController extends Controller
             'password'          => Hash::make($data['password']),
             'telno'             => $data['telno'],
             'remember_token'    => $data['_token'],
+            'purpose'           =>$data['registration_type']??''
 
         ]);
        
