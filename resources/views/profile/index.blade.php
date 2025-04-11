@@ -104,9 +104,11 @@
 
 
                     @else
-                    <button class="btn btn-primary w-md waves-effect waves-light" style="margin-left:22px"onclick="copyReferralLink()">
+                  
+                    <button class="btn btn-primary waves-effect waves-light" style="margin-left:22px"onclick="copyReferralLink()">
                         Aktifkan
                     </button>
+                    
                     @endif
                     </div>
                
@@ -114,6 +116,9 @@
             <div class="alert alert-success" style="display:none;">
                                 <p id="success"></p>
                             </div>
+
+    <br>
+    <br>
     <br>
             <!-- button for edit -->
             <div class="btn-group editBtnGrp" role="group" aria-label="">

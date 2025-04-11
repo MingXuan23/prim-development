@@ -30,7 +30,7 @@ class ProfileController extends Controller
         }
         
     
-
+       
        
         $userData =  Auth::user();
         $referral_code = DB::table('referral_code')
@@ -68,11 +68,21 @@ class ProfileController extends Controller
         //     'telno' => str_replace( '+6', '', $request->post('telno')),
         // ]);
 
-        $request->validate([
-            'name'      => 'required',
-            'telno'     => "required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
-            'email'     => "required|email|unique:users,email,$id",
-        ]);
+        if(Auth::user()->email == null &&  $request->email == null ){
+            $request->validate([
+                'name'      => 'required',
+                'telno'     => "required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
+               
+            ]);
+        }else{
+            $request->validate([
+                'name'      => 'required',
+                'telno'     => "required|numeric|regex:/^([0-9\s\-\+\(\)]*)$/|unique:users,telno,$id",
+                'email'     => "required|email|unique:users,email,$id",
+            ]);
+        }
+
+       
 
         if ($request->filled('icno')) {
             // Check if 'icno' already used by another user (exclude current user)

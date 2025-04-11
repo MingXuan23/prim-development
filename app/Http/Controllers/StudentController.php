@@ -2095,11 +2095,14 @@ class StudentController extends Controller
         if($request->secureKey != getenv('SECURE_ADMIN_KEY')){
             //dd($request->secureKey);
             //dd(getenv('SECURE_ADMIN_KEY'));
+           // return response()->json(["hello"=>"Success"]);
+          
             return redirect()->back()->with('error', 'Invalid Secure Key');
         }
         //dd('here');
         
         $student = json_decode($request->student);
+        
         $co=DB::table('class_organization as co')
         ->where('co.class_id',$student->newClass)
         ->first();
@@ -2115,12 +2118,12 @@ class StudentController extends Controller
                 ->where('co.class_id',$student->oldClassId);
                // dd('pass');
         $newparent = DB::table('users')
-                            ->where('telno', '=', $student->parentTelno)
-                            ->first();
-            
+                ->where('telno', '=', $student->parentTelno)
+                ->first();
+               
             // dd($newparent);
-
             if (empty($newparent)) {
+               
                 //if parent have email
                 if (isset($student->parentEmail) && !empty($student->parentEmail)) {
                     $validator = Validator::make((array)$student, [
@@ -2143,6 +2146,9 @@ class StudentController extends Controller
                     ]);
                     $newparent->save();
                 } else {
+                    
+
+
                     $validator = Validator::make((array)$student, [
                         'parentTelno' => 'required|unique:users,telno',
                     ]);
@@ -2164,12 +2170,15 @@ class StudentController extends Controller
                 } 
             }
 
+            
+
             // add parent role
             $parentRole = DB::table('organization_user')
                 ->where('user_id', $newparent->id)
                 ->where('organization_id', $co->organization_id)
                 ->where('role_id', 6)
                 ->first();
+               
 
             if (empty($parentRole)) {
                $ou_id =  DB::table('organization_user')->insertGetId([
@@ -2217,10 +2226,10 @@ class StudentController extends Controller
             ->where('status', 1)
             ->get();
             
-            // dd($class_student->get());
+          
             $studentHaveFees=DB::table('student_fees_new as sfn')
                             ->join('class_student as cs','cs.id','sfn.class_student_id')
-                            ->whereIn('sfn.class_student_id',[$new_class_student_id,$class_student_details])
+                            ->whereIn('sfn.class_student_id',[$new_class_student_id,$class_student_details??0])
                             ->get();
                             
             $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
