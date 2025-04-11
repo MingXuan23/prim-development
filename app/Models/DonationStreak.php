@@ -62,6 +62,7 @@ class DonationStreak extends Model
                     ->where('quality_donation',0)
                     ->first();
 
+                    
             if (!isset($streak)|| !$transactionDate->gte(Carbon::parse($streak->startdate))) {
                 continue;
             }
@@ -84,7 +85,7 @@ class DonationStreak extends Model
                 ->where('quality_donation',1)
                 ->first();
 
-                if($streak == null){
+                if($streak == null || !$transactionDate->gte(Carbon::parse($streak->startdate))){
                     continue;
                 }
                 $ids = json_decode($streak->donation_streak_record_ids);

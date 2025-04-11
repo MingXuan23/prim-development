@@ -129,9 +129,9 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                             ->join('organization_user as ou','ou.id','ous.organization_user_id')
                             ->join('users as u','u.id','ou.user_id')
                             ->where('s.nama', 'LIKE', '%' . $studentName . '%')
-                            ->where(function($query) use ($parentName, $phone) {
-                                $query->where('u.name', $parentName )
-                                      ->orWhere('u.telno', $phone)
+                            ->where(function($query) use ($phone) {
+                                $query
+                                      ->Where('u.telno', $phone)
                                       ->orWhere('u.icno', $phone);
                             })
                             ->select('s.id as studentId','s.nama as studentName','s.gender as gender','u.name as parentName','u.id as parentId','u.telno as parentTelno')
