@@ -239,13 +239,15 @@ $(document).ready(function() {
                       }
                     },
                     { 
-                      data: 'roomid', render: function(data) {
+                      data: 'roomid', 
+                      render: function(data) {
                         var editUrl = `{{ route('homestay.editRoomPage', ':roomid') }}`.replace(':roomid', data);
                         return `<a class="btn btn-primary" href="${editUrl}" id="btn-edit"  data-room-id="${data}">Sunting</a>`;
                       } 
                     },
                     {
-                      data: 'roomid', render: function(data) {
+                      data: 'roomid', 
+                      render: function(data) {
                         return `<button class="btn btn-danger" id="btn-delete" data-room-id="${data}">Padam</a>`;
                       }  
                     },

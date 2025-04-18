@@ -44,6 +44,8 @@
             }
         }
     </style>
+
+    <link rel="stylesheet" href="{{ URL::asset('assets/landing-page/css/yuran_style.css') }}">
 </head>
 
 <body>
@@ -74,8 +76,8 @@
                         </ul>
                     </li>
                     {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
-                    <li class="slash">|</li>
-                    <li><a href="#contact">Hubungi Kami</a></li>
+{{--                    <li class="slash">|</li>--}}
+{{--                    <li><a href="#contact">Hubungi Kami</a></li>--}}
                 </ul>
             </div>
             <div class="nav-right-content">
@@ -88,189 +90,370 @@
         </div>
     </nav>
 
-    <!-- header area start  -->
-    <header class="header-area header-bg-3 style-two" id="home" style="padding-top: 170px; padding-bottom: 170px;">
-        {{-- <div class="header-right-image  wow zoomIn" style="text-align: right">
-            <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image" style="padding-bottom: 358px;
-            max-width: 63%;">
-        </div> --}}
-        <div class="container">
-            <div class="row d-flex align-items-center">
-                <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: center">
-                    <img src="{{ URL::asset('assets/landing-page/img/header-yuran.png') }}" alt="header right image" style="max-width: 75%;" id="headerhover">
+    <main role="main">
+        <!--whatsapp contact button-->
+
+        <section aria-label="Click to reach out to us at WhatsApp" id="btn-whatsapp">
+            <a href="https://wa.me/139017388" target="_blank" class="social-link" >
+                <div class="Btn">
+                    <div class="sign">
+                        <svg class="socialSvg whatsappSvg" viewBox="0 0 16 16">
+                            <path
+                                d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"
+                            ></path>
+                        </svg>
+                    </div>
+                    <div class="text">Hubungi Kami</div>
                 </div>
-                <div class="col-lg-6 justify-content-center">
-                    <div class="header-inner">
-                        <h1 class="title wow fadeInDown">Yuran</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan untuk pengurusan yuran sesebuah organisasi
-                            berdaftar.</p>
-                        <div class="btn-wrapper wow fadeInUp">
-                            <!-- <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a> -->
-                            <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
+            </a>
+        </section>
+        <!--    hero section-->
+        <section id="section-hero" aria-label="Hero Section">
+            <div id="hero-wrapper">
+                <img id="hero-deco" style="--transition-delay: 0.45s" class="slide-from-bottom-element" alt="" src="{{URL::asset('assets/landing-page/img/images/arrow_2.png') }}">
+                <article id="hero-text">
+                    <h1 class="mb-2 slide-from-bottom-element">Bayar Yuran Sekolah Dengan <span class="color-primary">Mudah</span></h1>
+                    <p class="mb-2 slide-from-bottom-element" style="--transition-delay: 0.15s">Urus pembayaran sekolah anak anda dalam talian dengan
+                        selamat dan cepat.</p>
+                    <!-- From Uiverse.io by Creatlydev -->
+                    <button  id="btn-sign-up"  class="btn btn-primary slide-from-bottom-element"  style="--transition-delay: 0.3s" >
+                      <span class="btn__icon-wrapper">
+                        <svg
+                            viewBox="0 0 14 15"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="btn__icon-svg"
+                            width="10"
+                        >
+                          <path
+                              d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
+                              fill="currentColor"
+                          ></path>
+                        </svg>
+
+                        <svg
+                            viewBox="0 0 14 15"
+                            fill="none"
+                            width="10"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="btn__icon-svg btn__icon-svg--copy"
+                        >
+                          <path
+                              d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
+                              fill="currentColor"
+                          ></path>
+                        </svg>
+                      </span>
+                        <a href="/login">
+                            Log Masuk
+                        </a>
+                    </button>
+
+                </article>
+
+                <img class="slide-from-bottom-element" style="--transition-delay: 0.45s" id="img-hero" src="{{ URL::asset('assets/landing-page/img/images/hero_student.png') }}" alt="Hero Section's Image includes a picture of a student">
+            </div>
+        </section>
+        <!--feature section-->
+        <section id="section-feature" aria-label="Feature Section" class="container">
+            <div id="feature-wrapper">
+                <div class="mb-1-2 section-heading">
+                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <h2 class="h2 text-center">Cabaran & Solusi</h2>
+                </div>
+                <p class="text-center text-subtitle mb-4"> Transformasi cara pembayaran yuran sekolah.</p>
+
+                <div id="features">
+                    <article class="feature-card slide-from-bottom-element">
+                        <img class="img-fluid mb-1-2" src="{{ URL::asset('assets/landing-page/img/images/icon_online_payment.png') }}" alt="Icon for online payment">
+                        <h3 class="mb-1">Ibu bapa perlu ke sekolah untuk bayar yuran</h3>
+                        <p class="text-justify">Sistem ini membolehkan ibu bapa membuat pembayaran secara dalam talian tanpa perlu hadir ke sekolah. Proses lebih mudah, cepat dan fleksibel mengikut keselesaan ibu bapa.</p>
+                    </article>
+
+                    <article class="feature-card slide-from-bottom-element" style="--transition-delay: 0.15s">
+                        <img class="img-fluid mb-1-2" src="{{ URL::asset('assets/landing-page/img/images/icon_tracking.png') }}" alt="Icon for easy tracking">
+                        <h3 class="mb-1">Cikgu akan kumpul tunai yang banyak dan resit akan hilang</h3>
+                        <p class="text-justify">Pembayaran tanpa tunai mengurangkan beban guru untuk mengurus wang fizikal. Semua transaksi direkodkan secara automatik dan selamat dalam sistem. Dengan ini, guru tidak perlu risau resit hilang.</p>
+                    </article>
+
+                    <article class="feature-card slide-from-bottom-element" style="--transition-delay: 0.3s">
+                        <img class="img-fluid mb-1-2" src="{{ URL::asset('assets/landing-page/img/images/icon_verification.png') }}" alt="Icon for payments verification">
+                        <h3 class="mb-1"> Cikgu perlu ambil masa untuk tulis resit secara manual</h3>
+                        <p class="text-justify">Setiap transaksi akan disertakan dengan resit digital yang dijana secara automatik. Guru tidak perlu lagi tulis resit secara manual dan menjadikan proses tersebut lebih efisien serta kurang risiko kesilapan.</p>
+                    </article>
+                </div>
+            </div>
+
+        </section>
+        <!-- showcase section-->
+        <section id="section-showcase" aria-label="Application Showcase Section" class="container">
+            <div id="showcase-wrapper">
+                <div class="mb-1-2 section-heading">
+                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <h2 class="h2 text-center">Paparan Sistem</h2>
+                </div>
+                <p class="text-center text-subtitle mb-4"> Setiap fungsi direka untuk memudahkan urusan pembayaran yuran.</p>
+
+                <div id="showcase-container">
+                    <div id="showcase-buttons" >
+                        <button id="btn-showcase-left" class="btn-showcase">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: scaleY(-1);msFilter:progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);"><path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z"></path></svg>
+                        </button>
+
+                        <button id="btn-showcase-right" class="btn-showcase">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: rotate(180deg);msFilter:progid:DXImageTransform.Microsoft.BasicImage(rotation=2);"><path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z"></path></svg>
+                        </button>
+                    </div>
+                    <div id="showcase-screenshots">
+
+                        <article class="showcase-screenshot slide-from-bottom-element">
+                            <img src="{{ URL::asset('assets/landing-page/img/images/screenshot_mockup_1.svg') }}" alt="Screenshot of receipt for paid school fee">
+                        </article>
+
+                        <article class="showcase-screenshot">
+                            <img src="{{ URL::asset('assets/landing-page/img/images/screenshot_mockup_2.svg') }}" alt="Screenshot of past receipts table">
+                        </article>
+
+                        <article class="showcase-screenshot">
+                            <img src="{{ URL::asset('assets/landing-page/img/images/screenshot_mockup_3.svg') }}" alt="Screenshot of generated fee payment report">
+                        </article>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+        <!-- stats section-->
+        <section id="section-stat" aria-label="Statistic Section">
+            <div id="stat-wrapper">
+                <article class="stat slide-from-bottom-element"  >
+                    <div class="stat-number mb-1-2">{{number_format($organizationCount)}}</div>
+                    <div class="stat-text">Jumlah Sekolah Berdaftar</div>
+                </article>
+
+                <article class="stat slide-from-bottom-element" style="--transition-delay: 0.15s">
+                    <div class="stat-number mb-1-2">{{number_format($studentCount)}}</div>
+                    <div class="stat-text">Jumlah Pelajar</div>
+                </article>
+
+                <article class="stat slide-from-bottom-element" style="--transition-delay: 0.15s">
+                    <div class="stat-number mb-1-2">RM{{number_format($totalFee, 2)}}</div>
+                    <div class="stat-text">Jumlah Keseluruhan Yuran Dibayar</div>
+                </article>
+
+                <article class="stat slide-from-bottom-element" >
+                    <div class="stat-number mb-1-2">RM{{number_format($totalFeeThisYear, 2)}}</div>
+                    <div class="stat-text">Jumlah Yuran Dibayar Tahun ini</div>
+                </article>
+            </div>
+        </section>
+        <!-- member section-->
+        <section id="section-member" aria-label="Member Section" class="container">
+            <div id="member-wrapper">
+                <div class="section-heading">
+                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <h2 class="h2 text-center">Ahli-ahli Berdaftar</h2>
+                </div>
+                <p class="text-center text-subtitle mb-4">Terokai sekolah-sekolah di Malaysia yang telah berdaftar dengan platform kami serta Bank Islam dan menikmati kemudahan pembayaran yuran yang lebih mudah, pantas, dan selamat.</p>
+
+                <form id="form-school">
+                    <div id="input-selects">
+                        <select name="states" id="states" class="custom-select">
+                            <option value="" selected disabled>Negeri</option>
+                            <option value="all">Semua Negeri</option>
+
+                        </select>
+                        <select name="district" id="district" class="custom-select">
+                            <option value="" selected disabled>Daerah</option>
+                            <option value="all">Semua Daerah</option>
+
+                        </select>
+                        <button type="submit" id="btn-search">Cari</button>
+                    </div>
+                </form>
+
+                <div class="text-bold text-center" id="member-count">{{$organizations->count()}} <span class="text-small">Sekolah (Jumlah):</span></div>
+
+                <!--list of registered school members-->
+                <div class="members">
+                    @foreach($organizations as $key=>$org)
+                        <article class="member-card" data-state="{{$org->state}}" data-district="{{$org->district}}">
+                        <div class="member-card-header mb-1">
+                            <img src="{{ URL::asset('organization-picture/' . $org->organization_picture ) }}" alt="{{ $org->url_name }} logo">
+                            <div class="member-info-wrapper">
+                                <div class="member-info mb-1-2">
+{{--                                    <img src="{{ URL::asset('assets/landing-page/img/images/icon_school.png') }}" alt="Icon of school">--}}
+                                    <h3>{{ $org->title }}</h3>
+                                </div>
+                                <div class="member-info mb-1-2">
+                                    <img src="{{ URL::asset('assets/landing-page/img/images/icon_student.png') }}" alt="Icon of school">
+                                    <div>{{$organizationStudentCounts->where("id", $org->id)->first()->student_count}} <span class="text-small">pelajar</span></div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </header>
-    <!-- header area end  -->
+                        <div class="member-card-footer">
+                            <button  class="btn btn-primary" >
+                      <span class="btn__icon-wrapper">
+                        <svg
+                            viewBox="0 0 14 15"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="btn__icon-svg"
+                            width="10"
+                        >
+                          <path
+                              d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
+                              fill="currentColor"
+                          ></path>
+                        </svg>
 
-    <!-- about us area start -->
-    <section class="about-us-area">
-        <div class="container">
-            <div class="row justify-content-center" style="">
-                <div class="col-lg-10">
-                    <div class="section-title text-center pb-10">
-                        <h1 class="title wow fadeInDown">Organisasi</h1>
-                        <p class="text-center">Antara organisasi yang telah berdaftar bersama Yuran PRiM dan diperakui Bank Islam boleh diakses disini.</p>
-                        
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <div class="team-carousel">
-                        <!-- team carousel -->
-                        @foreach ($organizations as $org)
-                            <div class="single-team-member">
-                                <!-- single team member -->
-                                <div class="thumb">
-                                    <img src="{{ URL::asset('organization-picture/' . $org->organization_picture ) }}"
-                                        alt="{{ $org->url_name }} logo">
-                                    <div class="hover">
-                                        <ul class="social-icon">
-                                            <li class="white"><a href="/{{ $org->url_name }}"><i class="fa fa-link"></i></a></i></a>prim.my/{{ $org->url_name }}</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="content">
-                                    <h4 class="title">{{ $org->title }}</h4>
-                                    {{-- <span class="post">CEO, Appside</span> --}}
-                                </div>
-                            </div><!-- //. single team member -->
-                            {{-- <div class="owl-dots" style="text-align: center"></div> --}}
-                         @endforeach
-                    </div><!-- //. team carousel -->
-                    {{-- <div class="btn-wrapper wow fadeInUp">
-                        <a href="/yuran/organization-list" class="boxed-btn btn-rounded">Lebih Lanjut</a>
-                    </div> --}}
-                </div>
-            </div>  
-        </div>
-    </section>
-    <!-- about us area end -->
-    <!--====== TESTIMONIAL PART ENDS ======-->
-
-    <!-- team member area start -->
-    <section class="team-member-area" id="ourteam">
-
-        <div class="bg-shape-3 fa-rotate-180" style="top: 0px !important;right:0px;">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width:45%">
-        </div>
-        <div class="bg-shape-2">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg-min.jpg') }}" alt="">
-        </div>
-        <div class="bg-shape-3">
-            {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
-        </div>
-        <div class="container">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-10">
-                        <div class="section-title">
-                            <!-- section title -->
-                            {{-- <span class="subtitle">Screenshots</span> --}}
-                            <h3 class="title extra">Kerjasama</h3>
-                            <p>Laman web ini telah diakui dan disahkan selamat untuk digunakan.</p>
-                        </div><!-- //. section title -->
-                    </div>
-                </div>
-                <div class="row text-center">
-                    <div class="col-lg-12">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt=""
-                                    style="max-width:70%">
-                            </div>
-
-                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt=""
-                                    style="max-width:70%">
-
-                            </div>
-
-                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt=""
-                                    style="max-width:70%">
-
-                            </div>
-
+                        <svg
+                            viewBox="0 0 14 15"
+                            fill="none"
+                            width="10"
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="btn__icon-svg btn__icon-svg--copy"
+                        >
+                          <path
+                              d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
+                              fill="currentColor"
+                          ></path>
+                        </svg>
+                      </span>
+                                <a href="/{{ $org->url_name }}">
+                                    Daftar Masuk
+                                </a>
+                            </button>
+                            {{--check whether the school has ongoing donations--}}
+                            @if($organizationDonations->where("organization_id" , $org->id)->first())
+                                <button class="btn-derma">
+                                    <a href="/sumbangan/{{$organizationDonations->where("organization_id" , $org->id)->first()->url}}">Derma</a>
+                                </button>
+                            @endif
                         </div>
-                    </div>
+                    </article>
+
+                    @endforeach
                 </div>
             </div>
+        </section>
 
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="contact-area-wrapper" id="contact">
-                        <!-- contact area wrapper -->
-                        {{-- <span class="subtitle">Contact us</span> --}}
-                        <h3 class="title">Hubungi Kami</h3>
-                        <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>
-                        <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"
-                            enctype="multipart/form-data">
+        <!--organization-->
+        <!--        <section aria-label="Organization Section" id="section-organization">-->
+        <!--            <div id="organization-wrapper" class="container">-->
+        <!--                <div class="mb-1-2 section-heading">-->
+        <!--                    <img alt="" class="h2-deco-left" src="assets/images/arrow_orange.png" >-->
+        <!--                    <h2 class="h2 text-center">Organisasi Kami</h2>-->
+        <!--                </div>-->
+        <!--                <p class="text-center text-subtitle mb-4">Temui pakar-pakar di sebalik platform ini.-->
+        <!--                </p>-->
 
-                            @csrf
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="uname" name="uname"
-                                            placeholder="Nama Penuh" required>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <input type="email" class="form-control" id="email" name="email"
-                                            placeholder="Email" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control phone_no" id="telno" name="telno"
-                                            placeholder="Nombor Telefon" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12">
-                                    <div class="form-group textarea">
-                                        <textarea name="message" id="message" class="form-control" cols="30" rows="10"
-                                            placeholder="Mesej" required></textarea>
-                                    </div>
-                                    <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div><!-- //. contact area wrapper -->
+        <!--                <div id="officers">-->
+        <!--                    <article class="officer slide-from-bottom-element" style="&#45;&#45;transition-delay: 0.3s">-->
+        <!--                        <div class="officer-image">-->
+        <!--                            <img src="./assets/images/CEO(edited).png" alt="Image of CEO for Direct Pay" class="d-block img-fluid mx-auto mb-1">-->
+        <!--                        </div>-->
+        <!--                        <h3 class="mb-1">Yahya Bin Ibrahim</h3>-->
+        <!--                        <p>Chief Executive Officer</p>-->
+        <!--                    </article>-->
+        <!--                    <article class="officer slide-from-bottom-element" style="&#45;&#45;transition-delay: 0.15s">-->
+        <!--                        <div class="officer-image">-->
+        <!--                            <img src="./assets/images/COO(edited).png" alt="Image of COO for Direct Pay"class="d-block img-fluid mx-auto mb-1">-->
+        <!--                        </div>-->
+        <!--                        <h3 class="mb-1">Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h3>-->
+        <!--                        <p>Chief Operating Officer</p>-->
+        <!--                    </article>-->
+        <!--                    <article class="officer slide-from-bottom-element" >-->
+        <!--                        <div class="officer-image">-->
+        <!--                            <img src="./assets/images/CTO(edited).png" alt="Image of CTO for Direct Pay"class="d-block img-fluid mx-auto mb-1">-->
+        <!--                        </div>-->
+        <!--                        <h3 class="mb-1">Chuan Chuan You</h3>-->
+        <!--                        <p>Chief Technology Officer</p>-->
+        <!--                    </article>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </section>-->
+        <!--collaborators-->
+        <section aria-label="Platform's Collaborators Section" id="section-collab">
+            <div id="collab-wrapper" class="container">
+                <div class="mb-1-2 section-heading">
+                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <h2 class="h2 text-center">Dengan Kerjasama</h2>
                 </div>
-                <div class="col-lg-6">
-                    <div class="contact-area-wrapper" id="contact">
-                        <div class="map-responsive">
-                            <iframe
-                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""
-                                aria-hidden="false" tabindex="0">
-                            </iframe>
+                <p class="text-center text-subtitle mb-4">Laman web ini telah diakui dan disahkan selamat untuk digunakan.
+                </p>
 
-                            <br>
-
-                        </div>
-                    </div><!-- //. contact area wrapper -->
+                <div id="collaborators">
+                    <img class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/images/paynet_logo.png') }}" alt="Logo of Paynet Malaysia">
+                    <img style="--transition-delay: 0.15s"   class="slide-from-bottom-element"  src="{{ URL::asset('assets/landing-page/img/images/bank_islam_logo.png') }}" alt="Logo of Bank Islam">
+                    <img style="--transition-delay: 0.3s"  class="slide-from-bottom-element"   src="{{ URL::asset('assets/landing-page/img/images/utem_logo.png') }}" alt="Logo of Universiti Teknikal Malaysia Melaka">
                 </div>
             </div>
-        </div>
-    </section>
-    <!-- team member area end -->
+        </section>
+        <!--contact us-->
+        <!--        <section aria-label="Contact Us Form Section" id="section-contact">-->
+        <!--            <div id="contact-wrapper" class="container">-->
+        <!--                <img class="slide-from-bottom-element" src="./assets/images/contact_us.png" alt="Image of Customer Service">-->
+        <!--                    <form class="slide-from-bottom-element" style="&#45;&#45;transition-delay: 0.15s"  action="#" method="post" id="form-contact">-->
+        <!--                        <div class="mb-1-2 section-heading">-->
+        <!--                            <img alt="" class="h2-deco-right" src="assets/images/arrow_orange.png" >-->
+        <!--                            <h2 class="h2 text-center">Hubungi Kami</h2>-->
+        <!--                        </div>-->
+        <!--                        <p class="mb-2"> "Perlukan Bantuan? Mahu Demonstrasi Produk Secara Bersemuka?"<br>Hubungi pasukan mesra kami, dan kami akan menghubungi anda dalam masa 2 hari bekerja.-->
+        <!--                        </p>-->
+        <!--                        <div class="mb-1 col-2">-->
+        <!--                            <div>-->
+        <!--                                <label for="name">Nama Penuh</label>-->
+        <!--                                <input type="text" placeholder="John Doe" name="name" id="name" class="form-control">-->
+        <!--                            </div>-->
+        <!--                            <div>-->
+        <!--                                <label for="phone">Nombor Telefon</label>-->
+        <!--                                <input type="text" placeholder="+6011234562"  name="phone" id="phone" class="form-control">-->
+        <!--                            </div>-->
+        <!--                        </div>-->
+        <!--                        <div class="mb-1">-->
+        <!--                            <label for="email">Email</label>-->
+        <!--                            <input type="email" placeholder="john@gmail.com" name="email" id="email" class="form-control">-->
+        <!--                        </div>-->
+
+        <!--                        <div class="mb-3">-->
+        <!--                            <label for="message">Mesej</label>-->
+        <!--                            <textarea id="message" placeholder="Sebarang pertanyaan atau maklum balas untuk kami..."  name="message" class="form-control" rows="5"></textarea>-->
+        <!--                        </div>-->
+        <!--                        <button type="submit" id="btn-submit"  class="btn btn-primary" >-->
+        <!--                      <span class="btn__icon-wrapper">-->
+        <!--                        <svg-->
+        <!--                                viewBox="0 0 14 15"-->
+        <!--                                fill="none"-->
+        <!--                                xmlns="http://www.w3.org/2000/svg"-->
+        <!--                                class="btn__icon-svg"-->
+        <!--                                width="10"-->
+        <!--                        >-->
+        <!--                          <path-->
+        <!--                                  d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"-->
+        <!--                                  fill="currentColor"-->
+        <!--                          ></path>-->
+        <!--                        </svg>-->
+
+        <!--                        <svg-->
+        <!--                                viewBox="0 0 14 15"-->
+        <!--                                fill="none"-->
+        <!--                                width="10"-->
+        <!--                                xmlns="http://www.w3.org/2000/svg"-->
+        <!--                                class="btn__icon-svg btn__icon-svg&#45;&#45;copy"-->
+        <!--                        >-->
+        <!--                          <path-->
+        <!--                                  d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"-->
+        <!--                                  fill="currentColor"-->
+        <!--                          ></path>-->
+        <!--                        </svg>-->
+        <!--                      </span>-->
+        <!--                            Hantar-->
+        <!--                        </button>-->
+        <!--                    </form>-->
+        <!--            </div>-->
+        <!--        </section>-->
+    </main>
 
     <!-- footer area start -->
     <footer class="footer-area">
@@ -370,156 +553,579 @@
 
     <!-- preloader area end -->
 
-    <!-- back to top area start -->
-    <div class="back-to-top">
-        <i class="fas fa-angle-up"></i>
-    </div>
-    <!-- back to top area end -->
     @include('landing-page.footer-script')
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
     <script>
-        var msg = '{{Session::get('alert')}}';
-        var exist = '{{Session::has('alert')}}';
+        document.addEventListener("DOMContentLoaded", function(){
+            const organizations = JSON.parse(@json("$organizations"));
+            const heroSlideFromBottomElements = document.querySelectorAll('#section-hero .slide-from-bottom-element');
+            const featureSlideFromBottomElements = document.querySelectorAll('#section-feature .slide-from-bottom-element');
+            const showcaseSlideFromBottomElements = document.querySelectorAll('#section-showcase .slide-from-bottom-element');
+            const statSlideFromBottomElements = document.querySelectorAll('#section-stat .slide-from-bottom-element');
+            let memberSlideFromBottomElements = document.querySelectorAll('#section-member .slide-from-bottom-element');
+            const organizationSlideFromBottomElements = document.querySelectorAll('#section-organization   .slide-from-bottom-element');
+            const collabSlideFromBottomElements = document.querySelectorAll('#section-collab .slide-from-bottom-element');
+            const contactSlideFromBottomElements = document.querySelectorAll('#section-contact .slide-from-bottom-element');
+            //   setup intersection observers
+            const observerSlideBottomElement = new IntersectionObserver((entries) =>{
+                for(let entry of entries){
+                    if(entry.intersectionRatio > 0 ){
+                        entry.target.classList.add('slide-from-bottom');
+                        //force the first feature to slide in as well
+                        if(entry.target.classList.contains('member-card')){
+                            // Start auto-sliding when members are being displayed
+                            // startAutoSlide();
+                        }
 
-    if (exist) {
-        Swal.fire({
-            title: 'Terima Kasih',
-            text: 'Kerana anda telah menghubungi kami!',
-            type: 'success',
-            confirmButtonColor: '#556ee6',
-            cancelButtonColor: "#f46a6a"
-        });
-    }
-
-    $(document).ready(function() {
-        window.onload = function() {
-            document.getElementById("8").click();
-        };
-
-        // $.ajax({
-        //     url: "{{ route('landingpage.donation.header') }}",
-        //     type: 'GET',
-        //     success: function( result ){
-
-        //         $('#headerPoster').html( result );
-        //         $('#headerPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
-        //         $('#headerPoster').find('.owl-stage-outer').children().unwrap();
-        //         $('#headerPoster').owlCarousel({
-        //             loop:true,
-        //             autoplay:true,
-        //             autoplayTimeout:5000,
-        //             responsiveClass:true,
-        //             responsive:{
-        //                 0:{
-        //                     items:1,
-        //                     nav:false
-        //                 },
-        //                 600:{
-        //                     items:1,
-        //                     nav:false
-        //                 },
-        //                 1000:{
-        //                     items:1,
-        //                     nav:false,
-        //                 }
-        //             }, 
-        //         });
-        //     }
-        // });
-
-        $('#feedback').owlCarousel({
-            loop: true,
-            autoplay: true, //true if you want enable autoplay
-            autoPlayTimeout: 1000,
-            margin: 30,
-            dots: false,
-            nav: true,
-            smartSpeed:3000,
-            animateIn:'fadeIn',
-            animateOut:"fadeOut",
-            navText:['',''],
-            responsive: {
-                0: {
-                    items: 1,
-                    nav: false
-                },
-                414: {
-                    items: 1,
-                    nav: false
-                },
-                520: {
-                    items: 2,
-                    nav: false
-                },
-                767: {
-                    items: 2,
-                    nav: false
-                },
-                768: {
-                    items: 2,
-                    nav: false
-                },
-                960: {
-                    items: 3,
-                    nav:false
-                },
-                1200: {
-                    items: 4
-                },
-                1920: {
-                    items: 4
+                    }
                 }
+            });
+
+            for(let el of heroSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+            for(let el of featureSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+            for(let el of showcaseSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+            for(let el of statSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+            for(let el of memberSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+            for(let el of organizationSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+            for(let el of collabSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+            for(let el of contactSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+
+
+            //     for auto slide for members
+            // const membersContainer = document.querySelector('.members');
+            // const memberCards = document.querySelectorAll('.member-card');
+            // let isUserInteracting = false;
+            // let autoSlideInterval;
+            // let currentCardIndex = 0;
+            //
+            // // Function to get the current visible card index
+            // // Function to get the current visible card index
+            // function getCurrentVisibleCardIndex() {
+            //     const containerScrollLeft = membersContainer.scrollLeft;
+            //     const cardWidth = parseFloat(getComputedStyle(memberCards[0]).width);
+            //     const cardGap = parseFloat(getComputedStyle(membersContainer).gap);
+            //     const totalCardWidth = cardWidth + cardGap;
+            //
+            //     // Get container width to determine visible cards
+            //     const containerWidth = membersContainer.clientWidth;
+            //     const visibleCardsCount = Math.floor(containerWidth / totalCardWidth);
+            //
+            //     // Calculate the index based on scroll position
+            //     let calculatedIndex = Math.round(containerScrollLeft / totalCardWidth);
+            //     // Adjust for layouts with multiple visible cards
+            //     if (visibleCardsCount > 1) {
+            //         // If near the end, ensure we can still scroll to the last set of cards
+            //         calculatedIndex = Math.min(
+            //             calculatedIndex,
+            //             memberCards.length - visibleCardsCount
+            //         );
+            //         if(visibleCardsCount === 2 && calculatedIndex === memberCards.length - 2){
+            //             calculatedIndex++;
+            //         }
+            //     }
+            //
+            //     return calculatedIndex;
+            // }
+            //
+            //
+            // // Function to slide to a specific card
+            // function slideToCard(index) {
+            //     if (isUserInteracting) return;
+            //
+            //     // Ensure index is within bounds
+            //     currentCardIndex = Math.max(0, Math.min(index, memberCards.length - 1));
+            //
+            //     // Scroll to the exact left position of the target card
+            //     membersContainer.scrollTo({
+            //         left: (parseFloat(getComputedStyle(memberCards[0]).width) * currentCardIndex),
+            //         behavior: 'smooth'
+            //     });
+            // }
+            //
+            // // Function to slide to the next card
+            // function slideToNextCard() {
+            //     if (isUserInteracting) return;
+            //
+            //     // Update current index based on actual visible position
+            //     currentCardIndex = getCurrentVisibleCardIndex();
+            //     currentCardIndex++;
+            //
+            //     // Reset to first card if we've reached the end
+            //     if (currentCardIndex >= memberCards.length) {
+            //         currentCardIndex = 0;
+            //     }
+            //
+            //     slideToCard(currentCardIndex);
+            // }
+            //
+            // // Start automatic sliding
+            // function startAutoSlide() {
+            //     pauseAutoSlide(); // Clear any existing interval
+            //
+            //     // Update current index based on visible position before starting
+            //     currentCardIndex = getCurrentVisibleCardIndex();
+            //
+            //     autoSlideInterval = setInterval(slideToNextCard, 3000); // Slide every 3 seconds
+            // }
+            //
+            // // Pause automatic sliding
+            // function pauseAutoSlide() {
+            //     clearInterval(autoSlideInterval);
+            // }
+            //
+            // // Event listeners to detect user interaction
+            // membersContainer.addEventListener('mouseenter', () => {
+            //     isUserInteracting = true;
+            //     pauseAutoSlide();
+            // });
+            //
+            // membersContainer.addEventListener('mouseleave', () => {
+            //     isUserInteracting = false;
+            //     startAutoSlide();
+            // });
+            //
+            // // Touch events for mobile support
+            // membersContainer.addEventListener('touchstart', () => {
+            //     isUserInteracting = true;
+            //     pauseAutoSlide();
+            // });
+            //
+            // membersContainer.addEventListener('touchend', () => {
+            //     isUserInteracting = false;
+            //     startAutoSlide();
+            // });
+            //
+            // // Detect when user starts scrolling manually
+            // let scrollTimeout;
+            // membersContainer.addEventListener('scroll', () => {
+            //     // Detect manual scrolling
+            //     isUserInteracting = true;
+            //     pauseAutoSlide();
+            //
+            //     // Reset manual scrolling after a short delay
+            //     clearTimeout(scrollTimeout);
+            //     scrollTimeout = setTimeout(() => {
+            //         isUserInteracting = false;
+            //         startAutoSlide();
+            //     }, 1000);
+            // });
+            //
+            //
+
+            //     for screenshots showcase
+            // Get the necessary elements
+            const showcaseContainer = document.getElementById('showcase-screenshots');
+            const leftButton = document.getElementById('btn-showcase-left');
+            const rightButton = document.getElementById('btn-showcase-right');
+            const screenshots = document.querySelectorAll('.showcase-screenshot');
+
+            // Set initial values
+            let currentIndex = 0;
+            const totalScreenshots = screenshots.length;
+            let screenshotWidth  ; // Width of each screenshot (from your CSS)
+
+            // Function to update navigation buttons
+            function updateNavButtons() {
+                // Update button states
+                if (currentIndex === 0) {
+                    leftButton.style.opacity = '0.5';
+                    leftButton.style.pointerEvents = 'none';
+                } else {
+                    leftButton.style.opacity = '1';
+                    leftButton.style.pointerEvents = 'auto';
+                }
+
+                if (currentIndex === totalScreenshots - 1) {
+                    rightButton.style.opacity = '0.5';
+                    rightButton.style.pointerEvents = 'none';
+                } else {
+                    rightButton.style.opacity = '1';
+                    rightButton.style.pointerEvents = 'auto';
+                }
+            }
+
+            // Initialize button states
+            updateNavButtons();
+
+            // Function to scroll to a specific screenshot
+            function scrollToScreenshot(index) {
+                screenshotWidth  = parseInt(getComputedStyle(document.querySelector("#showcase-screenshots")).width);
+                const scrollPosition = index * screenshotWidth;
+                showcaseContainer.scrollTo({
+                    left: scrollPosition,
+                    behavior: 'smooth'
+                });
+
+                currentIndex = index;
+                updateNavButtons();
+            }
+
+            // Add click event for left button
+            leftButton.addEventListener('click', function() {
+                if (currentIndex > 0) {
+                    scrollToScreenshot(currentIndex - 1);
+                }
+            });
+
+            // Add click event for right button
+            rightButton.addEventListener('click', function() {
+                if (currentIndex < totalScreenshots - 1) {
+                    scrollToScreenshot(currentIndex + 1);
+                }
+            });
+
+            // Optional: Add keyboard navigation
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'ArrowLeft') {
+                    if (currentIndex > 0) {
+                        scrollToScreenshot(currentIndex - 1);
+                    }
+                } else if (event.key === 'ArrowRight') {
+                    if (currentIndex < totalScreenshots - 1) {
+                        scrollToScreenshot(currentIndex + 1);
+                    }
+                }
+            });
+
+            // Add scroll event to detect when manual scrolling occurs
+            showcaseContainer.addEventListener('scroll', function() {
+                // Calculate which screenshot is currently in view
+                const scrollPosition = showcaseContainer.scrollLeft;
+                const newIndex = Math.round(scrollPosition / screenshotWidth);
+
+                if (newIndex !== currentIndex) {
+                    currentIndex = newIndex;
+                    updateNavButtons();
+                }
+            });
+
+            // Optional: Add swipe gesture support for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            showcaseContainer.addEventListener('touchstart', function(event) {
+                touchStartX = event.changedTouches[0].screenX;
+            });
+
+            showcaseContainer.addEventListener('touchend', function(event) {
+                touchEndX = event.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const swipeThreshold = 50; // Minimum distance needed to register as a swipe
+
+                if (touchEndX - touchStartX > swipeThreshold) {
+                    // Swiped right
+                    if (currentIndex > 0) {
+                        scrollToScreenshot(currentIndex - 1);
+                    }
+                }
+
+                if (touchStartX - touchEndX > swipeThreshold) {
+                    // Swiped left
+                    if (currentIndex < totalScreenshots - 1) {
+                        scrollToScreenshot(currentIndex + 1);
+                    }
+                }
+            }
+
+// for schools filtering
+// Create objects to count organizations by state and district
+            const stateCount = {};
+            const districtsByState = {};
+
+// Add pagination variables
+            const cardsPerPage = 6;
+            let currentPage = 1;
+            let filteredCards = [];
+            let isFirstLoad = true;
+// Process organizations
+            organizations.forEach(org => {
+                // Count by state
+                if (org.state) {
+                    stateCount[org.state] = (stateCount[org.state] || 0) + 1;
+
+                    // Organize districts by state
+                    if (!districtsByState[org.state]) {
+                        districtsByState[org.state] = {};
+                    }
+
+                    // Count by district within state
+                    if (org.district) {
+                        districtsByState[org.state][org.district] =
+                            (districtsByState[org.state][org.district] || 0) + 1;
+                    }
+                }
+            });
+
+// Populate states dropdown
+            const statesSelect = document.getElementById('states');
+            Object.keys(stateCount).sort().forEach(state => {
+                const option = document.createElement('option');
+                option.value = state;
+                option.textContent = `${state} (${stateCount[state]})`;
+                statesSelect.appendChild(option);
+            });
+
+// Initially disable district dropdown
+            const districtSelect = document.getElementById('district');
+            districtSelect.disabled = true;
+
+// Handle state selection to populate districts
+            statesSelect.addEventListener('change', function () {
+                const selectedState = this.value;
+
+                // Clear previous district options except the first two (default + "All Districts")
+                while (districtSelect.options.length > 2) {
+                    districtSelect.remove(2);
+                }
+
+                if (selectedState !== 'all' && districtsByState[selectedState]) {
+                    Object.keys(districtsByState[selectedState]).sort().forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = `${district} (${districtsByState[selectedState][district]})`;
+                        districtSelect.appendChild(option);
+                    });
+
+                    districtSelect.disabled = false;
+                } else {
+                    // If "All States" is selected, disable district filter
+                    districtSelect.disabled = true;
+                }
+
+                // Reset to first page when filter changes
+                currentPage = 1;
+                // filterOrganizations(selectedState, districtSelect.value);
+            });
+
+// Form submission handler
+            document.getElementById('form-school').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Add your filter logic here
+                const selectedState = document.getElementById('states').value;
+                const selectedDistrict = document.getElementById('district').value;
+
+                // Reset to first page when filter is applied
+                currentPage = 1;
+
+                // Filter your organizations based on selections
+                filterOrganizations(selectedState, selectedDistrict);
+            });
+
+            function filterOrganizations(state, district) {
+                if(!state){
+                    return;
+                }
+
+                const allOrgs = document.querySelectorAll('.member-card');
+                let schoolCount = 0;
+                filteredCards = [];
+
+                allOrgs.forEach(org => {
+                    const orgState = org.getAttribute('data-state');
+                    const orgDistrict = org.getAttribute('data-district');
+
+                    const stateMatch = state === 'all' || orgState === state;
+                    const districtMatch = district === 'all' || district === '' || orgDistrict === district;
+
+                    if (stateMatch && districtMatch) {
+                        filteredCards.push(org);
+                        schoolCount++;
+                    }
+
+                    // Hide all cards initially
+                    org.style.display = 'none';
+                });
+
+                // Update school count display
+                const resultCount = document.querySelector("#member-count");
+                resultCount.innerHTML = `${schoolCount}`;
+                const span = document.createElement("span");
+                span.innerHTML = " Sekolah (Jumlah):";
+                span.classList.add("text-small");
+                resultCount.append(span);
+
+                // Update pagination
+                updatePagination();
+
+                // Show cards for current page
+                displayCurrentPageCards();
+            }
+
+// Function to display cards for the current page
+            function displayCurrentPageCards() {
+                const startIndex = (currentPage - 1) * cardsPerPage;
+                const endIndex = Math.min(startIndex + cardsPerPage, filteredCards.length);
+
+                // Hide all cards first
+                document.querySelectorAll('.member-card').forEach(card => {
+                    card.style.display = 'none';
+                });
+
+                // Show only cards for current page
+                for (let i = startIndex; i < endIndex; i++) {
+                    filteredCards[i].style.display = '';
+                    filteredCards[i].classList.add("slide-from-bottom-element");
+                    filteredCards[i].style.setProperty("--transition-delay", `${.05 * i}s`);
+                }
+                memberSlideFromBottomElements = document.querySelectorAll('#section-member .slide-from-bottom-element');
+                for(let el of memberSlideFromBottomElements){
+                    observerSlideBottomElement.observe(el);
+                }
+
+                //move to the top of the container when current screen size is smaller than 1000
+                if (window.innerWidth <= 1000 && !isFirstLoad) {
+                    const target = document.querySelector("#member-count");
+                    const offsetTop = target.getBoundingClientRect().top + window.scrollY;
+
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+
+                isFirstLoad = false;
+            }
+
+// Function to create and update pagination controls
+            function updatePagination() {
+                const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
+
+                // Get or create pagination container
+                let paginationContainer = document.querySelector('#school-pagination');
+                if (!paginationContainer) {
+                    paginationContainer = document.createElement('div');
+                    paginationContainer.id = 'school-pagination';
+                    paginationContainer.className = 'mt-4';
+
+                    // Insert after members container
+                    const membersContainer = document.querySelector('.members');
+                    membersContainer.parentNode.insertBefore(paginationContainer, membersContainer.nextSibling);
+                }
+
+                // Clear previous pagination
+                paginationContainer.innerHTML = '';
+
+                // Don't show pagination if only one page or no results
+                if (totalPages <= 1) {
+                    return;
+                }
+
+                // Create Bootstrap 4 pagination
+                const nav = document.createElement('nav');
+                const ul = document.createElement('ul');
+                ul.className = 'pagination justify-content-center';
+
+                // Previous button
+                const prevLi = document.createElement('li');
+                prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+                const prevA = document.createElement('a');
+                prevA.className = 'page-link';
+                prevA.href = '#';
+                prevA.textContent = 'Sebelumnya';
+                prevA.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                        currentPage--;
+                        displayCurrentPageCards();
+                        updatePagination();
+                    }
+                });
+                prevLi.appendChild(prevA);
+                ul.appendChild(prevLi);
+
+                // Page numbers
+                // Determine which page numbers to show
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + 4);
+
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageLi = document.createElement('li');
+                    pageLi.className = `page-item ${i === currentPage ? 'active' : ''}`;
+
+                    const pageA = document.createElement('a');
+                    pageA.className = 'page-link';
+                    pageA.href = '#';
+                    pageA.textContent = i;
+
+                    pageA.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        currentPage = i;
+                        displayCurrentPageCards();
+                        updatePagination();
+                    });
+
+                    pageLi.appendChild(pageA);
+                    ul.appendChild(pageLi);
+                }
+
+                // Next button
+                const nextLi = document.createElement('li');
+                nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+                const nextA = document.createElement('a');
+                nextA.className = 'page-link';
+                nextA.href = '#';
+                nextA.textContent = 'Seterusnya';
+                nextA.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                        currentPage++;
+                        displayCurrentPageCards();
+                        updatePagination();
+                    }
+                });
+                nextLi.appendChild(nextA);
+                ul.appendChild(nextLi);
+
+                nav.appendChild(ul);
+                paginationContainer.appendChild(nav);
+            }
+
+            // Update layout for pagination view
+            const membersContainer = document.querySelector('.members');
+            membersContainer.style.display = 'grid';
+            membersContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(min(100%, 350px), 1fr))';
+
+            // Apply initial filter and pagination
+            const allOrgs = document.querySelectorAll('.member-card');
+            filteredCards = Array.from(allOrgs);
+            updatePagination();
+            displayCurrentPageCards();
+
+            // Update school count
+            const resultCount = document.querySelector("#member-count");
+            if (resultCount) {
+                resultCount.innerHTML = `${filteredCards.length}`;
+                const span = document.createElement("span");
+                span.innerHTML = " Sekolah (Jumlah):";
+                span.classList.add("text-small");
+                resultCount.append(span);
             }
         });
 
-        $('.phone_no').mask('00000000000');
 
-        var typedonation;
-        $(document).on('click', '.btn-organization', function() {
-            var type = $(this).attr("id");
-            typedonation = type;
-            $.ajax({
-                url: "{{ route('landingpage.donation.bytabbing') }}",
-                type: 'GET',
-                data: {
-                    type: type,
-                },
-                success: function( result ){
-
-                    var posterExist = true;
-                    if (result === '') {
-                        result = `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
-                        posterExist = false;
-                    }
-
-                    $('#donationPoster').html( result );
-                    $('#donationPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
-                    $('#donationPoster').find('.owl-stage-outer').children().unwrap();
-                    $('#donationPoster').owlCarousel({
-                        // loop:true,
-                        dots: posterExist,
-                        // paginationNumbers: false,
-                        responsiveClass:true,
-                        responsive:{
-                            0:{
-                                items:1,
-                                nav:false
-                            },
-                            600:{
-                                items:2,
-                                nav:false
-                            },
-                            1000:{
-                                items:3,
-                                nav:false,
-                                loop:false
-                            }
-                        }, 
-                    });
-                }
-            });
-        });
-    });
     </script>
 </body>
 </html>

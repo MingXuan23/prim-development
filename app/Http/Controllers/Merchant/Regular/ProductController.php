@@ -3,6 +3,12 @@
 namespace App\Http\Controllers\Merchant\Regular;
 
 use App\Http\Controllers\Controller;
+use App\Mail\HomestayReceipt;
+use App\Mail\ResitBayaranBus;
+use App\Models\Booking;
+use App\Models\Bus_Booking;
+use App\Models\Grab_Booking;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -436,8 +442,9 @@ class ProductController extends Controller
         }
 
     }
+//    directPayReceipt
      public function testPayment(){
-         $transaction = Transaction::where('nama', '=', 'Merchant_20240420184445')->first();
+         $transaction = Transaction::where('nama', '=', 'Merchant_20240421182212')->first();
          $transaction->transac_no = 'test merchant payment';
          $transaction->status = "Success";
          $transaction->save();
@@ -456,6 +463,7 @@ class ProductController extends Controller
          ])
          ->select('product_item_id as itemId','quantity')
          ->get();
+         dd($relatedProductOrder);
          foreach($relatedProductOrder as $item){
              $relatedItem=DB::table('product_item')
              ->where('id',$item->itemId);
@@ -473,6 +481,8 @@ class ProductController extends Controller
                  ]);
              }
              else{
+                 dd($newQuantity);
+
                  $relatedItem
                  ->update([
                      'quantity_available'=>$newQuantity
@@ -494,6 +504,72 @@ class ProductController extends Controller
 
          return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user' ));
      }
+
+//     handle
+    public function testHandle(){
+         Transaction::where('nama', '=', 'Merchant_20240421182212')->update(
+            [
+                'status' => 'Success',
+                'description'=> 'Test Handler']
+        );
+        $transaction = Transaction::where('nama', '=', 'Merchant_20240421182212')->first();
+                            PgngOrder::where('transaction_id', $transaction->id)->first()->update([
+                                'status' => 'Paid'
+                            ]);
+
+                            $order = PgngOrder::where('transaction_id', $transaction->id)->first();
+
+                            $organization = Organization::find($order->organization_id);
+                            $user = User::find($order->user_id);
+
+                            $relatedProductOrder =DB::table('product_order')
+                                ->where([
+                                    ['pgng_order_id',$order->id],
+                                    ['deleted_at',NULL]
+                                ])
+                                ->select('product_item_id as itemId','quantity')
+                                ->get();
+                            dd($relatedProductOrder);
+
+                            foreach($relatedProductOrder as $item){
+                                $relatedItem=DB::table('product_item')
+                                    ->where('id',$item->itemId);
+
+                                $relatedItemQuantity=$relatedItem->first()->quantity_available;
+                                $newQuantity= intval($relatedItemQuantity - $item->quantity);
+                                if($newQuantity<=0){
+                                    $relatedItem
+                                        ->update([
+                                            'quantity_available'=>0,
+                                            'type' => 'no inventory',
+                                            'status'=> 0
+                                        ]);
+                                }
+                                else{
+                                    dd($newQuantity);
+                                    $relatedItem
+                                        ->update([
+                                            'quantity_available'=>$newQuantity
+                                        ]);
+                                }
+
+                            }
+                            $item = DB::table('product_order as po')
+                                ->join('product_item as pi', 'po.product_item_id', 'pi.id')
+                                ->where([
+                                    ['po.pgng_order_id', $order->id],
+                                    ['po.deleted_at',NULL],
+                                    ['pi.deleted_at',NULL],
+                                ])
+                                ->select('pi.name', 'po.quantity', 'pi.price')
+                                ->get();
+
+//                            Mail::to($user->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
+//                            Mail::to($organization->email)->send(new MerchantOrderReceipt($order, $organization, $t, $user));
+                            return view('merchant.receipt', compact('order', 'item', 'organization', 'transaction', 'user'));
+
+    }
+
 //    public function store(Request $request, $org_id, $order_id)
 //     {
 //         $pickup_date = $request->pickup_date;

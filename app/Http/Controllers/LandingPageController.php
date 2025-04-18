@@ -60,9 +60,60 @@ class LandingPageController extends AppBaseController
     {
         $organization = DB::table('organization_url as url')
             ->join('organizations as o', 'url.organization_id', '=', 'o.id')
+
             ->where('url.status',1)
+            ->whereNull("o.deleted_at")
             ->whereIn('o.type_org', [1, 2, 3])
             ->get();
+
+        $organizationCount = $organization->count();
+
+        //get the number of students in each of the school
+        $organizationStudentCounts =  DB::table('organization_url as url')
+            ->join('organizations as o', 'url.organization_id', '=', 'o.id')
+            ->whereIn('o.type_org', [1, 2, 3])
+            ->whereNull("o.deleted_at")
+            ->leftJoin('class_organization', 'o.id', '=', 'class_organization.organization_id')
+            ->leftJoin('class_student', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->select('o.id', DB::raw('COUNT(DISTINCT class_student.student_id) as student_count'))
+            ->groupBy('o.id')
+            ->get();
+
+        //find the donation related to the schools
+        $organizationDonations = DB::table('organization_url as url')
+            ->join('organizations as o', 'url.organization_id', '=', 'o.id')
+            ->whereIn('o.type_org', [1, 2, 3])
+            ->whereNull("o.deleted_at")
+            ->join("donation_organization as do", "o.id", "=", "do.organization_id")
+            ->join("donations as d", "do.donation_id", "=", "d.id")
+            ->where("date_end", ">=", now())
+            ->join(DB::raw("(SELECT organization_id, MAX(d2.date_created) as max_date
+                    FROM donation_organization do2
+                    JOIN donations d2 ON do2.donation_id = d2.id
+                    WHERE d2.date_end >= NOW()
+                    GROUP BY organization_id) latest"), function($join) {
+                $join->on('do.organization_id', '=', 'latest.organization_id')
+                    ->on('d.date_created', '=', 'latest.max_date');
+            })
+            ->select("do.organization_id", "d.*")
+            ->get();
+
+        //get the total number of students
+        $studentCount = $organizationStudentCounts->sum("student_count");
+
+        //get the total number of fees
+        $totalFee =  DB::table("fees_new as fn")
+            ->join("fees_new_organization_user as fu", "fn.id" , "fu.fees_new_id")
+            ->where("fu.status", "Paid")
+            ->sum("fn.totalAmount");
+
+        // Get the total number of fees for this year
+        $totalFeeThisYear = DB::table("fees_new as fn")
+            ->join("fees_new_organization_user as fu", "fn.id" , "fu.fees_new_id")
+            ->where("fu.status", "Paid")
+            ->whereYear("fn.start_date", date('Y'))  // This filters by the current year
+            ->sum("fn.totalAmount");
+
 
         // $schools = DB::table('organization_url')
         //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
@@ -80,7 +131,7 @@ class LandingPageController extends AppBaseController
         //     ->where('organization_url.title', 'LIKE', '%Poli%')
         //     ->get();
 
-        return view('landing-page.fees.index', ['organizations' => $organization]);
+        return view('landing-page.fees.index', ['organizations' => $organization,'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts, 'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
     }
     //end edit by wan
 
@@ -111,7 +162,7 @@ class LandingPageController extends AppBaseController
         // $organization = DB::table('organization_url')
         //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
         //     ->get();
-            
+
         // return view('landing-page.organization_list', ['organizations' => $organization]);
         return view('landing-page.organization_list');
     }
@@ -187,9 +238,9 @@ class LandingPageController extends AppBaseController
 
         // dd($totalAmount);
 
-        /* 
+        /*
             SELECT SUM(amount) AS "Total Amount"
-            FROM transactions	
+            FROM transactions
             WHERE datetime_created > CURDATE()
             AND `nama` LIKE "Donation%"
             AND `status` = "success";
@@ -225,7 +276,7 @@ class LandingPageController extends AppBaseController
         ->get();
 
 
-        session()->forget('intendedUrl');//reset intended url for point system 
+        session()->forget('intendedUrl');//reset intended url for point system
         return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount' ,'donors','leaders'));
     }
 
@@ -349,7 +400,7 @@ class LandingPageController extends AppBaseController
                 ->get();
 
             $currentYear = date('Y');
-            
+
 
             foreach ($donations as $donation) {
                 // to get the total amount of donation for each donation posters
@@ -370,7 +421,7 @@ class LandingPageController extends AppBaseController
                 ])
                 ->whereYear('t.datetime_created', $currentYear -1)
                 ->sum('t.amount');
-                
+
                 $posters = $posters . '<div class="card"> <div class="donation-amount">Tahun '.$currentYear.':<b> RM'.number_format($amountDonation,2).'</b></div>';
                 $posters = $posters. '<div class="donation-amount">Tahun '.($currentYear -1).':<b> RM'.number_format($previousDonation,2).'</b></div><img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy">';
                 $posters = $posters . '<div class="card-body"><div class="d-flex flex-column justify-content-center ">';
