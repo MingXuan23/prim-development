@@ -582,6 +582,17 @@ header{
     height: auto;
     object-fit: contain;
 }
+/*tutorial section*/
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+}
+#iframe-tutorial{
+    width: min(100%, 1000px);
+    aspect-ratio: 2/1;
+}
 /*stat section*/
 #section-stat{
     padding: 50px 20px;

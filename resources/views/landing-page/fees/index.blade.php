@@ -223,6 +223,20 @@
             </div>
 
         </section>
+        {{--   tutorial section     --}}
+        <section id="section-tutorial" aria-label="Tutorial on how to use the application section" class="container">
+            <div id="tutorial-wrapper">
+                <div class="mb-1-2 section-heading">
+                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <h2 class="h2 text-center">Cara Penggunaan Sistem</h2>
+                </div>
+                <p class="text-center text-subtitle mb-4"> Video langkah demi langkah untuk membantu anda menggunakan sistem tersebut.</p>
+                    <div id="video-container" class="d-flex justify-content-center align-items-center slide-from-bottom-element">
+                        <iframe id="iframe-tutorial"  src="https://www.youtube.com/embed/m5GUnMwcG28?loop=1&controls=1"  allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+        </section>
         <!-- stats section-->
         <section id="section-stat" aria-label="Statistic Section">
             <div id="stat-wrapper">
@@ -561,6 +575,7 @@
             const heroSlideFromBottomElements = document.querySelectorAll('#section-hero .slide-from-bottom-element');
             const featureSlideFromBottomElements = document.querySelectorAll('#section-feature .slide-from-bottom-element');
             const showcaseSlideFromBottomElements = document.querySelectorAll('#section-showcase .slide-from-bottom-element');
+            const tutorialSlideFromBottomElements = document.querySelectorAll('#section-tutorial .slide-from-bottom-element');
             const statSlideFromBottomElements = document.querySelectorAll('#section-stat .slide-from-bottom-element');
             let memberSlideFromBottomElements = document.querySelectorAll('#section-member .slide-from-bottom-element');
             const organizationSlideFromBottomElements = document.querySelectorAll('#section-organization   .slide-from-bottom-element');
@@ -588,6 +603,9 @@
                 observerSlideBottomElement.observe(el);
             }
             for(let el of showcaseSlideFromBottomElements){
+                observerSlideBottomElement.observe(el);
+            }
+            for(let el of tutorialSlideFromBottomElements){
                 observerSlideBottomElement.observe(el);
             }
             for(let el of statSlideFromBottomElements){
