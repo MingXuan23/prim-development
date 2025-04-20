@@ -566,30 +566,6 @@
             <!-- Containers for all groups -->
             <div class="leader-groups">
                 <!-- Leader item -->
-                <li class="leader-item" >
-                    <span class="leader-name">Fei</span>
-                    <span class="follower-count">22 Ahli</span>
-                </li>
-                <li class="leader-item" >
-                    <span class="leader-name">Fei</span>
-                    <span class="follower-count">22 Ahli</span>
-                </li>
-                <li class="leader-item" >
-                    <span class="leader-name">Fei</span>
-                    <span class="follower-count">22 Ahli</span>
-                </li>
-                <li class="leader-item" >
-                    <span class="leader-name">Fei</span>
-                    <span class="follower-count">22 Ahli</span>
-                </li>
-                <li class="leader-item" >
-                    <span class="leader-name">Fei</span>
-                    <span class="follower-count">22 Ahli</span>
-                </li>
-                <li class="leader-item" >
-                    <span class="leader-name">Fei</span>
-                    <span class="follower-count">22 Ahli</span>
-                </li>
                 @foreach ($leaders as $index => $leader)
                     <?php
                         $groupNumber = floor($index / 5) + 1;
