@@ -14,7 +14,7 @@
 
 
     --neutral-color-1: white!important;
-    --neutral-color-2: #e8e8e8!important;
+    --neutral-color-2: #f7f7f7!important;
     --neutral-color-3: #b9b9b9!important;
     --neutral-color-4: #333333!important;
     --neutral-color-5: #101010!important;
@@ -655,7 +655,7 @@ header{
 .member-card-header{
     display: flex;
     gap: .5rem;
-    border-bottom: 5px solid var(--neutral-color-1);
+    border-bottom: 2px solid var(--neutral-color-3);
     padding-bottom: 12px;
     & > img{
         width: 100px;
@@ -672,8 +672,14 @@ header{
         img{
             width: 30px;
             height: 30px;
+            flex-shrink: 0;
+        }
+        h3{
+            width: 100%!important;
+            text-align: left!important;
         }
     }
+
 }
 .text-small{
     font-size: 16px;
