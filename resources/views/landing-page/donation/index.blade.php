@@ -11,6 +11,77 @@
 
     @include('landing-page.head')
     <style>
+        /*whatsapp contact button*/
+        #btn-whatsapp{
+            position: fixed;
+            right: 12px;
+            bottom: 12px;
+            z-index: 999
+        }
+        .Btn {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 70px;
+            height: 70px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition-duration: 0.3s;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+            background-color: #00d757;
+        }
+
+        .sign {
+            width: 100%;
+            transition-duration: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sign svg {
+            width: 35px;
+        }
+
+        .sign svg path {
+            fill: white;
+        }
+        .text {
+            position: absolute;
+            right: 0%;
+            width: 100%;
+            opacity: 0;
+            color: white;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition-duration: 0.3s;
+        }
+
+        .Btn:hover {
+            width: 230px;
+            border-radius: 40px;
+            transition-duration: 0.3s;
+        }
+
+        .Btn:hover .sign {
+            width: 30%;
+            transition-duration: 0.3s;
+            padding-left: 10px;
+        }
+
+        .Btn:hover .text {
+            opacity: 1;
+            width: 70%;
+            transition-duration: 0.3s;
+            padding-right: 10px;
+        }
+        .Btn:active {
+            transform: translate(2px, 2px);
+        }
+
 
         .map-responsive {
             overflow: hidden;
@@ -51,15 +122,51 @@
         .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
             transform: scale(1.1);
         } */
-    
+        .why-choose-area.why-choose-us-bg{
+            background-image: none!important;
+        }
+        .why-choose-area{
+            .container{
+                position: relative;
+                .shape-1{
+                    position: absolute;
+                    left: 5%;
+                    top: 20%;
+                    -webkit-animation: upndown 10s linear 2s infinite;
+                    animation: upndown 10s linear 2s infinite;
+                }
+                .shape-2{
+                    position: absolute;
+                    left: -2%;
+                    top: 20%;
+                    -webkit-animation: upndown 8s linear 2s infinite;
+                    animation: upndown 8s linear 2s infinite;
+                    opacity: .5;
+                }
+                .shape-3{
+                    position: absolute;
+                    right: 5%;
+                    bottom: 20%;
+                    -webkit-animation: upndown 10s linear 2s infinite;
+                    animation: upndown 10s linear 2s infinite;
+                }
+                .shape-4{
+                    position: absolute;
+                    right: -2%;
+                    bottom: 20%;
+                    -webkit-animation: upndown 8s linear 2s infinite;
+                    animation: upndown 8s linear 2s infinite;
+                    opacity: .5;
+                }
+            }
+
+        }
         section[aria-label="Donors In The Past Week"] , section[aria-label="Top Ketua Ahli"]{
-            background-color: #500ade;
+            /*background-color: #500ade;*/
             padding-top: 80px;
             padding-bottom: 80px;
-            background-image: url('assets/landing-page/img/bg/why-us-dark-bg.png');
+            /*background-image: url('assets/landing-page/img/bg/why-us-dark-bg.png');*/
             background-size: contain;
-            border: 4px solid #B4B1F4;
-
         }
         .container.container-donation{
             overflow: hidden;
@@ -68,7 +175,7 @@
             display: flex;
             align-content: center;
             padding: 30px 0;
-            animation: slide 45s linear infinite;
+            animation: slide 70s linear infinite;
         }
         .donors-container-2{
             animation: slide 45s linear infinite 0.5s;
@@ -93,7 +200,7 @@
             text-align: center;
             border-radius: 0.25rem;
             text-transform: capitalize;
-            box-shadow: 1px 1px 4px  rgba(0,0,0,0.8);
+            /*box-shadow: 1px 1px 4px  rgba(0,0,0,0.8);*/
             width: 225px;
 
         }
@@ -112,10 +219,49 @@
         }
 
         .leader-container {
+            position: relative;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             text-align: center;
+
+            .shape-1{
+                position: absolute;
+                left: 5%;
+                bottom: 0;
+                -webkit-animation: upndown 10s linear 2s infinite;
+                animation: upndown 10s linear 2s infinite;
+                z-index: -1;
+            }
+            .shape-2{
+                position: absolute;
+                left: -2%;
+                bottom: 0;
+                -webkit-animation: upndown 8s linear 2s infinite;
+                animation: upndown 8s linear 2s infinite;
+                opacity: .5;
+                z-index: -1;
+
+            }
+            .shape-3{
+                position: absolute;
+                right: 5%;
+                top: 0;
+                -webkit-animation: upndown 10s linear 2s infinite;
+                animation: upndown 10s linear 2s infinite;
+                z-index: -1;
+
+            }
+            .shape-4{
+                position: absolute;
+                right: -2%;
+                top: 0;
+                -webkit-animation: upndown 8s linear 2s infinite;
+                animation: upndown 8s linear 2s infinite;
+                opacity: .5;
+                z-index: -1;
+
+            }
         }
 
         .leader-groups {
@@ -138,13 +284,14 @@
         .leader-item {
             width: 100%;
             padding: 15px;
-            justify-content: space-between; 
+            justify-content: space-between;
             display:flex;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgb(151, 151, 151);
             transition: all 0.3s ease;
+            background-image: -webkit-linear-gradient(50deg, #6104cc 0,#5e2ced 100%)!important;
         }
 
-  
+
         .leader-item:hover {
             background-color: rgba(255, 255, 255, 0.1);
             transform: translateX(10px);
@@ -152,12 +299,14 @@
 
         .leader-name {
             font-weight: bold;
-            color: #fff;
+            /*color: var(--secondary-color);*/
+            color: white;
         }
 
         .follower-count {
-            color: #e0e0e0;
+            /*color: var(--secondary-color);*/
             font-size: 0.9em;
+            color: white;
         }
 
         .leader-buttons {
@@ -165,7 +314,20 @@
             justify-content: center;
             margin-top: 30px;
         }
-
+        .single-why-us-item{
+            background-color: rgb(118, 70, 233);
+            text-align: center;
+            border: 2px solid rgb(118, 70, 233);
+            .icon{
+                margin: 0 auto;
+            }
+        }
+        .single-why-us-item:hover{
+            background-color: inherit;
+        }
+        .single-why-us-item .icon.gdbg-1{
+            background-image: -webkit-linear-gradient(50deg, #b59bff 0, #9749f8 100%) !important;
+        }
         /* Display rules for different screen sizes */
         @media (max-width: 799px) {
             .leader-groups {
@@ -283,8 +445,6 @@
                         </ul>
                     </li>
                     {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
-                    <li class="slash">|</li>
-                    <li><a href="#contact">Hubungi Kami</a></li>
                 </ul>
             </div>
             <div class="nav-right-content">
@@ -312,15 +472,15 @@
                 <div class="col-lg-6 justify-content-center">
                     <div class="header-inner">
                         {{-- <h1 class="title wow fadeInDown white">Derma</h1>
-                        <p class="white">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu subuh. Allah menjanjikan 
+                        <p class="white">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu subuh. Allah menjanjikan
                             banyak kelebihan dan ganjarannya. Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
                             untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                         </div> --}}
                         <h1 class="title wow fadeInDown white">Derma</h1>
-                        <p class="white" style="font-size: 20px;">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu Subuh. Allah menjanjikan 
-                            banyak kelebihan dan ganjarannya. 
+                        <p class="white" style="font-size: 20px;">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu Subuh. Allah menjanjikan
+                            banyak kelebihan dan ganjarannya.
                             Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
                             untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
                         <div class="btn-wrapper wow fadeInUp">
@@ -328,7 +488,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- <div class="col-lg-7">
                     <h1 class="title wow fadeInDown white ">PRiM</h1>
                     <p class=" white" style="font-size: 20px">Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
@@ -356,26 +516,39 @@
                     <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                 </div>
             </div> --}}
-        </div>
+{{--        </div>--}}
     </header>
     <!-- header area end  -->
-
+    <section aria-label="Click to reach out to us at WhatsApp" id="btn-whatsapp">
+        <a href="https://wa.me/139017388" target="_blank" class="social-link" >
+            <div class="Btn">
+                <div class="sign">
+                    <svg class="socialSvg whatsappSvg" viewBox="0 0 16 16">
+                        <path
+                            d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"
+                        ></path>
+                    </svg>
+                </div>
+                <div class="text">Hubungi Kami</div>
+            </div>
+        </a>
+    </section>
     <section aria-label="Donors In The Past Week">
         <div class="container container-donation">
-            <h3 class="my-2 text-white text-center">Penderma</h3>
-            <div class="mb-3 text-white text-center">Paparan penderma-penderma yang terkini</div>
+            <h3 class="my-2 text-center">Penderma</h3>
+            <div class="mb-3 text-center">Paparan penderma-penderma yang terkini</div>
             <div class="donors-container donors-container-1">
                 @foreach ($donors as $index => $donor)
-                    @if ($index % 10 == 0 && $index > 0)
-                        <!-- Close the previous row and open a new one -->
-                        </div><div class="donors-container donors-container-2">
-                    @endif
+{{--                    @if ($index % 10 == 0 && $index > 0)--}}
+{{--                        <!-- Close the previous row and open a new one -->--}}
+{{--                        </div><div class="donors-container donors-container-2">--}}
+{{--                    @endif--}}
                     <div class="donor-container">
                         <div class="donor-name" title="{{ $donor->username }}">{{ $donor->username }}</div>
                         <div class="donor-amount">RM{{ $donor->amount }}</div>
                         <small>{{date('d/m/Y h:i A',strtotime($donor->datetime_created))}}</small>
                     </div>
-                @endforeach            
+                @endforeach
         </div>
 
         </div>
@@ -383,10 +556,40 @@
     </section>
     <section aria-label="Top Ketua Ahli">
         <div class="leader-container">
-            <h3 class="my-2 text-white text-center">Senarai Ketua dengan Bilangan Pengikut (follower)</h3>
+            <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
+            <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
+            <div class="shape-3"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
+            <div class="shape-4"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
 
+            <h3 class="my-2 text-center">Senarai Ketua dengan Bilangan Pengikut (follower)</h3>
+            <div class="mb-3 text-center">Bilangan ahli mengikut ketua dalam inisiatif derma</div>
             <!-- Containers for all groups -->
             <div class="leader-groups">
+                <!-- Leader item -->
+                <li class="leader-item" >
+                    <span class="leader-name">Fei</span>
+                    <span class="follower-count">22 Ahli</span>
+                </li>
+                <li class="leader-item" >
+                    <span class="leader-name">Fei</span>
+                    <span class="follower-count">22 Ahli</span>
+                </li>
+                <li class="leader-item" >
+                    <span class="leader-name">Fei</span>
+                    <span class="follower-count">22 Ahli</span>
+                </li>
+                <li class="leader-item" >
+                    <span class="leader-name">Fei</span>
+                    <span class="follower-count">22 Ahli</span>
+                </li>
+                <li class="leader-item" >
+                    <span class="leader-name">Fei</span>
+                    <span class="follower-count">22 Ahli</span>
+                </li>
+                <li class="leader-item" >
+                    <span class="leader-name">Fei</span>
+                    <span class="follower-count">22 Ahli</span>
+                </li>
                 @foreach ($leaders as $index => $leader)
                     <?php
                         $groupNumber = floor($index / 5) + 1;
@@ -396,7 +599,7 @@
                         <div class="leader-group" id="group{{ $groupNumber }}">
                             <ul class="leader-list">
                     @endif
-                    
+
                     <!-- Leader item -->
                     <li class="leader-item" style="animation-delay: {{ $index * 0.1 }}s;">
                         <span class="leader-name">{{ $index + 1 }}. {{ $leader->name }}</span>
@@ -410,7 +613,7 @@
                     @endif
                 @endforeach
             </div>
-<!-- 
+<!--
             <div class="leader-buttons">
                 <button class="btn btn-info" onclick="showInfo()">Maklumat Lanjut</button>
                 <button class="btn btn-register" onclick="register()">Daftar</button>
@@ -421,16 +624,16 @@
     <!-- <section aria-label="Donors In The Past Week">
         <div class="container container-donation">
             <h3 class="my-2 text-white text-center">Ketua Ahli</h3>
-            
+
             <div class="donors-container">
                 @foreach ($leaders as $index => $leader)
 
                     <div class="donor-container">
                         <div class="donor-name" title="{{ $leader->name }}">{{ $leader->name}}</div>
                         <div class="donor-amount">Ahli: {{ $leader->member_count  }}</div>
-                       
+
                     </div>
-                @endforeach            
+                @endforeach
         </div>
 
         </div>
@@ -441,12 +644,12 @@
             <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width: 90%";>
         </div>
         <div class="container">
-            
+
             {{-- <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <div class="section-title">
                         <!-- section title -->
-                        
+
                         <h3 class="title">Tentang PRiM</h3>
                         <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
                             ibu bapa serta penjaga dengan pihak sekolah. PRiM menyediakan gerbang pembayaran yuran
@@ -468,7 +671,7 @@
                         </div>
                         {{-- <div class="col-lg-6">
                             <div class="section-title left-aligned">
-                                
+
                                 <h3 class="title extra" style="margin-top: 24px;">Derma</h3>
                                 <p>Kemudahan bersepadu yang disediakan supaya penderma boleh menderma <b>24 jam </b>
                                     sehari
@@ -581,7 +784,7 @@
                             RM<span class="count-num">{{ $dailyGain }}</span>
                             <h4 class="title">Jumlah Derma Hari Ini</h4>
                         </div>
-                    </div><!-- //. single counter item -->  
+                    </div><!-- //. single counter item -->
                 </div>
                 <div class="col-lg-4 col-md-4" style="margin-top: 25px;">
                     <div class="single-counter-item">
@@ -613,9 +816,13 @@
     <!-- why choose area start -->
     <section class="why-choose-area why-choose-us-bg">
         <div class="container">
+            <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
+            <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
+            <div class="shape-3"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
+            <div class="shape-4"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
             <div class="row justify-content-center">
                 <div class="col-lg-10">
-                    <div class="section-title white">
+                    <div class="section-title">
                         <!-- section title -->
                         {{-- <span class="subtitle">Modul</span> --}}
                         <h3 class="title extra">Kelebihan</h3>
@@ -759,55 +966,55 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-lg-10">
-                        <div class="section-title">
-                            <!-- section title -->
-                            {{-- <span class="subtitle">Screenshots</span> --}}
-                            <h3 class="title extra">Pasukan Kami</h3>
-                        </div><!-- //. section title -->
-                    </div>
-                </div>
-            </div>
-            <div class="row text-center">
-                <div class="col-lg-12 mb-200">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                            <div class="p-3">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">
-                            </div>
-                            <div class="pt-3">
-                                <h4>Yahya Bin Ibrahim</h4>
-                                <p>Chief Executive Officer</p>
-                            </div>
-                        </div>
+{{--            <div class="container">--}}
+{{--                <div class="row justify-content-center">--}}
+{{--                    <div class="col-lg-10">--}}
+{{--                        <div class="section-title">--}}
+{{--                            <!-- section title -->--}}
+{{--                            --}}{{-- <span class="subtitle">Screenshots</span> --}}
+{{--                            <h3 class="title extra">Pasukan Kami</h3>--}}
+{{--                        </div><!-- //. section title -->--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--            <div class="row text-center">--}}
+{{--                <div class="col-lg-12 mb-200">--}}
+{{--                    <div class="row justify-content-center">--}}
+{{--                        <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
+{{--                            <div class="p-3">--}}
+{{--                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
+{{--                            </div>--}}
+{{--                            <div class="pt-3">--}}
+{{--                                <h4>Yahya Bin Ibrahim</h4>--}}
+{{--                                <p>Chief Executive Officer</p>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
 
-                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                            <div class="p-3">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">
-                            </div>
-                            <div class="pt-3">
-                                <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>
-                                <p>Chief Operating Officer</p>
-                            </div>
-                        </div>
+{{--                        <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
+{{--                            <div class="p-3">--}}
+{{--                                <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
+{{--                            </div>--}}
+{{--                            <div class="pt-3">--}}
+{{--                                <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>--}}
+{{--                                <p>Chief Operating Officer</p>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
 
-                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                            <div class="p-3">
-                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">
-                            </div>
-                            <div class="pt-3">
-                                <h4>Chuan Chuan You</h4>
-                                <p>Chief Technology Officer</p>
-                            </div>
-                        </div>
+{{--                        <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
+{{--                            <div class="p-3">--}}
+{{--                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
+{{--                            </div>--}}
+{{--                            <div class="pt-3">--}}
+{{--                                <h4>Chuan Chuan You</h4>--}}
+{{--                                <p>Chief Technology Officer</p>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
 
-                    </div>
-                </div>
-            </div>
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
 
-            <div class="container">
+            <div class="container" style="margin-bottom: 10rem">
                 <div class="row justify-content-center">
                     <div class="col-lg-10">
                         <div class="section-title">
@@ -818,7 +1025,7 @@
                         </div><!-- //. section title -->
                     </div>
                 </div>
-                <div class="row text-center">
+                <div class="row text-center ">
                     <div class="col-lg-12">
                         <div class="row justify-content-center">
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
@@ -843,64 +1050,64 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="contact-area-wrapper" id="contact">
-                        <!-- contact area wrapper -->
-                        {{-- <span class="subtitle">Contact us</span> --}}
-                        <h3 class="title">Hubungi Kami</h3>
-                        <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>
-                        <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"
-                            enctype="multipart/form-data">
+{{--            <div class="row">--}}
+{{--                <div class="col-lg-6">--}}
+{{--                    <div class="contact-area-wrapper" id="contact">--}}
+{{--                        <!-- contact area wrapper -->--}}
+{{--                        --}}{{-- <span class="subtitle">Contact us</span> --}}
+{{--                        <h3 class="title">Hubungi Kami</h3>--}}
+{{--                        <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>--}}
+{{--                        <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"--}}
+{{--                            enctype="multipart/form-data">--}}
 
-                            @csrf
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" id="uname" name="uname"
-                                            placeholder="Nama Penuh" required>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <input type="email" class="form-control" id="email" name="email"
-                                            placeholder="Email" required>
-                                    </div>
-                                </div>
+{{--                            @csrf--}}
+{{--                            <div class="row">--}}
+{{--                                <div class="col-lg-12">--}}
+{{--                                    <div class="form-group">--}}
+{{--                                        <input type="text" class="form-control" id="uname" name="uname"--}}
+{{--                                            placeholder="Nama Penuh" required>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
+{{--                                <div class="col-lg-6">--}}
+{{--                                    <div class="form-group">--}}
+{{--                                        <input type="email" class="form-control" id="email" name="email"--}}
+{{--                                            placeholder="Email" required>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
-                                <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control phone_no" id="telno" name="telno"
-                                            placeholder="Nombor Telefon" required>
-                                    </div>
-                                </div>
+{{--                                <div class="col-lg-6">--}}
+{{--                                    <div class="form-group">--}}
+{{--                                        <input type="text" class="form-control phone_no" id="telno" name="telno"--}}
+{{--                                            placeholder="Nombor Telefon" required>--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
 
-                                <div class="col-lg-12">
-                                    <div class="form-group textarea">
-                                        <textarea name="message" id="message" class="form-control" cols="30" rows="10"
-                                            placeholder="Mesej" required></textarea>
-                                    </div>
-                                    <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div><!-- //. contact area wrapper -->
-                </div>
-                <div class="col-lg-6">
-                    <div class="contact-area-wrapper" id="contact">
-                        <div class="map-responsive">
-                            <iframe
-                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""
-                                aria-hidden="false" tabindex="0">
-                            </iframe>
+{{--                                <div class="col-lg-12">--}}
+{{--                                    <div class="form-group textarea">--}}
+{{--                                        <textarea name="message" id="message" class="form-control" cols="30" rows="10"--}}
+{{--                                            placeholder="Mesej" required></textarea>--}}
+{{--                                    </div>--}}
+{{--                                    <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
+{{--                        </form>--}}
+{{--                    </div><!-- //. contact area wrapper -->--}}
+{{--                </div>--}}
+{{--                <div class="col-lg-6">--}}
+{{--                    <div class="contact-area-wrapper" id="contact">--}}
+{{--                        <div class="map-responsive">--}}
+{{--                            <iframe--}}
+{{--                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"--}}
+{{--                                width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""--}}
+{{--                                aria-hidden="false" tabindex="0">--}}
+{{--                            </iframe>--}}
 
-                            <br>
+{{--                            <br>--}}
 
-                        </div>
-                    </div><!-- //. contact area wrapper -->
-                </div>
-            </div>
+{{--                        </div>--}}
+{{--                    </div><!-- //. contact area wrapper -->--}}
+{{--                </div>--}}
+{{--            </div>--}}
         </div>
     </section>
     <!-- team member area end -->
@@ -1004,9 +1211,9 @@
     <!-- preloader area end -->
 
     <!-- back to top area start -->
-    <div class="back-to-top">
-        <i class="fas fa-angle-up"></i>
-    </div>
+{{--    <div class="back-to-top">--}}
+{{--        <i class="fas fa-angle-up"></i>--}}
+{{--    </div>--}}
     <!-- back to top area end -->
     @include('landing-page.footer-script')
 
@@ -1055,7 +1262,7 @@
                             items:1,
                             nav:false,
                         }
-                    }, 
+                    },
                 });
             }
         });
@@ -1147,7 +1354,7 @@
                                 nav:false,
                                 loop:false
                             }
-                        }, 
+                        },
                     });
                 }
             });
