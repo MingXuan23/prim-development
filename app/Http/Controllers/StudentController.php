@@ -2226,6 +2226,11 @@ class StudentController extends Controller
             ->where('status', 1)
             ->get();
             
+            if (isset($class_student_details) && isset($class_student_details->class_student_id)) {
+                $class_student_details = $class_student_details->class_student_id;
+            }
+            
+            
           
             $studentHaveFees=DB::table('student_fees_new as sfn')
                             ->join('class_student as cs','cs.id','sfn.class_student_id')
@@ -2234,7 +2239,9 @@ class StudentController extends Controller
                             
             $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
     
-            $this->checkFeesBCWhenClassChanged($ifExitsCateBC,$studentFeesIDs ,$student,$class->levelid,$new_class_student_id,$class_student_details->id);
+            
+
+            $this->checkFeesBCWhenClassChanged($ifExitsCateBC,$studentFeesIDs ,$student,$class->levelid,$new_class_student_id,$class_student_details->id??0);
             
 
             $ifExitsCateRecurring = DB::table('fees_new')
