@@ -59,8 +59,16 @@
                         <div class="errorMessage"></div>
                     </div>
                 </div>
-      </div>
 
+                @if(Auth::user()->hasRole('Superadmin') ||  Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta') || Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Pentadbir Swasta') || Auth::user()->hasRole('Guru Swasta'))
+      <div class="input-group">
+        <button id="download-btn" class="btn btn-primary" onclick="downloadExcel()"> Export</button>
+      </div>
+      @endif
+      </div>
+      
+
+      
       {{-- <div class="">
         <button onclick="filter()" style="float: right" type="submit" class="btn btn-primary"><i
             class="fa fa-search"></i>
@@ -116,6 +124,53 @@
 @section('script')
 <script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script>
 <script>
+   $.ajaxSetup({
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        
+  function downloadExcel() {
+        const oid = $("#organization option:selected").val();
+        const startDate = $('#date_started').val();
+        const endDate = $('#date_end').val();
+
+        // Create a form element
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = "{{ route('fees.getFeeHistoryExport') }}";
+        form.target = '_blank'; // Open in new tab
+
+        // CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        // Add input fields
+        const inputs = {
+            oid: oid,
+            start_date: startDate,
+            end_date: endDate
+        };
+
+        for (const key in inputs) {
+            if (inputs[key]) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = inputs[key];
+                form.appendChild(input);
+            }
+        }
+
+        // Append and submit form
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    }
     $( document ).ready(function() {
 
       $('#date').datepicker({
@@ -135,6 +190,9 @@
         fetch_data();
 
         var receiptTable;
+
+
+       
 
         function fetch_data(oid = '') {
             receiptTable = $('#feesReceiptDataTable').DataTable({
@@ -196,11 +254,7 @@
         });
 
         // csrf token for ajax
-        $.ajaxSetup({
-                headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+       
     });
 </script>
 @endsection
