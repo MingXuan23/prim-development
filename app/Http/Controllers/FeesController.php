@@ -14,9 +14,12 @@ use Psy\Command\WhereamiCommand;
 use Yajra\DataTables\DataTables;
 use App\Exports\ExportYuranStatus;
 use App\Exports\ExportYuranStatusSwasta;
+
 use App\Exports\ExportJumlahBayaranIbuBapa;
 use App\Exports\ExportJumlahBayaranIbuBapaSwasta;
 use App\Exports\ExportClassTransaction;
+use App\Exports\ExportTransaction;
+
 use App\Exports\ExportYuranOverview;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -1778,7 +1781,7 @@ class FeesController extends AppBaseController
                         ->orWhere('t.nama', 'like', 'School_Fees%');
                 })
                     ->where('t.status', 'success')
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date','t.username as username','t.transac_no as transac_no')
                     ;
             }
             else
@@ -1795,7 +1798,7 @@ class FeesController extends AppBaseController
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date','t.username as username','t.transac_no as transac_no')
                     ->distinct('name')
                     ;
             }
@@ -1810,7 +1813,7 @@ class FeesController extends AppBaseController
                             ->orWhere('t.nama', 'like', 'School_Fees%');
                     })
                     ->where('t.status', 'success')
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date','t.username as username','t.transac_no as transac_no')
                     ;
             }
             else if(Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta'))
@@ -1827,7 +1830,7 @@ class FeesController extends AppBaseController
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date','t.username as username','t.transac_no as transac_no')
                     ->distinct('name')
                     ;
             }
@@ -1847,7 +1850,7 @@ class FeesController extends AppBaseController
                     ->where('t.status', 'success')
                     ->where('organization_user.user_id', Auth::id())
                     ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date','t.username as username','t.transac_no as transac_no')
                     ->distinct('name')
                     ;
             }
@@ -1866,7 +1869,7 @@ class FeesController extends AppBaseController
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.username as username','t.transac_no as transac_no')
                     ->distinct('name')
                     ;
             }
@@ -1878,6 +1881,7 @@ class FeesController extends AppBaseController
 
         }
         $listHisotry = $listHisotry->get();
+
       //  dd($listHisotry,$request->start_date);
         if (request()->ajax()) {
             return datatables()->of($listHisotry)
@@ -1898,8 +1902,27 @@ class FeesController extends AppBaseController
                 ->rawColumns(['action'])
                 ->make(true);
         }
+        
+        return $listHisotry;
+
+       
     }
 
+
+    public function getFeeHistoryExport(Request $request){
+        $list = $this->getFeesReceiptDataTable($request);
+       // dd($list);
+        $organization = DB::table('organizations')->where('id',$request->oid)->first();
+        $date = "_all";
+        if($request->start_date != null && $request->end_date != null){
+          $date ='_' .$request->start_date . '_ '. $request->end_date ;
+      
+
+        }
+        return Excel::download(new ExportTransaction($organization,$list), $organization->nama . $date. '.xlsx');
+
+        
+    }
     public function cetegoryReportIndex(){
 
         $organization = $this->getOrganizationByUserId();

@@ -292,6 +292,8 @@ Route::group(['prefix' => 'fees'], function () {
 
     Route::get('/history', 'ParentController@indexParentFeesHistory')->name('parent.fees.history');
     Route::get('/list-receipt', 'FeesController@getFeesReceiptDataTable')->name('fees.getFeesReceiptDataTable');
+    Route::post('/download-receipt', 'FeesController@getFeeHistoryExport')->name('fees.getFeeHistoryExport');
+
 
     Route::get('/category/report', 'FeesController@cetegoryReportIndex')->name('fees.category.report');
     Route::get('/category/report-swasta', 'FeesController@cetegoryReportIndexSwasta')->name('fees.category.report_swasta');
