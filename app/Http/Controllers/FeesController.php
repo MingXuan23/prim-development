@@ -336,7 +336,10 @@ class FeesController extends AppBaseController
         //makesure student from parent_org is fetched
         $all_student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
+           
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes','classes.id','class_organization.class_id')
+            ->where('classes.levelid','>',0)
             ->where('class_organization.organization_id', $oid)
             ->where('class_student.status',1)
             ->select('class_student.id as csid');
@@ -520,6 +523,7 @@ class FeesController extends AppBaseController
                     ->select('class_organization.organization_id as oid', 'classes.id', 'classes.nama', DB::raw('COUNT(students.id) as totalstudent'), 'class_student.fees_status')
                     ->where('class_organization.organization_id', $oid)
                     ->where('class_student.fees_status', 'Completed')
+                    ->where('classes.levelid','>',0)
                     ->where('class_student.status',1)
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
@@ -533,7 +537,7 @@ class FeesController extends AppBaseController
                     ->where('class_organization.organization_id', $oid)
                     ->where('class_student.fees_status', 'Not Complete')
                     ->where('class_student.status',1)
-
+                    ->where('classes.levelid','>',0)
                     ->groupBy('classes.nama')
                     ->orderBy('classes.nama')
                     ->get();
