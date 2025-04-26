@@ -265,7 +265,7 @@
         <section id="section-member" aria-label="Member Section" class="container">
             <div id="member-wrapper">
                 <div class="section-heading">
-                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
                     <h2 class="h2 text-center">Ahli-ahli Berdaftar</h2>
                 </div>
                 <p class="text-center text-subtitle mb-4">Terokai sekolah-sekolah di Malaysia yang telah berdaftar dengan platform kami serta Bank Islam dan menikmati kemudahan pembayaran yuran yang lebih mudah, pantas, dan selamat.</p>
@@ -286,26 +286,48 @@
                     </div>
                 </form>
 
-                <div class="text-bold text-center" id="member-count">{{$organizations->count()}} <span class="text-small">Sekolah (Jumlah):</span></div>
+                <div class="text-bold text-center" id="member-count">{{$organizations->count()}} <span class="text-total">Sekolah (Jumlah):</span></div>
 
                 <!--list of registered school members-->
                 <div class="members">
                     @foreach($organizations as $key=>$org)
                         <article class="member-card" data-state="{{$org->state}}" data-district="{{$org->district}}">
-                        <div class="member-card-header mb-1">
+                        <div class="member-card-header">
                             <img src="{{ URL::asset('organization-picture/' . $org->organization_picture ) }}" alt="{{ $org->url_name }} logo">
                             <div class="member-info-wrapper">
                                 <div class="member-info mb-1-2">
 {{--                                    <img src="{{ URL::asset('assets/landing-page/img/images/icon_school.png') }}" alt="Icon of school">--}}
                                     <h3>{{ $org->title }}</h3>
                                 </div>
-                                <div class="member-info mb-1-2">
-                                    <img src="{{ URL::asset('assets/landing-page/img/images/icon_student.png') }}" alt="Icon of school">
-                                    <div>{{$organizationStudentCounts->where("id", $org->id)->first()->student_count}} <span class="text-small">pelajar</span></div>
+                                <div class="member-info member-info-stats mb-1-2">
+                                    <div>
+{{--                                        <img src="{{ URL::asset('assets/landing-page/img/images/icon_student.png') }}" alt="Icon of school">--}}
+                                        @if($org->id === 137)
+                                            <div>{{$lmmStudentCounts->sum('student_count')}} <span class="text-small"> pelajar</span></div>
+                                        @else
+                                            <div>{{$organizationStudentCounts->where("id", $org->id)->first()->student_count}} <span class="text-small"> pelajar</span></div>
+
+                                        @endif
+                                    </div>
+                                    <div>
+                                        @if($org->id === 137)
+                                            {{ $lmm_results['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>
+                                        @else
+                                            {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>
+                                        @endif
+                                    </div>
+                                    <div>
+
+                                        @if($org->id === 137)
+                                            {{ $lmm_results['last_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y")-1 }}</span>
+                                        @else
+                                            {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="member-card-footer">
+                        <div class="member-card-footer pt-3">
                             <button  class="btn btn-primary" >
                       <span class="btn__icon-wrapper">
                         <svg
@@ -335,7 +357,7 @@
                         </svg>
                       </span>
                                 <a href="/{{ $org->url_name }}">
-                                    Daftar Masuk
+                                    Log Masuk
                                 </a>
                             </button>
                             {{--check whether the school has ongoing donations--}}
@@ -391,7 +413,7 @@
         <section aria-label="Platform's Collaborators Section" id="section-collab">
             <div id="collab-wrapper" class="container">
                 <div class="mb-1-2 section-heading">
-                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
                     <h2 class="h2 text-center">Dengan Kerjasama</h2>
                 </div>
                 <p class="text-center text-subtitle mb-4">Laman web ini telah diakui dan disahkan selamat untuk digunakan.
@@ -402,6 +424,54 @@
                     <img style="--transition-delay: 0.15s"   class="slide-from-bottom-element"  src="{{ URL::asset('assets/landing-page/img/images/bank_islam_logo.png') }}" alt="Logo of Bank Islam">
                     <img style="--transition-delay: 0.3s"  class="slide-from-bottom-element"   src="{{ URL::asset('assets/landing-page/img/images/utem_logo.png') }}" alt="Logo of Universiti Teknikal Malaysia Melaka">
                 </div>
+            </div>
+        </section>
+
+        <section aria-label="FAQ Section" id="section-faq">
+            <div id="faq-wrapper" class="container">
+                <div class="mb-1-2 section-heading">
+                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <h2 class="h2 text-center">Soalan Lazim</h2>
+                </div>
+                <p class="text-center text-subtitle mb-4">Jawapan kepada persoalan yang sering ditanya oleh pengguna
+                </p>
+
+                <div id="accordion">
+                    <div class="card slide-from-bottom-element">
+                        <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <div class="mb-0">
+                                1.	Apakah bayaran yang dikenakan kepada sekolah untuk menggunakan laman web yuran ini?
+                            </div>
+
+                            <img class="faq-arrow" src="{{ URL::asset('assets/landing-page/img/images/chevron_down.png') }}" alt="Click to show the answer for this question">
+                        </div>
+
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                Kami tidak mengenakan sebarang bayaran kepada pihak PIBG sekolah. Walaubagaimanapun, setiap kali pembayaran dibuat oleh ibu bapa atau penjaga, sistem akan mengenakan caj sebanyak 50 sen.
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="card slide-from-bottom-element" style="--transition-delay: 0.15s" >
+                        <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                            <div class="mb-0">
+                                2.	Apakah langkah yang PIBG sekolah perlu buat bagi membolehkan ibu bapa membayar yuran?
+                            </div>
+
+                            <img class="faq-arrow" src="{{ URL::asset('assets/landing-page/img/images/chevron_down.png') }}" alt="Click to show the answer for this question">
+                        </div>
+
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                            <div class="card-body">
+                                Ibu bapa perlu login ke dalam laman web dengan menggunakan nombor kad pengenalan. Pihak sekolah akan daftarkan setiap ibu bapa sebelum ibu bapa dibenarkan untuk log masuk.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </section>
         <!--contact us-->
@@ -570,7 +640,7 @@
     @include('landing-page.footer-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function(){
+        document.addEventListener("DOMContentLoaded", function() {
             const organizations = JSON.parse(@json("$organizations"));
             const heroSlideFromBottomElements = document.querySelectorAll('#section-hero .slide-from-bottom-element');
             const featureSlideFromBottomElements = document.querySelectorAll('#section-feature .slide-from-bottom-element');
@@ -580,14 +650,15 @@
             let memberSlideFromBottomElements = document.querySelectorAll('#section-member .slide-from-bottom-element');
             const organizationSlideFromBottomElements = document.querySelectorAll('#section-organization   .slide-from-bottom-element');
             const collabSlideFromBottomElements = document.querySelectorAll('#section-collab .slide-from-bottom-element');
+            const faqSlideFromBottomElements = document.querySelectorAll('#section-faq .slide-from-bottom-element');
             const contactSlideFromBottomElements = document.querySelectorAll('#section-contact .slide-from-bottom-element');
             //   setup intersection observers
-            const observerSlideBottomElement = new IntersectionObserver((entries) =>{
-                for(let entry of entries){
-                    if(entry.intersectionRatio > 0 ){
+            const observerSlideBottomElement = new IntersectionObserver((entries) => {
+                for (let entry of entries) {
+                    if (entry.intersectionRatio > 0) {
                         entry.target.classList.add('slide-from-bottom');
                         //force the first feature to slide in as well
-                        if(entry.target.classList.contains('member-card')){
+                        if (entry.target.classList.contains('member-card')) {
                             // Start auto-sliding when members are being displayed
                             // startAutoSlide();
                         }
@@ -596,31 +667,34 @@
                 }
             });
 
-            for(let el of heroSlideFromBottomElements){
+            for (let el of heroSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
-            for(let el of featureSlideFromBottomElements){
+            for (let el of featureSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
-            for(let el of showcaseSlideFromBottomElements){
+            for (let el of showcaseSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
-            for(let el of tutorialSlideFromBottomElements){
+            for (let el of tutorialSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
-            for(let el of statSlideFromBottomElements){
+            for (let el of statSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
-            for(let el of memberSlideFromBottomElements){
+            for (let el of memberSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
-            for(let el of organizationSlideFromBottomElements){
+            for (let el of organizationSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
-            for(let el of collabSlideFromBottomElements){
+            for (let el of collabSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
-            for(let el of contactSlideFromBottomElements){
+            for (let el of faqSlideFromBottomElements) {
+                observerSlideBottomElement.observe(el);
+            }
+            for (let el of contactSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
 
@@ -756,26 +830,27 @@
             // Set initial values
             let currentIndex = 0;
             const totalScreenshots = screenshots.length;
-            let screenshotWidth  ; // Width of each screenshot (from your CSS)
+            let screenshotWidth; // Width of each screenshot (from your CSS)
 
             // Function to update navigation buttons
             function updateNavButtons() {
                 // Update button states
-                if (currentIndex === 0) {
-                    leftButton.style.opacity = '0.5';
-                    leftButton.style.pointerEvents = 'none';
-                } else {
-                    leftButton.style.opacity = '1';
-                    leftButton.style.pointerEvents = 'auto';
-                }
+                // if (currentIndex === 0) {
+                //     leftButton.style.opacity = '0.5';
+                //     leftButton.style.pointerEvents = 'none';
+                // } else {
+                leftButton.style.opacity = '1';
+                leftButton.style.pointerEvents = 'auto';
+                // }
 
-                if (currentIndex === totalScreenshots - 1) {
-                    rightButton.style.opacity = '0.5';
-                    rightButton.style.pointerEvents = 'none';
-                } else {
-                    rightButton.style.opacity = '1';
-                    rightButton.style.pointerEvents = 'auto';
-                }
+                // if (currentIndex === totalScreenshots - 1) {
+                //     rightButton.style.opacity = '0.5';
+                //     rightButton.style.pointerEvents = 'none';
+                // } else
+                //
+                // {
+                rightButton.style.opacity = '1';
+                rightButton.style.pointerEvents = 'auto';
             }
 
             // Initialize button states
@@ -783,7 +858,7 @@
 
             // Function to scroll to a specific screenshot
             function scrollToScreenshot(index) {
-                screenshotWidth  = parseInt(getComputedStyle(document.querySelector("#showcase-screenshots")).width);
+                screenshotWidth = parseInt(getComputedStyle(document.querySelector("#showcase-screenshots")).width);
                 const scrollPosition = index * screenshotWidth;
                 showcaseContainer.scrollTo({
                     left: scrollPosition,
@@ -795,21 +870,25 @@
             }
 
             // Add click event for left button
-            leftButton.addEventListener('click', function() {
+            leftButton.addEventListener('click', function () {
                 if (currentIndex > 0) {
                     scrollToScreenshot(currentIndex - 1);
+                } else if (currentIndex <= 0) {
+                    scrollToScreenshot(currentIndex = totalScreenshots - 1);
                 }
             });
 
             // Add click event for right button
-            rightButton.addEventListener('click', function() {
+            rightButton.addEventListener('click', function () {
                 if (currentIndex < totalScreenshots - 1) {
                     scrollToScreenshot(currentIndex + 1);
+                } else if (currentIndex >= totalScreenshots - 1) {
+                    scrollToScreenshot(currentIndex = 0);
                 }
             });
 
             // Optional: Add keyboard navigation
-            document.addEventListener('keydown', function(event) {
+            document.addEventListener('keydown', function (event) {
                 if (event.key === 'ArrowLeft') {
                     if (currentIndex > 0) {
                         scrollToScreenshot(currentIndex - 1);
@@ -822,7 +901,7 @@
             });
 
             // Add scroll event to detect when manual scrolling occurs
-            showcaseContainer.addEventListener('scroll', function() {
+            showcaseContainer.addEventListener('scroll', function () {
                 // Calculate which screenshot is currently in view
                 const scrollPosition = showcaseContainer.scrollLeft;
                 const newIndex = Math.round(scrollPosition / screenshotWidth);
@@ -837,11 +916,11 @@
             let touchStartX = 0;
             let touchEndX = 0;
 
-            showcaseContainer.addEventListener('touchstart', function(event) {
+            showcaseContainer.addEventListener('touchstart', function (event) {
                 touchStartX = event.changedTouches[0].screenX;
             });
 
-            showcaseContainer.addEventListener('touchend', function(event) {
+            showcaseContainer.addEventListener('touchend', function (event) {
                 touchEndX = event.changedTouches[0].screenX;
                 handleSwipe();
             });
@@ -874,6 +953,10 @@
             let currentPage = 1;
             let filteredCards = [];
             let isFirstLoad = true;
+            // Global variables for state and district
+            let userState = null;
+            let userDistrict = null;
+
 // Process organizations
             organizations.forEach(org => {
                 // Count by state
@@ -935,7 +1018,7 @@
             });
 
 // Form submission handler
-            document.getElementById('form-school').addEventListener('submit', function(e) {
+            document.getElementById('form-school').addEventListener('submit', function (e) {
                 e.preventDefault();
                 // Add your filter logic here
                 const selectedState = document.getElementById('states').value;
@@ -949,7 +1032,7 @@
             });
 
             function filterOrganizations(state, district) {
-                if(!state){
+                if (!state) {
                     return;
                 }
 
@@ -978,7 +1061,7 @@
                 resultCount.innerHTML = `${schoolCount}`;
                 const span = document.createElement("span");
                 span.innerHTML = " Sekolah (Jumlah):";
-                span.classList.add("text-small");
+                span.classList.add("text-total");
                 resultCount.append(span);
 
                 // Update pagination
@@ -1005,7 +1088,7 @@
                     filteredCards[i].style.setProperty("--transition-delay", `${.05 * i}s`);
                 }
                 memberSlideFromBottomElements = document.querySelectorAll('#section-member .slide-from-bottom-element');
-                for(let el of memberSlideFromBottomElements){
+                for (let el of memberSlideFromBottomElements) {
                     observerSlideBottomElement.observe(el);
                 }
 
@@ -1138,12 +1221,88 @@
                 resultCount.innerHTML = `${filteredCards.length}`;
                 const span = document.createElement("span");
                 span.innerHTML = " Sekolah (Jumlah):";
-                span.classList.add("text-small");
+                span.classList.add("text-total");
                 resultCount.append(span);
             }
+
+
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    // Step 2: Use reverse geocoding
+                    getLocationDetails(lat, lon);
+                },
+                function (error) {
+                    console.error("Error getting location:", error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                },
+            );
+
+            function getLocationDetails(lat, lon) {
+                // Add zoom parameter to get more detailed address information
+                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=18&accept-language=ms`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // console.log("Full address data:", data);
+
+                        const address = data.address;
+
+                        // Try various fields that might contain district information
+                        const district = address.county ||
+                            address.city_district ||
+                            address.district ||
+                            address.suburb ||
+                            address.neighbourhood ||
+                            address.town ||
+                            address.city;
+
+                        const state = address.state || address.province;
+
+                        console.log("District:", district);
+                        console.log("State:", state);
+
+                        userState = state ?? null;
+                        userDistrict = district ?? null;
+
+                        //check if there are any states matched with the current user location
+                        const statesSelect = document.getElementById('states');
+
+                        if (userState && statesSelect) {
+                            for (const option of statesSelect.options) {
+                                if (option.value === userState) {
+                                    option.selected = true;
+                                    console.log("true");
+                                    const event = new Event('change');
+                                    statesSelect.dispatchEvent(event);
+                                    break;
+                                }
+                            }
+                        }
+                        //check if there are any states matched with the current user location
+                        if (userDistrict && districtSelect) {
+                            for (const option of districtSelect.options) {
+                                if (option.value === userDistrict) {
+                                    option.selected = true;
+                                    console.log("true");
+                                    break;
+                                }
+                            }
+                        }
+                        //trigger submit
+                        const event2 = new Event('submit');
+                        document.getElementById('form-school').dispatchEvent(event2);
+
+
+                    })
+                    .catch(error => console.error("Geocoding error:", error));
+            }
+
         });
-
-
     </script>
 </body>
 </html>
