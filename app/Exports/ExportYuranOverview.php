@@ -94,6 +94,7 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                         $parent = DB::table('fees_new_organization_user as fou')
                             ->join('organization_user as ou', 'ou.id', 'fou.organization_user_id')
                             ->join('users as u', 'u.id', 'ou.user_id')
+                            ->join('organization_user_student as ous','ous.organization_user_id','ou.od')
                             ->leftJoin('transactions as t', 't.id', 'fou.transaction_id')
                             ->where('fou.fees_new_id', $fn->id)
                             //->where('ou.status', "1")
@@ -112,7 +113,8 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                         $feedata->totalIncome = $fn->price * $fn->quantity * $feedata->paidNumber;
                         $feedata->estimateIncome = $fn->price * $fn->quantity * $feedata->estimateNumber;
                     } else {
-                        $student = DB::table('student_fees_new as sfn')
+                       
+                            $student = DB::table('student_fees_new as sfn')
                             ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', 'sfn.id')
                             ->leftJoin('transactions as t', 't.id', 'ftn.transactions_id')
                             ->leftJoin('class_student as cs', 'cs.id', 'sfn.class_student_id')
@@ -120,12 +122,21 @@ class ExportYuranOverview implements FromCollection, ShouldAutoSize, WithHeading
                             ->leftJoin('classes as c','c.id','co.class_id')
                             ->where('sfn.fees_id', $fn->id)
                             ->where('c.levelid','>',0)
+                            ->where('cs.status',1)
+                         
                             ->select('sfn.*', 't.status as tstatus')
-                            ->distinct()
+                            ->orderByDesc('tstatus')
+                            ->distinct('sfn.id')
                             ->get();
+                            
+                            $student = $student->unique('id');
+
+                            //dd($student);
+
+                       
         
                         $paid = $student->where('status', "Paid")->where('tstatus', "Success");
-        
+         
                         $feedata->no = $key + 1;
                         $feedata->yuranCategory = $fn->category;
                         $feedata->yuranName = $fn->name;
