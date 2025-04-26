@@ -348,7 +348,10 @@ class FeesController extends AppBaseController
             $check_debt = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
+            ->join('fees_new','fees_new.id','student_fees_new.fees_id')
             ->select('students.*')
+            ->where('fees_new.status',1)
+
             ->where('class_student.id',$s->csid)
             ->where('student_fees_new.status', 'Debt')
             ->count();
@@ -402,9 +405,11 @@ class FeesController extends AppBaseController
         foreach($all_parent->get() as $p){
             $check_debt = DB::table('organization_user')
             ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
+            ->join('fees_new', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id') // Ensure column name is correct here
             ->where('organization_user.id', $p->id)
             ->where('organization_user.role_id', 6)
             ->where('organization_user.status', 1)
+            ->where('fees_new.status',1)
             ->where('fees_new_organization_user.status', 'Debt')
             ->count();
     
@@ -675,6 +680,7 @@ class FeesController extends AppBaseController
                 ->select('students.*')
                 ->where('classes.id', $class_id)
                 ->where('class_student.fees_status', $status)
+                ->where('class_student.status',1)
                 ->orderBy('students.nama')
                 ->get();
             //$this->validateStatus($data);
@@ -1687,6 +1693,9 @@ class FeesController extends AppBaseController
             ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
             ->select('fees_new.*','students.id as studentid', 'students.nama as studentnama', 'student_fees_new.status')
             ->where('students.id', $student_id)
+            ->where('fees_new.status',1)
+            ->where('class_student.status',1)
+            
             ->orderBy('fees_new.name')
             ->get();
 
