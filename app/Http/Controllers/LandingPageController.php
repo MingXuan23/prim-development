@@ -79,6 +79,22 @@ class LandingPageController extends AppBaseController
             ->groupBy('o.id')
             ->get();
 
+        //get the maktab mahmud school student count
+
+        //get the number of students in each of the school
+        $lmmStudentCounts =  DB::table('organizations as o')
+            ->whereRaw('LOWER(o.nama) LIKE ?', ['%maktab mahmud%'])
+            ->orWhere('o.id', 137)//include MAAHAD TAHFIZ SAINS DARUL AMAN
+            ->whereNull("o.deleted_at")
+            ->whereIn('o.type_org', [1, 2, 3])
+            ->whereNull("o.deleted_at")
+            ->leftJoin('class_organization', 'o.id', '=', 'class_organization.organization_id')
+            ->leftJoin('class_student', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->select('o.id', DB::raw('COUNT(DISTINCT class_student.student_id) as student_count'))
+            ->groupBy('o.id')
+            ->get();
+
+
         //find the donation related to the schools
         $organizationDonations = DB::table('organization_url as url')
             ->join('organizations as o', 'url.organization_id', '=', 'o.id')
@@ -86,6 +102,7 @@ class LandingPageController extends AppBaseController
             ->whereNull("o.deleted_at")
             ->join("donation_organization as do", "o.id", "=", "do.organization_id")
             ->join("donations as d", "do.donation_id", "=", "d.id")
+            ->where("d.status", 1 )
             ->where("date_end", ">=", now())
             ->join(DB::raw("(SELECT organization_id, MAX(d2.date_created) as max_date
                     FROM donation_organization do2
@@ -99,7 +116,7 @@ class LandingPageController extends AppBaseController
             ->get();
 
         //get the total number of students
-        $studentCount = $organizationStudentCounts->sum("student_count");
+        $studentCount = $organizationStudentCounts->sum("student_count") + $lmmStudentCounts->sum("student_count") - $organizationStudentCounts->where('id', 137)->first()->student_count;//minus MAAHAD TAHFIZ SAINS DARUL AMAN because included in lmmStudentCounts
 
         //get the total number of fees
         $totalFee =  DB::table("fees_new as fn")
@@ -114,6 +131,166 @@ class LandingPageController extends AppBaseController
             ->whereYear("fn.start_date", date('Y'))  // This filters by the current year
             ->sum("fn.totalAmount");
 
+        $organization = DB::table('organization_url as url')
+            ->join('organizations as o', 'url.organization_id', '=', 'o.id')
+            ->where('url.status',1)
+            ->whereNull("o.deleted_at")
+            ->whereIn('o.type_org', [1, 2, 3])
+            ->get();
+
+// Create an array to store results for each organization
+        $results = [];
+
+        foreach ($organization as $org) {
+            $orgId = $org->id;
+
+            // Get current year and last year
+            $currentYear = date('Y');
+            $lastYear = $currentYear - 1;
+
+            // Define date ranges
+            $currentYearStartDate = "$currentYear-01-01"; // January 1st of current year
+
+            $lastYearStartDate = "$lastYear-01-01"; // January 1st of last year
+            $lastYearEndDate = "$lastYear-12-31"; // December 31st of last year
+
+            // This year - completed payments
+            $student_complete_this_year = DB::table('students')
+                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->where('classes.levelid', '>', 0)
+                ->where('class_organization.organization_id', $orgId)
+                ->where('class_student.fees_status', 'Completed')
+                ->where('class_student.status', 1)
+                ->whereDate('class_student.start_date', '>=' , $currentYearStartDate)
+                ->count();
+
+            // This year - not completed payments
+            $student_notcomplete_this_year = DB::table('students')
+                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->where('classes.levelid', '>', 0)
+                ->where('class_organization.organization_id', $orgId)
+                ->where('class_student.status', 1)
+                ->where('class_student.fees_status', 'Not Complete')
+                ->whereDate('class_student.start_date', '>=' , $currentYearStartDate)
+                ->count();
+
+            // Last year - completed payments
+            $student_complete_last_year = DB::table('students')
+                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->where('classes.levelid', '>', 0)
+                ->where('class_organization.organization_id', $orgId)
+                ->where('class_student.fees_status', 'Completed')
+                ->where('class_student.status', 1)
+                ->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
+                ->count();
+
+            // Last year - not completed payments
+            $student_notcomplete_last_year = DB::table('students')
+                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                ->where('classes.levelid', '>', 0)
+                ->where('class_organization.organization_id', $orgId)
+                ->where('class_student.status', 1)
+                ->where('class_student.fees_status', 'Not Complete')
+                ->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
+                ->count();
+
+            // Store the results for this organization
+            $results[$orgId] = [
+                'organization_id' => $orgId,
+                'organization_name' => $org->name ?? 'Unknown',
+                'this_year' => [
+                    'completed_count' => $student_complete_this_year,
+                    'not_completed_count' => $student_notcomplete_this_year,
+                    'total_count' => $student_complete_this_year + $student_notcomplete_this_year
+                ],
+                'last_year' => [
+                    'completed_count' => $student_complete_last_year,
+                    'not_completed_count' => $student_notcomplete_last_year,
+                    'total_count' => $student_complete_last_year + $student_notcomplete_last_year
+                ]
+            ];
+        }
+
+
+// Get IDs of all LMM organizations
+        $lmm_org_ids = DB::table('organizations as o')
+            ->whereRaw('LOWER(o.nama) LIKE ?', ['%maktab mahmud%'])
+            ->orWhere('o.id', 137) // Include MAAHAD TAHFIZ SAINS DARUL AMAN
+            ->whereNull("o.deleted_at")
+            ->whereIn('o.type_org', [1, 2, 3])
+            ->pluck('o.id')
+            ->toArray();
+
+// LMM schools - current year completed payments
+        $lmm_student_complete_this_year = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->where('classes.levelid', '>', 0)
+            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->where('class_student.fees_status', 'Completed')
+            ->where('class_student.status', 1)
+            ->whereDate('class_student.start_date', '>=' , $currentYearStartDate)
+            ->count();
+
+// LMM schools - current year not completed payments
+        $lmm_student_notcomplete_this_year = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->where('classes.levelid', '>', 0)
+            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->where('class_student.status', 1)
+            ->where('class_student.fees_status', 'Not Complete')
+            ->whereDate('class_student.start_date', '>=' , $currentYearStartDate)
+            ->count();
+
+// LMM schools - last year completed payments
+        $lmm_student_complete_last_year = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->where('classes.levelid', '>', 0)
+            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->where('class_student.fees_status', 'Completed')
+            ->where('class_student.status', 1)
+            ->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
+            ->count();
+
+// LMM schools - last year not completed payments
+        $lmm_student_notcomplete_last_year = DB::table('students')
+            ->join('class_student', 'class_student.student_id', '=', 'students.id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+            ->where('classes.levelid', '>', 0)
+            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->where('class_student.status', 1)
+            ->where('class_student.fees_status', 'Not Complete')
+            ->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
+            ->count();
+
+// Store the LMM results separately
+        $lmm_results = [
+            'group_name' => 'Maktab Mahmud Group',
+            'this_year' => [
+                'completed_count' => $lmm_student_complete_this_year,
+                'not_completed_count' => $lmm_student_notcomplete_this_year,
+                'total_count' => $lmm_student_complete_this_year + $lmm_student_notcomplete_this_year
+            ],
+            'last_year' => [
+                'completed_count' => $lmm_student_complete_last_year,
+                'not_completed_count' => $lmm_student_notcomplete_last_year,
+                'total_count' => $lmm_student_complete_last_year + $lmm_student_notcomplete_last_year
+            ]
+        ];
 
         // $schools = DB::table('organization_url')
         //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
@@ -130,8 +307,7 @@ class LandingPageController extends AppBaseController
         //     ->whereIn('type_organizations.id', [1, 2, 3])
         //     ->where('organization_url.title', 'LIKE', '%Poli%')
         //     ->get();
-
-        return view('landing-page.fees.index', ['organizations' => $organization,'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts, 'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
+        return view('landing-page.fees.index', ['results'=> $results, 'lmm_results' => $lmm_results ,'organizations' => $organization,'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts , 'lmmStudentCounts' => $lmmStudentCounts, 'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
     }
     //end edit by wan
 

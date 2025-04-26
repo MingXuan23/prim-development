@@ -71,10 +71,12 @@ h2{
 h3:not(.showcase-screenshot h3){
     font-size: 21px!important;
     color: var(--neutral-color-5)!important;
+    line-height: 1.25;
 
 }
 p{
     color: var(--neutral-color-5)!important;
+    font-size: 18px;
 
 }
 button{
@@ -582,6 +584,17 @@ header{
     height: auto;
     object-fit: contain;
 }
+/*tutorial section*/
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+}
+#iframe-tutorial{
+    width: min(100%, 1000px);
+    aspect-ratio: 2/1;
+}
 /*stat section*/
 #section-stat{
     padding: 50px 20px;
@@ -621,6 +634,9 @@ header{
     flex: 0 0 450px;
     background-color: var(--neutral-color-2);
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .page-item.active .page-link{
     background-color: var(--secondary-color)!important;
@@ -655,7 +671,6 @@ header{
 .member-card-header{
     display: flex;
     gap: .5rem;
-    border-bottom: 2px solid var(--neutral-color-3);
     padding-bottom: 12px;
     & > img{
         width: 100px;
@@ -664,31 +679,49 @@ header{
     }
 }
 .member-info-wrapper{
-    text-align: center;
     .member-info{
         display: flex;
-        gap: .25rem;
+        gap: .5rem!important;
         font-size: 19px!important;
+        div{
+            display: flex;
+        }
         img{
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             flex-shrink: 0;
         }
         h3{
-            width: 100%!important;
-            text-align: left!important;
+            text-align: left;
+            margin: 0;
         }
+
+    }
+    .member-info.member-info-stats{
+        flex-direction: column;
     }
 
 }
 .text-small{
     font-size: 16px;
     font-weight: normal;
+    text-align: left;
+    margin-left: .25rem;
+    display: flex;
+    align-items: flex-end;
+}
+.text-total{
+    font-size: 16px;
+    font-weight: normal;
+    text-align: left;
+    margin-left: .25rem;
 }
 .member-card-footer{
     display: flex;
     justify-content: flex-end;
     gap: .5rem;
+    border-top: 2px solid var(--neutral-color-3);
+
 }
 .btn-derma{
     all: unset;
@@ -798,9 +831,6 @@ header{
     color: var(--neutral-color-5);
 
 }
-#section-collab{
-    margin-bottom: 100px;
-}
 #collaborators{
     display: flex;
     justify-content: center;
@@ -815,6 +845,37 @@ header{
             text-align: center;
         }
     }
+}
+#section-faq{
+    margin-bottom: 100px;
+}
+
+#accordion .card-header{
+    cursor: pointer;
+    padding: 1.25rem!important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+#accordion .card-header div{
+    font-weight: 600;
+    font-size: 21px;
+    color: var(--neutral-color-5);
+}
+.faq-arrow{
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    transition: all .4s ease;
+    transform: rotate(180deg);
+
+}
+#accordion .card-header.collapsed .faq-arrow{
+    transform: rotate(0deg);
+}
+#accordion .card-body{
+    color: var(--neutral-color-5);
+    font-size: 18px;
 }
 #section-contact{
     background-color: var(--third-color);
@@ -996,7 +1057,7 @@ header{
         }
     }
     .feature-card{
-        padding: 20px;
+        padding: 30px 20px;
         display: block;
         flex-grow: 1;
         flex-basis: 100%;
@@ -1020,6 +1081,30 @@ header{
     }
     .member-card{
         flex: 0 0 300px;
+    }
+    .member-info-wrapper{
+        display: block!important;
+        width: 100%;
+
+        .member-info{
+            justify-content: center;
+            div{
+                text-align: center!important;
+                justify-content: center;
+
+
+            }
+            h3{
+                text-align: center;
+            }
+
+        }
+    }
+    .member-info{
+        h3{
+            display: flex;
+            justify-content: center;
+        }
     }
     .col-2{
         flex-wrap: wrap;
