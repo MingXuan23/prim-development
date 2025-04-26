@@ -310,16 +310,17 @@
                                         @endif
                                     </div>
                                     <div>
-                                        @if($org->id === 137)
-                                            {{ $lmm_results['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>
-                                        @else
+{{--                                        @if($org->id === 137)--}}
+{{--                                            {{ $lmm_results['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
+{{--                                        @else--}}
                                             {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>
-                                        @endif
+{{--                                        @endif--}}
                                     </div>
                                     <div>
-                                        @if($org->id === 137 && $lmm_results['last_year']['completed_count'] > 0)
-                                            {{ $lmm_results['last_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y")-1 }}</span>
-                                        @elseif($results[$org->id]['last_year']['completed_count'] > 0)
+{{--                                        @if($org->id === 137 && $lmm_results['last_year']['completed_count'] > 0)--}}
+{{--                                            {{ $lmm_results['last_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y")-1 }}</span>--}}
+{{--                                        @elseif($results[$org->id]['last_year']['completed_count'] > 0)--}}
+                                        @if($results[$org->id]['last_year']['completed_count'] > 0)
                                             {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>
                                         @endif
                                     </div>
