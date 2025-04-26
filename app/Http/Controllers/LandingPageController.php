@@ -75,6 +75,7 @@ class LandingPageController extends AppBaseController
             ->whereNull("o.deleted_at")
             ->leftJoin('class_organization', 'o.id', '=', 'class_organization.organization_id')
             ->leftJoin('class_student', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->where('class_student.status', 1)
             ->select('o.id', DB::raw('COUNT(DISTINCT class_student.student_id) as student_count'))
             ->groupBy('o.id')
             ->get();
@@ -90,6 +91,7 @@ class LandingPageController extends AppBaseController
             ->whereNull("o.deleted_at")
             ->leftJoin('class_organization', 'o.id', '=', 'class_organization.organization_id')
             ->leftJoin('class_student', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->where('class_student.status', 1)
             ->select('o.id', DB::raw('COUNT(DISTINCT class_student.student_id) as student_count'))
             ->groupBy('o.id')
             ->get();
@@ -154,71 +156,75 @@ class LandingPageController extends AppBaseController
             $lastYearStartDate = "$lastYear-01-01"; // January 1st of last year
             $lastYearEndDate = "$lastYear-12-31"; // December 31st of last year
 
-            // This year - completed payments
+            // Students with fees issued this year
+            $students_with_fees_this_year = DB::table('student_fees_new')
+                ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->where('class_organization.organization_id', $orgId)
+                ->whereYear('fees_new.start_date', $currentYear)
+                ->pluck('student_fees_new.class_student_id')
+                ->unique()
+                ->toArray();
+
+            // Students with DEBT this year
+            $students_with_debt_this_year = DB::table('student_fees_new')
+                ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->where('class_organization.organization_id', $orgId)
+                ->whereYear('fees_new.start_date', $currentYear)
+                ->where('student_fees_new.status', 'Debt')
+                ->pluck('student_fees_new.class_student_id')
+                ->unique()
+                ->toArray();
+
+            // Only students who have fees AND no debts
             $student_complete_this_year = DB::table('students')
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                ->where('classes.levelid', '>', 0)
-                ->where('class_organization.organization_id', $orgId)
-                ->where('class_student.fees_status', 'Completed')
+                ->whereIn('class_student.id', array_diff($students_with_fees_this_year, $students_with_debt_this_year))
                 ->where('class_student.status', 1)
-                ->whereDate('class_student.start_date', '>=' , $currentYearStartDate)
                 ->count();
 
-            // This year - not completed payments
-            $student_notcomplete_this_year = DB::table('students')
-                ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                ->where('classes.levelid', '>', 0)
-                ->where('class_organization.organization_id', $orgId)
-                ->where('class_student.status', 1)
-                ->where('class_student.fees_status', 'Not Complete')
-                ->whereDate('class_student.start_date', '>=' , $currentYearStartDate)
-                ->count();
 
-            // Last year - completed payments
+            $students_with_fees_last_year = DB::table('student_fees_new')
+                ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->where('class_organization.organization_id', $orgId)
+                ->whereYear('fees_new.start_date', $lastYear)
+                ->pluck('student_fees_new.class_student_id')
+                ->unique()
+                ->toArray();
+
+            $students_with_debt_last_year = DB::table('student_fees_new')
+                ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+                ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                ->where('class_organization.organization_id', $orgId)
+                ->whereYear('fees_new.start_date', $lastYear)
+                ->where('student_fees_new.status', 'Debt')
+                ->pluck('student_fees_new.class_student_id')
+                ->unique()
+                ->toArray();
+
             $student_complete_last_year = DB::table('students')
                 ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                ->where('classes.levelid', '>', 0)
-                ->where('class_organization.organization_id', $orgId)
-                ->where('class_student.fees_status', 'Completed')
+                ->whereIn('class_student.id', array_diff($students_with_fees_last_year, $students_with_debt_last_year))
                 ->where('class_student.status', 1)
-                ->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
                 ->count();
-
-            // Last year - not completed payments
-            $student_notcomplete_last_year = DB::table('students')
-                ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                ->where('classes.levelid', '>', 0)
-                ->where('class_organization.organization_id', $orgId)
-                ->where('class_student.status', 1)
-                ->where('class_student.fees_status', 'Not Complete')
-                ->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
-                ->count();
-
             // Store the results for this organization
             $results[$orgId] = [
                 'organization_id' => $orgId,
                 'organization_name' => $org->name ?? 'Unknown',
                 'this_year' => [
                     'completed_count' => $student_complete_this_year,
-                    'not_completed_count' => $student_notcomplete_this_year,
-                    'total_count' => $student_complete_this_year + $student_notcomplete_this_year
                 ],
                 'last_year' => [
                     'completed_count' => $student_complete_last_year,
-                    'not_completed_count' => $student_notcomplete_last_year,
-                    'total_count' => $student_complete_last_year + $student_notcomplete_last_year
                 ]
             ];
         }
-
 
 // Get IDs of all LMM organizations
         $lmm_org_ids = DB::table('organizations as o')
@@ -230,68 +236,82 @@ class LandingPageController extends AppBaseController
             ->toArray();
 
 // LMM schools - current year completed payments
+        $lmm_students_with_fees_this_year = DB::table('student_fees_new')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->whereYear('fees_new.start_date', $currentYear)
+            ->pluck('student_fees_new.class_student_id')
+            ->unique()
+            ->toArray();
+
+// Students with Debt this year
+        $lmm_students_with_debt_this_year = DB::table('student_fees_new')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->whereYear('fees_new.start_date', $currentYear)
+            ->where('student_fees_new.status', 'Debt')
+            ->pluck('student_fees_new.class_student_id')
+            ->unique()
+            ->toArray();
+
+// Final: Completed (have fee issued + no debt)
         $lmm_student_complete_this_year = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->where('classes.levelid', '>', 0)
-            ->whereIn('class_organization.organization_id', $lmm_org_ids)
-            ->where('class_student.fees_status', 'Completed')
+            ->whereIn('class_student.id', array_diff($lmm_students_with_fees_this_year, $lmm_students_with_debt_this_year))
             ->where('class_student.status', 1)
-            ->whereDate('class_student.start_date', '>=' , $currentYearStartDate)
             ->count();
 
-// LMM schools - current year not completed payments
         $lmm_student_notcomplete_this_year = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->where('classes.levelid', '>', 0)
-            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->whereIn('class_student.id', $lmm_students_with_debt_this_year)
             ->where('class_student.status', 1)
-            ->where('class_student.fees_status', 'Not Complete')
-            ->whereDate('class_student.start_date', '>=' , $currentYearStartDate)
             ->count();
 
-// LMM schools - last year completed payments
+        $lmm_students_with_fees_last_year = DB::table('student_fees_new')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->whereYear('fees_new.start_date', $lastYear)
+            ->pluck('student_fees_new.class_student_id')
+            ->unique()
+            ->toArray();
+
+        $lmm_students_with_debt_last_year = DB::table('student_fees_new')
+            ->join('fees_new', 'fees_new.id', '=', 'student_fees_new.fees_id')
+            ->join('class_student', 'class_student.id', '=', 'student_fees_new.class_student_id')
+            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->whereYear('fees_new.start_date', $lastYear)
+            ->where('student_fees_new.status', 'Debt')
+            ->pluck('student_fees_new.class_student_id')
+            ->unique()
+            ->toArray();
+
         $lmm_student_complete_last_year = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->where('classes.levelid', '>', 0)
-            ->whereIn('class_organization.organization_id', $lmm_org_ids)
-            ->where('class_student.fees_status', 'Completed')
+            ->whereIn('class_student.id', array_diff($lmm_students_with_fees_last_year, $lmm_students_with_debt_last_year))
             ->where('class_student.status', 1)
-            ->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
             ->count();
 
-// LMM schools - last year not completed payments
         $lmm_student_notcomplete_last_year = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
-            ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->where('classes.levelid', '>', 0)
-            ->whereIn('class_organization.organization_id', $lmm_org_ids)
+            ->whereIn('class_student.id', $lmm_students_with_debt_last_year)
             ->where('class_student.status', 1)
-            ->where('class_student.fees_status', 'Not Complete')
-            ->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
             ->count();
 
-// Store the LMM results separately
         $lmm_results = [
-            'group_name' => 'Maktab Mahmud Group',
             'this_year' => [
                 'completed_count' => $lmm_student_complete_this_year,
-                'not_completed_count' => $lmm_student_notcomplete_this_year,
-                'total_count' => $lmm_student_complete_this_year + $lmm_student_notcomplete_this_year
             ],
             'last_year' => [
                 'completed_count' => $lmm_student_complete_last_year,
-                'not_completed_count' => $lmm_student_notcomplete_last_year,
-                'total_count' => $lmm_student_complete_last_year + $lmm_student_notcomplete_last_year
             ]
         ];
-
         // $schools = DB::table('organization_url')
         //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
         //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')

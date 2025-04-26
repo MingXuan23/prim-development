@@ -317,10 +317,9 @@
                                         @endif
                                     </div>
                                     <div>
-
-                                        @if($org->id === 137)
+                                        @if($org->id === 137 && $lmm_results['last_year']['completed_count'] > 0)
                                             {{ $lmm_results['last_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y")-1 }}</span>
-                                        @else
+                                        @elseif($results[$org->id]['last_year']['completed_count'] > 0)
                                             {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>
                                         @endif
                                     </div>
@@ -831,7 +830,6 @@
             let currentIndex = 0;
             const totalScreenshots = screenshots.length;
             let screenshotWidth; // Width of each screenshot (from your CSS)
-
             // Function to update navigation buttons
             function updateNavButtons() {
                 // Update button states
@@ -1263,8 +1261,8 @@
 
                         const state = address.state || address.province;
 
-                        console.log("District:", district);
-                        console.log("State:", state);
+                        // console.log("District:", district);
+                        // console.log("State:", state);
 
                         userState = state ?? null;
                         userDistrict = district ?? null;
@@ -1276,7 +1274,7 @@
                             for (const option of statesSelect.options) {
                                 if (option.value === userState) {
                                     option.selected = true;
-                                    console.log("true");
+                                    isFirstLoad = true;
                                     const event = new Event('change');
                                     statesSelect.dispatchEvent(event);
                                     break;
@@ -1296,7 +1294,6 @@
                         //trigger submit
                         const event2 = new Event('submit');
                         document.getElementById('form-school').dispatchEvent(event2);
-
 
                     })
                     .catch(error => console.error("Geocoding error:", error));
