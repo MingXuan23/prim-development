@@ -69,6 +69,8 @@ Route::group(['prefix' => 'derma'], function () {
 //landing fees page route
 Route::group(['prefix' => 'yuran'], function () {
     Route::get('', 'LandingPageController@indexFees');
+    Route::get('data', 'LandingPageController@indexDataFess');
+
     Route::get('/organization-list', 'LandingPageController@indexOrganizationList');
     Route::get('organization-all-list', 'LandingPageController@getAllOrganizationList')->name('landingpage.organization.list');
 });
