@@ -1652,6 +1652,8 @@ class DirectPayController extends Controller
     public function handle()
     {
         $type = request()->query('type');
+         //comment only
+         set_time_limit(1500);
 
         $transactions = DB::table('transactions')
             ->whereIn('status', ['Pending', 'Failed'])
