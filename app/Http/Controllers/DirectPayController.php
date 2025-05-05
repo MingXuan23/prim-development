@@ -1663,6 +1663,7 @@ class DirectPayController extends Controller
         if($type=='all'){
             $transactions = DB::table('transactions')
             ->whereIn('status', ['Pending', 'Failed'])
+            ->orderByDesc('id')
             ->get();
         }
 
