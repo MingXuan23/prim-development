@@ -56,6 +56,108 @@ class LandingPageController extends AppBaseController
     //end wan add
 
     //edit by wan
+    public function indexDataFess()
+    {
+        $currentYear = date('Y');
+        $lastYear = date('Y', strtotime('-1 year'));
+    
+        $organization = DB::table('organizations as o')
+            ->join('fees_new as fn', 'fn.organization_id', '=', 'o.id')
+            ->leftJoin('organization_url as url', 'url.organization_id', '=', 'o.id')
+            ->whereIn('o.type_org', [1, 2, 3, 14])
+            ->whereNull('o.deleted_at')
+            ->where('o.id','<>',161)
+            ->whereIn(DB::raw('YEAR(fn.start_date)'), [$currentYear, $lastYear])
+            ->distinct()
+            ->select('o.nama','o.id','url.url_name as url') // You might want to select specific columns
+            ->get();
+    
+        foreach ($organization as $o) {
+
+            if (stripos($o->nama, 'MAKTAB MAHMUD') !== false) {
+                $o->url = 'lmm';
+            }
+            
+            // Find all distinct years for this organization
+            $years = DB::table('fees_new')
+                ->where('organization_id', $o->id)
+                ->whereIn(DB::raw('YEAR(start_date)'), [$currentYear, $lastYear])
+                ->selectRaw('DISTINCT YEAR(start_date) as year')
+                ->pluck('year');
+    
+            $o->data = []; // Initialize as array
+    
+            foreach ($years as $year) {
+                $tranA = DB::table('transactions as t')
+                    ->leftJoin('fees_new_organization_user as fou', 't.id', '=', 'fou.transaction_id')
+                    ->leftJoin('fees_new as fn', 'fn.id', '=', 'fou.fees_new_id')
+                    ->where('t.status', 'Success')
+                    ->where('fn.organization_id', $o->id)
+                    ->whereYear('fn.start_date', $year)
+                    ->select('t.id')
+                    ->distinct()
+                    ->get();
+    
+                $tranBC = DB::table('transactions as t')
+                    ->leftJoin('fees_transactions_new as ftn', 't.id', '=', 'ftn.transactions_id')
+                    ->leftJoin('student_fees_new as sfn', 'sfn.id', '=', 'ftn.student_fees_id')
+                    ->leftJoin('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
+                    ->where('fn.organization_id', $o->id)
+                    ->where('t.status', 'Success')
+                    ->whereYear('fn.start_date', $year)
+                    ->select('t.id')
+                    ->distinct()
+                    ->get();
+    
+                // Combine the two sets
+                $combined = $tranA->concat($tranBC);
+                $unique = $combined->unique('id');
+    
+                // Create JSON-like object for year and count
+                $o->data[] = [
+                    'year' => $year,
+                    'tcount' => $unique->count(),
+                ];
+
+                
+            }
+            $o->transaction_sum = collect($o->data)->sum('tcount');
+            unset($o->id);
+
+
+        }
+    
+        // Assumed you have calculated the below somewhere earlier, or you need to prepare them too
+        
+        $organization = $organization
+        ->sortByDesc(function ($org) {
+            return !is_null($org->url);
+        })
+        ->sortByDesc('transaction_sum')
+        ->values();
+    
+    dd($organization);
+       return response()->json($organization);
+    }
+    
+
+        // $schools = DB::table('organization_url')
+        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+        //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+        //     ->whereIn('type_organizations.id', [1, 2, 3])
+        //     ->where('organization_url.title', 'NOT LIKE', '%Poli%')
+        //     ->get();
+
+        // //dd($schools);
+
+        // $politeknik = DB::table('organization_url')
+        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+        //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+        //     ->whereIn('type_organizations.id', [1, 2, 3])
+        //     ->where('organization_url.title', 'LIKE', '%Poli%')
+        //     ->get();
+      
+    
     public function indexFees()
     {
         $organization = DB::table('organization_url as url')

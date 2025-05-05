@@ -1651,10 +1651,18 @@ class DirectPayController extends Controller
 
     public function handle()
     {
+        $type = request()->query('type');
+
         $transactions = DB::table('transactions')
             ->whereIn('status', ['Pending', 'Failed'])
             ->whereBetween('datetime_created', [now()->subDays(2), now()])
             ->get();
+
+        if($type=='all'){
+            $transactions = DB::table('transactions')
+            ->whereIn('status', ['Pending', 'Failed'])
+            ->get();
+        }
 
         echo 'Start Handle :',"<br>";
 
