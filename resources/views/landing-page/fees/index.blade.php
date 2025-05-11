@@ -313,7 +313,7 @@
                                     <div>
                                         @if($org->id === 137)
 {{--                                            {{ $lmm_results['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
-                                            {{ $lmm_results['data'][1]['tcount'] }} <span class="text-small"> transaksi pada tahun {{ date("Y") }}</span>
+                                            {{ $lmm_results['data'][1]['tcount'] }} <span class="text-small"> transaksi pada {{ date("Y") }}</span>
                                         @else
 {{--                                            {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
                                             @php
@@ -352,11 +352,9 @@
 
                                     @if($org->id === 137 &&  $lmm_results['data'][0]['tcount'] > 0)
 {{--                                            {{ $lmm_results['last_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y")-1 }}</span>                      --}}
-                                            {{ $lmm_results['data'][0]['tcount'] }} <span class="text-small"> transaksi pada tahun {{ date("Y")-1 }}</span>
+                                            {{ $lmm_results['data'][0]['tcount'] }} <span class="text-small"> transaksi pada {{ date("Y")-1 }}</span>
                                     @elseif($tcountPrevious > 0)
 {{--                                            {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>--}}
-
-
                                         {{ $tcountPrevious }} <span class="text-small"> transaksi pada {{ $previousYear }}</span>
                                     @endif
                                     </div>
