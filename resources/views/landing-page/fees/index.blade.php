@@ -312,17 +312,53 @@
                                     </div>
                                     <div>
                                         @if($org->id === 137)
-                                            {{ $lmm_results['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>
+{{--                                            {{ $lmm_results['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
+                                            {{ $lmm_results['data'][1]['tcount'] }} <span class="text-small"> transaksi pada tahun {{ date("Y") }}</span>
                                         @else
-                                            {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>
+{{--                                            {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
+                                            @php
+                                                $currentYear = now()->year;
+
+                                                // Find the organization entry with the matching URL
+                                                $matchedOrg = $organization2->firstWhere('url', $org->url_name);
+
+                                                // Find the tcount for the current year from its data array
+                                                $tcount = 0;
+                                                if ($matchedOrg) {
+                                                    $yearData = collect($matchedOrg->data)->firstWhere('year', $currentYear);
+                                                    $tcount = $yearData['tcount'] ?? 0;
+                                                }
+                                            @endphp
+
+                                            {{ $tcount }} <span class="text-small"> transaksi pada {{ $currentYear }}</span>
                                         @endif
                                     </div>
                                     <div>
-                                        @if($org->id === 137 && $lmm_results['last_year']['completed_count'] > 0)
-                                            {{ $lmm_results['last_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y")-1 }}</span>
-                                        @elseif($results[$org->id]['last_year']['completed_count'] > 0)
-                                            {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>
-                                        @endif
+                                    @php
+                                        $previousYear = now()->year- 1;
+                                       $tcountPrevious = 0;
+
+                                       // Find the organization with matching URL
+                                       $matchedOrg = $organization2->firstWhere('url', $org->url_name);
+
+                                       if ($matchedOrg) {
+                                           $dataCollection = collect($matchedOrg->data);
+
+                                           $previousData = $dataCollection->firstWhere('year', $previousYear);
+
+                                           $tcountPrevious = $previousData['tcount'] ?? 0;
+                                       }
+                                    @endphp
+
+                                    @if($org->id === 137 &&  $lmm_results['data'][0]['tcount'] > 0)
+{{--                                            {{ $lmm_results['last_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y")-1 }}</span>                      --}}
+                                            {{ $lmm_results['data'][0]['tcount'] }} <span class="text-small"> transaksi pada tahun {{ date("Y")-1 }}</span>
+                                    @elseif($tcountPrevious > 0)
+{{--                                            {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>--}}
+
+
+                                        {{ $tcountPrevious }} <span class="text-small"> transaksi pada {{ $previousYear }}</span>
+                                    @endif
                                     </div>
                                 </div>
                             </div>
