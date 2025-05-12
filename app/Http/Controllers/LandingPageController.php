@@ -441,12 +441,12 @@ class LandingPageController extends AppBaseController
             ->where('o.id','<>',161)
             ->whereIn(DB::raw('YEAR(fn.start_date)'), [$currentYear, $lastYear])
             ->distinct()
-            ->select('o.nama','o.id','url.url_name as url') // You might want to select specific columns
+            ->select('o.nama','o.id','url.url_name as url_name','o.state','o.postcode','o.district','o.city','o.organization_picture') // You might want to select specific columns
             ->get();
         foreach ($organization2 as $o) {
 
             if (stripos($o->nama, 'MAKTAB MAHMUD') !== false) {
-                $o->url = 'lmm';
+                $o->url_name = 'lmm';
             }
 
             // Find all distinct years for this organization
@@ -493,7 +493,7 @@ class LandingPageController extends AppBaseController
 
             }
             $o->transaction_sum = collect($o->data)->sum('tcount');
-            unset($o->id);
+           
 
         }
 
@@ -501,46 +501,48 @@ class LandingPageController extends AppBaseController
 
         $organization2 = $organization2
             ->sortByDesc(function ($org) {
-                return !is_null($org->url);
+                return !is_null($org->url_name);
             })
             ->sortByDesc('transaction_sum')
             ->values();
 
-        $transactionCounts = [
-            $lastYear => 0,
-            $currentYear => 0,
-        ];
+        // $transactionCounts = [
+        //     $lastYear => 0,
+        //     $currentYear => 0,
+        // ];
 
-        foreach ($organization2 as $org) {
-            if ($org->url === 'lmm') {
-                foreach ($org->data as $data) {
-                    if ($data['year'] === (int)$currentYear) {
-                        $transactionCounts[$currentYear] += $data['tcount'];
-                    }
-                    if ($data['year'] === (int)$lastYear) {
-                        $transactionCounts[$lastYear] += $data['tcount'];
-                    }
-                }
-            }
-        }
+        // foreach ($organization2 as $org) {
+        //     if ($org->url === 'lmm') {
+        //         foreach ($org->data as $data) {
+        //             if ($data['year'] === (int)$currentYear) {
+        //                 $transactionCounts[$currentYear] += $data['tcount'];
+        //             }
+        //             if ($data['year'] === (int)$lastYear) {
+        //                 $transactionCounts[$lastYear] += $data['tcount'];
+        //             }
+        //         }
+        //     }
+        // }
 
-        $lmm_results = [
-            'url' => 'lmm',
-            'transaction_sum' => $transactionCounts[$lastYear] + $transactionCounts[$currentYear],
-            'data' => [
-                [
-                    'year' => $lastYear,
-                    'tcount' => $transactionCounts[$lastYear],
-                ],
-                [
-                    'year' => $currentYear,
-                    'tcount' => $transactionCounts[$currentYear],
-                ],
-            ]
-        ];
+        // $lmm_results = [
+        //     'url' => 'lmm',
+        //     'transaction_sum' => $transactionCounts[$lastYear] + $transactionCounts[$currentYear],
+        //     'data' => [
+        //         [
+        //             'year' => $lastYear,
+        //             'tcount' => $transactionCounts[$lastYear],
+        //         ],
+        //         [
+        //             'year' => $currentYear,
+        //             'tcount' => $transactionCounts[$currentYear],
+        //         ],
+        //     ]
+        // ];
 
 //        dd($lmm_results);
-        return view('landing-page.fees.index', ['organization2'=> $organization2, 'lmm_results' => $lmm_results ,'organizations' => $organization,'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts , 'lmmStudentCounts' => $lmmStudentCounts, 'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
+
+
+        return view('landing-page.fees.index', ['organization2'=> $organization2, 'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts ,'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
     }
     //end edit by wan
 

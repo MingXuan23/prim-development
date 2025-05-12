@@ -287,34 +287,23 @@
                     </div>
                 </form>
 
-                <div class="text-bold text-center" id="member-count">{{$organizations->count()}} <span class="text-total">Sekolah (Jumlah):</span></div>
+                <div class="text-bold text-center" id="member-count">{{$organization2->count()}} <span class="text-total">Sekolah (Jumlah):</span></div>
 
                 <!--list of registered school members-->
                 <div class="members">
-                    @foreach($organizations as $key=>$org)
+                    @foreach($organization2 as $key=>$org)
                         <article class="member-card" data-state="{{$org->state}}" data-district="{{$org->district}}">
                         <div class="member-card-header">
                             <img src="{{ URL::asset('organization-picture/' . $org->organization_picture ) }}" alt="{{ $org->url_name }} logo">
                             <div class="member-info-wrapper">
                                 <div class="member-info mb-1-2">
 {{--                                    <img src="{{ URL::asset('assets/landing-page/img/images/icon_school.png') }}" alt="Icon of school">--}}
-                                    <h3>{{ $org->title }}</h3>
+                                    <h3>{{ $org->nama }}</h3>
                                 </div>
                                 <div class="member-info member-info-stats mb-1-2">
-                                    <div>
-{{--                                        <img src="{{ URL::asset('assets/landing-page/img/images/icon_student.png') }}" alt="Icon of school">--}}
-                                        @if($org->id === 137)
-                                            <div>{{$lmmStudentCounts->sum('student_count')}} <span class="text-small"> pelajar</span></div>
-                                        @else
-                                            <div>{{$organizationStudentCounts->where("id", $org->id)->first()->student_count}} <span class="text-small"> pelajar</span></div>
 
-                                        @endif
-                                    </div>
                                     <div>
-                                        @if($org->id === 137)
-{{--                                            {{ $lmm_results['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
-                                            {{ $lmm_results['data'][1]['tcount'] }} <span class="text-small"> transaksi pada {{ date("Y") }}</span>
-                                        @else
+
 {{--                                            {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
                                             @php
                                                 $currentYear = now()->year;
@@ -324,36 +313,30 @@
 
                                                 // Find the tcount for the current year from its data array
                                                 $tcount = 0;
-                                                if ($matchedOrg) {
-                                                    $yearData = collect($matchedOrg->data)->firstWhere('year', $currentYear);
+                                                 $yearData = collect($org->data)->firstWhere('year', $currentYear);
                                                     $tcount = $yearData['tcount'] ?? 0;
-                                                }
-                                            @endphp
 
-                                            {{ $tcount }} <span class="text-small"> transaksi pada {{ $currentYear }}</span>
-                                        @endif
-                                    </div>
-                                    <div>
-                                    @php
-                                        $previousYear = now()->year- 1;
+                                                      $previousYear = now()->year- 1;
                                        $tcountPrevious = 0;
 
                                        // Find the organization with matching URL
                                        $matchedOrg = $organization2->firstWhere('url', $org->url_name);
 
-                                       if ($matchedOrg) {
-                                           $dataCollection = collect($matchedOrg->data);
+                                         $dataCollection = collect($org->data);
 
                                            $previousData = $dataCollection->firstWhere('year', $previousYear);
 
                                            $tcountPrevious = $previousData['tcount'] ?? 0;
-                                       }
-                                    @endphp
 
-                                    @if($org->id === 137 &&  $lmm_results['data'][0]['tcount'] > 0)
-{{--                                            {{ $lmm_results['last_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y")-1 }}</span>                      --}}
-                                            {{ $lmm_results['data'][0]['tcount'] }} <span class="text-small"> transaksi pada {{ date("Y")-1 }}</span>
-                                    @elseif($tcountPrevious > 0)
+                                            @endphp
+
+                                        @if($tcount > 0 || $tcountPrevious == 0)    {{ $tcount }} <span class="text-small"> transaksi pada {{ $currentYear }}</span> @endif
+                                       
+                                    </div>
+                                    <div>
+                                   
+
+                                    @if($tcountPrevious > 0)
 {{--                                            {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>--}}
                                         {{ $tcountPrevious }} <span class="text-small"> transaksi pada {{ $previousYear }}</span>
                                     @endif
@@ -675,7 +658,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const organizations = JSON.parse(@json("$organizations"));
+            const organizations = JSON.parse(@json("$organization2"));
             const heroSlideFromBottomElements = document.querySelectorAll('#section-hero .slide-from-bottom-element');
             const featureSlideFromBottomElements = document.querySelectorAll('#section-feature .slide-from-bottom-element');
             const showcaseSlideFromBottomElements = document.querySelectorAll('#section-showcase .slide-from-bottom-element');
