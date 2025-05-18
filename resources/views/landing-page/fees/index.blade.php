@@ -305,19 +305,19 @@
                                     <div>
 
 {{--                                            {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
-                                            @php
-                                                $currentYear = now()->year;
+                                    @php
+                                        $currentYear = now()->year;
 
-                                                // Find the organization entry with the matching URL
-                                                $matchedOrg = $organization2->firstWhere('url', $org->url_name);
+                                        // Find the organization entry with the matching URL
+                                        $matchedOrg = $organization2->firstWhere('url', $org->url_name);
 
-                                                // Find the tcount for the current year from its data array
-                                                $tcount = 0;
-                                                 $yearData = collect($org->data)->firstWhere('year', $currentYear);
-                                                    $tcount = $yearData['tcount'] ?? 0;
+                                        // Find the tcount for the current year from its data array
+                                        $tcount = 0;
+                                         $yearData = collect($org->data)->firstWhere('year', $currentYear);
+                                            $tcount = $yearData['tcount'] ?? 0;
 
-                                                      $previousYear = now()->year- 1;
-                                       $tcountPrevious = 0;
+                                              $previousYear = now()->year- 1;
+                                            $tcountPrevious = 0;
 
                                        // Find the organization with matching URL
                                        $matchedOrg = $organization2->firstWhere('url', $org->url_name);
@@ -331,10 +331,10 @@
                                             @endphp
 
                                         @if($tcount > 0 || $tcountPrevious == 0)    {{ $tcount }} <span class="text-small"> transaksi pada {{ $currentYear }}</span> @endif
-                                       
+
                                     </div>
                                     <div>
-                                   
+
 
                                     @if($tcountPrevious > 0)
 {{--                                            {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>--}}
