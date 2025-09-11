@@ -27,6 +27,18 @@ class StudentTableSeeder extends Seeder
                 "nama" => "student 1",
                 "icno" => "026946-14-6137",
             ),
+            2 =>
+            array(
+                "id" => 3,
+                "nama" => "student A from 1 Bestari",
+                "icno" => "026946-15-6137",
+            ),
+            3 =>
+            array(
+                "id" => 4,
+                "nama" => "student B from 1 Bestari",
+                "icno" => "026946-14-6223",
+            ),
         ));
     }
 }
