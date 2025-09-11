@@ -79,12 +79,6 @@ class RegisterController extends Controller
 
         
         $validator->after(function ($validator) use ($data) {
-            if(isset($data['isAdmin'])){
-                return;
-            }
-            if (!isset($data['referral_code'])) {
-                return;
-            }
             if(!isset($data['registration_type'])){
                 $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
             }
@@ -92,7 +86,12 @@ class RegisterController extends Controller
             else if($data['registration_type'] == '-'){
                 $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
             }
-            
+            if(isset($data['isAdmin'])){
+                return;
+            }
+            if (!isset($data['referral_code'])) {
+                return;
+            }
 
             
             $valid = PointController::validateReferralCode($data['referral_code']);
@@ -110,7 +109,7 @@ class RegisterController extends Controller
         $this->validator($request->all())->validate();
 
         event(new Registered($user = $this->createAdmin($request->all())));
-        
+
         // You can customize this redirect after admin registration
         return redirect(route('home'));
     }
@@ -122,7 +121,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     { 
-       
+        
         //dd($data,isset($data['isAdmin']));
         $user= User::create([
             'name'              => $data['name'],
@@ -133,7 +132,6 @@ class RegisterController extends Controller
             'purpose'           =>$data['registration_type']??''
 
         ]);
-        // dd($user);
        
         if (!isset($data['isAdmin'])) {
             $role = DB::table('model_has_roles')->insert([
@@ -158,19 +156,17 @@ class RegisterController extends Controller
             //13/8/2024 - sir yahya want to do so 
         }
         
-        
         return $user;
 
     }
 
     public function register(Request $request)
     {
-        
         // If the registration type is "bayar_yuran", redirect without validation or user creation.
         if ($request->input('registration_type') === 'bayar_yuran') {
             return redirect('/register_yuran');
         }
-      
+       
         // Otherwise, perform the usual registration.
         $this->validator($request->all())->validate();
 

@@ -1689,8 +1689,8 @@ class StudentController extends Controller
 
             $newparent = DB::table('users')
                             ->where(function($query) use ($student) {
-                                $query
-                                      ->where('telno', $student->parentTelno);
+                                $query->where('name', $student->parentName)
+                                      ->orWhere('telno', $student->parentTelno);
                             })
                             ->first();
             
