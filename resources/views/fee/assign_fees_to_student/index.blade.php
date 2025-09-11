@@ -120,7 +120,7 @@
                     },
                     success: function (result) {
                         $(classId).empty();
-                        $(classId).append("<option value='0'> Semua Kelas</option>");
+                        $(classId).append("<option value='' selected disabled>Pilih Kelas</option>");
                         jQuery.each(result.success, function (key, value) {
                             $(classId).append("<option value='" + value.cid + "'>" + value.cname + "</option>");
                         });
@@ -175,7 +175,13 @@
                             },
                             {
                                 data: "gender",
-                                name: "gender",
+                                render: function (data, type, row) {
+                                    if (data == 'L') {
+                                        return "<p>Lelaki</p>";
+                                    } else if (data == 'P') {
+                                        return "<p>Perempuan</p>";
+                                    }
+                                },
                                 "width": "5%"
                             },
                             {
@@ -192,6 +198,8 @@
                             {
                                 data: "fees",
                                 render: function (data, type, row) {
+                                    // TODO change it to ellipsis so that the overflowed text will be hidden
+                                    // (to prevent the yuran name and status yuran from having line misarrangement)
                                     return data
                                         .map(fee => {
                                             if (fee.fee_category != null && fee.fee_name != null) {

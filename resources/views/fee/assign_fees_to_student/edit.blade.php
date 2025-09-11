@@ -51,8 +51,8 @@
 
                     <div class="form-group">
                         <label>Jantina</label>
-                        <input type="text" name="name" class="form-control" value="{{ $currentStudentFeesData["gender"] }}"
-                            readonly>
+                        <input type="text" name="name" class="form-control"
+                            value="{{ $currentStudentFeesData['gender'] == 'L' ? 'Lelaki' : 'Perempuan' }}" readonly>
                     </div>
 
 
@@ -157,7 +157,7 @@
 
                     result.data.forEach(fee => {
                         // only able to change for debt fees
-                        if (fee.fee_id != null && !selectedFeeIds.includes(fee.fee_id)) {
+                        if (fee.fee_id != null && !selectedFeeIds.includes(fee.fee_id) && fee.fee_category != "Kategori A") {
                             allFees.append("<option value = '" + fee.fee_id + "'>" + fee.fee_category + " - " + fee.fee_name + "</option>");
                         }
                     });

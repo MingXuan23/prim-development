@@ -156,7 +156,7 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('getPendingOrgDatatable', 'OrganizationController@getPendingOrgDatatable')->name('organization.getPendingOrgDatatable');
 
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
-    Route::get('organizations', 'OrganizationController@getAllOrganizationData')->name('organization.getAllOrganizationData');
+    Route::get('organizations', 'OrganizationController@getAllOrganizationJsonData')->name('organization.getAllOrganizationJsonData');
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
     Route::get('testRepeater', 'OrganizationController@testRepeater');

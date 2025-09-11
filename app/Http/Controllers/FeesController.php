@@ -669,7 +669,7 @@ class FeesController extends AppBaseController
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->select('students.*')
                 ->where('classes.id', $class_id)
-                ->where('class_student.fees_status', "LIKE", isset($status) ? $status : "%%")
+                ->where('class_student.fees_status', 'LIKE', isset($status) ? $status : '%%')
                 ->where('class_student.status', 1)
                 ->orderBy('students.nama')
                 ->get();
@@ -1037,6 +1037,41 @@ class FeesController extends AppBaseController
         }
     }
 
+    public function insertNewFeesRecurring($recurringFee, $classStudent, $studentFeesNewId)
+    {
+        // get the data required for storing a new fees_recurring data
+        $recurringDateStarted = Carbon::parse($recurringFee->start_date);
+        $recurringDateEnd = Carbon::parse($recurringFee->end_date);
+        $totalDays = ($recurringDateStarted->diffInDays($recurringDateEnd)) + 1;
+        $classStudentStartDate = Carbon::parse($classStudent->start_date);
+        $totalDaysLeft = ($classStudentStartDate)->diffInDays($recurringDateEnd);
+
+        // if the total days left by the new student is greater than the initial total days given by the recurring fee duration
+        // (new student started before fee starts)
+        // OR if the new student's start date is the same as the fee's start date (the fee and the student start on the same day)
+        if ($totalDaysLeft > $totalDays || $recurringDateStarted->day == $classStudentStartDate->day) {
+            // set the total days left for the student to the initial total days given to pay the fee
+            $totalDaysLeft = $totalDays;
+        }
+
+        // this is to ensure if the student started later than the fee start date, then they only pay a portion of the fee
+        // (based on the formula below)
+        $finalAmount = $recurringFee->totalAmount * ($totalDaysLeft / $totalDays);
+        if ($finalAmount > $recurringFee->totalAmount) {
+            $finalAmount = $recurringFee->totalAmount;
+        }
+
+        // insert a new fees_recurring
+        DB::table('fees_recurring')->insert([
+            'student_fees_new_id' => $studentFeesNewId,
+            'totalDay' => $totalDays,
+            'totalDayLeft' => $totalDaysLeft,
+            'finalAmount' => $finalAmount,
+            'desc' => 'RM' . $recurringFee->totalAmount . '*' . $totalDaysLeft . '/' . $totalDays,
+            'created_at' => now(),
+        ]);
+    }
+
     // show the main page for yuran pelajar (assign yuran for one student)
     public function AssignFeesToStudentIndex()
     {
@@ -1071,46 +1106,67 @@ class FeesController extends AppBaseController
         $studentId = $request->get("student_id");
 
         // get the class_student by student id to obtain its class_student_id to be assigned to student_fees_new
-        $class_student_id = DB::table("class_student as cs")
+        $class_student = DB::table("class_student as cs")
             ->join("class_organization as co", "cs.organclass_id", "=", "co.id")
-            ->select("cs.id as id")
+            ->select("cs.*")
             ->where("co.class_id", "=", $classId)
             ->where("co.organization_id", "=", $oid)
             ->where("cs.student_id", "=", $studentId)
             ->get()
-            ->pluck("id")
             ->first();
 
         // check if the fees are already assigned to the student
         $studentFeesNewData = DB::table("student_fees_new")
-            ->where("class_student_id", "=", $class_student_id)
+            ->where("class_student_id", "=", $class_student->id)
             ->get();
 
         // if fee selected is not in the student_fees_new table, add a new student_fees_new (which means assign the fee to the student)
         if (isset($feesSelected))
             foreach ($feesSelected as $feeId) {
+                // get the fees_new details
+                $fee = DB::table("fees_new")
+                    ->where("id", "=", $feeId)
+                    ->first();
+
                 if (!in_array($feeId, $studentFeesNewData->pluck("fees_id")->toArray())) {
                     // insert a new student_fees_new with status of debt if the student_fees_new does not contain the fees 
-                    DB::table("student_fees_new")->insert([
+                    $studentFeesNewId = DB::table("student_fees_new")->insertGetId([
                         "status" => "Debt",
                         "fees_id" => $feeId,
-                        "class_student_id" => $class_student_id
+                        "class_student_id" => $class_student->id
                     ]);
 
                     // update fees status for class_student to 'Not Complete'
                     DB::table("class_student")
-                        ->where("id", $class_student_id)
+                        ->where("id", "=", $class_student->id)
                         ->update(["fees_status" => "Not Complete"]);
+
+                    // if the kategori is kategori berulang, insert a new data into fees_recurring
+                    if ($fee->category == "Kategori Berulang") {
+                        $this->insertNewFeesRecurring($fee, $class_student, $studentFeesNewId);
+                    }
                 }
             }
 
         // if the student_fees_new contains fees that are not in the fees_selected, remove it (means that admin has removed the fee from this student) 
-        foreach ($studentFeesNewData->pluck("fees_id") as $studentCurrentFeeId) {
-            if (!in_array($studentCurrentFeeId, $feesSelected ?? [])) {
+        foreach ($studentFeesNewData as $sfn) {
+            if (!in_array($sfn->fees_id, $feesSelected ?? [])) {
+                // get the fees_new data for this student_fees_new
+                $fee = DB::table("fees_new")
+                    ->where("id", "=", $sfn->fees_id)
+                    ->first();
+
+                // if the fee category is Kategori Berulang, delete it from the fees_recurring
+                if ($fee->category == "Kategori Berulang") {
+                    DB::table("fees_recurring")
+                        ->where("student_fees_new_id", "=", $sfn->id)
+                        ->delete();
+                }
+
                 // delete data in student_fees_new
                 DB::table("student_fees_new")
-                    ->where("fees_id", "=", $studentCurrentFeeId)
-                    ->where("class_student_id", "=", $class_student_id)
+                    ->where("fees_id", "=", $sfn->fees_id)
+                    ->where("class_student_id", "=", $class_student->id)
                     ->where("status", "=", "Debt")
                     ->delete();
             }
@@ -1153,6 +1209,11 @@ class FeesController extends AppBaseController
             return redirect()->back()->withErrors("Sila pilih kelas.");
         }
 
+        // get the fees_new data
+        $fee = DB::table("fees_new")
+            ->where("id", "=", $feeId)
+            ->first();
+
         // get the class_student by student id to obtain its class_student_id to be assigned to student_fees_new
         $existingStudentIds = DB::table("class_student as cs")
             ->join("class_organization as co", "cs.organclass_id", "=", "co.id")
@@ -1172,26 +1233,29 @@ class FeesController extends AppBaseController
                     // if no, create a new student fees new for that student
 
                     // search for the class_student for that specific student id
-                    $classStudentId = DB::table("class_student as cs")
+                    $classStudent = DB::table("class_student as cs")
                         ->join("class_organization as co", "co.id", "=", "cs.organclass_id")
-                        ->select("cs.id as id")
+                        ->select("cs.*")
                         ->where("co.organization_id", "=", $oid)
                         ->where("co.class_id", "=", $classId)
                         ->where("cs.student_id", "=", $selectedStudentId)
-                        ->get()
-                        ->pluck("id")
                         ->first();
 
                     // update fees status for class_student to 'Not Complete'
                     DB::table("class_student")
-                        ->where("id", $classStudentId)
+                        ->where("id", "=", $classStudent->id)
                         ->update(["fees_status" => "Not Complete"]);
 
-                    DB::table("student_fees_new")->insert([
+                    $studentFeesNewId = DB::table("student_fees_new")->insertGetId([
                         "status" => "Debt",
                         "fees_id" => $feeId,
-                        "class_student_id" => $classStudentId
+                        "class_student_id" => $classStudent->id
                     ]);
+
+                    // insert a new fees_recurring if the fee is Kategori Berulang
+                    if ($fee->category == "Kategori Berulang") {
+                        $this->insertNewFeesRecurring($fee, $classStudent, $studentFeesNewId);
+                    }
                 }
             }
         }
@@ -1200,22 +1264,29 @@ class FeesController extends AppBaseController
         foreach ($existingStudentIds as $existingStudentId) {
             if (!in_array($existingStudentId, $selectedStudentIds ?? [])) {
                 // find the class_student_id to remove
-                $classStudentId = DB::table("class_student as cs")
+                $classStudent = DB::table("class_student as cs")
                     ->join("class_organization as co", "co.id", "=", "cs.organclass_id")
                     ->select("cs.id as id")
                     ->where("co.organization_id", "=", $oid)
                     ->where("co.class_id", "=", $classId)
                     ->where("cs.student_id", "=", $existingStudentId)
-                    ->get()
-                    ->pluck("id")
                     ->first();
 
                 // find the student_fees_new to remove it
-                DB::table("student_fees_new as sfn")
-                    ->where("sfn.class_student_id", "=", $classStudentId)
+                $studentFeesNew = DB::table("student_fees_new as sfn")
+                    ->where("sfn.class_student_id", "=", $classStudent->id)
                     ->where("sfn.fees_id", "=", $feeId)
-                    ->where("sfn.status", "=", "Debt")
-                    ->delete();
+                    ->where("sfn.status", "=", "Debt");
+
+                // delete fees_recurring data for recurring fees
+                if ($fee->category == "Kategori Berulang") {
+                    DB::table("fees_recurring")
+                        ->where("student_fees_new_id", "=", $studentFeesNew->first()->id)
+                        ->delete();
+                }
+
+                // remove student_fees_new
+                $studentFeesNew->delete();
             }
         }
 
