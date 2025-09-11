@@ -46,10 +46,9 @@ Route::group(['prefix' => ''], function () {
 //end wan add
 
 //landing donation page route
-Route::group(['prefix' => 'api/derma', 'namespace' => 'MobileAPI'], function (){
-    Route::post('returnDermaView','DermaController@returnDermaView');
-    Route::get('pointPage','DermaController@pointPage');
-
+Route::group(['prefix' => 'api/derma', 'namespace' => 'MobileAPI'], function () {
+    Route::post('returnDermaView', 'DermaController@returnDermaView');
+    Route::get('pointPage', 'DermaController@pointPage');
 });
 Route::group(['prefix' => 'derma'], function () {
     // routes/web.php
@@ -62,8 +61,6 @@ Route::group(['prefix' => 'derma'], function () {
     Route::get('/organization-donation-custom', 'LandingPageController@customOrganizationTabbing')->name('landingpage.donation.custom');
     Route::get('/organization-donation-bytabbing', 'LandingPageController@getDonationByTabbing')->name('landingpage.donation.bytabbing');
     Route::get('/organization-donation-header', 'LandingPageController@getHeaderPoster')->name('landingpage.donation.header');
-
-
 });
 
 //landing fees page route
@@ -87,19 +84,14 @@ Route::group(['prefix' => 'codereq'], function () {
     Route::post('validateRequest', 'CodeRequestController@validateRequest')->name('codereq.validateRequest');
     Route::post('list_by_email', 'CodeRequestController@list_by_email')->name('codereq.list_by_email');
     Route::get('receipt/{token}', 'CodeRequestController@receipt')->name('codereq.receipt');
-  
 });
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'codereq'], function () {
-   
+
     Route::get('helperList', 'CodeRequestController@helperList')->name('codereq.helperList');
     Route::post('list_by_helper', 'CodeRequestController@list_by_helper')->name('codereq.list_by_helper');
     Route::get('helper_join_request/{id}/{status}', 'CodeRequestController@helper_join_request')->name('codereq.helper_join_request');
     Route::get('show_source_code/{id}/', 'CodeRequestController@show_source_code')->name('codereq.show_source_code');
-
-
-
-  
 });
 
 // Route::group(['prefix' => 's-helper'], function () {
@@ -109,7 +101,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'codereq'], function () {
 
 Route::get('s-helper/show', 'CodeRequestController@show')->name('codereq.showlist');
 
-Route::resource('s-helper', 'CodeRequestController')->names('s_helper'); 
+Route::resource('s-helper', 'CodeRequestController')->names('s_helper');
 Route::resource('codereq', 'CodeRequestController')->names('codereq');
 
 
@@ -134,7 +126,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     Route::get('history', 'DonationController@historyDonor')->name('donate.donor_history');
     Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('donate.donor_history_datatable');
 
-   //Route::get('getReferralCode', 'PointController@getReferralCode')->name('donate.getReferralCode');
+    //Route::get('getReferralCode', 'PointController@getReferralCode')->name('donate.getReferralCode');
 });
 
 
@@ -147,25 +139,24 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
     Route::get('donationStreak/{id}', 'PointController@viewDonationStreak')->name('point.viewDonationStreak');
     Route::get('getDonationStreakTransactionTable/{id}', 'PointController@getDonationStreakTransactionTable')->name('point.getDonationStreakTransactionTable');
 
-    
+
     Route::get('spinningWheel', 'PointController@spinningWheel')->name('point.spinningWheel');
-    Route::get('shareReferralLink','PointController@shareReferralLink')->name('point.shareReferralLink');
+    Route::get('shareReferralLink', 'PointController@shareReferralLink')->name('point.shareReferralLink');
     Route::get('getReferralCode', 'PointController@getReferralCode')->name('point.getReferralCode');
     Route::get('reward', 'ReferralCodeRewardController@view')->name('point.viewreward');
-
-
 });
 
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');
 Route::get('sumbangan_anonymous/{link}', 'DonationController@anonymouIndex')->name('ANONdonate');
 
 Route::group(['prefix' => 'organization'], function () {
-    Route::get('manage','OrganizationController@manage')->name('organization.manage');
-    Route::post('updateSellerId','OrganizationController@updateSellerId')->name('organization.updateSellerId');
+    Route::get('manage', 'OrganizationController@manage')->name('organization.manage');
+    Route::post('updateSellerId', 'OrganizationController@updateSellerId')->name('organization.updateSellerId');
 
-    Route::get('getPendingOrgDatatable','OrganizationController@getPendingOrgDatatable')->name('organization.getPendingOrgDatatable');
+    Route::get('getPendingOrgDatatable', 'OrganizationController@getPendingOrgDatatable')->name('organization.getPendingOrgDatatable');
 
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
+    Route::get('organizations', 'OrganizationController@getAllOrganizationJsonData')->name('organization.getAllOrganizationJsonData');
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
     Route::get('testRepeater', 'OrganizationController@testRepeater');
@@ -193,34 +184,33 @@ Route::post('importSubject', 'SubjectController@subjectImport')->name('importSub
 
 Route::get('leaveReliefPolicy', 'Schedule\ScheduleController@leaveReliefPolicy')->name('schedule.leaveReliefPolicy');
 
-Route::group(['prefix' => 'schedule','namespace' => 'Schedule','middleware' => ['auth']], function () {
+Route::group(['prefix' => 'schedule', 'namespace' => 'Schedule', 'middleware' => ['auth']], function () {
 
-    Route::get('getVersion/{oid}','ScheduleController@getVersion')->name('schedule.getVersion');
+    Route::get('getVersion/{oid}', 'ScheduleController@getVersion')->name('schedule.getVersion');
 
-    Route::get('getScheduleStatus/{id}','ScheduleController@getScheduleStatus')->name('schedule.getScheduleStatus');
-    Route::post('updateSchedule','ScheduleController@updateSchedule')->name('schedule.updateSchedule');
-    Route::get('getScheduleView/{class_id}','ScheduleController@getScheduleView')->name('schedule.getScheduleView');
+    Route::get('getScheduleStatus/{id}', 'ScheduleController@getScheduleStatus')->name('schedule.getScheduleStatus');
+    Route::post('updateSchedule', 'ScheduleController@updateSchedule')->name('schedule.updateSchedule');
+    Route::get('getScheduleView/{class_id}', 'ScheduleController@getScheduleView')->name('schedule.getScheduleView');
 
-    Route::get('manageRelief','ScheduleController@manageReliefIndex')->name('schedule.manageRelief');
-    Route::post('getAllTeacher','ScheduleController@getAllTeacher')->name('schedule.getAllTeacher');
-    Route::post('datatablePendingRelief','ScheduleController@datatablePendingRelief')->name('schedule.datatablePendingRelief');
+    Route::get('manageRelief', 'ScheduleController@manageReliefIndex')->name('schedule.manageRelief');
+    Route::post('getAllTeacher', 'ScheduleController@getAllTeacher')->name('schedule.getAllTeacher');
+    Route::post('datatablePendingRelief', 'ScheduleController@datatablePendingRelief')->name('schedule.datatablePendingRelief');
 
 
-    Route::any('getFreeTeacher','ScheduleController@getFreeTeacher')->name('schedule.getFreeTeacher');
-    Route::post('autoSuggestRelief','ScheduleController@autoSuggestRelief')->name('schedule.autoSuggestRelief');
+    Route::any('getFreeTeacher', 'ScheduleController@getFreeTeacher')->name('schedule.getFreeTeacher');
+    Route::post('autoSuggestRelief', 'ScheduleController@autoSuggestRelief')->name('schedule.autoSuggestRelief');
 
-    Route::get('reliefReport','ScheduleController@reliefReportIndex')->name('schedule.reliefReport');
-    Route::get('notifyTeacher/{lrid}','ScheduleController@notifyTeacher')->name('schedule.notifyTeacher');
+    Route::get('reliefReport', 'ScheduleController@reliefReportIndex')->name('schedule.reliefReport');
+    Route::get('notifyTeacher/{lrid}', 'ScheduleController@notifyTeacher')->name('schedule.notifyTeacher');
 
-    Route::post('getReliefReport','ScheduleController@getReliefReport')->name('schedule.getReliefReport');
+    Route::post('getReliefReport', 'ScheduleController@getReliefReport')->name('schedule.getReliefReport');
 
-    Route::post('saveRelief','ScheduleController@saveRelief')->name('schedule.saveRelief');
-    Route::post('addTeacherLeave','ScheduleController@addTeacherLeave')->name('schedule.addTeacherLeave');
-    Route::post('getTeacherOfOrg','ScheduleController@getTeacherOfOrg')->name('schedule.getTeacherOfOrg');
+    Route::post('saveRelief', 'ScheduleController@saveRelief')->name('schedule.saveRelief');
+    Route::post('addTeacherLeave', 'ScheduleController@addTeacherLeave')->name('schedule.addTeacherLeave');
+    Route::post('getTeacherOfOrg', 'ScheduleController@getTeacherOfOrg')->name('schedule.getTeacherOfOrg');
 
-    Route::post('getTeacherSlot','ScheduleController@getTeacherSlot')->name('schedule.getTeacherSlot');
-    Route::post('adminManageRelief','ScheduleController@adminManageRelief')->name('schedule.adminManageRelief');
-
+    Route::post('getTeacherSlot', 'ScheduleController@getTeacherSlot')->name('schedule.getTeacherSlot');
+    Route::post('adminManageRelief', 'ScheduleController@adminManageRelief')->name('schedule.adminManageRelief');
 });
 Route::post('importSchedule', 'Schedule\ScheduleController@scheduleImport')->name('importSchedule');
 Route::post('importScheduleSubject', 'Schedule\ScheduleController@scheduleSubjectImport')->name('importScheduleSubject');
@@ -242,8 +232,8 @@ Route::group(['prefix' => 'student'], function () {
 });
 
 Route::group(['prefix' => 'fees'], function () {
-    Route::post('/test/submitSamuraForm','FeesController@submitSamuraForm')->name('fees.test.submitSamuraForm');
-    Route::get('/test/samuraFeeForm','FeesController@samuraFeeForm')->name('fees.test.samuraFeeForm');
+    Route::post('/test/submitSamuraForm', 'FeesController@submitSamuraForm')->name('fees.test.submitSamuraForm');
+    Route::get('/test/samuraFeeForm', 'FeesController@samuraFeeForm')->name('fees.test.samuraFeeForm');
 
     Route::post('/year', 'FeesController@fetchYear')->name('fees.fetchYear');
     Route::post('/class', 'FeesController@fetchClass')->name('fees.fetchClass');
@@ -270,6 +260,19 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/C', 'FeesController@CategoryC')->name('fees.C');
     Route::get('/add/C', 'FeesController@createCategoryC')->name('fees.createC');
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
+
+    // pages and routes for assigning multiple fees to one student
+    Route::get('/assignFeesToStudent', 'FeesController@AssignFeesToStudentIndex')->name('fees.assignFeesToStudentIndex');
+    Route::get('/assignFeesToStudent/class', 'FeesController@fetchOneStudentToManyFeesDatatable')->name('fees.fetchOneStudentToManyFeesDatatable');
+    Route::get('/allStudentFees/org', 'FeesController@fetchAllFeesDatatableByOrg')->name('fees.fetchAllFeesDatatableByOrg');
+    Route::get('/assignFeesToStudent/edit', 'FeesController@AssignFeesToStudentEdit')->name('fees.assignFeesToStudentEdit');
+    Route::post('/assignFeesToStudent/update', 'FeesController@AssignFeesToStudentUpdate')->name('fees.assignFeesToStudentUpdate');
+
+    // pages and routes for assigning multiple students to one fee
+    Route::get('/assignStudentsToFee/class', 'FeesController@fetchOneFeeToManyStudentsJson')->name('fees.fetchOneFeeToManyStudentsJson');
+    Route::get('/assignStudentsToFee', 'FeesController@AssignStudentsToFeeIndex')->name('fees.assignStudentsToFeeIndex');
+    Route::get('/assignStudentsToFee/edit', 'FeesController@AssignStudentsToFeeEdit')->name('fees.assignStudentsToFeeEdit');
+    Route::post('/assignStudentsToFee/update', 'FeesController@AssignStudentsToFeeUpdate')->name('fees.assignStudentsToFeeUpdate');
 
     //wan add
     Route::get('/Recurring', 'FeesController@CategoryRecurring')->name('fees.Recurring');
@@ -335,21 +338,22 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'profile'], function () {
     Route::get('/resetPwd', 'ProfileController@showChangePwd')->name('profile.resetPassword');
     Route::post('/updatePwd/{id}', 'ProfileController@updatePwd')->name('profile.updatePwd');
 });
-Route::group([ 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
-    Route::group(['namespace' => 'User'], function() {
+Route::group(['prefix' => 'koperasi', 'namespace' => 'Cooperative'], function () {
+    Route::group(['namespace' => 'User'], function () {
         Route::get('/selectedItemCart/{group_id}/{product_name}', 'UserCooperativeController@selectedItemCart')->name('koperasi.selectedItemCart');
     });
 });
 
-Route::group([ 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
-    Route::group(['namespace' => 'User'], function() {
-        Route::get('/koop/{id}','UserCooperativeController@koopShop')->name('koperasi.koopShop');
-
-    }
+Route::group(['prefix' => 'koperasi', 'namespace' => 'Cooperative'], function () {
+    Route::group(
+        ['namespace' => 'User'],
+        function () {
+            Route::get('/koop/{id}', 'UserCooperativeController@koopShop')->name('koperasi.koopShop');
+        }
     );
 });
-Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function() {
-    Route::group(['namespace' => 'User'], function() {
+Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => 'Cooperative'], function () {
+    Route::group(['namespace' => 'User'], function () {
         // Koop School
         Route::delete('/{org_id}/edit', 'UserCooperativeController@destroyItemCart')->name('koperasi.destroyItemCart');
         Route::post('/koperasi/fetchKoop', 'UserCooperativeController@fetchKoop')->name('koperasi.fetchKoop');
@@ -362,13 +366,13 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/{id}/list', 'UserCooperativeController@indexList')->name('koperasi.list');
 
         // Koop_Shop
-        Route::get('/koop','UserCooperativeController@indexKoop')->name('koperasi.indexKoop');
-        Route::post('/koop/productsListByGroup','UserCooperativeController@productsListByGroup')->name('koperasi.productsListByGroup');
-        Route::get('/koop/store/{id}','UserCooperativeController@storeKoop')->name('koperasi.storeKoop');
-        Route::get('/koop/{id}/cart','UserCooperativeController@koopCart')->name('koperasi.koopCart');
-        Route::post('/koop/{id}/fetchItemToModel','UserCooperativeController@fetchItemToModel')->name('koperasi.fetchItemToModel');
-        Route::post('/koop/storeInCart','UserCooperativeController@storeInCart')->name('koperasi.storeInCart');
-        Route::post('/checkCart','UserCooperativeController@checkCart')->name('koperasi.checkCart');
+        Route::get('/koop', 'UserCooperativeController@indexKoop')->name('koperasi.indexKoop');
+        Route::post('/koop/productsListByGroup', 'UserCooperativeController@productsListByGroup')->name('koperasi.productsListByGroup');
+        Route::get('/koop/store/{id}', 'UserCooperativeController@storeKoop')->name('koperasi.storeKoop');
+        Route::get('/koop/{id}/cart', 'UserCooperativeController@koopCart')->name('koperasi.koopCart');
+        Route::post('/koop/{id}/fetchItemToModel', 'UserCooperativeController@fetchItemToModel')->name('koperasi.fetchItemToModel');
+        Route::post('/koop/storeInCart', 'UserCooperativeController@storeInCart')->name('koperasi.storeInCart');
+        Route::post('/checkCart', 'UserCooperativeController@checkCart')->name('koperasi.checkCart');
 
         //Route::get('/testPay','UserCooperativeController@testPay')->name('koperasi.testPay');
         //created for test action after payment only
@@ -376,42 +380,42 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
 
     });
 
-    Route::group(['namespace' => 'Admin'], function() {
-        Route::get('/produkmenu','AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
-        Route::get('/fetchprodukmenu/{koopId}','AdminProductCooperativeController@getProductMenuByOrgId')->name('koperasi.changeProductMenu');
-        Route::get('/produkmenu/delete/{id}','AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
-        Route::post('/produkmenu/deleteSelectedProducts','AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
-        Route::get('/produkmenu/getProductList','AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
-        Route::post('/produktype/getProductNumOfGroup','AdminProductCooperativeController@getProductNumOfGroup')->name('koperasi.getProductNumOfGroup');
+    Route::group(['namespace' => 'Admin'], function () {
+        Route::get('/produkmenu', 'AdminProductCooperativeController@productMenu')->name('koperasi.productMenu');
+        Route::get('/fetchprodukmenu/{koopId}', 'AdminProductCooperativeController@getProductMenuByOrgId')->name('koperasi.changeProductMenu');
+        Route::get('/produkmenu/delete/{id}', 'AdminProductCooperativeController@deleteType')->name('koperasi.deleteType');
+        Route::post('/produkmenu/deleteSelectedProducts', 'AdminProductCooperativeController@deleteSelectedProducts')->name('koperasi.deleteSelectedProducts');
+        Route::get('/produkmenu/getProductList', 'AdminProductCooperativeController@getProductList')->name('koperasi.getProductList');
+        Route::post('/produktype/getProductNumOfGroup', 'AdminProductCooperativeController@getProductNumOfGroup')->name('koperasi.getProductNumOfGroup');
 
 
-        Route::any('/produktype','AdminProductCooperativeController@createType')->name('koperasi.addtype');
-        Route::post('/produktype/add','AdminProductCooperativeController@storeType')->name('koperasi.storeType');
-        Route::post('/produktype/update/{id}','AdminProductCooperativeController@updateType')->name('koperasi.updateType');
-        Route::get('/produktype/edit/{id}','AdminProductCooperativeController@editType')->name('koperasi.editType');
+        Route::any('/produktype', 'AdminProductCooperativeController@createType')->name('koperasi.addtype');
+        Route::post('/produktype/add', 'AdminProductCooperativeController@storeType')->name('koperasi.storeType');
+        Route::post('/produktype/update/{id}', 'AdminProductCooperativeController@updateType')->name('koperasi.updateType');
+        Route::get('/produktype/edit/{id}', 'AdminProductCooperativeController@editType')->name('koperasi.editType');
         Route::post('/importproducttype', 'AdminProductCooperativeController@importproducttype')->name('importproducttype');
         Route::post('/importproduct', 'AdminProductCooperativeController@importproduct')->name('importproduct');
 
-        Route::get('/admin','AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
-        Route::post('/produk','AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
-        Route::post('/storeproduk','AdminProductCooperativeController@storeProduct')->name('koperasi.storeProduct');
-        Route::get('/produk/update/{id}','AdminProductCooperativeController@editProduct')->name('koperasi.editProduct');
-        Route::post('/produk/update/{id}','AdminProductCooperativeController@updateProduct')->name('koperasi.updateProduct');
-        Route::get('/produk/delete/{id}','AdminProductCooperativeController@deleteProduct')->name('koperasi.deleteProduct');
+        Route::get('/admin', 'AdminProductCooperativeController@indexAdmin')->name('koperasi.indexAdmin');
+        Route::post('/produk', 'AdminProductCooperativeController@createProduct')->name('koperasi.createProduct');
+        Route::post('/storeproduk', 'AdminProductCooperativeController@storeProduct')->name('koperasi.storeProduct');
+        Route::get('/produk/update/{id}', 'AdminProductCooperativeController@editProduct')->name('koperasi.editProduct');
+        Route::post('/produk/update/{id}', 'AdminProductCooperativeController@updateProduct')->name('koperasi.updateProduct');
+        Route::get('/produk/delete/{id}', 'AdminProductCooperativeController@deleteProduct')->name('koperasi.deleteProduct');
 
 
-        Route::get('/openingHours','AdminOpeningHoursCooperativeController@indexOpening')->name('koperasi.indexOpening');
-        Route::get('/openingChangeKoperasi','AdminOpeningHoursCooperativeController@openingChangeKoperasi')->name('koperasi.openingChangeKoperasi');
-        Route::post('/openingHours','AdminOpeningHoursCooperativeController@storeOpening')->name('koperasi.storeOpening');
+        Route::get('/openingHours', 'AdminOpeningHoursCooperativeController@indexOpening')->name('koperasi.indexOpening');
+        Route::get('/openingChangeKoperasi', 'AdminOpeningHoursCooperativeController@openingChangeKoperasi')->name('koperasi.openingChangeKoperasi');
+        Route::post('/openingHours', 'AdminOpeningHoursCooperativeController@storeOpening')->name('koperasi.storeOpening');
 
-        Route::get('/Confirm','AdminOrderCooperativeController@indexConfirm')->name('koperasi.indexConfirm');
-        Route::get('/fetchConfirmTable','AdminOrderCooperativeController@fetchConfirmTable')->name('koperasi.fetchConfirmTable');
+        Route::get('/Confirm', 'AdminOrderCooperativeController@indexConfirm')->name('koperasi.indexConfirm');
+        Route::get('/fetchConfirmTable', 'AdminOrderCooperativeController@fetchConfirmTable')->name('koperasi.fetchConfirmTable');
 
-        Route::get('/Confirm/update/{id}','AdminOrderCooperativeController@storeConfirm')->name('koperasi.storeConfirm');
-        Route::get('/Confirm/delete/{id}','AdminOrderCooperativeController@notConfirm')->name('koperasi.notConfirm');
+        Route::get('/Confirm/update/{id}', 'AdminOrderCooperativeController@storeConfirm')->name('koperasi.storeConfirm');
+        Route::get('/Confirm/delete/{id}', 'AdminOrderCooperativeController@notConfirm')->name('koperasi.notConfirm');
 
-        Route::get('/returnProdukMenu/{page}','AdminProductCooperativeController@returnProdukMenu')->name('koperasi.return');
-        Route::get('/fetchClassyear','AdminProductCooperativeController@fetchClassyear')->name('koperasi.fetchClassYear');
+        Route::get('/returnProdukMenu/{page}', 'AdminProductCooperativeController@returnProdukMenu')->name('koperasi.return');
+        Route::get('/fetchClassyear', 'AdminProductCooperativeController@fetchClassyear')->name('koperasi.fetchClassYear');
 
         Route::get('/{id}/{customerID}/list', 'AdminOrderCooperativeController@viewPgngList')->name('koperasi.viewPgngList');
         Route::get('returnFromList/{url}/{koopId}', 'AdminOrderCooperativeController@returnFromList')->name('koperasi.returnFromList');
@@ -419,34 +423,32 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'koperasi', 'namespace' => '
         Route::get('/fetchAdminHistory', 'AdminOrderCooperativeController@fetchAdminHistory')->name('koperasi.fetchAdminHistory');
 
         Route::get('/exportKoperasiOverview/{id}', 'AdminOrderCooperativeController@exportKoperasiOverview')->name('koperasi.exportKoperasiOverview');
-
     });
 });
 
-                                //// *** Get & Go ***////
-Route::group(['namespace' => 'Merchant'], function() {
-    Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function() {
-    Route::get('/product', 'ProductController@index')->name('merchant-product.index');
-    Route::get('/product/{id}', 'ProductController@show')->name('merchant-product.show');
-    Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
-
+//// *** Get & Go ***////
+Route::group(['namespace' => 'Merchant'], function () {
+    Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function () {
+        Route::get('/product', 'ProductController@index')->name('merchant-product.index');
+        Route::get('/product/{id}', 'ProductController@show')->name('merchant-product.show');
+        Route::get('', 'LandingPageController@index')->name('merchant-reg.index');
     });
 });
 
 
-Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
-    Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function() {
+Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function () {
+    Route::group(['prefix' => 'getngo', 'namespace' => 'Regular'], function () {
         // Index
         Route::get('fetch-merchant', 'LandingPageController@test_index')->name('merchant.fetch-merchant');
         //Product
-        Route::get('/cart','ProductController@showAllCart')->name('merchant.all-cart');//to show all products in cart
-        Route::put('update-cart','ProductController@updateCart')->name('merchant.update-cart');//to update  a cart
-        Route::get('load-cart-counter','ProductController@loadCartCounter')->name('merchant.load-cart-counter');
-        Route::get('get-actual-total-price','ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
+        Route::get('/cart', 'ProductController@showAllCart')->name('merchant.all-cart'); //to show all products in cart
+        Route::put('update-cart', 'ProductController@updateCart')->name('merchant.update-cart'); //to update  a cart
+        Route::get('load-cart-counter', 'ProductController@loadCartCounter')->name('merchant.load-cart-counter');
+        Route::get('get-actual-total-price', 'ProductController@getTotalPrice')->name('merchant.get-actual-total-price');
 
-         Route::get('/testPayment','ProductController@testPayment')->name('merchant.testPayment');
+        Route::get('/testPayment', 'ProductController@testPayment')->name('merchant.testPayment');
 
-         // Checkout
+        // Checkout
         Route::get('{id}/checkout', 'ProductController@checkOut')->name('merchant.checkout');
         Route::get('get-checkout-items', 'ProductController@getCheckoutItems')->name('merchant.get-checkout-items');
         // Get all cart
@@ -454,14 +456,14 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         // Orders
         Route::get('all-orders', 'HistoryController@index')->name('merchant.all-orders');
         Route::get('get-all-orders', 'HistoryController@getAllOrder')->name('merchant.get-all-orders');
-        Route::post('picked-up-order','HistoryController@orderPickedUp')->name('merchant.order-picked-up');
+        Route::post('picked-up-order', 'HistoryController@orderPickedUp')->name('merchant.order-picked-up');
         Route::delete('delete-order', 'HistoryController@deletePaidOrder')->name('merchant.delete-order');
         Route::get('all-orders/history', 'HistoryController@history')->name('merchant.order-history');
         Route::get('get-order-history', 'HistoryController@getOrderHistory')->name('merchant.get-order-history');
         Route::get('{order_id}/order-details', 'HistoryController@showOrderDetail')->name('merchant.order-detail');
         Route::get('{transaction_id}/order-details-transaction', 'HistoryController@showOrderDetailTransaction')->name('merchant.order-detail-transaction');
         // Menu
-       // Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
+        // Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
         Route::post('get-counter', 'OrderController@countItemsInCart')->name('merchant-reg.count-cart');
 
         Route::post('store-item', 'OrderController@storeItemInCart')->name('merchant-reg.store-item');
@@ -471,11 +473,9 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::post('fetch-disabled-dates', 'OrderController@fetchDisabledDates')->name('merchant-reg.disabled-dates');
         Route::post('fetch-hours', 'OrderController@fetchOperationHours')->name('merchant-reg.fetch-hours');
         Route::post('{org_id}/cart/{order_id}/payment', 'OrderController@store')->name('merchant-reg.store-order');
-
-
     });
 
-    Route::group(['prefix' => 'admin', 'namespace' => 'AdminRegular'], function() {
+    Route::group(['prefix' => 'admin', 'namespace' => 'AdminRegular'], function () {
         # Main Dashboard
         Route::get('/home', 'DashboardController@index')->name('admin-reg.home');
         Route::get('get-latest-orders', 'DashboardController@getLatestOrdersByNow')->name('admin-reg.latest-orders');
@@ -512,12 +512,12 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('orders', 'OrderController@index')->name('admin-reg.orders');
         Route::get('all-orders', 'OrderController@getAllOrders')->name('admin-reg.all-orders');
         Route::get('count-orders', 'OrderController@countTotalOrders')->name('admin-reg.count-orders');
-        Route::post('picked-up-order','OrderController@orderPickedUp')->name('admin-reg.order-picked-up');
+        Route::post('picked-up-order', 'OrderController@orderPickedUp')->name('admin-reg.order-picked-up');
         Route::delete('destroy-order', 'OrderController@destroy')->name('admin-reg.destroy-order');
         Route::get('all-orders/{id}/history', 'OrderController@showHistory')->name('admin-reg.history');
         Route::get('all-histories', 'OrderController@getAllHistories')->name('admin-reg.all-histories');
 
-        Route::put('update-service-charge/{id}','OrderController@updateServiceCharge' )->name('admin-reg.updateServiceCharge');
+        Route::put('update-service-charge/{id}', 'OrderController@updateServiceCharge')->name('admin-reg.updateServiceCharge');
         # Report Dashboard
         Route::get('/sales-report', 'ReportController@index')->name('admin-reg.report');
         Route::get('get-report', 'ReportController@getReport')->name('admin-reg.get-report');
@@ -531,11 +531,11 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Merchant'], function() {
         Route::get('order-details/{order_id}', 'OrderController@showList')->name('admin-reg.order-detail');
     });
 });
-                                        //// ***End of Get & Go ***////
+//// ***End of Get & Go ***////
 
 //without login
-Route::group(['namespace' => 'Merchant\Regular'], function() {
-    Route::group(['prefix' => 'getngo'], function() {
+Route::group(['namespace' => 'Merchant\Regular'], function () {
+    Route::group(['prefix' => 'getngo'], function () {
         Route::get('{id}', 'OrderController@index')->name('merchant-reg.show');
         Route::post('fetch-item', 'OrderController@fetchItem')->name('merchant-reg.fetch-item');
     });
@@ -585,15 +585,15 @@ Route::group(['middleware' => ['auth']], function () {
         'dorm'               => 'DormController',
         'koperasi'           => 'Cooperative\User\UserCooperativeController',
         'delivery'           => 'DeliveryController',
-        'point'             =>'PointController',
-        'admin/reward'            =>'ReferralCodeRewardController'
+        'point'             => 'PointController',
+        'admin/reward'            => 'ReferralCodeRewardController'
     ]);
 });
 Route::get('adminTestFpx/{id}/', 'DirectPayController@adminTestFpx')->name('adminTestFpx');
 Route::get('adminHandle', 'DirectPayController@handle');
 Route::get('testcallback', 'DirectPayController@testcallback');
 
-Route::get('getTransactionInfo/{id}','DirectPayController@getTransactionInfo');
+Route::get('getTransactionInfo/{id}', 'DirectPayController@getTransactionInfo');
 Route::get('paydonate', 'PayController@donateindex')->name('paydonate');
 Route::get('donateFromMobile', 'PayController@donateFromMobile');
 Route::post('trn', 'PayController@transaction')->name('trn');
@@ -780,136 +780,136 @@ Route::group(['prefix' => 'sekolah'], function () {
 
 Route::group(['prefix' => 'delivery'], function () {
     Route::get('/index', 'DeliveryController@index')->name('delivery.parcelIndex');
-   //Route::get('')
+    //Route::get('')
 });
 
-    //// *** Book & Stay ***////
-    Route::group(['prefix' => 'booknstay'], function () {
-        // Homestay Guest
-        Route::get('home', 'HomestayController@homePage')->name('homestay.homePage');
-        Route::get('homestay/{id}_{name}', 'HomestayController@showRoom')->name('homestay.showRoom');
-        Route::get('fetch-unavailable-dates', 'HomestayController@fetchUnavailableDates')->name('homestay.fetchUnavailableDates');
-        Route::get('fetch-discount-increase-dates', 'HomestayController@fetchDiscountIncreaseDates')->name('homestay.fetchDiscountIncreaseDates');
-        Route::get('calculate-total-price', 'HomestayController@calculateTotalPrice')->name('homestay.calculateTotalPrice');
-        Route::get('autocomplete-search', 'HomestayController@autocompleteSearch')->name('homestay.autocompleteSearch');
-        Route::get('search-room','HomestayController@searchRoom')->name('homestay.searchRoom');
-        // Route::get('generate-booking-details-pdf/{id}','HomestayController@generateBookingDetailsPdf')->name('homestay.generateBookingDetailsPdf');
-        Route::get('get-more-reviews','HomestayController@getMoreReviews')->name('homestay.getMoreReviews');
-        Route::group(['middleware' => 'auth'], function(){
-//            Route::post('test-payment', 'HomestayController@testPayment')->name('homestay.testPayment');
+//// *** Book & Stay ***////
+Route::group(['prefix' => 'booknstay'], function () {
+    // Homestay Guest
+    Route::get('home', 'HomestayController@homePage')->name('homestay.homePage');
+    Route::get('homestay/{id}_{name}', 'HomestayController@showRoom')->name('homestay.showRoom');
+    Route::get('fetch-unavailable-dates', 'HomestayController@fetchUnavailableDates')->name('homestay.fetchUnavailableDates');
+    Route::get('fetch-discount-increase-dates', 'HomestayController@fetchDiscountIncreaseDates')->name('homestay.fetchDiscountIncreaseDates');
+    Route::get('calculate-total-price', 'HomestayController@calculateTotalPrice')->name('homestay.calculateTotalPrice');
+    Route::get('autocomplete-search', 'HomestayController@autocompleteSearch')->name('homestay.autocompleteSearch');
+    Route::get('search-room', 'HomestayController@searchRoom')->name('homestay.searchRoom');
+    // Route::get('generate-booking-details-pdf/{id}','HomestayController@generateBookingDetailsPdf')->name('homestay.generateBookingDetailsPdf');
+    Route::get('get-more-reviews', 'HomestayController@getMoreReviews')->name('homestay.getMoreReviews');
+    Route::group(['middleware' => 'auth'], function () {
+        //            Route::post('test-payment', 'HomestayController@testPayment')->name('homestay.testPayment');
 
-            // Homestay Customer
-            Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
-            Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
-            Route::post('add-review', 'HomestayController@addReview')->name('homestay.addReview');
-            Route::get('booking-details/{id}','HomestayController@bookingDetails')->name('homestay.bookingDetails');
-            Route::get('test-receipt','HomestayController@testReceipt')->name('homestay.testReceipt');
-            // Homestay Management
-            Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
-            Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
-            Route::get('tambahbilik', 'HomestayController@tambahbilik')->name('homestay.tambahbilik');
-            Route::post('addroom', 'HomestayController@addroom')->name('homestay.addroom');
-            Route::get('edit-room/{id}', 'HomestayController@editRoomPage')->name('homestay.editRoomPage');
-            Route::post('update-room', 'HomestayController@updateRoom')->name('homestay.updateRoom');
-            Route::post('delete-room', 'HomestayController@deleteRoom')->name('homestay.deleteRoom');
-            Route::get('urustempahan', 'HomestayController@urustempahan')->name('homestay.urustempahan');
-            Route::get('get-booking-data', 'HomestayController@getBookingData')->name('homestay.getBookingData');
-            Route::post('checkout-homestay', 'HomestayController@checkoutHomestay')->name('homestay.checkoutHomestay');
-            Route::post('cancel-booking', 'HomestayController@cancelBooking')->name('homestay.cancelBooking');
-            Route::get('view-booking-history/{id}','HomestayController@viewBookingHistory')->name('homestay.viewBookingHistory');
-            Route::get('get-booking-history-data', 'HomestayController@getBookingHistoryData')->name('homestay.getBookingHistoryData');
-            Route::put('update-deposit-charge/{id}','HomestayController@updateDepositCharge')->name('homestay.updateDepositCharge');
-            Route::get('view-customers-reviews','HomestayController@viewCustomersReview')->name('homestay.viewCustomersReview');
-            Route::get('get-customers-review', 'HomestayController@getCustomersReview')->name('homestay.getCustomersReview');
-            Route::get('view-performance-report','HomestayController@viewPerformanceReport')->name('homestay.viewPerformanceReport');
-            Route::get('get-report-data', 'HomestayController@getReportData')->name('homestay.getReportData');
-            Route::post('send-reminder' ,'HomestayController@sendReminder')->name('homestay.sendReminder');
-            // Homestay Dates Management
-            Route::get('homestay-date', 'HomestayController@manageDate')->name('homestay.manageDate');
-            Route::get('get-organization-homestays', 'HomestayController@getOrganizationHomestays')->name('homestay.getOrganizationHomestays');
-            Route::get('get-disabled-dates', 'HomestayController@getDisabledDates')->name('homestay.getDisabledDates');
-            Route::post('add-disabled-date', 'HomestayController@addDisableDate')->name('homestay.addDisabledDate');
-            Route::put('update-disabled-date', 'HomestayController@updateDisabledDate')->name('homestay.updateDisabledDate');
-            Route::delete('delete-disabled-date', 'HomestayController@deleteDisabledDate')->name('homestay.deleteDisabledDate');
-            //Homestay Promotion
-            Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');
-            Route::get('get-promotion-data', 'HomestayController@getPromotionData')->name('homestay.getPromotionData');
-            Route::get('setpromotion/{id}', 'HomestayController@setpromotion')->name('homestay.setpromotion');
-            Route::get('fetch-unavailable-promotion-dates', 'HomestayController@fetchUnavailablePromotionDates')->name('homestay.fetchUnavailablePromotionDates');
-            Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
-            Route::get('edit-promotion/{id}','HomestayController@editPromotionPage')->name('homestay.editPromotionPage');
-            Route::get('fetch-unavailable-edit-promotion-dates', 'HomestayController@fetchUnavailableEditPromotionDates')->name('homestay.fetchUnavailableEditPromotionDates');
-            Route::post('update-promotion', 'HomestayController@updatePromotion')->name('homestay.updatePromotion');
-            Route::post('delete-promotion', 'HomestayController@deletePromotion')->name('homestay.deletePromotion');
-            Route::get('view-promotion-history/{id}', 'HomestayController@viewPromotionHistory')->name('homestay.viewPromotionHistory');
-            Route::get('get-promotion-history', 'HomestayController@getPromotionHistory')->name('homestay.getPromotionHistory');
-        });
+        // Homestay Customer
+        Route::post('book-room', 'HomestayController@bookRoom')->name('homestay.bookRoom');
+        Route::get('tempahananda', 'HomestayController@tempahananda')->name('homestay.tempahananda');
+        Route::post('add-review', 'HomestayController@addReview')->name('homestay.addReview');
+        Route::get('booking-details/{id}', 'HomestayController@bookingDetails')->name('homestay.bookingDetails');
+        Route::get('test-receipt', 'HomestayController@testReceipt')->name('homestay.testReceipt');
+        // Homestay Management
+        Route::get('urusbilik', 'HomestayController@urusbilik')->name('homestay.urusbilik');
+        Route::get('gettabledata', 'HomestayController@gettabledata')->name('homestay.gettabledata');
+        Route::get('tambahbilik', 'HomestayController@tambahbilik')->name('homestay.tambahbilik');
+        Route::post('addroom', 'HomestayController@addroom')->name('homestay.addroom');
+        Route::get('edit-room/{id}', 'HomestayController@editRoomPage')->name('homestay.editRoomPage');
+        Route::post('update-room', 'HomestayController@updateRoom')->name('homestay.updateRoom');
+        Route::post('delete-room', 'HomestayController@deleteRoom')->name('homestay.deleteRoom');
+        Route::get('urustempahan', 'HomestayController@urustempahan')->name('homestay.urustempahan');
+        Route::get('get-booking-data', 'HomestayController@getBookingData')->name('homestay.getBookingData');
+        Route::post('checkout-homestay', 'HomestayController@checkoutHomestay')->name('homestay.checkoutHomestay');
+        Route::post('cancel-booking', 'HomestayController@cancelBooking')->name('homestay.cancelBooking');
+        Route::get('view-booking-history/{id}', 'HomestayController@viewBookingHistory')->name('homestay.viewBookingHistory');
+        Route::get('get-booking-history-data', 'HomestayController@getBookingHistoryData')->name('homestay.getBookingHistoryData');
+        Route::put('update-deposit-charge/{id}', 'HomestayController@updateDepositCharge')->name('homestay.updateDepositCharge');
+        Route::get('view-customers-reviews', 'HomestayController@viewCustomersReview')->name('homestay.viewCustomersReview');
+        Route::get('get-customers-review', 'HomestayController@getCustomersReview')->name('homestay.getCustomersReview');
+        Route::get('view-performance-report', 'HomestayController@viewPerformanceReport')->name('homestay.viewPerformanceReport');
+        Route::get('get-report-data', 'HomestayController@getReportData')->name('homestay.getReportData');
+        Route::post('send-reminder', 'HomestayController@sendReminder')->name('homestay.sendReminder');
+        // Homestay Dates Management
+        Route::get('homestay-date', 'HomestayController@manageDate')->name('homestay.manageDate');
+        Route::get('get-organization-homestays', 'HomestayController@getOrganizationHomestays')->name('homestay.getOrganizationHomestays');
+        Route::get('get-disabled-dates', 'HomestayController@getDisabledDates')->name('homestay.getDisabledDates');
+        Route::post('add-disabled-date', 'HomestayController@addDisableDate')->name('homestay.addDisabledDate');
+        Route::put('update-disabled-date', 'HomestayController@updateDisabledDate')->name('homestay.updateDisabledDate');
+        Route::delete('delete-disabled-date', 'HomestayController@deleteDisabledDate')->name('homestay.deleteDisabledDate');
+        //Homestay Promotion
+        Route::get('promotion', 'HomestayController@promotionPage')->name('homestay.promotionPage');
+        Route::get('get-promotion-data', 'HomestayController@getPromotionData')->name('homestay.getPromotionData');
+        Route::get('setpromotion/{id}', 'HomestayController@setpromotion')->name('homestay.setpromotion');
+        Route::get('fetch-unavailable-promotion-dates', 'HomestayController@fetchUnavailablePromotionDates')->name('homestay.fetchUnavailablePromotionDates');
+        Route::post('insertpromotion', 'HomestayController@insertpromotion')->name('homestay.insertpromotion');
+        Route::get('edit-promotion/{id}', 'HomestayController@editPromotionPage')->name('homestay.editPromotionPage');
+        Route::get('fetch-unavailable-edit-promotion-dates', 'HomestayController@fetchUnavailableEditPromotionDates')->name('homestay.fetchUnavailableEditPromotionDates');
+        Route::post('update-promotion', 'HomestayController@updatePromotion')->name('homestay.updatePromotion');
+        Route::post('delete-promotion', 'HomestayController@deletePromotion')->name('homestay.deletePromotion');
+        Route::get('view-promotion-history/{id}', 'HomestayController@viewPromotionHistory')->name('homestay.viewPromotionHistory');
+        Route::get('get-promotion-history', 'HomestayController@getPromotionHistory')->name('homestay.getPromotionHistory');
     });
+});
 
 
-    //// ***End of Book & Stay ***////
+//// ***End of Book & Stay ***////
 
 
 
 
 
-    Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
-    Route::post('editpromo/{id}', 'HomestayController@editpromo');
+Route::get('disabledatepromo/{id}', 'HomestayController@disabledatepromo');
+Route::post('editpromo/{id}', 'HomestayController@editpromo');
 
-    Route::get('bookinglist', 'HomestayController@bookinglist')->name('homestay.bookinglist');
-    Route::get('bookhomestay/{id}', 'HomestayController@bookhomestay')->name('homestay.bookhomestay');
-    Route::get('disabledateroom/{id}', 'HomestayController@disabledateroom');
-    Route::post('bookhomestay/insertbooking/{id}/{price}', 'HomestayController@insertbooking');
-    Route::get('homestayresit/{id}', 'HomestayController@homestayresit')->name('homestay.homestayresit');
+Route::get('bookinglist', 'HomestayController@bookinglist')->name('homestay.bookinglist');
+Route::get('bookhomestay/{id}', 'HomestayController@bookhomestay')->name('homestay.bookhomestay');
+Route::get('disabledateroom/{id}', 'HomestayController@disabledateroom');
+Route::post('bookhomestay/insertbooking/{id}/{price}', 'HomestayController@insertbooking');
+Route::get('homestayresit/{id}', 'HomestayController@homestayresit')->name('homestay.homestayresit');
 
-    Route::post('tunjukpelanggan', 'HomestayController@tunjukpelanggan');
-    Route::post('cancelpelanggan/{id}', 'HomestayController@cancelpelanggan');
-    Route::get('userhistory', 'HomestayController@userhistory')->name('homestay.userhistory');
-    Route::get('tunjuksales', 'HomestayController@tunjuksales')->name('homestay.tunjuksales');
-    Route::get('homestaysales/{id}/{checkin}/{checkout}', 'HomestayController@homestaysales');
+Route::post('tunjukpelanggan', 'HomestayController@tunjukpelanggan');
+Route::post('cancelpelanggan/{id}', 'HomestayController@cancelpelanggan');
+Route::get('userhistory', 'HomestayController@userhistory')->name('homestay.userhistory');
+Route::get('tunjuksales', 'HomestayController@tunjuksales')->name('homestay.tunjuksales');
+Route::get('homestaysales/{id}/{checkin}/{checkout}', 'HomestayController@homestaysales');
 
-    //Route::post('test', 'HomestayController@test')->name('homestay.test');
+//Route::post('test', 'HomestayController@test')->name('homestay.test');
 
-    Route::get('/grab-setcar','GrabStudentController@setcar')->name('grab.setinsert');
-    Route::post('/grab-insertcar','GrabStudentController@insertcar')->name('grab.insert');
-    Route::get('/grab-check','GrabStudentController@checkcar')->name('grab.check');
-    Route::post('/updaterow-grab/{id}','GrabStudentController@updatecar')->name('grab.update/{id}');
-    Route::post('/updaterow-destinationgrab/{id}','GrabStudentController@updatedestination')->name('grab.updatedestination/{id}');
-    Route::get('/grab-destination','GrabStudentController@setdestination')->name('grab.setdestination');
-    Route::post('/grab-insertdestination','GrabStudentController@insertdestination')->name('grab.insertdestination');
-    Route::get('/grab-checkpassenger','GrabStudentController@grabcheckpassenger')->name('grab.checkpassenger');
-    Route::get('/book-grab','GrabStudentController@bookgrab')->name('book.grab');
-    Route::post('/passengerselect-grab/{id}','GrabStudentController@selectbookgrab')->name('passengerselect-grab/{id}');
-    Route::post('/passengerpay-grab/{id}','GrabStudentController@paymentgrab')->name('passengerpay-grab/{id}');
-    Route::get('/bayar-grab','GrabStudentController@makepaymentgrab')->name('bayar.grab');
-    Route::post('/passengernotify-grab/{id}','GrabStudentController@notifygrab')->name('passengernotify-grab/{id}');
-    Route::get('/grab-notify','GrabStudentController@grabsendnotify')->name('grab.notifypassenger');
-    Route::post('/notifygrab-passenger/{id}','GrabStudentController@updatenotifygrab')->name('notifygrab-passenger/{id}');
-    Route::get('/grab-bayartempahan','GrabStudentController@grabbayartempahan')->name('grab.bayartempahan');
-    Route::post('/passengerpilihtempahan-grab/{id}','GrabStudentController@passengerpilihtempahan')->name('passengerpilihtempahan-grab/{id}');
-    Route::post('/passengerbayartempahan-grab/{id}','GrabStudentController@passengerbayartempahan')->name('passengerbayartempahan-grab/{id}');
-    Route::get('/grab-checksales','GrabStudentController@checksales')->name('grab.checksales');
-    Route::post('/grab-sales', 'GrabStudentController@grabsales')->name('generate-sales-graph');
+Route::get('/grab-setcar', 'GrabStudentController@setcar')->name('grab.setinsert');
+Route::post('/grab-insertcar', 'GrabStudentController@insertcar')->name('grab.insert');
+Route::get('/grab-check', 'GrabStudentController@checkcar')->name('grab.check');
+Route::post('/updaterow-grab/{id}', 'GrabStudentController@updatecar')->name('grab.update/{id}');
+Route::post('/updaterow-destinationgrab/{id}', 'GrabStudentController@updatedestination')->name('grab.updatedestination/{id}');
+Route::get('/grab-destination', 'GrabStudentController@setdestination')->name('grab.setdestination');
+Route::post('/grab-insertdestination', 'GrabStudentController@insertdestination')->name('grab.insertdestination');
+Route::get('/grab-checkpassenger', 'GrabStudentController@grabcheckpassenger')->name('grab.checkpassenger');
+Route::get('/book-grab', 'GrabStudentController@bookgrab')->name('book.grab');
+Route::post('/passengerselect-grab/{id}', 'GrabStudentController@selectbookgrab')->name('passengerselect-grab/{id}');
+Route::post('/passengerpay-grab/{id}', 'GrabStudentController@paymentgrab')->name('passengerpay-grab/{id}');
+Route::get('/bayar-grab', 'GrabStudentController@makepaymentgrab')->name('bayar.grab');
+Route::post('/passengernotify-grab/{id}', 'GrabStudentController@notifygrab')->name('passengernotify-grab/{id}');
+Route::get('/grab-notify', 'GrabStudentController@grabsendnotify')->name('grab.notifypassenger');
+Route::post('/notifygrab-passenger/{id}', 'GrabStudentController@updatenotifygrab')->name('notifygrab-passenger/{id}');
+Route::get('/grab-bayartempahan', 'GrabStudentController@grabbayartempahan')->name('grab.bayartempahan');
+Route::post('/passengerpilihtempahan-grab/{id}', 'GrabStudentController@passengerpilihtempahan')->name('passengerpilihtempahan-grab/{id}');
+Route::post('/passengerbayartempahan-grab/{id}', 'GrabStudentController@passengerbayartempahan')->name('passengerbayartempahan-grab/{id}');
+Route::get('/grab-checksales', 'GrabStudentController@checksales')->name('grab.checksales');
+Route::post('/grab-sales', 'GrabStudentController@grabsales')->name('generate-sales-graph');
 
-    Route::get('/bus-setbus','BusController@setbus')->name('bus.setinsert');
-    Route::post('/bus-insertbus','BusController@insertbus')->name('bus.insert');
-    Route::get('/bus-managebus','BusController@managebus')->name('bus.manage');
-    Route::post('/managebus-bus/{id}','BusController@manageselectedbus')->name('bus.displaymanage/{id}');
-    Route::post('/updatemanagebus-bus/{id}','BusController@updatebus')->name('bus.update/{id}');
-    Route::get('/book-bus','BusController@bookbus')->name('book.bus');
-    Route::post('/passengerselect-bus/{id}','BusController@selectbookbus')->name('passengerselect-bus/{id}');
-    Route::post('/passengerpay-bus/{id}','BusController@paymentbus')->name('passengerpay-bus/{id}');
-    Route::post('/passengernotify-bus/{id}','BusController@notifybus')->name('passengernotify-bus/{id}');
-    Route::get('/bus-notify','BusController@bussendnotify')->name('bus.notifypassenger');
-    Route::post('/notifybus-passenger/{id}','BusController@updatenotifybus')->name('notifybus-passenger/{id}');
-    Route::get('/bus-bayartempahan','BusController@busbayartempahan')->name('bus.bayartempahan');
-    Route::post('/passengerpilihtempahan-bus/{id}','BusController@buspilihtempahan')->name('passengerpilihtempahan-bus/{id}');
-    Route::post('/passengerbayartempahan-bus/{id}','BusController@passengerbusbayartempahan')->name('passengerbayartempahan-bus/{id}');
-    Route::get('/bayar-bus','BusController@makepaymentbus')->name('bayar.bus');
-    Route::get('/bus-listpassenger','BusController@listpassenger')->name('bus.listpassenger');
-    Route::post('/passengerlist-bus/{id}','BusController@listpassengerbus')->name('passengerlist-bus/{id}');
-    Route::get('/bus-checksales','BusController@checksales')->name('bus.checksales');
-    Route::post('/bus-sales', 'BusController@bussales')->name('generate-sales-busgraph');
+Route::get('/bus-setbus', 'BusController@setbus')->name('bus.setinsert');
+Route::post('/bus-insertbus', 'BusController@insertbus')->name('bus.insert');
+Route::get('/bus-managebus', 'BusController@managebus')->name('bus.manage');
+Route::post('/managebus-bus/{id}', 'BusController@manageselectedbus')->name('bus.displaymanage/{id}');
+Route::post('/updatemanagebus-bus/{id}', 'BusController@updatebus')->name('bus.update/{id}');
+Route::get('/book-bus', 'BusController@bookbus')->name('book.bus');
+Route::post('/passengerselect-bus/{id}', 'BusController@selectbookbus')->name('passengerselect-bus/{id}');
+Route::post('/passengerpay-bus/{id}', 'BusController@paymentbus')->name('passengerpay-bus/{id}');
+Route::post('/passengernotify-bus/{id}', 'BusController@notifybus')->name('passengernotify-bus/{id}');
+Route::get('/bus-notify', 'BusController@bussendnotify')->name('bus.notifypassenger');
+Route::post('/notifybus-passenger/{id}', 'BusController@updatenotifybus')->name('notifybus-passenger/{id}');
+Route::get('/bus-bayartempahan', 'BusController@busbayartempahan')->name('bus.bayartempahan');
+Route::post('/passengerpilihtempahan-bus/{id}', 'BusController@buspilihtempahan')->name('passengerpilihtempahan-bus/{id}');
+Route::post('/passengerbayartempahan-bus/{id}', 'BusController@passengerbusbayartempahan')->name('passengerbayartempahan-bus/{id}');
+Route::get('/bayar-bus', 'BusController@makepaymentbus')->name('bayar.bus');
+Route::get('/bus-listpassenger', 'BusController@listpassenger')->name('bus.listpassenger');
+Route::post('/passengerlist-bus/{id}', 'BusController@listpassengerbus')->name('passengerlist-bus/{id}');
+Route::get('/bus-checksales', 'BusController@checksales')->name('bus.checksales');
+Route::post('/bus-sales', 'BusController@bussales')->name('generate-sales-busgraph');
 
 
 
@@ -959,7 +959,7 @@ Route::group(['prefix' => 'polimas'], function () {
         Route::post('/allexportstudent', 'PolimasController@AllStudentExport')->name('polimas.allstudentexport');
         Route::post('/exportstudent', 'PolimasController@StudentExport')->name('polimas.studentexport');
 
-        Route::get('/konvoChart','PolimasController@konvoChart')->name('polimas.student.konvoChart');
+        Route::get('/konvoChart', 'PolimasController@konvoChart')->name('polimas.student.konvoChart');
     });
 });
 
@@ -985,6 +985,3 @@ Route::group(['prefix' => 'offernride'], function () {
     Route::get('/trip/getTripDatatable', 'OfferNRideController@getTripDatatable')->name('offernride.getTripDatatable');
     Route::get('/trip/add', 'OfferNRideController@trip_add')->name('offernride.trip-add');
 });
-
-
-
