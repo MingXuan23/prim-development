@@ -234,17 +234,17 @@ class LandingPageController extends AppBaseController
         $studentCount = $organizationStudentCounts->sum("student_count") + $lmmStudentCounts->sum("student_count") - $organizationStudentCounts->where('id', 137)->first()->student_count;//minus MAAHAD TAHFIZ SAINS DARUL AMAN because included in lmmStudentCounts
 
         //get the total number of fees
-//        $totalFee =  DB::table("fees_new as fn")
-//            ->join("fees_new_organization_user as fu", "fn.id" , "fu.fees_new_id")
-//            ->where("fu.status", "Paid")
-//            ->sum("fn.totalAmount");
+        $totalFee =  DB::table("fees_new as fn")
+            ->join("fees_new_organization_user as fu", "fn.id" , "fu.fees_new_id")
+            ->where("fu.status", "Paid")
+            ->sum("fn.totalAmount");
 
-//        // Get the total number of fees for this year
-//        $totalFeeThisYear = DB::table("fees_new as fn")
-//            ->join("fees_new_organization_user as fu", "fn.id" , "fu.fees_new_id")
-//            ->where("fu.status", "Paid")
-//            ->whereYear("fn.start_date", date('Y'))  // This filters by the current year
-//            ->sum("fn.totalAmount");
+        // Get the total number of fees for this year
+        $totalFeeThisYear = DB::table("fees_new as fn")
+            ->join("fees_new_organization_user as fu", "fn.id" , "fu.fees_new_id")
+            ->where("fu.status", "Paid")
+            ->whereYear("fn.start_date", date('Y'))  // This filters by the current year
+            ->sum("fn.totalAmount");
 
         $organization = DB::table('organization_url as url')
             ->join('organizations as o', 'url.organization_id', '=', 'o.id')
@@ -252,6 +252,183 @@ class LandingPageController extends AppBaseController
             ->whereNull("o.deleted_at")
             ->whereIn('o.type_org', [1, 2, 3])
             ->get();
+
+// Create an array to store results for each organization
+//        $results = [];
+//        // Get current year and last year
+//        $currentYear = date('Y');
+//        $lastYear = $currentYear - 1;
+//
+//        // Define date ranges
+//        $currentYearStartDate = "$currentYear-01-01"; // January 1st of current year
+//        $currentYearEndDate = "$currentYear-12-31"; // December 31st of last year
+//        $lastYearStartDate = "$lastYear-01-01"; // January 1st of last year
+//        $lastYearEndDate = "$lastYear-12-31"; // December 31st of last year
+//
+//        foreach ($organization as $org) {
+//            $orgId = $org->id;
+//            $student_complete_this_year = DB::table('students')
+//                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+//                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+//                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+//                ->select('students.*', 'class_student.fees_status','class_student.id as csid','class_student.start_date','class_student.end_date')
+//                ->where([
+//                      ['class_organization.organization_id', $orgId ]
+//                ])
+//                ->where(function($query) use ($currentYearStartDate, $currentYearEndDate) {
+//                    $query->whereBetween('class_student.start_date', [$currentYearStartDate, $currentYearEndDate])
+//                        ->orWhere(function($query) use ($currentYearEndDate) {
+//                            $query->whereNull('class_student.end_date')
+//                                ->where('class_student.start_date', '<=', $currentYearEndDate);
+//                        })
+//                        ->orWhere(function($query) use ($currentYearStartDate, $currentYearEndDate) {
+//                            $query->whereNotNull('class_student.end_date')
+//                                ->whereBetween('class_student.end_date',  [$currentYearStartDate, $currentYearEndDate]);
+//                        })
+//                        ->orWhere(function($query) use ($currentYearStartDate, $currentYearEndDate) {
+//                            $query->whereNotNull('class_student.end_date')
+//                                ->where( 'class_student.end_date','>=', $currentYearStartDate)
+//                                ->where('class_student.start_date','<=',$currentYearEndDate);
+//
+//                        });
+//
+//                })
+//                ->get();
+//
+//
+//            $student_complete_last_year = DB::table('students')
+//                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+//                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+//                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+//                ->select('students.*', 'class_student.fees_status','class_student.id as csid','class_student.start_date','class_student.end_date')
+//                ->where([
+//                    ['class_organization.organization_id', $orgId ]
+//                ])
+//                ->where(function($query) use ($lastYearStartDate, $lastYearEndDate) {
+//                    $query->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
+//                        ->orWhere(function($query) use ($lastYearEndDate) {
+//                            $query->whereNull('class_student.end_date')
+//                                ->where('class_student.start_date', '<=', $lastYearEndDate);
+//                        })
+//                        ->orWhere(function($query) use ($lastYearStartDate, $lastYearEndDate) {
+//                            $query->whereNotNull('class_student.end_date')
+//                                ->whereBetween('class_student.end_date',  [$lastYearStartDate, $lastYearEndDate]);
+//                        })
+//                        ->orWhere(function($query) use ($lastYearStartDate, $lastYearEndDate) {
+//                            $query->whereNotNull('class_student.end_date')
+//                                ->where( 'class_student.end_date','>=', $lastYearStartDate)
+//                                ->where('class_student.start_date','<=',$lastYearEndDate);
+//
+//                        });
+//
+//                })
+//                ->get();
+//
+//            $results[$orgId] = [
+//                'organization_id' => $orgId,
+//                'this_year' => [
+//                    'completed_count' => $student_complete_this_year->where("fees_status", "Completed")
+//                        ->count(),
+//                ],
+//                'last_year' => [
+//                    'completed_count' => $student_complete_last_year->where("fees_status", "Completed")
+//                        ->count(),
+//                ],
+//                'total_students' => $student_complete_this_year->count(),
+//            ];
+//        }
+
+//for lmm
+//        $lmm_results = [
+//            'this_year' => [
+//                'completed_count' => 0
+//            ],
+//            'last_year' => [
+//                'completed_count' => 0
+//            ],
+//            'total_students' => 0,
+//        ];
+//        foreach($lmmOrganizations as $orgId){
+//            $student_complete_this_year = DB::table('students')
+//                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+//                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+//                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+//                ->select('students.*', 'class_student.fees_status','class_student.id as csid','class_student.start_date','class_student.end_date')
+//                ->where([
+//                    ['class_organization.organization_id', $orgId ]
+//                ])
+//                ->where(function($query) use ($currentYearStartDate, $currentYearEndDate) {
+//                    $query->whereBetween('class_student.start_date', [$currentYearStartDate, $currentYearEndDate])
+//                        ->orWhere(function($query) use ($currentYearEndDate) {
+//                            $query->whereNull('class_student.end_date')
+//                                ->where('class_student.start_date', '<=', $currentYearEndDate);
+//                        })
+//                        ->orWhere(function($query) use ($currentYearStartDate, $currentYearEndDate) {
+//                            $query->whereNotNull('class_student.end_date')
+//                                ->whereBetween('class_student.end_date',  [$currentYearStartDate, $currentYearEndDate]);
+//                        })
+//                        ->orWhere(function($query) use ($currentYearStartDate, $currentYearEndDate) {
+//                            $query->whereNotNull('class_student.end_date')
+//                                ->where( 'class_student.end_date','>=', $currentYearStartDate)
+//                                ->where('class_student.start_date','<=',$currentYearEndDate);
+//
+//                        });
+//
+//                })
+//                ->get();
+//
+//
+//            $student_complete_last_year = DB::table('students')
+//                ->join('class_student', 'class_student.student_id', '=', 'students.id')
+//                ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+//                ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+//                ->select('students.*', 'class_student.fees_status','class_student.id as csid','class_student.start_date','class_student.end_date')
+//                ->where([
+//                    ['class_organization.organization_id', $orgId ]
+//                ])
+//                ->where(function($query) use ($lastYearStartDate, $lastYearEndDate) {
+//                    $query->whereBetween('class_student.start_date', [$lastYearStartDate, $lastYearEndDate])
+//                        ->orWhere(function($query) use ($lastYearEndDate) {
+//                            $query->whereNull('class_student.end_date')
+//                                ->where('class_student.start_date', '<=', $lastYearEndDate);
+//                        })
+//                        ->orWhere(function($query) use ($lastYearStartDate, $lastYearEndDate) {
+//                            $query->whereNotNull('class_student.end_date')
+//                                ->whereBetween('class_student.end_date',  [$lastYearStartDate, $lastYearEndDate]);
+//                        })
+//                        ->orWhere(function($query) use ($lastYearStartDate, $lastYearEndDate) {
+//                            $query->whereNotNull('class_student.end_date')
+//                                ->where( 'class_student.end_date','>=', $lastYearStartDate)
+//                                ->where('class_student.start_date','<=',$lastYearEndDate);
+//
+//                        });
+//
+//                })
+//                ->get();
+//
+//            // Instead of storing by organization ID, just add to the totals
+//            $lmm_results['this_year']['completed_count'] += $student_complete_this_year->where("fees_status", "Completed")->count();
+//            $lmm_results['last_year']['completed_count'] += $student_complete_last_year->where("fees_status", "Completed")->count();
+//            $lmm_results['total_students'] += $student_complete_this_year->count();
+//        }
+
+
+        // $schools = DB::table('organization_url')
+        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+        //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+        //     ->whereIn('type_organizations.id', [1, 2, 3])
+        //     ->where('organization_url.title', 'NOT LIKE', '%Poli%')
+        //     ->get();
+
+        // //dd($schools);
+
+        // $politeknik = DB::table('organization_url')
+        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+        //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+        //     ->whereIn('type_organizations.id', [1, 2, 3])
+        //     ->where('organization_url.title', 'LIKE', '%Poli%')
+        //     ->get();
+//        return view('landing-page.fees.index', ['results'=> $results, 'lmm_results' => $lmm_results ,'organizations' => $organization,'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts , 'lmmStudentCounts' => $lmmStudentCounts, 'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
 
         $currentYear = date('Y');
         $lastYear = date('Y', strtotime('-1 year'));
@@ -266,9 +443,6 @@ class LandingPageController extends AppBaseController
             ->distinct()
             ->select('o.nama','o.id','url.url_name as url_name','o.state','o.postcode','o.district','o.city','o.organization_picture') // You might want to select specific columns
             ->get();
-        $totalFee = $totalFeeThisYear =  0;
-
-
         foreach ($organization2 as $o) {
 
             if (stripos($o->nama, 'MAKTAB MAHMUD') !== false) {
@@ -291,8 +465,8 @@ class LandingPageController extends AppBaseController
                     ->where('t.status', 'Success')
                     ->where('fn.organization_id', $o->id)
                     ->whereYear('fn.start_date', $year)
-                    ->select('t.id','t.amount')
-                    ->distinct('t.id')
+                    ->select('t.id')
+                    ->distinct()
                     ->get();
 
 
@@ -304,33 +478,25 @@ class LandingPageController extends AppBaseController
                     ->where('fn.organization_id', $o->id)
                     ->where('t.status', 'Success')
                     ->whereYear('fn.start_date', $year)
-                    ->select('t.id','t.amount')
-                    ->distinct('t.id')
+                    ->select('t.id')
+                    ->distinct()
                     ->get();
 
                 // Combine the two sets
                 $combined = $tranA->concat($tranBC);
                 $unique = $combined->unique('id');
-                $amount =  $unique->sum('amount');
                 // Create JSON-like object for year and count
                 $o->data[] = [
                     'year' => $year,
                     'tcount' => $unique->count(),
-                    'tamount' => $amount,
                 ];
-
-                //Add to total amount of fee paid
-                $totalFee += $amount;
-                //Check whether need to add to the total fee paid in this year
-                if($year === now()->year){
-                    $totalFeeThisYear += $amount;
-                }
 
             }
             $o->transaction_sum = collect($o->data)->sum('tcount');
-
+           
 
         }
+
         // Assumed you have calculated the below somewhere earlier, or you need to prepare them too
 
         $organization2 = $organization2
@@ -339,6 +505,41 @@ class LandingPageController extends AppBaseController
             })
             ->sortByDesc('transaction_sum')
             ->values();
+
+        // $transactionCounts = [
+        //     $lastYear => 0,
+        //     $currentYear => 0,
+        // ];
+
+        // foreach ($organization2 as $org) {
+        //     if ($org->url === 'lmm') {
+        //         foreach ($org->data as $data) {
+        //             if ($data['year'] === (int)$currentYear) {
+        //                 $transactionCounts[$currentYear] += $data['tcount'];
+        //             }
+        //             if ($data['year'] === (int)$lastYear) {
+        //                 $transactionCounts[$lastYear] += $data['tcount'];
+        //             }
+        //         }
+        //     }
+        // }
+
+        // $lmm_results = [
+        //     'url' => 'lmm',
+        //     'transaction_sum' => $transactionCounts[$lastYear] + $transactionCounts[$currentYear],
+        //     'data' => [
+        //         [
+        //             'year' => $lastYear,
+        //             'tcount' => $transactionCounts[$lastYear],
+        //         ],
+        //         [
+        //             'year' => $currentYear,
+        //             'tcount' => $transactionCounts[$currentYear],
+        //         ],
+        //     ]
+        // ];
+
+//        dd($lmm_results);
 
 
         return view('landing-page.fees.index', ['organization2'=> $organization2, 'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts ,'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
