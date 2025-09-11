@@ -36,12 +36,12 @@ Route::group(['prefix' => 'mobile'], function () {
     Route::get('/gettransactionbyyear', 'MobileApiController@gettransactionbyyear');
     Route::get('/donationnumberbyorganization', 'MobileApiController@donationnumberbyorganization');
     Route::get('/getdonationbycategory', 'MobileApiController@getdonationbycategory');
-    
+
     Route::post('/login', 'MobileApiController@login');
     Route::post('/updateProfile', 'MobileApiController@updateProfile');
-    
+
     //route for mobile dish
-    Route::group(['prefix' => 'dish'], function (){
+    Route::group(['prefix' => 'dish'], function () {
         Route::get('/getOrganizationWithDish', 'DishController@getOrganizationWithDish');
         Route::get('/getAllDishes', 'DishController@getAllDishes');
         Route::get('/getAllAvailableDates', 'DishController@getAllAvailableDates');
@@ -49,7 +49,7 @@ Route::group(['prefix' => 'mobile'], function () {
     });
 
     //route for mobile order
-    Route::group(['prefix' => 'order'], function (){
+    Route::group(['prefix' => 'order'], function () {
         Route::get('/getAllOrderById/{id}', 'OrderController@getAllOrderById');
         Route::get('/getAllOrderByOrganId/{id}', 'OrderController@getAllOrderByOrganId');
 
@@ -58,8 +58,8 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::post('/updateStatusToDelivered', 'OrderController@updateStatusToDelivered');
     });
 
-    //route for mobile order
-    Route::group(['prefix' => 'yuran'], function (){
+    //route for mobile yuran
+    Route::group(['prefix' => 'yuran'], function () {
         Route::post('login', 'MobileAPI\YuranController@login');
         Route::get('getOrganizationByUserId', 'MobileAPI\YuranController@getOrganizationByUserId');
         Route::post('getReceiptByOid', 'MobileAPI\YuranController@getReceiptByOid');
@@ -67,10 +67,13 @@ Route::group(['prefix' => 'mobile'], function () {
 
         Route::post('getYuran', 'MobileAPI\YuranController@getYuranByParentIdAndOrganId');
         Route::post('yuranTransaction', 'MobileAPI\YuranController@pay');
+
+        //new mobile yuran api
+        Route::post('loginAndGetYuran', 'MobileAPI\NewYuranController@loginAndGetYuran');
     });
 });
 
-Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
+Route::group(['prefix' => 'schedule', 'namespace' => 'Schedule'], function () {
     Route::post('login', 'ScheduleApiController@login');
     Route::get('getTimeOff', 'ScheduleApiController@getTimeOff');
     Route::get('sendNotification/{id}/{title}/{message}', 'ScheduleApiController@sendNotification');
@@ -79,20 +82,17 @@ Route::group(['prefix' => 'schedule' , 'namespace' => 'Schedule'],function () {
     Route::get('getSchedule/{id}', 'ScheduleApiController@getSchedule');
     Route::get('getTeacherInfo/{id}', 'ScheduleApiController@getTeacherInfo');
     Route::any('submitLeave', 'ScheduleApiController@submitLeave');
-    
+
     Route::get('getLeaveType', 'ScheduleApiController@getLeaveType');
-    Route::post('getPendingRelief','ScheduleApiController@getPendingRelief');
+    Route::post('getPendingRelief', 'ScheduleApiController@getPendingRelief');
 
-    Route::post('submitReliefResponse','ScheduleApiController@submitReliefResponse');
-    Route::get('getHistory/{id}','ScheduleApiController@getHistory');
-    Route::get('getHistoryByRange/{id}/{year}/{month}','ScheduleApiController@getHistoryByRange');
-
-
-    
+    Route::post('submitReliefResponse', 'ScheduleApiController@submitReliefResponse');
+    Route::get('getHistory/{id}', 'ScheduleApiController@getHistory');
+    Route::get('getHistoryByRange/{id}/{year}/{month}', 'ScheduleApiController@getHistoryByRange');
 });
 
 //route for mobile orderS
-Route::group(['prefix' => 'OrderS'], function (){
+Route::group(['prefix' => 'OrderS'], function () {
     Route::get('test', 'OrderSController@testData');
     Route::post('login', 'OrderSController@login');
     Route::post('isUserOrderSAdmin', 'OrderSController@isUserOrderSAdmin');
@@ -123,13 +123,13 @@ Route::group(['prefix' => 'OrderS'], function (){
     Route::post('getReport', 'OrderSController@getReport');
 });
 
-Route::group(['prefix' => 'derma', 'namespace' => 'MobileAPI'], function (){
-    Route::post('login','DermaController@login');
-    Route::post('validateToken','DermaController@validateToken');
+Route::group(['prefix' => 'derma', 'namespace' => 'MobileAPI'], function () {
+    Route::post('login', 'DermaController@login');
+    Route::post('validateToken', 'DermaController@validateToken');
 
-    Route::get('getDerma','DermaController@getDerma');
-    Route::post('getDermaInfo','DermaController@getDermaInfo');
-  
+    Route::get('getDerma', 'DermaController@getDerma');
+    Route::post('getDermaInfo', 'DermaController@getDermaInfo');
+
 
 
     //Route::post('returnDermaView','DermaController@returnDermaView');

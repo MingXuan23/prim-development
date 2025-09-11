@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 
+//Mobile Yuran API skip AUTHENTICATION
+Route::get('/mobile/pay', [App\Http\Controllers\MobileAPI\NewYuranController::class, 'pay'])->name('mobile.pay');
+Route::get('/mobile/receipt/{transaction_id}', [App\Http\Controllers\MobileAPI\NewYuranController::class, 'receipt'])->name('mobile.receipt');
+Route::get('/mobile/receipt/download/{transaction_id}', [App\Http\Controllers\MobileAPI\NewYuranController::class, 'downloadReceipt'])->name('mobile.receipt.download');
+
 Auth::routes();
 
 Route::get('registerAdmin', 'Auth\RegisterController@AdminRegisterIndex')->name('register.admin');
