@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered; // 
 use App\Http\Controllers\PointController;
+use App\Http\Controllers\StudentController;
+use Carbon\Carbon;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\DataTables;
 
 class RegisterController extends Controller
 {
@@ -65,36 +70,34 @@ class RegisterController extends Controller
 
     protected function validator(array $data)
     {
-      
+
         $validator = Validator::make($data, [
             'name'              => ['required', 'string', 'max:255'],
             'email'             => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
             'telno'             => ['required', 'numeric', 'min:10'],
-            
-            
+
+
         ], [
             'password.regex' => 'Password must contains at least 1 number, 1 uppercase, 1 special character (@!$#%^&*())',
         ]);
 
-        
+
         $validator->after(function ($validator) use ($data) {
-            if(isset($data['isAdmin'])){
+            if (isset($data['isAdmin'])) {
                 return;
             }
             if (!isset($data['referral_code'])) {
                 return;
             }
-            if(!isset($data['registration_type'])){
+            if (!isset($data['registration_type'])) {
+                $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
+            } else if ($data['registration_type'] == '-') {
                 $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
             }
 
-            else if($data['registration_type'] == '-'){
-                $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
-            }
-            
 
-            
+
             $valid = PointController::validateReferralCode($data['referral_code']);
             if (!$valid) {
                 $validator->errors()->add('referral_code', 'Expired referral code.');
@@ -110,7 +113,7 @@ class RegisterController extends Controller
         $this->validator($request->all())->validate();
 
         event(new Registered($user = $this->createAdmin($request->all())));
-        
+
         // You can customize this redirect after admin registration
         return redirect(route('home'));
     }
@@ -121,56 +124,103 @@ class RegisterController extends Controller
      * @return \App\User
      */
     protected function create(array $data)
-    { 
-       
+    {
+
         //dd($data,isset($data['isAdmin']));
-        $user= User::create([
+        $user = User::create([
             'name'              => $data['name'],
             'email'             => $data['email'],
             'password'          => Hash::make($data['password']),
             'telno'             => $data['telno'],
             'remember_token'    => $data['_token'],
-            'purpose'           =>$data['registration_type']??''
+            'purpose'           => $data['registration_type'] ?? ''
 
         ]);
         // dd($user);
-       
+
         if (!isset($data['isAdmin'])) {
             $role = DB::table('model_has_roles')->insert([
                 'role_id' => 15,
                 'model_type' => "App\User",
                 'model_id' => $user->id,
             ]);
-           
-           
-        }else{
+        } else {
             return $user;
             //no going code below as he is admin
         }
 
-        
+
         $referral_code = $data['referral_code'];
 
-        if($referral_code!=null){
-            $this->referral_code_member_registration($referral_code,$user);
-        }else{
-            $this->referral_code_member_registration("4St449BZ0005",$user);
+        if ($referral_code != null) {
+            $this->referral_code_member_registration($referral_code, $user);
+        } else {
+            $this->referral_code_member_registration("4St449BZ0005", $user);
             //13/8/2024 - sir yahya want to do so 
         }
-        
-        
-        return $user;
 
+
+        return $user;
     }
 
     public function register(Request $request)
     {
-        
         // If the registration type is "bayar_yuran", redirect without validation or user creation.
         if ($request->input('registration_type') === 'bayar_yuran') {
-            return redirect('/register_yuran');
+            // validate input
+            $validator = Validator::make($request->all(), [
+                'name'              => ['required', 'string', 'max:255'],
+                'email'             => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+                'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
+                'icno'              => ['required', 'string', 'min:12', 'max:14'],
+                'telno'             => ['required', 'numeric', 'min:10', 'unique:users,telno'],
+            ]);
+
+            // return error messages if validator fails
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
+
+            // check ic no seperately (some users might enter ic no with a '-' and some might won't)
+            $icExisted = DB::table("users")->where("icno", "=", str_replace("-", "", $request->get("icno")))->get();
+
+            if ($icExisted->count() > 0) {
+                return redirect()->back()->withErrors(["icno" => "The IC No. has already been taken."])->withInput();
+            }
+
+            // insert user data
+            $user = User::create([
+                "name" => $request->get("name"),
+                "email" => $request->get("email"),
+                "password" => Hash::make($request->get("password")),
+                "telno" => $request->get("telno"),
+                "remember_token" => $request->get("_token"),
+                "purpose" => $request->get("registration_type"),
+            ]);
+
+            // insert icno and email verified (non mass-assignable)
+            DB::table("users")->where("id", "=", $user->id)->update([
+                "icno" => str_replace("-", "", $request->get("icno")),
+                "email_verified_at" => now()
+            ]);
+
+            // get the roleId from roles table
+            $roleId = DB::table("roles")->where("name", "=", "Penjaga")->first()->id;
+
+            // create new model_has_roles
+            DB::table("model_has_roles")->insert([
+                "role_id" => $roleId,
+                "model_id" => $user->id,
+                "model_type" => "App\User"
+            ]);
+
+            $this->guard()->login($user);
+
+            event(new Registered($user));
+
+            return redirect('/home');
         }
-      
+
         // Otherwise, perform the usual registration.
         $this->validator($request->all())->validate();
 
@@ -199,19 +249,20 @@ class RegisterController extends Controller
             $request->session()->forget('url.intended');
             return redirect($redirectUrl);
         }
-        
+
         return redirect($this->redirectTo);
     }
 
-    protected function referral_code_member_registration($referral_code,$user){
+    protected function referral_code_member_registration($referral_code, $user)
+    {
         //dd($referral_code,$user);
-        $code = DB::table('referral_code')->where('code',$referral_code)->first();
+        $code = DB::table('referral_code')->where('code', $referral_code)->first();
         DB::table('referral_code_member')->insert([
-            'created_at' =>now(),
+            'created_at' => now(),
             'updated_at' => now(),
             'leader_referral_code_id' => $code->id,
             'member_user_id' => $user->id,
-            'status' =>1
+            'status' => 1
         ]);
     }
 }

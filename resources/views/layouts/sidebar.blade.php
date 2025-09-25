@@ -441,7 +441,24 @@
                         <span>Yuran</span>
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
+                        @role('Superadmin|Pentadbir|Pentadbir Swasta|Guru|Guru Swasta')
+                        <li>
+                            <a href="{{ route('student.parentRegisterStudents.index') }}" class=" waves-effect"
+                                aria-expanded="true">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Pendaftaran Pelajar</span>
+                            </a>
+                        </li>
+                        @endrole
+
                         @role('Superadmin|Penjaga')
+                        <li>
+                            <a href="{{ route('student.parentRegisterStudents.create') }}" class=" waves-effect">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Daftar Pelajar</span>
+                            </a>
+                        </li>
+
                         <li>
                             <a href="{{ route('dependent_fees') }}" class=" waves-effect">
                                 <i class="far fa-credit-card"></i>
@@ -538,18 +555,20 @@
                                 <span>Yuran Berulang</span>
                             </a>
                         </li>
+                        @endrole
 
+                        @role('Superadmin|Pentadbir|Pentadbir Swasta')
                         <li>
                             <a href="{{ route('fees.assignFeesToStudentIndex') }}" class=" waves-effect"
                                 aria-expanded="true">
-                                <i class="fas fa-user-cog"></i>
+                                <i class="fas fa-edit"></i>
                                 <span>Ubah Yuran</span>
                             </a>
                         </li>
                         <li>
                             <a href="{{ route('fees.assignStudentsToFeeIndex') }}" class=" waves-effect"
                                 aria-expanded="true">
-                                <i class="fas fa-user-cog"></i>
+                                <i class="fas fa-edit"></i>
                                 <span>Ubah Pembayar</span>
                             </a>
                         </li>

@@ -22,6 +22,7 @@ Route::get('/mobile/receipt/download/{transaction_id}', [App\Http\Controllers\Mo
 
 Auth::routes();
 
+// Route::get('/register/{organizationId}', 'Auth\RegisterController@showRegistrationForm')->name('register.bayar_yuran');
 Route::get('registerAdmin', 'Auth\RegisterController@AdminRegisterIndex')->name('register.admin');
 Route::get('register_yuran', 'Auth\RegisterController@YuranRegisterIndex')->name('register.yuran_register');
 
@@ -38,8 +39,6 @@ Route::get('/form', 'HomeController@form');
 // Route::get('/organization-list', 'LandingPageController@organizationList');
 Route::get('/activity-list', 'LandingPageController@activitylist');
 Route::get('/activity-details', 'LandingPageController@activitydetails');
-
-
 
 
 //wan add
@@ -161,7 +160,6 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('getPendingOrgDatatable', 'OrganizationController@getPendingOrgDatatable')->name('organization.getPendingOrgDatatable');
 
     Route::get('list', 'OrganizationController@getOrganizationDatatable')->name('organization.getOrganizationDatatable');
-    Route::get('organizations', 'OrganizationController@getAllOrganizationJsonData')->name('organization.getAllOrganizationJsonData');
     Route::get('all', 'OrganizationController@getAllOrganization')->name('organization.getAll');
     Route::post('get-district', 'OrganizationController@getDistrict')->name('organization.get-district');
     Route::get('testRepeater', 'OrganizationController@testRepeater');
@@ -234,6 +232,16 @@ Route::group(['prefix' => 'student'], function () {
     Route::get('compareTransferStudentDiffOrg', 'StudentController@compareTransferStudentDiffOrg')->name('student.compareTransferStudentDiffOrg');
 
     Route::post('student/fetchClass', 'StudentController@fetchClass')->name('student.fetchClass');
+
+    // parent register student routes
+    Route::group(['prefix' => 'parentRegisterStudents', 'middleware' => ['auth']], function () {
+        Route::get("/add", "StudentController@parentRegisterStudentsCreate")->name("student.parentRegisterStudents.create");
+        Route::post("/store", "StudentController@parentRegisterStudentsStore")->name("student.parentRegisterStudents.store");
+
+        Route::get('/', 'StudentController@parentRegisterStudentsIndex')->name('student.parentRegisterStudents.index');
+        Route::get('/allPendingRegistrations', 'StudentController@getAllPendingRegistrations')->name('student.parentRegisterStudents.getAllPendingRegistrations');
+        Route::get('/acceptOrRejectRegistrations', 'StudentController@acceptOrRejectRegistrations')->name('student.parentRegisterStudents.acceptOrRejectRegistrations');
+    });
 });
 
 Route::group(['prefix' => 'fees'], function () {
@@ -267,17 +275,21 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
 
     // pages and routes for assigning multiple fees to one student
-    Route::get('/assignFeesToStudent', 'FeesController@AssignFeesToStudentIndex')->name('fees.assignFeesToStudentIndex');
-    Route::get('/assignFeesToStudent/class', 'FeesController@fetchOneStudentToManyFeesDatatable')->name('fees.fetchOneStudentToManyFeesDatatable');
-    Route::get('/allStudentFees/org', 'FeesController@fetchAllFeesDatatableByOrg')->name('fees.fetchAllFeesDatatableByOrg');
-    Route::get('/assignFeesToStudent/edit', 'FeesController@AssignFeesToStudentEdit')->name('fees.assignFeesToStudentEdit');
-    Route::post('/assignFeesToStudent/update', 'FeesController@AssignFeesToStudentUpdate')->name('fees.assignFeesToStudentUpdate');
+    Route::group(['prefix' => 'assignFeesToStudent', 'middleware' => ['auth']], function () {
+        Route::get('/', 'FeesController@AssignFeesToStudentIndex')->name('fees.assignFeesToStudentIndex');
+        Route::get('/class', 'FeesController@fetchOneStudentToManyFeesDatatable')->name('fees.fetchOneStudentToManyFeesDatatable');
+        Route::get('/allStudentFees/org', 'FeesController@fetchAllFeesDatatableByOrg')->name('fees.fetchAllFeesDatatableByOrg');
+        Route::get('/edit', 'FeesController@AssignFeesToStudentEdit')->name('fees.assignFeesToStudentEdit');
+        Route::post('/update', 'FeesController@AssignFeesToStudentUpdate')->name('fees.assignFeesToStudentUpdate');
+    });
 
     // pages and routes for assigning multiple students to one fee
-    Route::get('/assignStudentsToFee/class', 'FeesController@fetchOneFeeToManyStudentsJson')->name('fees.fetchOneFeeToManyStudentsJson');
-    Route::get('/assignStudentsToFee', 'FeesController@AssignStudentsToFeeIndex')->name('fees.assignStudentsToFeeIndex');
-    Route::get('/assignStudentsToFee/edit', 'FeesController@AssignStudentsToFeeEdit')->name('fees.assignStudentsToFeeEdit');
-    Route::post('/assignStudentsToFee/update', 'FeesController@AssignStudentsToFeeUpdate')->name('fees.assignStudentsToFeeUpdate');
+    Route::group(['prefix' => 'assignStudentsToFee', 'middleware' => ['auth']], function () {
+        Route::get('/class', 'FeesController@fetchOneFeeToManyStudentsJson')->name('fees.fetchOneFeeToManyStudentsJson');
+        Route::get('/', 'FeesController@AssignStudentsToFeeIndex')->name('fees.assignStudentsToFeeIndex');
+        Route::get('/edit', 'FeesController@AssignStudentsToFeeEdit')->name('fees.assignStudentsToFeeEdit');
+        Route::post('/update', 'FeesController@AssignStudentsToFeeUpdate')->name('fees.assignStudentsToFeeUpdate');
+    });
 
     //wan add
     Route::get('/Recurring', 'FeesController@CategoryRecurring')->name('fees.Recurring');
