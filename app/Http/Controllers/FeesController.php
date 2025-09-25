@@ -771,7 +771,7 @@ class FeesController extends AppBaseController
                 }
                 if (count($activeChildren) > 0 || count($activeChildrenInParent) > 0) {
                     $fees_parent = DB::table('organization_user')
-                        ->where('id',)
+                        ->where('id', '=', $parent_id[$i]->id)
                         ->update(['fees_status' => 'Not Complete']);
 
                     DB::table('fees_new_organization_user')->insert([
@@ -1075,6 +1075,14 @@ class FeesController extends AppBaseController
     // show the main page for yuran pelajar (assign yuran for one student)
     public function AssignFeesToStudentIndex()
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $organization = $this->getOrganizationByUserId();
 
         return view('fee.assign_fees_to_student.index', compact("organization"));
@@ -1083,6 +1091,14 @@ class FeesController extends AppBaseController
     // show the edit page for adding or removing yuran from student (assign yuran for one student)
     public function AssignFeesToStudentEdit(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $oid = $request->get("oid");
         $organization = Organization::findOrFail($oid);
 
@@ -1100,6 +1116,14 @@ class FeesController extends AppBaseController
     // update data for adding or removing yuran from student (assign yuran for one student) into database
     public function AssignFeesToStudentUpdate(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $feesSelected = $request->get("fees_selected");
         $classId = $request->get("class_id");
         $oid = $request->get("oid");
@@ -1179,6 +1203,14 @@ class FeesController extends AppBaseController
     // show the main page for pelajar yuran (assign students for one yuran)
     public function AssignStudentsToFeeIndex()
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $organization = $this->getOrganizationByUserId();
 
         return view('fee.assign_students_to_fee.index', compact("organization"));
@@ -1187,6 +1219,14 @@ class FeesController extends AppBaseController
     // show the edit page for adding or removing students from fees (assign students for one yuran)
     public function AssignStudentsToFeeEdit(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $oid = $request->get("oid");
         $organization = Organization::findOrFail($oid);
 
@@ -1200,6 +1240,14 @@ class FeesController extends AppBaseController
     // update data for adding or removing students from yuran (assign students for one yuran) into database
     public function AssignStudentsToFeeUpdate(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $oid = $request->get("oid");
         $feeId = $request->get("fee_id");
         $selectedStudentIds = $request->get("students_selected");
@@ -1295,12 +1343,17 @@ class FeesController extends AppBaseController
     }
 
     // helper method to fetch all fees within an organization
-    public function fetchAllFeesByOrganization($oid)
+    public function fetchAllFeesByOrgAndCategories($oid, $categories)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
         return DB::table("fees_new as fn")
             ->join("organizations as o", "fn.organization_id", "=", "o.id")
             ->select("fn.id as fee_id", "fn.name as fee_name", "fn.category as fee_category", "fn.status as fee_status")
             ->where("o.id", "=", $oid)
+            ->whereIn("fn.category", $categories)
             ->where("fn.status", "=", 1)
             ->orderBy("fn.category", "asc")
             ->orderBy("fn.name", "asc")
@@ -1310,8 +1363,16 @@ class FeesController extends AppBaseController
     // route method to fetch all fees datatable within an organization
     public function fetchAllFeesDatatableByOrg(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $oid = $request->get("oid");
-        $data = $this->fetchAllFeesByOrganization($oid);
+        $data = $this->fetchAllFeesByOrgAndCategories($oid, ["Kategori B", "Kategori C", "Kategori Berulang"]);
 
         $table = Datatables::of($data);
 
@@ -1329,8 +1390,12 @@ class FeesController extends AppBaseController
     }
 
     // helper method to fetch a fee details with their asscociated students by fee id and return as collection
-    public function fetchOneFeeToManyStudents($oid, $feeId = null)
+    public function fetchOneFeeToManyStudents($oid, $feeId = null, $classId = null)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
         return DB::table("fees_new as fn")
             ->leftJoin("student_fees_new as sfn", "fn.id", "=", "sfn.fees_id")
             ->leftJoin("class_student as cs", "cs.id", "=", "sfn.class_student_id")
@@ -1349,6 +1414,7 @@ class FeesController extends AppBaseController
             )
             ->where("fn.organization_id", "=", $oid)
             ->where("fn.id", "LIKE", isset($feeId) ? $feeId : "%%")
+            ->where("co.class_id", "LIKE", isset($classId) ? $classId : "%%")
             ->get()
             ->groupBy("fee_id")
             ->map(function ($group) {
@@ -1374,10 +1440,19 @@ class FeesController extends AppBaseController
 
     public function fetchOneFeeToManyStudentsJson(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $oid = $request->get("oid");
         $feeId = $request->get("feeId");
+        $classId = $request->get("classId");
 
-        $data = $this->fetchOneFeeToManyStudents($oid, $feeId)->values();
+        $data = $this->fetchOneFeeToManyStudents($oid, $feeId, $classId)->values();
 
         return response()->json($data);
     }
@@ -1385,6 +1460,10 @@ class FeesController extends AppBaseController
     // helper method to fetch a student details with their fees by student's class id and return as collection
     public function fetchOneStudentToManyFees($oid, $classId, $studentId = null)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
         return DB::table("students as s")
             ->join("class_student as cs", "s.id", "=", "cs.student_id")
             ->join("class_organization as co", "co.id", "=", "cs.organclass_id")
@@ -1403,6 +1482,7 @@ class FeesController extends AppBaseController
             ->where("co.organization_id", "=", $oid)
             ->where("co.class_id", "=", $classId)
             ->where("s.id", "LIKE", isset($studentId) ? $studentId : "%%")
+            ->where("cs.status", "!=", -1)
             ->orderBy("fee_category", "asc")
             ->orderBy("fee_name", "asc")
             ->get()
@@ -1477,6 +1557,14 @@ class FeesController extends AppBaseController
     // method to return Datatable for the student fees retrieved in fetchStudentFeesByClass method
     public function fetchOneStudentToManyFeesDatatable(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole("Superadmin") && !Auth::user()->hasRole("Pentadbir") && !Auth::user()->hasRole("Pentadbir Swasta")) {
+            return redirect('/home');
+        }
+
         $oid = $request->get('oid');
         $classId = $request->get('classid');
         $routeName = $request->get("routeName");
@@ -1490,7 +1578,7 @@ class FeesController extends AppBaseController
                  <a style='margin: 0 auto;' href='" .
                 route($routeName, ["oid" => $oid, "classId" => $classId, "studentId" => $row["student_id"]]) .
                 "'" .
-                (($row["student_status"] == 0)
+                (($row["student_status"] != 1)
                     ? " class='btn btn-primary disabled' aria-disabled='true'>"
                     : " class='btn btn-primary'>") .
                 "<i class='fa-solid fa-pen-to-square'></i> Ubah Suai Yuran</a>

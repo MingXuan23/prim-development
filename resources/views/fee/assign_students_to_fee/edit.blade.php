@@ -153,19 +153,22 @@
 
             // ************************** get all selected students for current fee based on class ********************************
             $("#classes").on("change", function () {
+                var allStudents = $("#students");
+                var selectedStudentsList = $("#students-selected");
+
+                selectedStudentsList.empty();
+                allStudents.empty();
+
                 // fetch students from current class that are selected
                 $.ajax({
                     url: "{{ route('fees.fetchOneFeeToManyStudentsJson') }}",
                     method: "GET",
                     data: {
                         oid: $("#organization-id").val(),
-                        feeId: $("#fee-id").val()
+                        feeId: $("#fee-id").val(),
+                        classId: $("#classes").val()
                     },
                     success: function (result) {
-                        var selectedStudentsList = $("#students-selected");
-
-                        selectedStudentsList.empty();
-
                         if (result[0].students[0].student_id != null) {
                             result[0].students.forEach(function (student) {
                                 if (student.student_fee_status === "Paid") {
@@ -187,7 +190,6 @@
                         status: null
                     },
                     success: function (result) {
-                        var allStudents = $("#students");
                         var selectedStudentsId = $("#students-selected option").map(function () {
                             return parseInt($(this).val());
                         }).get();

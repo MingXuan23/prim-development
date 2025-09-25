@@ -15,7 +15,7 @@
     <div class="row align-items-center">
         <div class="col-sm-6">
             <div class="page-title-box">
-                <h4 class="font-size-18">Ubah Yuran Pelajar</h4>
+                <h4 class="font-size-18">Permohonan Pendaftaran Pelajar Untuk Bayar Yuran</h4>
             </div>
         </div>
     </div>
@@ -48,16 +48,9 @@
                         <label>Organisasi</label>
                         <select name="organization" id="organization" class="form-control">
                             <option value="" disabled selected>Pilih Organisasi</option>
-                            @foreach($organization as $row)
+                            @foreach($organizations as $row)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
                             @endforeach
-                        </select>
-                    </div>
-
-                    <div id="dkelas" class="form-group">
-                        <label> Kelas </label>
-                        <select name="classes" id="classes" class="form-control">
-                            <option value="0" disabled selected>Pilih Kelas</option>
                         </select>
                     </div>
 
@@ -66,16 +59,18 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="table-responsive">
-                            <table id="studentsTable" class="table table-bordered table-striped dt-responsive wrap"
+                            <table id="pendingRegistrationsTable"
+                                class="table table-bordered table-striped dt-responsive wrap"
                                 style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                                 <thead>
                                     <tr style="text-align:center">
                                         <th>No</th>
+                                        <th>Nama Penjaga</th>
+                                        <th>No. Telefon Penjaga</th>
                                         <th>Nama Pelajar</th>
-                                        <th>Jantina</th>
-                                        <th>Status Pelajar</th>
-                                        <th>Yuran</th>
-                                        <th>Status Yuran</th>
+                                        <th>No. Kad Pengenalan Pelajar</th>
+                                        <th>Jantina Pelajar</th>
+                                        <th>Kelas</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -102,12 +97,6 @@
 
     <script>
         $(document).ready(function () {
-
-            if ($("#organization").val() == "") {
-                $("#organization").prop("selectedIndex", 1).trigger('change');
-                fetch_classes($("#organization").val(), '#classes');
-            }
-
             // function to fetch classes by organization
             function fetch_classes(oid = '', classId = '') {
                 var _token = $('input[name="_token"]').val();
@@ -128,32 +117,29 @@
                 })
             }
 
-            $('#classes').change(function () {
+            $('#organization, #classes').on('change', function () {
                 if ($(this).val() != '') {
-                    var classid = $("#classes option:selected").val();
-                    var studentsTable = $('#studentsTable');
+                    var classId = $("#classes option:selected").val();
+                    var pendingRegistrationsTable = $('#pendingRegistrationsTable');
 
                     // remove the initial data when the classes selection is being reselected
-                    studentsTable.DataTable().clear().destroy();
+                    pendingRegistrationsTable.DataTable().clear().destroy();
 
                     // add data to the yuran table to display all students with respective exportAllYuranStatus
-                    studentsTable = studentsTable.DataTable({
+                    pendingRegistrationsTable = pendingRegistrationsTable.DataTable({
                         ordering: true,
                         processing: true,
                         serverSide: true,
                         ajax: {
-                            url: "{{ route('fees.fetchOneStudentToManyFeesDatatable') }}",
+                            url: "{{ route('student.parentRegisterStudents.getAllPendingRegistrations') }}",
                             method: "GET",
                             data: {
                                 oid: $('#organization').val(),
-                                classid: classid,
-                                routeName: "fees.assignFeesToStudentEdit"
                             }
                         },
                         'columnDefs': [{
-                            "targets": [0, 1, 2, 3, 4, 5],
-                            "className": "text-center",
-                            "width": "2%"
+                            "targets": [0, 1, 2, 3, 4, 5, 6],
+                            "className": "text-center"
                         }],
                         order: [
                             [1, 'asc']
@@ -169,72 +155,54 @@
                                 "width": "5%"
                             },
                             {
-                                data: "student_name",
-                                name: "student_name",
-                                "width": "20%"
+                                data: "parent_name",
+                                name: "parent_name",
+                                "width": "10%"
                             },
                             {
-                                data: "gender",
+                                data: "telno",
+                                name: "telno",
+                                "width": "10%"
+                            },
+                            {
+                                data: "student_name",
+                                name: "student_name",
                                 render: function (data, type, row) {
-                                    if (data == 'L') {
-                                        return "<p>Lelaki</p>";
-                                    } else if (data == 'P') {
-                                        return "<p>Perempuan</p>";
+                                    return "<span>" + data + "</span>";
+                                },
+                                "width": "17%"
+                            },
+                            {
+                                data: "student_icno",
+                                name: "student_icno",
+                                render: function (data, type, row) {
+                                    return "<span>" + data + "</span>"
+                                },
+                                "width": "15%"
+                            },
+                            {
+                                data: "student_gender",
+                                name: "student_gender",
+                                render: function (data, type, row) {
+                                    if (data == "L") {
+                                        return "<span>Lelaki</span>";
+                                    } else {
+                                        return "<span>Perempuan</span>";
                                     }
                                 },
                                 "width": "5%"
                             },
                             {
-                                data: "student_status",
+                                name: "student_class",
+                                data: "student_class",
                                 render: function (data, type, row) {
-                                    if (data == 1) {
-                                        return "<p>Active</p>";
-                                    } else {
-                                        return "<p>Inactive</p>";
-                                    }
+                                    return "<span>" + data + "</span>";
                                 },
                                 "width": "10%"
                             },
                             {
-                                data: "fees",
-                                render: function (data, type, row) {
-                                    // if the first object in the data array has null values, return a dash (-)
-                                    if (data[0]['fee_category'] == null) {
-                                        return "<span>-</span>";
-                                    }
-
-                                    // (to prevent the yuran name and status yuran from having line misarrangement)
-                                    return data
-                                        .map(fee => {
-                                            if (fee.fee_category != null && fee.fee_name != null) {
-                                                return "<span class='text-truncate'>" + fee.fee_category + " - " + fee.fee_name + "</span>";
-                                            }
-                                        })
-                                        .join("<br>");
-                                },
-                                "width": "40%"
-                            },
-                            {
-                                data: "fees",
-                                render: function (data, type, row) {
-                                    // if the first object in the data array has null values, return a dash (-)
-                                    if (data[0]['fee_status'] == null) {
-                                        return "<span>-</span>";
-                                    }
-
-                                    return data
-                                        .map(fee => {
-                                            if (fee.fee_status != null) {
-                                                return "<span>" + fee.fee_status + "</span>";
-                                            }
-                                        })
-                                        .join("<br>");
-                                },
-                                "width": "10%"
-                            },
-                            {
-                                data: "action",
-                                name: "action",
+                                data: "actions",
+                                name: "actions",
                                 "width": "15%"
                             }
                         ]
@@ -244,8 +212,6 @@
 
             $('#organization').on('change', function () {
                 // remove the initial data when the organization selection is being reselected
-                $('#studentsTable').DataTable().clear().destroy();
-
                 if ($(this).val() != '') {
                     fetch_classes($("#organization").val(), "#classes");
                 }
@@ -260,11 +226,5 @@
 
             $('.alert').delay(3000).fadeOut();
         });
-
-        function remindMessage() {
-            //document.querySelectorAll('#buttonExport').forEach(button => button.disabled = true);
-            if ($('#yuranExport1').val() == 0)
-                alert("To download all data may take more time,dont refresh the page");
-        }
     </script>
 @endsection
