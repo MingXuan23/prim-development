@@ -64,7 +64,7 @@ class LoginController extends Controller
         // $this->middleware('guest')->except('logout');
     }
 
-     /**
+    /**
      * Log the user out of the application.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -81,7 +81,8 @@ class LoginController extends Controller
         return redirect('/derma');
     }
 
-    public function startsWith($string, $startString) {
+    public function startsWith($string, $startString)
+    {
         $len = strlen($startString);
         return (substr($string, 0, $len) === $startString);
     }
@@ -97,79 +98,65 @@ class LoginController extends Controller
         // $request->get  get email (name) from form
         if (session()->has('intendedUrl')) {
             $intendedUrl = session()->pull('intendedUrl');
-            $this->redirectTo =$intendedUrl;
+            $this->redirectTo = $intendedUrl;
 
             session()->forget('intendedUrl');
         }
 
         $phone = $request->get('email');
-        
-        if(is_numeric($request->get('email'))){
+
+        if (is_numeric($request->get('email'))) {
             $user = User::where('icno', $phone)->first();
-           
+
             if ($user) {
                 //dd($user);
                 return ['icno' => $phone, 'password' => $request->get('password')];
             }
-            if(!$this->startsWith((string)$request->get('email'),"+60") && !$this->startsWith((string)$request->get('email'),"60")){
-                if(strlen((string)$request->get('email')) == 10)
-                {
+            if (!$this->startsWith((string)$request->get('email'), "+60") && !$this->startsWith((string)$request->get('email'), "60")) {
+                if (strlen((string)$request->get('email')) == 10) {
                     $phone = str_pad($request->get('email'), 12, "+60", STR_PAD_LEFT);
-                } 
-                elseif(strlen((string)$request->get('email')) == 11)
-                {
+                } elseif (strlen((string)$request->get('email')) == 11) {
                     $phone = str_pad($request->get('email'), 13, "+60", STR_PAD_LEFT);
-                }   
-            } else if($this->startsWith((string)$request->get('email'),"60")){
-                if(strlen((string)$request->get('email')) == 11)
-                {
+                }
+            } else if ($this->startsWith((string)$request->get('email'), "60")) {
+                if (strlen((string)$request->get('email')) == 11) {
                     $phone = str_pad($request->get('email'), 12, "+", STR_PAD_LEFT);
-                } 
-                elseif(strlen((string)$request->get('email')) == 12)
-                {
+                } elseif (strlen((string)$request->get('email')) == 12) {
                     $phone = str_pad($request->get('email'), 13, "+", STR_PAD_LEFT);
-                }   
+                }
             }
-            return ['telno'=>$phone,'password'=>$request->get('password')];
-
-           
-        }
-        else if(strpos($request->get('email'), "@") !== false){
-            return ['email' => $request->get('email'), 'password'=>$request->get('password')];
-        }
-        else{
-            return ['telno' => $phone, 'password'=>$request->get('password')];
-
+            return ['telno' => $phone, 'password' => $request->get('password')];
+        } else if (strpos($request->get('email'), "@") !== false) {
+            return ['email' => $request->get('email'), 'password' => $request->get('password')];
+        } else {
+            return ['telno' => $phone, 'password' => $request->get('password')];
         }
         // //elseif (filter_var($request->get('email'), FILTER_VALIDATE_EMAIL)) {
         //     return ['email' => $request->get('email'), 'password'=>$request->get('password')];
         // }
-        return ['email' => $request->get('email'), 'password'=>$request->get('password')];
+        return ['email' => $request->get('email'), 'password' => $request->get('password')];
     }
 
-    public static function loginAsGuest(){
+    public static function loginAsGuest()
+    {
         $guest = DB::table('users as u')
-                        ->join('model_has_roles as m','m.model_id','u.id')
-                        ->where('m.role_id',22)
-                        ->orderBy('u.updated_at')
-                        ->orderBy('u.id')
-                        ->select('u.id as guest_id')
-                        ->first();
-            DB::table('users')->where('id',$guest->guest_id)->update([
-                'updated_at'=>now()
-            ]);
-            $cart = DB::table('pgng_orders')->where('user_id', $guest->guest_id)->where('status','In cart')->delete();
-            //dd($cart);
-    
-            // DB::table('users')->update([
-            //     'updated_at'=>now()
-            // ]);
-            Auth::loginUsingId($guest->guest_id);
-             //dd($guestList);
-     
-    }
-    
-    
-}
+            ->join('model_has_roles as m', 'm.model_id', 'u.id')
+            ->where('m.role_id', 22)
+            ->orderBy('u.updated_at')
+            ->orderBy('u.id')
+            ->select('u.id as guest_id')
+            ->first();
+        DB::table('users')->where('id', $guest->guest_id)->update([
+            'updated_at' => now()
+        ]);
+        $cart = DB::table('pgng_orders')->where('user_id', $guest->guest_id)->where('status', 'In cart')->delete();
+        //dd($cart);
 
-   
+        // DB::table('users')->update([
+        //     'updated_at'=>now()
+        // ]);
+        Auth::loginUsingId($guest->guest_id);
+        //dd($guestList);
+
+    }
+}

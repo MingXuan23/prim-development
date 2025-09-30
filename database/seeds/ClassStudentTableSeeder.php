@@ -30,6 +30,21 @@ class ClassStudentTableSeeder extends Seeder
                 "student_id" => 2,
                 "status" => 1,
             ),
+            //below is students from 1 Bestari
+            2 =>
+            array(
+                "id" => 3,
+                "organclass_id" => 1,
+                "student_id" => 3,
+                "status" => 1,
+            ),
+            3 =>
+            array(
+                "id" => 4,
+                "organclass_id" => 1,
+                "student_id" => 4,
+                "status" => 0,
+            ),
         ));
     }
 }

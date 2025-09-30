@@ -32,6 +32,14 @@ class ClassOrganizationTableSeeder extends Seeder
                 "organization_id" => 4,
 
             ),
+            2 =>
+            array(
+                "id" => 3,
+                "class_id" => 3,
+                "organ_user_id" => 7,
+                "organization_id" => 2,
+
+            ),
         ));
     }
 }

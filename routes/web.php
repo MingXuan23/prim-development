@@ -22,6 +22,7 @@ Route::get('/mobile/receipt/download/{transaction_id}', [App\Http\Controllers\Mo
 
 Auth::routes();
 
+// Route::get('/register/{organizationId}', 'Auth\RegisterController@showRegistrationForm')->name('register.bayar_yuran');
 Route::get('registerAdmin', 'Auth\RegisterController@AdminRegisterIndex')->name('register.admin');
 Route::get('register_yuran', 'Auth\RegisterController@YuranRegisterIndex')->name('register.yuran_register');
 
@@ -38,8 +39,6 @@ Route::get('/form', 'HomeController@form');
 // Route::get('/organization-list', 'LandingPageController@organizationList');
 Route::get('/activity-list', 'LandingPageController@activitylist');
 Route::get('/activity-details', 'LandingPageController@activitydetails');
-
-
 
 
 //wan add
@@ -233,6 +232,16 @@ Route::group(['prefix' => 'student'], function () {
     Route::get('compareTransferStudentDiffOrg', 'StudentController@compareTransferStudentDiffOrg')->name('student.compareTransferStudentDiffOrg');
 
     Route::post('student/fetchClass', 'StudentController@fetchClass')->name('student.fetchClass');
+
+    // parent register student routes
+    Route::group(['prefix' => 'parentRegisterStudents', 'middleware' => ['auth']], function () {
+        Route::get("/add", "StudentController@parentRegisterStudentsCreate")->name("student.parentRegisterStudents.create");
+        Route::post("/store", "StudentController@parentRegisterStudentsStore")->name("student.parentRegisterStudents.store");
+
+        Route::get('/', 'StudentController@parentRegisterStudentsIndex')->name('student.parentRegisterStudents.index');
+        Route::get('/allPendingRegistrations', 'StudentController@getAllPendingRegistrations')->name('student.parentRegisterStudents.getAllPendingRegistrations');
+        Route::get('/acceptOrRejectRegistrations', 'StudentController@acceptOrRejectRegistrations')->name('student.parentRegisterStudents.acceptOrRejectRegistrations');
+    });
 });
 
 Route::group(['prefix' => 'fees'], function () {
@@ -264,6 +273,23 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/C', 'FeesController@CategoryC')->name('fees.C');
     Route::get('/add/C', 'FeesController@createCategoryC')->name('fees.createC');
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
+
+    // pages and routes for assigning multiple fees to one student
+    Route::group(['prefix' => 'assignFeesToStudent', 'middleware' => ['auth']], function () {
+        Route::get('/', 'FeesController@AssignFeesToStudentIndex')->name('fees.assignFeesToStudentIndex');
+        Route::get('/class', 'FeesController@fetchOneStudentToManyFeesDatatable')->name('fees.fetchOneStudentToManyFeesDatatable');
+        Route::get('/allStudentFees/org', 'FeesController@fetchAllFeesDatatableByOrg')->name('fees.fetchAllFeesDatatableByOrg');
+        Route::get('/edit', 'FeesController@AssignFeesToStudentEdit')->name('fees.assignFeesToStudentEdit');
+        Route::post('/update', 'FeesController@AssignFeesToStudentUpdate')->name('fees.assignFeesToStudentUpdate');
+    });
+
+    // pages and routes for assigning multiple students to one fee
+    Route::group(['prefix' => 'assignStudentsToFee', 'middleware' => ['auth']], function () {
+        Route::get('/class', 'FeesController@fetchOneFeeToManyStudentsJson')->name('fees.fetchOneFeeToManyStudentsJson');
+        Route::get('/', 'FeesController@AssignStudentsToFeeIndex')->name('fees.assignStudentsToFeeIndex');
+        Route::get('/edit', 'FeesController@AssignStudentsToFeeEdit')->name('fees.assignStudentsToFeeEdit');
+        Route::post('/update', 'FeesController@AssignStudentsToFeeUpdate')->name('fees.assignStudentsToFeeUpdate');
+    });
 
     //wan add
     Route::get('/Recurring', 'FeesController@CategoryRecurring')->name('fees.Recurring');
@@ -955,24 +981,24 @@ Route::group(['prefix' => 'polimas'], function () {
 });
 
 //offer & ride
-// Route::group(['prefix' => 'offernride'], function () {
-//     // Home page
-//     Route::get('/home', 'OfferNRideController@index')->name('offernride.index');
-//     // Manage Driver page
-//     Route::get('/driver', 'OfferNRideController@driver_index')->name('offernride.driver-index');
-//     Route::get('/driver/getDriverDatatable', 'OfferNRideController@getDriverDatatable')->name('offernride.getDriverDatatable');
-//     Route::get('/driver/add', 'OfferNRideController@driver_add')->name('offernride.driver-add');
-//     Route::post('/driver/add/store', 'OfferNRideController@driver_store')->name('offernride.driver-store');
-//     Route::get('/driver/{oid}{id}', 'OfferNRideController@driver_edit')->name('offernride.driver-edit');
-//     Route::post('/driver/fetchDrivers', 'OfferNRideController@fetchDrivers')->name('offernride.fetchDrivers');
-//     // Manage Vehicle page
-//     Route::get('/vehicle', 'OfferNRideController@vehicle_index')->name('offernride.vehicle-index');
-//     Route::get('/vehicle/getVehicleDatatable', 'OfferNRideController@getVehicleDatatable')->name('offernride.getVehicleDatatable');
-//     Route::get('/vehicle/add', 'OfferNRideController@vehicle_add')->name('offernride.vehicle-add');
-//     Route::post('/vehicle/add/store', 'OfferNRideController@Vehicle_store')->name('offernride.vehicle-store');
-//     Route::get('/vehicle/{oid}{id}', 'OfferNRideController@vehicle_edit')->name('offernride.vehicle-edit');
-//     // Manage Trip page
-//     Route::get('/trip', 'OfferNRideController@trip_index')->name('offernride.trip-index');
-//     Route::get('/trip/getTripDatatable', 'OfferNRideController@getTripDatatable')->name('offernride.getTripDatatable');
-//     Route::get('/trip/add', 'OfferNRideController@trip_add')->name('offernride.trip-add');
-// });
+Route::group(['prefix' => 'offernride'], function () {
+    // Home page
+    Route::get('/home', 'OfferNRideController@index')->name('offernride.index');
+    // Manage Driver page
+    Route::get('/driver', 'OfferNRideController@driver_index')->name('offernride.driver-index');
+    Route::get('/driver/getDriverDatatable', 'OfferNRideController@getDriverDatatable')->name('offernride.getDriverDatatable');
+    Route::get('/driver/add', 'OfferNRideController@driver_add')->name('offernride.driver-add');
+    Route::post('/driver/add/store', 'OfferNRideController@driver_store')->name('offernride.driver-store');
+    Route::get('/driver/{oid}{id}', 'OfferNRideController@driver_edit')->name('offernride.driver-edit');
+    Route::post('/driver/fetchDrivers', 'OfferNRideController@fetchDrivers')->name('offernride.fetchDrivers');
+    // Manage Vehicle page
+    Route::get('/vehicle', 'OfferNRideController@vehicle_index')->name('offernride.vehicle-index');
+    Route::get('/vehicle/getVehicleDatatable', 'OfferNRideController@getVehicleDatatable')->name('offernride.getVehicleDatatable');
+    Route::get('/vehicle/add', 'OfferNRideController@vehicle_add')->name('offernride.vehicle-add');
+    Route::post('/vehicle/add/store', 'OfferNRideController@Vehicle_store')->name('offernride.vehicle-store');
+    Route::get('/vehicle/{oid}{id}', 'OfferNRideController@vehicle_edit')->name('offernride.vehicle-edit');
+    // Manage Trip page
+    Route::get('/trip', 'OfferNRideController@trip_index')->name('offernride.trip-index');
+    Route::get('/trip/getTripDatatable', 'OfferNRideController@getTripDatatable')->name('offernride.getTripDatatable');
+    Route::get('/trip/add', 'OfferNRideController@trip_add')->name('offernride.trip-add');
+});
