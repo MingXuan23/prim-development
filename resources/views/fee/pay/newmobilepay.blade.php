@@ -154,7 +154,7 @@
                     </li>
                 </ul>
 
-                <form method="POST" action="{{ route('api.directpayIndex') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('directpayIndex') }}" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="amount" value="{{ $grandTotal }}">
                     <input type="hidden" name="o_id" value="{{ $getorganization ? $getorganization->id : '' }}">

@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('api.fpxIndex');
-Route::post('directpayIndex', 'DirectpayController@directpayIndex')->name('api.directpayIndex');
+Route::post('directpayIndex', 'DirectPayController@directpayIndex')->name('api.directpayIndex');
 Route::get('adminHandle', 'DirectPayController@handle');
 Route::get('devtrans', 'PayController@devtrans')->name('devtrans');
 
