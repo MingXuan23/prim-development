@@ -1077,7 +1077,7 @@ class StudentController extends Controller
             $organizations = DB::table("organizations as o")
                 ->join("organization_user as ou", "ou.organization_id", "=", "o.id")
                 ->select("o.*")
-                ->where("ou.id", "=", Auth::id())
+                ->where("ou.user_id", "=", Auth::id())
                 ->get();
         }
 
