@@ -70,6 +70,7 @@ Route::group(['prefix' => 'mobile'], function () {
 
         //new mobile yuran api
         Route::post('loginAndGetYuran', 'MobileAPI\NewYuranController@loginAndGetYuran');
+        Route::post('updateProfile', 'MobileAPI\NewYuranController@updateProfile');
     });
 });
 

@@ -117,7 +117,9 @@ class NewYuranController extends Controller
                     'fn.organization_id',
                     'fno.status as fno_status',
                     'fno.transaction_id',
-                    'ou.organization_id as ou_org_id'
+                    'ou.organization_id as ou_org_id',
+                    'fn.start_date',
+                    'fn.end_date'
                 )
                 ->whereIn('ou.organization_id', $orgIds)
                 ->where('ou.user_id', $user->id)
@@ -141,7 +143,9 @@ class NewYuranController extends Controller
                     'fn.organization_id',
                     'sfn.id as student_fees_new_id',
                     'sfn.status as sfn_status',
-                    'cs.student_id'
+                    'cs.student_id',
+                    'fn.start_date',
+                    'fn.end_date'
                 )
                 ->whereIn('cs.student_id', $studentIds)
                 ->where('fn.status', 1)
@@ -205,6 +209,9 @@ class NewYuranController extends Controller
                 ];
             }
 
+            $apiToken = bin2hex(random_bytes(32));
+            DB::table('users')->where('id', $user->id)->update(['api_token' => $apiToken]);
+
             return response()->json([
                 'success' => true,
                 'name' => $user->name,
@@ -215,6 +222,7 @@ class NewYuranController extends Controller
                 'address' => $user->address,
                 'postcode' => $user->postcode,
                 'state' => $user->state,
+                'api_token' => $apiToken,
                 'data' => $studentsData
             ], 200);
         } catch (\Exception $e) {
@@ -582,6 +590,115 @@ class NewYuranController extends Controller
             Log::critical('CRITICAL ERROR in mobile receipt download: ' . $e->getMessage());
             Log::critical('Stack trace: ' . $e->getTraceAsString());
             abort(500, 'Failed to generate receipt PDF.');
+        }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        try {
+            $userId = $request->input('user_id');
+            $apiToken = $request->input('user_token');
+
+            if (!$userId || !$apiToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required parameter: user_id or user_token'
+                ], 400);
+            }
+
+            $currentUser = DB::table('users')
+                ->where('id', $userId)
+                ->where('api_token', $apiToken)
+                ->first();
+
+            if (!$currentUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access.'
+                ], 401);
+            }
+
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . $userId,
+                'username' => 'nullable|string|max:255|unique:users,username,' . $userId,
+                'icno' => 'nullable|string|max:20|unique:users,icno,' . $userId,
+                'telno' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:255',
+                'postcode' => 'nullable|string|max:10',
+                'state' => 'nullable|string|max:50',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed.',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $newData = array_filter([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'username' => $request->input('username'),
+                'icno' => $request->input('icno'),
+                'telno' => $request->input('telno'),
+                'address' => $request->input('address'),
+                'postcode' => $request->input('postcode'),
+                'state' => $request->input('state'),
+            ], fn($value) => $value !== '');
+
+            $fieldsToCompare = ['name', 'email', 'username', 'icno', 'telno', 'address', 'postcode', 'state'];
+            $hasChanges = false;
+
+            foreach ($fieldsToCompare as $field) {
+                $currentValue = $currentUser->$field ?? '';
+                $newValue = $newData[$field] ?? '';
+                if ($currentValue !== $newValue) {
+                    $hasChanges = true;
+                    break;
+                }
+            }
+
+            if (!$hasChanges) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tiada perubahan dibuat.'
+                ], 200);
+            }
+
+            $newData['updated_at'] = now();
+            $updated = DB::table('users')->where('id', $userId)->update($newData);
+
+            if ($updated) {
+                $updatedUser = DB::table('users')->where('id', $userId)->first();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Profil berjaya dikemaskini.',
+                    'data' => [
+                        'name' => $updatedUser->name,
+                        'email' => $updatedUser->email,
+                        'username' => $updatedUser->username,
+                        'icno' => $updatedUser->icno,
+                        'telno' => $updatedUser->telno,
+                        'address' => $updatedUser->address,
+                        'postcode' => $updatedUser->postcode,
+                        'state' => $updatedUser->state,
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kemas kini gagal.'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in updateProfile: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat pelayan dalaman.'
+            ], 500);
         }
     }
 }

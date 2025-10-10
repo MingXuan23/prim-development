@@ -66,6 +66,9 @@
                     </div>
                     @endforeach
                 </div>
+                @if ($getstudentfees && $getstudentfees->isEmpty())
+                <hr>
+                @endif
 
                 @foreach ($get_fees_by_parent as $fee)
                 <input type="hidden" name="parent_fees_id[]" value="{{ $fee->id }}">
@@ -96,7 +99,7 @@
                     <div class="col-6">
                         <div class="row">
                             <div class="col-12">
-                                <h4>{{ $loop->parent->iteration }}. {{ $fee->name }}</h4>
+                                <h4>{{ $loop->iteration }}. {{ $fee->name }}</h4>
                             </div>
                             <div class="col-12">
                                 <h5 class="mt-0" style="color:#8699ad">
