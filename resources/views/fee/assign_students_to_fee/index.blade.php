@@ -168,7 +168,11 @@
                         {
                             data: "fee_status",
                             render: function (data, type, row) {
-                                return "<p>" + (data == 1) ? "Active" : "Inactive" + "</p>"
+                                if (data == 1) {
+                                    return "<span class='badge badge-success'>Aktif</span>"
+                                } else {
+                                    return "<span class='badge badge-danger'>Tidak Aktif</span>"
+                                }
                             },
                             "width": "10%"
                         },
