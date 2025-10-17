@@ -7,44 +7,9 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            padding: 20px;
-        }
-
-        .card {
-            border: none;
-            border-radius: 0;
-            overflow: hidden;
-        }
-
-        .card-body {
-            padding: 0;
-        }
-
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -15px;
-        }
-
-        .col-12,
-        .col-lg-3,
-        .col-lg-5,
-        .col-lg-4,
-        .col-sm-12,
-        .col-6,
-        .col-4,
-        .col-1,
-        .col-7 {
-            position: relative;
-            width: 100%;
-            padding: 0 15px;
+            margin: 20px;
+            font-size: 13px;
+            color: #000;
         }
 
         .text-center {
@@ -61,275 +26,218 @@
             font-weight: bold;
         }
 
-        h2,
-        h4,
-        h5 {
-            margin: 0.5rem 0;
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 13px;
         }
 
         th,
         td {
-            padding: 6px;
-            text-align: left;
-        }
-
-        .table-bordered th,
-        .table-bordered td {
+            padding: 6px 8px;
             border: 1px solid #ddd;
+            vertical-align: top;
         }
 
-        .table-striped tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
+        th {
+            background-color: #e9ecef;
+            font-weight: bold;
         }
 
-        .infotbl {
-            margin-bottom: 0;
-        }
-
-        .pl-2 {
-            padding-left: 1rem;
-        }
-
-        .w-200 {
-            width: 200px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
+        .table-title {
+            background-color: #e9ecef;
             text-align: center;
-            text-decoration: none;
-            border-radius: 4px;
-            cursor: pointer;
+            font-weight: bold;
         }
 
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            border: none;
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            border-bottom: 2px solid #e0e0e0;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            padding-bottom: 3px;
         }
 
-        .btn-fill {
+        .org-header {
             width: 100%;
+            margin-bottom: 15px;
         }
 
-        .g-0 {
-            gap: 0;
+        .org-header td {
+            border: none;
+            vertical-align: middle;
         }
 
-        .mdi-file-pdf::before {
-            content: "📄";
+        .org-name {
+            font-size: 16px;
+            font-weight: bold;
         }
 
-        .w-10 {
-            width: 10rem;
+        .address {
+            font-size: 13px;
+            line-height: 1.4;
         }
 
-        .mx-2 {
-            margin: 0 1rem;
+        .amount-total {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .amount-number {
+            font-size: 15px;
+            font-weight: bold;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="row mt-3">
-            <div class="col-12">
-                <div class="card mb-1">
-                    <div class="card-body py-5">
-                        <div class="row justify-content-center" style="background-color:#e9ecef">
-                            <h2 class="text-center">Resit Pembayaran Yuran</h2>
-                        </div>
-                        <br>
-                        <div class="row">
-                            <div class="col-lg-3 col-sm-12 p-0">
-                                <center>
-                                    @if($get_organization->organization_picture)
-                                    @php
-                                    $logoPath = public_path('organization-picture/' . $get_organization->organization_picture);
-                                    @endphp
-                                    @if(file_exists($logoPath))
-                                    <img src="{{ $logoPath }}" height="80" alt="{{ $get_organization->nama }}" />
-                                    @endif
-                                    @endif
-                                </center>
-                            </div>
-                            <div class="col-lg-5 col-sm-12 p-0">
-                                <h4>{{ $get_organization->nama }}</h4>
-                                <p>{{ $get_organization->address }},
-                                    <br />
-                                    {{ $get_organization->postcode }} {{ $get_organization->city }}, {{ $get_organization->state }}
-                                </p>
-                            </div>
-                            <div class="col-lg-4 col-sm-12">
-                                <table style="width: 100%">
-                                    <tr style="background-color:#e9ecef">
-                                        <th colspan="6" class="text-center">Maklumat Resit</th>
-                                    </tr>
-                                    <tr>
-                                        <td>No Resit</td>
-                                        <td style="width: 20px">:</td>
-                                        <td>{{ $get_transaction->description }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Tarikh</td>
-                                        <td>:</td>
-                                        <td>{{ $get_transaction->datetime_created->format('j M Y H:i:s A')}}</td>
-                                    </tr>
-                                </table>
-                            </div>
 
-                            <div class="col-12 pt-3">
-                                <table style="width: 100%">
-                                    <tr>
-                                        <th colspan="6" class="text-center" style="background-color:#e9ecef">
-                                            Maklumat Pembayar
-                                        </th>
-                                    </tr>
-                                </table>
+    <h2>Resit Pembayaran Yuran</h2>
 
-
-
-                                <div class="row g-0">
-                                    <div class="col-sm-12 col-lg-6">
-                                        <table class="table table-borderless infotbl mb-0">
-                                            <tr>
-                                                <td class="col-4"><strong>Nama</strong></td>
-                                                <td class="col-1">:</td>
-                                                <td class="col-7">{{ $getparent->name }}</td>
-                                            </tr>
-                                        </table>
-                                    </div>
-
-                                    <div class="col-sm-12 col-lg-6">
-                                        <table class="table table-borderless infotbl mb-0">
-                                            <tr>
-                                                <td class="col-4"><strong>No. Kad Pengenalan</strong></td>
-                                                <td class="col-1">:</td>
-                                                <td class="col-7">
-                                                    @if($getparent->icno)
-                                                    {{ $getparent->icno }}
-                                                    @else
-                                                    {{ $getparent->telno }}
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <br>
-
-                                @if (count($getfees_categoryA) != 0)
-                                <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 20px">
-                                    <strong>{{ $get_organization->nama }}</strong>
-                                </div>
-
-                                <div class="pt-2 pb-2">
-                                    Kategori A
-                                </div>
-
-                                <table class="table table-bordered table-striped">
-                                    <tr style="text-align: center">
-                                        <th style="width:3%">Bil.</th>
-                                        <th>Item</th>
-                                        <th style="width:20%">Amaun (RM)</th>
-                                    </tr>
-                                    @foreach ($getfees_categoryA as $item)
-                                    <tr>
-                                        <td style="text-align: center"> {{ $loop->iteration }}.</td>
-                                        <td>
-                                            <div class="pl-2"> {{ $item->name }} x {{ $item->quantity }} </div>
-                                        </td>
-                                        <td style="text-align: center">
-                                            {{ number_format((float)$item->totalAmount, 2, '.', '') }}
-                                        </td>
-                                    </tr>
-                                    @endforeach
-
-                                    <tr>
-                                        <td></td>
-                                        <td style="text-align:center"><b>Jumlah</b></td>
-                                        <td style="text-align:center">
-                                            <b>{{ number_format($getfees_categoryA->sum('totalAmount'), 2) }}</b>
-                                        </td>
-                                    </tr>
-                                </table>
-                                @endif
-
-                                @if (count($get_student) != 0)
-                                @foreach ($get_student as $student)
-                                <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 20px">
-                                    <strong> {{ $student->nama }} ({{ $student->classname }})</strong>
-                                </div>
-
-                                @foreach ($get_category->where('studentid', $student->id) as $category)
-                                <div class="pt-2 pb-2">
-                                    {{ $category->category }}
-                                </div>
-
-                                <table class="table table-bordered table-striped">
-                                    <tr style="text-align: center">
-                                        <th style="width:3%">Bil.</th>
-                                        <th>Item</th>
-                                        <th style="width:20%">Amaun (RM)</th>
-                                    </tr>
-                                    @foreach ($get_fees->where('studentid', $student->id)->where('category', $category->category) as $item)
-                                    <tr>
-                                        <td style="text-align: center"> {{ $loop->iteration }}.</td>
-                                        <td>
-                                            <div class="pl-2"> {{ $item->name }} x {{ $item->quantity }} </div>
-                                        </td>
-                                        <td style="text-align: center">
-                                            {{ number_format((float)$item->totalAmount, 2, '.', '') }}
-                                        </td>
-                                    </tr>
-                                    @endforeach
-
-                                    <tr>
-                                        <td></td>
-                                        <td style="text-align:center"><b>Jumlah</b></td>
-                                        <td style="text-align:center">
-                                            <b>{{ number_format($get_fees->where('studentid', $student->id)->where('category', $category->category)->sum('totalAmount'), 2) }}</b>
-                                        </td>
-                                    </tr>
-                                </table>
-                                @endforeach
-                                @endforeach
-                                @endif
-
-                                <table style="width:100%" class="infotbl">
-                                    <tr>
-                                        <td></td>
-                                        <td colspan="3" style="text-align:right">
-                                            Caj yang dikenakan oleh organisasi (RM)
-                                        </td>
-                                        <td style="text-align:center;width:20%">
-                                            {{ number_format((float)$get_organization->fixed_charges, 2, '.', '') }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran (RM)</b></td>
-                                        <td style="text-align:center; width:20%; font-size:18px">
-                                            <b>{{ number_format((float)$get_transaction->amount, 2, '.', '') }}</b>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Organization header -->
+    <table class="org-header">
+        <tr>
+            <td style="width:20%; text-align:center;">
+                @if(!empty($get_organization->organization_picture))
+                @php
+                $imageUrl = 'https://prim.my/organization-picture/' . $get_organization->organization_picture;
+                $headers = @get_headers($imageUrl);
+                $imageExists = $headers && strpos($headers[0], '200') !== false;
+                @endphp
+                @if($imageExists)
+                <img src="{{ $imageUrl }}" height="80" alt="">
+                @endif
+                @endif
+            </td>
+            <td style="width:80%;">
+                <div class="org-name">{{ $get_organization->nama }}</div>
+                <div class="address">
+                    {{ $get_organization->address }},
+                    <br>{{ $get_organization->postcode }} {{ $get_organization->city }}, {{ $get_organization->state }}
                 </div>
-            </div>
-        </div>
-    </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Maklumat Resit -->
+    <table>
+        <tr>
+            <th colspan="2" class="table-title">Maklumat Resit</th>
+        </tr>
+        <tr>
+            <td style="width:30%;">No Resit</td>
+            <td>{{ $get_transaction->description }}</td>
+        </tr>
+        <tr>
+            <td>No Transaksi FPX</td>
+            <td>{{ $get_transaction->transac_no ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td>Tarikh</td>
+            <td>{{ $get_transaction->datetime_created->format('j M Y H:i:s A') }}</td>
+        </tr>
+    </table>
+
+    <!-- Maklumat Pembayar -->
+    <table>
+        <tr>
+            <th colspan="2" class="table-title">Maklumat Pembayar</th>
+        </tr>
+        <tr>
+            <td style="width:30%;">Nama</td>
+            <td>{{ $getparent->name }}</td>
+        </tr>
+        <tr>
+            <td>No. Kad Pengenalan</td>
+            <td>
+                @if($getparent->icno)
+                {{ $getparent->icno }}
+                @else
+                {{ $getparent->telno }}
+                @endif
+            </td>
+        </tr>
+    </table>
+
+    <!-- Category A -->
+    @if (count($getfees_categoryA) != 0)
+    <div class="section-title">{{ $get_organization->nama }}</div>
+    <div style="font-weight:bold; margin-bottom:5px;">Kategori A</div>
+    <table>
+        <tr>
+            <th style="width:5%; text-align:center;">Bil.</th>
+            <th>Item</th>
+            <th style="width:20%; text-align:center;">Amaun (RM)</th>
+        </tr>
+        @foreach ($getfees_categoryA as $item)
+        <tr>
+            <td style="text-align:center;">{{ $loop->iteration }}</td>
+            <td>{{ $item->name }} x {{ $item->quantity }}</td>
+            <td style="text-align:center;">{{ number_format((float)$item->totalAmount, 2, '.', '') }}</td>
+        </tr>
+        @endforeach
+        <tr>
+            <td></td>
+            <td style="text-align:right;"><strong>Jumlah</strong></td>
+            <td style="text-align:center;"><strong>{{ number_format($getfees_categoryA->sum('totalAmount'), 2) }}</strong></td>
+        </tr>
+    </table>
+    @endif
+
+    <!-- Student & Categories -->
+    @if (count($get_student) != 0)
+    @foreach ($get_student as $student)
+    <div class="section-title">{{ $student->nama }} ({{ $student->classname }})</div>
+    @foreach ($get_category->where('studentid', $student->id) as $category)
+    <div style="font-weight:bold; margin-bottom:5px;">{{ $category->category }}</div>
+    <table>
+        <tr>
+            <th style="width:5%; text-align:center;">Bil.</th>
+            <th>Item</th>
+            <th style="width:20%; text-align:center;">Amaun (RM)</th>
+        </tr>
+        @foreach ($get_fees->where('studentid', $student->id)->where('category', $category->category) as $item)
+        <tr>
+            <td style="text-align:center;">{{ $loop->iteration }}</td>
+            <td>{{ $item->name }} x {{ $item->quantity }}</td>
+            <td style="text-align:center;">{{ number_format((float)$item->totalAmount, 2, '.', '') }}</td>
+        </tr>
+        @endforeach
+        <tr>
+            <td></td>
+            <td style="text-align:right;"><strong>Jumlah</strong></td>
+            <td style="text-align:center;"><strong>{{ number_format($get_fees->where('studentid', $student->id)->where('category', $category->category)->sum('totalAmount'), 2) }}</strong></td>
+        </tr>
+    </table>
+    @endforeach
+    @endforeach
+    @endif
+
+    <!-- Total Summary -->
+    <table>
+        <tr>
+            <td style="border:none;"></td>
+            <td colspan="3" style="text-align:right; border:none;">Caj yang dikenakan oleh organisasi (RM)</td>
+            <td style="text-align:center; width:20%;">{{ number_format((float)$get_organization->fixed_charges, 2, '.', '') }}</td>
+        </tr>
+        <tr>
+            <td style="border:none;"></td>
+            <td colspan="3" class="amount-total" style="text-align:right; border:none;">Jumlah Bayaran (RM)</td>
+            <td class="amount-number">{{ number_format((float)$get_transaction->amount, 2, '.', '') }}</td>
+        </tr>
+    </table>
+
 </body>
 
 </html>
