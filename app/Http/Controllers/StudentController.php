@@ -1078,6 +1078,7 @@ class StudentController extends Controller
                 ->join("organization_user as ou", "ou.organization_id", "=", "o.id")
                 ->select("o.*")
                 ->where("ou.user_id", "=", Auth::id())
+                ->distinct()
                 ->get();
         }
 

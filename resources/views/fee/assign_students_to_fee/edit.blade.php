@@ -179,7 +179,7 @@
                 });
 
                 $.when(selectedStudentsData, allStudentsData).done(function (selectedStudentsData, allStudentsData) {
-                    if (selectedStudentsData[0][0].students[0].student_id != null) {
+                    if (selectedStudentsData[0].length > 0 && selectedStudentsData[0][0].students[0].student_id != null) {
                         selectedStudentsData[0][0].students.forEach(function (student) {
                             if (student.student_fee_status === "Paid") {
                                 selectedStudentsList.append("<option disabled selected value='" + student.student_id + "'>" + student.student_name + "</option>");
@@ -189,9 +189,14 @@
                         });
                     }
 
-                    var selectedStudentsId = $("#students-selected option").map(function () {
-                        return parseInt($(this).val());
-                    }).get();
+                    var studentsIdOption = $("#students-selected option");
+                    var selectedStudentsId = [];
+
+                    if (studentsIdOption.length > 0) {
+                        selectedStudentsId = $("#students-selected option").map(function () {
+                            return parseInt($(this).val());
+                        }).get();
+                    }
 
                     allStudentsData[0].data.forEach(student => {
                         if (student.id != null && !selectedStudentsId.includes(student.id)) {
