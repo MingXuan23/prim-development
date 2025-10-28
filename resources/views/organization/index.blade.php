@@ -103,7 +103,7 @@
         var organizationTable = $('#organizationTable').DataTable({
             ordering: true,
             processing: true,
-            serverSide: true,
+           // serverSide: true,
                 ajax: {
                     url: "{{ route('organization.getOrganizationDatatable') }}",
                     type: 'GET',

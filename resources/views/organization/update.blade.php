@@ -84,9 +84,9 @@
 
                             <div class="col">
                                 <div class="form-group">
-                                    <label>Seller Id</label>
-                                    <input type="text" name="seller_id" class="form-control" placeholder="Seller Id Organisasi"
-                                    value="{{ $org->seller_id }}" data-parsley-required-message="Sila masukkan seller id organisasi" required>
+                                    <label>Private Key</label>
+                                    <input type="text" name="seller_id" class="form-control" placeholder="Private Key Organisasi"
+                                    value="{{ $org->private_key }}" data-parsley-required-message="Sila masukkan Private Key Organisasi" required>
                                 </div>
                             </div>
                         </div>

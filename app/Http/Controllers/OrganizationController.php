@@ -296,6 +296,7 @@ class OrganizationController extends Controller
                 ->whereIn('role_id', [2, 1239])
                 ->get();
 
+          
             if ($exists->isEmpty()) {
                 return view('errors.404');
             }
@@ -339,7 +340,7 @@ class OrganizationController extends Controller
 
         if (isset($request->seller_id)) {
             Organization::where('id', $id)->update([
-                'seller_id'         => $request->seller_id,
+                'private_key'         => $request->seller_id,
                 'fixed_charges'      =>  $request->fixed_charges,
             ]);
         }
@@ -389,7 +390,7 @@ class OrganizationController extends Controller
                 })
                 //->rawColumns(['action'])
                 ->addColumn('status', function ($row) {
-                    if ($row->seller_id != null) {
+                    if ($row->private_key != null) {
                         $fpxstatus = '<span class="badge rounded-pill bg-success text-white">Ready</span>';
                     } else {
                         $fpxstatus = '<span class="badge rounded-pill bg-warning text-white">Pending</span>';
