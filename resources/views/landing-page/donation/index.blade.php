@@ -327,6 +327,25 @@
         .single-why-us-item .icon.gdbg-1{
             background-image: -webkit-linear-gradient(50deg, #b59bff 0, #9749f8 100%) !important;
         }
+
+        #section-tutorial{
+            margin-bottom: 5rem;
+        }
+        #video-container{
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 50%;
+            margin: 20px 0;
+        }
+        #video-container iframe{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         /* Display rules for different screen sizes */
         @media (max-width: 799px) {
             .leader-groups {
@@ -927,6 +946,20 @@
         </div>
     </section>
     <!--====== TESTIMONIAL PART ENDS ======-->
+
+    {{-- VIDEO START --}}
+    <section id="section-tutorial" class="container">
+        <div id="tutorial-wrapper">
+            <div class="mb-1-2 section-heading">
+                <h3 class="title py-4" style="text-align: center;">Video Kelebihan Sedekah di Pagi Hari</h3>
+            </div>
+                <div id="video-container" class="d-flex justify-content-center align-items-center">
+                    <iframe height="100%" width="100%" src="https://www.youtube.com/embed/m5GUnMwcG28?loop=1&controls=1"  allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+    </section>
+    {{-- VIDEO END --}}
 
     <!-- team member area start -->
     <section class="team-member-area" id="ourteam">
