@@ -34,6 +34,11 @@ use App\Imports\AssignFeeByParentIncome;
 
 class FeesController extends AppBaseController
 {
+    function __construct()
+    {
+        $this->updateStatusFees();
+    }
+
     public function index()
     {
         //
@@ -163,17 +168,33 @@ class FeesController extends AppBaseController
         }
     }
 
+    public function closeFee($id){
+        $result = DB::table('fees_new')
+            ->where('id', '=', $id)
+            ->update([
+            'status'        =>  '0'
+        ]);
+
+        if ($result) {
+            Session::flash('success', 'Yuran Berjaya Ditutup');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Yuran Gagal Ditutup');
+            return View::make('layouts/flash-messages');
+        }
+    }
+
     public function destroy($id)
     {
         $result = DB::table('fees_new')
             ->where('id', '=', $id)
             ->delete();
-        
-       /*  $result = DB::table('fees_new')
-            ->where('id', '=', $id)
-            ->update([
-                'status'        =>  '0'
-            ]); */
+
+    //    $result = DB::table('fees_new')
+    //         ->where('id', '=', $id)
+    //         ->update([
+    //         'status'        =>  '0'
+    //     ]);
 
         if ($result) {
             Session::flash('success', 'Yuran Berjaya Dipadam');
@@ -257,7 +278,7 @@ class FeesController extends AppBaseController
         $year   = $request->get('year');
 
         $organization = Organization::find($oid);
-        
+
         if ($organization->parent_org != null)
         {
             $oid = $organization->parent_org;
@@ -336,14 +357,14 @@ class FeesController extends AppBaseController
         //makesure student from parent_org is fetched
         $all_student = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
-           
+
             ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
             ->join('classes','classes.id','class_organization.class_id')
             ->where('classes.levelid','>',0)
             ->where('class_organization.organization_id', $oid)
             ->where('class_student.status',1)
             ->select('class_student.id as csid');
-        
+
         foreach($all_student->get() as $s){
             $check_debt = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
@@ -400,8 +421,8 @@ class FeesController extends AppBaseController
             //->whereIn('organization_id',[160,159,154,153,152,151,150,149,148,147,146,145,144,143,142,141,137,127,107,106,93,88,80])
             ->where('role_id', 6)
             ->where('status', 1);
-            
-        
+
+
         foreach($all_parent->get() as $p){
             $check_debt = DB::table('organization_user')
             ->join('fees_new_organization_user', 'fees_new_organization_user.organization_user_id', '=', 'organization_user.id')
@@ -412,9 +433,9 @@ class FeesController extends AppBaseController
             ->where('fees_new.status',1)
             ->where('fees_new_organization_user.status', 'Debt')
             ->count();
-    
+
             if ($check_debt == 0) {
-                
+
                 DB::table('organization_user')
                     ->where('id', $p->id)
                     ->where('role_id', 6)
@@ -422,8 +443,8 @@ class FeesController extends AppBaseController
                     ->update(['fees_status' => 'Completed']);
             }
         }
-      
-       
+
+
 
         // $parent_complete =  DB::table('organization_user')
         //     ->where('organization_id', $oid)
@@ -619,7 +640,7 @@ class FeesController extends AppBaseController
                     ->select('users.*', 'organization_user.organization_id')
                     ->distinct('users.id')
                     ->get();
-     
+
             } else {
                 // $data = DB::table('users')
                 //     ->join('organization_user', 'organization_user.user_id', '=', 'users.id')
@@ -790,7 +811,7 @@ class FeesController extends AppBaseController
                     'organization_user_id' => $parent_id[$i]->id,
                 ]);
                 }
-               
+
             }
 
             return redirect('/fees/A')->with('success', 'Yuran Kategori A telah berjaya dimasukkan');
@@ -812,9 +833,9 @@ class FeesController extends AppBaseController
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategori A")
-                        ->where('status', "1")
+                        // ->where('status', "1")
                         ->get();
-                    
+
                     foreach($data as $d)
                     {
                         $d->target = "Setiap Keluarga";
@@ -824,9 +845,9 @@ class FeesController extends AppBaseController
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategori B")
-                        ->where('status', "1")
+                        // ->where('status', "1")
                         ->get();
-                    
+
                     foreach($data as $d)
                     {
                         $level = json_decode($d->target);
@@ -847,7 +868,7 @@ class FeesController extends AppBaseController
                             $classes = DB::table('classes')
                                         ->whereIN('id', $level->data)
                                         ->get();
-                            
+
                             $d->target = "Kelas : ";
                             foreach($classes as $i=>$class)
                             {
@@ -860,9 +881,9 @@ class FeesController extends AppBaseController
                     $data     = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategori C")
-                        ->where('status', "1")
+                        // ->where('status', "1")
                         ->get();
-                    
+
                     foreach($data as $d)
                     {
                         $level = json_decode($d->target);
@@ -884,7 +905,7 @@ class FeesController extends AppBaseController
                             $classes = DB::table('classes')
                                         ->whereIN('id', $level->data)
                                         ->get();
-                            
+
                             $d->target = $d->target . $d->target = "Kelas : ";
                             foreach($classes as $i=>$class)
                             {
@@ -898,7 +919,7 @@ class FeesController extends AppBaseController
                         ->where('category', "Kategori Berulang")
                         ->where('status', "1")
                         ->get();
-                    
+
                     foreach($data as $d)
                     {
                         $level = json_decode($d->target);
@@ -919,7 +940,7 @@ class FeesController extends AppBaseController
                             $classes = DB::table('classes')
                                         ->whereIN('id', $level->data)
                                         ->get();
-                            
+
                             $d->target = "Kelas : ";
                             foreach($classes as $i=>$class)
                             {
@@ -944,16 +965,20 @@ class FeesController extends AppBaseController
                 }
             });
             //to do update status btn
-            /* $table->addColumn('action', function ($row) {
+            $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                if ($row->status == '1') {
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-info m-1">Tutup yuran</button></div>';
+                }else{
+                    // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                }
                 return $btn;
-            }); */
+            });
 
-            // $table->rawColumns(['status', 'action']);
-            $table->rawColumns(['target', 'status']);
+            $table->rawColumns(['status', 'action']);
+            // $table->rawColumns(['target', 'status']);
             return $table->make(true);
         }
     }
@@ -1084,9 +1109,9 @@ class FeesController extends AppBaseController
         // dd($request->get('level'));
         $level = $request->get('level');
         $oid = $request->get('oid');
-        
+
         $organization = Organization::find($oid);
-        
+
         if ($organization->parent_org != null)
         {
             $oid = $organization->parent_org;
@@ -1144,15 +1169,15 @@ class FeesController extends AppBaseController
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org: $oid)
                 ->where('classes.levelid','>',0)
                 ->where('classes.status', "1")
-                ->where('students.gender', $gender)  
+                ->where('students.gender', $gender)
                 ->get();
-           
+
             $data = array(
                 'data' => $level,
                 'gender' => $gender
             );
-        } 
-        else 
+        }
+        else
         {
             if($category == "Kategori Berulang")
             {
@@ -1208,7 +1233,7 @@ class FeesController extends AppBaseController
             $fees_student = DB::table('class_student')
                 ->where('id', $list[$i]->class_student_id)
                 ->update(['fees_status' => 'Not Complete']);
-            
+
             // DB::table('student_fees_new')->insert([
             //     'status' => 'Debt',
             //     'fees_id' => $fees,
@@ -1220,7 +1245,7 @@ class FeesController extends AppBaseController
                 'fees_id' => $fees,
                 'class_student_id' => $list[$i]->class_student_id,
             ]);
-            
+
             if($category == "Kategori Berulang")
             {
                 $datestarted = Carbon::parse($date_started); //back to original date without format (string to datetime)
@@ -1255,7 +1280,7 @@ class FeesController extends AppBaseController
 
         if ($category == "Kategori B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
-        } 
+        }
         else if($category == "Kategori C") {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
         }
@@ -1271,7 +1296,7 @@ class FeesController extends AppBaseController
 
     public function submitSamuraForm(Request $request)
     {
-       
+
 
         $file = $request->file('file');
 
@@ -1378,7 +1403,7 @@ class FeesController extends AppBaseController
                 'fees_id' => $fees,
                 'class_student_id' => $list[$i]->class_student_id,
             ]);
-            
+
             if($category == "Kategori Berulang")
             {
                 $datestarted = Carbon::parse($date_started); //back to original date without format (string to datetime)
@@ -1404,7 +1429,7 @@ class FeesController extends AppBaseController
                     'desc' => 'RM' . $total . '*' . $totalDayLeft . '/' . $totalDay,
                     'created_at' => now(),
                 ]);
-                
+
                 //dd($total * ($totalDayLeft / $totalDay));
             }
         }
@@ -1483,7 +1508,7 @@ class FeesController extends AppBaseController
                     'data' => $class_arr
                 );
             }
-            
+
         }
 
         $target = json_encode($data);
@@ -1501,7 +1526,7 @@ class FeesController extends AppBaseController
             'target'            => $target,
             'organization_id'   => $oid,
         ]);
-        
+
         for ($i = 0; $i < count($list_student); $i++) {
             $fees_student = DB::table('class_student')
                 ->where('id', $list_student[$i]->class_student_id)
@@ -1518,7 +1543,7 @@ class FeesController extends AppBaseController
                 'fees_id' => $fees,
                 'class_student_id' => $list_student[$i]->class_student_id,
             ]);
-            
+
             if($category == "Kategori Berulang")
             {
                 $datestarted = Carbon::parse($date_started); //back to original date without format (string to datetime)
@@ -1544,14 +1569,14 @@ class FeesController extends AppBaseController
                     'desc' => 'RM' . $total . '*' . $totalDayLeft . '/' . $totalDay,
                     'created_at' => now(),
                 ]);
-                
+
                 //dd($total * ($totalDayLeft / $totalDay));
             }
         }
-        
+
         if ($category == "Kategori B") {
             return redirect('/fees/B')->with('success', 'Yuran Kategori B telah berjaya dimasukkan');
-        } 
+        }
         else if($category == "Kategori C") {
             return redirect('/fees/C')->with('success', 'Yuran Kategori C telah berjaya dimasukkan');
         }
@@ -1589,7 +1614,7 @@ class FeesController extends AppBaseController
         {
             array_push($list_dependent, $dependent->studentid);
         }
-        
+
         // ************************* get list organization by parent  *******************************
 
         $organizations = DB::table('organizations')
@@ -1624,7 +1649,7 @@ class FeesController extends AppBaseController
             ->whereIn('students.id', $list_dependent)
             ->where('student_fees_new.status', 'Debt')
             ->get();
-       
+
         $getfees_bystudent = DB::table('students')
             ->join('class_student', 'class_student.student_id', '=', 'students.id')
             ->join('student_fees_new', 'student_fees_new.class_student_id', '=', 'class_student.id')
@@ -1666,7 +1691,7 @@ class FeesController extends AppBaseController
             ->where('organization_user.status', 1)
             ->where('fees_new_organization_user.status', 'Debt')
             ->get();
-            
+
         $getfees_category_A_byparent  = DB::table('fees_new')
             ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
@@ -1695,7 +1720,7 @@ class FeesController extends AppBaseController
             ->where('students.id', $student_id)
             ->where('fees_new.status',1)
             ->where('class_student.status',1)
-            
+
             ->orderBy('fees_new.name')
             ->get();
 
@@ -1751,19 +1776,19 @@ class FeesController extends AppBaseController
         $start_date = $request->date_started;
         $end_date   = $request->date_end;
         $show_all_payment = $request->show_all_payments =="true" ? true : false;
-    
+
         $org = DB::table('organizations')->where('id', $orgId)->first();
-    
+
         if ($org == null) {
             return redirect()->back()->withError('Invalid Organization!');
         }
-      
+
         return Excel::download(
             new ExportClassTransaction($class_id, $org, $start_date, $end_date, $show_all_payment),
             'class_transaction.xlsx'
         );
     }
-    
+
 
 
     public function searchreportswasta()
@@ -1890,7 +1915,7 @@ class FeesController extends AppBaseController
 
         if($request->start_date != null && $request->end_date != null){
             $listHisotry = $listHisotry->whereBetween('datetime_created',[$request->start_date,$request->end_date]);
-            
+
 
         }
         $listHisotry = $listHisotry->get();
@@ -1915,10 +1940,10 @@ class FeesController extends AppBaseController
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        
+
         return $listHisotry;
 
-       
+
     }
 
 
@@ -1929,12 +1954,12 @@ class FeesController extends AppBaseController
         $date = "_all";
         if($request->start_date != null && $request->end_date != null){
           $date ='_' .$request->start_date . '_ '. $request->end_date ;
-      
+
 
         }
         return Excel::download(new ExportTransaction($organization,$list), $organization->nama . $date. '.xlsx');
 
-        
+
     }
     public function cetegoryReportIndex(){
 
@@ -1966,7 +1991,7 @@ class FeesController extends AppBaseController
         //     return $student;
         // });
 
-        
+
         return view('fee.categoryReport.index', compact('organization'));
     }
 
@@ -2107,7 +2132,7 @@ class FeesController extends AppBaseController
                 ->orderBy('s.nama')
                 ->get()
                 ->keyBy('user_id');
-    
+
                 $feeA=DB::table('fees_new_organization_user as fou')
                         ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
                         ->where('ou.organization_id',$request->orgId)
@@ -2123,7 +2148,7 @@ class FeesController extends AppBaseController
                     }
                     return $student;
                 });
-                
+
             }
             else
             {
@@ -2154,7 +2179,7 @@ class FeesController extends AppBaseController
                     ->orderBy('s.nama')
                     ->get();
                 }
-                
+
             }
 
             $table = Datatables::of($data);
@@ -2171,10 +2196,10 @@ class FeesController extends AppBaseController
                     else {
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<span class="badge badge-success"> Telah Bayar </span></div>';
-    
+
                         return $btn;
                     }
-                    
+
                 } else {
                     $btn = '<div class="d-flex justify-content-center">';
                     $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
@@ -2192,7 +2217,7 @@ class FeesController extends AppBaseController
 
     public function ExportAllYuranStatus(Request $request)
     {
-       
+
         if($request->yuranExport==0){
             $yuran = DB::table('fees_new')
             ->where('organization_id', $request->organExport)
@@ -2207,14 +2232,14 @@ class FeesController extends AppBaseController
             $filename = str_replace('/','-',$yuran[0]->name);
 
         }
-        
+
 
         $orgtypeSwasta = DB::table('organizations as o')
             ->where('id', $request->organExport)
             ->where('o.type_org', 15)
             ->get();
 
-       
+
         if(!$orgtypeSwasta || count($orgtypeSwasta)==0)
         {
             return Excel::download(new ExportYuranStatus($yuran),  $filename. '.xlsx');
@@ -2223,7 +2248,7 @@ class FeesController extends AppBaseController
         {
             return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
         }
-        
+
     }
 
     public function ExportJumlahBayaranIbuBapa(Request $request)
@@ -2232,7 +2257,7 @@ class FeesController extends AppBaseController
         ->where('id',$request->organExport1)
         ->first();
 
-       if($request->yuranExport1!=0){   
+       if($request->yuranExport1!=0){
         $kelas= DB::table('classes')
         ->where('id', $request->yuranExport1)
         ->first();
@@ -2262,13 +2287,21 @@ class FeesController extends AppBaseController
     }
 
     public function exportYuranOverview(Request $request){
-        
+
         $org=DB::table('organizations')
         ->where('id',$request->organization)
         ->first();
         //dd($request);
         $filename="Yuran_Overview_".$org->nama;
         return Excel::download(new ExportYuranOverview($org->id ), $filename . '.xlsx');
+    }
+
+    public function updateStatusFees(){
+        DB::table('fees_new')
+            ->whereDate('end_date', '<', Carbon::now()->toDateString())
+            ->update([
+                'status' => '0'
+        ]);
     }
 }
 
@@ -2289,7 +2322,7 @@ class FeesController extends AppBaseController
 //         foreach($users as $u){
 
 //             DB::table('users')
-            
+
 //             ->where('id', $u->id)
 //             ->update([
 //                 'name'=> preg_replace('/^\s+|\s+$/u', '', $u->name)

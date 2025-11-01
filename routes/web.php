@@ -87,11 +87,11 @@ Route::group(['prefix' => 'codereq'], function () {
     Route::post('validateRequest', 'CodeRequestController@validateRequest')->name('codereq.validateRequest');
     Route::post('list_by_email', 'CodeRequestController@list_by_email')->name('codereq.list_by_email');
     Route::get('receipt/{token}', 'CodeRequestController@receipt')->name('codereq.receipt');
-  
+
 });
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'codereq'], function () {
-   
+
     Route::get('helperList', 'CodeRequestController@helperList')->name('codereq.helperList');
     Route::post('list_by_helper', 'CodeRequestController@list_by_helper')->name('codereq.list_by_helper');
     Route::get('helper_join_request/{id}/{status}', 'CodeRequestController@helper_join_request')->name('codereq.helper_join_request');
@@ -99,7 +99,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'codereq'], function () {
 
 
 
-  
+
 });
 
 // Route::group(['prefix' => 's-helper'], function () {
@@ -109,7 +109,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'codereq'], function () {
 
 Route::get('s-helper/show', 'CodeRequestController@show')->name('codereq.showlist');
 
-Route::resource('s-helper', 'CodeRequestController')->names('s_helper'); 
+Route::resource('s-helper', 'CodeRequestController')->names('s_helper');
 Route::resource('codereq', 'CodeRequestController')->names('codereq');
 
 
@@ -147,7 +147,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
     Route::get('donationStreak/{id}', 'PointController@viewDonationStreak')->name('point.viewDonationStreak');
     Route::get('getDonationStreakTransactionTable/{id}', 'PointController@getDonationStreakTransactionTable')->name('point.getDonationStreakTransactionTable');
 
-    
+
     Route::get('spinningWheel', 'PointController@spinningWheel')->name('point.spinningWheel');
     Route::get('shareReferralLink','PointController@shareReferralLink')->name('point.shareReferralLink');
     Route::get('getReferralCode', 'PointController@getReferralCode')->name('point.getReferralCode');
@@ -302,6 +302,8 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 
     Route::post('/list-fetchYuranbyOrganId', 'FeesController@fecthYuranByOrganizationId')->name('fees.fetchYuranByOrganId');
+
+    Route::post('/closeFee/{id}', 'FeesController@closeFee');
 });
 
 Route::group(['prefix' => 'parent'], function () {
