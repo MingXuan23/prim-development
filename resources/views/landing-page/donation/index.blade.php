@@ -11,6 +11,9 @@
 
     @include('landing-page.head')
     <style>
+        html{
+            scroll-behavior: smooth;
+        }
         /*whatsapp contact button*/
         #btn-whatsapp{
             position: fixed;
@@ -500,7 +503,9 @@
                         <p class="white" style="font-size: 20px;">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu Subuh. Allah menjanjikan
                             banyak kelebihan dan ganjarannya.
                             Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
-                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
+                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.
+                            Kami juga sediakan ganjaran di dunia untuk yang bersedekah subuh. Klik untuk <a class="text-white" href="#tutorial-wrapper"><mark> maklumat lanjut.</mark></a></p>
+                        </p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                         </div>
@@ -887,7 +892,7 @@
                 <div class="col-lg-10">
                     <div class="section-title">
                         <!-- section title -->
-                        <h3 class="title">Organisasi</h3>
+                        <h3 class="title" id="scroll-organisasi">Organisasi</h3>
                         <p>Antara organisasi derma yang berdaftar bersama PRiM.</p>
                     </div><!-- //. section title -->
                 </div>
