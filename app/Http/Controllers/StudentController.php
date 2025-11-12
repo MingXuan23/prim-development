@@ -1624,48 +1624,63 @@ class StudentController extends Controller
 
             $userId = Auth::id();
 
-            if ($classid != '' && !is_null($hasOrganizaton)) {
-                $data = DB::table('students')
-                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status', 'class_student.start_date')
-                    ->where([
-                        ['classes.id', $classid],
-                        ['class_student.status', 1],
-                    ])
-                    ->orderBy('students.nama')
-                    ->get();
+            $data = null;
 
-                $table = Datatables::of($data);
-
-                $table->addColumn('status', function ($row) {
-                    if ($row->status == '1') {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
-
-                        return $btn;
-                    } else {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
-
-                        return $btn;
-                    }
-                });
-
-                $table->addColumn('action', function ($row) {
-                    $token = csrf_token();
-                    $btn = '<div class="d-flex justify-content-center"></div>';
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1" target="_blank">Edit</a>';
-                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button>';
-                    $btn = $btn . '</div>';
-                    return $btn;
-                });
-
-                $table->rawColumns(['status', 'action']);
-                return $table->make(true);
+            if (!is_null($hasOrganizaton)) {
+                if ($classid == '') {
+                    $data = DB::table('students')
+                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                        ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                        ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                        ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status', 'class_student.start_date')
+                        ->where([
+                            ['class_student.status', 1],
+                        ])
+                        ->orderBy('students.nama')
+                        ->get();
+                } else {
+                    $data = DB::table('students')
+                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                        ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                        ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                        ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status', 'class_student.start_date')
+                        ->where([
+                            ['classes.id', $classid],
+                            ['class_student.status', 1],
+                        ])
+                        ->orderBy('students.nama')
+                        ->get();
+                }
             }
+
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == '1') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center"></div>';
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1" target="_blank">Edit</a>';
+                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button>';
+                $btn = $btn . '</div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
         }
     }
 
