@@ -1616,7 +1616,7 @@ class StudentController extends Controller
         // dd($request->oid);
 
         if (request()->ajax()) {
-            // $oid = $request->oid;
+            $oid = $request->oid;
 
             $classid = $request->classid;
 
@@ -1634,6 +1634,7 @@ class StudentController extends Controller
                         ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                         ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status', 'class_student.start_date')
                         ->where([
+                            ['class_organization.organization_id', $oid],
                             ['class_student.status', 1],
                         ])
                         ->orderBy('students.nama')

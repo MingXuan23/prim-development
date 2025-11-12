@@ -14,8 +14,8 @@
                 <h4 class="font-size-18">Pelajar</h4>
                 <h6>Senarai Pelajar Ikut Sekolah dan Kelas yang Dipilih</h5>
                     <!-- <ol class="breadcrumb mb-0">
-                                                <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                                            </ol> -->
+                                                                                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                                                                </ol> -->
             </div>
         </div>
     </div>
@@ -54,7 +54,7 @@
                         <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal"
                             data-target="#modelId1"> <i class="fas fa-plus"></i> Export Pelajar</a>
                         <!-- <a style="margin: 1px;" href="{{ route('exportstudent') }} " class="btn btn-success"> <i
-                                                        class="fas fa-plus"></i> Export</a> -->
+                                                                                            class="fas fa-plus"></i> Export</a> -->
                         {{-- {{ route('exportmurid') }} {{ route('murid.create') }} --}}
                         <a style="margin: 19px; float: right;" href="{{ route('student.create') }} " target="_blank"
                             class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Pelajar</a>
@@ -228,11 +228,6 @@
 
                 var studentTable;
 
-                if ($("#organization").val() != "") {
-                    $("#organization").prop("selectedIndex", 1).trigger('change');
-                    fetchClass($("#organization").val(), '#classes');
-                }
-
                 if ($("#organImport").val() != "") {
                     $("#organImport").prop("selectedIndex", 0).trigger('change');
                     fetchClass($("#organImport").val(), '#classImport');
@@ -276,6 +271,7 @@
                 // When visibility changes, detectFocus is executed
 
                 function fetch_data(cid = '') {
+
                     studentTable = $('#studentTable').DataTable({
                         processing: true,
                         serverSide: true,
@@ -284,7 +280,8 @@
                             url: "{{ route('student.getStudentDatatable') }}",
                             data: {
                                 classid: cid,
-                                hasOrganization: true
+                                hasOrganization: true,
+                                oid: $("#organization").val()
                             },
                             type: 'GET',
 
@@ -358,7 +355,9 @@
                 $('#organization').change(function () {
                     var organizationid = $("#organization").val();
                     var _token = $('input[name="_token"]').val();
+
                     // fetch students when organization is selected
+                    $('#studentTable').DataTable().clear().destroy();
                     fetch_data();
 
                     fetchClass(organizationid, "#classes");
