@@ -186,6 +186,7 @@ class FeesController extends AppBaseController
     public function getOrganizationByUserId()
     {
         $userId = Auth::id();
+
         if (Auth::user()->hasRole('Superadmin')) {
             return Organization::all();
 
@@ -2275,6 +2276,9 @@ class FeesController extends AppBaseController
 
     public function getFeesReceiptDataTable(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect("/login");
+        }
 
         if (Auth::user()->hasRole('Superadmin')) {
             if ($request->oid === NULL) {
@@ -2447,6 +2451,9 @@ class FeesController extends AppBaseController
 
     public function fetchClassForCateYuran(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect("/login");
+        }
 
         // dd($request->get('schid'));
         $organ = Organization::find($request->get('oid'));

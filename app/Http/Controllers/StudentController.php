@@ -1116,22 +1116,17 @@ class StudentController extends Controller
             // validate input for student info
             $validator = Validator::make([
                 "name" => $studentName,
-                "icno" => $request->get("icnos")[$index],
+                "email" => $request->get("emails")[$index],
+                "icno" => str_replace("-", "", $request->get("icnos")[$index]),
                 "gender" => $request->get("genders")[$index],
                 "class_id" => $request->get("class_ids")[$index],
             ], [
                 "name" => ["required", "string"],
-                "icno" => ['required', 'string', 'min:14', 'max:14', 'unique:students,icno'],
+                "email" => ["nullable", "email", "unique:students,email"],
+                "icno" => ['required', 'string', 'min:12', 'max:14', 'unique:students,icno'],
                 "gender" => ["required", Rule::in(["L", "P"])],
                 "class_id" => ["required"]
             ]);
-
-            // check if email already existed in students db
-            $emailsExisted = DB::table("students")->select("email")->get()->pluck("email")->toArray();
-
-            if ($request->get("emails")[$index] != null && in_array($request->get("emails")[$index], $emailsExisted)) {
-                return redirect()->back()->withErrors("Emel sudah didaftar.")->withInput();
-            }
 
             if ($validator->fails()) {
                 return redirect()->back()->withErrors($validator)->withInput();
@@ -1140,14 +1135,11 @@ class StudentController extends Controller
             // convert the student info to json object
             $studentInfo = json_encode([
                 "name" => $studentName,
-                "icno" => $request->get("icnos")[$index],
+                "icno" => str_replace("-", "", $request->get("icnos")[$index]),
                 "gender" => $request->get("genders")[$index],
                 "email" => $request->get("emails")[$index],
                 "class_id" => $request->get("class_ids")[$index],
             ]);
-
-            // add student info into the students array
-            // array_push($students, $studentInfo);
 
             // insert a new registration_requests
             DB::table("registration_requests")->insert([
@@ -1225,7 +1217,7 @@ class StudentController extends Controller
 
             if (in_array($studentInfo->icno, $icnosExisted)) {
                 DB::rollBack();
-                return redirect()->back()->withErrors("Salah satu no. kad pengenalan pelajar sudah didaftar dalam sistem.");
+                return redirect()->back()->withErrors("No. kad pengenalan pelajar sudah didaftar dalam sistem.");
             }
 
             // check if email to be registered is already in db
@@ -1233,7 +1225,7 @@ class StudentController extends Controller
 
             if (isset($studentInfo->email) && in_array($studentInfo->email, $emailsExisted)) {
                 DB::rollBack();
-                return redirect()->back()->withErrors("Salah satu email pelajar sudah didaftar dalam sistem.");
+                return redirect()->back()->withErrors("Emel pelajar sudah didaftar dalam sistem.");
             }
 
             // insert a new student
@@ -1624,7 +1616,7 @@ class StudentController extends Controller
         // dd($request->oid);
 
         if (request()->ajax()) {
-            // $oid = $request->oid;
+            $oid = $request->oid;
 
             $classid = $request->classid;
 
@@ -1632,48 +1624,64 @@ class StudentController extends Controller
 
             $userId = Auth::id();
 
-            if ($classid != '' && !is_null($hasOrganizaton)) {
-                $data = DB::table('students')
-                    ->join('class_student', 'class_student.student_id', '=', 'students.id')
-                    ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
-                    ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status', 'class_student.start_date')
-                    ->where([
-                        ['classes.id', $classid],
-                        ['class_student.status', 1],
-                    ])
-                    ->orderBy('students.nama')
-                    ->get();
+            $data = null;
 
-                $table = Datatables::of($data);
-
-                $table->addColumn('status', function ($row) {
-                    if ($row->status == '1') {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
-
-                        return $btn;
-                    } else {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
-
-                        return $btn;
-                    }
-                });
-
-                $table->addColumn('action', function ($row) {
-                    $token = csrf_token();
-                    $btn = '<div class="d-flex justify-content-center"></div>';
-                    $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1" target="_blank">Edit</a>';
-                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button>';
-                    $btn = $btn . '</div>';
-                    return $btn;
-                });
-
-                $table->rawColumns(['status', 'action']);
-                return $table->make(true);
+            if (!is_null($hasOrganizaton)) {
+                if ($classid == '') {
+                    $data = DB::table('students')
+                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                        ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                        ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                        ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status', 'class_student.start_date')
+                        ->where([
+                            ['class_organization.organization_id', $oid],
+                            ['class_student.status', 1],
+                        ])
+                        ->orderBy('students.nama')
+                        ->get();
+                } else {
+                    $data = DB::table('students')
+                        ->join('class_student', 'class_student.student_id', '=', 'students.id')
+                        ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
+                        ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+                        ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status', 'class_student.start_date')
+                        ->where([
+                            ['classes.id', $classid],
+                            ['class_student.status', 1],
+                        ])
+                        ->orderBy('students.nama')
+                        ->get();
+                }
             }
+
+            $table = Datatables::of($data);
+
+            $table->addColumn('status', function ($row) {
+                if ($row->status == '1') {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-success">Aktif</span></div>';
+
+                    return $btn;
+                } else {
+                    $btn = '<div class="d-flex justify-content-center">';
+                    $btn = $btn . '<span class="badge badge-danger"> Tidak Aktif </span></div>';
+
+                    return $btn;
+                }
+            });
+
+            $table->addColumn('action', function ($row) {
+                $token = csrf_token();
+                $btn = '<div class="d-flex justify-content-center"></div>';
+                $btn = '<div class="d-flex justify-content-center">';
+                $btn = $btn . '<a href="' . route('student.edit', $row->id) . '" class="btn btn-primary m-1" target="_blank">Edit</a>';
+                // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button>';
+                $btn = $btn . '</div>';
+                return $btn;
+            });
+
+            $table->rawColumns(['status', 'action']);
+            return $table->make(true);
         }
     }
 

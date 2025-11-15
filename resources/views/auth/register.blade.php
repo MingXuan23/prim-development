@@ -10,8 +10,8 @@
 
         <style>
             /* #name {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        text-transform: uppercase;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    text-transform: uppercase;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
 
             ::-webkit-input-placeholder {
                 /* WebKit browsers */
@@ -93,13 +93,13 @@
                                             <select name="registration_type" id="registration_type"
                                                 class="form-control @error('registration_type') is-invalid @enderror">
                                                 <option value="-">-- Sila Pilih --</option>
-                                                <option value="bayar_yuran">Bayar Yuran</option>
-                                                <option value="beli_barang">Beli Barang (Get &amp; Go)</option>
-                                                <option value="sewa_homestay">Sewa Homestay</option>
-                                                <option value="ganjaran_derma_prim">Ganjaran Derma PRiM</option>
+                                                <option value="bayar_yuran" {{ old('registration_type') == 'bayar_yuran' ? 'selected' : '' }}>Bayar Yuran</option>
+                                                <option value="beli_barang" {{ old('registration_type') == 'beli_barang' ? 'selected' : '' }}>Beli Barang(Get &amp; Go)</option>
+                                                <option value="sewa_homestay" {{ old('registration_type') == 'sewa_homestay' ? 'selected' : '' }}>Sewa Homestay</option>
+                                                <option value="ganjaran_derma_prim" {{ old('registration_type') == 'ganjaran_derma_prim' ? 'selected' : '' }}>
+                                                    Ganjaran Derma PRiM</option>
                                             </select>
                                             @error('registration_type')
-
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
                                                 </span>
@@ -131,8 +131,9 @@
                                         </div>
 
                                         {{-- Additional parent's icno for bayar_yuran--}}
-                                        <div class="form-group hide-section">
-                                            <label for="telno">No. Kad Pengenalan</label>
+                                        <div
+                                            class="form-group {{ old("registration_type") == "bayar_yuran" ? '' : 'hide-section' }}">
+                                            <label for="icno">No. Kad Pengenalan</label>
                                             <input type="text" name="icno" id="icno"
                                                 class="form-control @error('icno') is-invalid @enderror"
                                                 placeholder="No. Kad Pengenalan">
