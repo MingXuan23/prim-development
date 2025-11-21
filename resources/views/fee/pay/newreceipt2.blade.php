@@ -175,6 +175,16 @@
         .org-title {
             margin-top: 10px !important;
         }
+
+        .button-row {
+            white-space: nowrap;
+        }
+
+        .button-row button {
+            display: inline-flex;
+            margin: 0 8px;
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -348,9 +358,16 @@
                                     </tr>
                                 </table>
 
-                                <div class="col-12 pt-5 text-center">
-                                    <button id="downloadBtn" class="btn btn-primary p-2 w-10 mx-2 btn-fill" style="font-size:18px">
+                                <div class="col-12 pt-5 text-center button-row">
+                                    <button id="downloadBtn" class="btn btn-primary p-2 btn-fill" style="font-size:18px">
                                         <span class="mdi mdi-download"> Muat Turun </span>
+                                    </button>
+                                    <button
+                                        id="shareBtn"
+                                        class="btn btn-success p-2 btn-fill"
+                                        style="font-size:18px"
+                                        onclick="window.ShareChannel?.postMessage('share')">
+                                        <span class="mdi mdi-share"> Kongsi </span>
                                     </button>
                                 </div>
                             </div>
