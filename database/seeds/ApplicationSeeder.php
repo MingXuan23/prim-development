@@ -1,0 +1,25 @@
+<?php
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class ApplicationSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        DB::table('applications')->insert(
+            [
+                'application_name' => 'prim_bayarYuran_app',
+                'status'           => 1,
+                'author'           => 'sia',
+                'created_at'       => now(),
+                'updated_at'       => now(),
+            ],
+        );
+    }
+}

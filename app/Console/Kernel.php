@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
         //$schedule->command('transactionstatus:cron')->everyMinute();
         $schedule->command('fees:reminder')->dailyAt('09:00');
         $schedule->command('balances:reminder')->dailyAt('09:00');
+        $schedule->command('notification:send-fee-reminder')->dailyAt('08:00');
     }
 
     /**

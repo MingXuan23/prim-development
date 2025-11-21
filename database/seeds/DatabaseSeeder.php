@@ -33,5 +33,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ClassOrganizationTableSeeder::class);
         $this->call(ClassStudentTableSeeder::class);
         $this->call(ReferalCodeMemberLevelSeeder::class);
+        $this->call(ApplicationSeeder::class);
     }
 }
