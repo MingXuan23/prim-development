@@ -62,7 +62,8 @@
             
         ],
         "files": [
-            "app/helper.php"
+            "app/helper.php",
+            "app/FcmHelper.php"
         ]
     },
     "autoload-dev": {
