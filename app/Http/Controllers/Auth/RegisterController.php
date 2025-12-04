@@ -72,10 +72,10 @@ class RegisterController extends Controller
     {
 
         $validator = Validator::make($data, [
-            'name'              => ['required', 'string', 'max:255'],
-            'email'             => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
-            'telno'             => ['required', 'numeric', 'min:10'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
+            'telno' => ['required', 'numeric', 'min:10'],
 
 
         ], [
@@ -128,12 +128,12 @@ class RegisterController extends Controller
 
         //dd($data,isset($data['isAdmin']));
         $user = User::create([
-            'name'              => $data['name'],
-            'email'             => $data['email'],
-            'password'          => Hash::make($data['password']),
-            'telno'             => $data['telno'],
-            'remember_token'    => $data['_token'],
-            'purpose'           => $data['registration_type'] ?? ''
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'telno' => $data['telno'],
+            'remember_token' => $data['_token'],
+            'purpose' => $data['registration_type'] ?? ''
 
         ]);
         // dd($user);
@@ -169,11 +169,11 @@ class RegisterController extends Controller
         if ($request->input('registration_type') === 'bayar_yuran') {
             // validate input
             $validator = Validator::make($request->all(), [
-                'name'              => ['required', 'string', 'max:255'],
-                'email'             => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-                'password'          => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
-                'icno'              => ['required', 'string', 'min:12', 'max:14'],
-                'telno'             => ['required', 'numeric', 'min:10', 'unique:users,telno'],
+                'name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+                'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
+                'icno' => ['required', 'string', 'min:12', 'max:14'],
+                'telno' => ['required', 'numeric', 'min:10', 'unique:users,telno'],
             ]);
 
             // return error messages if validator fails
@@ -182,7 +182,12 @@ class RegisterController extends Controller
             }
 
             // check ic no seperately (some users might enter ic no with a '-' and some might won't)
-            $icExisted = DB::table("users")->where("icno", "=", str_replace("-", "", $request->get("icno")))->get();
+            $icEntered = str_replace("-", "", $request->get("icno"));
+            $icExisted = DB::table("users")
+                ->where("email", "LIKE", "%$icEntered%")
+                ->orWhere("telno", "LIKE", "%$icEntered%")
+                ->orWhere("icno", "=", $icEntered)
+                ->get();
 
             if ($icExisted->count() > 0) {
                 return redirect()->back()->withErrors(["icno" => "The IC No. has already been taken."])->withInput();
