@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Transaction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class NewYuranController extends Controller
 {
@@ -18,6 +20,7 @@ class NewYuranController extends Controller
     {
         try {
             $loginId = $request->input('email') ?? $request->input('login_id');
+            $rememberMe = $request->boolean('remember_me', false);
             if (!$loginId) {
                 return response()->json([
                     'success' => false,
@@ -117,7 +120,9 @@ class NewYuranController extends Controller
                     'fn.organization_id',
                     'fno.status as fno_status',
                     'fno.transaction_id',
-                    'ou.organization_id as ou_org_id'
+                    'ou.organization_id as ou_org_id',
+                    'fn.start_date',
+                    'fn.end_date'
                 )
                 ->whereIn('ou.organization_id', $orgIds)
                 ->where('ou.user_id', $user->id)
@@ -141,14 +146,16 @@ class NewYuranController extends Controller
                     'fn.organization_id',
                     'sfn.id as student_fees_new_id',
                     'sfn.status as sfn_status',
-                    'cs.student_id'
+                    'cs.student_id',
+                    'fn.start_date',
+                    'fn.end_date'
                 )
                 ->whereIn('cs.student_id', $studentIds)
                 ->where('fn.status', 1)
                 ->where('sfn.status', 'Debt')
                 ->get();
 
-            $receipts = DB::table('transactions as t')
+            $receiptsFromStudent = DB::table('transactions as t')
                 ->join('fees_transactions_new as ftn', 'ftn.transactions_id', '=', 't.id')
                 ->join('student_fees_new as sfn', 'sfn.id', '=', 'ftn.student_fees_id')
                 ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
@@ -156,10 +163,17 @@ class NewYuranController extends Controller
                 ->select('t.id', 't.nama', 't.description', 't.amount', 't.datetime_created as date', 'co.organization_id')
                 ->whereIn('co.organization_id', $orgIds)
                 ->where('t.user_id', $user->id)
-                ->where('t.description', 'like', 'YS%')
-                ->where('t.status', 'success')
-                ->distinct('t.id')
-                ->get();
+                ->where('t.status', 'Success');
+
+            $receiptsFromParent = DB::table('transactions as t')
+                ->join('fees_new_organization_user as fno', 'fno.transaction_id', '=', 't.id')
+                ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
+                ->select('t.id', 't.nama', 't.description', 't.amount', 't.datetime_created as date', 'ou.organization_id')
+                ->whereIn('ou.organization_id', $orgIds)
+                ->where('t.user_id', $user->id)
+                ->where('t.status', 'Success');
+
+            $receipts = $receiptsFromParent->union($receiptsFromStudent)->distinct()->get();
 
             $studentClassMap = DB::table('students as s')
                 ->join('class_student as cs', 'cs.student_id', '=', 's.id')
@@ -196,17 +210,83 @@ class NewYuranController extends Controller
                     }
                 }
 
-                $orgReceipts = $receipts->where('organization_id', $student->organization_id);
 
                 $studentsData[] = [
                     'student' => $student,
-                    'fees' => $allFees,
-                    'receipt' => $orgReceipts,
+                    'fees' => $allFees
                 ];
+            }
+
+
+            $existingToken = DB::table('user_token')->where('user_id', $user->id)->first();
+            $deviceToken = $request->input('device_token');
+
+            $isFirstTimeBind = false;
+
+            if (!$existingToken) {
+                $isFirstTimeBind = true;
+            } elseif ($existingToken->device_token !== $deviceToken) {
+                $isFirstTimeBind = true; 
+            }
+            $apiToken = bin2hex(random_bytes(32));
+
+            $fcmToken = $request->input('fcm_token');
+
+
+
+            if (!$deviceToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing device_token'
+                ], 400);
+            }
+
+            if ($existingToken && $existingToken->device_token !== null) {
+                if ($existingToken->device_token !== $deviceToken) {
+
+                    $boundDeviceToken = $existingToken->device_token;
+
+                    $deviceName = preg_replace('/^DEV_[^_]+_/', '', $boundDeviceToken);
+                    $deviceName = str_replace('_', '', $deviceName);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This account is ready bound to another device.',
+                        'error_code' => 'DEVICE_MISMATCH',
+                        'hint' => 'Akaun ini telah diikat kepada peranti: ' . $deviceName .
+                            '. Log masuk menggunakan peranti berdaftar, atau pilih "Peranti Hilang" untuk tukar peranti.'
+                    ], 409);
+                }
+            }
+
+            $tokenData = [
+                'api_token' => $apiToken,
+                'fcm_token' => $fcmToken,
+                'updated_at' => now(),
+                'expired_at' => now()->addYear(),
+                'device_token' => $deviceToken
+            ];
+
+            $rememberToken = null;
+            if ($rememberMe) {
+                $rememberToken = bin2hex(random_bytes(32));
+                $tokenData['remember_token'] = $rememberToken;
+            }
+
+
+            if ($existingToken) {
+                DB::table('user_token')
+                    ->where('user_id', $user->id)
+                    ->update($tokenData);
+            } else {
+                $tokenData['user_id'] = $user->id;
+                $tokenData['application_id'] = DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id');
+                DB::table('user_token')->insert($tokenData);
             }
 
             return response()->json([
                 'success' => true,
+                'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'username' => $user->username,
@@ -215,7 +295,11 @@ class NewYuranController extends Controller
                 'address' => $user->address,
                 'postcode' => $user->postcode,
                 'state' => $user->state,
-                'data' => $studentsData
+                'api_token' => $apiToken,
+                'remember_token' => $rememberToken,
+                'data' => $studentsData,
+                'receipts' => $receipts,
+                'is_first_time_device_bind' => $isFirstTimeBind
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -250,55 +334,66 @@ class NewYuranController extends Controller
         try {
             $sessionKey = $request->query('session_key');
             $mobileUserId = $request->query('user_id');
-            $mobileStudentFeesIdsStr = $request->query('student_fees_ids', '');
-            $mobileParentFeesIdsStr = $request->query('parent_fees_ids', '');
 
             if (!$sessionKey || !$mobileUserId) {
                 abort(400, 'Invalid mobile payment request.');
             }
 
-            $studentFeesNewIds = array_unique(array_filter(explode(',', $mobileStudentFeesIdsStr)));
-            $parentFeesIds = array_unique(array_filter(explode(',', $mobileParentFeesIdsStr)));
+            $rawStudent = $request->input('student_fees_id', []);
+            $rawParent  = $request->input('parent_fees_id', []);
+
+            $studentFeesNewIds = is_array($rawStudent)
+                ? array_map('intval', $rawStudent)
+                : (strlen($rawStudent) > 0 ? [(int)$rawStudent] : []);
+
+            $parentFeesNewIds = is_array($rawParent)
+                ? array_map('intval', $rawParent)
+                : (strlen($rawParent) > 0 ? [(int)$rawParent] : []);
+
+            $studentFeesNewIds = array_filter($studentFeesNewIds, fn($id) => is_int($id) && $id > 0);
+            $parentFeesNewIds = array_filter($parentFeesNewIds, fn($id) => is_int($id) && $id > 0);
+
+            if (empty($studentFeesNewIds) && empty($parentFeesNewIds)) {
+                abort(400, 'Tiada yuran dipilih.');
+            }
+
+
+            $orgUser = DB::table('organization_user')
+                ->where('user_id', $mobileUserId)
+                ->where('role_id', 6)
+                ->where('status', 1)
+                ->first();
+
+            if (!$orgUser) {
+                abort(400, 'Organization user not found for this guardian.');
+            }
 
             $getorganization = null;
             $getstudent = collect([]);
             $getstudentfees = collect([]);
-            $get_fees_by_parent = collect([]);
             $getfees_category_A_byparent = collect([]);
 
-            $orgUser = DB::table('organization_user')
-                ->join('organizations', 'organizations.id', '=', 'organization_user.organization_id')
-                ->select('organizations.*')
-                ->where('organization_user.user_id', $mobileUserId)
-                ->where('organization_user.role_id', 6)
-                ->where('organization_user.status', 1)
-                ->first();
+            if (!empty($studentFeesNewIds)) {
+                $orgId = DB::table('student_fees_new as sfn')
+                    ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+                    ->join('organization_user_student as ous', 'ous.student_id', '=', 'cs.student_id')
+                    ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                    ->whereIn('sfn.id', $studentFeesNewIds)
+                    ->value('ou.organization_id');
 
-            if ($orgUser) {
-                $getorganization = $orgUser;
-            } else {
-                if (!empty($studentFeesNewIds)) {
-                    $orgId = DB::table('student_fees_new as sfn')
-                        ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
-                        ->join('organization_user_student as ous', 'ous.student_id', '=', 'cs.student_id')
-                        ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
-                        ->whereIn('sfn.id', $studentFeesNewIds)
-                        ->value('ou.organization_id');
-
-                    if ($orgId) {
-                        $getorganization = Organization::find($orgId);
-                    }
+                if ($orgId) {
+                    $getorganization = Organization::find($orgId);
                 }
             }
 
-            if (!$getorganization && !empty($parentFeesIds)) {
+            if (!$getorganization && !empty($parentFeesNewIds)) {
                 $orgId = DB::table('fees_new as fn')
                     ->join('fees_new_organization_user as fno', 'fno.fees_new_id', '=', 'fn.id')
                     ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
                     ->where('ou.user_id', $mobileUserId)
                     ->where('ou.role_id', 6)
                     ->where('ou.status', 1)
-                    ->whereIn('fn.id', $parentFeesIds)
+                    ->whereIn('fn.id', $parentFeesNewIds)
                     ->value('ou.organization_id');
 
                 if ($orgId) {
@@ -309,6 +404,8 @@ class NewYuranController extends Controller
             if (!$getorganization) {
                 abort(400, 'Organization not found for the selected fees. Please contact support.');
             }
+
+            $totalBC = 0.0;
 
             if (!empty($studentFeesNewIds)) {
                 $getstudentfees = DB::table('student_fees_new as sfn')
@@ -332,6 +429,10 @@ class NewYuranController extends Controller
                     ->where('sfn.status', 'Debt')
                     ->get();
 
+                foreach ($getstudentfees as $fee) {
+                    $totalBC += $fee->quantity * $fee->price;
+                }
+
                 $studentIds = $getstudentfees->pluck('studentid')->unique()->toArray();
                 $getstudent = DB::table('students')
                     ->select('id as studentid', 'nama as studentname')
@@ -339,32 +440,48 @@ class NewYuranController extends Controller
                     ->get();
             }
 
-            if (!empty($parentFeesIds)) {
-                $get_fees_by_parent = DB::table('fees_new')
-                    ->whereIn('id', $parentFeesIds)
-                    ->where('status', 1)
-                    ->get();
+            $totalA = 0.0;
+            $fno_ids = []; 
 
+            if (!empty($parentFeesNewIds)) {
                 $getfees_category_A_byparent = DB::table('fees_new as fn')
                     ->join('fees_new_organization_user as fno', 'fno.fees_new_id', '=', 'fn.id')
                     ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
-                    ->select('fn.*')
+                    ->select('fn.*', 'fno.id as fno_id') 
                     ->where('ou.user_id', $mobileUserId)
                     ->where('ou.role_id', 6)
                     ->where('ou.status', 1)
-                    ->whereIn('fn.id', $parentFeesIds)
+                    ->whereIn('fn.id', $parentFeesNewIds)
                     ->get();
+
+                foreach ($getfees_category_A_byparent as $fee) {
+                    $totalA += $fee->quantity * $fee->price;
+                }
+
+                $fno_ids = $getfees_category_A_byparent->pluck('fno_id')->unique()->toArray();
             }
+
+            $fixedCharges = $getorganization && isset($getorganization->fixed_charges)
+                ? (float)$getorganization->fixed_charges
+                : 0.0;
+
+            $grandTotal = $totalA + $totalBC + $fixedCharges;
 
             return view('fee.pay.newmobilepay', compact(
                 'getstudent',
                 'getorganization',
                 'getstudentfees',
-                'get_fees_by_parent',
-                'getfees_category_A_byparent',
-            ) + ['user_id' => $mobileUserId]);
+                'getfees_category_A_byparent'
+            ) + [
+                'user_id' => $mobileUserId,
+                'totalA' => $totalA,
+                'totalBC' => $totalBC,
+                'fixedCharges' => $fixedCharges,
+                'grandTotal' => $grandTotal,
+                'original_student_fees_ids' => $studentFeesNewIds,
+                'fno_ids' => $fno_ids, 
+            ]);
         } catch (\Exception $e) {
-            Log::error('Error in mobile pay: ' . $e->getMessage());
             abort(500, 'Failed to load payment page. Please try again later.');
         }
     }
@@ -469,7 +586,6 @@ class NewYuranController extends Controller
                 'get_organization'
             ));
         } catch (\Exception $e) {
-            Log::error('Error in mobile receipt: ' . $e->getMessage());
             abort(500, 'Failed to load receipt page.');
         }
     }
@@ -482,7 +598,6 @@ class NewYuranController extends Controller
 
             $transaction = Transaction::find($transactionId);
             if (!$transaction) {
-                Log::error("Transaction not found for ID: {$transactionId}");
                 abort(404, 'Transaction not found.');
             }
 
@@ -490,7 +605,6 @@ class NewYuranController extends Controller
 
             $getparent = DB::table('users')->where('id', $transaction->user_id)->first();
             if (!$getparent) {
-                Log::error("Parent not found for user ID: {$transaction->user_id}");
                 abort(404, 'Parent not found for this transaction.');
             }
 
@@ -528,7 +642,6 @@ class NewYuranController extends Controller
             }
 
             if (!$orgId) {
-                Log::error("Organization not found for transaction ID: {$transactionId}");
                 abort(400, 'Organization not found for the transaction.');
             }
 
@@ -579,9 +692,837 @@ class NewYuranController extends Controller
 
             return $pdf->download("resit-{$transactionId}.pdf");
         } catch (\Exception $e) {
-            Log::critical('CRITICAL ERROR in mobile receipt download: ' . $e->getMessage());
-            Log::critical('Stack trace: ' . $e->getTraceAsString());
             abort(500, 'Failed to generate receipt PDF.');
+        }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        try {
+            $userId = $request->input('user_id');
+            $apiToken = $request->input('user_token');
+
+            if (!$userId || !$apiToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required parameter: user_id or user_token'
+                ], 400);
+            }
+
+            $currentUser = DB::table('user_token')
+                ->where('user_id', $userId)
+                ->where('api_token', $apiToken)
+                ->first();
+
+            if (!$currentUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access.'
+                ], 401);
+            }
+
+
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'email' => 'nullable|email|max:255|unique:users,email,' . $userId,
+                'username' => 'nullable|string|max:255|unique:users,username,' . $userId,
+                'icno' => 'nullable|string|max:20|unique:users,icno,' . $userId,
+                'telno' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:255',
+                'postcode' => 'nullable|string|max:10',
+                'state' => 'nullable|string|max:50',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed.',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $newData = array_filter([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'username' => $request->input('username'),
+                'icno' => $request->input('icno'),
+                'telno' => $request->input('telno'),
+                'address' => $request->input('address'),
+                'postcode' => $request->input('postcode'),
+                'state' => $request->input('state'),
+            ], fn($value) => $value !== '');
+
+            $fieldsToCompare = ['name', 'email', 'username', 'icno', 'telno', 'address', 'postcode', 'state'];
+            $hasChanges = false;
+
+            foreach ($fieldsToCompare as $field) {
+                $currentValue = $currentUser->$field ?? '';
+                $newValue = $newData[$field] ?? '';
+                if ($currentValue !== $newValue) {
+                    $hasChanges = true;
+                    break;
+                }
+            }
+
+            if (!$hasChanges) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tiada perubahan dibuat.'
+                ], 200);
+            }
+
+            $newData['updated_at'] = now();
+            $updated = DB::table('users')->where('id', $userId)->update($newData);
+
+            if ($updated) {
+                $updatedUser = DB::table('users')->where('id', $userId)->first();
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Profil berjaya dikemaskini.',
+                    'data' => [
+                        'name' => $updatedUser->name,
+                        'email' => $updatedUser->email,
+                        'username' => $updatedUser->username,
+                        'icno' => $updatedUser->icno,
+                        'telno' => $updatedUser->telno,
+                        'address' => $updatedUser->address,
+                        'postcode' => $updatedUser->postcode,
+                        'state' => $updatedUser->state,
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kemas kini gagal.'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat pelayan dalaman.'
+            ], 500);
+        }
+    }
+
+    public function refreshSession(Request $request)
+    {
+        try {
+            $userId = $request->input('user_id');
+            $rememberToken = $request->input('remember_token');
+            $deviceToken = $request->input('device_token');
+
+            if (!$userId || !$rememberToken || !$deviceToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required parameter'
+                ], 400);
+            }
+
+            $userTokenRecord = DB::table('user_token')
+                ->where('user_id', $userId)
+                ->where('remember_token', $rememberToken)
+                ->where('expired_at', '>', now())
+                ->first();
+
+            if (!$userTokenRecord) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired session.'
+                ], 401);
+            }
+
+            if ($userTokenRecord->device_token !== $deviceToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Login failed.',
+                    'error_code' => 'DEVICE_MISMATCH',
+                    'hint' => 'Please log in using your registered device.'
+                ], 403);
+            }
+
+            $user = DB::table('users')->where('id', $userId)->first();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+            }
+
+            $rememberToken = $userTokenRecord->remember_token;
+            $newApiToken = bin2hex(random_bytes(32));
+
+            DB::table('user_token')
+                ->where('user_id', $userId)
+                ->update([
+                    'api_token' => $newApiToken,
+                    'updated_at' => now(),
+                    'expired_at' => now()->addYear(),
+                ]);
+
+            $students = DB::table('students as s')
+                ->join('organization_user_student as ous', 'ous.student_id', '=', 's.id')
+                ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                ->join('organizations as o', 'o.id', '=', 'ou.organization_id')
+                ->select(
+                    's.id as student_id',
+                    's.nama as student_name',
+                    'ou.organization_id',
+                    'o.nama as organization_name',
+                    'ou.user_id'
+                )
+                ->where('ou.user_id', $userId)
+                ->where('ou.role_id', 6)
+                ->where('ou.status', 1)
+                ->get();
+
+            if ($students->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'username' => $user->username,
+                    'icno' => $user->icno,
+                    'telno' => $user->telno,
+                    'address' => $user->address,
+                    'postcode' => $user->postcode,
+                    'state' => $user->state,
+                    'api_token' => $newApiToken,
+                    'data' => []
+                ], 200);
+            }
+
+            $orgIds = $students->pluck('organization_id')->unique()->toArray();
+            $studentIds = $students->pluck('student_id')->toArray();
+
+            $categoryAFees = DB::table('fees_new as fn')
+                ->join('fees_new_organization_user as fno', 'fno.fees_new_id', '=', 'fn.id')
+                ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
+                ->select(
+                    'fn.id',
+                    'fn.name',
+                    'fn.desc',
+                    'fn.category',
+                    'fn.quantity',
+                    'fn.price',
+                    'fn.totalamount',
+                    'fn.status',
+                    'fn.organization_id',
+                    'fno.status as fno_status',
+                    'fno.transaction_id',
+                    'ou.organization_id as ou_org_id',
+                    'fn.start_date',
+                    'fn.end_date'
+                )
+                ->whereIn('ou.organization_id', $orgIds)
+                ->where('ou.user_id', $userId)
+                ->where('ou.role_id', 6)
+                ->where('ou.status', 1)
+                ->where('fn.status', 1)
+                ->get();
+
+            $categoryBCFees = DB::table('fees_new as fn')
+                ->join('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
+                ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+                ->select(
+                    'fn.id',
+                    'fn.name',
+                    'fn.desc',
+                    'fn.category',
+                    'fn.quantity',
+                    'fn.price',
+                    'fn.totalamount',
+                    'fn.status',
+                    'fn.organization_id',
+                    'sfn.id as student_fees_new_id',
+                    'sfn.status as sfn_status',
+                    'cs.student_id',
+                    'fn.start_date',
+                    'fn.end_date'
+                )
+                ->whereIn('cs.student_id', $studentIds)
+                ->where('fn.status', 1)
+                ->where('sfn.status', 'Debt')
+                ->get();
+
+            $receiptsFromStudent = DB::table('transactions as t')
+                ->join('fees_transactions_new as ftn', 'ftn.transactions_id', '=', 't.id')
+                ->join('student_fees_new as sfn', 'sfn.id', '=', 'ftn.student_fees_id')
+                ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                ->select('t.id', 't.nama', 't.description', 't.amount', 't.datetime_created as date', 'co.organization_id')
+                ->whereIn('co.organization_id', $orgIds)
+                ->where('t.user_id', $user->id)
+                ->where('t.status', 'Success');
+
+            $receiptsFromParent = DB::table('transactions as t')
+                ->join('fees_new_organization_user as fno', 'fno.transaction_id', '=', 't.id')
+                ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
+                ->select('t.id', 't.nama', 't.description', 't.amount', 't.datetime_created as date', 'ou.organization_id')
+                ->whereIn('ou.organization_id', $orgIds)
+                ->where('t.user_id', $user->id)
+                ->where('t.status', 'Success');
+
+            $receipts = $receiptsFromParent->union($receiptsFromStudent)->distinct()->get();
+
+            $studentClassMap = DB::table('students as s')
+                ->join('class_student as cs', 'cs.student_id', '=', 's.id')
+                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                ->join('classes as c', 'c.id', '=', 'co.class_id')
+                ->select('s.id as student_id', 's.nama as student_name', 'c.nama as class_name')
+                ->whereIn('s.id', $studentIds)
+                ->get()
+                ->keyBy('student_id');
+
+            $studentsData = [];
+
+            foreach ($students as $student) {
+                $feesA = $categoryAFees
+                    ->where('ou_org_id', $student->organization_id)
+                    ->where('fno_status', 'Debt')
+                    ->map(function ($fee) {
+                        $fee->student_id = null;
+                        return $fee;
+                    });
+
+                $feesBC = $categoryBCFees
+                    ->where('student_id', $student->student_id)
+                    ->where('sfn_status', 'Debt');
+
+                $allFees = $feesA->merge($feesBC);
+
+                foreach ($allFees as $fee) {
+                    if ($fee->category !== 'Kategory A' && !empty($fee->student_id)) {
+                        $info = $studentClassMap[$fee->student_id] ?? null;
+                        if ($info) {
+                            $fee->category = $fee->category . ' - ' . $info->student_name . ' (' . $info->class_name . ')';
+                        }
+                    }
+                }
+
+
+                $studentsData[] = [
+                    'student' => $student,
+                    'fees' => $allFees
+                ];
+            }
+
+            $updatedToken = DB::table('user_token')->where('user_id', $userId)->first();
+
+            return response()->json([
+                'success' => true,
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'username' => $user->username,
+                'icno' => $user->icno,
+                'telno' => $user->telno,
+                'address' => $user->address,
+                'postcode' => $user->postcode,
+                'state' => $user->state,
+                'api_token' => $newApiToken,
+                'remember_token' =>  $updatedToken->remember_token,
+                'data' => $studentsData,
+                'receipts' => $receipts,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function unbindDevice(Request $request)
+    {
+        $userId = $request->input('user_id');
+        $currentDeviceToken = $request->input('device_token'); 
+
+        if (!$userId || !$currentDeviceToken) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Missing required parameter: user_id or device_token'
+            ], 400);
+        }
+
+        $userTokenRecord = DB::table('user_token')
+            ->where('user_id', $userId)
+            ->where('device_token', $currentDeviceToken)
+            ->first();
+
+        if (!$userTokenRecord) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No binding found for this device.'
+            ], 404);
+        }
+
+        DB::table('user_token')
+            ->where('user_id', $userId)
+            ->update([
+                'device_token' => null,
+                'remember_token' => null, 
+                'fcm_token' => null,
+                'updated_at' => now(),
+                'expired_at' => null
+            ]);
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Device unbound successfully.'
+        ], 200);
+    }
+
+    public function getUserByEmailOrPhone(Request $request)
+    {
+        $loginId = $request->input('login_id');
+        if (!$loginId) {
+            return response()->json(['success' => false, 'message' => 'Missing login_id'], 400);
+        }
+
+        $user = $this->findUserByAnyLoginId($loginId);
+        if (!$user) {
+            $allUsers = DB::table('users')->select('id', 'icno', 'telno', 'email')->get();
+            return response()->json(['success' => false, 'message' => 'User not found'], 404);
+        }
+
+
+        $students = DB::table('students as s')
+            ->join('organization_user_student as ous', 'ous.student_id', '=', 's.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+            ->join('organizations as o', 'o.id', '=', 'ou.organization_id')
+            ->join('class_student as cs', 'cs.student_id', '=', 's.id')
+            ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+            ->join('classes as c', 'c.id', '=', 'co.class_id')
+            ->where('ou.user_id', $user->id)
+            ->select(
+                's.nama as student_name',
+                'c.nama as class_name',
+                'o.nama as organization_name'
+            )
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'student_name' => $item->student_name,
+                    'class_name' => $item->class_name,
+                    'organization_name' => $item->organization_name,
+                ];
+            })
+            ->toArray();
+
+        $deviceData = DB::table('user_token')->where('user_id', $user->id)->first();
+
+        return response()->json([
+            'success' => true,
+            'email' => $user->email,
+            'students' => $students,
+            'device_token' => $deviceData ? $deviceData->device_token : null,
+        ], 200);
+    }
+
+    public function sendOtp(Request $request)
+    {
+        $email = $request->input('email');
+        $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        Cache::put("otp_$email", $otp, now()->addMinutes(10));
+
+
+        try {
+            Mail::raw("Kod OTP anda: $otp\nSah selama 10 minit.", function ($message) use ($email) {
+                $message->to($email)->subject('Kod OTP untuk Gantian Peranti');
+            });
+
+            return response()->json(['success' => true, 'message' => 'OTP sent']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to send email'], 500);
+        }
+    }
+
+    public function forceBindDevice(Request $request)
+    {
+        $email = $request->input('email');
+        $newDeviceToken = $request->input('new_device_token');
+        $rememberMe = $request->boolean('remember_me', false);
+        $isFirstTimeBind = true;
+
+        $user = DB::table('users')->where('email', $email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Pengguna tidak wujud'], 404);
+        }
+
+        $newApiToken = bin2hex(random_bytes(32));
+        $rememberToken = null;
+
+        if ($rememberMe) {
+            $rememberToken = bin2hex(random_bytes(32)); 
+        }
+
+        DB::table('user_token')
+            ->updateOrInsert(
+                ['user_id' => $user->id],
+                [
+                    'device_token' => $newDeviceToken,
+                    'api_token' => $newApiToken,
+                    'remember_token' => $rememberToken, 
+                    'application_id' => DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id'),
+                    'updated_at' => now(),
+                    'expired_at' => now()->addYear(),
+                ]
+            );
+
+        
+        $students = DB::table('students as s')
+            ->join('organization_user_student as ous', 'ous.student_id', '=', 's.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+            ->join('organizations as o', 'o.id', '=', 'ou.organization_id')
+            ->select(
+                's.id as student_id',
+                's.nama as student_name',
+                'ou.organization_id',
+                'o.nama as organization_name',
+                'ou.user_id'
+            )
+            ->where('ou.user_id', $user->id)
+            ->where('ou.role_id', 6)
+            ->where('ou.status', 1)
+            ->get();
+
+        if ($students->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Peranti berjaya digantikan',
+                'api_token' => $newApiToken,
+                'remember_token' => null,
+                'data' => []
+            ]);
+        }
+
+        $orgIds = $students->pluck('organization_id')->unique()->toArray();
+        $studentIds = $students->pluck('student_id')->toArray();
+
+        $categoryAFees = DB::table('fees_new as fn')
+            ->join('fees_new_organization_user as fno', 'fno.fees_new_id', '=', 'fn.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
+            ->select(
+                'fn.id',
+                'fn.name',
+                'fn.desc',
+                'fn.category',
+                'fn.quantity',
+                'fn.price',
+                'fn.totalamount',
+                'fn.status',
+                'fn.organization_id',
+                'fno.status as fno_status',
+                'fno.transaction_id',
+                'ou.organization_id as ou_org_id',
+                'fn.start_date',
+                'fn.end_date'
+            )
+            ->whereIn('ou.organization_id', $orgIds)
+            ->where('ou.user_id', $user->id)
+            ->where('ou.role_id', 6)
+            ->where('ou.status', 1)
+            ->where('fn.status', 1)
+            ->get();
+
+        $categoryBCFees = DB::table('fees_new as fn')
+            ->join('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
+            ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+            ->select(
+                'fn.id',
+                'fn.name',
+                'fn.desc',
+                'fn.category',
+                'fn.quantity',
+                'fn.price',
+                'fn.totalamount',
+                'fn.status',
+                'fn.organization_id',
+                'sfn.id as student_fees_new_id',
+                'sfn.status as sfn_status',
+                'cs.student_id',
+                'fn.start_date',
+                'fn.end_date'
+            )
+            ->whereIn('cs.student_id', $studentIds)
+            ->where('fn.status', 1)
+            ->where('sfn.status', 'Debt')
+            ->get();
+
+        $receiptsFromStudent = DB::table('transactions as t')
+            ->join('fees_transactions_new as ftn', 'ftn.transactions_id', '=', 't.id')
+            ->join('student_fees_new as sfn', 'sfn.id', '=', 'ftn.student_fees_id')
+            ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+            ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+            ->select('t.id', 't.nama', 't.description', 't.amount', 't.datetime_created as date', 'co.organization_id')
+            ->whereIn('co.organization_id', $orgIds)
+            ->where('t.user_id', $user->id)
+            ->where('t.status', 'Success');
+
+        $receiptsFromParent = DB::table('transactions as t')
+            ->join('fees_new_organization_user as fno', 'fno.transaction_id', '=', 't.id')
+            ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
+            ->select('t.id', 't.nama', 't.description', 't.amount', 't.datetime_created as date', 'ou.organization_id')
+            ->whereIn('ou.organization_id', $orgIds)
+            ->where('t.user_id', $user->id)
+            ->where('t.status', 'Success');
+
+        $receipts = $receiptsFromParent->union($receiptsFromStudent)->distinct()->get();
+
+        $studentClassMap = DB::table('students as s')
+            ->join('class_student as cs', 'cs.student_id', '=', 's.id')
+            ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+            ->join('classes as c', 'c.id', '=', 'co.class_id')
+            ->select('s.id as student_id', 's.nama as student_name', 'c.nama as class_name')
+            ->whereIn('s.id', $studentIds)
+            ->get()
+            ->keyBy('student_id');
+
+        $studentsData = [];
+
+        foreach ($students as $student) {
+            $feesA = $categoryAFees
+                ->where('ou_org_id', $student->organization_id)
+                ->where('fno_status', 'Debt')
+                ->map(function ($fee) {
+                    $fee->student_id = null;
+                    return $fee;
+                });
+
+            $feesBC = $categoryBCFees
+                ->where('student_id', $student->student_id)
+                ->where('sfn_status', 'Debt');
+
+            $allFees = $feesA->merge($feesBC);
+
+            foreach ($allFees as $fee) {
+                if ($fee->category !== 'Kategory A' && !empty($fee->student_id)) {
+                    $info = $studentClassMap[$fee->student_id] ?? null;
+                    if ($info) {
+                        $fee->category = $fee->category . ' - ' . $info->student_name . ' (' . $info->class_name . ')';
+                    }
+                }
+            }
+
+            $studentsData[] = [
+                'student' => $student,
+                'fees' => $allFees
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Peranti berjaya digantikan',
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'username' => $user->username,
+            'icno' => $user->icno,
+            'telno' => $user->telno,
+            'address' => $user->address,
+            'postcode' => $user->postcode,
+            'state' => $user->state,
+            'api_token' => $newApiToken,
+            'remember_token' => $rememberToken,
+            'data' => $studentsData,
+            'receipts' => $receipts,
+            'is_first_time_device_bind' => $isFirstTimeBind
+        ]);
+    }
+
+    public function updateUserEmail(Request $request)
+    {
+        $loginId = $request->input('login_id');
+        $newEmail = $request->input('email');
+
+        if (!filter_var($newEmail, FILTER_VALIDATE_EMAIL)) {
+            return response()->json(['success' => false, 'message' => 'Emel tidak sah'], 400);
+        }
+
+        $user = $this->findUserByAnyLoginId($loginId);
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Pengguna tidak dijumpai'], 404);
+        }
+
+        DB::table('users')->where('id', $user->id)->update(['email' => $newEmail]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Emel berjaya dikemaskini'
+        ]);
+    }
+
+    public function verifyOtp(Request $request)
+    {
+        $email = $request->input('email');
+        $otp = $request->input('otp');
+        $loginId = $request->input('login_id');
+
+        if (!$email || !$otp || !$loginId) {
+            return response()->json(['success' => false, 'message' => 'Missing required parameters'], 400);
+        }
+
+        $originalUser = $this->findUserByAnyLoginId($loginId);
+        if (!$originalUser) {
+            return response()->json(['success' => false, 'message' => 'Pengguna tidak dijumpai'], 404);
+        }
+
+        if ($originalUser->email !== $email) {
+            return response()->json(['success' => false, 'message' => 'Emel tidak sepadan dengan pengguna'], 403);
+        }
+
+        $cachedOtp = Cache::get("otp_$email");
+        if ($cachedOtp !== $otp) {
+            return response()->json(['success' => false, 'message' => 'OTP salah'], 400);
+        }
+
+        Cache::forget("otp_$email");
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP berjaya disahkan'
+        ]);
+    }
+
+    protected function normalizePhoneNumber($phone)
+    {
+        $clean = preg_replace('/[^\d]/', '', $phone);
+        if (strlen($clean) < 9) return $clean;
+
+        $candidates = [];
+
+        if (substr($clean, 0, 2) === '60') {
+            $candidates[] = '+60' . substr($clean, 2); 
+            $candidates[] = '0' . substr($clean, 2);   
+        } elseif ($clean[0] === '0') {
+            $candidates[] = '+60' . substr($clean, 1); 
+            $candidates[] = $clean;                   
+        } else {
+            $candidates[] = '+60' . $clean;           
+            $candidates[] = '0' . $clean;             
+        }
+
+        return array_unique($candidates);
+    }
+
+    private function findUserByAnyLoginId($loginId)
+    {
+        if (!$loginId) return null;
+
+        if (filter_var($loginId, FILTER_VALIDATE_EMAIL)) {
+            return DB::table('users')->where('email', $loginId)->first();
+        }
+
+        if (is_numeric($loginId)) {
+            $user = DB::table('users')->where('icno', $loginId)->first();
+            if ($user) return $user;
+
+            $clean = preg_replace('/\D/', '', $loginId);
+            $phoneCandidates = $this->normalizePhoneNumber($loginId);
+
+            return DB::table('users')
+                ->whereIn('telno', $phoneCandidates)
+                ->first();
+        }
+
+        $phoneCandidates = $this->normalizePhoneNumber($loginId);
+
+        return DB::table('users')
+            ->whereIn('telno', $phoneCandidates)
+            ->first();
+    }
+
+    public function getNotifyDays(Request $request)
+    {
+        try {
+            $apiToken = $request->input('user_token'); 
+            if (!$apiToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing user_token'
+                ], 400);
+            }
+
+            $userToken = DB::table('user_token')->where('api_token', $apiToken)->first();
+            if (!$userToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired token'
+                ], 401);
+            }
+
+            $user = DB::table('user_token')->where('user_id', $userToken->user_id)->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'notify_days_before' => $user->notify_days_before
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateNotifyDays(Request $request)
+    {
+        try {
+            $apiToken = $request->input('user_token');
+            $days = $request->input('notify_days_before');
+
+            if (!$apiToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing user_token'
+                ], 400);
+            }
+
+            if ($days === null || $days < 1 || $days > 30) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'notify_days_before must be between 1 and 30'
+                ], 400);
+            }
+
+            $userToken = DB::table('user_token')->where('api_token', $apiToken)->first();
+            if (!$userToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid or expired token'
+                ], 401);
+            }
+
+            $user = DB::table('user_token')->where('user_id', $userToken->user_id)->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found'
+                ], 404);
+            }
+
+            DB::table('user_token')
+                ->where('user_id', $user->user_id)
+                ->update(['notify_days_before' => $days]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification days updated successfully',
+                'notify_days_before' => $days
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An unexpected error occurred.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }

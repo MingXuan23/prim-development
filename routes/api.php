@@ -70,6 +70,16 @@ Route::group(['prefix' => 'mobile'], function () {
 
         //new mobile yuran api
         Route::post('loginAndGetYuran', 'MobileAPI\NewYuranController@loginAndGetYuran');
+        Route::post('updateProfile', 'MobileAPI\NewYuranController@updateProfile');
+        Route::post('refreshSession', 'MobileAPI\NewYuranController@refreshSession');
+        Route::post('unbindDevice', 'MobileAPI\NewYuranController@unbindDevice');
+        Route::post('getUserByEmailOrPhone', 'MobileAPI\NewYuranController@getUserByEmailOrPhone');
+        Route::post('sendOtp', 'MobileAPI\NewYuranController@sendOtp');
+        Route::post('forceBindDevice', 'MobileAPI\NewYuranController@forceBindDevice');
+        Route::post('updateUserEmail', 'MobileAPI\NewYuranController@updateUserEmail');
+        Route::post('verifyOtp', 'MobileAPI\NewYuranController@verifyOtp');
+        Route::get('getNotifyDays', 'MobileAPI\NewYuranController@getNotifyDays');
+        Route::post('updateNotifyDays', 'MobileAPI\NewYuranController@updateNotifyDays');
     });
 });
 
