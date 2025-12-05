@@ -31,7 +31,7 @@ class SendFeeReminderNotification extends Command
 
 
         foreach ($users as $user) {
-            $days = $user->notify_days_before;
+            $days = $user->notify_days_before ?: 7;
             $deadline = $today->copy()->addDays($days);
 
             $orgIds = DB::table('organization_user_student as ous')

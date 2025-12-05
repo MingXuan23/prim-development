@@ -80,6 +80,10 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::post('verifyOtp', 'MobileAPI\NewYuranController@verifyOtp');
         Route::get('getNotifyDays', 'MobileAPI\NewYuranController@getNotifyDays');
         Route::post('updateNotifyDays', 'MobileAPI\NewYuranController@updateNotifyDays');
+        Route::get('getOrganizations', 'MobileAPI\NewYuranController@getOrganizations');
+        Route::get('getClasses', 'MobileAPI\NewYuranController@getClasses');
+        Route::post('registerStudents', 'MobileAPI\NewYuranController@registerStudents');
+        Route::post('registerParent', 'MobileAPI\NewYuranController@registerParent');
     });
 });
 

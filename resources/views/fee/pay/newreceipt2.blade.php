@@ -199,7 +199,7 @@
                         </div>
                         <div class="row">
                             <div class="col-12 text-center mb-2 mt-3">
-                                @php
+                                <!-- @php
                                 $imageUrl = 'https://prim.my/organization-picture/' . $get_organization->organization_picture;
 
                                 $imageExists = false;
@@ -211,7 +211,25 @@
 
                                 @if($imageExists)
                                 <img src="{{ $imageUrl }}" height="60" alt="">
+                                @endif -->
+
+                                @php
+                                $picName = $get_organization->organization_picture;
+
+                                $relativePath = 'organization-picture/' . $picName;
+
+                                if (!empty($picName) && file_exists(public_path($relativePath))) {
+                                $showImage = true;
+                                $finalImageUrl = asset($relativePath);
+                                } else {
+                                $showImage = false;
+                                }
+                                @endphp
+
+                                @if($showImage)
+                                <img src="{{ $finalImageUrl }}" height="60" alt="Organization Logo">
                                 @endif
+
                             </div>
 
                             <div class="col-12 text-center address-section">

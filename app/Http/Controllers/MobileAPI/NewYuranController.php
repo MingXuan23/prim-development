@@ -13,6 +13,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use App\User;
+use Illuminate\Support\Facades\Hash;
 
 class NewYuranController extends Controller
 {
@@ -71,6 +73,72 @@ class NewYuranController extends Controller
                 return response()->json(['success' => false, 'message' => 'User not found.'], 404);
             }
 
+            $existingToken = DB::table('user_token')->where('user_id', $user->id)->first();
+            $deviceToken = $request->input('device_token');
+            $fcmToken = $request->input('fcm_token');
+
+            $isFirstTimeBind = false;
+
+            if (!$existingToken) {
+                $isFirstTimeBind = true;
+            } elseif ($existingToken->device_token !== $deviceToken) {
+                $isFirstTimeBind = true;
+            }
+
+            $apiToken = bin2hex(random_bytes(32));
+
+            if (!$deviceToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing device_token'
+                ], 400);
+            }
+
+            if ($existingToken && $existingToken->device_token !== null) {
+                if ($existingToken->device_token !== $deviceToken) {
+                    $boundDeviceToken = $existingToken->device_token;
+                    $deviceName = preg_replace('/^DEV_[^_]+_/', '', $boundDeviceToken);
+                    $deviceName = str_replace('_', '', $deviceName);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'This account is ready bound to another device.',
+                        'error_code' => 'DEVICE_MISMATCH',
+                        'hint' => 'Akaun ini telah diikat kepada peranti: ' . $deviceName .
+                            '. Log masuk menggunakan peranti berdaftar, atau pilih "Peranti Hilang" untuk tukar peranti.'
+                    ], 409);
+                }
+            }
+
+            $tokenData = [
+                'api_token' => $apiToken,
+                'fcm_token' => $fcmToken,
+                'updated_at' => now(),
+                'expired_at' => now()->addYear(),
+                'device_token' => $deviceToken
+            ];
+
+            $rememberToken = null;
+            if ($rememberMe) {
+                $rememberToken = bin2hex(random_bytes(32));
+                $tokenData['remember_token'] = $rememberToken;
+            } else {
+                if ($existingToken) {
+                    $tokenData['remember_token'] = $existingToken->remember_token;
+                    $rememberToken = $existingToken->remember_token;
+                }
+            }
+
+            if ($existingToken) {
+                DB::table('user_token')
+                    ->where('user_id', $user->id)
+                    ->update($tokenData);
+            } else {
+                $tokenData['user_id'] = $user->id;
+                $tokenData['application_id'] = DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id');
+                DB::table('user_token')->insert($tokenData);
+            }
+
             $students = DB::table('students as s')
                 ->join('organization_user_student as ous', 'ous.student_id', '=', 's.id')
                 ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
@@ -89,6 +157,7 @@ class NewYuranController extends Controller
 
             if ($students->isEmpty()) {
                 return response()->json([
+                    'id' => $user->id,
                     'success' => true,
                     'name' => $user->name,
                     'email' => $user->email,
@@ -98,6 +167,9 @@ class NewYuranController extends Controller
                     'address' => $user->address,
                     'postcode' => $user->postcode,
                     'state' => $user->state,
+                    'api_token' => $apiToken,
+                    'remember_token' => $rememberToken,
+                    'is_first_time_device_bind' => $isFirstTimeBind,
                     'data' => []
                 ], 200);
             }
@@ -218,71 +290,6 @@ class NewYuranController extends Controller
             }
 
 
-            $existingToken = DB::table('user_token')->where('user_id', $user->id)->first();
-            $deviceToken = $request->input('device_token');
-
-            $isFirstTimeBind = false;
-
-            if (!$existingToken) {
-                $isFirstTimeBind = true;
-            } elseif ($existingToken->device_token !== $deviceToken) {
-                $isFirstTimeBind = true; 
-            }
-            $apiToken = bin2hex(random_bytes(32));
-
-            $fcmToken = $request->input('fcm_token');
-
-
-
-            if (!$deviceToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing device_token'
-                ], 400);
-            }
-
-            if ($existingToken && $existingToken->device_token !== null) {
-                if ($existingToken->device_token !== $deviceToken) {
-
-                    $boundDeviceToken = $existingToken->device_token;
-
-                    $deviceName = preg_replace('/^DEV_[^_]+_/', '', $boundDeviceToken);
-                    $deviceName = str_replace('_', '', $deviceName);
-
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'This account is ready bound to another device.',
-                        'error_code' => 'DEVICE_MISMATCH',
-                        'hint' => 'Akaun ini telah diikat kepada peranti: ' . $deviceName .
-                            '. Log masuk menggunakan peranti berdaftar, atau pilih "Peranti Hilang" untuk tukar peranti.'
-                    ], 409);
-                }
-            }
-
-            $tokenData = [
-                'api_token' => $apiToken,
-                'fcm_token' => $fcmToken,
-                'updated_at' => now(),
-                'expired_at' => now()->addYear(),
-                'device_token' => $deviceToken
-            ];
-
-            $rememberToken = null;
-            if ($rememberMe) {
-                $rememberToken = bin2hex(random_bytes(32));
-                $tokenData['remember_token'] = $rememberToken;
-            }
-
-
-            if ($existingToken) {
-                DB::table('user_token')
-                    ->where('user_id', $user->id)
-                    ->update($tokenData);
-            } else {
-                $tokenData['user_id'] = $user->id;
-                $tokenData['application_id'] = DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id');
-                DB::table('user_token')->insert($tokenData);
-            }
 
             return response()->json([
                 'success' => true,
@@ -441,13 +448,13 @@ class NewYuranController extends Controller
             }
 
             $totalA = 0.0;
-            $fno_ids = []; 
+            $fno_ids = [];
 
             if (!empty($parentFeesNewIds)) {
                 $getfees_category_A_byparent = DB::table('fees_new as fn')
                     ->join('fees_new_organization_user as fno', 'fno.fees_new_id', '=', 'fn.id')
                     ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
-                    ->select('fn.*', 'fno.id as fno_id') 
+                    ->select('fn.*', 'fno.id as fno_id')
                     ->where('ou.user_id', $mobileUserId)
                     ->where('ou.role_id', 6)
                     ->where('ou.status', 1)
@@ -479,7 +486,7 @@ class NewYuranController extends Controller
                 'fixedCharges' => $fixedCharges,
                 'grandTotal' => $grandTotal,
                 'original_student_fees_ids' => $studentFeesNewIds,
-                'fno_ids' => $fno_ids, 
+                'fno_ids' => $fno_ids,
             ]);
         } catch (\Exception $e) {
             abort(500, 'Failed to load payment page. Please try again later.');
@@ -874,6 +881,7 @@ class NewYuranController extends Controller
 
             if ($students->isEmpty()) {
                 return response()->json([
+                    'id' => $user->id,
                     'success' => true,
                     'name' => $user->name,
                     'email' => $user->email,
@@ -1029,11 +1037,11 @@ class NewYuranController extends Controller
             ], 500);
         }
     }
-    
+
     public function unbindDevice(Request $request)
     {
         $userId = $request->input('user_id');
-        $currentDeviceToken = $request->input('device_token'); 
+        $currentDeviceToken = $request->input('device_token');
 
         if (!$userId || !$currentDeviceToken) {
             return response()->json([
@@ -1058,7 +1066,7 @@ class NewYuranController extends Controller
             ->where('user_id', $userId)
             ->update([
                 'device_token' => null,
-                'remember_token' => null, 
+                'remember_token' => null,
                 'fcm_token' => null,
                 'updated_at' => now(),
                 'expired_at' => null
@@ -1142,6 +1150,7 @@ class NewYuranController extends Controller
         $email = $request->input('email');
         $newDeviceToken = $request->input('new_device_token');
         $rememberMe = $request->boolean('remember_me', false);
+        $fcmToken = $request->input('fcm_token');
         $isFirstTimeBind = true;
 
         $user = DB::table('users')->where('email', $email)->first();
@@ -1153,7 +1162,7 @@ class NewYuranController extends Controller
         $rememberToken = null;
 
         if ($rememberMe) {
-            $rememberToken = bin2hex(random_bytes(32)); 
+            $rememberToken = bin2hex(random_bytes(32));
         }
 
         DB::table('user_token')
@@ -1162,14 +1171,15 @@ class NewYuranController extends Controller
                 [
                     'device_token' => $newDeviceToken,
                     'api_token' => $newApiToken,
-                    'remember_token' => $rememberToken, 
+                    'remember_token' => $rememberToken,
                     'application_id' => DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id'),
+                    'fcm_token' => $fcmToken,
                     'updated_at' => now(),
                     'expired_at' => now()->addYear(),
                 ]
             );
 
-        
+
         $students = DB::table('students as s')
             ->join('organization_user_student as ous', 'ous.student_id', '=', 's.id')
             ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
@@ -1392,14 +1402,14 @@ class NewYuranController extends Controller
         $candidates = [];
 
         if (substr($clean, 0, 2) === '60') {
-            $candidates[] = '+60' . substr($clean, 2); 
-            $candidates[] = '0' . substr($clean, 2);   
+            $candidates[] = '+60' . substr($clean, 2);
+            $candidates[] = '0' . substr($clean, 2);
         } elseif ($clean[0] === '0') {
-            $candidates[] = '+60' . substr($clean, 1); 
-            $candidates[] = $clean;                   
+            $candidates[] = '+60' . substr($clean, 1);
+            $candidates[] = $clean;
         } else {
-            $candidates[] = '+60' . $clean;           
-            $candidates[] = '0' . $clean;             
+            $candidates[] = '+60' . $clean;
+            $candidates[] = '0' . $clean;
         }
 
         return array_unique($candidates);
@@ -1435,7 +1445,7 @@ class NewYuranController extends Controller
     public function getNotifyDays(Request $request)
     {
         try {
-            $apiToken = $request->input('user_token'); 
+            $apiToken = $request->input('user_token');
             if (!$apiToken) {
                 return response()->json([
                     'success' => false,
@@ -1522,6 +1532,315 @@ class NewYuranController extends Controller
                 'success' => false,
                 'message' => 'An unexpected error occurred.',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getOrganizations(Request $request)
+    {
+        try {
+            $userId = $request->input('user_id');
+            $apiToken = $request->input('user_token');
+
+            if (!$userId || !$apiToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required parameter: user_id or user_token'
+                ], 400);
+            }
+
+            $currentUser = DB::table('user_token')
+                ->where('user_id', $userId)
+                ->where('api_token', $apiToken)
+                ->first();
+
+            if (!$currentUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access.'
+                ], 401);
+            }
+
+            $organizations = DB::table("organizations")->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $organizations
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat pelayan dalaman.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getClasses(Request $request)
+    {
+        try {
+            $userId = $request->input('user_id');
+            $apiToken = $request->input('user_token');
+
+            if (!$userId || !$apiToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required parameter: user_id or user_token'
+                ], 400);
+            }
+
+            $currentUser = DB::table('user_token')
+                ->where('user_id', $userId)
+                ->where('api_token', $apiToken)
+                ->first();
+
+            if (!$currentUser) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access.'
+                ], 401);
+            }
+
+            $organizationId = $request->input('organization_id');
+
+            if (!$organizationId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Parameter organization_id diperlukan.'
+                ], 400);
+            }
+
+
+            $classes = DB::table('class_organization as co')
+                ->join('classes as c', 'c.id', '=', 'co.class_id')
+                ->where('co.organization_id', $organizationId)
+                ->select('c.id as cid', 'c.nama as cname')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $classes
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat pelayan dalaman.'
+            ], 500);
+        }
+    }
+
+
+
+    public function registerStudents(Request $request)
+    {
+        try {
+            $userId = $request->input('user_id');
+            $apiToken = $request->input('user_token');
+
+            if (!$userId || !$apiToken) {
+                Log::warning('registerStudents - Missing user_id or user_token', ['user_id' => $userId, 'api_token_present' => !empty($apiToken)]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Missing required parameter: user_id or user_token'
+                ], 400);
+            }
+
+            Log::info('registerStudents - Authenticating user', ['user_id' => $userId]);
+
+            $parentToken = DB::table('user_token')
+                ->where('user_id', $userId)
+                ->where('api_token', $apiToken)
+                ->first();
+
+            if (!$parentToken) {
+                Log::warning('registerStudents - Invalid token for user', ['user_id' => $userId]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access.'
+                ], 401);
+            }
+
+            $validator = Validator::make($request->all(), [
+                'students' => 'required|array|min:1',
+                'students.*.name' => 'required|string|max:255',
+                'students.*.icno' => 'required|string|size:14|unique:students,icno',
+                'students.*.email' => 'nullable|email|max:255|unique:students,email',
+                'students.*.gender' => 'required|in:L,P',
+                'students.*.class_id' => 'required|exists:classes,id',
+            ]);
+
+            if ($validator->fails()) {
+                Log::warning('registerStudents - Validation failed', ['errors' => $validator->errors()->toArray()]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengesahan gagal.',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $studentsData = $request->input('students');
+            $failedRegistrations = [];
+
+            DB::beginTransaction();
+            Log::info('registerStudents - Database transaction started');
+
+            foreach ($studentsData as $index => $studentInfo) {
+                try {
+                    $organizationId = $this->getOrganizationIdForClass($studentInfo['class_id']);
+
+                    $icExists = DB::table('students')->where('icno', $studentInfo['icno'])->exists();
+                    $emailExists = !empty($studentInfo['email']) && DB::table('students')->where('email', $studentInfo['email'])->exists();
+
+                    if ($icExists) {
+                        throw new \Exception("No. kad pengenalan tersebut sudah digunakan.");
+                    }
+                    if ($emailExists) {
+                        throw new \Exception("Emel tersebut sudah digunakan.");
+                    }
+
+                    $studentJson = json_encode([
+                        'name' => $studentInfo['name'],
+                        'icno' => $studentInfo['icno'],
+                        'gender' => $studentInfo['gender'],
+                        'email' => $studentInfo['email'] ?? null,
+                        'class_id' => $studentInfo['class_id'],
+                    ]);
+
+                    DB::table('registration_requests')->insert([
+                        'student_info' => $studentJson,
+                        'status' => 'Pending',
+                        'parent_id' => $userId,
+                        'organization_id' => $organizationId
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("registerStudents - Failed to process student {$index}", [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                        'student_info' => $studentInfo
+                    ]);
+                    $failedRegistrations[] = [
+                        'index' => $index,
+                        'name' => $studentInfo['name'],
+                        'error' => $e->getMessage()
+                    ];
+                }
+            }
+
+            if (count($failedRegistrations) === count($studentsData)) {
+                DB::rollBack();
+                Log::warning('registerStudents - All registrations failed, transaction rolled back', ['failed_registrations' => $failedRegistrations]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Semua pendaftaran gagal.',
+                    'details' => $failedRegistrations
+                ], 422);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Permohonan pendaftaran pelajar telah dihantar kepada pentadbir untuk disemak dan diterima.'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::critical('registerStudents - Uncaught Exception caused 500 error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat semasa pendaftaran.'
+            ], 500);
+        }
+    }
+
+    private function getOrganizationIdForClass($classId)
+    {
+        $org = DB::table('class_organization')
+            ->where('class_id', $classId)
+            ->first(['organization_id']);
+
+        if (!$org) {
+            throw new \Exception("Kelas tidak dikaitkan dengan sebarang organisasi.");
+        }
+
+        return $org->organization_id;
+    }
+
+    public function registerParent(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name'      => ['required', 'string', 'max:255'],
+            'email'     => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'icno'      => ['required', 'string', 'min:12', 'max:14'],
+            'telno'     => ['required', 'numeric', 'min:10', 'unique:users,telno'],
+        ], [
+            'icno.min' => 'IC No. mesti sekurang-kurangnya 12 digit',
+            'telno.unique' => 'Nombor telefon telah didaftarkan.',
+            'email.unique' => 'Emel telah didaftarkan.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sila semak maklumat anda.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $cleanIc = str_replace("-", "", $request->input("icno"));
+        $icExists = DB::table("users")->where("icno", $cleanIc)->exists();
+
+        if ($icExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No. Kad Pengenalan telah wujud.',
+                'errors' => ['icno' => ['The IC No. has already been taken.']]
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $user = User::create([
+                "name" => $request->input("name"),
+                "email" => $request->input("email"),
+                "password" => Hash::make("abc123"),
+                "telno" => $request->input("telno"),
+                "purpose" => "bayar_yuran",
+            ]);
+
+            DB::table("users")->where("id", "=", $user->id)->update([
+                "icno" => $cleanIc,
+                "email_verified_at" => now()
+            ]);
+
+            $role = DB::table("roles")->where("name", "Penjaga")->first();
+            if ($role) {
+                DB::table("model_has_roles")->insert([
+                    "role_id" => $role->id,
+                    "model_id" => $user->id,
+                    "model_type" => "App\User"
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tahniah! Pendaftaran berjaya! Sila log masuk.'
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Register Parent Error: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Ralat semasa pendaftaran. Sila cuba lagi.',
+                'debug' => $e->getMessage()
             ], 500);
         }
     }
