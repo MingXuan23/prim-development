@@ -35,6 +35,8 @@
                 <form method="POST" action="{{ route('directpayIndex') }}">
                     @csrf
 
+                    <input type="hidden" name="source" value="mobile">
+
                     <input type="hidden" name="amount" value="{{ number_format($grandTotal, 2, '.', '') }}">
                     <input type="hidden" name="o_id" value="{{ $getorganization->id ?? '' }}">
                     <input type="hidden" name="desc" value="School_Fees">
