@@ -188,9 +188,9 @@
                                 data: "student_status",
                                 render: function (data, type, row) {
                                     if (data == 1) {
-                                        return "<p>Active</p>";
+                                        return "<span class='badge badge-success'>Aktif</span>";
                                     } else {
-                                        return "<p>Inactive</p>";
+                                        return "<span class='badge badge-danger'>Tidak Aktif</span>";
                                     }
                                 },
                                 "width": "10%"
@@ -207,7 +207,7 @@
                                     return data
                                         .map(fee => {
                                             if (fee.fee_category != null && fee.fee_name != null) {
-                                                return "<span class='text-truncate'>" + fee.fee_category + " - " + fee.fee_name + "</span>";
+                                                return "<span class='text-truncate mb-1'>" + fee.fee_category + " - " + fee.fee_name + "</span>";
                                             }
                                         })
                                         .join("<br>");
@@ -224,8 +224,10 @@
 
                                     return data
                                         .map(fee => {
-                                            if (fee.fee_status != null) {
-                                                return "<span>" + fee.fee_status + "</span>";
+                                            if (fee.fee_status == "Debt") {
+                                                return "<span class='badge badge-danger mb-1'>Belum Selesai</span>";
+                                            } else if (fee.fee_status == "Complete") {
+                                                return "<span class='badge badge-success mb-1'>Selesai</span>";
                                             }
                                         })
                                         .join("<br>");

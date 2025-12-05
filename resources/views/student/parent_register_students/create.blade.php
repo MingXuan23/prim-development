@@ -218,9 +218,6 @@
 
             currentRowIndex++;
 
-            // disable the organization select to ensure that users only select one organization
-            // $("#organization").prop("disabled", true);
-
             // check if there are students in the table, if not disable the button
             if (studentsTable.children().length == 0) {
                 $("#daftar-btn").prop("disabled", true);
@@ -247,11 +244,6 @@
             $('#parent_phone').mask('000000000000');
 
             fetchClass($("#organization").val());
-
-            // re-enable the organization select
-            // $("form").on("submit", function () {
-            //     $("#organization").prop("disabled", false);
-            // });
 
             $('#organization').change(function () {
                 if ($(this).val() != '') {

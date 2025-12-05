@@ -153,54 +153,57 @@
 
             // ************************** get all selected students for current fee based on class ********************************
             $("#classes").on("change", function () {
-                var allStudents = $("#students");
+                var allStudentsList = $("#students");
                 var selectedStudentsList = $("#students-selected");
 
                 selectedStudentsList.empty();
-                allStudents.empty();
+                allStudentsList.empty();
 
-                // fetch students from current class that are selected
-                $.ajax({
+                var selectedStudentsData = $.ajax({
                     url: "{{ route('fees.fetchOneFeeToManyStudentsJson') }}",
                     method: "GET",
                     data: {
                         oid: $("#organization-id").val(),
                         feeId: $("#fee-id").val(),
                         classId: $("#classes").val()
-                    },
-                    success: function (result) {
-                        if (result[0].students[0].student_id != null) {
-                            result[0].students.forEach(function (student) {
-                                if (student.student_fee_status === "Paid") {
-                                    selectedStudentsList.append("<option disabled selected value='" + student.student_id + "'>" + student.student_name + "</option>");
-                                } else {
-                                    selectedStudentsList.append("<option value='" + student.student_id + "'>" + student.student_name + "</option>")
-                                }
-                            });
-                        }
                     }
                 });
 
-                // fetch students from current class that are not selected
-                $.ajax({
+                var allStudentsData = $.ajax({
                     url: "{{ route('fees.getstudentDatatable') }}",
                     method: "GET",
                     data: {
                         class_id: $("#classes").val(),
                         status: null
-                    },
-                    success: function (result) {
-                        var selectedStudentsId = $("#students-selected option").map(function () {
-                            return parseInt($(this).val());
-                        }).get();
+                    }
+                });
 
-                        result.data.forEach(student => {
-                            if (student.id != null && !selectedStudentsId.includes(student.id)) {
-                                allStudents.append("<option value = '" + student.id + "'>" + student.nama + "</option>");
+                $.when(selectedStudentsData, allStudentsData).done(function (selectedStudentsData, allStudentsData) {
+                    if (selectedStudentsData[0].length > 0 && selectedStudentsData[0][0].students[0].student_id != null) {
+                        selectedStudentsData[0][0].students.forEach(function (student) {
+                            if (student.student_fee_status === "Paid") {
+                                selectedStudentsList.append("<option disabled selected value='" + student.student_id + "'>" + student.student_name + "</option>");
+                            } else {
+                                selectedStudentsList.append("<option value='" + student.student_id + "'>" + student.student_name + "</option>")
                             }
                         });
                     }
-                });
+
+                    var studentsIdOption = $("#students-selected option");
+                    var selectedStudentsId = [];
+
+                    if (studentsIdOption.length > 0) {
+                        selectedStudentsId = $("#students-selected option").map(function () {
+                            return parseInt($(this).val());
+                        }).get();
+                    }
+
+                    allStudentsData[0].data.forEach(student => {
+                        if (student.id != null && !selectedStudentsId.includes(student.id)) {
+                            allStudentsList.append("<option value = '" + student.id + "'>" + student.nama + "</option>");
+                        }
+                    });
+                })
             });
 
             // ************************** move students to selected list and vice versa ********************************

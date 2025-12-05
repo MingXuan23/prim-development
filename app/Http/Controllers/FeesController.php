@@ -186,6 +186,7 @@ class FeesController extends AppBaseController
     public function getOrganizationByUserId()
     {
         $userId = Auth::id();
+
         if (Auth::user()->hasRole('Superadmin')) {
             return Organization::all();
 
@@ -1234,6 +1235,10 @@ class FeesController extends AppBaseController
         $feeId = $request->get("feeId");
         $currentFee = $this->fetchOneFeeToManyStudents($oid, $feeId)->first();
 
+        // dump($oid);
+        // dump($feeId);
+        // dd($currentFee);
+
         return view('fee.assign_students_to_fee.edit', compact("organization", "currentFee"));
     }
 
@@ -1321,10 +1326,10 @@ class FeesController extends AppBaseController
                     ->first();
 
                 // find the student_fees_new to remove it
-                $studentFeesNew = DB::table("student_fees_new as sfn")
-                    ->where("sfn.class_student_id", "=", $classStudent->id)
-                    ->where("sfn.fees_id", "=", $feeId)
-                    ->where("sfn.status", "=", "Debt");
+                $studentFeesNew = DB::table("student_fees_new")
+                    ->where("class_student_id", "=", $classStudent->id)
+                    ->where("fees_id", "=", $feeId)
+                    ->where("status", "Debt");
 
                 // delete fees_recurring data for recurring fees
                 if ($fee->category == "Kategori Berulang") {
@@ -1390,13 +1395,13 @@ class FeesController extends AppBaseController
     }
 
     // helper method to fetch a fee details with their asscociated students by fee id and return as collection
-    public function fetchOneFeeToManyStudents($oid, $feeId = null, $classId = null)
+    public function fetchOneFeeToManyStudents($oid, $feeId, $classId = null)
     {
         if (Auth::id() == null) {
             return redirect('/login');
         }
 
-        return DB::table("fees_new as fn")
+        $fees = DB::table("fees_new as fn")
             ->leftJoin("student_fees_new as sfn", "fn.id", "=", "sfn.fees_id")
             ->leftJoin("class_student as cs", "cs.id", "=", "sfn.class_student_id")
             ->leftJoin("class_organization as co", "co.id", "=", "cs.organclass_id")
@@ -1413,8 +1418,13 @@ class FeesController extends AppBaseController
                 "sfn.status as student_fee_status"
             )
             ->where("fn.organization_id", "=", $oid)
-            ->where("fn.id", "LIKE", isset($feeId) ? $feeId : "%%")
-            ->where("co.class_id", "LIKE", isset($classId) ? $classId : "%%")
+            ->where("fn.id", "=", $feeId);
+
+        if (isset($classId)) {
+            $fees = $fees->where("co.class_id", "=", $classId);
+        }
+
+        return $fees
             ->get()
             ->groupBy("fee_id")
             ->map(function ($group) {
@@ -2266,6 +2276,9 @@ class FeesController extends AppBaseController
 
     public function getFeesReceiptDataTable(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect("/login");
+        }
 
         if (Auth::user()->hasRole('Superadmin')) {
             if ($request->oid === NULL) {
@@ -2438,6 +2451,9 @@ class FeesController extends AppBaseController
 
     public function fetchClassForCateYuran(Request $request)
     {
+        if (Auth::id() == null) {
+            return redirect("/login");
+        }
 
         // dd($request->get('schid'));
         $organ = Organization::find($request->get('oid'));
