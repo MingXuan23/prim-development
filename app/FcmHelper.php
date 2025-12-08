@@ -12,6 +12,7 @@ class FcmHelper
 
         $userToken = DB::table('user_token')
             ->where('user_id', $userId)
+            ->where('application_id', 2)
             ->orderBy('updated_at', 'desc')
             ->first();
 
