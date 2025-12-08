@@ -10,7 +10,10 @@ class FcmHelper
     public static function sendToUser($userId, $title, $body, $data = [])
     {
 
-        $userToken = DB::table('user_token')->where('user_id', $userId)->first();
+        $userToken = DB::table('user_token')
+            ->where('user_id', $userId)
+            ->orderBy('updated_at', 'desc')
+            ->first();
 
         if (!$userToken || !$userToken->fcm_token) {
             return false;
