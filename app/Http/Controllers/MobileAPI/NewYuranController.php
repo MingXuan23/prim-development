@@ -1166,18 +1166,16 @@ class NewYuranController extends Controller
         }
 
         DB::table('user_token')
-            ->updateOrInsert(
-                ['user_id' => $user->id],
-                [
-                    'device_token' => $newDeviceToken,
-                    'api_token' => $newApiToken,
-                    'remember_token' => $rememberToken,
-                    'application_id' => DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id'),
-                    'fcm_token' => $fcmToken,
-                    'updated_at' => now(),
-                    'expired_at' => now()->addYear(),
-                ]
-            );
+            ->where('user_id', $user->id)
+            ->update([
+                'device_token' => $newDeviceToken,
+                'api_token' => $newApiToken,
+                'remember_token' => $rememberToken,
+                'application_id' => DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id'),
+                'fcm_token' => $fcmToken,
+                'updated_at' => now(),
+                'expired_at' => now()->addYear(),
+            ]);
 
 
         $students = DB::table('students as s')
