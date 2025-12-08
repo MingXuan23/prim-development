@@ -7,12 +7,14 @@ use Illuminate\Support\Facades\Log;
 
 class FcmHelper
 {
+    const YuranApplicationID = 2;
+
     public static function sendToUser($userId, $title, $body, $data = [])
     {
 
         $userToken = DB::table('user_token')
             ->where('user_id', $userId)
-            ->where('application_id', 2)
+            ->where('application_id', self::YuranApplicationID)
             ->orderBy('updated_at', 'desc')
             ->first();
 
