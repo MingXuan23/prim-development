@@ -109,7 +109,7 @@
     <table class="org-header">
         <tr>
             <td style="width:20%; text-align:center;">
-                @if(!empty($get_organization->organization_picture))
+                <!-- @if(!empty($get_organization->organization_picture))
                 @php
                 $imageUrl = 'https://prim.my/organization-picture/' . $get_organization->organization_picture;
                 $headers = @get_headers($imageUrl);
@@ -118,6 +118,26 @@
                 @if($imageExists)
                 <img src="{{ $imageUrl }}" height="80" alt="">
                 @endif
+                @endif -->
+                @php
+                $picName = $get_organization->organization_picture;
+                $relativePath = 'organization-picture/' . $picName;
+                $fullPath = public_path($relativePath);
+                $base64Image = null;
+
+                if (!empty($picName) && file_exists($fullPath)) {
+                $type = pathinfo($fullPath, PATHINFO_EXTENSION);
+
+                $data = file_get_contents($fullPath);
+
+                $base64Image = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                }
+                @endphp
+
+                @if($base64Image)
+                <img src="{{ $base64Image }}" height="80" alt="Logo">
+                @else
+                {{-- <img src="..." height="80"> --}}
                 @endif
             </td>
             <td style="width:80%;">
