@@ -88,10 +88,10 @@
                     </div>
 
                     <div style="margin: 0px 19px 19px 19px; float: right;">
-                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
-                                class="fas fa-plus"></i> Export All</a>
-                        <a href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
-                                class="fas fa-plus"></i> Export</a>
+                        <!-- <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"
+                                                        id="exportAllModalBtn"> <i class="fas fa-plus"></i> Export All</a> -->
+                        <a href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1" id="exportModalBtn">
+                            <i class="fas fa-plus"></i> Export Pelajar</a>
                     </div>
 
                     <div class="table-responsive">
@@ -111,34 +111,34 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-                aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Export Murid</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form action="{{ route('polimas.allstudentexport') }}" method="post">
-                            <div class="modal-body">
-                                {{ csrf_field() }}
-                                <div class="form-group">
-                                    <label>Organisasi</label>
-                                    <select name="organExport" id="organExport" class="form-control">
-                                        <option value="{{ $organization->id }}" selected>{{ $organization->nama }}</option>
-                                    </select>
-                                </div>
+            <!-- <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Export Murid</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <form action="{{ route('polimas.allstudentexport') }}" method="post">
+                                                    <div class="modal-body">
+                                                        {{ csrf_field() }}
+                                                        <div class="form-group">
+                                                            <label>Organisasi</label>
+                                                            <select name="organExport" id="organExport" class="form-control">
+                                                                <option value="{{ $organization->id }}" selected>{{ $organization->nama }}</option>
+                                                            </select>
+                                                        </div>
 
-                                <div class="modal-footer">
-                                    <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+                                                        <div class="modal-footer">
+                                                            <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div> -->
 
             <div class="modal fade" id="modelId1" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
                 aria-hidden="true">
@@ -154,12 +154,23 @@
                             <div class="modal-body">
                                 {{ csrf_field() }}
                                 <div class="form-group">
+                                    <label>Sila pilih jenis eksport</label>
+                                    <select id="export_type" name="export_type" class="form-control">
+                                        <option value="" disabled selected>Pilih Jenis Eksport</option>
+                                        <option value="tanpa_data">Tanpa data</option>
+                                        <option value="data_dalam_organisasi">Data pelajar mengikut organisasi</option>
+                                        <option value="data_dalam_kelas">Data pelajar mengikut kelas</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="organization-hide">
                                     <label>Organisasi</label>
                                     <select name="organExport" id="organExport" class="form-control">
+                                        <option value="" disabled selected>Pilih organisasi</option>
                                         <option value="{{ $organization->id }}" selected>{{ $organization->nama }}</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" id="class-hide">
                                     <label>Nama Kelas</label>
                                     <select name="classExport" id="classExport" class="form-control">
 
@@ -328,6 +339,44 @@
                 if (classid) {
                     $('#studentTable').DataTable().destroy();
                     fetch_data(classid);
+                }
+            });
+
+            // function to reset and hide all options for export
+            function hideExportTypeOptions() {
+                // reset all options for export
+                $("#organExport").prop("selectedIndex", 0).trigger("change");
+                $("#classExport").prop("selectedIndex", 0);
+
+                // hide all options for export
+                $("#organization-hide").hide();
+                $("#class-hide").hide();
+            }
+
+            $("#exportModalBtn").click(function () {
+                // reset export type dropdown value
+                $("#export_type").prop("selectedIndex", 0);
+
+                // hide and reset all options for export first
+                hideExportTypeOptions();
+            })
+
+            $("#export_type").change(function () {
+                var exportType = $("#export_type").val();
+
+                // hide and reset all options for export everytime the export type select changes
+                hideExportTypeOptions();
+
+                switch (exportType) {
+                    case "data_dalam_organisasi":
+                        $("#organization-hide").show();
+                        break;
+                    case "data_dalam_kelas":
+                        $("#organization-hide").show();
+                        $("#class-hide").show();
+                        break;
+                    default:
+                        break;
                 }
             });
 

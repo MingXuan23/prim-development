@@ -99,17 +99,43 @@ class StudentController extends Controller
     public function studentexport(Request $request)
     {
         $this->validate($request, [
-            'organExport'      =>  'required',
-            'classExport' => 'required_without_all:yearExport',
-            'yearExport' => 'required_without_all:classExport',
+            'export_type' => "required"
         ]);
 
-        //dd($request->classExport, $request->yearExport);
         $name = "";
-        if ($request->classExport != null) {
-            $name = ClassModel::find($request->classExport)->nama;
-        } else {
-            $name = Organization::find($request->organExport)->nama .  "Year " . $request->yearExport;
+
+        switch ($request->get("export_type")) {
+            case "tanpa_data":
+                $name = "export_tanpa_data";
+                break;
+            case "data_dalam_organisasi":
+                // make sure that user chooses each of the required options
+                $this->validate($request, [
+                    'organExport' => "required"
+                ]);
+
+                $name = Organization::find($request->organExport)->nama;
+                break;
+            case "data_dalam_tahun":
+                // make sure that user chooses each of the required options
+                $this->validate($request, [
+                    'organExport' => "required",
+                    "yearExport" => "required"
+                ]);
+
+                $name = Organization::find($request->organExport)->nama . " Year " . $request->yearExport;
+                break;
+            case "data_dalam_kelas":
+                // make sure that user chooses each of the required options
+                $this->validate($request, [
+                    'organExport' => "required",
+                    "classExport" => "required"
+                ]);
+
+                $name = ClassModel::find($request->classExport)->nama;
+                break;
+            default:
+                break;
         }
 
         return Excel::download(new StudentExport($request->organExport, $request->classExport, $request->yearExport), $name . '.xlsx');
@@ -118,8 +144,8 @@ class StudentController extends Controller
     public function studentimport(Request $request)
     {
         $this->validate($request, [
-            'classImport'          =>  'required',
-            'organImport'          => 'required',
+            'classImport' => 'required',
+            'organImport' => 'required',
         ]);
 
         // dd($request->classImport);
@@ -134,8 +160,8 @@ class StudentController extends Controller
             ->get();
         //dd($ifSwasta);
 
-        $file       = $request->file('file');
-        $namaFile   = $file->getClientOriginalName();
+        $file = $request->file('file');
+        $namaFile = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
         $public_path = $_SERVER['DOCUMENT_ROOT'];
 
@@ -183,7 +209,7 @@ class StudentController extends Controller
     public function create()
     {
         //
-        $userid     = Auth::id();
+        $userid = Auth::id();
 
         $school = DB::table('organizations')
             ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
@@ -211,7 +237,7 @@ class StudentController extends Controller
     public function createSwasta()
     {
         //
-        $userid     = Auth::id();
+        $userid = Auth::id();
 
         $school = DB::table('organizations')
             ->join('organization_user', 'organization_user.organization_id', '=', 'organizations.id')
@@ -253,10 +279,10 @@ class StudentController extends Controller
             ->first();
 
         $this->validate($request, [
-            'name'              =>  'required',
-            'classes'           =>  'required',
-            'parent_name'       =>  'required',
-            'parent_icno'      =>  'required',
+            'name' => 'required',
+            'classes' => 'required',
+            'parent_name' => 'required',
+            'parent_icno' => 'required',
         ]);
 
         $icno = $this->trimString(str_replace('-', '', $request->get('parent_icno')));
@@ -280,21 +306,21 @@ class StudentController extends Controller
 
             if (empty($newparent)) {
                 $this->validate($request, [
-                    'parent_icno'      =>  'required|unique:users,telno',
+                    'parent_icno' => 'required|unique:users,telno',
                 ]);
 
                 if ($request->parent_email != null) {
                     $this->validate($request, [
-                        'parent_email'     =>  'required|email|unique:users,email',
+                        'parent_email' => 'required|email|unique:users,email',
                     ]);
                 }
 
                 $newparent = new Parents([
-                    'name'           =>  $parentname,
-                    'email'          =>  $request->get('parent_email'),
-                    'password'       =>  Hash::make('abc123'),
-                    'telno'          =>  $icno,
-                    'remember_token' =>  Str::random(40),
+                    'name' => $parentname,
+                    'email' => $request->get('parent_email'),
+                    'password' => Hash::make('abc123'),
+                    'telno' => $icno,
+                    'remember_token' => Str::random(40),
                 ]);
                 $newparent->save();
             }
@@ -308,11 +334,11 @@ class StudentController extends Controller
 
             if (empty($parentRole)) {
                 DB::table('organization_user')->insert([
-                    'organization_id'   => $co->oid,
-                    'user_id'           => $newparent->id,
-                    'role_id'           => 6,
-                    'start_date'        => now(),
-                    'status'            => 1,
+                    'organization_id' => $co->oid,
+                    'user_id' => $newparent->id,
+                    'role_id' => 6,
+                    'start_date' => now(),
+                    'status' => 1,
                 ]);
             }
         } else {
@@ -330,11 +356,11 @@ class StudentController extends Controller
 
             if (empty($parentRole)) {
                 DB::table('organization_user')->insert([
-                    'organization_id'   => $co->oid,
-                    'user_id'           => $newparent->id,
-                    'role_id'           => 6,
-                    'start_date'        => now(),
-                    'status'            => 1,
+                    'organization_id' => $co->oid,
+                    'user_id' => $newparent->id,
+                    'role_id' => 6,
+                    'start_date' => now(),
+                    'status' => 1,
                 ]);
             }
         }
@@ -353,10 +379,10 @@ class StudentController extends Controller
             ->first();
 
         $this->validate($request, [
-            'name'              =>  'required',
-            'classes'           =>  'required',
-            'parent_name'       =>  'required',
-            'parent_icno'      =>  'required',
+            'name' => 'required',
+            'classes' => 'required',
+            'parent_name' => 'required',
+            'parent_icno' => 'required',
         ]);
 
         $icno = $this->trimString(str_replace('-', '', $request->get('parent_icno')));
@@ -380,21 +406,21 @@ class StudentController extends Controller
 
             if (empty($newparent)) {
                 $this->validate($request, [
-                    'parent_icno'      =>  'required|unique:users,telno',
+                    'parent_icno' => 'required|unique:users,telno',
                 ]);
 
                 if ($request->parent_email != null) {
                     $this->validate($request, [
-                        'parent_email'     =>  'required|email|unique:users,email',
+                        'parent_email' => 'required|email|unique:users,email',
                     ]);
                 }
 
                 $newparent = new Parents([
-                    'name'           =>  $parentname,
-                    'email'          =>  $request->get('parent_email'),
-                    'password'       =>  Hash::make('abc123'),
-                    'telno'          =>  $icno,
-                    'remember_token' =>  Str::random(40),
+                    'name' => $parentname,
+                    'email' => $request->get('parent_email'),
+                    'password' => Hash::make('abc123'),
+                    'telno' => $icno,
+                    'remember_token' => Str::random(40),
                 ]);
                 $newparent->save();
             }
@@ -408,11 +434,11 @@ class StudentController extends Controller
 
             if (empty($parentRole)) {
                 DB::table('organization_user')->insert([
-                    'organization_id'   => $co->oid,
-                    'user_id'           => $newparent->id,
-                    'role_id'           => 6,
-                    'start_date'        => now(),
-                    'status'            => 1,
+                    'organization_id' => $co->oid,
+                    'user_id' => $newparent->id,
+                    'role_id' => 6,
+                    'start_date' => now(),
+                    'status' => 1,
                 ]);
             }
         } else {
@@ -430,11 +456,11 @@ class StudentController extends Controller
 
             if (empty($parentRole)) {
                 DB::table('organization_user')->insert([
-                    'organization_id'   => $co->oid,
-                    'user_id'           => $newparent->id,
-                    'role_id'           => 6,
-                    'start_date'        => now(),
-                    'status'            => 1,
+                    'organization_id' => $co->oid,
+                    'user_id' => $newparent->id,
+                    'role_id' => 6,
+                    'start_date' => now(),
+                    'status' => 1,
                 ]);
             }
         }
@@ -464,19 +490,19 @@ class StudentController extends Controller
         $user->assignRole($rolename->nama);
 
         $student = new Student([
-            'nama'          =>  empty($studentData->name) ? $this->trimString(strtoupper($studentData->studentName)) : $this->trimString(strtoupper($studentData->name)),
+            'nama' => empty($studentData->name) ? $this->trimString(strtoupper($studentData->studentName)) : $this->trimString(strtoupper($studentData->name)),
             // 'icno'          =>  $request->get('icno'),
-            'gender'        =>  $studentData->gender,
+            'gender' => $studentData->gender,
             //'email'         =>  $studentData->email,
         ]);
 
         $student->save();
         // 
         DB::table('class_student')->insert([
-            'organclass_id'   => $co->id,
-            'student_id'      => $student->id,
-            'start_date'      => now(),
-            'status'          => 1,
+            'organclass_id' => $co->id,
+            'student_id' => $student->id,
+            'start_date' => now(),
+            'status' => 1,
         ]);
 
         $classStu = DB::table('class_student')
@@ -485,8 +511,8 @@ class StudentController extends Controller
 
 
         DB::table('organization_user_student')->insert([
-            'organization_user_id'  => $ou->id,
-            'student_id'            => $student->id
+            'organization_user_id' => $ou->id,
+            'student_id' => $student->id
         ]);
 
         // dd($ou);
@@ -523,10 +549,10 @@ class StudentController extends Controller
         if (!$ifExitsCateA->isEmpty() && count($ifExits) == 0) {
             foreach ($ifExitsCateA as $kateA) {
                 DB::table('fees_new_organization_user')->insert([
-                    'status'                    => 'Debt',
-                    'fees_new_id'               =>  $kateA->id,
-                    'organization_user_id'      =>  $ou->id,
-                    'transaction_id'            => NULL
+                    'status' => 'Debt',
+                    'fees_new_id' => $kateA->id,
+                    'organization_user_id' => $ou->id,
+                    'transaction_id' => NULL
                 ]);
             }
         }
@@ -543,16 +569,16 @@ class StudentController extends Controller
 
                 if ($target->data == "All_Level" || $target->data == $class->levelid) {
                     DB::table('student_fees_new')->insert([
-                        'status'            => 'Debt',
-                        'fees_id'           =>  $kateBC->id,
-                        'class_student_id'  =>  $classStu->id
+                        'status' => 'Debt',
+                        'fees_id' => $kateBC->id,
+                        'class_student_id' => $classStu->id
                     ]);
                 } else if (is_array($target->data)) {
                     if (in_array($class->id, $target->data)) {
                         DB::table('student_fees_new')->insert([
-                            'status'            => 'Debt',
-                            'fees_id'           =>  $kateBC->id,
-                            'class_student_id'  =>  $classStu->id
+                            'status' => 'Debt',
+                            'fees_id' => $kateBC->id,
+                            'class_student_id' => $classStu->id
                         ]);
                     }
                 }
@@ -578,9 +604,9 @@ class StudentController extends Controller
                         // ]);
 
                         $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                            'status'            => 'Debt',
-                            'fees_id'           =>  $kateRec->id,
-                            'class_student_id'  =>  $classStu->id
+                            'status' => 'Debt',
+                            'fees_id' => $kateRec->id,
+                            'class_student_id' => $classStu->id
                         ]);
 
                         $datestarted = Carbon::parse($kateRec->start_date); //back to original date without format (string to datetime)
@@ -613,9 +639,9 @@ class StudentController extends Controller
                             // ]);
 
                             $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                'status'            => 'Debt',
-                                'fees_id'           =>  $kateRec->id,
-                                'class_student_id'  =>  $classStu->id
+                                'status' => 'Debt',
+                                'fees_id' => $kateRec->id,
+                                'class_student_id' => $classStu->id
                             ]);
 
                             $datestarted = Carbon::parse($kateRec->start_date); //back to original date without format (string to datetime)
@@ -652,11 +678,11 @@ class StudentController extends Controller
         foreach ($child_organs as $child_organ) {
 
             $organ_user_id = DB::table('organization_user')->insertGetId([
-                'organization_id'   => $child_organ->id,
-                'user_id'           => $parentId,
-                'role_id'           => 6,
-                'start_date'        => now(),
-                'status'            => 1,
+                'organization_id' => $child_organ->id,
+                'user_id' => $parentId,
+                'role_id' => 6,
+                'start_date' => now(),
+                'status' => 1,
             ]);
 
             $ifExitsCateA = DB::table('fees_new')
@@ -681,10 +707,10 @@ class StudentController extends Controller
             if (!$ifExitsCateA->isEmpty() && count($ifExits) == 0) {
                 foreach ($ifExitsCateA as $kateA) {
                     DB::table('fees_new_organization_user')->insert([
-                        'status'                    => 'Debt',
-                        'fees_new_id'               =>  $kateA->id,
-                        'organization_user_id'      =>  $organ_user_id,
-                        'transaction_id'            => NULL
+                        'status' => 'Debt',
+                        'fees_new_id' => $kateA->id,
+                        'organization_user_id' => $organ_user_id,
+                        'transaction_id' => NULL
                     ]);
                 }
             }
@@ -701,16 +727,16 @@ class StudentController extends Controller
 
                     if ($target->data == "All_Level" || $target->data == $class->levelid) {
                         DB::table('student_fees_new')->insert([
-                            'status'            => 'Debt',
-                            'fees_id'           =>  $kateBC->id,
-                            'class_student_id'  =>  $classStu->id
+                            'status' => 'Debt',
+                            'fees_id' => $kateBC->id,
+                            'class_student_id' => $classStu->id
                         ]);
                     } else if (is_array($target->data)) {
                         if (in_array($class->id, $target->data)) {
                             DB::table('student_fees_new')->insert([
-                                'status'            => 'Debt',
-                                'fees_id'           =>  $kateBC->id,
-                                'class_student_id'  =>  $classStu->id
+                                'status' => 'Debt',
+                                'fees_id' => $kateBC->id,
+                                'class_student_id' => $classStu->id
                             ]);
                         }
                     }
@@ -736,9 +762,9 @@ class StudentController extends Controller
                             // ]);
 
                             $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                'status'            => 'Debt',
-                                'fees_id'           =>  $kateRec->id,
-                                'class_student_id'  =>  $classStu->id
+                                'status' => 'Debt',
+                                'fees_id' => $kateRec->id,
+                                'class_student_id' => $classStu->id
                             ]);
 
                             $datestarted = Carbon::parse($kateRec->start_date); //back to original date without format (string to datetime)
@@ -773,9 +799,9 @@ class StudentController extends Controller
                             // }
 
                             $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                'status'            => 'Debt',
-                                'fees_id'           =>  $kateRec->id,
-                                'class_student_id'  =>  $classStu->id
+                                'status' => 'Debt',
+                                'fees_id' => $kateRec->id,
+                                'class_student_id' => $classStu->id
                             ]);
 
                             $datestarted = Carbon::parse($kateRec->start_date); //back to original date without format (string to datetime)
@@ -832,10 +858,10 @@ class StudentController extends Controller
             foreach ($allFees as $fee) {
                 // assign the fee to the parent
                 DB::table('fees_new_organization_user')->insert([
-                    'status'                    => 'Debt',
-                    'fees_new_id'               =>  $fee->id,
-                    'organization_user_id'      =>  $organizationUserId,
-                    'transaction_id'            => null
+                    'status' => 'Debt',
+                    'fees_new_id' => $fee->id,
+                    'organization_user_id' => $organizationUserId,
+                    'transaction_id' => null
                 ]);
 
                 // update the parent's organization_user and set its fees_status to 'Not Complete'
@@ -887,9 +913,9 @@ class StudentController extends Controller
                     if ($target->data == "All_Level" || $target->data == $class->levelid) {
                         // assign this fee to the new student
                         DB::table('student_fees_new')->insert([
-                            'status'            => 'Debt',
-                            'fees_id'           =>  $fee->id,
-                            'class_student_id'  =>  $classStudentId
+                            'status' => 'Debt',
+                            'fees_id' => $fee->id,
+                            'class_student_id' => $classStudentId
                         ]);
 
                         DB::table("class_student")
@@ -900,9 +926,9 @@ class StudentController extends Controller
                         if (in_array($class->id, $target->data)) {
                             // assign this fee to the new student
                             DB::table('student_fees_new')->insert([
-                                'status'            => 'Debt',
-                                'fees_id'           =>  $fee->id,
-                                'class_student_id'  =>  $classStudentId
+                                'status' => 'Debt',
+                                'fees_id' => $fee->id,
+                                'class_student_id' => $classStudentId
                             ]);
 
                             DB::table("class_student")
@@ -922,9 +948,9 @@ class StudentController extends Controller
                         (is_array($target->data) && in_array($class->id, $target->data))
                     ) {
                         $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                            'status'            => 'Debt',
-                            'fees_id'           =>  $fee->id,
-                            'class_student_id'  =>  $classStudentId
+                            'status' => 'Debt',
+                            'fees_id' => $fee->id,
+                            'class_student_id' => $classStudentId
                         ]);
 
                         // get class_student by current class_student_id
@@ -1448,9 +1474,9 @@ class StudentController extends Controller
                                 // ]);
 
                                 $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                    'status'            => 'Debt',
-                                    'fees_id'           =>  $kateRec->id,
-                                    'class_student_id'  =>  $new_class_student_id
+                                    'status' => 'Debt',
+                                    'fees_id' => $kateRec->id,
+                                    'class_student_id' => $new_class_student_id
                                 ]);
 
                                 DB::table('fees_recurring')->insert([
@@ -1501,9 +1527,9 @@ class StudentController extends Controller
                                     // ]);
 
                                     $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                        'status'            => 'Debt',
-                                        'fees_id'           =>  $kateRec->id,
-                                        'class_student_id'  =>  $new_class_student_id
+                                        'status' => 'Debt',
+                                        'fees_id' => $kateRec->id,
+                                        'class_student_id' => $new_class_student_id
                                     ]);
 
                                     DB::table('fees_recurring')->insert([
@@ -1549,9 +1575,9 @@ class StudentController extends Controller
         $classid = $request->get('classes');
 
         $this->validate($request, [
-            'name'          =>  'required',
+            'name' => 'required',
             //'icno'          =>  'required',
-            'classes'       =>  'required',
+            'classes' => 'required',
         ]);
 
         $getOrganizationClass = DB::table('class_organization')
@@ -1581,7 +1607,8 @@ class StudentController extends Controller
             ]
         );
 
-        return redirect()->back()->with('success', 'The data has been updated!')->with('closeTab', true);;
+        return redirect()->back()->with('success', 'The data has been updated!')->with('closeTab', true);
+        ;
     }
 
     public function destroy($id)
@@ -1802,7 +1829,7 @@ class StudentController extends Controller
                             })
                             ->orWhere(function ($query) use ($start_date, $end_date) {
                                 $query->whereNotNull('class_student.end_date')
-                                    ->whereBetween('class_student.end_date',  [$start_date, $end_date]);
+                                    ->whereBetween('class_student.end_date', [$start_date, $end_date]);
                             })
                             ->orWhere(function ($query) use ($start_date, $end_date) {
                                 $query->whereNotNull('class_student.end_date')
@@ -1830,7 +1857,7 @@ class StudentController extends Controller
                                 })
                                 ->orWhere(function ($query) use ($start_date, $end_date) {
                                     $query->whereNotNull('class_student.end_date')
-                                        ->whereBetween('class_student.end_date',  [$start_date, $end_date]);
+                                        ->whereBetween('class_student.end_date', [$start_date, $end_date]);
                                 })
                                 ->orWhere(function ($query) use ($start_date, $end_date) {
                                     $query->whereNotNull('class_student.end_date')
@@ -1846,7 +1873,7 @@ class StudentController extends Controller
                             //     $query->whereNotNull('class_student.end_date')
                             //           ->whereBetween($end_date, ['class_student.start_date', 'class_student.end_date']);
                             // })
-
+    
                         })
                         ->orderBy('students.nama');
                 }
@@ -1873,7 +1900,8 @@ class StudentController extends Controller
                         $row_end_date = Carbon::tomorrow()->format('Y-m-d');
                         //$row->end_date = Carbon::now()->format('Y-m-d');
                     } else {
-                        $row_end_date = Carbon::parse($row->end_date)->endOfDay()->format('Y-m-d H:i:s');;
+                        $row_end_date = Carbon::parse($row->end_date)->endOfDay()->format('Y-m-d H:i:s');
+                        ;
                     }
 
                     // dd($row,$row_end_date);
@@ -2017,7 +2045,7 @@ class StudentController extends Controller
                             if ($fl->sfn_status == 'Paid') {
                                 $status = 'Telah Bayar';
                             }
-                            $btn = $btn . '<option>' . $fl->name . ' : RM' . number_format((float)$fl->fr_finalAmount, 2, '.', '') . ' ( ' . $status . ' )</option>';
+                            $btn = $btn . '<option>' . $fl->name . ' : RM' . number_format((float) $fl->fr_finalAmount, 2, '.', '') . ' ( ' . $status . ' )</option>';
                         }
                         $btn = $btn . '</select>';
                         return $btn;
@@ -2154,7 +2182,7 @@ class StudentController extends Controller
             if (empty($newparent)) {
                 //if parent have email
                 if (isset($student->parentEmail) && !empty($student->parentEmail)) {
-                    $validator = Validator::make((array)$student, [
+                    $validator = Validator::make((array) $student, [
                         'parentTelno' => 'required|unique:users,telno',
                         'parentEmail' => 'unique:users,email',
                     ]);
@@ -2166,15 +2194,15 @@ class StudentController extends Controller
                     }
 
                     $newparent = new Parents([
-                        'name'           =>  $student->parentName,
-                        'email'          =>  $student->parentEmail,
-                        'password'       =>  Hash::make('abc123'),
-                        'telno'          =>  $student->parentTelno,
-                        'remember_token' =>  Str::random(40),
+                        'name' => $student->parentName,
+                        'email' => $student->parentEmail,
+                        'password' => Hash::make('abc123'),
+                        'telno' => $student->parentTelno,
+                        'remember_token' => Str::random(40),
                     ]);
                     $newparent->save();
                 } else {
-                    $validator = Validator::make((array)$student, [
+                    $validator = Validator::make((array) $student, [
                         'parentTelno' => 'required|unique:users,telno',
                     ]);
 
@@ -2185,11 +2213,11 @@ class StudentController extends Controller
                     }
 
                     $newparent = new Parents([
-                        'name'           =>  $student->parentName,
+                        'name' => $student->parentName,
                         //'email'          =>  $request->get('parent_email'),
-                        'password'       =>  Hash::make('abc123'),
-                        'telno'          =>  $student->parentTelno,
-                        'remember_token' =>  Str::random(40),
+                        'password' => Hash::make('abc123'),
+                        'telno' => $student->parentTelno,
+                        'remember_token' => Str::random(40),
                     ]);
                     $newparent->save();
                 }
@@ -2204,11 +2232,11 @@ class StudentController extends Controller
 
             if (empty($parentRole)) {
                 DB::table('organization_user')->insert([
-                    'organization_id'   => $co->oid,
-                    'user_id'           => $newparent->id,
-                    'role_id'           => 6,
-                    'start_date'        => now(),
-                    'status'            => 1,
+                    'organization_id' => $co->oid,
+                    'user_id' => $newparent->id,
+                    'role_id' => 6,
+                    'start_date' => now(),
+                    'status' => 1,
                 ]);
             }
         } else {
@@ -2229,11 +2257,11 @@ class StudentController extends Controller
 
             if (empty($parentRole)) {
                 DB::table('organization_user')->insert([
-                    'organization_id'   => $co->oid,
-                    'user_id'           => $newparent->id,
-                    'role_id'           => 6,
-                    'start_date'        => now(),
-                    'status'            => 1,
+                    'organization_id' => $co->oid,
+                    'user_id' => $newparent->id,
+                    'role_id' => 6,
+                    'start_date' => now(),
+                    'status' => 1,
                 ]);
             }
         }
@@ -2264,13 +2292,13 @@ class StudentController extends Controller
                             ->where('fees_id', $kateBC->id)
                             ->where('status', 'Debt')
                             ->update([
-                                'class_student_id'  =>  $new_class_student_id
+                                'class_student_id' => $new_class_student_id
                             ]);
                     } else {
                         DB::table('student_fees_new')->insert([
-                            'status'            => 'Debt',
-                            'fees_id'           =>  $kateBC->id,
-                            'class_student_id'  =>  $new_class_student_id
+                            'status' => 'Debt',
+                            'fees_id' => $kateBC->id,
+                            'class_student_id' => $new_class_student_id
                         ]);
                     }
                 } else if (is_array($target->data)) {
@@ -2281,13 +2309,13 @@ class StudentController extends Controller
                                 ->where('fees_id', $kateBC->id)
                                 ->where('status', 'Debt')
                                 ->update([
-                                    'class_student_id'  =>  $new_class_student_id
+                                    'class_student_id' => $new_class_student_id
                                 ]);
                         } else {
                             DB::table('student_fees_new')->insert([
-                                'status'            => 'Debt',
-                                'fees_id'           =>  $kateBC->id,
-                                'class_student_id'  =>  $new_class_student_id
+                                'status' => 'Debt',
+                                'fees_id' => $kateBC->id,
+                                'class_student_id' => $new_class_student_id
                             ]);
                         }
                     } else {
@@ -2422,9 +2450,9 @@ class StudentController extends Controller
                                 // ]);
 
                                 $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                    'status'            => 'Debt',
-                                    'fees_id'           =>  $kateRec->id,
-                                    'class_student_id'  =>  $new_class_student_id
+                                    'status' => 'Debt',
+                                    'fees_id' => $kateRec->id,
+                                    'class_student_id' => $new_class_student_id
                                 ]);
 
                                 DB::table('fees_recurring')->insert([
@@ -2475,9 +2503,9 @@ class StudentController extends Controller
                                     // ]);
 
                                     $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                        'status'            => 'Debt',
-                                        'fees_id'           =>  $kateRec->id,
-                                        'class_student_id'  =>  $new_class_student_id
+                                        'status' => 'Debt',
+                                        'fees_id' => $kateRec->id,
+                                        'class_student_id' => $new_class_student_id
                                     ]);
 
                                     DB::table('fees_recurring')->insert([
@@ -2566,7 +2594,7 @@ class StudentController extends Controller
 
             //if parent have email
             if (isset($student->parentEmail) && !empty($student->parentEmail)) {
-                $validator = Validator::make((array)$student, [
+                $validator = Validator::make((array) $student, [
                     'parentTelno' => 'required|unique:users,telno',
                     'parentEmail' => 'unique:users,email',
                 ]);
@@ -2578,18 +2606,18 @@ class StudentController extends Controller
                 }
 
                 $newparent = new Parents([
-                    'name'           =>  $student->parentName,
-                    'email'          =>  $student->parentEmail,
-                    'password'       =>  Hash::make('abc123'),
-                    'telno'          =>  $student->parentTelno,
-                    'remember_token' =>  Str::random(40),
+                    'name' => $student->parentName,
+                    'email' => $student->parentEmail,
+                    'password' => Hash::make('abc123'),
+                    'telno' => $student->parentTelno,
+                    'remember_token' => Str::random(40),
                 ]);
                 $newparent->save();
             } else {
 
 
 
-                $validator = Validator::make((array)$student, [
+                $validator = Validator::make((array) $student, [
                     'parentTelno' => 'required|unique:users,telno',
                 ]);
 
@@ -2600,11 +2628,11 @@ class StudentController extends Controller
                 }
 
                 $newparent = new Parents([
-                    'name'           =>  $student->parentName,
+                    'name' => $student->parentName,
                     //'email'          =>  $request->get('parent_email'),
-                    'password'       =>  Hash::make('abc123'),
-                    'telno'          =>  $student->parentTelno,
-                    'remember_token' =>  Str::random(40),
+                    'password' => Hash::make('abc123'),
+                    'telno' => $student->parentTelno,
+                    'remember_token' => Str::random(40),
                 ]);
                 $newparent->save();
             }
@@ -2621,12 +2649,12 @@ class StudentController extends Controller
 
 
         if (empty($parentRole)) {
-            $ou_id =  DB::table('organization_user')->insertGetId([
-                'organization_id'   => $co->organization_id,
-                'user_id'           => $newparent->id,
-                'role_id'           => 6,
-                'start_date'        => now(),
-                'status'            => 1,
+            $ou_id = DB::table('organization_user')->insertGetId([
+                'organization_id' => $co->organization_id,
+                'user_id' => $newparent->id,
+                'role_id' => 6,
+                'start_date' => now(),
+                'status' => 1,
             ]);
 
             DB::table('organization_user_student')
@@ -2744,9 +2772,9 @@ class StudentController extends Controller
                                 // ]);
 
                                 $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                    'status'            => 'Debt',
-                                    'fees_id'           =>  $kateRec->id,
-                                    'class_student_id'  =>  $new_class_student_id
+                                    'status' => 'Debt',
+                                    'fees_id' => $kateRec->id,
+                                    'class_student_id' => $new_class_student_id
                                 ]);
 
                                 DB::table('fees_recurring')->insert([
@@ -2797,9 +2825,9 @@ class StudentController extends Controller
                                     // ]);
 
                                     $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                        'status'            => 'Debt',
-                                        'fees_id'           =>  $kateRec->id,
-                                        'class_student_id'  =>  $new_class_student_id
+                                        'status' => 'Debt',
+                                        'fees_id' => $kateRec->id,
+                                        'class_student_id' => $new_class_student_id
                                     ]);
 
                                     DB::table('fees_recurring')->insert([
