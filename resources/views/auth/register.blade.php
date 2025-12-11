@@ -10,8 +10,8 @@
 
         <style>
             /* #name {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    text-transform: uppercase;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            text-transform: uppercase;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        } */
 
             ::-webkit-input-placeholder {
                 /* WebKit browsers */
@@ -49,13 +49,11 @@
         @endif
 
         {{-- Error message --}}
-        {{-- @if (session('errors'))
-        @foreach ($errors->all() as $error)
-        <div class="alert alert-danger" role="alert">
-            <p class="text-center">{{ $error }}</p>
-        </div>
-        @endforeach
-        @endif --}}
+        @error("icno_registered")
+            <div class="alert alert-danger" role="alert">
+                <p class="text-center">{{ $message }}</p>
+            </div>
+        @enderror
 
         <div class="account-pages my-5 pt-5">
             <div class="container">

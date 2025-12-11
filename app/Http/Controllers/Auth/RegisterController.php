@@ -189,9 +189,32 @@ class RegisterController extends Controller
                 ->orWhere("icno", "=", $icEntered)
                 ->get();
 
-            if ($icExisted->count() > 0) {
-                return redirect()->back()->withErrors(["icno" => "The IC No. has already been taken."])->withInput();
+            // search for user accounts that have been registered by an organization admin
+            $userRegisteredByAdmin = DB::table("users")
+                ->where("telno", "LIKE", "%$icEntered%")
+                ->get();
+
+            if ($userRegisteredByAdmin->count() > 0) {
+                // this section is for parents that have already been registered by an admin but they didn't know
+                // when they register themselves, the error message will tell them they have been registered and which organization has helped them to register
+
+                // get organization that registered the parent's ic
+                $organization = DB::table("organizations as o")
+                    ->join("organization_user as ou", "o.id", "=", "ou.organization_id")
+                    ->where("ou.user_id", "=", $userRegisteredByAdmin->first()->id)
+                    ->orderBy("ou.id", "ASC")
+                    ->first();
+
+                return redirect()->back()->withErrors([
+                    "icno_registered" => "Your IC no. has already been registered by " . $organization->nama . "'s admin. Please login using your IC no. and the password provided."
+                ])->withInput();
+            } else if ($icExisted->count() > 0) {
+                // this is for parents that already registered an account but forgot
+                // when they register the second time with the same ic, this message pops up
+                return redirect()->back()->withErrors(["icno" => "The IC no. given has already been taken."])->withInput();
             }
+
+
 
             // insert user data
             $user = User::create([

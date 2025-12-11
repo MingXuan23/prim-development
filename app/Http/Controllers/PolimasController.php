@@ -355,14 +355,43 @@ class PolimasController extends Controller
 
     public function StudentExport(Request $request)
     {
+        // make sure export type is not null
+        $this->validate($request, [
+            'export_type' => ['required']
+        ]);
+
         // dd($request);
-        $class = DB::table('classes')
-            ->where('id', $request->classExport)
-            ->first();
 
-        $filename = str_replace('/', '', $class->nama);
+        $filename = "";
 
-        return Excel::download(new PolimasSutdentExport($this->oid, $request->classExport), $filename . '.xlsx');
+        switch ($request->get("export_type")) {
+            case "tanpa_data":
+                $filename = "export_tanpa_data";
+                break;
+            case "data_dalam_organisasi":
+                $this->validate($request, [
+                    'organExport' => ['required']
+                ]);
+                $organization = DB::table('organizations')
+                    ->where('id', $request->organExport)
+                    ->first();
+                $filename = str_replace('/', '', $organization->nama);
+                break;
+            case "data_dalam_kelas":
+                $this->validate($request, [
+                    'organExport' => ['required'],
+                    'classExport' => ['required'],
+                ]);
+                $class = DB::table('classes')
+                    ->where('id', $request->classExport)
+                    ->first();
+                $filename = str_replace('/', '', $class->nama);
+                break;
+            default:
+                break;
+        }
+
+        return Excel::download(new PolimasSutdentExport($request->organExport, $request->classExport), $filename . '.xlsx');
     }
 
     public function AllStudentExport(Request $request)
