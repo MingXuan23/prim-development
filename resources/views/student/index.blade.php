@@ -14,8 +14,8 @@
                 <h4 class="font-size-18">Pelajar</h4>
                 <h6>Senarai Pelajar Ikut Sekolah dan Kelas yang Dipilih</h5>
                     <!-- <ol class="breadcrumb mb-0">
-                                                                                                                                                                                                                                                                                                                                                                                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                                                                                                                                                                                                                                                                                                                                                                                </ol> -->
+                                                                                                                                                                                                                                                                                                                                                                                        <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                                                                                                                                                                                                                                                                                                                                                                    </ol> -->
             </div>
         </div>
     </div>
@@ -54,7 +54,7 @@
                         <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"
                             id="exportModalBtn"> <i class="fas fa-plus"></i> Export Pelajar</a>
                         <!-- <a style="margin: 1px;" href="{{ route('exportstudent') }} " class="btn btn-success"> <i
-                                                                                                                                                                                                                                                                                                                                                                                            class="fas fa-plus"></i> Export</a> -->
+                                                                                                                                                                                                                                                                                                                                                                                                class="fas fa-plus"></i> Export</a> -->
                         {{-- {{ route('exportmurid') }} {{ route('murid.create') }} --}}
                         <a style="margin: 19px; float: right;" href="{{ route('student.create') }} " target="_blank"
                             class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Pelajar</a>
@@ -194,6 +194,7 @@
                                     <div class="form-group" id="organization-hide">
                                         <label>Organisasi</label>
                                         <select name="organExport" id="organExport" class="form-control">
+                                            <option value="" disabled selected>Pilih organisasi</option>
                                             @foreach($organization as $row)
                                                 <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                             @endforeach
