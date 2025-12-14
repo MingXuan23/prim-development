@@ -48,8 +48,6 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->where('ou.organization_id', $orgId)
-                ->where('cs.status', 1)
-                ->where('c.status', 1)
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'ou.user_id')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
@@ -59,6 +57,7 @@ class ExportYuranStatus implements WithMultipleSheets
                 $studentItem = $student->where('user_id', $fee->user_id)->first();
                 return (object) array_merge((array) $studentItem, (array) $fee);
             });
+
 
             foreach ($data as &$item) {
                 unset($item->user_id);
