@@ -65,14 +65,13 @@ class ExportYuranStatus implements WithMultipleSheets
                 return [
                     $d->nama_kelas,
                     $d->nama,
-                    $d->gender == null ? 1 : 0,
                     $d->status == 'Paid' ? 0 : 1,
                 ];
             })
                 ->unique('nama')
                 ->values();
 
-            foreach ($data as &$item) {
+            foreach ($data as $key => $item) {
                 unset($item->user_id);
             }
         } else {
