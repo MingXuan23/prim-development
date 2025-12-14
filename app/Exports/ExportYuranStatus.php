@@ -53,16 +53,16 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->orderBy('s.nama')
                 ->get();
 
+            // dd($student);
+
             $data = $feeStatus->map(function ($fee) use ($student) {
                 $studentItem = $student->where('user_id', $fee->user_id)->first();
                 return (object) array_merge((array) $studentItem, (array) $fee);
             });
 
-
             foreach ($data as &$item) {
                 unset($item->user_id);
             }
-            //dd($data);
         } else {
             $data = DB::table('students as s')
                 ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
@@ -76,7 +76,18 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->get();
         }
 
-        foreach ($data as $key => $student) {
+        // sort based on class, student name
+        $data = $data->sortBy(function ($d) {
+            return [
+                $d->nama_kelas,
+                $d->nama,
+                $d->status == 'Paid' ? 0 : 1,
+            ];
+        })
+            ->unique('nama')
+            ->values();
+
+        foreach ($data as $student) {
             $student->status = $student->status == "Debt" ? "Masih Berhutang" : "Telah Bayar";
         }
 
