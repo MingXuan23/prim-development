@@ -60,18 +60,7 @@ class ExportYuranStatus implements WithMultipleSheets
                 return (object) array_merge((array) $studentItem, (array) $fee);
             });
 
-            // sort based on class, student name
-            $data = $data->sortBy(function ($d) {
-                return [
-                    $d->nama_kelas,
-                    $d->nama,
-                    $d->status == 'Paid' ? 0 : 1,
-                ];
-            })
-                ->unique('nama')
-                ->values();
-
-            foreach ($data as $key => $item) {
+            foreach ($data as &$item) {
                 unset($item->user_id);
             }
         } else {
@@ -87,7 +76,18 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->get();
         }
 
-        foreach ($data as $key => $student) {
+        // sort based on class, student name
+        $data = $data->sortBy(function ($d) {
+            return [
+                $d->nama_kelas,
+                $d->nama,
+                $d->status == 'Paid' ? 0 : 1,
+            ];
+        })
+            ->unique('nama')
+            ->values();
+
+        foreach ($data as $student) {
             $student->status = $student->status == "Debt" ? "Masih Berhutang" : "Telah Bayar";
         }
 
