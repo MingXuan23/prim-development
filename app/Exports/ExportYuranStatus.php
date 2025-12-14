@@ -65,15 +65,17 @@ class ExportYuranStatus implements WithMultipleSheets
                 return [
                     $d->nama_kelas,
                     $d->nama,
+                    $d->gender == null ? 1 : 0,
                     $d->status == 'Paid' ? 0 : 1,
                 ];
             })
                 ->unique('nama')
                 ->values();
 
-            foreach ($data as $key => $item) {
+            foreach ($data as &$item) {
                 unset($item->user_id);
             }
+            dd($data);
         } else {
             $data = DB::table('students as s')
                 ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
