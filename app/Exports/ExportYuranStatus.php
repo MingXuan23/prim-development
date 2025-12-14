@@ -75,7 +75,6 @@ class ExportYuranStatus implements WithMultipleSheets
             foreach ($data as &$item) {
                 unset($item->user_id);
             }
-            dd($data);
         } else {
             $data = DB::table('students as s')
                 ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
