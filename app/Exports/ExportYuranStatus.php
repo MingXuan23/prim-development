@@ -19,53 +19,51 @@ class ExportYuranStatus implements WithMultipleSheets
     }
 
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
 
-    public function fetchdata($yuran){
-        if($yuran->category == "Kategori A")
-        {
-            
-            $org=DB::table('organizations as o')
-                    ->where('o.id',$yuran->organization_id)
-                    ->first();
+    public function fetchdata($yuran)
+    {
+        if ($yuran->category == "Kategori A") {
 
-            $orgId=$org->id;
-            if($org->parent_org!=null ){
-                $orgId=$org->parent_org;
+            $org = DB::table('organizations as o')
+                ->where('o.id', $yuran->organization_id)
+                ->first();
+
+            $orgId = $org->id;
+            if ($org->parent_org != null) {
+                $orgId = $org->parent_org;
             }
             $feeStatus = DB::table('fees_new_organization_user as fou')
-                    ->leftJoin('organization_user as ou','ou.id','fou.organization_user_id')
-                    ->where('fou.fees_new_id', $yuran->id)
-                    ->select('ou.user_id','fou.status')
-                    ->distinct('fou.id')
-                    ->get();
+                ->leftJoin('organization_user as ou', 'ou.id', 'fou.organization_user_id')
+                ->where('fou.fees_new_id', $yuran->id)
+                ->select('ou.user_id', 'fou.status')
+                ->distinct('fou.id')
+                ->get();
 
-            $student=DB::table('organization_user as ou')
+            $student = DB::table('organization_user as ou')
                 ->leftJoin('organization_user_student as ous', 'ous.organization_user_id', 'ou.id')
                 ->leftJoin('students as s', 's.id', 'ous.student_id')
                 ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
-                ->leftJoin('classes as c','c.id','co.class_id')
+                ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->where('ou.organization_id', $orgId)
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'ou.user_id')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
                 ->get();
-            
+
             $data = $feeStatus->map(function ($fee) use ($student) {
                 $studentItem = $student->where('user_id', $fee->user_id)->first();
                 return (object) array_merge((array) $studentItem, (array) $fee);
             });
-            
+
 
             foreach ($data as &$item) {
                 unset($item->user_id);
             }
             //dd($data);
-        }
-        else
-        {
+        } else {
             $data = DB::table('students as s')
                 ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
@@ -77,7 +75,7 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->orderBy('s.nama')
                 ->get();
         }
-        
+
         foreach ($data as $key => $student) {
             $student->status = $student->status == "Debt" ? "Masih Berhutang" : "Telah Bayar";
         }
@@ -99,7 +97,7 @@ class ExportYuranStatus implements WithMultipleSheets
     //         $sheets[] = new Sheet($datas, $heading);
     //     }
     //     return $sheets;
-       
+
     // }
 
     public function sheets(): array
@@ -114,9 +112,9 @@ class ExportYuranStatus implements WithMultipleSheets
 
         foreach ($this->yuran as $yuranItem) {
             $data = $this->fetchdata($yuranItem);
-           
-            $sheets[] = new Sheet($data, $heading,$yuranItem->name);
-            
+
+            $sheets[] = new Sheet($data, $heading, $yuranItem->name . ($yuranItem->status == 1 ? ' (Aktif)' : ' (Tidak Aktif)'));
+
         }
         //dd($sheets);
         return $sheets;
