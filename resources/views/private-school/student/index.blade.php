@@ -13,8 +13,8 @@
             <div class="page-title-box">
                 <h4 class="font-size-18">Pelajar</h4>
                 <!-- <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                    </ol> -->
+                                                                            <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                                                        </ol> -->
             </div>
         </div>
     </div>
@@ -51,10 +51,10 @@
                 <div>
                     <a style="margin: 19px;" href="#" class="btn btn-primary" data-toggle="modal" data-target="#modelId"> <i
                             class="fas fa-plus"></i> Import</a>
-                    <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"> <i
-                            class="fas fa-plus"></i> Export</a>
+                    <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#modelId1"
+                        id="exportModalBtn"> <i class="fas fa-plus"></i> Export</a>
                     <!-- <a style="margin: 1px;" href="{{ route('exportstudent') }} " class="btn btn-success"> <i
-                                class="fas fa-plus"></i> Export</a> -->
+                                                                                    class="fas fa-plus"></i> Export</a> -->
                     {{-- {{ route('exportmurid') }} {{ route('murid.create') }} --}}
                     <a style="margin: 19px; float: right;" href="{{ route('private-school.student.create') }}"
                         class="btn btn-primary"> <i class="fas fa-plus"></i> Tambah Murid</a>
@@ -178,14 +178,25 @@
                             <div class="modal-body">
                                 {{ csrf_field() }}
                                 <div class="form-group">
+                                    <label>Sila pilih jenis eksport</label>
+                                    <select id="export_type" name="export_type" class="form-control">
+                                        <option value="" disabled selected>Pilih Jenis Eksport</option>
+                                        <option value="tanpa_data">Tanpa data</option>
+                                        <option value="data_dalam_organisasi">Data pelajar mengikut organisasi</option>
+                                        <option value="data_dalam_kelas">Data pelajar mengikut kelas</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="organization-hide">
                                     <label>Organisasi</label>
                                     <select name="organExport" id="organExport" class="form-control">
+                                        <option value="" disabled selected>Pilih organisasi</option>
                                         @foreach($organization as $row)
                                             <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" id="class-hide">
                                     <label>Nama Kelas</label>
                                     <select name="classExport" id="classExport" class="form-control">
 
@@ -345,6 +356,44 @@
                     fetch_data(classid);
                 }
                 // console.log(organizationid);
+            });
+
+            // function to reset and hide all options for export
+            function hideExportTypeOptions() {
+                // reset all options for export
+                $("#organExport").prop("selectedIndex", 0).trigger("change");
+                $("#classExport").prop("selectedIndex", 0);
+
+                // hide all options for export
+                $("#organization-hide").hide();
+                $("#class-hide").hide();
+            }
+
+            $("#exportModalBtn").click(function () {
+                // reset export type dropdown value
+                $("#export_type").prop("selectedIndex", 0);
+
+                // hide and reset all options for export first
+                hideExportTypeOptions();
+            })
+
+            $("#export_type").change(function () {
+                var exportType = $("#export_type").val();
+
+                // hide and reset all options for export everytime the export type select changes
+                hideExportTypeOptions();
+
+                switch (exportType) {
+                    case "data_dalam_organisasi":
+                        $("#organization-hide").show();
+                        break;
+                    case "data_dalam_kelas":
+                        $("#organization-hide").show();
+                        $("#class-hide").show();
+                        break;
+                    default:
+                        break;
+                }
             });
 
             // csrf token for ajax
