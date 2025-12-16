@@ -105,7 +105,7 @@ class DirectPayController extends Controller
                 $fpx_buyerEmail      = $user->email;
                 $telno               = $user->telno;
                 $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
-                
+
                 //add _M_ for mobile payment
                 if ($request->has('source') && $request->source == 'mobile') {
                     $fpx_sellerExOrderNo = $request->desc . "_M_" . date('YmdHis');
@@ -699,6 +699,41 @@ class DirectPayController extends Controller
             $this->failTransactionAction($case[0], $request->Fpx_SellerOrderNo);
             $user = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
             //gitdd($user,$request->Fpx_SellerOrderNo);
+            //for mobile handle payment failed
+            if ($user && strpos($user->nama, '_M_') !== false) {
+                try {
+                    $curl_options = [];
+
+                    if (config('app.env') === 'local') {
+                        $curl_options = [
+                            CURLOPT_SSL_VERIFYHOST => 0,
+                            CURLOPT_SSL_VERIFYPEER => 0,
+                        ];
+                    }
+
+                    $options = array(
+                        'cluster' => env('PUSHER_APP_CLUSTER'),
+                        'useTLS' => true,
+                        'curl_options' => $curl_options,
+                    );
+
+                    $pusher = new \Pusher\Pusher(
+                        env('PUSHER_APP_KEY'),
+                        env('PUSHER_APP_SECRET'),
+                        env('PUSHER_APP_ID'),
+                        $options
+                    );
+
+                    $data = [
+                        'transactionId' => $user->id,
+                        'status' => 'Failed'
+                    ];
+
+                    $pusher->trigger('payment-user-' . $user->user_id, 'payment.failed', $data);
+                } catch (\Exception $e) {
+                    Log::error("Pusher Manual Error: " . $e->getMessage());
+                }
+            }
             return view('fpx.transactionFailed', compact('request', 'user'));
 
             // Transaction::where('nama', '=', $request->fpx_sellerExOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
@@ -1131,13 +1166,13 @@ class DirectPayController extends Controller
         if ($transaction->status != 'Success') {
             return;
         }
-        
+
         //create event for mobile payment success pusher
         if (strpos($transaction->nama, '_M_') !== false) {
-           try {
-                
+            try {
+
                 $curl_options = [];
-                
+
                 if (config('app.env') === 'local') {
                     $curl_options = [
                         CURLOPT_SSL_VERIFYHOST => 0,
@@ -1148,7 +1183,7 @@ class DirectPayController extends Controller
                 $options = array(
                     'cluster' => env('PUSHER_APP_CLUSTER'),
                     'useTLS' => true,
-                    'curl_options' => $curl_options, 
+                    'curl_options' => $curl_options,
                 );
 
                 $pusher = new \Pusher\Pusher(
@@ -1164,7 +1199,6 @@ class DirectPayController extends Controller
                 ];
 
                 $pusher->trigger('payment-user-' . $transaction->user_id, 'payment.success', $data);
-
             } catch (\Exception $e) {
                 Log::error("Pusher Manual Error: " . $e->getMessage());
             }
