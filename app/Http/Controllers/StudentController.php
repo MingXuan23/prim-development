@@ -1122,7 +1122,11 @@ class StudentController extends Controller
             return redirect('/home');
         }
 
-        $organizations = DB::table("organizations")->get();
+        $organizations = DB::table("organizations as o")
+            ->join("type_organizations as to", "to.id", "=", "o.type_org")
+            ->whereIn("to.nama", ["SK /SJK", "SRA /SRAI", "SMK /SMJK", "Sekolah Swasta /Tadika"])
+            ->select("o.*")
+            ->get();
 
         return view('student.parent_register_students.create', compact("organizations"));
     }
