@@ -236,7 +236,8 @@ Route::group(['prefix' => 'student'], function () {
     // parent register student routes
     Route::group(['prefix' => 'parentRegisterStudents', 'middleware' => ['auth']], function () {
         Route::get("/add", "StudentController@parentRegisterStudentsCreate")->name("student.parentRegisterStudents.create");
-        Route::post("/store", "StudentController@parentRegisterStudentsStore")->name("student.parentRegisterStudents.store");
+        Route::post("/store", "StudentController@parentRegisterStudentsStore")->name("student.parentRegisterStudents.store")
+            ->middleware("throttle:3,1");
 
         Route::get('/', 'StudentController@parentRegisterStudentsIndex')->name('student.parentRegisterStudents.index');
         Route::get('/allPendingRegistrations', 'StudentController@getAllPendingRegistrations')->name('student.parentRegisterStudents.getAllPendingRegistrations');
@@ -579,31 +580,31 @@ Route::group(['prefix' => 'private-school'], function () {
 
 Route::group(['middleware' => ['auth']], function () {
     Route::resources([
-        'school'             => 'SchoolController',
-        'teacher'            => 'TeacherController',
-        'class'              => 'ClassController',
-        'student'            => 'StudentController',
-        'subject'            => 'SubjectController',
-        'schedule'           => 'Schedule\ScheduleController',
-        'manage_relief'      => 'Schedule\ScheduleController',
-        'relief_report'      => 'Schedule\ScheduleController',
-        'category'           => 'CategoryController',
-        'fees'               => 'FeesController',
-        'details'            => 'DetailsController',
-        'jaim'               => 'UserJaimController',
-        'parent'             => 'ParentController',
-        'pay'                => 'PayController',
-        'organization'       => 'OrganizationController',
-        'donation'           => 'DonationController',
-        'reminder'           => 'ReminderController',
-        'activity'           => 'ActivityController',
-        'session'            => 'SessionController',
-        'profile'            => 'ProfileController',
-        'dorm'               => 'DormController',
-        'koperasi'           => 'Cooperative\User\UserCooperativeController',
-        'delivery'           => 'DeliveryController',
-        'point'             => 'PointController',
-        'admin/reward'            => 'ReferralCodeRewardController'
+        'school' => 'SchoolController',
+        'teacher' => 'TeacherController',
+        'class' => 'ClassController',
+        'student' => 'StudentController',
+        'subject' => 'SubjectController',
+        'schedule' => 'Schedule\ScheduleController',
+        'manage_relief' => 'Schedule\ScheduleController',
+        'relief_report' => 'Schedule\ScheduleController',
+        'category' => 'CategoryController',
+        'fees' => 'FeesController',
+        'details' => 'DetailsController',
+        'jaim' => 'UserJaimController',
+        'parent' => 'ParentController',
+        'pay' => 'PayController',
+        'organization' => 'OrganizationController',
+        'donation' => 'DonationController',
+        'reminder' => 'ReminderController',
+        'activity' => 'ActivityController',
+        'session' => 'SessionController',
+        'profile' => 'ProfileController',
+        'dorm' => 'DormController',
+        'koperasi' => 'Cooperative\User\UserCooperativeController',
+        'delivery' => 'DeliveryController',
+        'point' => 'PointController',
+        'admin/reward' => 'ReferralCodeRewardController'
     ]);
 });
 Route::get('adminTestFpx/{id}/', 'DirectPayController@adminTestFpx')->name('adminTestFpx');

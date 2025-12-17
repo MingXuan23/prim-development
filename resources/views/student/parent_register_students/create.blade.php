@@ -171,6 +171,10 @@
                 return alert("Sila isikan semua maklumat yang diperlukan.");
             }
 
+            if (studentsTable.children().length == 10) {
+                return alert("Anda hanya boleh mendaftar maksimum 10 orang pelajar sahaja dalam satu permohonan.")
+            }
+
             // check if the icnos are the same
             $(".student-icno").map((_, icno) => {
                 if (studentIcnoInput.val() == icno.innerText) {
@@ -233,7 +237,6 @@
 
             // check if the list is empty, if yes, enable the selection of organization
             if ($("#students-table tbody").children().length == 0) {
-                // $("#organization").prop("disabled", false);
                 $("#daftar-btn").prop("disabled", true);
             }
         }
