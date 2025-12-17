@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Hash;
 
 class NewYuranController extends Controller
 {
+    const APP_NAME = 'prim_bayarYuran_app';
+
     public function loginAndGetYuran(Request $request)
     {
         try {
@@ -135,7 +137,7 @@ class NewYuranController extends Controller
                     ->update($tokenData);
             } else {
                 $tokenData['user_id'] = $user->id;
-                $tokenData['application_id'] = DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id');
+                $tokenData['application_id'] = DB::table('applications')->where('application_name', self::APP_NAME)->value('id');
                 DB::table('user_token')->insert($tokenData);
             }
 
@@ -706,27 +708,7 @@ class NewYuranController extends Controller
     public function updateProfile(Request $request)
     {
         try {
-            $userId = $request->input('user_id');
-            $apiToken = $request->input('user_token');
-
-            if (!$userId || !$apiToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing required parameter: user_id or user_token'
-                ], 400);
-            }
-
-            $currentUser = DB::table('user_token')
-                ->where('user_id', $userId)
-                ->where('api_token', $apiToken)
-                ->first();
-
-            if (!$currentUser) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized access.'
-                ], 401);
-            }
+            $userId = $request->input('auth_user_id');
 
 
             $validator = Validator::make($request->all(), [
@@ -1171,7 +1153,7 @@ class NewYuranController extends Controller
                 'device_token' => $newDeviceToken,
                 'api_token' => $newApiToken,
                 'remember_token' => $rememberToken,
-                'application_id' => DB::table('applications')->where('application_name', 'prim_bayarYuran_app')->value('id'),
+                'application_id' => DB::table('applications')->where('application_name', self::APP_NAME)->value('id'),
                 'fcm_token' => $fcmToken,
                 'updated_at' => now(),
                 'expired_at' => now()->addYear(),
@@ -1198,9 +1180,20 @@ class NewYuranController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Peranti berjaya digantikan',
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'username' => $user->username,
+                'icno' => $user->icno,
+                'telno' => $user->telno,
+                'address' => $user->address,
+                'postcode' => $user->postcode,
+                'state' => $user->state,
                 'api_token' => $newApiToken,
-                'remember_token' => null,
-                'data' => []
+                'remember_token' => $rememberToken,
+                'data' => [],
+                'receipts' => [],
+                'is_first_time_device_bind' => $isFirstTimeBind ?? false
             ]);
         }
 
@@ -1537,28 +1530,6 @@ class NewYuranController extends Controller
     public function getOrganizations(Request $request)
     {
         try {
-            $userId = $request->input('user_id');
-            $apiToken = $request->input('user_token');
-
-            if (!$userId || !$apiToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing required parameter: user_id or user_token'
-                ], 400);
-            }
-
-            $currentUser = DB::table('user_token')
-                ->where('user_id', $userId)
-                ->where('api_token', $apiToken)
-                ->first();
-
-            if (!$currentUser) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized access.'
-                ], 401);
-            }
-
             $organizations = DB::table("organizations")->get();
 
             return response()->json([
@@ -1577,28 +1548,6 @@ class NewYuranController extends Controller
     public function getClasses(Request $request)
     {
         try {
-            $userId = $request->input('user_id');
-            $apiToken = $request->input('user_token');
-
-            if (!$userId || !$apiToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing required parameter: user_id or user_token'
-                ], 400);
-            }
-
-            $currentUser = DB::table('user_token')
-                ->where('user_id', $userId)
-                ->where('api_token', $apiToken)
-                ->first();
-
-            if (!$currentUser) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized access.'
-                ], 401);
-            }
-
             $organizationId = $request->input('organization_id');
 
             if (!$organizationId) {
@@ -1839,6 +1788,91 @@ class NewYuranController extends Controller
                 'success' => false,
                 'message' => 'Ralat semasa pendaftaran. Sila cuba lagi.',
                 'debug' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getAnnouncements(Request $request)
+    {
+        try {
+            $userId = $request->input('auth_user_id');
+
+            $students = DB::table('organization_user_student as ous')
+                ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                ->where('ou.user_id', $userId)
+                ->where('ou.role_id', 6)
+                ->where('ou.status', 1)
+                ->select('ous.student_id', 'ou.organization_id')
+                ->get();
+
+            if ($students->isEmpty()) {
+                return response()->json(['success' => true, 'data' => []]);
+            }
+
+            $studentIds = $students->pluck('student_id')->unique()->toArray();
+            $parentOrgIds = $students->pluck('organization_id')->unique()->toArray();
+
+            $classIds = DB::table('class_student as cs')
+                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                ->whereIn('cs.student_id', $studentIds)
+                ->pluck('co.class_id')
+                ->unique()
+                ->toArray();
+
+            $orgAnnouncements = DB::table('organization_announcements as oa')
+                ->join('organizations as o', 'o.id', '=', 'oa.organization_id')
+                ->whereIn('oa.organization_id', $parentOrgIds)
+                ->where('oa.status', 'published')
+                ->select(
+                    'oa.id',
+                    'oa.title',
+                    'oa.content',
+                    'oa.created_at',
+                    'o.nama as source_name',
+                    DB::raw('"organization" as type'),
+                    DB::raw('NULL as student_name')
+                );
+
+            $classAnnouncements = DB::table('class_announcements as ca')
+                ->join('classes as c', 'c.id', '=', 'ca.class_id')
+                ->whereIn('ca.class_id', $classIds)
+                ->where('ca.status', 'published')
+                ->select(
+                    'ca.id',
+                    'ca.title',
+                    'ca.content',
+                    'ca.created_at',
+                    'c.nama as source_name',
+                    DB::raw('"class" as type'),
+                    DB::raw('NULL as student_name')
+                );
+
+            $allAnnouncements = $orgAnnouncements
+                ->union($classAnnouncements)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $formattedData = $allAnnouncements->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'content' => $item->content,
+                    'source_name' => $item->source_name,
+                    'type' => $item->type, // 'organization' 或 'class'
+                    'date' => \Carbon\Carbon::parse($item->created_at)->format('d M Y, h:i A'),
+                    'raw_date' => $item->created_at
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $formattedData
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching announcements',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
