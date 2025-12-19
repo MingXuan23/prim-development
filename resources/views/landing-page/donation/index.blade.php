@@ -11,9 +11,6 @@
 
     @include('landing-page.head')
     <style>
-        html{
-            scroll-behavior: smooth;
-        }
         /*whatsapp contact button*/
         #btn-whatsapp{
             position: fixed;
@@ -330,25 +327,6 @@
         .single-why-us-item .icon.gdbg-1{
             background-image: -webkit-linear-gradient(50deg, #b59bff 0, #9749f8 100%) !important;
         }
-
-        #section-tutorial{
-            margin-bottom: 5rem;
-        }
-        #video-container{
-            position: relative;
-            width: 100%;
-            height: 0;
-            padding-bottom: 50%;
-            margin: 20px 0;
-        }
-        #video-container iframe{
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
         /* Display rules for different screen sizes */
         @media (max-width: 799px) {
             .leader-groups {
@@ -500,12 +478,10 @@
                             <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                         </div> --}}
                         <h1 class="title wow fadeInDown white">Derma</h1>
-                        <p class="white" style="font-size: 20px;">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu Subuh. Allah menjanjikan
+                            <p class="white" style="font-size: 20px;">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu Subuh. Allah menjanjikan
                             banyak kelebihan dan ganjarannya.
                             Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
-                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.
-                            Kami juga sediakan ganjaran di dunia untuk yang bersedekah subuh. Klik untuk <a class="text-white" href="#tutorial-wrapper"><mark> maklumat lanjut.</mark></a></p>
-                        </p>
+                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                         </div>
@@ -892,7 +868,7 @@
                 <div class="col-lg-10">
                     <div class="section-title">
                         <!-- section title -->
-                        <h3 class="title" id="scroll-organisasi">Organisasi</h3>
+                        <h3 class="title">Organisasi</h3>
                         <p>Antara organisasi derma yang berdaftar bersama PRiM.</p>
                     </div><!-- //. section title -->
                 </div>
@@ -951,20 +927,6 @@
         </div>
     </section>
     <!--====== TESTIMONIAL PART ENDS ======-->
-
-    {{-- VIDEO START --}}
-    <section id="section-tutorial" class="container">
-        <div id="tutorial-wrapper">
-            <div class="mb-1-2 section-heading">
-                <h3 class="title py-4" style="text-align: center;">Video Kelebihan Sedekah di Pagi Hari</h3>
-            </div>
-                <div id="video-container" class="d-flex justify-content-center align-items-center">
-                    <iframe height="100%" width="100%" src="https://www.youtube.com/embed/m5GUnMwcG28?loop=1&controls=1"  allowfullscreen>
-                    </iframe>
-                </div>
-            </div>
-    </section>
-    {{-- VIDEO END --}}
 
     <!-- team member area start -->
     <section class="team-member-area" id="ourteam">
