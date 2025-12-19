@@ -280,11 +280,6 @@
             $('#closeConfirmationModal').modal('show');
         });
 
-        $(document).on('click', '.btn-info', function(){
-            fee_id = $(this).attr('id');
-            $('#closeConfirmationModal').modal('show');
-        });
-
         $('#delete').click(function() {
 
             console.log(fee_id);
