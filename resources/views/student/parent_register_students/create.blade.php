@@ -134,6 +134,23 @@
             </form>
         </div>
     </div>
+
+    <div id="warningMessageModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Perhatian</h4>
+                </div>
+                <div class="modal-body">
+                    Sila isikan semua maklumat yang diperlukan.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" class="btn btn-primary" id="teruskan"
+                        name="teruskan">Teruskan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
@@ -148,6 +165,16 @@
 
     <script>
         let currentRowIndex = 1;
+        const warningMessageModal = $('#warningMessageModal');
+
+        $('#teruskan').click(function () {
+            warningMessageModal.modal('hide');
+        });
+
+        function displayWarningMessage(message) {
+            $('#warningMessageModal .modal-body').text(message);
+            warningMessageModal.modal('show');
+        }
 
         // function to add students
         function addStudent() {
@@ -168,18 +195,18 @@
 
             // check if all inputs are not empty
             if (inputArray.some(inp => inp !== studentEmailInput && (inp.val() == null || inp.val().trim() === ""))) {
-                return alert("Sila isikan semua maklumat yang diperlukan.");
+                return displayWarningMessage("Sila isikan semua maklumat yang diperlukan.");
             }
 
             if (studentsTable.children().length == 10) {
-                return alert("Anda hanya boleh mendaftar maksimum 10 orang pelajar sahaja dalam satu permohonan.")
+                return displayWarningMessage("Anda hanya boleh mendaftar maksimum 10 orang pelajar sahaja dalam satu permohonan.");
             }
 
             // check if the icnos are the same
             $(".student-icno").map((_, icno) => {
                 if (studentIcnoInput.val() == icno.innerText) {
                     isDuplicate = true;
-                    alert("No. kad pengenalan tersebut sudah digunakan.");
+                    displayWarningMessage("No. kad pengenalan tersebut sudah digunakan.");
                 }
             });
 
@@ -187,7 +214,7 @@
             $(".student-email").map((_, email) => {
                 if (studentEmailInput.val() == email.innerText) {
                     isDuplicate = true;
-                    alert("Emel tersebut sudah digunakan.");
+                    displayWarningMessage("Emel tersebut sudah digunakan.");
                 }
             });
 
