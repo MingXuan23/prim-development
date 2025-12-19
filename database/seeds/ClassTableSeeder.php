@@ -30,6 +30,13 @@ class ClassTableSeeder extends Seeder
                 "status"    => 1,
 
             ),
+            array(
+                "id" => 3,
+                "nama" => "1 Cemerlang",
+                "levelid" => 1,
+                "status"    => 1,
+
+            ),
         ));
     }
 }

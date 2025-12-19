@@ -24,61 +24,63 @@ class OrganizationController extends Controller
         return view('organization.index');
     }
 
-    public function manage(){
-       if(!Auth::user()->hasRole('Superadmin')){
+    public function manage()
+    {
+        if (!Auth::user()->hasRole('Superadmin')) {
             return view('errors.404');
-       }
+        }
 
-      // $pending_org = DB::table('organizations')->whereNull('private_key')->get();
-       return view('organization.manage');
+        // $pending_org = DB::table('organizations')->whereNull('private_key')->get();
+        return view('organization.manage');
     }
 
-    public function createMerchant($nama,$email,$sellerId)
-{
-    $url = env("DIRECT_PAY_MERCHANT_URL");
-    //dd($url);
+    public function createMerchant($nama, $email, $sellerId)
+    {
+        $url = env("DIRECT_PAY_MERCHANT_URL");
+        //dd($url);
 
-    $data = [
-        "name" => $nama,
-        "email" => $email,
-        "sellerId" => $sellerId,
-        "callbackurl" => "https://prim.my/directpayReceipt"
-    ];
+        $data = [
+            "name" => $nama,
+            "email" => $email,
+            "sellerId" => $sellerId,
+            "callbackurl" => "https://prim.my/directpayReceipt"
+        ];
 
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-    ]);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
-    // Execute the cURL request and assign the response to a variable
-    $response = curl_exec($ch);
-    curl_close($ch);
+        // Execute the cURL request and assign the response to a variable
+        $response = curl_exec($ch);
+        curl_close($ch);
 
-    // You can now use $response for further processing
-    // For example, you can decode it if it's in JSON format:
-    
-    $decodedResponse = json_decode($response, true);
+        // You can now use $response for further processing
+        // For example, you can decode it if it's in JSON format:
 
-    // Return or use the response as needed
-    return $decodedResponse;
-}
+        $decodedResponse = json_decode($response, true);
 
-    public function getPendingOrgDatatable(){
+        // Return or use the response as needed
+        return $decodedResponse;
+    }
+
+    public function getPendingOrgDatatable()
+    {
         if (request()->ajax()) {
             $pending_org = DB::table('organizations')
                 ->whereNull('private_key')
                 ->select('id', 'nama', 'address')
                 ->get();
-    
-                return datatables()::of($pending_org)
-                ->addColumn('seller_id', function($row) {
-                    return '<input type="text" name="seller_id['.$row->id.']" class="form-control seller-id" data-id="'.$row->id.'" />';
+
+            return datatables()::of($pending_org)
+                ->addColumn('seller_id', function ($row) {
+                    return '<input type="text" name="seller_id[' . $row->id . ']" class="form-control seller-id" data-id="' . $row->id . '" />';
                 })
-                ->addColumn('action', function($row) {
-                    return '<button type="button" class="btn btn-primary update-button" data-id="'.$row->id.'">Update</button>';
+                ->addColumn('action', function ($row) {
+                    return '<button type="button" class="btn btn-primary update-button" data-id="' . $row->id . '">Update</button>';
                 })
                 ->rawColumns(['seller_id', 'action'])
                 ->make(true);
@@ -89,45 +91,37 @@ class OrganizationController extends Controller
     {
         $sellerId = trim($request->seller_id);
         // Validation logic
-        if(!Auth::user()->hasRole('Superadmin')){
+        if (!Auth::user()->hasRole('Superadmin')) {
             return response()->json(['success' => false, 'message' => 'Unauthorized Action']);
-       }
-        else if (empty($sellerId)) {
+        } else if (empty($sellerId)) {
             return response()->json(['success' => false, 'message' => 'Seller ID cannot be empty.']);
-        }
-    
-       else if (!preg_match('/^SE/',  $sellerId) || strlen( $sellerId) < 10) {
+        } else if (!preg_match('/^SE/',  $sellerId) || strlen($sellerId) < 10) {
             return response()->json(['success' => false, 'message' => 'Invalid Format Seller ID']);
         }
 
-        $org = DB::table('organizations')->where('id',$request->id)->first();
-       // dd('here');
-       try{
+        $org = DB::table('organizations')->where('id', $request->id)->first();
+        // dd('here');
+        try {
 
-        $private_key = $this->createMerchant($org->nama,$org->email,$sellerId);
-        if (empty($private_key)){
-        return response()->json(['success' => false, 'message' => 'Server Busy. Please Try again later']);
+            $private_key = $this->createMerchant($org->nama, $org->email, $sellerId);
+            if (empty($private_key)) {
+                return response()->json(['success' => false, 'message' => 'Server Busy. Please Try again later']);
+            }
+            $result = DB::table('organizations')->where('id', $request->id)->update([
+                'private_key' => $private_key,
+                'seller_id' => $sellerId
+            ]);
 
+            if ($result) {
+                return response()->json(['success' => true, 'message' => 'Update Success']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Update Failed']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Server Busy. Please Try again later']);
         }
-        $result = DB::table('organizations')->where('id',$request->id)->update([
-            'private_key' =>$private_key,
-            'seller_id'=>$sellerId
-        ]);
-
-        if($result){
-            return response()->json(['success' => true, 'message' => 'Update Success']);
-
-        }else{
-            return response()->json(['success' => false, 'message' => 'Update Failed']);
-
-        }
-       }catch(\Exception $e){
-        return response()->json(['success' => false, 'message' => 'Server Busy. Please Try again later']);
-            
-       }
-       
     }
-    
+
 
     public function create()
     {
@@ -152,8 +146,7 @@ class OrganizationController extends Controller
 
     public function store(OrganizationRequest $request)
     {
-        if ($request->type_org == 10)
-        {
+        if ($request->type_org == 10) {
             Validator::make($request->all(), [
                 'parent_org' => "required"
             ]);
@@ -162,21 +155,19 @@ class OrganizationController extends Controller
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
         //dd($request);
-        
+
         $file_name = '';
 
-        if($this->orgIsExist($request->type_org, $request->nama)) {
+        if ($this->orgIsExist($request->type_org, $request->nama)) {
             return back()->withInput()->with('error', 'Nama Organisasi Telah Diambil');
         }
 
         if (!is_null($request->organization_picture)) {
             $extension = $request->organization_picture->extension();
-           
+
             $storagePath  = $request->organization_picture->storeAs('/public/organization-picture', $str . '.' . $extension);
             $file_name = basename($storagePath);
-        }
-        else
-        {
+        } else {
             $file_name = null;
         }
 
@@ -187,14 +178,14 @@ class OrganizationController extends Controller
         //dd($request->parent_org);
         $type_org = TypeOrganization::find($request->type_org);
 
-        Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($type_org->nama , $organization->id)]);
-        
+        Organization::where('id', $organization->id)->update(['code' => $this->generateOrganizationCode($type_org->nama, $organization->id)]);
+
         //attach foreign key to pivot table
-        $organization->user()->attach(Auth::id(), ['role_id' => 2,'start_date' => now(), 'status' => 1]);
+        $organization->user()->attach(Auth::id(), ['role_id' => 2, 'start_date' => now(), 'status' => 1]);
 
         $user = Auth::user();
         $user->assignRole('Admin');
-        
+
         $role = $this->assignRoleForOrganization($type_org->nama);
 
         if ($request->type_org == 1 || $request->type_org == 2 || $request->type_org == 3) {
@@ -207,7 +198,7 @@ class OrganizationController extends Controller
             $organization->user()->attach(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => 20]);
             $user->assignRole('Pentadbir Swasta');
         }
-        
+
         // Koperasi
         if ($type_org->nama == "Koperasi") {
             Organization::where('id', $organization->id)->update(['parent_org' => $request->parent_org]);
@@ -241,7 +232,7 @@ class OrganizationController extends Controller
         if ($type_org->nama == "Peniaga Barang Berjadual") {
             $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
             $user->assignRole($role->nama);
-            
+
             $this->insertOrganizationHours($organization->id);
         }
 
@@ -267,7 +258,7 @@ class OrganizationController extends Controller
             $this->insertOrganizationHours($organization->id);
         }
 
-        
+
         if ($type_org->nama == "Bas") {
             $organization->user()->updateExistingPivot(Auth::id(), ['start_date' => now(), 'status' => 1, 'role_id' => $role->id]);
             $user->assignRole($role->nama);
@@ -281,7 +272,7 @@ class OrganizationController extends Controller
 
             $this->insertOrganizationHours($organization->id);
         }
-        
+
         return redirect('/organization')->with('success', 'Organisasi Berjaya Ditambah');
     }
 
@@ -300,12 +291,13 @@ class OrganizationController extends Controller
         if (!Auth::user()->hasRole('Superadmin')) {
             $user = Auth::user();
             $exists = DB::table('organization_user')
-                        ->where('user_id', $user->id)
-                        ->where('organization_id', $id)
-                        ->whereIn('role_id', [2, 1239])
-                        ->get();
-            
-            if($exists->isEmpty()){
+                ->where('user_id', $user->id)
+                ->where('organization_id', $id)
+                ->whereIn('role_id', [2, 1239])
+                ->get();
+
+          
+            if ($exists->isEmpty()) {
                 return view('errors.404');
             }
         }
@@ -317,8 +309,7 @@ class OrganizationController extends Controller
         $states = Jajahan::negeri();
 
         // Koperasi
-        if($org->type_org == 1039)
-        {
+        if ($org->type_org == 1039) {
             $parent_org = $this->getAvailableSchoolForKoop();
 
             $org_parent_name = Organization::where('id', $org->parent_org)->first();
@@ -349,7 +340,7 @@ class OrganizationController extends Controller
 
         if (isset($request->seller_id)) {
             Organization::where('id', $id)->update([
-                'seller_id'         => $request->seller_id,
+                'private_key'         => $request->seller_id,
                 'fixed_charges'      =>  $request->fixed_charges,
             ]);
         }
@@ -360,8 +351,8 @@ class OrganizationController extends Controller
     public function destroy($id)
     {
         $type_org_id = TypeOrganization::where('nama', 'Peniaga Barang Umum')->first()->id;
-        
-        if(Organization::find($id)->type_org == $type_org_id){
+
+        if (Organization::find($id)->type_org == $type_org_id) {
             $this->destroyAllImages($id);
         }
 
@@ -379,12 +370,12 @@ class OrganizationController extends Controller
     public function getOrganizationDatatable()
     {
         $organizationList = $this->getOrganizationByUserId();
-        
+
         if (request()->ajax()) {
             return datatables()->of($organizationList)
                 ->addColumn('action', function ($row) {
                     $type = TypeOrganization::find($row->type_org);
-                    if($type->nama != 'Peniaga Barang Umum') {
+                    if ($type->nama != 'Peniaga Barang Umum') {
                         $token = csrf_token();
                         $btn = '<div class="d-flex justify-content-center">';
                         $btn = $btn . '<a href="' . route('organization.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
@@ -399,15 +390,15 @@ class OrganizationController extends Controller
                 })
                 //->rawColumns(['action'])
                 ->addColumn('status', function ($row) {
-                    if($row->seller_id != null) {
-                        $fpxstatus='<span class="badge rounded-pill bg-success text-white">Ready</span>';
+                    if ($row->private_key != null) {
+                        $fpxstatus = '<span class="badge rounded-pill bg-success text-white">Ready</span>';
                     } else {
-                        $fpxstatus='<span class="badge rounded-pill bg-warning text-white">Pending</span>';
+                        $fpxstatus = '<span class="badge rounded-pill bg-warning text-white">Pending</span>';
                     }
                     return $fpxstatus;
                 })
-                
-                ->rawColumns(['status','action'])
+
+                ->rawColumns(['status', 'action'])
                 ->make(true);
         }
     }
@@ -416,24 +407,25 @@ class OrganizationController extends Controller
     {
         $role_id = [];
         $userId = Auth::id();
-        $roles = DB::table('organization_roles')->whereIn('nama', ['Admin', 'Regular Merchant Admin','Homestay Admin','Grab Student Admin','Bas Admin','OrderS Admin'])->get();
+        $roles = DB::table('organization_roles')->whereIn('nama', ['Admin', 'Regular Merchant Admin', 'Homestay Admin', 'Grab Student Admin', 'Bas Admin', 'OrderS Admin'])->get();
 
-        foreach($roles as $row) { $role_id[] = $row->id; }
+        foreach ($roles as $row) {
+            $role_id[] = $row->id;
+        }
 
         if (Auth::user()->hasRole('Superadmin')) {
             return Organization::all();
         } else {
             $userId = Auth::id();
             return DB::table('organizations as o')
-            ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
-            ->select("o.*")
-            ->distinct()
-            ->where('ou.user_id', $userId)
-            ->whereIn('ou.role_id', $role_id)
-            ->where('o.deleted_at', null)
-            ->get();
+                ->leftJoin('organization_user as ou', 'o.id', 'ou.organization_id')
+                ->select("o.*")
+                ->distinct()
+                ->where('ou.user_id', $userId)
+                ->whereIn('ou.role_id', $role_id)
+                ->where('o.deleted_at', null)
+                ->get();
         }
-        
     }
 
     public function getAllOrganization()
@@ -443,53 +435,52 @@ class OrganizationController extends Controller
 
     public function generateOrganizationCode($typeOrg, $id) //have changed from if else to switch
     {
-        $prefix="";
-        switch($typeOrg)
-        {
+        $prefix = "";
+        switch ($typeOrg) {
             case "SK /SJK":
-                $prefix='SK';
+                $prefix = 'SK';
                 break;
             case "SRA /SRAI":
-                $prefix='SA';
+                $prefix = 'SA';
                 break;
             case "SK /SJK":
-                $prefix='SK';
+                $prefix = 'SK';
                 break;
             case "SRA /SRAI":
-                $prefix='SA';
+                $prefix = 'SA';
                 break;
-            case"SMK /SMJK":
-                $prefix='SM';
+            case "SMK /SMJK":
+                $prefix = 'SM';
                 break;
             case "Masjid":
-                $prefix='MS';
+                $prefix = 'MS';
                 break;
-             case "NGO":
-                $prefix='NGO';
+            case "NGO":
+                $prefix = 'NGO';
                 break;
             case "Rumah Anak Yatim":
-                $prefix='RAY';
+                $prefix = 'RAY';
                 break;
             case "Pusat Tahfiz":
-                $prefix='PT';
+                $prefix = 'PT';
                 break;
             case "Koperasi":
-                $prefix='KP';
+                $prefix = 'KP';
                 break;
-            case"Peniaga Barang Berjadual":
-                $prefix='PBJ';
+            case "Peniaga Barang Berjadual":
+                $prefix = 'PBJ';
                 break;
             case "Peniaga Barang Umum":
-                $prefix='PBU';
-                break;                 
+                $prefix = 'PBU';
+                break;
             case "PIBG Sekolah":
-                $prefix='PIBG';
+                $prefix = 'PIBG';
                 break;
             case "OrderS":
-                $prefix='OS';
+                $prefix = 'OS';
                 break;
         }
-       $code=$prefix.str_pad($id, 5, '0', STR_PAD_LEFT);
+        $code = $prefix . str_pad($id, 5, '0', STR_PAD_LEFT);
         return $code;
     }
 
@@ -503,32 +494,19 @@ class OrganizationController extends Controller
     {
         $role = '';
 
-        if($type_org_name == "Koperasi")
-        {
+        if ($type_org_name == "Koperasi") {
             $role = OrganizationRole::where('nama', '=', 'Koop Admin')->first();
-        } 
-        else if($type_org_name == "Peniaga Barang Berjadual")
-        {
+        } else if ($type_org_name == "Peniaga Barang Berjadual") {
             $role = OrganizationRole::where('nama', '=', 'Schedule Merchant Admin')->first();
-        }
-        else if($type_org_name == "Peniaga Barang Umum")
-        {
+        } else if ($type_org_name == "Peniaga Barang Umum") {
             $role = OrganizationRole::where('nama', '=', 'Regular Merchant Admin')->first();
-        }
-        else if($type_org_name == "Homestay / Hotel")
-        {
+        } else if ($type_org_name == "Homestay / Hotel") {
             $role = OrganizationRole::where('nama', '=', 'Homestay Admin')->first();
-        }
-        else if($type_org_name == "Grab Student")
-        {
+        } else if ($type_org_name == "Grab Student") {
             $role = OrganizationRole::where('nama', '=', 'Grab Student Admin')->first();
-        }
-        else if($type_org_name == "Bas")
-        {
+        } else if ($type_org_name == "Bas") {
             $role = OrganizationRole::where('nama', '=', 'Bas Admin')->first();
-        }
-        else if($type_org_name == "OrderS")
-        {
+        } else if ($type_org_name == "OrderS") {
             $role = OrganizationRole::where('nama', '=', 'OrderS Admin')->first();
         }
 
@@ -598,24 +576,18 @@ class OrganizationController extends Controller
         $allKoop = Organization::where('type_org', 1039)->get();
 
         $isNotParent = array();
-        foreach($allSchool as $school)
-        {
-            if(count($allKoop) != 0)
-            {
-                foreach($allKoop as $koop)
-                {
-                    if($school->id != $koop->parent_org)
-                    {
+        foreach ($allSchool as $school) {
+            if (count($allKoop) != 0) {
+                foreach ($allKoop as $koop) {
+                    if ($school->id != $koop->parent_org) {
                         $isNotParent[] += (int)$school->id;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 $isNotParent[] += (int)$school->id;
             }
         }
-        
+
         $parent_org = Organization::whereIn('id', $isNotParent)->get();
 
         return $parent_org;
@@ -626,9 +598,9 @@ class OrganizationController extends Controller
         $type_org = TypeOrganization::find($type_org_id);
         $org = Organization::where('type_org', $type_org->id)->select('nama')->get();
 
-        if($type_org->nama == 'Peniaga Barang Umum') {
-            foreach($org as $row) {
-                if($row->nama == $org_name) {
+        if ($type_org->nama == 'Peniaga Barang Umum') {
+            foreach ($org as $row) {
+                if ($row->nama == $org_name) {
                     return true;
                 } else {
                     return false;
@@ -642,33 +614,27 @@ class OrganizationController extends Controller
         $org = Organization::find($org_id);
 
         // get existing image
-        $file = public_path('/organization-picture/'.$org->organization_picture);
-        
+        $file = public_path('/organization-picture/' . $org->organization_picture);
+
         // if the existing image is exist then delete
-        if(File::exists($file))
-        {
+        if (File::exists($file)) {
             File::delete($file);
         }
 
         $groups = DB::table('product_group')->where('organization_id', $org_id)->get();
 
-        foreach($groups as $group)
-        {
+        foreach ($groups as $group) {
             $item = DB::table('product_item')->where('product_group_id', $group->id)->select('image')->get();
-            foreach($item as $row)
-            {
-                if($row->image != NULL)
-                {
-                    $file = public_path("merchant-image/product-item/".$org->code."/".$row->image);
+            foreach ($item as $row) {
+                if ($row->image != NULL) {
+                    $file = public_path("merchant-image/product-item/" . $org->code . "/" . $row->image);
                     $exists = File::exists($file);
-                    
-                    if($exists)
-                    {
+
+                    if ($exists) {
                         File::delete($file);
                     }
                 }
             }
         }
-        
     }
 }

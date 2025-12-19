@@ -11,7 +11,7 @@
         "php": "^7.2.5|^8.0",
         "apility/laravel-fcm": "^1.5",
         "arcanedev/log-viewer": "7.x",
-        "barryvdh/laravel-dompdf": "^1.0",
+        "barryvdh/laravel-dompdf": "^2.0",
         "doctrine/dbal": "2.*",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
@@ -25,7 +25,7 @@
         "laravel/ui": "2.4",
         "maatwebsite/excel": "^3.1",
         "pragmarx/countries": "^0.7.2",
-        "pusher/pusher-php-server": "~4.0",
+        "pusher/pusher-php-server": "^4.1",
         "silviolleite/laravelpwa": "^2.0",
         "spatie/laravel-permission": "^3.18",
         "stripe/stripe-php": "^7.67",
@@ -62,7 +62,8 @@
             
         ],
         "files": [
-            "app/helper.php"
+            "app/helper.php",
+            "app/FcmHelper.php"
         ]
     },
     "autoload-dev": {

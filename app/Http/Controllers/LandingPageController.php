@@ -136,7 +136,7 @@ class LandingPageController extends AppBaseController
         ->sortByDesc('transaction_sum')
         ->values();
 
-    dd($organization);
+   // dd($organization);
        return response()->json($organization);
     }
 
@@ -167,6 +167,7 @@ class LandingPageController extends AppBaseController
             ->whereNull("o.deleted_at")
             ->whereIn('o.type_org', [1, 2, 3])
             ->get();
+           //dd($organization);
 
         $organizationCount = $organization->count();
 
@@ -339,7 +340,10 @@ class LandingPageController extends AppBaseController
             })
             ->sortByDesc('transaction_sum')
             ->values();
+            
+        $organizationCount = $organization2->count();
 
+        //dd(['organization2'=> $organization2, 'organizationCount' => $organizationCount ]);
 
         return view('landing-page.fees.index', ['organization2'=> $organization2, 'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts ,'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
     }
