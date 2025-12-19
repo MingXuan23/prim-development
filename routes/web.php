@@ -323,6 +323,8 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 
     Route::post('/list-fetchYuranbyOrganId', 'FeesController@fecthYuranByOrganizationId')->name('fees.fetchYuranByOrganId');
+
+    Route::post('/closeFee/{id}', 'FeesController@closeFee');
 });
 
 Route::group(['prefix' => 'parent'], function () {
