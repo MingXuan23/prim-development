@@ -2752,13 +2752,25 @@ class FeesController extends AppBaseController
 
     public function closeFee($id)
     {
-        $result = DB::table('fees_new')
+        $userId = Auth::id();
+        $oid = DB::table('fees_new')
+                ->where("id",$id)
+                ->value('organization_id');
+
+        $result = DB::table('organization_user')
+            ->where('organization_id', $oid)
+            ->where('user_id', $userId)
+            ->whereIn('role_id', [2, 4])
+            ->exists();
+        
+        if ($result) {
+
+            DB::table('fees_new')
             ->where('id', '=', $id)
             ->update([
                 'status'        =>  '0'
             ]);
 
-        if ($result) {
             Session::flash('success', 'Yuran Berjaya Ditutup');
             return View::make('layouts/flash-messages');
         } else {
