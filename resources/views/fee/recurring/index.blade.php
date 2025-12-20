@@ -85,7 +85,7 @@
                                     <th>Tarikh Akhir</th>
                                     <th>Rujukan</th>
                                     <th>Status</th>
-                                    <!-- <th>Action</th> -->
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                         </table>
@@ -112,6 +112,26 @@
                 </div>
             </div>
             {{-- end confirmation delete modal --}}
+
+        {{-- confirmation close fee --}}
+        <div id="closeConfirmationModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Tutup Yuran</h4>
+                    </div>
+                    <div class="modal-body">
+                        Adakah anda pasti?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="closeFee"
+                            name="closeFee">Tutup</button>
+                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- end confirmation close fee --}}
 
         </div>
     </div>
@@ -254,6 +274,11 @@
                         name: 'status',
                         orderable: false,
                         searchable: false
+                    },{
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
                     },],
                     error: function (error) {
                         alert('error');
@@ -285,7 +310,7 @@
 
             $('#organization').change(function () {
                 var organizationid = $("#organization option:selected").val();
-                $('#categoryB').DataTable().destroy();
+                $('#categoryRecurring').DataTable().destroy();
                 // console.log(organizationid);
                 fetch_data(organizationid);
             });
@@ -302,6 +327,11 @@
             $(document).on('click', '.btn-danger', function () {
                 fee_id = $(this).attr('id');
                 $('#deleteConfirmationModal').modal('show');
+            });
+
+            $(document).on('click', '.btn-info', function(){
+                fee_id = $(this).attr('id');
+                $('#closeConfirmationModal').modal('show');
             });
 
             $('#delete').click(function () {
@@ -321,13 +351,38 @@
 
                         $('div.flash-message').html(data);
 
-                        categoryB.ajax.reload();
+                        categoryRecurring.ajax.reload();
                     },
                     error: function (data) {
                         $('div.flash-message').html(data);
                     }
                 })
             });
+
+            $('#closeFee').click(function() {
+
+            console.log(fee_id);
+            $.ajax({
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                },
+                url: "closeFee/" + fee_id,
+                success: function(data) {
+                    setTimeout(function() {
+                        $('#confirmModal').modal('hide');
+                    }, 2000);
+
+                    $('div.flash-message').html(data);
+
+                    categoryRecurring.ajax.reload();
+                },
+                error: function (data) {
+                    $('div.flash-message').html(data);
+                }
+            })
+        });
 
             $('.alert').delay(3000).fadeOut();
 
