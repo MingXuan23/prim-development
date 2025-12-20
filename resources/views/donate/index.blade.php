@@ -12,8 +12,8 @@
       <div class="page-title-box">
         <h4 class="font-size-18">Derma</h4>
         <!-- <ol class="breadcrumb mb-0">
-                                                                                                                                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                                                                                                                                </ol> -->
+                                                                                                                                              <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                                                                                                                          </ol> -->
       </div>
     </div>
   </div>
@@ -243,10 +243,6 @@
         $('#deleteConfirmationModal').modal('show');
       });
 
-      $('#teruskan').click(function () {
-        $('#statusMessageModal').modal('hide');
-      });
-
       $('#delete').click(function () {
         $.ajax({
           type: 'POST',
@@ -274,13 +270,17 @@
               .trim();
 
             $('#statusMessageModal').modal('show');
-            $('#statusMessageModal .modal-title').text(message == "Derma Gagal Dipadam" ? "Gagal" : "Berjaya");
+            $('#statusMessageModal .modal-title').text(message == "Derma Gagal Ditutup" ? "Gagal" : "Berjaya");
             $('#statusMessageModal .modal-body').text(message);
 
             donationTable.ajax.reload();
           },
           error: function (data) {
             $('div.flash-message').html(data);
+
+            $('#statusMessageModal').modal('show');
+            $('#statusMessageModal .modal-title').text("Gagal");
+            $('#statusMessageModal .modal-body').text("Derma gagal ditutup.");
           }
         })
       });

@@ -190,10 +190,10 @@ class FeesController extends AppBaseController
             ]); */
 
         if ($result) {
-            Session::flash('success', 'Yuran Berjaya Dipadam');
+            Session::flash('success', 'Yuran Berjaya Dibuang');
             return View::make('layouts/flash-messages');
         } else {
-            Session::flash('error', 'Yuran Gagal Dipadam');
+            Session::flash('error', 'Yuran Gagal Dibuang');
             return View::make('layouts/flash-messages');
         }
     }
@@ -2754,22 +2754,22 @@ class FeesController extends AppBaseController
     {
         $userId = Auth::id();
         $oid = DB::table('fees_new')
-                ->where("id",$id)
-                ->value('organization_id');
+            ->where("id", $id)
+            ->value('organization_id');
 
         $result = DB::table('organization_user')
             ->where('organization_id', $oid)
             ->where('user_id', $userId)
             ->whereIn('role_id', [2, 4])
             ->exists();
-        
+
         if ($result) {
 
             DB::table('fees_new')
-            ->where('id', '=', $id)
-            ->update([
-                'status'        =>  '0'
-            ]);
+                ->where('id', '=', $id)
+                ->update([
+                    'status' => '0'
+                ]);
 
             Session::flash('success', 'Yuran Berjaya Ditutup');
             return View::make('layouts/flash-messages');
