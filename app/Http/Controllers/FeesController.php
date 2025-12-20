@@ -35,6 +35,11 @@ use SebastianBergmann\Type\TrueType;
 
 class FeesController extends AppBaseController
 {
+    function __construct()
+    {
+        $this->updateStatusFees();
+    }
+
     public function index()
     {
         //
@@ -44,6 +49,14 @@ class FeesController extends AppBaseController
         return view('pentadbir.fee.index', compact('fees', 'listcategory', 'organization'));
     }
 
+    public function updateStatusFees()
+    {
+        DB::table('fees_new')
+            ->whereDate('end_date', '<', Carbon::now()->toDateString())
+            ->update([
+                'status' => '0'
+            ]);
+    }
 
 
     public function create()
@@ -804,7 +817,7 @@ class FeesController extends AppBaseController
                     $data = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategori A")
-                        ->where('status', "1")
+                        // ->where('status', "1")
                         ->get();
 
                     foreach ($data as $d) {
@@ -814,7 +827,7 @@ class FeesController extends AppBaseController
                     $data = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategori B")
-                        ->where('status', "1")
+                        // ->where('status', "1")
                         ->get();
 
                     foreach ($data as $d) {
@@ -840,7 +853,7 @@ class FeesController extends AppBaseController
                     $data = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategori C")
-                        ->where('status', "1")
+                        // ->where('status', "1")
                         ->get();
 
                     foreach ($data as $d) {
@@ -867,7 +880,7 @@ class FeesController extends AppBaseController
                     $data = DB::table('fees_new')
                         ->where('organization_id', $oid)
                         ->where('category', "Kategori Berulang")
-                        ->where('status', "1")
+                        // ->where('status', "1")
                         ->get();
 
                     foreach ($data as $d) {
@@ -906,16 +919,20 @@ class FeesController extends AppBaseController
                 }
             });
             //to do update status btn
-            /* $table->addColumn('action', function ($row) {
+            $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
-                // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                if ($row->status == '1') {
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-info m-1">Tutup yuran</button></div>';
+                } else {
+                    // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
+                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                }
                 return $btn;
-            }); */
+            });
 
-            // $table->rawColumns(['status', 'action']);
-            $table->rawColumns(['target', 'status']);
+            $table->rawColumns(['status', 'action']);
+            // $table->rawColumns(['target', 'status']);
             return $table->make(true);
         }
     }
@@ -2731,6 +2748,35 @@ class FeesController extends AppBaseController
         //dd($request);
         $filename = "Yuran_Overview_" . $org->nama;
         return Excel::download(new ExportYuranOverview($org->id), $filename . '.xlsx');
+    }
+
+    public function closeFee($id)
+    {
+        $userId = Auth::id();
+        $oid = DB::table('fees_new')
+                ->where("id",$id)
+                ->value('organization_id');
+
+        $result = DB::table('organization_user')
+            ->where('organization_id', $oid)
+            ->where('user_id', $userId)
+            ->whereIn('role_id', [2, 4])
+            ->exists();
+        
+        if ($result) {
+
+            DB::table('fees_new')
+            ->where('id', '=', $id)
+            ->update([
+                'status'        =>  '0'
+            ]);
+
+            Session::flash('success', 'Yuran Berjaya Ditutup');
+            return View::make('layouts/flash-messages');
+        } else {
+            Session::flash('error', 'Yuran Gagal Ditutup');
+            return View::make('layouts/flash-messages');
+        }
     }
 }
 

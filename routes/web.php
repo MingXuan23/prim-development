@@ -323,6 +323,8 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 
     Route::post('/list-fetchYuranbyOrganId', 'FeesController@fecthYuranByOrganizationId')->name('fees.fetchYuranByOrganId');
+
+    Route::post('/closeFee/{id}', 'FeesController@closeFee');
 });
 
 Route::group(['prefix' => 'parent'], function () {
@@ -620,6 +622,7 @@ Route::post('payment', 'PayController@paymentProcess')->name('payment');
 
 Route::post('fpxIndex', 'PayController@fpxIndex')->name('fpxIndex');
 Route::post('directpayIndex', 'DirectPayController@directpayIndex')->name('directpayIndex');
+Route::post('newDirectpayIndex', 'DirectPayController@newDirectpayIndex')->name('newDirectpayIndex');
 
 Route::post('paymentStatus', 'PayController@paymentStatus')->name('paymentStatus');
 Route::post('transactionReceipt', 'PayController@transactionReceipt')->name('transactionReceipt');
