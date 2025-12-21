@@ -11,8 +11,8 @@
             <div class="page-title-box">
                 <h4 class="font-size-18">Kategori - Yuran Berulang</h4>
                 <!-- <ol class="breadcrumb mb-0">
-                                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                                </ol> -->
+                                                                                <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                                                            </ol> -->
             </div>
         </div>
     </div>
@@ -98,14 +98,14 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title">Padam Butiran</h4>
+                            <h4 class="modal-title">Buang Yuran</h4>
                         </div>
                         <div class="modal-body">
                             Adakah anda pasti?
                         </div>
                         <div class="modal-footer">
                             <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete"
-                                name="delete">Padam</button>
+                                name="delete">Teruskan</button>
                             <button type="button" data-dismiss="modal" class="btn">Batal</button>
                         </div>
                     </div>
@@ -113,25 +113,44 @@
             </div>
             {{-- end confirmation delete modal --}}
 
-        {{-- confirmation close fee --}}
-        <div id="closeConfirmationModal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Tutup Yuran</h4>
-                    </div>
-                    <div class="modal-body">
-                        Adakah anda pasti?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" data-dismiss="modal" class="btn btn-primary" id="closeFee"
-                            name="closeFee">Tutup</button>
-                        <button type="button" data-dismiss="modal" class="btn">Batal</button>
+            {{-- confirmation close fee --}}
+            <div id="closeConfirmationModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Tutup Yuran</h4>
+                        </div>
+                        <div class="modal-body">
+                            Adakah anda pasti?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" class="btn btn-primary" id="closeFee"
+                                name="closeFee">Teruskan</button>
+                            <button type="button" data-dismiss="modal" class="btn">Batal</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {{-- end confirmation close fee --}}
+            {{-- end confirmation close fee --}}
+
+            {{-- yuran close/delete status modal --}}
+            <div id="statusMessageModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Berjaya</h4>
+                        </div>
+                        <div class="modal-body">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" class="btn btn-primary" id="teruskan"
+                                name="teruskan">Teruskan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- end yuran close/delete status modal --}}
 
         </div>
     </div>
@@ -274,7 +293,7 @@
                         name: 'status',
                         orderable: false,
                         searchable: false
-                    },{
+                    }, {
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -329,7 +348,7 @@
                 $('#deleteConfirmationModal').modal('show');
             });
 
-            $(document).on('click', '.btn-info', function(){
+            $(document).on('click', '.btn-info', function () {
                 fee_id = $(this).attr('id');
                 $('#closeConfirmationModal').modal('show');
             });
@@ -351,38 +370,53 @@
 
                         $('div.flash-message').html(data);
 
+                        $('#statusMessageModal .modal-title').text('Berjaya');
+                        $('#statusMessageModal .modal-body').text("Yuran berjaya dibuang.");
+                        $('#statusMessageModal').modal('show');
+
                         categoryRecurring.ajax.reload();
                     },
                     error: function (data) {
                         $('div.flash-message').html(data);
+
+                        $('#statusMessageModal .modal-title').text('Gagal');
+                        $('#statusMessageModal .modal-body').text("Yuran gagal dibuang.");
+                        $('#statusMessageModal').modal('show');
                     }
                 })
             });
 
-            $('#closeFee').click(function() {
+            $('#closeFee').click(function () {
 
-            console.log(fee_id);
-            $.ajax({
-                type: 'POST',
-                dataType: 'html',
-                data: {
-                    "_token": "{{ csrf_token() }}",
-                },
-                url: "closeFee/" + fee_id,
-                success: function(data) {
-                    setTimeout(function() {
-                        $('#confirmModal').modal('hide');
-                    }, 2000);
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'html',
+                    data: {
+                        "_token": "{{ csrf_token() }}",
+                    },
+                    url: "closeFee/" + fee_id,
+                    success: function (data) {
+                        setTimeout(function () {
+                            $('#confirmModal').modal('hide');
+                        }, 2000);
 
-                    $('div.flash-message').html(data);
+                        $('div.flash-message').html(data);
 
-                    categoryRecurring.ajax.reload();
-                },
-                error: function (data) {
-                    $('div.flash-message').html(data);
-                }
-            })
-        });
+                        $('#statusMessageModal .modal-title').text('Berjaya');
+                        $('#statusMessageModal .modal-body').text("Yuran berjaya ditutup.");
+                        $('#statusMessageModal').modal('show');
+
+                        categoryRecurring.ajax.reload();
+                    },
+                    error: function (data) {
+                        $('div.flash-message').html(data);
+
+                        $('#statusMessageModal .modal-title').text('Gagal');
+                        $('#statusMessageModal .modal-body').text("Yuran gagal ditutup.");
+                        $('#statusMessageModal').modal('show');
+                    }
+                })
+            });
 
             $('.alert').delay(3000).fadeOut();
 
