@@ -11,8 +11,8 @@
             <div class="page-title-box">
                 <h4 class="font-size-18">Kategori - Yuran Berulang</h4>
                 <!-- <ol class="breadcrumb mb-0">
-                                                                                <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                                                                            </ol> -->
+                                                                                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                                                                </ol> -->
             </div>
         </div>
     </div>
@@ -370,9 +370,18 @@
 
                         $('div.flash-message').html(data);
 
-                        $('#statusMessageModal .modal-title').text('Berjaya');
-                        $('#statusMessageModal .modal-body').text("Yuran berjaya dibuang.");
+                        var message = $('<div>')
+                            .html(data)
+                            .find('.alert')
+                            .find('button')
+                            .remove()
+                            .end()
+                            .text()
+                            .trim();
+
                         $('#statusMessageModal').modal('show');
+                        $('#statusMessageModal .modal-title').text(message == "Yuran Gagal Dibuang" ? "Gagal" : "Berjaya");
+                        $('#statusMessageModal .modal-body').text(message);
 
                         categoryRecurring.ajax.reload();
                     },
