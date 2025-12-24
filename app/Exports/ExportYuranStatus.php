@@ -36,6 +36,7 @@ class ExportYuranStatus implements WithMultipleSheets
             }
             $feeStatus = DB::table('fees_new_organization_user as fou')
                 ->leftJoin('organization_user as ou', 'ou.id', 'fou.organization_user_id')
+                // ->leftJoin('transactions as t', 'fou.transaction_id', 't.id')
                 ->where('fou.fees_new_id', $yuran->id)
                 ->select('ou.user_id', 'fou.status')
                 ->distinct('fou.id')
@@ -69,6 +70,8 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->leftJoin('classes as c', 'c.id', 'co.class_id')
                 ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                // ->leftJoin('fees_transactions_new as ftn', 'sfn.id', 'ftn.student_fees_id')
+                // ->leftJoin('transactions as t', 'fou.transaction_id', 't.id')
                 ->where('sfn.fees_id', $yuran->id)
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'sfn.status')
                 ->orderBy('c.nama')
@@ -120,6 +123,17 @@ class ExportYuranStatus implements WithMultipleSheets
             'Jantina',
             'Status',
         ];
+
+        // foreach ($this->yuran as $yuranItem) {
+        //     $data = $this->fetchdata($yuranItem);
+
+        //     $yuranName = mb_substr($yuranItem->name, 0, 10) .
+        //         "..." .
+        //         mb_substr($yuranItem->name, mb_strlen($yuranItem->name) - 10, -10);
+
+        //     $sheets[] = new Sheet($data, $heading, $yuranName . ($yuranItem->status == 1 ? ' (Active)' : ' (Inactive)'));
+
+        // }
 
         foreach ($this->yuran as $yuranItem) {
             $data = $this->fetchdata($yuranItem);

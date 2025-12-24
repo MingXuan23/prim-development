@@ -79,101 +79,149 @@ class FeesController extends AppBaseController
     {
         // get type org
         // get year from class name
-        $fee = DB::table('fees')
-            ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
-            ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
-            ->join('classes', 'class_organization.class_id', '=', 'classes.id')
-            ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
-            ->select('fees.id as feeid', 'fees.nama as feename', 'fees.totalamount', 'organizations.id as organization_id', 'organizations.type_org', 'classes.nama')
-            ->where('fees.id', $id)
+        // $fee = DB::table('fees')
+        //     ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+        //     ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+        //     ->join('classes', 'class_organization.class_id', '=', 'classes.id')
+        //     ->join('organizations', 'organizations.id', '=', 'class_organization.organization_id')
+        //     ->select('fees.id as feeid', 'fees.nama as feename', 'fees.totalamount', 'organizations.id as organization_id', 'organizations.type_org', 'classes.nama')
+        //     ->where('fees.id', $id)
+        //     ->first();
+
+        $fee = DB::table('fees_new as fn')
+            // ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+            // ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+            // ->join('classes', 'class_organization.class_id', '=', 'classes.id')
+            ->join('organizations as o', 'o.id', '=', 'fn.organization_id')
+            ->select(
+                'fn.id as feeid',
+                'fn.name as feename',
+                'fn.category',
+                'fn.totalamount',
+                'fn.start_date',
+                'fn.end_date',
+                'o.id as organization_id',
+                'o.type_org'
+            )
+            ->where('fn.id', $id)
             ->first();
 
-        $aa = $fee->nama;
-        $getyear = substr($aa, 0, 1);
+        // $aa = $fee->feename;
+        // $getyear = substr($aa, 0, 1);
 
-        $getallclass = DB::table('organizations')
-            ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as classname')
-            ->where('organizations.id', $fee->organization_id)
-            ->where('classes.nama', 'LIKE', '%' . $getyear . '%')
-            ->orderBy('classes.nama')
-            ->get();
+        // $getallclass = DB::table('organizations')
+        //     ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
+        //     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+        //     ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as classname')
+        //     ->where('organizations.id', $fee->organization_id)
+        //     ->where('classes.nama', 'LIKE', '%' . $getyear . '%')
+        //     ->orderBy('classes.nama')
+        //     ->get();
 
-        $getclass = DB::table('fees')
-            ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
-            ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
-            ->join('classes', 'class_organization.class_id', '=', 'classes.id')
-            ->select('fees.id as feeid', 'fees.nama as feename', 'fees.totalamount', 'class_organization.organization_id', 'classes.id as cid', 'classes.nama as classname')
-            ->where('fees.id', $id)
-            ->orderBy('classes.nama')
-            ->get();
+        // $getclass = DB::table('fees')
+        //     ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+        //     ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+        //     ->join('classes', 'class_organization.class_id', '=', 'classes.id')
+        //     ->select('fees.id as feeid', 'fees.nama as feename', 'fees.totalamount', 'class_organization.organization_id', 'classes.id as cid', 'classes.nama as classname')
+        //     ->where('fees.id', $id)
+        //     ->orderBy('classes.nama')
+        //     ->get();
 
         // $getclassid = $getclass->cid;
 
         // dd($getclass);
         $organization = $this->getOrganizationByUserId();
-        return view('pentadbir.fee.update', compact('fee', 'organization', 'getyear', 'getclass', 'getallclass'));
+        // return view('pentadbir.fee.update', compact('fee', 'organization', 'getyear', 'getclass', 'getallclass'));
+        return view('pentadbir.fee.update', compact('fee', 'organization'));
     }
 
     public function update(Request $request, $id)
     {
-        $class = $request->get('cb_class');
+        // $class = $request->get('cb_class');
 
-        $req = DB::table('organizations')
-            ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
-            ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-            ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname', 'class_organization.id as co_id')
-            ->where('organizations.id', $request->get('organization'))
-            ->whereIn('classes.id', $class)
-            ->get()->toArray();
+        // $req = DB::table('organizations')
+        //     ->join('class_organization', 'class_organization.organization_id', '=', 'organizations.id')
+        //     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
+        //     ->select('organizations.id as oid', 'organizations.nama as organizationname', 'classes.id as cid', 'classes.nama as cname', 'class_organization.id as co_id')
+        //     ->where('organizations.id', $request->get('organization'))
+        //     ->whereIn('classes.id', $class)
+        //     ->get()->toArray();
 
-        //get all class that have been store with that fees
-        $getclassfees = DB::table('fees')
-            ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
-            ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
-            ->join('classes', 'class_organization.class_id', '=', 'classes.id')
-            ->select('fees.id as feeid', 'fees.nama as feename', 'fees.totalamount', 'class_organization.organization_id', 'classes.id as cid', 'classes.nama as classname')
-            ->where('fees.id', $id)
-            ->get()->toArray();
+        // //get all class that have been store with that fees
+        // $getclassfees = DB::table('fees')
+        //     ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+        //     ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+        //     ->join('classes', 'class_organization.class_id', '=', 'classes.id')
+        //     ->select('fees.id as feeid', 'fees.nama as feename', 'fees.totalamount', 'class_organization.organization_id', 'classes.id as cid', 'classes.nama as classname')
+        //     ->where('fees.id', $id)
+        //     ->get()->toArray();
 
 
-        for ($i = 0; $i < count($req); $i++) {
+        // for ($i = 0; $i < count($req); $i++) {
 
-            //check if that kelas (in request) have been store with that fees or not
-            $query = DB::table('fees')
-                ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
-                ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
-                ->join('classes', 'class_organization.class_id', '=', 'classes.id')
-                ->select('fees.id as feeid', 'fees.nama as feename', 'fees.totalamount', 'class_organization.organization_id', 'classes.id as cid', 'classes.nama as classname')
-                ->where('fees.id', $id)
-                ->where('class_fees.class_organization_id', $req[$i]->co_id)
-                ->first();
+        //     //check if that kelas (in request) have been store with that fees or not
+        //     $query = DB::table('fees')
+        //         ->join('class_fees', 'class_fees.fees_id', '=', 'fees.id')
+        //         ->join('class_organization', 'class_fees.class_organization_id', '=', 'class_organization.id')
+        //         ->join('classes', 'class_organization.class_id', '=', 'classes.id')
+        //         ->select('fees.id as feeid', 'fees.nama as feename', 'fees.totalamount', 'class_organization.organization_id', 'classes.id as cid', 'classes.nama as classname')
+        //         ->where('fees.id', $id)
+        //         ->where('class_fees.class_organization_id', $req[$i]->co_id)
+        //         ->first();
 
-            for ($j = 0; $j < count($getclassfees); $j++) {
-                if (is_null($query)) {
-                    // dd('haha');
+        //     for ($j = 0; $j < count($getclassfees); $j++) {
+        //         if (is_null($query)) {
+        //             // dd('haha');
 
-                    DB::table('class_fees')->insert([
-                        'status' => '1',
-                        'class_organization_id' => $req[$i]->co_id,
-                        'fees_id' => $id
-                    ]);
-                } elseif ($req[$i]->co_id != $getclassfees[$j]) {
-                    DB::table('class_fees')
-                        ->where('fees_id', $id)
-                        ->update([
-                            'status' => '0'
-                        ]);
-                } else {
-                    DB::table('class_fees')
-                        ->where('fees_id', $id)
-                        ->update([
-                            'status' => '1',
-                            'class_organization_id' => $req[$i]->co_id
-                        ]);
-                }
-            }
+        //             DB::table('class_fees')->insert([
+        //                 'status' => '1',
+        //                 'class_organization_id' => $req[$i]->co_id,
+        //                 'fees_id' => $id
+        //             ]);
+        //         } elseif ($req[$i]->co_id != $getclassfees[$j]) {
+        //             DB::table('class_fees')
+        //                 ->where('fees_id', $id)
+        //                 ->update([
+        //                     'status' => '0'
+        //                 ]);
+        //         } else {
+        //             DB::table('class_fees')
+        //                 ->where('fees_id', $id)
+        //                 ->update([
+        //                     'status' => '1',
+        //                     'class_organization_id' => $req[$i]->co_id
+        //                 ]);
+        //         }
+        //     }
+        // }
+        $feeCategory = DB::table("fees_new")
+            ->where("id", $id)
+            ->select("category")
+            ->first();
+
+        $oid = $request->get('organization');
+        $date_started = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
+        $date_end = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
+        // $date_today = 
+
+        DB::table("fees_new")
+            ->where("id", $id)
+            ->update([
+                "name" => $request->get('name'),
+                "desc" => $request->get("description"),
+                "organization_id" => $oid,
+                "start_date" => $date_started,
+                "end_date" => $date_end
+            ]);
+
+        if ($feeCategory->category == "Kategori A") {
+            return redirect()->route('fees.A');
+        } else if ($feeCategory->category == "Kategori B") {
+            return redirect()->route('fees.B');
+        } else if ($feeCategory->category == "Kategori C") {
+            return redirect()->route('fees.C');
+        } else {
+            return redirect()->route('fees.Recurring');
         }
     }
 
@@ -805,6 +853,11 @@ class FeesController extends AppBaseController
         }
     }
 
+    public function updateFeeDetails()
+    {
+
+    }
+
     public function getCategoryDatatable(Request $request)
     {
         if (request()->ajax()) {
@@ -926,6 +979,8 @@ class FeesController extends AppBaseController
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
                 if ($row->status == '1') {
+                    // add a new edit button in the actions column
+                    $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Ubah Butiran</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-info m-1">Tutup yuran</button></div>';
                 } else {
                     // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
