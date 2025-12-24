@@ -179,6 +179,9 @@ class FeesController extends AppBaseController
 
     public function destroy($id)
     {
+        Session::flash('error', 'Yuran Gagal Dibuang');
+        return View::make('layouts/flash-messages');
+
         $result = DB::table('fees_new')
             ->where('id', '=', $id)
             ->delete();
