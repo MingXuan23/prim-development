@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+
 
 class NewYuranController extends Controller
 {
@@ -157,6 +160,8 @@ class NewYuranController extends Controller
                 ->where('ou.status', 1)
                 ->get();
 
+            $profileImageUrl = $user->profile_image ? asset($user->profile_image) : null;
+
             if ($students->isEmpty()) {
                 return response()->json([
                     'id' => $user->id,
@@ -172,6 +177,7 @@ class NewYuranController extends Controller
                     'api_token' => $apiToken,
                     'remember_token' => $rememberToken,
                     'is_first_time_device_bind' => $isFirstTimeBind,
+                    'profile_image' => $profileImageUrl,
                     'data' => []
                 ], 200);
             }
@@ -308,7 +314,8 @@ class NewYuranController extends Controller
                 'remember_token' => $rememberToken,
                 'data' => $studentsData,
                 'receipts' => $receipts,
-                'is_first_time_device_bind' => $isFirstTimeBind
+                'is_first_time_device_bind' => $isFirstTimeBind,
+                'profile_image' => $profileImageUrl,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -710,6 +717,12 @@ class NewYuranController extends Controller
         try {
             $userId = $request->input('auth_user_id');
 
+            $currentUser = DB::table('users')->where('id', $userId)->first();
+            $hasChanges = false;
+
+            if (!$currentUser) {
+                return response()->json(['success' => false, 'message' => 'Pengguna tidak dijumpai.'], 404);
+            }
 
             $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
@@ -720,6 +733,7 @@ class NewYuranController extends Controller
                 'address' => 'nullable|string|max:255',
                 'postcode' => 'nullable|string|max:10',
                 'state' => 'nullable|string|max:50',
+                'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
 
             if ($validator->fails()) {
@@ -739,15 +753,41 @@ class NewYuranController extends Controller
                 'address' => $request->input('address'),
                 'postcode' => $request->input('postcode'),
                 'state' => $request->input('state'),
-            ], fn($value) => $value !== '');
+            ], fn($value) => $value !== null && $value !== '');
+
+
+            if ($request->input('remove_image') === 'true') {
+                if ($currentUser->profile_image) {
+                    $oldPath = public_path($currentUser->profile_image);
+                    if (File::exists($oldPath)) {
+                        File::delete($oldPath);
+                    }
+                }
+                $newData['profile_image'] = null;
+                $hasChanges = true;
+            } else if ($request->hasFile('profile_image')) {
+                $file = $request->file('profile_image');
+
+                if ($currentUser->profile_image) {
+                    $oldPath = public_path($currentUser->profile_image);
+                    if (File::exists($oldPath)) {
+                        File::delete($oldPath);
+                    }
+                }
+
+                $filename = Str::random(40) . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('profile_images'), $filename);
+
+                $newData['profile_image'] = 'profile_images/' . $filename;
+                $hasChanges = true;
+            }
 
             $fieldsToCompare = ['name', 'email', 'username', 'icno', 'telno', 'address', 'postcode', 'state'];
-            $hasChanges = false;
 
             foreach ($fieldsToCompare as $field) {
                 $currentValue = $currentUser->$field ?? '';
                 $newValue = $newData[$field] ?? '';
-                if ($currentValue !== $newValue) {
+                if (isset($newData[$field]) && $currentValue != $newValue) {
                     $hasChanges = true;
                     break;
                 }
@@ -761,14 +801,21 @@ class NewYuranController extends Controller
             }
 
             $newData['updated_at'] = now();
+
             $updated = DB::table('users')->where('id', $userId)->update($newData);
 
-            if ($updated) {
+            if ($updated || $hasChanges) {
                 $updatedUser = DB::table('users')->where('id', $userId)->first();
+
+                $profileImageUrl = $updatedUser->profile_image
+                    ? asset($updatedUser->profile_image)
+                    : null;
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Profil berjaya dikemaskini.',
                     'data' => [
+                        'id' => $updatedUser->id,
                         'name' => $updatedUser->name,
                         'email' => $updatedUser->email,
                         'username' => $updatedUser->username,
@@ -777,6 +824,7 @@ class NewYuranController extends Controller
                         'address' => $updatedUser->address,
                         'postcode' => $updatedUser->postcode,
                         'state' => $updatedUser->state,
+                        'profile_image' => $profileImageUrl,
                     ]
                 ]);
             } else {
@@ -788,7 +836,7 @@ class NewYuranController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ralat pelayan dalaman.'
+                'message' => 'Ralat pelayan dalaman: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -861,6 +909,8 @@ class NewYuranController extends Controller
                 ->where('ou.status', 1)
                 ->get();
 
+            $profileImageUrl = $user->profile_image ? asset($user->profile_image) : null;
+
             if ($students->isEmpty()) {
                 return response()->json([
                     'id' => $user->id,
@@ -874,6 +924,7 @@ class NewYuranController extends Controller
                     'postcode' => $user->postcode,
                     'state' => $user->state,
                     'api_token' => $newApiToken,
+                    'profile_image' => $profileImageUrl,
                     'data' => []
                 ], 200);
             }
@@ -1010,6 +1061,7 @@ class NewYuranController extends Controller
                 'remember_token' =>  $updatedToken->remember_token,
                 'data' => $studentsData,
                 'receipts' => $receipts,
+                'profile_image' => $profileImageUrl,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -1530,7 +1582,11 @@ class NewYuranController extends Controller
     public function getOrganizations(Request $request)
     {
         try {
-            $organizations = DB::table("organizations")->get();
+            $organizations = DB::table("organizations as o")
+                ->join("type_organizations as to", "to.id", "=", "o.type_org")
+                ->whereIn("to.nama", ["SK /SJK", "SRA /SRAI", "SMK /SMJK", "Sekolah Swasta /Tadika"])
+                ->select("o.*")
+                ->get();
 
             return response()->json([
                 'success' => true,
@@ -1795,39 +1851,64 @@ class NewYuranController extends Controller
     public function getAnnouncements(Request $request)
     {
         try {
-            $userId = $request->input('auth_user_id');
+            $userId = $request->input('auth_user_id') ?? $request->input('user_id');
+            $requestedOrgId = $request->input('organization_id');
 
-            $students = DB::table('organization_user_student as ous')
+            if (!$userId) {
+                return response()->json(['success' => false, 'message' => 'User ID is required'], 400);
+            }
+
+            $query = DB::table('organization_user_student as ous')
                 ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                ->join('class_student as cs', 'cs.student_id', '=', 'ous.student_id')
+                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                ->join('classes as c', 'c.id', '=', 'co.class_id')
                 ->where('ou.user_id', $userId)
-                ->where('ou.role_id', 6)
-                ->where('ou.status', 1)
-                ->select('ous.student_id', 'ou.organization_id')
+                ->where('ou.role_id', 6)                                                                  
+                ->where('ou.status', 1);
+
+            if ($requestedOrgId) {
+                $query->where('ou.organization_id', $requestedOrgId);
+            }
+
+            $studentsData = $query->select(
+                'ou.organization_id',
+                'co.class_id as real_class_id',
+                'c.levelid'
+            )
                 ->get();
 
-            if ($students->isEmpty()) {
+            if ($studentsData->isEmpty()) {
                 return response()->json(['success' => true, 'data' => []]);
             }
 
-            $studentIds = $students->pluck('student_id')->unique()->toArray();
-            $parentOrgIds = $students->pluck('organization_id')->unique()->toArray();
+            $parentOrgIds = $studentsData->pluck('organization_id')->unique()->toArray();
+            $classIds = $studentsData->pluck('real_class_id')->unique()->toArray();
 
-            $classIds = DB::table('class_student as cs')
-                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
-                ->whereIn('cs.student_id', $studentIds)
-                ->pluck('co.class_id')
-                ->unique()
-                ->toArray();
+            $allowedTahaps = ['both'];
+
+            foreach ($studentsData as $data) {
+                if ($data->levelid) {
+                    $level = (int)$data->levelid;
+                    if ($level >= 1 && $level <= 3) {
+                        if (!in_array('1', $allowedTahaps)) $allowedTahaps[] = '1';
+                    } elseif ($level >= 4 && $level <= 6) {
+                        if (!in_array('2', $allowedTahaps)) $allowedTahaps[] = '2';
+                    }
+                }
+            }
 
             $orgAnnouncements = DB::table('organization_announcements as oa')
                 ->join('organizations as o', 'o.id', '=', 'oa.organization_id')
                 ->whereIn('oa.organization_id', $parentOrgIds)
                 ->where('oa.status', 'published')
+                ->whereIn('oa.tahap', $allowedTahaps)
                 ->select(
                     'oa.id',
                     'oa.title',
                     'oa.content',
                     'oa.created_at',
+                    'oa.tahap',
                     'o.nama as source_name',
                     DB::raw('"organization" as type'),
                     DB::raw('NULL as student_name')
@@ -1842,6 +1923,7 @@ class NewYuranController extends Controller
                     'ca.title',
                     'ca.content',
                     'ca.created_at',
+                    DB::raw('NULL as tahap'),
                     'c.nama as source_name',
                     DB::raw('"class" as type'),
                     DB::raw('NULL as student_name')
@@ -1858,7 +1940,8 @@ class NewYuranController extends Controller
                     'title' => $item->title,
                     'content' => $item->content,
                     'source_name' => $item->source_name,
-                    'type' => $item->type, // 'organization' 或 'class'
+                    'tahap' => $item->tahap,
+                    'type' => $item->type,
                     'date' => \Carbon\Carbon::parse($item->created_at)->format('d M Y, h:i A'),
                     'raw_date' => $item->created_at
                 ];
@@ -1875,5 +1958,186 @@ class NewYuranController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function getSocialFeeds(Request $request)
+    {
+        try {
+            $userId = $request->input('auth_user_id') ?? $request->input('user_id');
+
+            if (!$userId) {
+                return response()->json(['success' => false, 'message' => 'User ID is required'], 400);
+            }
+
+            $classIds = DB::table('organization_user_student as ous')
+                ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                ->join('class_student as cs', 'cs.student_id', '=', 'ous.student_id')
+                ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
+                ->where('ou.user_id', $userId)
+                ->where('ou.status', 1)
+                ->pluck('co.class_id')
+                ->unique()
+                ->toArray();
+
+            if (empty($classIds)) {
+                return response()->json(['success' => true, 'data' => []]);
+            }
+
+            $query = DB::table('class_posts as p')
+                ->join('users as u', 'u.id', '=', 'p.user_id')
+                ->join('classes as c', 'c.id', '=', 'p.class_id')
+                ->whereIn('p.class_id', $classIds)
+                ->select(
+                    'p.id',
+                    'p.content',
+                    'p.media_url',
+                    'p.media_type',
+                    'p.created_at',
+                    'u.name as author_name',
+                    'u.profile_image as author_image',
+                    'c.nama as class_name',
+                    DB::raw('(SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = p.id) as like_count'),
+                    DB::raw('(SELECT COUNT(*) FROM post_comments WHERE post_comments.post_id = p.id) as comment_count'),
+                    DB::raw('(SELECT COUNT(*) FROM post_likes WHERE post_likes.post_id = p.id AND post_likes.user_id = ?) as is_liked')
+                )
+                ->setBindings([$userId], 'select')
+                ->orderBy('p.created_at', 'desc');
+
+            $posts = $query->paginate(10);
+
+            foreach ($posts as $post) {
+                $post->media_full_url = $post->media_url ? asset($post->media_url) : null;
+                $post->author_image_url = $post->author_image ? asset($post->author_image) : null;
+                $post->is_liked = $post->is_liked > 0;
+                $post->time_ago = \Carbon\Carbon::parse($post->created_at)->diffForHumans();
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $posts
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function toggleLikePost(Request $request)
+    {
+        $userId = $request->input('auth_user_id') ?? $request->input('user_id');
+        $postId = $request->input('post_id');
+
+        if (!$userId || !$postId) return response()->json(['success' => false], 400);
+
+        $exists = DB::table('post_likes')
+            ->where('user_id', $userId)
+            ->where('post_id', $postId)
+            ->first();
+
+        if ($exists) {
+            DB::table('post_likes')->where('id', $exists->id)->delete();
+            return response()->json(['success' => true, 'action' => 'unliked']);
+        } else {
+            DB::table('post_likes')->insert([
+                'user_id' => $userId,
+                'post_id' => $postId,
+                'created_at' => now(),
+            ]);
+            return response()->json(['success' => true, 'action' => 'liked']);
+        }
+    }
+
+    public function getPostComments(Request $request)
+    {
+        $postId = $request->input('post_id');
+
+        $comments = DB::table('post_comments as c')
+            ->join('users as u', 'u.id', '=', 'c.user_id')
+            ->where('c.post_id', $postId)
+            ->select('c.id', 'c.user_id', 'c.content', 'c.created_at', 'u.name as user_name', 'u.profile_image')
+            ->orderBy('c.created_at', 'asc')
+            ->get();
+
+        $comments->transform(function ($comment) {
+            $comment->profile_image_url = $comment->profile_image ? asset($comment->profile_image) : null;
+            $comment->time_ago = \Carbon\Carbon::parse($comment->created_at)->diffForHumans();
+            return $comment;
+        });
+
+        return response()->json(['success' => true, 'data' => $comments]);
+    }
+
+    public function addPostComment(Request $request)
+    {
+        $userId = $request->input('auth_user_id') ?? $request->input('user_id');
+        $postId = $request->input('post_id');
+        $content = $request->input('content');
+
+        if (!$userId || !$postId || !$content) {
+            return response()->json(['success' => false, 'message' => 'Missing parameters'], 400);
+        }
+
+        $id = DB::table('post_comments')->insertGetId([
+            'user_id' => $userId,
+            'post_id' => $postId,
+            'content' => $content,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        return response()->json(['success' => true, 'comment_id' => $id]);
+    }
+
+    public function deletePostComment(Request $request)
+    {
+        $userId = $request->input('auth_user_id') ?? $request->input('user_id');
+        $commentId = $request->input('comment_id');
+
+        if (!$userId || !$commentId) {
+            return response()->json(['success' => false, 'message' => 'Missing parameters'], 400);
+        }
+
+        $comment = DB::table('post_comments')->where('id', $commentId)->first();
+
+        if (!$comment) {
+            return response()->json(['success' => false, 'message' => 'Comment not found'], 404);
+        }
+
+        if ($comment->user_id != $userId) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action'], 403);
+        }
+
+        DB::table('post_comments')->where('id', $commentId)->delete();
+
+        return response()->json(['success' => true, 'message' => 'Comment deleted successfully']);
+    }
+
+    public function updatePostComment(Request $request)
+    {
+        $userId = $request->input('auth_user_id') ?? $request->input('user_id');
+        $commentId = $request->input('comment_id');
+        $content = $request->input('content');
+
+        if (!$userId || !$commentId || empty($content)) {
+            return response()->json(['success' => false, 'message' => 'Missing parameters'], 400);
+        }
+
+        $comment = DB::table('post_comments')->where('id', $commentId)->first();
+
+        if (!$comment) {
+            return response()->json(['success' => false, 'message' => 'Comment not found'], 404);
+        }
+
+        if ($comment->user_id != $userId) {
+            return response()->json(['success' => false, 'message' => 'Unauthorized action'], 403);
+        }
+
+        DB::table('post_comments')
+            ->where('id', $commentId)
+            ->update([
+                'content' => $content,
+                'updated_at' => now(),
+            ]);
+
+        return response()->json(['success' => true, 'message' => 'Comment updated successfully']);
     }
 }
