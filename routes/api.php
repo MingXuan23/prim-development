@@ -73,7 +73,6 @@ Route::group(['prefix' => 'mobile'], function () {
             Route::post('updateProfile', 'MobileAPI\NewYuranController@updateProfile');
             Route::get('getOrganizations', 'MobileAPI\NewYuranController@getOrganizations');
             Route::get('getClasses', 'MobileAPI\NewYuranController@getClasses');
-            Route::post('getAnnouncements', 'MobileAPI\NewYuranController@getAnnouncements');
         });
         Route::post('loginAndGetYuran', 'MobileAPI\NewYuranController@loginAndGetYuran');
         Route::post('refreshSession', 'MobileAPI\NewYuranController@refreshSession');
@@ -87,6 +86,13 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::post('updateNotifyDays', 'MobileAPI\NewYuranController@updateNotifyDays');
         Route::post('registerStudents', 'MobileAPI\NewYuranController@registerStudents');
         Route::post('registerParent', 'MobileAPI\NewYuranController@registerParent');
+        Route::post('getAnnouncements', 'MobileAPI\NewYuranController@getAnnouncements');
+        Route::post('getSocialFeeds', 'MobileAPI\NewYuranController@getSocialFeeds');
+        Route::post('toggleLikePost', 'MobileAPI\NewYuranController@toggleLikePost');
+        Route::post('getPostComments', 'MobileAPI\NewYuranController@getPostComments');
+        Route::post('addPostComment', 'MobileAPI\NewYuranController@addPostComment');
+        Route::post('deletePostComment', 'MobileAPI\NewYuranController@deletePostComment');
+        Route::post('updatePostComment', 'MobileAPI\NewYuranController@updatePostComment');
     });
 });
 
