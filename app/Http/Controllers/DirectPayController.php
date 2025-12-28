@@ -850,7 +850,7 @@ class DirectPayController extends Controller
 
 
             $transaction = new Transaction();
-            $transaction->nama          = 'PRIM'.$fpx_sellerExOrderNo;
+            $transaction->nama          = 'PRIM_'.$fpx_sellerExOrderNo;
             $transaction->description   = $fpx_sellerOrderNo;
             $transaction->transac_no    = NULL;
             // convert time to Y-m-d H:i:s format
