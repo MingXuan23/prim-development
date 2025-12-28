@@ -850,7 +850,7 @@ class DirectPayController extends Controller
 
 
             $transaction = new Transaction();
-            $transaction->nama          = $fpx_sellerExOrderNo;
+            $transaction->nama          = 'PRIM_'.$fpx_sellerExOrderNo;
             $transaction->description   = $fpx_sellerOrderNo;
             $transaction->transac_no    = NULL;
             // convert time to Y-m-d H:i:s format
@@ -1051,11 +1051,13 @@ class DirectPayController extends Controller
                 'fpx_buyerName'       => $fpx_buyerName,
                 'private_key'         => $private_key,
                 'fpx_txnAmount'       => $fpx_txnAmount,
-                'fpx_sellerExOrderNo' => $fpx_sellerExOrderNo,
-                'fpx_sellerOrderNo'   => $fpx_sellerOrderNo,
+                'fpx_sellerExOrderNo' => $fpx_sellerOrderNo,
+                'fpx_sellerOrderNo'   =>  $fpx_sellerExOrderNo,
                 'getstudentfees'      => $getstudentfees,
                 'getparentfees'       => $getparentfees,
             ];
+
+            
 
             $url = $this->signRequestandGetPaymentUrl($data);
             return redirect()->away($url);
@@ -1148,14 +1150,13 @@ class DirectPayController extends Controller
 
        // dd($requestBody, $base64Payload);
         // 5. Send Request
-        $response = Http::withoutVerifying()
-        ->withHeaders([
+        $response = Http::withHeaders([
             'X-MerchantId' => $payloadObj['MerchantId'],
             'X-Signature'  => $signatureBase64,
             'Content-Type' => 'application/json',
         ])
         ->withBody($requestBody, 'application/json')
-        ->post('https://localhost:7129/api/v1/Pay/GetPaymentUrl');
+        ->post(env('DIRECTPAY_GETPAYMENT_URL'));
         // ->post('https://sit.directpay.my/api/v1/Pay/GetPaymentUrl');
            
         $res =  $response->json();
