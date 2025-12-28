@@ -1051,11 +1051,13 @@ class DirectPayController extends Controller
                 'fpx_buyerName'       => $fpx_buyerName,
                 'private_key'         => $private_key,
                 'fpx_txnAmount'       => $fpx_txnAmount,
-                'fpx_sellerExOrderNo' => $fpx_sellerExOrderNo,
-                'fpx_sellerOrderNo'   => $fpx_sellerOrderNo,
+                'fpx_sellerExOrderNo' => $fpx_sellerOrderNo,
+                'fpx_sellerOrderNo'   =>  $fpx_sellerExOrderNo,
                 'getstudentfees'      => $getstudentfees,
                 'getparentfees'       => $getparentfees,
             ];
+
+            
 
             $url = $this->signRequestandGetPaymentUrl($data);
             return redirect()->away($url);
