@@ -1148,14 +1148,13 @@ class DirectPayController extends Controller
 
        // dd($requestBody, $base64Payload);
         // 5. Send Request
-        $response = Http::withoutVerifying()
-        ->withHeaders([
+        $response = Http::withHeaders([
             'X-MerchantId' => $payloadObj['MerchantId'],
             'X-Signature'  => $signatureBase64,
             'Content-Type' => 'application/json',
         ])
         ->withBody($requestBody, 'application/json')
-        ->post('https://localhost:7129/api/v1/Pay/GetPaymentUrl');
+        ->post(env('DIRECTPAY_GETPAYMENT_URL'));
         // ->post('https://sit.directpay.my/api/v1/Pay/GetPaymentUrl');
            
         $res =  $response->json();
