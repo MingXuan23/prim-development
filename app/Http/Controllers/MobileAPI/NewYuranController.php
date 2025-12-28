@@ -188,6 +188,7 @@ class NewYuranController extends Controller
             $categoryAFees = DB::table('fees_new as fn')
                 ->join('fees_new_organization_user as fno', 'fno.fees_new_id', '=', 'fn.id')
                 ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
+                ->join('organizations as o', 'fn.organization_id', '=', 'o.id')
                 ->select(
                     'fn.id',
                     'fn.name',
@@ -198,6 +199,7 @@ class NewYuranController extends Controller
                     'fn.totalamount',
                     'fn.status',
                     'fn.organization_id',
+                    'o.nama as organization_name',
                     'fno.status as fno_status',
                     'fno.transaction_id',
                     'ou.organization_id as ou_org_id',
@@ -214,6 +216,7 @@ class NewYuranController extends Controller
             $categoryBCFees = DB::table('fees_new as fn')
                 ->join('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
                 ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+                ->join('organizations as o', 'fn.organization_id', '=', 'o.id')
                 ->select(
                     'fn.id',
                     'fn.name',
@@ -224,6 +227,7 @@ class NewYuranController extends Controller
                     'fn.totalamount',
                     'fn.status',
                     'fn.organization_id',
+                    'o.nama as organization_name',
                     'sfn.id as student_fees_new_id',
                     'sfn.status as sfn_status',
                     'cs.student_id',
@@ -935,6 +939,7 @@ class NewYuranController extends Controller
             $categoryAFees = DB::table('fees_new as fn')
                 ->join('fees_new_organization_user as fno', 'fno.fees_new_id', '=', 'fn.id')
                 ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
+                ->join('organizations as o', 'fn.organization_id', '=', 'o.id')
                 ->select(
                     'fn.id',
                     'fn.name',
@@ -945,6 +950,7 @@ class NewYuranController extends Controller
                     'fn.totalamount',
                     'fn.status',
                     'fn.organization_id',
+                    'o.nama as organization_name',
                     'fno.status as fno_status',
                     'fno.transaction_id',
                     'ou.organization_id as ou_org_id',
@@ -961,6 +967,7 @@ class NewYuranController extends Controller
             $categoryBCFees = DB::table('fees_new as fn')
                 ->join('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
                 ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+                ->join('organizations as o', 'fn.organization_id', '=', 'o.id')
                 ->select(
                     'fn.id',
                     'fn.name',
@@ -971,6 +978,7 @@ class NewYuranController extends Controller
                     'fn.totalamount',
                     'fn.status',
                     'fn.organization_id',
+                    'o.nama as organization_name',
                     'sfn.id as student_fees_new_id',
                     'sfn.status as sfn_status',
                     'cs.student_id',
@@ -1074,7 +1082,7 @@ class NewYuranController extends Controller
 
     public function unbindDevice(Request $request)
     {
-        $userId = $request->input('user_id');
+        $userId = $request->input('auth_user_id') ?? $request->input('user_id');
         $currentDeviceToken = $request->input('device_token');
 
         if (!$userId || !$currentDeviceToken) {
@@ -1488,39 +1496,27 @@ class NewYuranController extends Controller
     public function getNotifyDays(Request $request)
     {
         try {
-            $apiToken = $request->input('user_token');
-            if (!$apiToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing user_token'
-                ], 400);
+            $userId = $request->input('auth_user_id') ?? $request->input('user_id');
+
+            if (!$userId) {
+                return response()->json(['success' => false, 'message' => 'User ID not found'], 400);
             }
 
-            $userToken = DB::table('user_token')->where('api_token', $apiToken)->first();
-            if (!$userToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid or expired token'
-                ], 401);
-            }
-
-            $user = DB::table('user_token')->where('user_id', $userToken->user_id)->first();
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found'
-                ], 404);
+            $record = DB::table('user_token')->where('user_id', $userId)->first();
+            
+            if (!$record) {
+                return response()->json(['success' => false, 'message' => 'Settings not found'], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'notify_days_before' => $user->notify_days_before
+                'notify_days_before' => $record->notify_days_before
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'An unexpected error occurred.',
-                'error' => $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -1528,15 +1524,8 @@ class NewYuranController extends Controller
     public function updateNotifyDays(Request $request)
     {
         try {
-            $apiToken = $request->input('user_token');
+            $userId = $request->input('auth_user_id') ?? $request->input('user_id');
             $days = $request->input('notify_days_before');
-
-            if (!$apiToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Missing user_token'
-                ], 400);
-            }
 
             if ($days === null || $days < 1 || $days > 30) {
                 return response()->json([
@@ -1545,24 +1534,8 @@ class NewYuranController extends Controller
                 ], 400);
             }
 
-            $userToken = DB::table('user_token')->where('api_token', $apiToken)->first();
-            if (!$userToken) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid or expired token'
-                ], 401);
-            }
-
-            $user = DB::table('user_token')->where('user_id', $userToken->user_id)->first();
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found'
-                ], 404);
-            }
-
-            DB::table('user_token')
-                ->where('user_id', $user->user_id)
+            $updated = DB::table('user_token')
+                ->where('user_id', $userId)
                 ->update(['notify_days_before' => $days]);
 
             return response()->json([
@@ -1570,11 +1543,11 @@ class NewYuranController extends Controller
                 'message' => 'Notification days updated successfully',
                 'notify_days_before' => $days
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'An unexpected error occurred.',
-                'error' => $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -1637,7 +1610,7 @@ class NewYuranController extends Controller
     public function registerStudents(Request $request)
     {
         try {
-            $userId = $request->input('user_id');
+            $userId = $request->input('auth_user_id') ?? $request->input('user_id');
             $apiToken = $request->input('user_token');
 
             if (!$userId || !$apiToken) {
@@ -1864,7 +1837,7 @@ class NewYuranController extends Controller
                 ->join('class_organization as co', 'co.id', '=', 'cs.organclass_id')
                 ->join('classes as c', 'c.id', '=', 'co.class_id')
                 ->where('ou.user_id', $userId)
-                ->where('ou.role_id', 6)                                                                  
+                ->where('ou.role_id', 6)
                 ->where('ou.status', 1);
 
             if ($requestedOrgId) {
@@ -1875,8 +1848,7 @@ class NewYuranController extends Controller
                 'ou.organization_id',
                 'co.class_id as real_class_id',
                 'c.levelid'
-            )
-                ->get();
+            )->get();
 
             if ($studentsData->isEmpty()) {
                 return response()->json(['success' => true, 'data' => []]);
@@ -1886,7 +1858,6 @@ class NewYuranController extends Controller
             $classIds = $studentsData->pluck('real_class_id')->unique()->toArray();
 
             $allowedTahaps = ['both'];
-
             foreach ($studentsData as $data) {
                 if ($data->levelid) {
                     $level = (int)$data->levelid;
@@ -1916,15 +1887,19 @@ class NewYuranController extends Controller
 
             $classAnnouncements = DB::table('class_announcements as ca')
                 ->join('classes as c', 'c.id', '=', 'ca.class_id')
+                ->join('class_organization as co', 'co.class_id', '=', 'c.id')
+                ->join('organizations as o', 'o.id', '=', 'co.organization_id')
                 ->whereIn('ca.class_id', $classIds)
+                ->whereIn('o.id', $parentOrgIds)
                 ->where('ca.status', 'published')
+                ->distinct()
                 ->select(
                     'ca.id',
                     'ca.title',
                     'ca.content',
                     'ca.created_at',
                     DB::raw('NULL as tahap'),
-                    'c.nama as source_name',
+                    DB::raw("CONCAT(o.nama, ' - ', c.nama) as source_name"),
                     DB::raw('"class" as type'),
                     DB::raw('NULL as student_name')
                 );

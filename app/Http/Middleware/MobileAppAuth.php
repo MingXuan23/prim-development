@@ -9,17 +9,10 @@ class MobileAppAuth
 {
     public function handle($request, Closure $next)
     {
-        $token = $request->bearerToken();
+        $token = $request->bearerToken() ?? $request->input('user_token');
 
         if (!$token) {
-            $token = $request->input('user_token');
-        }
-
-        if (!$token) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Missing Authorization Token'
-            ], 401);
+            return response()->json(['success' => false, 'message' => 'Missing Authorization Token'], 401);
         }
 
         $userTokenRecord = DB::table('user_token')
@@ -30,7 +23,17 @@ class MobileAppAuth
         if (!$userTokenRecord) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized: Invalid or Expired Token'
+                'message' => 'Session expired or logged in elsewhere.',
+                'error_code' => 'FORCE_LOGOUT'
+            ], 401);
+        }
+
+        $requestDeviceToken = $request->input('device_token') ?? $request->header('device_token');
+        if ($requestDeviceToken && $userTokenRecord->device_token !== $requestDeviceToken) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device Mismatch',
+                'error_code' => 'FORCE_LOGOUT'
             ], 401);
         }
 
