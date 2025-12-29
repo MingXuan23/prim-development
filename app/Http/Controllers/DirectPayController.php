@@ -93,7 +93,9 @@ class DirectPayController extends Controller
                     $fpx_buyerName = "Penderma Tanpa Nama";
                 }
 
-               $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
+                $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
+
+
 
                 $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
@@ -605,7 +607,8 @@ class DirectPayController extends Controller
                     $fpx_buyerName = "Penderma Tanpa Nama";
                 }
 
-                $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
+               $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
+
 
                 $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
