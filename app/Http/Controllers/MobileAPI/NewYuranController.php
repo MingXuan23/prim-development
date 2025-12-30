@@ -17,6 +17,7 @@ use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Config;
 
 
 class NewYuranController extends Controller
@@ -750,7 +751,6 @@ class NewYuranController extends Controller
 
             $newData = array_filter([
                 'name' => $request->input('name'),
-                'email' => $request->input('email'),
                 'username' => $request->input('username'),
                 'icno' => $request->input('icno'),
                 'telno' => $request->input('telno'),
@@ -758,6 +758,15 @@ class NewYuranController extends Controller
                 'postcode' => $request->input('postcode'),
                 'state' => $request->input('state'),
             ], fn($value) => $value !== null && $value !== '');
+
+            if ($request->has('email')) {
+                $emailInput = trim($request->input('email'));
+                if ($emailInput === '') {
+                    $newData['email'] = null;
+                } else {
+                    $newData['email'] = $emailInput;
+                }
+            }
 
 
             if ($request->input('remove_image') === 'true') {
@@ -791,7 +800,7 @@ class NewYuranController extends Controller
             foreach ($fieldsToCompare as $field) {
                 $currentValue = $currentUser->$field ?? '';
                 $newValue = $newData[$field] ?? '';
-                if (isset($newData[$field]) && $currentValue != $newValue) {
+                if (array_key_exists($field, $newData) && $currentValue != $newValue) {
                     $hasChanges = true;
                     break;
                 }
@@ -1130,7 +1139,6 @@ class NewYuranController extends Controller
 
         $user = $this->findUserByAnyLoginId($loginId);
         if (!$user) {
-            $allUsers = DB::table('users')->select('id', 'icno', 'telno', 'email')->get();
             return response()->json(['success' => false, 'message' => 'User not found'], 404);
         }
 
@@ -1163,6 +1171,7 @@ class NewYuranController extends Controller
         return response()->json([
             'success' => true,
             'email' => $user->email,
+            'has_icno' => !empty($user->icno),
             'students' => $students,
             'device_token' => $deviceData ? $deviceData->device_token : null,
         ], 200);
@@ -1194,10 +1203,25 @@ class NewYuranController extends Controller
         $rememberMe = $request->boolean('remember_me', false);
         $fcmToken = $request->input('fcm_token');
         $isFirstTimeBind = true;
+        $newEmail = $request->input('new_email');
 
-        $user = DB::table('users')->where('email', $email)->first();
+        $user = null;
+        if ($request->has('login_id')) {
+            $user = $this->findUserByAnyLoginId($request->input('login_id'));
+        } else {
+            $user = DB::table('users')->where('email', $email)->first();
+        }
+
         if (!$user) {
             return response()->json(['message' => 'Pengguna tidak wujud'], 404);
+        }
+
+        if (!empty($newEmail) && $newEmail !== $user->email) {
+            $exists = DB::table('users')->where('email', $newEmail)->where('id', '!=', $user->id)->exists();
+            if (!$exists) {
+                DB::table('users')->where('id', $user->id)->update(['email' => $newEmail]);
+                $user->email = $newEmail;
+            }
         }
 
         $newApiToken = bin2hex(random_bytes(32));
@@ -1428,11 +1452,17 @@ class NewYuranController extends Controller
             return response()->json(['success' => false, 'message' => 'Pengguna tidak dijumpai'], 404);
         }
 
-        if ($originalUser->email !== $email) {
-            return response()->json(['success' => false, 'message' => 'Emel tidak sepadan dengan pengguna'], 403);
+        $cachedOtp = Cache::get("otp_$email");
+        if ($cachedOtp !== $otp) {
+            return response()->json(['success' => false, 'message' => 'OTP salah'], 400);
         }
 
-        $cachedOtp = Cache::get("otp_$email");
+        Cache::forget("otp_$email");
+
+        if (!$cachedOtp) {
+            return response()->json(['success' => false, 'message' => 'OTP tamat tempoh atau tidak sah'], 400);
+        }
+
         if ($cachedOtp !== $otp) {
             return response()->json(['success' => false, 'message' => 'OTP salah'], 400);
         }
@@ -1503,7 +1533,7 @@ class NewYuranController extends Controller
             }
 
             $record = DB::table('user_token')->where('user_id', $userId)->first();
-            
+
             if (!$record) {
                 return response()->json(['success' => false, 'message' => 'Settings not found'], 404);
             }
@@ -1512,7 +1542,6 @@ class NewYuranController extends Controller
                 'success' => true,
                 'notify_days_before' => $record->notify_days_before
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -1543,7 +1572,6 @@ class NewYuranController extends Controller
                 'message' => 'Notification days updated successfully',
                 'notify_days_before' => $days
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -2008,17 +2036,52 @@ class NewYuranController extends Controller
             ->where('post_id', $postId)
             ->first();
 
+        $action = '';
         if ($exists) {
             DB::table('post_likes')->where('id', $exists->id)->delete();
-            return response()->json(['success' => true, 'action' => 'unliked']);
+            $action = 'unliked';
         } else {
             DB::table('post_likes')->insert([
                 'user_id' => $userId,
                 'post_id' => $postId,
                 'created_at' => now(),
             ]);
-            return response()->json(['success' => true, 'action' => 'liked']);
+            $action = 'liked';
         }
+
+        $newLikeCount = DB::table('post_likes')->where('post_id', $postId)->count();
+
+        try {
+            $options = array(
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            );
+
+            if (config('app.env') === 'local') {
+                $options['curl_options'] = [
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_SSL_VERIFYPEER => 0,
+                ];
+            }
+
+            $pusher = new \Pusher\Pusher(
+                env('PUSHER_APP_KEY'),
+                env('PUSHER_APP_SECRET'),
+                env('PUSHER_APP_ID'),
+                $options
+            );
+
+            $data = [
+                'post_id' => (int)$postId,
+                'new_like_count' => $newLikeCount
+            ];
+
+            $pusher->trigger('social-feed', 'post-liked', $data);
+        } catch (\Exception $e) {
+            Log::error("Pusher Like Error: " . $e->getMessage());
+        }
+
+        return response()->json(['success' => true, 'action' => $action, 'new_count' => $newLikeCount]);
     }
 
     public function getPostComments(Request $request)
@@ -2059,6 +2122,38 @@ class NewYuranController extends Controller
             'updated_at' => now()
         ]);
 
+        $newCommentCount = DB::table('post_comments')->where('post_id', $postId)->count();
+
+        try {
+            $options = array(
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true,
+            );
+
+            if (config('app.env') === 'local') {
+                $options['curl_options'] = [
+                    CURLOPT_SSL_VERIFYHOST => 0,
+                    CURLOPT_SSL_VERIFYPEER => 0,
+                ];
+            }
+
+            $pusher = new \Pusher\Pusher(
+                env('PUSHER_APP_KEY'),
+                env('PUSHER_APP_SECRET'),
+                env('PUSHER_APP_ID'),
+                $options
+            );
+
+            $data = [
+                'post_id' => (int)$postId,
+                'new_comment_count' => $newCommentCount
+            ];
+
+            $pusher->trigger('social-feed', 'comment-added', $data);
+        } catch (\Exception $e) {
+            Log::error("Pusher Comment Error: " . $e->getMessage());
+        }
+
         return response()->json(['success' => true, 'comment_id' => $id]);
     }
 
@@ -2082,6 +2177,27 @@ class NewYuranController extends Controller
         }
 
         DB::table('post_comments')->where('id', $commentId)->delete();
+
+
+        if (isset($comment->post_id)) {
+            $postId = $comment->post_id;
+            $newCommentCount = DB::table('post_comments')->where('post_id', $postId)->count();
+
+            try {
+                $options = array('cluster' => env('PUSHER_APP_CLUSTER'), 'useTLS' => true);
+                if (config('app.env') === 'local') {
+                    $options['curl_options'] = [CURLOPT_SSL_VERIFYHOST => 0, CURLOPT_SSL_VERIFYPEER => 0];
+                }
+                $pusher = new \Pusher\Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), $options);
+
+                $pusher->trigger('social-feed', 'comment-added', [
+                    'post_id' => (int)$postId,
+                    'new_comment_count' => $newCommentCount
+                ]);
+            } catch (\Exception $e) {
+                Log::error("Pusher Delete Error: " . $e->getMessage());
+            }
+        }
 
         return response()->json(['success' => true, 'message' => 'Comment deleted successfully']);
     }
@@ -2114,5 +2230,41 @@ class NewYuranController extends Controller
             ]);
 
         return response()->json(['success' => true, 'message' => 'Comment updated successfully']);
+    }
+
+    public function checkEmailAvailability(Request $request)
+    {
+        $email = $request->input('email');
+        $exists = DB::table('users')->where('email', $email)->exists();
+
+        if ($exists) {
+            return response()->json(['success' => false, 'message' => 'Emel ini telah digunakan oleh pengguna lain.']);
+        }
+        return response()->json(['success' => true]);
+    }
+
+    public function verifyIdentity(Request $request)
+    {
+        $loginId = $request->input('login_id');
+        $type = $request->input('type');
+        $value = $request->input('value');
+
+        $user = $this->findUserByAnyLoginId($loginId);
+        if (!$user) return response()->json(['success' => false, 'message' => 'User not found'], 404);
+
+        if ($type === 'icno') {
+            $inputIc = str_replace(['-', ' '], '', $value);
+            $dbIc = str_replace(['-', ' '], '', $user->icno);
+
+            if ($inputIc === $dbIc) {
+                return response()->json(['success' => true]);
+            }
+        } elseif ($type === 'name') {
+            if (strtolower(trim($value)) === strtolower(trim($user->name))) {
+                return response()->json(['success' => true]);
+            }
+        }
+
+        return response()->json(['success' => false, 'message' => 'Maklumat tidak tepat.']);
     }
 }

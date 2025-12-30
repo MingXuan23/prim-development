@@ -95,6 +95,8 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::post('updateUserEmail', 'MobileAPI\NewYuranController@updateUserEmail');
         Route::post('verifyOtp', 'MobileAPI\NewYuranController@verifyOtp');
         Route::post('getUserByEmailOrPhone', 'MobileAPI\NewYuranController@getUserByEmailOrPhone');
+        Route::post('checkEmailAvailability', 'MobileAPI\NewYuranController@checkEmailAvailability');
+        Route::post('verifyIdentity', 'MobileAPI\NewYuranController@verifyIdentity');
     });
 });
 
