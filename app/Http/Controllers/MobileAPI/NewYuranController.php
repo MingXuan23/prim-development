@@ -1260,6 +1260,8 @@ class NewYuranController extends Controller
             ->where('ou.status', 1)
             ->get();
 
+        $profileImageUrl = $user->profile_image ? asset($user->profile_image) : null;
+
         if ($students->isEmpty()) {
             return response()->json([
                 'success' => true,
@@ -1277,7 +1279,8 @@ class NewYuranController extends Controller
                 'remember_token' => $rememberToken,
                 'data' => [],
                 'receipts' => [],
-                'is_first_time_device_bind' => $isFirstTimeBind ?? false
+                'is_first_time_device_bind' => $isFirstTimeBind ?? false,
+                'profile_image' => $profileImageUrl,
             ]);
         }
 
@@ -1411,7 +1414,8 @@ class NewYuranController extends Controller
             'remember_token' => $rememberToken,
             'data' => $studentsData,
             'receipts' => $receipts,
-            'is_first_time_device_bind' => $isFirstTimeBind
+            'is_first_time_device_bind' => $isFirstTimeBind,
+            'profile_image' => $profileImageUrl,
         ]);
     }
 
