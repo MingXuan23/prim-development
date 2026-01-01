@@ -980,7 +980,7 @@ class FeesController extends AppBaseController
                 $btn = '<div class="d-flex justify-content-center">';
                 if ($row->status == '1') {
                     // add a new edit button in the actions column
-                    $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Ubah Butiran</a>';
+                    // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Ubah Butiran</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-info m-1">Tutup yuran</button></div>';
                 } else {
                     // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
