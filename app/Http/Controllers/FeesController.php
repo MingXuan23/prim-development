@@ -1570,6 +1570,7 @@ class FeesController extends AppBaseController
             ->where("co.class_id", "=", $classId)
             ->where("s.id", "LIKE", isset($studentId) ? $studentId : "%%")
             ->where("cs.status", "!=", -1)
+            ->where("fn.status", 1)
             ->orderBy("fee_category", "asc")
             ->orderBy("fee_name", "asc")
             ->get()

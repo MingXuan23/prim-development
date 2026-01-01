@@ -226,7 +226,7 @@
                                         .map(fee => {
                                             if (fee.fee_status == "Debt") {
                                                 return "<span class='badge badge-danger mb-1'>Belum Selesai</span>";
-                                            } else if (fee.fee_status == "Complete") {
+                                            } else if (fee.fee_status == "Paid") {
                                                 return "<span class='badge badge-success mb-1'>Selesai</span>";
                                             }
                                         })
