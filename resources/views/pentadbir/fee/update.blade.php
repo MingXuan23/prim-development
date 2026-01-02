@@ -41,7 +41,7 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label>Nama Organisasi</label>
-                        <select name="organization" id="organization" class="form-control">
+                        <select name="organization" id="organization" class="form-control" disabled>
                             <option value="" disabled>Pilih Organisasi</option>
                             @foreach($organization as $row)
                                 @if($row->id == $fee->organization_id)
@@ -78,10 +78,35 @@
                         </div>
                     </div>
 
+                    <!-- @if ($fee->category != "Kategori A")
+                        <div class="form-group">
+                            <label>Tahap</label>
+                            <select name="level" id="level" class="form-control"
+                                data-parsley-required-message="Sila pilih tahap"
+                                data-parsley-required-message="Sila pilih tahap" required>
+                                <option value="" disabled selected>Pilih Tahap</option>
+                                <option value="All_Level">Semua Tahap</option>
+                                <option value="1">Tahap 1</option>
+                                <option value="2">Tahap 2</option>
+                            </select>
+                        </div>
+
+                        <div class="yearhide form-group">
+                            <label>Tahun</label>
+                            <select name="year" id="year" class="form-control">
+                                <option value="" disabled selected>Pilih Tahun</option>
+                            </select>
+                        </div>
+
+                        <div class="cbhide row px-4 py-3">
+
+                        </div>
+                    @endif -->
+
                     <div class="form-group">
                         <label>Penerangan</label>
                         <textarea name="description" class="form-control" placeholder="Penerangan" cols="30"
-                            rows="5"></textarea>
+                            rows="5">{{ $fee->desc }}</textarea>
                     </div>
 
                     <div class="form-group mb-0">
@@ -113,10 +138,9 @@
 
     <script>
         $(document).ready(function () {
+            $('.yearhide').hide();
 
-            // $('.yearhide').hide();
-
-            // $('.cbhide').hide();
+            $('.cbhide').hide();
 
             var today = new Date();
 
@@ -128,6 +152,10 @@
                 orientation: 'bottom'
             });
 
+            // trigger organization change because organization is sure to be selected at first
+            $('#organization').trigger('change');
+
+            // ************************** checkbox class ********************************
             $(document).on('change', '#checkedAll', function () {
                 if (this.checked) {
                     $(".checkSingle").each(function () {
@@ -140,6 +168,7 @@
                 }
             });
 
+            // ************************** checkbox class ********************************
             $(document).on('change', '.checkSingle', function () {
 
                 // console.log('asdf');
@@ -159,77 +188,82 @@
 
             });
 
-            $('#organization').change(function () {
-
+            // ************************** retrieve class year ********************************
+            $('#level').change(function () {
                 if ($(this).val() != '') {
-                    var organizationid = $("#organization option:selected").val();
+                    var level = $("#level option:selected").val();
+                    var oid = $("#organization option:selected").val();
                     var _token = $('input[name="_token"]').val();
-                    $.ajax({
-                        url: "{{ route('fees.fetchYear') }}",
-                        method: "POST",
-                        data: {
-                            oid: organizationid,
-                            _token: _token
-                        },
-                        success: function (result) {
-                            $('.yearhide').show();
-                            $('#year').empty();
 
-                            if (result.success.type_org == 1 || result.success.type_org == 2) {
+                    if (level == "All_Level") {
+                        $('.yearhide').hide();
+                        $('.cbhide').hide();
+                        $('#cb_class').remove();
+                        $(".cbhide label").remove();
+                        $('#year').empty();
 
-                                $("#year").append("<option value='' selected> Pilih Tahun</option>");
-                                $("#year").append("<option value='1'>Tahun 1</option>");
-                                $("#year").append("<option value='2'>Tahun 2</option>");
-                                $("#year").append("<option value='3'>Tahun 3</option>");
-                                $("#year").append("<option value='4'>Tahun 4</option>");
-                                $("#year").append("<option value='5'>Tahun 5</option>");
-                                $("#year").append("<option value='6'>Tahun 6</option>");
+                    } else {
+                        $.ajax({
+                            url: "{{ route('fees.fetchClassYear') }}",
+                            method: "GET",
+                            data: {
+                                level: level,
+                                oid: oid,
+                                _token: _token
+                            },
+                            success: function (result) {
 
-                            } else if (result.success.type_org == 3) {
-                                $("#year").append("<option value='' selected> Pilih Tingkatan</option>");
-                                $("#year").append("<option value='1'>Tingkatan 1</option>");
-                                $("#year").append("<option value='2'>Tingkatan 2</option>");
-                                $("#year").append("<option value='3'>Tingkatan 3</option>");
-                                $("#year").append("<option value='4'>Tingkatan 4</option>");
-                                $("#year").append("<option value='5'>Tingkatan 5</option>");
-                                $("#year").append("<option value='6'>Tingkatan 6</option>");
+                                $('.yearhide').show();
+                                $('#year').empty();
+                                $("#year").append("<option value='All_Year' selected> Semua Tahun</option>");
+                                jQuery.each(result.datayear, function (key, value) {
+                                    $("#year").append("<option value='" + value.year + "'> Tahun " + value.year + "</option>");
+                                });
                             }
-
-                            $('.cbhide').hide();
-                        }
-
-                    })
+                        })
+                    }
                 }
             });
 
+            // ************************** retrieve class ********************************
             $('#year').change(function () {
-
                 if ($(this).val() != '') {
-                    var organizationid = $("#organization option:selected").val();
                     var year = $("#year option:selected").val();
+                    var oid = $("#organization option:selected").val();
                     var _token = $('input[name="_token"]').val();
+
                     $.ajax({
                         url: "{{ route('fees.fetchClass') }}",
                         method: "POST",
                         data: {
-                            oid: organizationid,
                             year: year,
+                            oid: oid,
                             _token: _token
                         },
                         success: function (result) {
-                            $('.cbhide').show();
-                            $('#cb_class').remove();
-                            $(".cbhide label").remove();
-                            $(".cbhide").append("<label for='checkAll' style='margin-right: 22px;' class='form-check-label'> <input class='form-check-input' type='checkbox' id='checkedAll' name='all' value=''/> Semua Kelas </label>");
 
-                            // console.log(result.success.oid);
-                            jQuery.each(result.success, function (key, value) {
+                            if (year == "All_Year") {
+                                $('.cbhide').hide();
+                                $('#cb_class').remove();
+                                $(".cbhide label").remove();
+                            } else {
+                                $('.cbhide').show();
+                                $('#cb_class').remove();
+                                $(".cbhide div").remove();
+                                $(".cbhide").append(
+                                    "<div class='col-md-2 col-sm-6 mb-2'><label for='checkAll' style='margin-right: 22px;' class='form-check-label'> <input class='form-check-input' type='checkbox' id='checkedAll' name='all_classes' value=''/> Semua Kelas </label></div>"
+                                );
 
-                                $(".cbhide").append("<label for='cb_class' style='margin-right: 22px;' class='form-check-label'> <input class='checkSingle form-check-input' type='checkbox' id='cb_class' name='cb_class[]' value='" + value.cid + "'/> " + value.cname + " </label>");
+                                jQuery.each(result.success, function (key, value) {
+                                    $(".cbhide").append(
+                                        "<div class='col-md-2 col-sm-6 mb-2'><label for='cb_class' style='margin-right: 22px;' class='form-check-label'> <input class='checkSingle form-check-input' data-parsley-required-message='Sila pilih kelas' data-parsley-errors-container='.errorMessageCB' type='checkbox' id='cb_class' name='cb_class[]' value='" +
+                                        value.cid + "'/> " + value.cname + " </label><br> <div class='errorMessageCB'></div></div>");
+                                });
 
-                            });
+                                $("#cb_class").attr('required', '');
+                            }
+
                         }
-
                     })
                 }
             });

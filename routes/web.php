@@ -276,8 +276,8 @@ Route::group(['prefix' => 'fees'], function () {
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
 
     // page and route for editing fee details
-    // Route::get('/edit', 'FeesController@edit')->name('fees.edit');
-    // Route::patch('/update', 'FeesController@update')->name('fees.update');
+    Route::get('/edit', 'FeesController@edit')->name('fees.edit');
+    Route::patch('/update', 'FeesController@update')->name('fees.update');
 
     // pages and routes for assigning multiple fees to one student
     Route::group(['prefix' => 'assignFeesToStudent', 'middleware' => ['auth']], function () {
