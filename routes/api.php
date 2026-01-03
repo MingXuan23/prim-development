@@ -84,6 +84,7 @@ Route::group(['prefix' => 'mobile'], function () {
             Route::post('addPostComment', 'MobileAPI\NewYuranController@addPostComment');
             Route::post('deletePostComment', 'MobileAPI\NewYuranController@deletePostComment');
             Route::post('updatePostComment', 'MobileAPI\NewYuranController@updatePostComment');
+            Route::post('getPostLikesUser', 'MobileAPI\NewYuranController@getPostLikesUser');
         });
 
         //outside
@@ -97,6 +98,9 @@ Route::group(['prefix' => 'mobile'], function () {
         Route::post('getUserByEmailOrPhone', 'MobileAPI\NewYuranController@getUserByEmailOrPhone');
         Route::post('checkEmailAvailability', 'MobileAPI\NewYuranController@checkEmailAvailability');
         Route::post('verifyIdentity', 'MobileAPI\NewYuranController@verifyIdentity');
+
+        //showcase trigger cron job notification
+        Route::post('testfcm', 'MobileAPI\NewYuranController@testfcm');
     });
 });
 
