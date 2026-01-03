@@ -1817,7 +1817,7 @@ class DirectPayController extends Controller
         }
 
         $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-        $fpx_productDescCode = substr(ltrim($fpx_productDesc, "PRIM_"), 0, 1);
+        $fpx_productDescCode = substr($fpx_productDesc, 0, 1);
         switch ($fpx_productDescCode) {
             case 'S':
                 $list_student_fees_id_by_student = DB::table('student_fees_new')
