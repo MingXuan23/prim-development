@@ -305,41 +305,22 @@
                                     <div>
 
 {{--                                            {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
-                                    @php
-                                        $currentYear = now()->year;
+                                        @php
+                                            // Find the organization entry with the matching URL
+                                            $matchedOrg = $organization2->firstWhere('url', $org->url_name);
+                                            
+                                            $tcountLatest = $org->data[0]['tcount'];
+                                            $tcountYearLatest = $org->data[0]['year'];
+                                            $tcountPrevious = $org->data[1]['tcount'];
+                                            $tcountYearPrev = $org->data[1]['year'];
 
-                                        // Find the organization entry with the matching URL
-                                        $matchedOrg = $organization2->firstWhere('url', $org->url_name);
+                                        @endphp
 
-                                        // Find the tcount for the current year from its data array
-                                        $tcount = 0;
-                                         $yearData = collect($org->data)->firstWhere('year', $currentYear);
-                                            $tcount = $yearData['tcount'] ?? 0;
-
-                                              $previousYear = now()->year- 1;
-                                            $tcountPrevious = 0;
-
-                                       // Find the organization with matching URL
-                                       $matchedOrg = $organization2->firstWhere('url', $org->url_name);
-
-                                         $dataCollection = collect($org->data);
-
-                                           $previousData = $dataCollection->firstWhere('year', $previousYear);
-
-                                           $tcountPrevious = $previousData['tcount'] ?? 0;
-
-                                            @endphp
-
-                                        @if($tcount > 0 || $tcountPrevious == 0)    {{ $tcount }} <span class="text-small"> transaksi pada {{ $currentYear }}</span> @endif
+                                        @if ($tcountLatest > 0) {{ $tcountLatest }} <span class="text-small"> transaksi pada {{ $tcountYearLatest }}</span> @endif
 
                                     </div>
                                     <div>
-
-
-                                    @if($tcountPrevious > 0)
-{{--                                            {{ $results[$org->id]['last_year']['completed_count'] }} <span class="text-small">  pelajar bayar yuran {{ date("Y")-1 }}</span>--}}
-                                        {{ $tcountPrevious }} <span class="text-small"> transaksi pada {{ $previousYear }}</span>
-                                    @endif
+                                        @if($tcountPrevious > 0) {{ $tcountPrevious }} <span class="text-small"> transaksi pada {{ $tcountYearPrev }}</span> @endif
                                     </div>
                                 </div>
                             </div>

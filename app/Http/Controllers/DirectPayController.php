@@ -75,7 +75,7 @@ class DirectPayController extends Controller
 
         try {
             $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
-            $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
+            $getparentfees = ($request->parent_fees_id) ? $request->parent_fees_id : "";
             $user = null;
             $prefixCode = "";
 
@@ -88,7 +88,7 @@ class DirectPayController extends Controller
                     $telno = $request->telno;
                     $fpx_buyerName = $request->name;
                 } else {
-                    $fpx_buyerEmail =  NULL;
+                    $fpx_buyerEmail = NULL;
                     $telno = NULL;
                     $fpx_buyerName = "Penderma Tanpa Nama";
                 }
@@ -97,7 +97,7 @@ class DirectPayController extends Controller
 
 
 
-                $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                $fpx_sellerOrderNo = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT) . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
                 $private_key = $organization->private_key;
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
@@ -109,9 +109,9 @@ class DirectPayController extends Controller
                 $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
                 $organization = Organization::find($request->o_id);
 
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
 
                 //add _M_ for mobile payment
                 if ($request->has('source') && $request->source == 'mobile') {
@@ -121,7 +121,7 @@ class DirectPayController extends Controller
                     $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                 }
 
-                $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
 
 
                 $private_key = $organization->private_key;
@@ -130,11 +130,11 @@ class DirectPayController extends Controller
             } else if ($request->desc == 'Food_Order') {
                 $user = User::find($request->user_id);
                 $organization = Organization::find($request->o_id);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "FOPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "FOPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -169,11 +169,11 @@ class DirectPayController extends Controller
 
                 $user = User::find($gng_order->user_id);
                 $organization = Organization::find($gng_order->organization_id);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "MUPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "MUPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id: "SE00013841";
@@ -185,11 +185,11 @@ class DirectPayController extends Controller
 
                 $user = User::find($cart->user_id);
                 $organization = Organization::find($cart->organization_id);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "KOPPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "KOPPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -201,8 +201,8 @@ class DirectPayController extends Controller
                 $request->amount = $homestay->totalprice;
                 $bookingId = $request->bookingid;
 
-                $paymentType =  $request->paymentType;
-                $depositAmount =  NULL;
+                $paymentType = $request->paymentType;
+                $depositAmount = NULL;
                 if ($paymentType == 'deposit') {
                     $depositCharge = $room->organization->fixed_charges;
                     $depositAmount = $homestay->totalprice * $depositCharge / 100;
@@ -226,11 +226,11 @@ class DirectPayController extends Controller
 
 
                 $organization = Organization::find($room->homestayid);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
 
                 //https://directpay.my/api/fpx/GetTransactionInfo?PrivateKey=9BB6D047-2FB3-4B7A-9199-09441E7F4B0C&Fpx_SellerOrderNo=Merchant_20240115210137&Fpx_SellerExOrderNo=DirectPay20240115210144
                 //$fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
@@ -245,11 +245,11 @@ class DirectPayController extends Controller
                 $bookingId = $request->bookingid;
 
                 $organization = Organization::find($kereta->id_organizations);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "GSPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "GSPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 //$fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -261,11 +261,11 @@ class DirectPayController extends Controller
                 $bookingId = $request->bookingid;
 
                 $organization = Organization::find($basorg->id_organizations);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "BUPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "BUPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 //$fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -283,11 +283,11 @@ class DirectPayController extends Controller
                     ]);
 
                     $organization = Organization::find($orders->organ_id);
-                    $fpx_buyerEmail      = $user->email;
-                    $telno               = $user->telno;
-                    $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                    $fpx_buyerEmail = $user->email;
+                    $telno = $user->telno;
+                    $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                     $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                    $fpx_sellerOrderNo  = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
+                    $fpx_sellerOrderNo = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
                     $private_key = $organization->private_key;
                 } else {
                     $user = User::find($request->user_id);
@@ -306,11 +306,11 @@ class DirectPayController extends Controller
                         ]);
 
                     $organization = Organization::find($organ_id);
-                    $fpx_buyerEmail      = $user_email;
-                    $telno               = $user_telno;
-                    $fpx_buyerName       = $user_name;
+                    $fpx_buyerEmail = $user_email;
+                    $telno = $user_telno;
+                    $fpx_buyerName = $user_name;
                     $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                    $fpx_sellerOrderNo  = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
+                    $fpx_sellerOrderNo = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
                     $private_key = $organization->private_key;
                 }
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
@@ -327,38 +327,38 @@ class DirectPayController extends Controller
 
 
                 $organization = Organization::find($organ_id);
-                $fpx_buyerEmail      = $user_email;
-                $telno               = $user_telno;
-                $fpx_buyerName       = $user_name;
+                $fpx_buyerEmail = $user_email;
+                $telno = $user_telno;
+                $fpx_buyerName = $user_name;
                 $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "RSPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "RSPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
             }
 
 
 
-            $fpx_sellerTxnTime  = date('YmdHis');
-            $fpx_txnAmount      = $request->amount;
+            $fpx_sellerTxnTime = date('YmdHis');
+            $fpx_txnAmount = $request->amount;
 
 
             $transaction = new Transaction();
-            $transaction->nama          = $fpx_sellerExOrderNo;
-            $transaction->description   = $fpx_sellerOrderNo;
-            $transaction->transac_no    = NULL;
+            $transaction->nama = $fpx_sellerExOrderNo;
+            $transaction->description = $fpx_sellerOrderNo;
+            $transaction->transac_no = NULL;
             // convert time to Y-m-d H:i:s format
             $date_time = date_create_from_format('YmdHis', $fpx_sellerTxnTime);
             $transaction->datetime_created = $date_time->format('Y-m-d H:i:s');
-            $transaction->amount        = $fpx_txnAmount;
-            $transaction->status        = 'Pending';
-            $transaction->email         = $fpx_buyerEmail;
-            $transaction->telno         = $telno;
-            $transaction->user_id       = $user ? $user->id : null;
-            $transaction->username      = strtoupper($fpx_buyerName);
+            $transaction->amount = $fpx_txnAmount;
+            $transaction->status = 'Pending';
+            $transaction->email = $fpx_buyerEmail;
+            $transaction->telno = $telno;
+            $transaction->user_id = $user ? $user->id : null;
+            $transaction->username = strtoupper($fpx_buyerName);
             //$transaction->fpx_checksum  = $fpx_checkSum;
             //$transaction->buyerBankId      = $request->bankid;
 
-            $list_student_fees_id   = $getstudentfees;
-            $list_parent_fees_id    = $getparentfees;
+            $list_student_fees_id = $getstudentfees;
+            $list_parent_fees_id = $getparentfees;
 
             $id = explode("_", $fpx_sellerOrderNo);
             $id = (int) str_replace("PRIM", "", $id[0]);
@@ -424,7 +424,7 @@ class DirectPayController extends Controller
                     //     }
 
                 } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'K') {
-                    $daySelect = (int)$request->week_status;
+                    $daySelect = (int) $request->week_status;
                     if ($daySelect == -1) {
                         $pickUp = Carbon::create(1, 1, 1)->toDateString(); //mindate
                     } else {
@@ -464,7 +464,7 @@ class DirectPayController extends Controller
                     // $own_code_id = $own_code !=null ?$own_code->id:0;
                     if ($result['source'] != 'none') {
                         $entity = new stdClass();
-                        $entity->room_booking_id = (int)$bookingId;
+                        $entity->room_booking_id = (int) $bookingId;
                         $entity_json = json_encode($entity);
                         // dd($entity,$entity_json);
                         $this->insertPointHistory($referral_code->id, $transaction->id, 1, 1, 'Transaksi Book & Stay RM' . $transaction->amount, $entity_json);
@@ -513,7 +513,7 @@ class DirectPayController extends Controller
                     // $own_code_id = $own_code !=null ?$own_code->id:0;
 
                     if ($result['own_code'] != "") {
-                        $own_code =  DB::table('referral_code')
+                        $own_code = DB::table('referral_code')
                             ->where('code', $result['own_code'])
                             ->first();
                         $this->insertPointHistory($own_code->id, $transaction->id, 0, 1, 'Transaksi Derma daripada sendiri');
@@ -589,7 +589,7 @@ class DirectPayController extends Controller
 
         try {
             $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
-            $getparentfees  = ($request->parent_fees_id) ? $request->parent_fees_id : "";
+            $getparentfees = ($request->parent_fees_id) ? $request->parent_fees_id : "";
             $user = null;
             $prefixCode = "";
 
@@ -602,7 +602,7 @@ class DirectPayController extends Controller
                     $telno = $request->telno;
                     $fpx_buyerName = $request->name;
                 } else {
-                    $fpx_buyerEmail =  NULL;
+                    $fpx_buyerEmail = NULL;
                     $telno = NULL;
                     $fpx_buyerName = "Penderma Tanpa Nama";
                 }
@@ -610,7 +610,7 @@ class DirectPayController extends Controller
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
 
 
-                $fpx_sellerOrderNo  = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT)  . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                $fpx_sellerOrderNo = "PRIM" . str_pad($request->d_id, 3, "0", STR_PAD_LEFT) . "_" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
                 $private_key = $organization->private_key;
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
@@ -622,9 +622,9 @@ class DirectPayController extends Controller
                 $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
                 $organization = Organization::find($request->o_id);
 
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
 
                 //add _M_ for mobile payment
                 if ($request->has('source') && $request->source == 'mobile') {
@@ -634,7 +634,7 @@ class DirectPayController extends Controller
                     $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
                 }
 
-                $fpx_sellerOrderNo  = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "YSPRIM" . date('YmdHis') . rand(10000, 99999);
 
 
                 $private_key = $organization->private_key;
@@ -643,12 +643,12 @@ class DirectPayController extends Controller
             } else if ($request->desc == 'Food_Order') {
                 $user = User::find($request->user_id);
                 $organization = Organization::find($request->o_id);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 //$fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "FOPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "FOPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -683,13 +683,13 @@ class DirectPayController extends Controller
 
                 $user = User::find($gng_order->user_id);
                 $organization = Organization::find($gng_order->organization_id);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 //                $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
 
-                $fpx_sellerOrderNo  = "MUPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "MUPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id: "SE00013841";
@@ -701,13 +701,13 @@ class DirectPayController extends Controller
 
                 $user = User::find($cart->user_id);
                 $organization = Organization::find($cart->organization_id);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 //$fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
 
-                $fpx_sellerOrderNo  = "KOPPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "KOPPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 // $fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -719,8 +719,8 @@ class DirectPayController extends Controller
                 $request->amount = $homestay->totalprice;
                 $bookingId = $request->bookingid;
 
-                $paymentType =  $request->paymentType;
-                $depositAmount =  NULL;
+                $paymentType = $request->paymentType;
+                $depositAmount = NULL;
                 if ($paymentType == 'deposit') {
                     $depositCharge = $room->organization->fixed_charges;
                     $depositAmount = $homestay->totalprice * $depositCharge / 100;
@@ -744,13 +744,13 @@ class DirectPayController extends Controller
 
 
                 $organization = Organization::find($room->homestayid);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 // $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
 
-                $fpx_sellerOrderNo  = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "HOPRIM" . date('YmdHis') . rand(10000, 99999);
 
                 //https://directpay.my/api/fpx/GetTransactionInfo?PrivateKey=9BB6D047-2FB3-4B7A-9199-09441E7F4B0C&Fpx_SellerOrderNo=Merchant_20240115210137&Fpx_SellerExOrderNo=DirectPay20240115210144
                 //$fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
@@ -765,12 +765,12 @@ class DirectPayController extends Controller
                 $bookingId = $request->bookingid;
 
                 $organization = Organization::find($kereta->id_organizations);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 // $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "GSPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "GSPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 //$fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -782,12 +782,12 @@ class DirectPayController extends Controller
                 $bookingId = $request->bookingid;
 
                 $organization = Organization::find($basorg->id_organizations);
-                $fpx_buyerEmail      = $user->email;
-                $telno               = $user->telno;
-                $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                 //$fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "BUPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "BUPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
                 //$fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
@@ -805,12 +805,12 @@ class DirectPayController extends Controller
                     ]);
 
                     $organization = Organization::find($orders->organ_id);
-                    $fpx_buyerEmail      = $user->email;
-                    $telno               = $user->telno;
-                    $fpx_buyerName       = User::where('id', '=', Auth::id())->pluck('name')->first();
+                    $fpx_buyerEmail = $user->email;
+                    $telno = $user->telno;
+                    $fpx_buyerName = User::where('id', '=', Auth::id())->pluck('name')->first();
                     //$fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                     $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
-                    $fpx_sellerOrderNo  = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
+                    $fpx_sellerOrderNo = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
                     $private_key = $organization->private_key;
                 } else {
                     $user = User::find($request->user_id);
@@ -829,12 +829,12 @@ class DirectPayController extends Controller
                         ]);
 
                     $organization = Organization::find($organ_id);
-                    $fpx_buyerEmail      = $user_email;
-                    $telno               = $user_telno;
-                    $fpx_buyerName       = $user_name;
+                    $fpx_buyerEmail = $user_email;
+                    $telno = $user_telno;
+                    $fpx_buyerName = $user_name;
                     // $fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                     $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
-                    $fpx_sellerOrderNo  = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
+                    $fpx_sellerOrderNo = "OSPRIM" . date('YmdHis') . rand(10000, 99999);
                     $private_key = $organization->private_key;
                 }
                 // $fpx_sellerExId     = config('app.env') == 'production' ? "EX00011125" : "EX00012323";
@@ -851,39 +851,39 @@ class DirectPayController extends Controller
 
 
                 $organization = Organization::find($organ_id);
-                $fpx_buyerEmail      = $user_email;
-                $telno               = $user_telno;
-                $fpx_buyerName       = $user_name;
+                $fpx_buyerEmail = $user_email;
+                $telno = $user_telno;
+                $fpx_buyerName = $user_name;
                 //$fpx_sellerExOrderNo = $request->desc . "_" . date('YmdHis');
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
-                $fpx_sellerOrderNo  = "RSPRIM" . date('YmdHis') . rand(10000, 99999);
+                $fpx_sellerOrderNo = "RSPRIM" . date('YmdHis') . rand(10000, 99999);
                 $private_key = $organization->private_key;
             }
 
 
 
-            $fpx_sellerTxnTime  = date('YmdHis');
-            $fpx_txnAmount      = $request->amount;
+            $fpx_sellerTxnTime = date('YmdHis');
+            $fpx_txnAmount = $request->amount;
 
 
             $transaction = new Transaction();
-            $transaction->nama          = 'PRIM_' . $fpx_sellerExOrderNo;
-            $transaction->description   = $fpx_sellerOrderNo;
-            $transaction->transac_no    = NULL;
+            $transaction->nama = 'PRIM_' . $fpx_sellerExOrderNo;
+            $transaction->description = $fpx_sellerOrderNo;
+            $transaction->transac_no = NULL;
             // convert time to Y-m-d H:i:s format
             $date_time = date_create_from_format('YmdHis', $fpx_sellerTxnTime);
             $transaction->datetime_created = $date_time->format('Y-m-d H:i:s');
-            $transaction->amount        = $fpx_txnAmount;
-            $transaction->status        = 'Pending';
-            $transaction->email         = $fpx_buyerEmail;
-            $transaction->telno         = $telno;
-            $transaction->user_id       = $user ? $user->id : null;
-            $transaction->username      = strtoupper($fpx_buyerName);
+            $transaction->amount = $fpx_txnAmount;
+            $transaction->status = 'Pending';
+            $transaction->email = $fpx_buyerEmail;
+            $transaction->telno = $telno;
+            $transaction->user_id = $user ? $user->id : null;
+            $transaction->username = strtoupper($fpx_buyerName);
             //$transaction->fpx_checksum  = $fpx_checkSum;
             //$transaction->buyerBankId      = $request->bankid;
 
-            $list_student_fees_id   = $getstudentfees;
-            $list_parent_fees_id    = $getparentfees;
+            $list_student_fees_id = $getstudentfees;
+            $list_parent_fees_id = $getparentfees;
 
             $id = explode("_", $fpx_sellerOrderNo);
             $id = (int) str_replace("PRIM", "", $id[0]);
@@ -949,7 +949,7 @@ class DirectPayController extends Controller
                     //     }
 
                 } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'K') {
-                    $daySelect = (int)$request->week_status;
+                    $daySelect = (int) $request->week_status;
                     if ($daySelect == -1) {
                         $pickUp = Carbon::create(1, 1, 1)->toDateString(); //mindate
                     } else {
@@ -989,7 +989,7 @@ class DirectPayController extends Controller
                     // $own_code_id = $own_code !=null ?$own_code->id:0;
                     if ($result['source'] != 'none') {
                         $entity = new stdClass();
-                        $entity->room_booking_id = (int)$bookingId;
+                        $entity->room_booking_id = (int) $bookingId;
                         $entity_json = json_encode($entity);
                         // dd($entity,$entity_json);
                         $this->insertPointHistory($referral_code->id, $transaction->id, 1, 1, 'Transaksi Book & Stay RM' . $transaction->amount, $entity_json);
@@ -1038,7 +1038,7 @@ class DirectPayController extends Controller
                     // $own_code_id = $own_code !=null ?$own_code->id:0;
 
                     if ($result['own_code'] != "") {
-                        $own_code =  DB::table('referral_code')
+                        $own_code = DB::table('referral_code')
                             ->where('code', $result['own_code'])
                             ->first();
                         $this->insertPointHistory($own_code->id, $transaction->id, 0, 1, 'Transaksi Derma daripada sendiri');
@@ -1064,14 +1064,14 @@ class DirectPayController extends Controller
 
             //dd($pos,$fpx_sellerOrderNo);
             $data = [
-                'fpx_buyerEmail'      => $fpx_buyerEmail,
-                'fpx_buyerName'       => $fpx_buyerName,
-                'private_key'         => $private_key,
-                'fpx_txnAmount'       => $fpx_txnAmount,
+                'fpx_buyerEmail' => $fpx_buyerEmail,
+                'fpx_buyerName' => $fpx_buyerName,
+                'private_key' => $private_key,
+                'fpx_txnAmount' => $fpx_txnAmount,
                 'fpx_sellerExOrderNo' => $fpx_sellerOrderNo,
-                'fpx_sellerOrderNo'   =>  $fpx_sellerExOrderNo,
-                'getstudentfees'      => $getstudentfees,
-                'getparentfees'       => $getparentfees,
+                'fpx_sellerOrderNo' => $fpx_sellerExOrderNo,
+                'getstudentfees' => $getstudentfees,
+                'getparentfees' => $getparentfees,
             ];
 
 
@@ -1128,14 +1128,14 @@ class DirectPayController extends Controller
         // Mapping $data to the API's expected keys
         $payloadObj = [
             'SellerOrderNo' => $data['fpx_sellerOrderNo'],
-            'Amount'        => number_format((float)$data['fpx_txnAmount'], 2, '.', ''),
-            'BuyerEmail'    => $data['fpx_buyerEmail'],
-            'BuyerName'     => $data['fpx_buyerName'],
+            'Amount' => number_format((float) $data['fpx_txnAmount'], 2, '.', ''),
+            'BuyerEmail' => $data['fpx_buyerEmail'],
+            'BuyerName' => $data['fpx_buyerName'],
             // Use provided merchant ID or fallback to config/TEST001
-            'MerchantId'    => $data['merchant_id'] ?? 'TEST001',
+            'MerchantId' => $data['merchant_id'] ?? 'TEST001',
             //'CallBackUrl'   => '{default}', // Update this
-            'TimeStamp'     => Carbon::now()->toIso8601String(),
-            'RequestId'     => Str::random(12),
+            'TimeStamp' => Carbon::now()->toIso8601String(),
+            'RequestId' => Str::random(12),
         ];
 
         $payloadObj['MerchantId'] = 'TEST001';
@@ -1169,14 +1169,14 @@ class DirectPayController extends Controller
         // 5. Send Request
         $response = Http::withHeaders([
             'X-MerchantId' => $payloadObj['MerchantId'],
-            'X-Signature'  => $signatureBase64,
+            'X-Signature' => $signatureBase64,
             'Content-Type' => 'application/json',
         ])
             ->withBody($requestBody, 'application/json')
             ->post(env('DIRECTPAY_GETPAYMENT_URL'));
         // ->post('https://sit.directpay.my/api/v1/Pay/GetPaymentUrl');
 
-        $res =  $response->json();
+        $res = $response->json();
 
         // 5. Handle Response or Throw Exception
         if (isset($res['status']) && $res['status'] === true) {
@@ -1267,7 +1267,7 @@ class DirectPayController extends Controller
                         ->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Success', 'amount' => $request->TransactionAmount, 'description' => $request->Fpx_SellerExOrderNo]);
 
                     $request->fpx_debitAuthCode == "00" ? $status = "Success" : $status = "Failed/Pending";
-                    \Log::channel('PRIM_transaction')->info("Transaction Callback : " .  $request->Fpx_SellerExOrderNo . " , " . $status);
+                    \Log::channel('PRIM_transaction')->info("Transaction Callback : " . $request->Fpx_SellerExOrderNo . " , " . $status);
 
                     // $donation = $this->donation->getDonationByTransactionName($request->fpx_sellerExOrderNo);
                     // $organization = $this->organization->getOrganizationByDonationId($donation->id);
@@ -1423,7 +1423,7 @@ class DirectPayController extends Controller
             ->get();
 
         // get transaction for fees category A
-        $getfees_categoryA  = DB::table('fees_new')
+        $getfees_categoryA = DB::table('fees_new')
             ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
             ->select('fees_new.*')
@@ -1567,7 +1567,7 @@ class DirectPayController extends Controller
         }
 
         // get transaction for fees category A
-        $getfees_categoryA  = DB::table('fees_new')
+        $getfees_categoryA = DB::table('fees_new')
             ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
             ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
             ->select('fees_new.*')
@@ -1817,7 +1817,7 @@ class DirectPayController extends Controller
         }
 
         $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-        $fpx_productDescCode = substr($fpx_productDesc, 0, 1);
+        $fpx_productDescCode = substr(ltrim($fpx_productDesc, "PRIM_"), 0, 1);
         switch ($fpx_productDescCode) {
             case 'S':
                 $list_student_fees_id_by_student = DB::table('student_fees_new')
@@ -1828,7 +1828,7 @@ class DirectPayController extends Controller
                     ->get()
                     ->groupBy('class_student_id');
 
-                $list_parent_fees_id  = DB::table('fees_new')
+                $list_parent_fees_id = DB::table('fees_new')
                     ->join('fees_new_organization_user', 'fees_new_organization_user.fees_new_id', '=', 'fees_new.id')
                     ->join('organization_user', 'organization_user.id', '=', 'fees_new_organization_user.organization_user_id')
                     ->select('fees_new_organization_user.*')
@@ -1844,7 +1844,7 @@ class DirectPayController extends Controller
                     for ($i = 0; $i < count($list_student_fees_id); $i++) {
 
                         // ************************* update student fees status fees by transactions *************************
-                        $res  = DB::table('student_fees_new')
+                        $res = DB::table('student_fees_new')
                             ->where('id', $list_student_fees_id[$i]->student_fees_id)
                             ->update(['status' => 'Paid']);
 
@@ -2287,7 +2287,9 @@ class DirectPayController extends Controller
             return view('errors.500');
     }
 
-    public function updateDonationStreak() {}
+    public function updateDonationStreak()
+    {
+    }
 
     public function handle()
     {
