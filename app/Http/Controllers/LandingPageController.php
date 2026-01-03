@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use App\Models\Donation;
 use App\Models\Feedback;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
@@ -257,90 +258,108 @@ class LandingPageController extends AppBaseController
         $currentYear = date('Y');
         $lastYear = date('Y', strtotime('-1 year'));
 
-        $organization2 = DB::table('organizations as o')
-            ->join('fees_new as fn', 'fn.organization_id', '=', 'o.id')
-            ->leftJoin('organization_url as url', 'url.organization_id', '=', 'o.id')
-            ->whereIn('o.type_org', [1, 2, 3, 14])
-            ->whereNull('o.deleted_at')
-            ->where('o.id', '<>', 161)
-            ->whereIn(DB::raw('YEAR(fn.start_date)'), [$currentYear, $lastYear])
-            ->distinct()
-            ->select('o.nama', 'o.id', 'url.url_name as url_name', 'o.state', 'o.postcode', 'o.district', 'o.city', 'o.organization_picture') // You might want to select specific columns
-            ->get();
-        $totalFee = $totalFeeThisYear = 0;
+        // cache key to get the cache data or to store cache data
+        $cacheKey = "LandingPageController_transactions";
 
-        foreach ($organization2 as $o) {
+        // store cache results if cache key does not exist or get cache data if cache key exists
+        $cacheResults = Cache::remember($cacheKey, now()->addHours(1), function () use ($currentYear, $lastYear) {
 
-            if (stripos($o->nama, 'MAKTAB MAHMUD') !== false) {
-                $o->url_name = 'lmm';
-            }
-
-            // Find all distinct years for this organization
-            $years = DB::table('fees_new')
-                ->where('organization_id', $o->id)
-                ->whereIn(DB::raw('YEAR(start_date)'), [$currentYear, $lastYear])
-                ->whereIn(DB::raw('YEAR(end_date)'), [$currentYear, $lastYear])
-                ->selectRaw('DISTINCT YEAR(start_date) as start_year, YEAR(end_date) as end_year')
+            $organization2 = DB::table('organizations as o')
+                ->join('fees_new as fn', 'fn.organization_id', '=', 'o.id')
+                ->leftJoin('organization_url as url', 'url.organization_id', '=', 'o.id')
+                ->whereIn('o.type_org', [1, 2, 3, 14])
+                ->whereNull('o.deleted_at')
+                ->where('o.id', '<>', 161)
+                ->whereIn(DB::raw('YEAR(fn.start_date)'), [$currentYear, $lastYear])
+                ->distinct()
+                ->select('o.nama', 'o.id', 'url.url_name as url_name', 'o.state', 'o.postcode', 'o.district', 'o.city', 'o.organization_picture') // You might want to select specific columns
                 ->get();
 
-            $o->data = []; // Initialize as array
+            $totalFee = $totalFeeThisYear = 0;
 
-            foreach ($years as $year) {
-                $startYear = $year->start_year;
-                $endYear = $year->end_year;
+            $allTranA = DB::table('transactions as t')
+                ->leftJoin('fees_new_organization_user as fou', 't.id', '=', 'fou.transaction_id')
+                ->leftJoin('fees_new as fn', 'fn.id', '=', 'fou.fees_new_id')
+                ->where('t.status', 'Success')
+                ->select('t.id', 't.amount', 't.datetime_created', 'fn.organization_id')
+                ->distinct('t.id')
+                ->get();
 
-                $tranA = DB::table('transactions as t')
-                    ->leftJoin('fees_new_organization_user as fou', 't.id', '=', 'fou.transaction_id')
-                    ->leftJoin('fees_new as fn', 'fn.id', '=', 'fou.fees_new_id')
-                    ->where('t.status', 'Success')
-                    ->where('fn.organization_id', $o->id)
-                    ->whereYear('fn.start_date', $startYear)
-                    ->whereYear('fn.end_date', $endYear)
-                    ->whereYear("t.datetime_created", $endYear)
-                    ->select('t.id', 't.amount')
-                    ->distinct('t.id')
-                    ->get();
+            $allTranBC = DB::table('transactions as t')
+                ->leftJoin('fees_transactions_new as ftn', 't.id', '=', 'ftn.transactions_id')
+                ->leftJoin('student_fees_new as sfn', 'sfn.id', '=', 'ftn.student_fees_id')
+                ->leftJoin('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
+                ->where('t.status', 'Success')
+                ->select('t.id', 't.amount', 't.datetime_created', 'fn.organization_id')
+                ->distinct('t.id')
+                ->get();
 
+            foreach ($organization2 as $o) {
 
+                $year = $currentYear;
 
-                $tranBC = DB::table('transactions as t')
-                    ->leftJoin('fees_transactions_new as ftn', 't.id', '=', 'ftn.transactions_id')
-                    ->leftJoin('student_fees_new as sfn', 'sfn.id', '=', 'ftn.student_fees_id')
-                    ->leftJoin('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
-                    ->where('fn.organization_id', $o->id)
-                    ->where('t.status', 'Success')
-                    ->whereYear('fn.start_date', $startYear)
-                    ->whereYear('fn.end_date', $endYear)
-                    ->whereYear("t.datetime_created", $endYear)
-                    ->select('t.id', 't.amount')
-                    ->distinct('t.id')
-                    ->get();
-
-                // Combine the two sets
-                $combined = $tranA->concat($tranBC);
-                $unique = $combined->unique('id');
-                $amount = $unique->sum('amount');
-                // Create JSON-like object for year and count
-                $o->data[] = [
-                    'year' => $currentYear == $endYear ? $endYear : $startYear,
-                    'tcount' => $unique->count(),
-                    'tamount' => $amount,
-                ];
-
-                //Add to total amount of fee paid
-                $totalFee += $amount;
-                //Check whether need to add to the total fee paid in this year
-                if ($startYear === now()->year || $endYear === now()->year) {
-                    $totalFeeThisYear += $amount;
+                if (stripos($o->nama, 'MAKTAB MAHMUD') !== false) {
+                    $o->url_name = 'lmm';
                 }
 
+                $o->data = []; // Initialize as array
+
+                $tranAByOrg = $allTranA->where("organization_id", $o->id);
+                $tranBCByOrg = $allTranBC->where("organization_id", $o->id);
+
+                // loop two times for two years (current year and previous year)
+                for ($i = 0; $i < 2; $i++) {
+
+                    for ($j = 0; $j < 3; $j++) {
+
+                        $tranA = $tranAByOrg->whereBetween("datetime_created", ["$year-01-01", "$year-12-31"]);
+                        $tranBC = $tranBCByOrg->whereBetween("datetime_created", ["$year-01-01", "$year-12-31"]);
+
+                        // Combine the two sets
+                        $combined = $tranA->concat($tranBC);
+                        $unique = $combined->unique('id');
+                        $amount = $unique->sum('amount');
+
+                        if ($tranA->count() > 0 || $tranBC->count() > 0 || count($o->data) > 0) {
+                            break;
+                        }
+
+                        $year--;
+                    }
+
+                    // Create JSON-like object for year and count
+                    $o->data[] = [
+                        'year' => $year,
+                        'tcount' => $unique->count(),
+                        'tamount' => $amount,
+                    ];
+
+                    //Add to total amount of fee paid
+                    $totalFee += $amount;
+                    //Check whether need to add to the total fee paid in this year
+                    if ($year === now()->year) {
+                        $totalFeeThisYear += $amount;
+                    }
+
+                    $year--;
+                }
+
+                $o->transaction_sum = collect($o->data)->sum('tcount');
             }
-            $o->transaction_sum = collect($o->data)->sum('tcount');
 
+            return [
+                "organization2" => $organization2,
+                "totalFee" => $totalFee,
+                "totalFeeThisYear" => $totalFeeThisYear
+            ];
+        });
 
-        }
+        // assign cache results to respective variables
+        $organization2 = $cacheResults["organization2"];
+        $totalFee = $cacheResults["totalFee"];
+        $totalFeeThisYear = $cacheResults["totalFeeThisYear"];
+
         // Assumed you have calculated the below somewhere earlier, or you need to prepare them too
-
         $organization2 = $organization2
             ->sortByDesc(function ($org) {
                 return !is_null($org->url_name);
@@ -349,8 +368,6 @@ class LandingPageController extends AppBaseController
             ->values();
 
         $organizationCount = $organization2->count();
-
-        //dd(['organization2'=> $organization2, 'organizationCount' => $organizationCount ]);
 
         return view('landing-page.fees.index', ['organization2' => $organization2, 'organizationCount' => $organizationCount, 'organizationStudentCounts' => $organizationStudentCounts, 'organizationDonations' => $organizationDonations, 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
     }
