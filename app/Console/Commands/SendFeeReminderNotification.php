@@ -125,9 +125,12 @@ class SendFeeReminderNotification extends Command
 
             $success = FcmHelper::sendToUser($user->user_id, $title, trim($body), [
                 'type' => 'fee_reminder',
+                'user_id' => (string)$user->user_id,
                 'due_count' => (string)$fees->count(),
                 'days_until_due' => (string)$days,
             ]);
+
+            $this->info("Sent to {$user->name} (ID: {$user->user_id})");
         }
     }
 }

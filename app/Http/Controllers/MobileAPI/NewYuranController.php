@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Artisan;
 
 
 class NewYuranController extends Controller
@@ -717,13 +718,13 @@ class NewYuranController extends Controller
         }
     }
 
+
     public function updateProfile(Request $request)
     {
         try {
             $userId = $request->input('auth_user_id');
 
             $currentUser = DB::table('users')->where('id', $userId)->first();
-            $hasChanges = false;
 
             if (!$currentUser) {
                 return response()->json(['success' => false, 'message' => 'Pengguna tidak dijumpai.'], 404);
@@ -749,25 +750,32 @@ class NewYuranController extends Controller
                 ], 422);
             }
 
-            $newData = array_filter([
-                'name' => $request->input('name'),
-                'username' => $request->input('username'),
-                'icno' => $request->input('icno'),
-                'telno' => $request->input('telno'),
-                'address' => $request->input('address'),
-                'postcode' => $request->input('postcode'),
-                'state' => $request->input('state'),
-            ], fn($value) => $value !== null && $value !== '');
+            $newData = [];
+            $hasChanges = false;
 
-            if ($request->has('email')) {
-                $emailInput = trim($request->input('email'));
-                if ($emailInput === '') {
-                    $newData['email'] = null;
-                } else {
-                    $newData['email'] = $emailInput;
+            $standardFields = ['username', 'address', 'postcode', 'state'];
+            foreach ($standardFields as $field) {
+                if ($request->has($field)) {
+                    $newData[$field] = $request->input($field);
                 }
             }
 
+            $protectedFields = ['email', 'name', 'icno', 'telno'];
+
+            foreach ($protectedFields as $field) {
+                if ($request->has($field)) {
+                    $inputValue = trim($request->input($field));
+
+                    if ($inputValue !== '') {
+                        $newData[$field] = $inputValue;
+                    } else {
+                        if (!empty($currentUser->$field)) {
+                        } else {
+                            $newData[$field] = null;
+                        }
+                    }
+                }
+            }
 
             if ($request->input('remove_image') === 'true') {
                 if ($currentUser->profile_image) {
@@ -795,14 +803,14 @@ class NewYuranController extends Controller
                 $hasChanges = true;
             }
 
-            $fieldsToCompare = ['name', 'email', 'username', 'icno', 'telno', 'address', 'postcode', 'state'];
+            foreach ($newData as $key => $newValue) {
+                $currentValue = $currentUser->$key ?? null;
 
-            foreach ($fieldsToCompare as $field) {
-                $currentValue = $currentUser->$field ?? '';
-                $newValue = $newData[$field] ?? '';
-                if (array_key_exists($field, $newData) && $currentValue != $newValue) {
+                $strCurrent = (string)$currentValue;
+                $strNew = (string)$newValue;
+
+                if ($strCurrent !== $strNew) {
                     $hasChanges = true;
-                    break;
                 }
             }
 
@@ -815,37 +823,27 @@ class NewYuranController extends Controller
 
             $newData['updated_at'] = now();
 
-            $updated = DB::table('users')->where('id', $userId)->update($newData);
+            DB::table('users')->where('id', $userId)->update($newData);
 
-            if ($updated || $hasChanges) {
-                $updatedUser = DB::table('users')->where('id', $userId)->first();
+            $updatedUser = DB::table('users')->where('id', $userId)->first();
+            $profileImageUrl = $updatedUser->profile_image ? asset($updatedUser->profile_image) : null;
 
-                $profileImageUrl = $updatedUser->profile_image
-                    ? asset($updatedUser->profile_image)
-                    : null;
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Profil berjaya dikemaskini.',
-                    'data' => [
-                        'id' => $updatedUser->id,
-                        'name' => $updatedUser->name,
-                        'email' => $updatedUser->email,
-                        'username' => $updatedUser->username,
-                        'icno' => $updatedUser->icno,
-                        'telno' => $updatedUser->telno,
-                        'address' => $updatedUser->address,
-                        'postcode' => $updatedUser->postcode,
-                        'state' => $updatedUser->state,
-                        'profile_image' => $profileImageUrl,
-                    ]
-                ]);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kemas kini gagal.'
-                ], 500);
-            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Profil berjaya dikemaskini.',
+                'data' => [
+                    'id' => $updatedUser->id,
+                    'name' => $updatedUser->name,
+                    'email' => $updatedUser->email,
+                    'username' => $updatedUser->username,
+                    'icno' => $updatedUser->icno,
+                    'telno' => $updatedUser->telno,
+                    'address' => $updatedUser->address,
+                    'postcode' => $updatedUser->postcode,
+                    'state' => $updatedUser->state,
+                    'profile_image' => $profileImageUrl,
+                ]
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -1290,6 +1288,7 @@ class NewYuranController extends Controller
         $categoryAFees = DB::table('fees_new as fn')
             ->join('fees_new_organization_user as fno', 'fno.fees_new_id', '=', 'fn.id')
             ->join('organization_user as ou', 'ou.id', '=', 'fno.organization_user_id')
+            ->join('organizations as o', 'fn.organization_id', '=', 'o.id')
             ->select(
                 'fn.id',
                 'fn.name',
@@ -1300,6 +1299,7 @@ class NewYuranController extends Controller
                 'fn.totalamount',
                 'fn.status',
                 'fn.organization_id',
+                'o.nama as organization_name',
                 'fno.status as fno_status',
                 'fno.transaction_id',
                 'ou.organization_id as ou_org_id',
@@ -1316,6 +1316,7 @@ class NewYuranController extends Controller
         $categoryBCFees = DB::table('fees_new as fn')
             ->join('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
             ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+            ->join('organizations as o', 'fn.organization_id', '=', 'o.id')
             ->select(
                 'fn.id',
                 'fn.name',
@@ -1326,6 +1327,7 @@ class NewYuranController extends Controller
                 'fn.totalamount',
                 'fn.status',
                 'fn.organization_id',
+                'o.nama as organization_name',
                 'sfn.id as student_fees_new_id',
                 'sfn.status as sfn_status',
                 'cs.student_id',
@@ -1976,6 +1978,8 @@ class NewYuranController extends Controller
                 return response()->json(['success' => false, 'message' => 'User ID is required'], 400);
             }
 
+            \Carbon\Carbon::setLocale('ms');
+
             $classIds = DB::table('organization_user_student as ous')
                 ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
                 ->join('class_student as cs', 'cs.student_id', '=', 'ous.student_id')
@@ -2091,6 +2095,12 @@ class NewYuranController extends Controller
     public function getPostComments(Request $request)
     {
         $postId = $request->input('post_id');
+
+        if (!$postId) {
+            return response()->json(['success' => false, 'message' => 'Post ID is required'], 400);
+        }
+
+        \Carbon\Carbon::setLocale('ms');
 
         $comments = DB::table('post_comments as c')
             ->join('users as u', 'u.id', '=', 'c.user_id')
@@ -2270,5 +2280,47 @@ class NewYuranController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Maklumat tidak tepat.']);
+    }
+
+    public function getPostLikesUser(Request $request)
+    {
+        try {
+            $postId = $request->input('post_id');
+
+            $likes = DB::table('post_likes')
+                ->join('users', 'post_likes.user_id', '=', 'users.id')
+                ->where('post_likes.post_id', $postId)
+                ->select('users.name', 'users.profile_image')
+                ->orderBy('post_likes.created_at', 'desc')
+                ->get();
+
+            $formattedLikes = $likes->map(function ($user) {
+                return [
+                    'name' => $user->name,
+                    'profile_image' => $user->profile_image ? asset($user->profile_image) : null,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => $formattedLikes
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    // admin test FCM cron notification
+    public function testfcm()
+    {
+        $exitCode = Artisan::call('notification:send-fee-reminder');
+
+        $output = Artisan::output();
+
+        return response()->json([
+            'message' => 'Command executed',
+            'exitCode' => $exitCode,
+            'output' => $output
+        ]);
     }
 }
