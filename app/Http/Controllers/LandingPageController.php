@@ -337,7 +337,7 @@ class LandingPageController extends AppBaseController
                     //Add to total amount of fee paid
                     $totalFee += $amount;
                     //Check whether need to add to the total fee paid in this year
-                    if ($year === now()->year) {
+                    if ($year == now()->year) {
                         $totalFeeThisYear += $amount;
                     }
 
