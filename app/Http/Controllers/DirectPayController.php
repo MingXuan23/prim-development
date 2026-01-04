@@ -1288,7 +1288,8 @@ class DirectPayController extends Controller
     // callback for FPX
     public function directpayReceipt(Request $request)
     {
-        $case = explode("_", $request->Fpx_SellerOrderNo);
+        //$case = explode("_", $request->Fpx_SellerOrderNo);
+        $case = $request->Fpx_SellerOrderNo;
         //return response()->json(['request'=>'success']);
         if ($request->Fpx_DebitAuthCode == '00') {
             // dd($case[0]);
@@ -1304,11 +1305,11 @@ class DirectPayController extends Controller
                 );
 
 
-            return $this->updateTransaction($case[0], $request->Fpx_SellerOrderNo, true);
+            return $this->updateTransaction($case, $request->Fpx_SellerOrderNo, true);
         } else {
 
             Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->update(['transac_no' => $request->Fpx_FpxTxnId, 'status' => 'Failed']);
-            $this->failTransactionAction($case[0], $request->Fpx_SellerOrderNo);
+            $this->failTransactionAction($case, $request->Fpx_SellerOrderNo);
             $user = Transaction::where('nama', '=', $request->Fpx_SellerOrderNo)->first();
             //gitdd($user,$request->Fpx_SellerOrderNo);
             //for mobile handle payment failed
@@ -1633,7 +1634,7 @@ class DirectPayController extends Controller
                     continue;
                 }
 
-                $fpx_productDesc = explode("_", $transaction->nama)[0];
+                $fpx_productDesc =$transaction->nama;
 
                 if ($response_value['fpx_DebitAuthCode'] == '00') {
 
@@ -1661,6 +1662,7 @@ class DirectPayController extends Controller
         \Log::info("Update Transaction Command Run Successfully!");
     }
 
+    //for old directpay
     public function getTransactionInfo($transaction_id)
     {
 
@@ -1764,8 +1766,9 @@ class DirectPayController extends Controller
             return;
         }
 
-        switch ($fpx_productDesc) {
-            case 'Request':
+        $fpx_productDescCode = substr(ltrim($fpx_productDesc,"PRIM_") , 0, 1);
+        switch ($fpx_productDescCode) {
+            case 'R':
                 $update = DB::table('code_requests')->where('transaction_id', $transaction->id)->update([
                     'status' => 'Payment Failed',
 
@@ -1817,7 +1820,7 @@ class DirectPayController extends Controller
         }
 
         $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-        $fpx_productDescCode = substr($fpx_productDesc, 0, 1);
+        $fpx_productDescCode = substr(ltrim($fpx_productDesc,"PRIM_") , 0, 1);
         switch ($fpx_productDescCode) {
             case 'S':
                 $list_student_fees_id_by_student = DB::table('student_fees_new')
@@ -2334,7 +2337,7 @@ class DirectPayController extends Controller
                 }
 
                 if ($response_value['fpx_DebitAuthCode'] == '00') {
-                    $fpx_productDesc = explode("_", $transaction->nama)[0];
+                    $fpx_productDesc = $transaction->nama;
 
                     Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
                         [
