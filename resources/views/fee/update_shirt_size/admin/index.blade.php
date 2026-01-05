@@ -46,12 +46,17 @@
 
                     <div class="form-group">
                         <label>Organisasi</label>
-                        <select name="organization" id="organization" class="form-control">
-                            <option value="" disabled selected>Pilih Organisasi</option>
+                        <select name="organization" id="organization" class="form-control" disabled>
+                            <!-- <option value="" disabled>Pilih Organisasi</option> -->
                             @foreach($organizations as $row)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
                             @endforeach
                         </select>
+                    </div>
+
+                    <div>
+                        <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#exportModal"
+                            id="exportModalBtn"> <i class="fas fa-plus"></i> Export</a>
                     </div>
 
                 </div>
@@ -66,14 +71,47 @@
                                         <th>No</th>
                                         <th>Nama Yuran</th>
                                         <th>Kuantiti</th>
-                                        <th>Harga</th>
-                                        <th>Jumlah</th>
+                                        <th>Harga (RM)</th>
+                                        <th>Jumlah (RM)</th>
                                         <th>Nama Penjaga</th>
                                         <th>Nama Pelajar</th>
                                         <th>Saiz Baju</th>
                                     </tr>
                                 </thead>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Export Pengemaskinian Saiz Baju</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            
+                            <form action="{{ route('fees.updateShirtSize.admin.exportFormResponses') }}" method="post">
+                                <div class="modal-body">
+                                    {{ csrf_field() }}
+                                    <div class="form-group" id="organization">
+                                        <label>Organisasi</label>
+                                        <select name="organExport" id="organExport" class="form-control" disabled>
+                                            <!-- <option value="" disabled selected>Pilih organisasi</option> -->
+                                            @foreach($organizations as $row)
+                                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -97,84 +135,85 @@
     <script>
         $(document).ready(function () {
 
-            $('#organization').change(function () {
-                if ($(this).val() != '') {
-                    var yuranTable = $('#yuranTable');
 
-                    // remove the initial data when the classes selection is being reselected
-                    yuranTable.DataTable().clear().destroy();
+            // $('#organization').change(function () {
+            // if ($(this).val() != '') {
+            var yuranTable = $('#yuranTable');
 
-                    // add data to the yuran table to display all students with respective exportAllYuranStatus
-                    yuranTable = yuranTable.DataTable({
-                        ordering: true,
-                        processing: true,
-                        serverSide: true,
-                        ajax: {
-                            url: "{{ route('fees.updateShirtSize.admin.getShirtSizeResponsesDatatable') }}",
-                            method: "GET"
+            // remove the initial data when the classes selection is being reselected
+            yuranTable.DataTable().clear().destroy();
+
+            // add data to the yuran table to display all students with respective exportAllYuranStatus
+            yuranTable = yuranTable.DataTable({
+                ordering: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('fees.updateShirtSize.admin.getShirtSizeResponsesDatatable') }}",
+                    method: "GET"
+                },
+                'columnDefs': [{
+                    "targets": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "className": "text-center",
+                    "width": "2%"
+                }],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [
+                    {
+                        "data": null,
+                        searchable: false,
+                        "sortable": false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
                         },
-                        'columnDefs': [{
-                            "targets": [0, 1, 2, 3, 4, 5, 6, 7],
-                            "className": "text-center",
-                            "width": "2%"
-                        }],
-                        order: [
-                            [1, 'asc']
-                        ],
-                        columns: [
-                            {
-                                "data": null,
-                                searchable: false,
-                                "sortable": false,
-                                render: function (data, type, row, meta) {
-                                    return meta.row + meta.settings._iDisplayStart + 1;
-                                },
-                                "width": "5%"
-                            },
-                            {
-                                data: "fee_name",
-                                name: "fee_name",
-                                "width": "20%"
-                            },
-                            {
-                                data: "quantity",
-                                name: "quantity",
-                                "width": "3%"
-                            },
-                            {
-                                data: "price",
-                                name: "price",
-                                "width": "3%"
-                            },
-                            {
-                                data: "total_amount",
-                                name: "total_amount",
-                                "width": "3%"
-                            },
-                            {
-                                data: "penjaga_name",
-                                name: "penjaga_name",
-                                "width": "20%"
-                            },
-                            {
-                                data: "student_name",
-                                name: "student_name",
-                                "width": "20%"
-                            },
-                            {
-                                data: "shirt_size",
-                                name: "shirt_size",
-                                "width": "3%"
-                            }
-                        ]
-                    })
-                }
-            });
+                        "width": "5%"
+                    },
+                    {
+                        data: "fee_name",
+                        name: "fee_name",
+                        "width": "20%"
+                    },
+                    {
+                        data: "quantity",
+                        name: "quantity",
+                        "width": "3%"
+                    },
+                    {
+                        data: "price",
+                        name: "price",
+                        "width": "3%"
+                    },
+                    {
+                        data: "total_amount",
+                        name: "total_amount",
+                        "width": "3%"
+                    },
+                    {
+                        data: "penjaga_name",
+                        name: "penjaga_name",
+                        "width": "20%"
+                    },
+                    {
+                        data: "student_name",
+                        name: "student_name",
+                        "width": "20%"
+                    },
+                    {
+                        data: "shirt_size",
+                        name: "shirt_size",
+                        "width": "3%"
+                    }
+                ]
+            })
+            // }
+            // });
 
-            $('#organization').on('change', function () {
-                // remove the initial data when the organization selection is being reselected
-                $('#yuranTable').DataTable().clear().destroy();
-            });
+            // $('#organization').on('change', function () {
+            //     // remove the initial data when the organization selection is being reselected
+            //     $('#yuranTable').DataTable().clear().destroy();
+            // });
 
             // csrf token for ajax
             $.ajaxSetup({

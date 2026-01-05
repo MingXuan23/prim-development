@@ -46,8 +46,8 @@
 
                     <div class="form-group">
                         <label>Organisasi</label>
-                        <select name="organization" id="organization" class="form-control">
-                            <option value="" disabled selected>Pilih Organisasi</option>
+                        <select name="organization" id="organization" class="form-control" disabled>
+                            <!-- <option value="" disabled selected>Pilih Organisasi</option> -->
                             @foreach($organizations as $row)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
                             @endforeach
@@ -66,8 +66,8 @@
                                         <th>No</th>
                                         <th>Nama Yuran</th>
                                         <th>Kuantiti</th>
-                                        <th>Harga</th>
-                                        <th>Jumlah</th>
+                                        <th>Harga (RM)</th>
+                                        <th>Jumlah (RM)</th>
                                         <th>Nama Pelajar</th>
                                         <th>Action</th>
                                     </tr>
@@ -96,28 +96,8 @@
     <script>
         $(document).ready(function () {
 
-            // function to fetch classes by organization
-            function fetch_classes(oid = '', classId = '') {
-                var _token = $('input[name="_token"]').val();
-                $.ajax({
-                    url: "{{ route('fees.fetchClassForCateYuran') }}",
-                    method: "POST",
-                    data: {
-                        oid: oid,
-                        _token: _token
-                    },
-                    success: function (result) {
-                        $(classId).empty();
-                        $(classId).append("<option value='' selected disabled>Pilih Kelas</option>");
-                        jQuery.each(result.success, function (key, value) {
-                            $(classId).append("<option value='" + value.cid + "'>" + value.cname + "</option>");
-                        });
-                    }
-                })
-            }
-
-            $('#organization').change(function () {
-                if ($(this).val() != '') {
+            // $('#organization').change(function () {
+                // if ($(this).val() != '') {
                     var yuranTable = $('#yuranTable');
 
                     // remove the initial data when the classes selection is being reselected
@@ -185,13 +165,13 @@
                             },
                         ]
                     })
-                }
-            });
+                // }
+            // });
 
-            $('#organization').on('change', function () {
-                // remove the initial data when the organization selection is being reselected
-                $('#yuranTable').DataTable().clear().destroy();
-            });
+            // $('#organization').on('change', function () {
+            //     // remove the initial data when the organization selection is being reselected
+            //     $('#yuranTable').DataTable().clear().destroy();
+            // });
 
             // csrf token for ajax
             $.ajaxSetup({

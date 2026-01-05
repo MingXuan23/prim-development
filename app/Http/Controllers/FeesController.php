@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\FormResponsesExport;
 use Carbon\Carbon;
 use App\Models\Fee;
 use App\Models\Fee_New;
@@ -234,12 +235,12 @@ class FeesController extends AppBaseController
         $studentId = $request->get("student_id");
         $shirtSize = null;
         $responseId = null;
-        $shirtSizeResponses = DB::table("shirt_size_responses")->get();
+        $formResponses = DB::table("form_responses")->get();
 
-        foreach ($shirtSizeResponses as $response) {
+        foreach ($formResponses as $response) {
             $data = json_decode($response->response);
 
-            if ($fee->id == $data->fees_id && $data->student_id == $studentId && $data->user_id == Auth::id()) {
+            if ($fee->id == $data->fees_id && $data->student_id == $studentId && $response->user_id == Auth::id()) {
                 $shirtSize = $data->shirt_size;
                 $responseId = $response->id;
                 break;
@@ -261,38 +262,58 @@ class FeesController extends AppBaseController
             return redirect('/home');
         }
 
+        $fee = DB::table("fees_new")
+            ->where("id", $request->get("fees_id"))
+            ->select("id", "name", "desc", "quantity", "price", "totalAmount")
+            ->first();
+
+        $penjagaName = DB::table("users")
+            ->where("id", Auth::id())
+            ->select("name")
+            ->first()
+            ->name;
+
+        $student = DB::table("students")
+            ->where("id", $request->get('student_id'))
+            ->select("id", "nama")
+            ->first();
+
+        $response = array(
+            "shirt_size" => $request->get("shirt_size"),
+            "fees_id" => $fee->id,
+            "fee_name" => $fee->name,
+            "desc" => $fee->desc,
+            "quantity" => $fee->quantity,
+            "price" => $fee->price,
+            "total_amount" => $fee->totalAmount,
+            "penjaga_name" => $penjagaName,
+            "student_id" => $student->id,
+            "student_name" => $student->nama
+        );
+
+        $jsonResponse = json_encode($response);
+
         $responseId = $request->get('response_id');
+
         if ($responseId == null) {
             // if user has not chosen shirt size before, create new response
-            $response = array(
-                "shirt_size" => $request->get("shirt_size"),
-                "fees_id" => $request->get("fees_id"),
-                "user_id" => Auth::id(),
-                "student_id" => $request->get('student_id')
-            );
-
-            $jsonResponse = json_encode($response);
-
-            DB::table("shirt_size_responses")
+            DB::table("form_responses")
                 ->insert([
-                    "response" => $jsonResponse
+                    "response" => $jsonResponse,
+                    "purpose" => "Choose shirt size",
+                    "user_id" => Auth::id(),
+                    "organization_id" => $request->get('organization')
                 ]);
         } else {
             // if user has already chose shirt size before, update their previous response
-            $response = array(
-                "shirt_size" => $request->get("shirt_size"),
-                "fees_id" => $request->get("fees_id"),
-                "user_id" => Auth::id(),
-                "student_id" => $request->get('student_id')
-            );
-
-            DB::table("shirt_size_responses")
+            DB::table("form_responses")
+                ->where("id", $responseId)
                 ->update([
-                    "response" => $response
+                    "response" => $jsonResponse
                 ]);
         }
 
-        return redirect()->route('fees.updateShirtSize.buyer.index')->with('success', 'Kemaskini baju anda telah disimpan.');
+        return redirect()->route('fees.updateShirtSize.buyer.index')->with('success', 'Pilihan saiz baju anda telah disimpan.');
     }
 
     // temporary method for frontend to get data about shirt yuran
@@ -333,8 +354,6 @@ class FeesController extends AppBaseController
                 ->get();
         }
 
-        $shirtSizeResponses = DB::table("shirt_size_responses")->get();
-
         $table = Datatables::of($feesPaid);
 
         $table->addColumn('action', function ($row) {
@@ -359,78 +378,43 @@ class FeesController extends AppBaseController
             return redirect('/home');
         }
 
-        $responses = DB::table("shirt_size_responses")->get();
+        $responses = DB::table("form_responses")->get();
 
         $table = Datatables::of($responses)
             ->addColumn('fee_name', function ($row) {
                 $response = json_decode($row->response);
 
-                $feeName = DB::table("fees_new")
-                    ->where("id", $response->fees_id)
-                    ->select("name")
-                    ->value('name');
-
-                return $feeName;
+                return $response->fee_name;
             })
             ->addColumn('desc', function ($row) {
                 $response = json_decode($row->response);
 
-                $desc = DB::table("fees_new")
-                    ->where("id", $response->fees_id)
-                    ->select("desc")
-                    ->value('desc');
-
-                return $desc;
+                return $response->desc;
             })
             ->addColumn('quantity', function ($row) {
                 $response = json_decode($row->response);
 
-                $feeQuantity = DB::table("fees_new")
-                    ->where("id", $response->fees_id)
-                    ->select("quantity")
-                    ->value('quantity');
-
-                return $feeQuantity;
+                return $response->quantity;
             })
             ->addColumn('price', function ($row) {
                 $response = json_decode($row->response);
 
-                $price = DB::table("fees_new")
-                    ->where("id", $response->fees_id)
-                    ->select("price")
-                    ->value('price');
-
-                return $price;
+                return $response->price;
             })
             ->addColumn('total_amount', function ($row) {
                 $response = json_decode($row->response);
 
-                $totalAmount = DB::table("fees_new")
-                    ->where("id", $response->fees_id)
-                    ->select("totalAmount")
-                    ->value('totalAmount');
-
-                return $totalAmount;
+                return $response->total_amount;
             })
             ->addColumn('penjaga_name', function ($row) {
                 $response = json_decode($row->response);
 
-                $penjagaName = DB::table("users")
-                    ->where("id", $response->user_id)
-                    ->select("name")
-                    ->value('name');
-
-                return $penjagaName;
+                return $response->penjaga_name;
             })
             ->addColumn('student_name', function ($row) {
                 $response = json_decode($row->response);
 
-                $studentName = DB::table("students")
-                    ->where("id", $response->student_id)
-                    ->select("nama")
-                    ->value('nama');
-
-                return $studentName;
+                return $response->student_name;
             })
             ->addColumn('shirt_size', function ($row) {
                 $response = json_decode($row->response);
@@ -439,6 +423,19 @@ class FeesController extends AppBaseController
             });
 
         return $table->make(true);
+    }
+
+    public function exportFormResponses()
+    {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Pentadbir') && !Auth::user()->hasRole('Guru')) {
+            return redirect('/home');
+        }
+
+        return Excel::download(new FormResponsesExport(), "SAIZ BAJU PIBG SMS MUZAFFAR SYAH.xlsx");
     }
 
     public function getOrganizationByUserId()
