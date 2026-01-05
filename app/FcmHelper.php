@@ -90,16 +90,13 @@ class FcmHelper
                 'android' => [
                     'priority' => 'high',
                     'ttl' => '86400s',
-                    'direct_book_at' => true,
+                    'direct_boot_ok' => true,
                     'notification' => [
-                        'channel_id' => 'fcm_default_channel', 
-                        'icon' => 'launcher_icon',             
+                        'channel_id' => 'fcm_default_channel',
                         'sound' => 'default',
                         'default_sound' => true,
                         'default_vibrate_timings' => true,
                         'default_light_settings' => true,
-                        'visibility' => 'PUBLIC',              
-                        'notification_priority' => 'PRIORITY_MAX'
                     ]
                 ]
             ]
