@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use App\Models\Donation;
 use App\Models\Feedback;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\DataTables;
 
@@ -43,11 +44,11 @@ class LandingPageController extends AppBaseController
         //dd($schools);
 
         $politeknik = DB::table('organization_url')
-        ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
-        ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
-        ->whereIn('type_organizations.id', [1, 2, 3])
-        ->where('organization_url.title', 'LIKE', '%Poli%')
-        ->get();
+            ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+            ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+            ->whereIn('type_organizations.id', [1, 2, 3])
+            ->where('organization_url.title', 'LIKE', '%Poli%')
+            ->get();
 
         //dd($politeknik);
 
@@ -66,10 +67,10 @@ class LandingPageController extends AppBaseController
             ->leftJoin('organization_url as url', 'url.organization_id', '=', 'o.id')
             ->whereIn('o.type_org', [1, 2, 3, 14])
             ->whereNull('o.deleted_at')
-            ->where('o.id','<>',161)
+            ->where('o.id', '<>', 161)
             ->whereIn(DB::raw('YEAR(fn.start_date)'), [$currentYear, $lastYear])
             ->distinct()
-            ->select('o.nama','o.id','url.url_name as url') // You might want to select specific columns
+            ->select('o.nama', 'o.id', 'url.url_name as url') // You might want to select specific columns
             ->get();
 
         foreach ($organization as $o) {
@@ -130,32 +131,32 @@ class LandingPageController extends AppBaseController
         // Assumed you have calculated the below somewhere earlier, or you need to prepare them too
 
         $organization = $organization
-        ->sortByDesc(function ($org) {
-            return !is_null($org->url);
-        })
-        ->sortByDesc('transaction_sum')
-        ->values();
+            ->sortByDesc(function ($org) {
+                return !is_null($org->url);
+            })
+            ->sortByDesc('transaction_sum')
+            ->values();
 
-   // dd($organization);
-       return response()->json($organization);
+        // dd($organization);
+        return response()->json($organization);
     }
 
 
-        // $schools = DB::table('organization_url')
-        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
-        //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
-        //     ->whereIn('type_organizations.id', [1, 2, 3])
-        //     ->where('organization_url.title', 'NOT LIKE', '%Poli%')
-        //     ->get();
+    // $schools = DB::table('organization_url')
+    //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+    //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+    //     ->whereIn('type_organizations.id', [1, 2, 3])
+    //     ->where('organization_url.title', 'NOT LIKE', '%Poli%')
+    //     ->get();
 
-        // //dd($schools);
+    // //dd($schools);
 
-        // $politeknik = DB::table('organization_url')
-        //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
-        //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
-        //     ->whereIn('type_organizations.id', [1, 2, 3])
-        //     ->where('organization_url.title', 'LIKE', '%Poli%')
-        //     ->get();
+    // $politeknik = DB::table('organization_url')
+    //     ->join('organizations', 'organization_url.organization_id', '=', 'organizations.id')
+    //     ->join('type_organizations', 'organizations.type_org', '=', 'type_organizations.id')
+    //     ->whereIn('type_organizations.id', [1, 2, 3])
+    //     ->where('organization_url.title', 'LIKE', '%Poli%')
+    //     ->get();
 
 
     public function indexFees()
@@ -163,16 +164,16 @@ class LandingPageController extends AppBaseController
         $organization = DB::table('organization_url as url')
             ->join('organizations as o', 'url.organization_id', '=', 'o.id')
 
-            ->where('url.status',1)
+            ->where('url.status', 1)
             ->whereNull("o.deleted_at")
             ->whereIn('o.type_org', [1, 2, 3])
             ->get();
-           //dd($organization);
+        //dd($organization);
 
         $organizationCount = $organization->count();
 
         //get the number of students in each of the school
-        $organizationStudentCounts =  DB::table('organization_url as url')
+        $organizationStudentCounts = DB::table('organization_url as url')
             ->join('organizations as o', 'url.organization_id', '=', 'o.id')
             ->whereIn('o.type_org', [1, 2, 3])
             ->whereNull("o.deleted_at")
@@ -186,7 +187,7 @@ class LandingPageController extends AppBaseController
         //get the maktab mahmud school student count
 
         //get the number of students in each of the school
-        $lmmStudentCounts =  DB::table('organizations as o')
+        $lmmStudentCounts = DB::table('organizations as o')
             ->whereRaw('LOWER(o.nama) LIKE ?', ['%maktab mahmud%'])
             ->orWhere('o.id', 137)//include MAAHAD TAHFIZ SAINS DARUL AMAN
             ->whereNull("o.deleted_at")
@@ -199,7 +200,7 @@ class LandingPageController extends AppBaseController
             ->groupBy('o.id')
             ->get();
 
-        $lmmOrganizations =  DB::table('organizations as o')
+        $lmmOrganizations = DB::table('organizations as o')
             ->whereRaw('LOWER(o.nama) LIKE ?', ['%maktab mahmud%'])
             ->orWhere('o.id', 137)//include MAAHAD TAHFIZ SAINS DARUL AMAN
             ->whereNull("o.deleted_at")
@@ -218,13 +219,13 @@ class LandingPageController extends AppBaseController
             ->whereNull("o.deleted_at")
             ->join("donation_organization as do", "o.id", "=", "do.organization_id")
             ->join("donations as d", "do.donation_id", "=", "d.id")
-            ->where("d.status", 1 )
+            ->where("d.status", 1)
             ->where("date_end", ">=", now())
             ->join(DB::raw("(SELECT organization_id, MAX(d2.date_created) as max_date
                     FROM donation_organization do2
                     JOIN donations d2 ON do2.donation_id = d2.id
                     WHERE d2.date_end >= NOW()
-                    GROUP BY organization_id) latest"), function($join) {
+                    GROUP BY organization_id) latest"), function ($join) {
                 $join->on('do.organization_id', '=', 'latest.organization_id')
                     ->on('d.date_created', '=', 'latest.max_date');
             })
@@ -240,7 +241,7 @@ class LandingPageController extends AppBaseController
 //            ->where("fu.status", "Paid")
 //            ->sum("fn.totalAmount");
 
-//        // Get the total number of fees for this year
+        //        // Get the total number of fees for this year
 //        $totalFeeThisYear = DB::table("fees_new as fn")
 //            ->join("fees_new_organization_user as fu", "fn.id" , "fu.fees_new_id")
 //            ->where("fu.status", "Paid")
@@ -249,7 +250,7 @@ class LandingPageController extends AppBaseController
 
         $organization = DB::table('organization_url as url')
             ->join('organizations as o', 'url.organization_id', '=', 'o.id')
-            ->where('url.status',1)
+            ->where('url.status', 1)
             ->whereNull("o.deleted_at")
             ->whereIn('o.type_org', [1, 2, 3])
             ->get();
@@ -257,95 +258,118 @@ class LandingPageController extends AppBaseController
         $currentYear = date('Y');
         $lastYear = date('Y', strtotime('-1 year'));
 
-        $organization2 = DB::table('organizations as o')
-            ->join('fees_new as fn', 'fn.organization_id', '=', 'o.id')
-            ->leftJoin('organization_url as url', 'url.organization_id', '=', 'o.id')
-            ->whereIn('o.type_org', [1, 2, 3, 14])
-            ->whereNull('o.deleted_at')
-            ->where('o.id','<>',161)
-            ->whereIn(DB::raw('YEAR(fn.start_date)'), [$currentYear, $lastYear])
-            ->distinct()
-            ->select('o.nama','o.id','url.url_name as url_name','o.state','o.postcode','o.district','o.city','o.organization_picture') // You might want to select specific columns
-            ->get();
-        $totalFee = $totalFeeThisYear =  0;
+        // cache key to get the cache data or to store cache data
+        $cacheKey = "LandingPageController_transactions";
 
+        // store cache results if cache key does not exist or get cache data if cache key exists
+        $cacheResults = Cache::remember($cacheKey, now()->addHours(1), function () use ($currentYear, $lastYear) {
 
-        foreach ($organization2 as $o) {
+            $organization2 = DB::table('organizations as o')
+                ->join('fees_new as fn', 'fn.organization_id', '=', 'o.id')
+                ->leftJoin('organization_url as url', 'url.organization_id', '=', 'o.id')
+                ->whereIn('o.type_org', [1, 2, 3, 14])
+                ->whereNull('o.deleted_at')
+                ->where('o.id', '<>', 161)
+                ->whereIn(DB::raw('YEAR(fn.start_date)'), [$currentYear, $lastYear])
+                ->distinct()
+                ->select('o.nama', 'o.id', 'url.url_name as url_name', 'o.state', 'o.postcode', 'o.district', 'o.city', 'o.organization_picture') // You might want to select specific columns
+                ->get();
 
-            if (stripos($o->nama, 'MAKTAB MAHMUD') !== false) {
-                $o->url_name = 'lmm';
-            }
+            $totalFee = $totalFeeThisYear = 0;
 
-            // Find all distinct years for this organization
-            $years = DB::table('fees_new')
-                ->where('organization_id', $o->id)
-                ->whereIn(DB::raw('YEAR(start_date)'), [$currentYear, $lastYear])
-                ->selectRaw('DISTINCT YEAR(start_date) as year')
-                ->pluck('year');
+            $allTranA = DB::table('transactions as t')
+                ->leftJoin('fees_new_organization_user as fou', 't.id', '=', 'fou.transaction_id')
+                ->leftJoin('fees_new as fn', 'fn.id', '=', 'fou.fees_new_id')
+                ->where('t.status', 'Success')
+                ->select('t.id', 't.amount', 't.datetime_created', 'fn.organization_id')
+                ->distinct('t.id')
+                ->get();
 
-            $o->data = []; // Initialize as array
+            $allTranBC = DB::table('transactions as t')
+                ->leftJoin('fees_transactions_new as ftn', 't.id', '=', 'ftn.transactions_id')
+                ->leftJoin('student_fees_new as sfn', 'sfn.id', '=', 'ftn.student_fees_id')
+                ->leftJoin('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
+                ->where('t.status', 'Success')
+                ->select('t.id', 't.amount', 't.datetime_created', 'fn.organization_id')
+                ->distinct('t.id')
+                ->get();
 
-            foreach ($years as $year) {
-                $tranA = DB::table('transactions as t')
-                    ->leftJoin('fees_new_organization_user as fou', 't.id', '=', 'fou.transaction_id')
-                    ->leftJoin('fees_new as fn', 'fn.id', '=', 'fou.fees_new_id')
-                    ->where('t.status', 'Success')
-                    ->where('fn.organization_id', $o->id)
-                    ->whereYear('fn.start_date', $year)
-                    ->select('t.id','t.amount')
-                    ->distinct('t.id')
-                    ->get();
+            foreach ($organization2 as $o) {
 
+                $year = $currentYear;
 
-
-                $tranBC = DB::table('transactions as t')
-                    ->leftJoin('fees_transactions_new as ftn', 't.id', '=', 'ftn.transactions_id')
-                    ->leftJoin('student_fees_new as sfn', 'sfn.id', '=', 'ftn.student_fees_id')
-                    ->leftJoin('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
-                    ->where('fn.organization_id', $o->id)
-                    ->where('t.status', 'Success')
-                    ->whereYear('fn.start_date', $year)
-                    ->select('t.id','t.amount')
-                    ->distinct('t.id')
-                    ->get();
-
-                // Combine the two sets
-                $combined = $tranA->concat($tranBC);
-                $unique = $combined->unique('id');
-                $amount =  $unique->sum('amount');
-                // Create JSON-like object for year and count
-                $o->data[] = [
-                    'year' => $year,
-                    'tcount' => $unique->count(),
-                    'tamount' => $amount,
-                ];
-
-                //Add to total amount of fee paid
-                $totalFee += $amount;
-                //Check whether need to add to the total fee paid in this year
-                if($year === now()->year){
-                    $totalFeeThisYear += $amount;
+                if (stripos($o->nama, 'MAKTAB MAHMUD') !== false) {
+                    $o->url_name = 'lmm';
                 }
 
+                $o->data = []; // Initialize as array
+
+                $tranAByOrg = $allTranA->where("organization_id", $o->id);
+                $tranBCByOrg = $allTranBC->where("organization_id", $o->id);
+
+                // loop two times for two years (current year and previous year)
+                for ($i = 0; $i < 2; $i++) {
+
+                    for ($j = 0; $j < 3; $j++) {
+
+                        $tranA = $tranAByOrg->whereBetween("datetime_created", ["$year-01-01", "$year-12-31"]);
+                        $tranBC = $tranBCByOrg->whereBetween("datetime_created", ["$year-01-01", "$year-12-31"]);
+
+                        // Combine the two sets
+                        $combined = $tranA->concat($tranBC);
+                        $unique = $combined->unique('id');
+                        $amount = $unique->sum('amount');
+
+                        if ($tranA->count() > 0 || $tranBC->count() > 0 || count($o->data) > 0) {
+                            break;
+                        }
+
+                        $year--;
+                    }
+
+                    // Create JSON-like object for year and count
+                    $o->data[] = [
+                        'year' => $year,
+                        'tcount' => $unique->count(),
+                        'tamount' => $amount,
+                    ];
+
+                    //Add to total amount of fee paid
+                    $totalFee += $amount;
+                    //Check whether need to add to the total fee paid in this year
+                    if ($year == now()->year) {
+                        $totalFeeThisYear += $amount;
+                    }
+
+                    $year--;
+                }
+
+                $o->transaction_sum = collect($o->data)->sum('tcount');
             }
-            $o->transaction_sum = collect($o->data)->sum('tcount');
 
+            return [
+                "organization2" => $organization2,
+                "totalFee" => $totalFee,
+                "totalFeeThisYear" => $totalFeeThisYear
+            ];
+        });
 
-        }
+        // assign cache results to respective variables
+        $organization2 = $cacheResults["organization2"];
+        $totalFee = $cacheResults["totalFee"];
+        $totalFeeThisYear = $cacheResults["totalFeeThisYear"];
+
         // Assumed you have calculated the below somewhere earlier, or you need to prepare them too
-
         $organization2 = $organization2
             ->sortByDesc(function ($org) {
                 return !is_null($org->url_name);
             })
             ->sortByDesc('transaction_sum')
             ->values();
-            
+
         $organizationCount = $organization2->count();
 
-        //dd(['organization2'=> $organization2, 'organizationCount' => $organizationCount ]);
-
-        return view('landing-page.fees.index', ['organization2'=> $organization2, 'organizationCount' => $organizationCount , 'organizationStudentCounts' => $organizationStudentCounts ,'organizationDonations' => $organizationDonations , 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
+        return view('landing-page.fees.index', ['organization2' => $organization2, 'organizationCount' => $organizationCount, 'organizationStudentCounts' => $organizationStudentCounts, 'organizationDonations' => $organizationDonations, 'studentCount' => $studentCount, 'totalFee' => $totalFee, 'totalFeeThisYear' => $totalFeeThisYear]);
     }
     //end edit by wan
 
@@ -353,17 +377,17 @@ class LandingPageController extends AppBaseController
     {
         // dd($request);
         $this->validate($request, [
-            'uname'         =>  'required',
-            'email'         =>  'required | email',
-            'message'       =>  'required',
-            'telno'         =>  'required',
+            'uname' => 'required',
+            'email' => 'required | email',
+            'message' => 'required',
+            'telno' => 'required',
         ]);
 
         $feedback = Feedback::create([
-            'name'      => $request->get('uname'),
-            'email'     => $request->get('email'),
-            'telno'     => $request->get('telno'),
-            'message'   => $request->get('message'),
+            'name' => $request->get('uname'),
+            'email' => $request->get('email'),
+            'telno' => $request->get('telno'),
+            'message' => $request->get('message'),
         ]);
 
         return redirect()->back()->with('alert', 'Terima kasih');
@@ -466,32 +490,32 @@ class LandingPageController extends AppBaseController
             ->count();
 
         $oneWeekBeforeToday = date_create(date('Y-m-d'));
-        date_sub($oneWeekBeforeToday,date_interval_create_from_date_string('7 days'));
-        $donors = Transaction::where('nama','LIKE' , 'Donation%')
-        ->where('status','Success')
-        ->where(function($query) use ($oneWeekBeforeToday){
-            $query->whereDate('datetime_created', '<=', date('Y-m-d'));
-            // ->where('datetime_created' , '>' , $oneWeekBeforeToday);
-
-        })
-        ->orderBy('datetime_created' ,'desc')
-        ->orderBy('amount' ,'desc')
-        ->take(20)
-        ->get();
+        date_sub($oneWeekBeforeToday, date_interval_create_from_date_string('7 days'));
+        $donors = Transaction::where('nama', 'LIKE', 'Donation%')
+            ->where('status', 'Success')
+            ->where(function ($query) use ($oneWeekBeforeToday) {
+                $query->whereDate('datetime_created', '<=', date('Y-m-d'));
+                // ->where('datetime_created' , '>' , $oneWeekBeforeToday);
+    
+            })
+            ->orderBy('datetime_created', 'desc')
+            ->orderBy('amount', 'desc')
+            ->take(20)
+            ->get();
 
         $leaders = DB::table('referral_code as rc')
-        ->join('referral_code_member as rcm', 'rc.id', '=', 'rcm.leader_referral_code_id')
-        ->join('users as u', 'u.id', '=', 'rc.user_id')
-        ->where('u.id','<>',17151)
-        ->groupBy('rc.id', 'u.name') // Also grouping by 'u.name'
-        ->select('u.name', DB::raw('COUNT(rcm.id) as member_count'))
-        ->orderBy('member_count','desc')
-        ->limit(15)
-        ->get();
+            ->join('referral_code_member as rcm', 'rc.id', '=', 'rcm.leader_referral_code_id')
+            ->join('users as u', 'u.id', '=', 'rc.user_id')
+            ->where('u.id', '<>', 17151)
+            ->groupBy('rc.id', 'u.name') // Also grouping by 'u.name'
+            ->select('u.name', DB::raw('COUNT(rcm.id) as member_count'))
+            ->orderBy('member_count', 'desc')
+            ->limit(15)
+            ->get();
 
 
         session()->forget('intendedUrl');//reset intended url for point system
-        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount' ,'donors','leaders'));
+        return view('landing-page.donation.index', compact('organization', 'transactions', 'donation', 'dailyGain', 'dailyTransactions', 'totalAmount', 'donors', 'leaders'));
     }
 
     public function organizationListDonation()
@@ -619,25 +643,25 @@ class LandingPageController extends AppBaseController
             foreach ($donations as $donation) {
                 // to get the total amount of donation for each donation posters
                 $amountDonation = DB::table('donation_transaction as dt')->
-                join('transactions as t', 't.id' , 'dt.transaction_id')
-                ->where([
-                    't.status' => 'Success',
-                    'dt.donation_id' => $donation->id,
-                ])
-                ->whereYear('t.datetime_created', $currentYear)
-                ->sum('t.amount');
+                    join('transactions as t', 't.id', 'dt.transaction_id')
+                    ->where([
+                        't.status' => 'Success',
+                        'dt.donation_id' => $donation->id,
+                    ])
+                    ->whereYear('t.datetime_created', $currentYear)
+                    ->sum('t.amount');
 
                 $previousDonation = DB::table('donation_transaction as dt')->
-                join('transactions as t', 't.id' , 'dt.transaction_id')
-                ->where([
-                    't.status' => 'Success',
-                    'dt.donation_id' => $donation->id,
-                ])
-                ->whereYear('t.datetime_created', $currentYear -1)
-                ->sum('t.amount');
+                    join('transactions as t', 't.id', 'dt.transaction_id')
+                    ->where([
+                        't.status' => 'Success',
+                        'dt.donation_id' => $donation->id,
+                    ])
+                    ->whereYear('t.datetime_created', $currentYear - 1)
+                    ->sum('t.amount');
 
-                $posters = $posters . '<div class="card"> <div class="donation-amount">Tahun '.$currentYear.':<b> RM'.number_format($amountDonation,2).'</b></div>';
-                $posters = $posters. '<div class="donation-amount">Tahun '.($currentYear -1).':<b> RM'.number_format($previousDonation,2).'</b></div><img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy">';
+                $posters = $posters . '<div class="card"> <div class="donation-amount">Tahun ' . $currentYear . ':<b> RM' . number_format($amountDonation, 2) . '</b></div>';
+                $posters = $posters . '<div class="donation-amount">Tahun ' . ($currentYear - 1) . ':<b> RM' . number_format($previousDonation, 2) . '</b></div><img class="card-img-top donation-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy">';
                 $posters = $posters . '<div class="card-body"><div class="d-flex flex-column justify-content-center ">';
                 $posters = $posters . '<a href="' . route('URLdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation">Derma Dengan Nama</a></div>';
                 $posters = $posters . '<div class="d-flex justify-content-center"><a href="' . route('ANONdonate', ['link' => $donation->url]) . ' " class="boxed-btn btn-rounded btn-donation2">Derma Tanpa Nama</a></div></div>
@@ -663,30 +687,30 @@ class LandingPageController extends AppBaseController
             ->limit(5)
             ->get();
 
-            $currentYear = date('Y');
+        $currentYear = date('Y');
 
         foreach ($donations as $donation) {
             $amountDonation = DB::table('donation_transaction as dt')->
-            join('transactions as t', 't.id' , 'dt.transaction_id')
-            ->where([
-                't.status' => 'Success',
-                'dt.donation_id' => $donation->id,
-            ])
-            ->whereYear('t.datetime_created', $currentYear)
-            ->sum('t.amount');
+                join('transactions as t', 't.id', 'dt.transaction_id')
+                ->where([
+                    't.status' => 'Success',
+                    'dt.donation_id' => $donation->id,
+                ])
+                ->whereYear('t.datetime_created', $currentYear)
+                ->sum('t.amount');
 
             $previousDonation = DB::table('donation_transaction as dt')->
-            join('transactions as t', 't.id' , 'dt.transaction_id')
-            ->where([
-                't.status' => 'Success',
-                'dt.donation_id' => $donation->id,
-            ])
-            ->whereYear('t.datetime_created', $currentYear -1)
-            ->sum('t.amount');
+                join('transactions as t', 't.id', 'dt.transaction_id')
+                ->where([
+                    't.status' => 'Success',
+                    'dt.donation_id' => $donation->id,
+                ])
+                ->whereYear('t.datetime_created', $currentYear - 1)
+                ->sum('t.amount');
 
-            $posters = $posters . '<div class="card"> <div class="donation-amount">Tahun '.$currentYear.':<b> RM'.number_format($amountDonation,2).'</b></div> ';
-            $posters = $posters .'<div class="donation-amount">Tahun '.($currentYear -1).':<b> RM'.number_format($previousDonation,2).'</b></div>';
-            $posters = $posters. '<a href="' . route('ANONdonate', ['link' => $donation->url]) . '">';
+            $posters = $posters . '<div class="card"> <div class="donation-amount">Tahun ' . $currentYear . ':<b> RM' . number_format($amountDonation, 2) . '</b></div> ';
+            $posters = $posters . '<div class="donation-amount">Tahun ' . ($currentYear - 1) . ':<b> RM' . number_format($previousDonation, 2) . '</b></div>';
+            $posters = $posters . '<a href="' . route('ANONdonate', ['link' => $donation->url]) . '">';
             $posters = $posters . '<img class="card-img-top header-poster" src="donation-poster/' . $donation->donation_poster . '" alt="Card image cap" loading="lazy"></a></div>';
         }
 
