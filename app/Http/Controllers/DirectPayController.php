@@ -73,13 +73,13 @@ class DirectPayController extends Controller
     public function directpayIndex(Request $request)
     {
 
-       $whitelistUsers = [17151, 5];
+       $whitelistUsers = [17151];
 
         // Ensure user is authenticated
         if (Auth::check() && in_array(Auth::id(), $whitelistUsers, true)) {
             return $this->newDirectpayIndex($request);
         }
-        
+
         try {
             $getstudentfees = ($request->student_fees_id) ? $request->student_fees_id : "";
             $getparentfees = ($request->parent_fees_id) ? $request->parent_fees_id : "";
