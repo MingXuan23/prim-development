@@ -84,13 +84,22 @@ class FcmHelper
                     'body' => $body
                 ],
                 'data' => array_merge([
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    'type' => 'fee_reminder',
                 ], $data),
                 'android' => [
                     'priority' => 'high',
+                    'ttl' => '86400s',
+                    'direct_book_at' => true,
                     'notification' => [
-                        'channel_id' => 'fcm_default_channel',
-                        'sound' => 'default'
+                        'channel_id' => 'fcm_default_channel', 
+                        'icon' => 'launcher_icon',             
+                        'sound' => 'default',
+                        'default_sound' => true,
+                        'default_vibrate_timings' => true,
+                        'default_light_settings' => true,
+                        'visibility' => 'PUBLIC',              
+                        'notification_priority' => 'PRIORITY_MAX'
                     ]
                 ]
             ]
