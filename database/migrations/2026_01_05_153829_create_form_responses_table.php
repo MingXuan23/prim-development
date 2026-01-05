@@ -17,8 +17,8 @@ class CreateFormResponsesTable extends Migration
             $table->id();
             $table->json('response');
             $table->string('purpose');
-            $table->foreignId("organization_id")->constrained("organizations", "id");
-            $table->foreignId("user_id")->constrained("users", "id");
+            $table->foreignId("organization_id")->nullable()->constrained("organizations", "id");
+            $table->foreignId("user_id")->nullable()->constrained("users", "id");
             $table->timestamps();
         });
     }
