@@ -466,12 +466,28 @@
                             </a>
                         </li>
 
+                        <li>
+                            <a href="{{ route('fees.updateShirtSize.buyer.index') }}" class=" waves-effect">
+                                <i class="fas fa-tshirt"></i>
+                                <span>Kemaskini Saiz Baju</span>
+                            </a>
+                        </li>
+
                         {{-- <li>
                             <a href="{{ route('parent.dependent') }}" class=" waves-effect">
                                 <i class="fas fa-child"></i>
                                 <span>Carian Tanggungan</span>
                             </a>
                         </li> --}}
+                        @endrole
+
+                        @role('Superadmin|Pentadbir|Guru')
+                        <li>
+                            <a href="{{ route('fees.updateShirtSize.admin.index') }}" class=" waves-effect">
+                                <i class="fas fa-tshirt"></i>
+                                <span>Saiz Baju Pembeli</span>
+                            </a>
+                        </li>
                         @endrole
 
                         @role('Superadmin|Pentadbir')

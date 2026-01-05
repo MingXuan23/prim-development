@@ -151,6 +151,296 @@ class FeesController extends AppBaseController
         }
     }
 
+    // temporary page for admins to look at their shirt bought
+    public function adminUpdateShirtSizeIndex()
+    {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Pentadbir') && !Auth::user()->hasRole('Guru')) {
+            return redirect('/home');
+        }
+
+        if (Auth::user()->hasRole('Superadmin')) {
+            $organizations = DB::table("organizations as o")
+                ->where("nama", "PIBG SMS Muzaffar Syah")
+                ->select('o.*')
+                ->get();
+        } else {
+            $organizations = DB::table("organizations as o")
+                ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+                ->where('ou.user_id', Auth::id())
+                ->where("nama", "PIBG SMS Muzaffar Syah")
+                ->select('o.*')
+                ->distinct()
+                ->get();
+        }
+
+        return view('fee.update_shirt_size.admin.index', compact("organizations"));
+    }
+
+    // temporary page for users to look at their shirt bought
+    public function buyerUpdateShirtSizeIndex()
+    {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Penjaga')) {
+            return redirect('/home');
+        }
+
+        if (Auth::user()->hasRole('Superadmin')) {
+            $organizations = DB::table("organizations as o")
+                ->where("nama", "PIBG SMS Muzaffar Syah")
+                ->select('o.*')
+                ->get();
+        } else {
+            $organizations = DB::table("organizations as o")
+                ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+                ->where('ou.user_id', Auth::id())
+                ->where("nama", "PIBG SMS Muzaffar Syah")
+                ->select('o.*')
+                ->get();
+        }
+
+        return view('fee.update_shirt_size.buyer.index', compact("organizations"));
+    }
+
+    // temporary page for buyers to choose their shirt size
+    public function editShirtSize(Request $request)
+    {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Penjaga')) {
+            return redirect('/home');
+        }
+
+        $fee = DB::table("fees_new")
+            ->where("id", $request->get('fees_id'))
+            ->select('id', 'name', 'desc', 'quantity', 'price', 'totalAmount')
+            ->first();
+
+        $organization = DB::table("organizations as o")
+            ->join('organization_user as ou', 'o.id', '=', 'ou.organization_id')
+            ->where('ou.user_id', Auth::id())
+            ->where("nama", "PIBG SMS Muzaffar Syah")
+            ->select('o.*')
+            ->get();
+
+        $studentId = $request->get("student_id");
+        $shirtSize = null;
+        $responseId = null;
+        $shirtSizeResponses = DB::table("shirt_size_responses")->get();
+
+        foreach ($shirtSizeResponses as $response) {
+            $data = json_decode($response->response);
+
+            if ($fee->id == $data->fees_id && $data->student_id == $studentId && $data->user_id == Auth::id()) {
+                $shirtSize = $data->shirt_size;
+                $responseId = $response->id;
+                break;
+            }
+        }
+
+
+        return view('fee.update_shirt_size.buyer.edit', compact("fee", "organization", "studentId", "shirtSize", "responseId"));
+    }
+
+    // temporary function for users to update their shirt size
+    public function updateShirtSize(Request $request)
+    {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Penjaga')) {
+            return redirect('/home');
+        }
+
+        $responseId = $request->get('response_id');
+        if ($responseId == null) {
+            // if user has not chosen shirt size before, create new response
+            $response = array(
+                "shirt_size" => $request->get("shirt_size"),
+                "fees_id" => $request->get("fees_id"),
+                "user_id" => Auth::id(),
+                "student_id" => $request->get('student_id')
+            );
+
+            $jsonResponse = json_encode($response);
+
+            DB::table("shirt_size_responses")
+                ->insert([
+                    "response" => $jsonResponse
+                ]);
+        } else {
+            // if user has already chose shirt size before, update their previous response
+            $response = array(
+                "shirt_size" => $request->get("shirt_size"),
+                "fees_id" => $request->get("fees_id"),
+                "user_id" => Auth::id(),
+                "student_id" => $request->get('student_id')
+            );
+
+            DB::table("shirt_size_responses")
+                ->update([
+                    "response" => $response
+                ]);
+        }
+
+        return redirect()->route('fees.updateShirtSize.buyer.index')->with('success', 'Kemaskini baju anda telah disimpan.');
+    }
+
+    // temporary method for frontend to get data about shirt yuran
+    public function getShirtYuranDatatable(Request $request)
+    {
+        $user_id = Auth::id();
+
+        if ($user_id == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Penjaga')) {
+            return redirect('/home');
+        }
+
+        $organization_id = $request->get('oid');
+
+        if (Auth::user()->hasRole('Superadmin')) {
+            $feesPaid = DB::table("fees_new as fn")
+                ->join('student_fees_new as sfn', 'fn.id', '=', 'sfn.fees_id')
+                ->where("fn.organization_id", $organization_id)
+                ->where('sfn.status', 'Paid')
+                ->where('fn.name', 'LIKE', '%BAJU%')
+                ->select('fn.id', 'fn.name', 'fn.desc', 'fn.quantity', 'fn.price', 'fn.totalAmount')
+                ->get();
+        } else {
+            $feesPaid = DB::table("fees_new as fn")
+                ->join('student_fees_new as sfn', 'fn.id', '=', 'sfn.fees_id')
+                ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+                ->join('students as s', 'cs.student_id', '=', 's.id')
+                ->join('organization_user_student as ous', 'ous.student_id', '=', 's.id')
+                ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                ->where("fn.organization_id", $organization_id)
+                ->where('sfn.status', 'Paid')
+                ->where('ou.user_id', $user_id)
+                ->where('fn.name', 'LIKE', '%BAJU%')
+                ->select('fn.id', 'fn.name as fee_name', 'fn.desc', 'fn.quantity', 'fn.price', 'fn.totalAmount', 's.id as student_id', 's.nama as student_name')
+                ->get();
+        }
+
+        $shirtSizeResponses = DB::table("shirt_size_responses")->get();
+
+        $table = Datatables::of($feesPaid);
+
+        $table->addColumn('action', function ($row) {
+            return "<div class='d-flex justify-content-center'>" .
+                "<a class='btn btn-primary' href='" .
+                route('fees.updateShirtSize.buyer.editShirtSize', ['fees_id' => $row->id, 'student_id' => $row->student_id]) .
+                "'>Kemaskini</a>" .
+                "</div>";
+        });
+
+        return $table->make(true);
+    }
+
+    // temporary method for frontend to get responses (updated shirt size)
+    public function getShirtSizeResponsesDatatable()
+    {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Pentadbir') && !Auth::user()->hasRole('Guru')) {
+            return redirect('/home');
+        }
+
+        $responses = DB::table("shirt_size_responses")->get();
+
+        $table = Datatables::of($responses)
+            ->addColumn('fee_name', function ($row) {
+                $response = json_decode($row->response);
+
+                $feeName = DB::table("fees_new")
+                    ->where("id", $response->fees_id)
+                    ->select("name")
+                    ->value('name');
+
+                return $feeName;
+            })
+            ->addColumn('desc', function ($row) {
+                $response = json_decode($row->response);
+
+                $desc = DB::table("fees_new")
+                    ->where("id", $response->fees_id)
+                    ->select("desc")
+                    ->value('desc');
+
+                return $desc;
+            })
+            ->addColumn('quantity', function ($row) {
+                $response = json_decode($row->response);
+
+                $feeQuantity = DB::table("fees_new")
+                    ->where("id", $response->fees_id)
+                    ->select("quantity")
+                    ->value('quantity');
+
+                return $feeQuantity;
+            })
+            ->addColumn('price', function ($row) {
+                $response = json_decode($row->response);
+
+                $price = DB::table("fees_new")
+                    ->where("id", $response->fees_id)
+                    ->select("price")
+                    ->value('price');
+
+                return $price;
+            })
+            ->addColumn('total_amount', function ($row) {
+                $response = json_decode($row->response);
+
+                $totalAmount = DB::table("fees_new")
+                    ->where("id", $response->fees_id)
+                    ->select("totalAmount")
+                    ->value('totalAmount');
+
+                return $totalAmount;
+            })
+            ->addColumn('penjaga_name', function ($row) {
+                $response = json_decode($row->response);
+
+                $penjagaName = DB::table("users")
+                    ->where("id", $response->user_id)
+                    ->select("name")
+                    ->value('name');
+
+                return $penjagaName;
+            })
+            ->addColumn('student_name', function ($row) {
+                $response = json_decode($row->response);
+
+                $studentName = DB::table("students")
+                    ->where("id", $response->student_id)
+                    ->select("nama")
+                    ->value('nama');
+
+                return $studentName;
+            })
+            ->addColumn('shirt_size', function ($row) {
+                $response = json_decode($row->response);
+
+                return $response->shirt_size;
+            });
+
+        return $table->make(true);
+    }
+
     public function getOrganizationByUserId()
     {
         $userId = Auth::id();

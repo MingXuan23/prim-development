@@ -275,6 +275,15 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/add/C', 'FeesController@createCategoryC')->name('fees.createC');
     Route::post('/store/C', 'FeesController@StoreCategoryC')->name('fees.storeC');
 
+    // pages and routes for updating tshirt size (temporary)
+    Route::get('/update-shirt-size/buyer/index', 'FeesController@buyerUpdateShirtSizeIndex')->name('fees.updateShirtSize.buyer.index');
+    Route::get('/update-shirt-size/buyer/getShirtYuranDatatable', 'FeesController@getShirtYuranDatatable')->name('fees.updateShirtSize.getShirtYuranDatatable');
+    Route::get('/update-shirt-size/buyer/editShirtSize', 'FeesController@editShirtSize')->name('fees.updateShirtSize.buyer.editShirtSize');
+    Route::put('/update-shirt-size/updateShirtSize', 'FeesController@updateShirtSize')->name('fees.updateShirtSize.updateShirtSize');
+    // page for admins to view shirt size updated by buyer
+    Route::get('/update-shirt-size/admin/index', 'FeesController@adminUpdateShirtSizeIndex')->name('fees.updateShirtSize.admin.index');
+    Route::get('/update-shirt-size/admin/getShirtSizeResponsesDatatable', 'FeesController@getShirtSizeResponsesDatatable')->name('fees.updateShirtSize.admin.getShirtSizeResponsesDatatable');
+
     // page and route for editing fee details
     Route::get('/edit', 'FeesController@edit')->name('fees.edit');
     Route::patch('/update', 'FeesController@update')->name('fees.update');
