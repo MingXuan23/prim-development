@@ -368,7 +368,7 @@ class FeesController extends AppBaseController
     }
 
     // temporary method for frontend to get responses (updated shirt size)
-    public function getShirtSizeResponsesDatatable()
+    public function getShirtSizeResponsesDatatable(Request $request)
     {
         if (Auth::id() == null) {
             return redirect('/login');
@@ -378,7 +378,9 @@ class FeesController extends AppBaseController
             return redirect('/home');
         }
 
-        $responses = DB::table("form_responses")->get();
+        $oid = $request->get('oid');
+
+        $responses = DB::table("form_responses")->where('organization_id', $oid)->get();
 
         $table = Datatables::of($responses)
             ->addColumn('fee_name', function ($row) {
