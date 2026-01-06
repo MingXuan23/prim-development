@@ -117,7 +117,7 @@
                 ordering: true,
                 processing: true,
                 serverSide: true,
-                dom: 'B',
+                dom: 'Bfrtip',
                 buttons: [
                     {
                         extend: 'excelHtml5',
