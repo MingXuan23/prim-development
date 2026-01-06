@@ -49,7 +49,7 @@
 
                     <div class="form-group">
                         <label>Organisasi</label>
-                        <select name="organization" id="organization" class="form-control" readonly>
+                        <select name="organization" id="organization" class="form-control" disabled>
                             <!-- <option value="" disabled>Pilih Organisasi</option> -->
                             @foreach($organizations as $row)
                                 <option value="{{ $row->id }}">{{ $row->nama }}</option>
@@ -131,10 +131,7 @@
                 ],
                 ajax: {
                     url: "{{ route('fees.updateShirtSize.admin.getShirtSizeResponsesDatatable') }}",
-                    method: "GET",
-                    data: {
-                        oid: $('#organization').val()
-                    }
+                    method: "GET"
                 },
                 'columnDefs': [{
                     "targets": [0, 1, 2, 3, 4, 5, 6, 7],
