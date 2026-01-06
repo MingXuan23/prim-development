@@ -283,7 +283,6 @@ Route::group(['prefix' => 'fees'], function () {
     // page for admins to view shirt size updated by buyer
     Route::get('/update-shirt-size/admin/index', 'FeesController@adminUpdateShirtSizeIndex')->name('fees.updateShirtSize.admin.index');
     Route::get('/update-shirt-size/admin/getShirtSizeResponsesDatatable', 'FeesController@getShirtSizeResponsesDatatable')->name('fees.updateShirtSize.admin.getShirtSizeResponsesDatatable');
-    Route::post('/update-shirt-size/admin/exportFormResponses', 'FeesController@exportFormResponses')->name('fees.updateShirtSize.admin.exportFormResponses');
 
     // page and route for editing fee details
     Route::get('/edit', 'FeesController@edit')->name('fees.edit');

@@ -425,19 +425,6 @@ class FeesController extends AppBaseController
         return $table->make(true);
     }
 
-    public function exportFormResponses()
-    {
-        if (Auth::id() == null) {
-            return redirect('/login');
-        }
-
-        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Pentadbir') && !Auth::user()->hasRole('Guru')) {
-            return redirect('/home');
-        }
-
-        return Excel::download(new FormResponsesExport(), "SAIZ BAJU PIBG SMS MUZAFFAR SYAH.xlsx");
-    }
-
     public function getOrganizationByUserId()
     {
         $userId = Auth::id();

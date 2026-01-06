@@ -3,6 +3,9 @@
 @include('layouts.datatable')
 @section('css')
     <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{ URL::asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ URL::asset('assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+
     <style>
         .errorMessage {
             color: red;
@@ -54,11 +57,6 @@
                         </select>
                     </div>
 
-                    <div>
-                        <a style="margin: 1px;" href="#" class="btn btn-success" data-toggle="modal" data-target="#exportModal"
-                            id="exportModalBtn"> <i class="fas fa-plus"></i> Export</a>
-                    </div>
-
                 </div>
 
                 <div class="col-md-12">
@@ -82,39 +80,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-                    aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Export Pengemaskinian Saiz Baju</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            
-                            <form action="{{ route('fees.updateShirtSize.admin.exportFormResponses') }}" method="post">
-                                <div class="modal-body">
-                                    {{ csrf_field() }}
-                                    <div class="form-group" id="organization">
-                                        <label>Organisasi</label>
-                                        <select name="organExport" id="organExport" class="form-control" disabled>
-                                            <!-- <option value="" disabled selected>Pilih organisasi</option> -->
-                                            @foreach($organizations as $row)
-                                                <option value="{{ $row->id }}" selected>{{ $row->nama }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -131,6 +96,10 @@
     <script src="{{ URL::asset('assets/libs/parsleyjs/parsleyjs.min.js')}}"></script>
     <script src="{{ URL::asset('assets/js/pages/dashboard.init.js')}}"></script>
     <script src="{{ URL::asset('assets/libs/bootstrap-datepicker/bootstrap-datepicker.min.js') }}" defer></script>
+    <script src="{{ URL::asset('assets/jszip/3.10.1/jszip.min.js')}}"></script>
+    <script src="{{ URL::asset('assets/libs/jszip/jszip.min.js') }} "></script>
+    <script src="{{ URL::asset('assets/js/dataTables.buttons.min.js')}}"></script>
+    <script src="{{ URL::asset('assets/js/pages/buttons.html5.min.js')}}"></script>
 
     <script>
         $(document).ready(function () {
@@ -148,6 +117,18 @@
                 ordering: true,
                 processing: true,
                 serverSide: true,
+                dom: 'B',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Export',
+                        className: 'btn btn-success mb-2',
+                        title: 'Pengemaskinian Saiz Baju',
+                        exportOptions: {
+                            columns: ':not(:first-child)'  // exclude the indexing
+                        }
+                    }
+                ],
                 ajax: {
                     url: "{{ route('fees.updateShirtSize.admin.getShirtSizeResponsesDatatable') }}",
                     method: "GET"
