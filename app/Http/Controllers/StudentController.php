@@ -1357,6 +1357,8 @@ class StudentController extends Controller
             ->orderBy('classes.nama')
             ->first();
 
+        dd($id);
+
         $listclass = DB::table('classes')
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('classes.id as id', 'classes.nama', 'classes.levelid')
