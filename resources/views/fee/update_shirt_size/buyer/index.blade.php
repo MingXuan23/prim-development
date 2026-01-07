@@ -69,6 +69,8 @@
                                         <th>Harga (RM)</th>
                                         <th>Jumlah (RM)</th>
                                         <th>Nama Pelajar</th>
+                                        <th>Shirt Size</th>
+                                        <th>Nota Kepada Sekolah</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -97,75 +99,85 @@
         $(document).ready(function () {
 
             // $('#organization').change(function () {
-                // if ($(this).val() != '') {
-                    var yuranTable = $('#yuranTable');
+            // if ($(this).val() != '') {
+            var yuranTable = $('#yuranTable');
 
-                    // remove the initial data when the classes selection is being reselected
-                    yuranTable.DataTable().clear().destroy();
+            // remove the initial data when the classes selection is being reselected
+            yuranTable.DataTable().clear().destroy();
 
-                    // add data to the yuran table to display all students with respective exportAllYuranStatus
-                    yuranTable = yuranTable.DataTable({
-                        ordering: true,
-                        processing: true,
-                        serverSide: true,
-                        ajax: {
-                            url: "{{ route('fees.updateShirtSize.getShirtYuranDatatable') }}",
-                            method: "GET",
-                            data: {
-                                oid: $('#organization').val()
-                            }
+            // add data to the yuran table to display all students with respective exportAllYuranStatus
+            yuranTable = yuranTable.DataTable({
+                ordering: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('fees.updateShirtSize.getShirtYuranDatatable') }}",
+                    method: "GET",
+                    data: {
+                        oid: $('#organization').val()
+                    }
+                },
+                'columnDefs': [{
+                    "targets": [0, 1, 2, 3, 4, 5, 6],
+                    "className": "text-center",
+                    "width": "2%"
+                }],
+                order: [
+                    [1, 'asc']
+                ],
+                columns: [
+                    {
+                        "data": null,
+                        searchable: false,
+                        "sortable": false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
                         },
-                        'columnDefs': [{
-                            "targets": [0, 1, 2, 3, 4, 5, 6],
-                            "className": "text-center",
-                            "width": "2%"
-                        }],
-                        order: [
-                            [1, 'asc']
-                        ],
-                        columns: [
-                            {
-                                "data": null,
-                                searchable: false,
-                                "sortable": false,
-                                render: function (data, type, row, meta) {
-                                    return meta.row + meta.settings._iDisplayStart + 1;
-                                },
-                                "width": "5%"
-                            },
-                            {
-                                data: "fee_name",
-                                name: "fee_name",
-                                "width": "20%"
-                            },
-                            {
-                                data: "quantity",
-                                name: "quantity",
-                                "width": "5%"
-                            },
-                            {
-                                data: "price",
-                                name: "price",
-                                "width": "5%"
-                            },
-                            {
-                                data: "totalAmount",
-                                name: "totalAmount",
-                                "width": "5%"
-                            },
-                            {
-                                data: "student_name",
-                                name: "student_name",
-                                "width": "20%"
-                            },
-                            {
-                                data: "action",
-                                name: "action",
-                                "width": "10%"
-                            },
-                        ]
-                    })
-                // }
+                        "width": "2%"
+                    },
+                    {
+                        data: "fee_name",
+                        name: "fee_name",
+                        "width": "20%"
+                    },
+                    {
+                        data: "quantity",
+                        name: "quantity",
+                        "width": "2%"
+                    },
+                    {
+                        data: "price",
+                        name: "price",
+                        "width": "2%"
+                    },
+                    {
+                        data: "totalAmount",
+                        name: "totalAmount",
+                        "width": "2%"
+                    },
+                    {
+                        data: "student_name",
+                        name: "student_name",
+                        "width": "20%"
+                    },
+                    {
+                        data: "shirt_size",
+                        name: "shirt_size",
+                        "width": "3%"
+                    },
+                    {
+                        data: "notes_to_school",
+                        name: "notes_to_school",
+                        "width": "20%"
+                    },
+                    {
+                        data: "action",
+                        name: "action",
+                        "width": "10%"
+                    },
+                ]
+            })
+            // }
             // });
 
             // $('#organization').on('change', function () {

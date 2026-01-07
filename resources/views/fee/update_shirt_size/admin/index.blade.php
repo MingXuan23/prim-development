@@ -3,8 +3,10 @@
 @include('layouts.datatable')
 @section('css')
     <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
-    <link href="{{ URL::asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ URL::asset('assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ URL::asset('assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}" rel="stylesheet"
+        type="text/css" />
+    <link href="{{ URL::asset('assets/libs/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css') }}" rel="stylesheet"
+        type="text/css" />
 
     <style>
         .errorMessage {
@@ -74,6 +76,7 @@
                                         <th>Nama Penjaga</th>
                                         <th>Nama Pelajar</th>
                                         <th>Saiz Baju</th>
+                                        <th>Nota Kepada Sekolah</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -188,6 +191,11 @@
                         data: "shirt_size",
                         name: "shirt_size",
                         "width": "3%"
+                    },
+                    {
+                        data: "notes_to_school",
+                        name: "notes_to_school",
+                        "width": "20%"
                     }
                 ]
             })

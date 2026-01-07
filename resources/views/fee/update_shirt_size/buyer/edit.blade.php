@@ -106,9 +106,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Penerangan</label>
-                        <textarea name="description" class="form-control" placeholder="Penerangan" cols="30" rows="5"
-                            readonly>{{ $fee->desc }}</textarea>
+                        <label>Nota kepada sekolah (Optional)</label>
+                        <textarea name="notes_to_school" class="form-control" placeholder="Nota kepada sekolah" cols="30" rows="5">{{ $notesToSchool }}</textarea>
                     </div>
 
                     <div class="form-group mb-0">
