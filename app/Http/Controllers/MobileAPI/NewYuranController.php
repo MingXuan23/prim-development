@@ -511,9 +511,34 @@ class NewYuranController extends Controller
     public function receipt(Request $request, $transactionId)
     {
         try {
+            $token = $request->query('token');
+            $deviceToken = $request->query('device_token');
+            $forceLogoutUrl = 'https://prim.my/mobile/force-logout';
+
+            if (!$token) {
+                return redirect()->away($forceLogoutUrl);
+            }
+
+            $session = DB::table('user_token')
+                ->where('api_token', $token)
+                ->where('expired_at', '>', now())
+                ->first();
+
+            if (!$session) {
+                return redirect()->away($forceLogoutUrl);
+            }
+
+            if ($session->device_token && $session->device_token !== $deviceToken) {
+                return redirect()->away($forceLogoutUrl);
+            }
+
             $transaction = Transaction::find($transactionId);
             if (!$transaction) {
                 abort(404, 'Transaction not found.');
+            }
+
+            if ($transaction->user_id != $session->user_id) {
+                abort(403, 'Unauthorized access to this receipt.');
             }
 
             $getparent = null;
@@ -1809,7 +1834,7 @@ class NewYuranController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'No. Kad Pengenalan telah wujud.',
-                'errors' => ['icno' => ['The IC No. has already been taken.']]
+                'errors' => ['icno' => ['No. Kad Pengenalan telah didaftarkan.']]
             ], 422);
         }
 
@@ -2308,6 +2333,17 @@ class NewYuranController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function checkAuthStatus(Request $request)
+    {
+        return response()->json(
+            [
+                'success' => true,
+                'message' => 'Session and device are valid.'
+            ]
+
+        );
     }
 
     // admin test FCM cron notification
