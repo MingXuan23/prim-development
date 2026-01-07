@@ -85,6 +85,7 @@ Route::group(['prefix' => 'mobile'], function () {
             Route::post('deletePostComment', 'MobileAPI\NewYuranController@deletePostComment');
             Route::post('updatePostComment', 'MobileAPI\NewYuranController@updatePostComment');
             Route::post('getPostLikesUser', 'MobileAPI\NewYuranController@getPostLikesUser');
+            Route::post('checkAuthStatus', 'MobileAPI\NewYuranController@checkAuthStatus');
         });
 
         //outside
