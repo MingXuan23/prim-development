@@ -243,7 +243,7 @@ class FeesController extends AppBaseController
 
             if ($fee->id == $data->fees_id && $data->student_id == $studentId && $response->user_id == Auth::id()) {
                 $shirtSize = $data->shirt_size;
-                $notesToSchool = $data->notes_to_school;
+                $notesToSchool = $data->notes_to_school ?? '';
                 $responseId = $response->id;
                 break;
             }
