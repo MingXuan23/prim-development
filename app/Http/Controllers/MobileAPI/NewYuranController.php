@@ -792,6 +792,9 @@ class NewYuranController extends Controller
                     $inputValue = trim($request->input($field));
 
                     if ($inputValue !== '') {
+                        if ($field === 'icno') {
+                            $inputValue = str_replace('-', '', $inputValue);
+                        }
                         $newData[$field] = $inputValue;
                     } else {
                         if (!empty($currentUser->$field)) {
